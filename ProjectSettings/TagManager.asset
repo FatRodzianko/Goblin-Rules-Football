@@ -11,6 +11,7 @@ TagManager:
   - goblin-body
   - punchbox
   - hurtbox
+  - camera
   layers:
   - Default
   - TransparentFX

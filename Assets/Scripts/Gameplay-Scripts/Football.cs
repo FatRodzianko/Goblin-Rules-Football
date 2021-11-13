@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using Cinemachine;
 public class Football : NetworkBehaviour
 {
     [Header("State of the Ball")]
     [SyncVar(hook = nameof(HandleIsHeld))] public bool isHeld;
     [SyncVar] public bool isOnGround;
-    [SyncVar] public bool isThrown;
+    [SyncVar(hook = nameof(HandleIsThrown))] public bool isThrown;
     [SyncVar] public bool isFalling;
 
     [Header("Ball Components")]
@@ -29,12 +30,16 @@ public class Football : NetworkBehaviour
     [SyncVar] public bool isFumbled = false;
     public float fumbleCount = 0.0f;
 
+    [SerializeField] public CinemachineVirtualCamera myCamera;
+    public GamePlayer localPlayer;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
         myRenderer.enabled = true;
         myCollider.enabled = true;
 
+        myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
     }
     // Start is called before the first frame update
     void Start()
@@ -328,5 +333,20 @@ public class Football : NetworkBehaviour
         isFumbled = true;
         animator.SetBool("isFumbled", true);
 
+    }
+    void HandleIsThrown(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            isThrown = newValue;
+        if (isClient)
+        {
+            if (!newValue)
+            {
+                if (myCamera.Follow == this.transform)
+                {
+                    localPlayer.FollowSelectedGoblin(localPlayer.selectGoblin.transform);
+                }
+            }
+        }
     }
 }

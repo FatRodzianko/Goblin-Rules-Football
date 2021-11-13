@@ -8,12 +8,14 @@ public class GoblinScript : NetworkBehaviour
     public float pressedTime = 0f;
     public float releasedTime = 0f;
 
+
     [Header("Player Owner Info")]
     [SyncVar] public string ownerName;
     [SyncVar] public int ownerConnectionId;
     [SyncVar] public int ownerPlayerNumber;
     [SyncVar] public uint ownerNetId;
     public GamePlayer myGamePlayer;
+    
 
     [Header("Goblin Base Stats")]
     [SyncVar] public int MaxHealth;
@@ -204,6 +206,7 @@ public class GoblinScript : NetworkBehaviour
                 if (newValue)
                 {
                     rb.bodyType = RigidbodyType2D.Dynamic;
+                    //myGamePlayer.FollowSelectedGoblin(this.transform);
                 }
                 else
                 {

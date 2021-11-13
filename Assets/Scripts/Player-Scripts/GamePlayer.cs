@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using System.Linq;
 using System;
+using Cinemachine;
 
 public class GamePlayer : NetworkBehaviour
 {
@@ -34,6 +35,9 @@ public class GamePlayer : NetworkBehaviour
     [Header("Football")]
     [SerializeField] private GameObject footballPrefab;
 
+    [SerializeField] CinemachineVirtualCamera myCamera;
+    public Football football;
+
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -62,6 +66,8 @@ public class GamePlayer : NetworkBehaviour
         InputManager.Controls.Player.Block.performed += _ => StartBlockGoblin();
         InputManager.Controls.Player.Block.canceled += _ => StopBlockGoblin();
 
+        myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
+        
     }
 
     public override void OnStartClient()
@@ -78,7 +84,14 @@ public class GamePlayer : NetworkBehaviour
             CmdSpawnPlayerCharacters();
 
         }
-            
+        if (hasAuthority)
+        {
+            football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+            if (football)
+                football.localPlayer = this;
+        }
+        
+
     }
     [Command]
     void CmdSpawnFootball()
@@ -185,6 +198,7 @@ public class GamePlayer : NetworkBehaviour
         {
             GoblinToAdd.SelectThisCharacter();
             selectGoblin = GoblinToAdd;
+            FollowSelectedGoblin(selectGoblin.transform);
         }
         else if (!qGoblin)
         {
@@ -230,6 +244,11 @@ public class GamePlayer : NetworkBehaviour
                 currentSelectedGoblin.ThrowBall(currentQGoblin);
                 IEnumerator stopSwitch = PreventGoblinSwitch();
                 StartCoroutine(stopSwitch);
+                FollowSelectedGoblin(GameObject.FindGameObjectWithTag("football").transform);
+            }
+            else
+            {
+                FollowSelectedGoblin(selectGoblin.transform);
             }
         }
         
@@ -267,6 +286,11 @@ public class GamePlayer : NetworkBehaviour
 
                 IEnumerator stopSwitch = PreventGoblinSwitch();
                 StartCoroutine(stopSwitch);
+                FollowSelectedGoblin(GameObject.FindGameObjectWithTag("football").transform);
+            }
+            else
+            {
+                FollowSelectedGoblin(selectGoblin.transform);
             }
         }
         
@@ -342,5 +366,8 @@ public class GamePlayer : NetworkBehaviour
             }
         }
     }
-
+    public void FollowSelectedGoblin(Transform goblinToFollow)
+    {
+        myCamera.Follow = goblinToFollow.transform;
+    }
 }
