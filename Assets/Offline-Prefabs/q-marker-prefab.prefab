@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5984786758686278841}
   - component: {fileID: 6282233607900037344}
+  - component: {fileID: 4438744351813706014}
   m_Layer: 0
-  m_Name: q-marker
+  m_Name: q-marker-prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -42,6 +43,7 @@ SpriteRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -82,3 +84,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4438744351813706014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7215489222767727815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9984d2db8d7f2a64ea1e3a7409eac037, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isQ: 1
+  myRenderer: {fileID: 6282233607900037344}
+  normalIcon: {fileID: 21300000, guid: 7222d66ad89644d468937bedbfac915c, type: 3}
+  leftIcon: {fileID: 21300000, guid: 9b58ebe2ccf27f14e84068c1d362c5d1, type: 3}
+  rightIcon: {fileID: 21300000, guid: bb14d3c4fd6eaa24e862c1d029bb679c, type: 3}

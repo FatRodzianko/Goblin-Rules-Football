@@ -32,6 +32,7 @@ public class Football : NetworkBehaviour
 
     [SerializeField] public CinemachineVirtualCamera myCamera;
     public GamePlayer localPlayer;
+    CameraMarker myCameraMarker;
 
     public override void OnStartClient()
     {
@@ -40,6 +41,16 @@ public class Football : NetworkBehaviour
         myCollider.enabled = true;
 
         myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
+        /*TrackFootballScript footballTracker = Camera.main.GetComponent<TrackFootballScript>();
+        if (!footballTracker.myFootball)
+        {
+            footballTracker.myFootball = this.gameObject;
+            footballTracker.myFootballScript = this;
+            footballTracker.doesCameraHaveFootball = true;
+        }*/
+
+        myCameraMarker = Camera.main.GetComponent < CameraMarker > ();
+            
     }
     // Start is called before the first frame update
     void Start()
@@ -62,6 +73,30 @@ public class Football : NetworkBehaviour
             }
                 
         }*/
+    }
+    private void Update()
+    {
+        /*Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1)
+        {
+            Debug.Log("Football is on screen.");
+        }
+        else
+            Debug.Log("Football is OFF screen.");*/
+
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x < 0)
+        {
+            myCameraMarker.ActivateFootballMarker(true, isHeld,this.transform.position.y);
+        }
+        else if (screenPoint.x > 1)
+        {
+            myCameraMarker.ActivateFootballMarker(false, isHeld, this.transform.position.y);
+        }
+        else
+        {
+            myCameraMarker.DeActivateFootballMarker();
+        }
     }
     private void FixedUpdate()
     {
@@ -349,4 +384,13 @@ public class Football : NetworkBehaviour
             }
         }
     }
+    /*private void OnBecameInvisible()
+    {
+        Debug.Log("Football is no longer visibile");
+
+    }
+    private void OnBecameVisible()
+    {
+        Debug.Log("Football IS NOW visibile");
+    }*/
 }

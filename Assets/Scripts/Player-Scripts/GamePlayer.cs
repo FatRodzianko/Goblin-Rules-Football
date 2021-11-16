@@ -67,7 +67,16 @@ public class GamePlayer : NetworkBehaviour
         InputManager.Controls.Player.Block.canceled += _ => StopBlockGoblin();
 
         myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
-        
+
+        /*TrackFootballScript footballTracker = Camera.main.GetComponent<TrackFootballScript>();
+        if (!footballTracker.myPlayer)
+        {
+            footballTracker.myPlayer = this;
+        }*/
+        CameraMarker myCameraMarker = Camera.main.GetComponent<CameraMarker>();
+        if (!myCameraMarker.myPlayer)
+            myCameraMarker.myPlayer = this;
+
     }
 
     public override void OnStartClient()
