@@ -15,6 +15,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public int ownerPlayerNumber;
     [SyncVar] public uint ownerNetId;
     public GamePlayer myGamePlayer;
+    public GamePlayer serverGamePlayer;
     
 
     [Header("Goblin Base Stats")]
@@ -91,6 +92,12 @@ public class GoblinScript : NetworkBehaviour
     [Header("Blocking Info")]
     [SyncVar(hook = nameof(HandleIsBlocking))] public bool isBlocking = false;
 
+    [Header("Kicking Info")]
+    [SyncVar(hook = nameof(HandleIsKicking))] public bool isKicking = false;
+
+    [Header("Can the Goblin Pass stuff")]
+    public Football gameFootball;
+    [SyncVar(hook = nameof(HandleCanGoblinReceivePass))] public bool canGoblinReceivePass = false;
 
 
     [Header("Recovery Enumerator Stuff?")]
@@ -108,7 +115,6 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] private GameObject punchBoxCollider;
     [SerializeField] private GameObject hurtBoxCollider;
     [SerializeField] private GameObject slideBoxCollider;
-
 
     public override void OnStartAuthority()
     {
@@ -131,6 +137,14 @@ public class GoblinScript : NetworkBehaviour
         InputManager.Controls.Player.Sprint.performed += _ => IsPlayerSprinting(true);
         InputManager.Controls.Player.Sprint.canceled += _ => IsPlayerSprinting(false);        
         
+    }
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        if (!gameFootball)
+        {
+            gameFootball = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+        }
     }
     void GoblinStartingPosition(bool isPlayerGameLeader)
     {
@@ -275,6 +289,43 @@ public class GoblinScript : NetworkBehaviour
             if (hasAuthority)
             {
                 eMarker.SetActive(newValue);
+            }
+        }
+    }
+    private void Update()
+    {
+        if (isServer)
+        {
+            // Check if goblin can be passed too?
+            if (serverGamePlayer.doesTeamHaveBall && !doesCharacterHaveBall)
+            {
+                float diffFromFootball = gameFootball.transform.position.x - this.transform.position.x;
+                if (isGoblinGrey)
+                {
+                    if (diffFromFootball <= 0)
+                    {
+                        HandleCanGoblinReceivePass(this.canGoblinReceivePass, true);
+                    }
+                    else
+                    {
+                        HandleCanGoblinReceivePass(this.canGoblinReceivePass, false);
+                    }
+                }
+                else
+                {
+                    if (diffFromFootball >= 0)
+                    {
+                        HandleCanGoblinReceivePass(this.canGoblinReceivePass, true);
+                    }
+                    else
+                    {
+                        HandleCanGoblinReceivePass(this.canGoblinReceivePass, false);
+                    }
+                }
+            }
+            else
+            {
+                HandleCanGoblinReceivePass(this.canGoblinReceivePass, true);
             }
         }
     }
@@ -489,21 +540,26 @@ public class GoblinScript : NetworkBehaviour
     {
         Debug.Log("ThrowBall: Throwing the ball to: " + goblinToThrowTo.gameObject.name);
         Football footballScript = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
-        if (hasAuthority)
+        if (!isKicking && !isDiving)
         {
-            /*IEnumerator throwing = DisableColliderForThrow();
-            //DisableColliderForThrow();
-            StartCoroutine(throwing);*/
-            golbinBodyCollider.enabled = false;
-            CmdStartThrowing();
+            if (hasAuthority)
+            {
+                /*IEnumerator throwing = DisableColliderForThrow();
+                //DisableColliderForThrow();
+                StartCoroutine(throwing);*/
+                golbinBodyCollider.enabled = false;
+                CmdStartThrowing();
+            }
+
+            footballScript.CmdThrowFootball(this.gameObject.GetComponent<NetworkIdentity>().netId, goblinToThrowTo.gameObject.GetComponent<NetworkIdentity>().netId);
         }
-            
-        footballScript.CmdThrowFootball(this.gameObject.GetComponent<NetworkIdentity>().netId, goblinToThrowTo.gameObject.GetComponent<NetworkIdentity>().netId);
+        
     }
     [Command]
     void CmdStartThrowing()
     {
-        this.HandleIsThrowing(isThrowing, true);
+        if(!isKicking && !isDiving)
+            this.HandleIsThrowing(isThrowing, true);
     }
     public void HandleIsThrowing(bool oldValue, bool newValue)
     {
@@ -1159,6 +1215,86 @@ public class GoblinScript : NetworkBehaviour
                 if (newValue && isBlocking)
                     CmdSetBlocking(false);
             }
+        }
+    }
+    public void KickFootballGoblin()
+    {
+        if (hasAuthority && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
+            CmdKickFootball();
+    }
+    [Command]
+    void CmdKickFootball()
+    {
+        if (!isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
+        {
+            HandleIsKicking(this.isKicking, true);
+        }
+    }
+    public void HandleIsKicking(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            isKicking = newValue;
+        if (isClient)
+        {
+            Debug.Log("HandleIsKicking: isClient");
+            if (hasAuthority)
+            {
+                Debug.Log("HandleIsKicking: hasAuthority");
+                if (newValue)
+                {
+                    Debug.Log("HandleIsKicking: start the kick animation");
+                    animator.Play(goblinType + "-kick-football");
+                }
+                    
+            }
+            
+        }
+    }
+    public void KickTheFootball()
+    {
+        Debug.Log("KickTheFootball");
+        if (hasAuthority && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
+            CmdKickTheFootball();
+    }
+    [Command]
+    void CmdKickTheFootball()
+    {
+        HandleHasBall(doesCharacterHaveBall, false);
+        Football footballScript = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+        Vector3 newLocalPosition = footballScript.transform.localPosition;
+        if (myRenderer.flipX)
+        {
+            newLocalPosition.x -= 1.0f;
+        }
+        else
+            newLocalPosition.x += 1.0f;
+        footballScript.transform.localPosition = newLocalPosition;
+
+        footballScript.KickFootballDownField(isGoblinGrey);
+    }
+    public void StopKicking()
+    {
+        Debug.Log("StopKicking");
+        if (hasAuthority)
+            CmdStopKicking();
+    }
+    [Command]
+    void CmdStopKicking()
+    {
+        HandleIsKicking(this.isKicking, false);
+    }
+    public void HandleCanGoblinReceivePass(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            canGoblinReceivePass = newValue;
+        if (isClient)
+        {
+            if (hasAuthority)
+            {
+                qMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(newValue);
+                eMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(newValue);
+            }
+            
         }
     }
 }

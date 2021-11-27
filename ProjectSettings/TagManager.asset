@@ -12,6 +12,8 @@ TagManager:
   - punchbox
   - hurtbox
   - camera
+  - GreyEndZone
+  - GreenEndZone
   layers:
   - Default
   - TransparentFX
@@ -27,7 +29,7 @@ TagManager:
   - goblinPlayers
   - slidebox
   - diving-footbox
-  - 
+  - end-zone
   - 
   - 
   - 

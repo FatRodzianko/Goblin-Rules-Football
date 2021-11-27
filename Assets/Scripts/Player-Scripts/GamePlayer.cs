@@ -27,6 +27,7 @@ public class GamePlayer : NetworkBehaviour
     public GoblinScript qGoblin;
     public GoblinScript eGoblin;
     public bool canSwitchGoblin = true;
+    public GoblinScript serverSelectGoblin;
 
     [Header("Team Info")]
     [SyncVar] public string teamName;
@@ -65,6 +66,7 @@ public class GamePlayer : NetworkBehaviour
         InputManager.Controls.Player.Dive.performed += _ => DiveGoblin();
         InputManager.Controls.Player.Block.performed += _ => StartBlockGoblin();
         InputManager.Controls.Player.Block.canceled += _ => StopBlockGoblin();
+        InputManager.Controls.Player.KickFootball.performed += _ => KickFootball();
 
         myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
 
@@ -151,6 +153,7 @@ public class GamePlayer : NetworkBehaviour
             newGrenadierScript.goblinType = "grenadier";
             if (!IsGameLeader)
                 newGrenadierScript.goblinType += "-grey";
+            newGrenadierScript.serverGamePlayer = this;
 
 
             GameObject newBerserker = Instantiate(berserkerPrefab, transform.position, Quaternion.identity);
@@ -173,7 +176,7 @@ public class GamePlayer : NetworkBehaviour
             newBerserkerScript.goblinType = "berserker";
             if (!IsGameLeader)
                 newBerserkerScript.goblinType += "-grey";
-
+            newBerserkerScript.serverGamePlayer = this;
 
             GameObject newSkirmisher = Instantiate(skrimisherPrefab, transform.position, Quaternion.identity);
             if (IsGameLeader)
@@ -195,6 +198,8 @@ public class GamePlayer : NetworkBehaviour
             newSkirmisherScript.goblinType = "skirmisher";
             if (!IsGameLeader)
                 newSkirmisherScript.goblinType += "-grey";
+
+            newSkirmisherScript.serverGamePlayer = this;
 
             areCharactersSpawnedYet = true;
         }
@@ -226,8 +231,10 @@ public class GamePlayer : NetworkBehaviour
     public void SwitchToQGoblin()
     {
         Debug.Log("SwitchToQGoblin: " + canSwitchGoblin.ToString());
-        if (canSwitchGoblin || qGoblin.doesCharacterHaveBall)
+        if ((canSwitchGoblin && !selectGoblin.isKicking && !selectGoblin.isDiving) || qGoblin.doesCharacterHaveBall)
         {
+            if (doesTeamHaveBall && !qGoblin.canGoblinReceivePass)
+                return;
             GoblinScript currentSelectedGoblin = selectGoblin;
             GoblinScript currentQGoblin = qGoblin;
 
@@ -259,14 +266,17 @@ public class GamePlayer : NetworkBehaviour
             {
                 FollowSelectedGoblin(selectGoblin.transform);
             }
+            CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
         }
         
     }
     public void SwitchToEGoblin()
     {
         Debug.Log("SwitchToEGoblin: " + canSwitchGoblin.ToString());
-        if (canSwitchGoblin || eGoblin.doesCharacterHaveBall)
+        if ((canSwitchGoblin && !selectGoblin.isKicking && !selectGoblin.isDiving) || eGoblin.doesCharacterHaveBall)
         {
+            if (doesTeamHaveBall && !eGoblin.canGoblinReceivePass)
+                return;
             GoblinScript currentSelectedGoblin = selectGoblin;
             GoblinScript currentEGoblin = eGoblin;
 
@@ -301,6 +311,8 @@ public class GamePlayer : NetworkBehaviour
             {
                 FollowSelectedGoblin(selectGoblin.transform);
             }
+            CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
+
         }
         
     }
@@ -378,5 +390,21 @@ public class GamePlayer : NetworkBehaviour
     public void FollowSelectedGoblin(Transform goblinToFollow)
     {
         myCamera.Follow = goblinToFollow.transform;
+    }
+    void KickFootball()
+    {
+        Debug.Log("KickFootball executed ");
+        if (selectGoblin)
+        {
+            if (!selectGoblin.isSliding && !selectGoblin.isDiving && !selectGoblin.isGoblinKnockedOut && !selectGoblin.isPunching)
+            {
+                selectGoblin.KickFootballGoblin();
+            }
+        }
+    }
+    [Command]
+    public void CmdSetSelectedGoblinOnServer(uint goblinNetId)
+    {
+        serverSelectGoblin = NetworkIdentity.spawned[goblinNetId].gameObject.GetComponent<GoblinScript>();
     }
 }

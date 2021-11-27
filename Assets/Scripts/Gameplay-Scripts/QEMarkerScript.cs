@@ -5,11 +5,16 @@ using UnityEngine;
 public class QEMarkerScript : MonoBehaviour
 {
     public bool isQ;
+    public bool canPassToThisGoblin = true;
     CameraMarker myCameraMarker;
 
     Vector3 newPosition = Vector3.zero;
     Vector3 savedLocalPosition;
     Vector3 myTransformPosition;
+
+    [SerializeField] SpriteRenderer myRenderer;
+    [SerializeField] Sprite canPass;
+    [SerializeField] Sprite cannotPass;
 
     // Start is called before the first frame update
     void Start()
@@ -37,11 +42,11 @@ public class QEMarkerScript : MonoBehaviour
         Vector3 screenPoint = Camera.main.WorldToViewportPoint(myTransformPosition);
         if (screenPoint.x < 0)
         {
-            myCameraMarker.ActivateGoblinMarker(true, isQ, this.transform.position.y);
+            myCameraMarker.ActivateGoblinMarker(true, isQ, this.transform.position.y, canPassToThisGoblin);
         }
         else if (screenPoint.x > 1)
         {
-            myCameraMarker.ActivateGoblinMarker(false, isQ, this.transform.position.y);
+            myCameraMarker.ActivateGoblinMarker(false, isQ, this.transform.position.y, canPassToThisGoblin);
         }
         else
         {
@@ -53,5 +58,19 @@ public class QEMarkerScript : MonoBehaviour
     private void FixedUpdate()
     {
         
+    }
+    public void UpdateSpriteForPassing(bool canReceivePass)
+    {
+        if (canReceivePass)
+        {
+            myRenderer.sprite = canPass;
+            canPassToThisGoblin = true;
+        }
+        else
+        {
+            myRenderer.sprite = cannotPass;
+            canPassToThisGoblin = false;
+        }
+            
     }
 }

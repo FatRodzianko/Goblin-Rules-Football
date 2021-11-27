@@ -81,6 +81,14 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""KickFootball"",
+                    ""type"": ""Button"",
+                    ""id"": ""f24a79c5-3d8d-418f-9dcb-b615f69ab95d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -270,6 +278,17 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""action"": ""Block"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""aee29fbb-f9c5-4ae7-86dd-4eb785a0e2d6"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""KickFootball"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -303,6 +322,7 @@ public class @Controls : IInputActionCollection, IDisposable
         m_Player_Slide = m_Player.FindAction("Slide", throwIfNotFound: true);
         m_Player_Dive = m_Player.FindAction("Dive", throwIfNotFound: true);
         m_Player_Block = m_Player.FindAction("Block", throwIfNotFound: true);
+        m_Player_KickFootball = m_Player.FindAction("KickFootball", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -360,6 +380,7 @@ public class @Controls : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Slide;
     private readonly InputAction m_Player_Dive;
     private readonly InputAction m_Player_Block;
+    private readonly InputAction m_Player_KickFootball;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -372,6 +393,7 @@ public class @Controls : IInputActionCollection, IDisposable
         public InputAction @Slide => m_Wrapper.m_Player_Slide;
         public InputAction @Dive => m_Wrapper.m_Player_Dive;
         public InputAction @Block => m_Wrapper.m_Player_Block;
+        public InputAction @KickFootball => m_Wrapper.m_Player_KickFootball;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -405,6 +427,9 @@ public class @Controls : IInputActionCollection, IDisposable
                 @Block.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnBlock;
                 @Block.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnBlock;
                 @Block.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnBlock;
+                @KickFootball.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickFootball;
+                @KickFootball.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickFootball;
+                @KickFootball.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickFootball;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -433,6 +458,9 @@ public class @Controls : IInputActionCollection, IDisposable
                 @Block.started += instance.OnBlock;
                 @Block.performed += instance.OnBlock;
                 @Block.canceled += instance.OnBlock;
+                @KickFootball.started += instance.OnKickFootball;
+                @KickFootball.performed += instance.OnKickFootball;
+                @KickFootball.canceled += instance.OnKickFootball;
             }
         }
     }
@@ -456,5 +484,6 @@ public class @Controls : IInputActionCollection, IDisposable
         void OnSlide(InputAction.CallbackContext context);
         void OnDive(InputAction.CallbackContext context);
         void OnBlock(InputAction.CallbackContext context);
+        void OnKickFootball(InputAction.CallbackContext context);
     }
 }

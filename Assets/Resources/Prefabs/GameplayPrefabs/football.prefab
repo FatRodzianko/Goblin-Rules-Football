@@ -172,6 +172,7 @@ MonoBehaviour:
   isOnGround: 0
   isThrown: 0
   isFalling: 0
+  goblinWithBall: {fileID: 0}
   myRenderer: {fileID: 7510187484870184807}
   myCollider: {fileID: 7510187484870184806}
   myRigidBody: {fileID: 7510187484870184801}
@@ -184,6 +185,17 @@ MonoBehaviour:
   distanceTraveled: 0
   isFumbled: 0
   fumbleCount: 0
+  isKicked: 0
+  kickCount: 0
+  kickCountModifier: 0.5
+  minKickDist: 10
+  maxKickDist: 40
+  footballShadowPrefab: {fileID: 6110733450249199357, guid: 940fbaf286f5276479de05888960ef80, type: 3}
+  footballLandingTargetPrefab: {fileID: 8210455033227271828, guid: f84d24a960000bf4f99e022d525534ad, type: 3}
+  localKickCount: 0
+  localKickCountModifier: 0
+  myCamera: {fileID: 0}
+  localPlayer: {fileID: 0}
 --- !u!95 &573848318654464580
 Animator:
   serializedVersion: 3

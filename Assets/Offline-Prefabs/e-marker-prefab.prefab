@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9984d2db8d7f2a64ea1e3a7409eac037, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isQ: 0
   myRenderer: {fileID: 6265392432951054077}
-  normalIcon: {fileID: 21300000, guid: 5f724f321d654b648959102f5ea6e9ad, type: 3}
-  leftIcon: {fileID: 21300000, guid: da33b1e0fc9a36848ae5f1357d0b58ed, type: 3}
-  rightIcon: {fileID: 21300000, guid: c0583ccd2cfaa1743b64452181087579, type: 3}
+  canPass: {fileID: 21300000, guid: 5f724f321d654b648959102f5ea6e9ad, type: 3}
+  cannotPass: {fileID: 21300000, guid: 29aef983c0b64db4291a39d131d040d3, type: 3}

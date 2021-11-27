@@ -98,6 +98,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isQ: 1
   myRenderer: {fileID: 6282233607900037344}
-  normalIcon: {fileID: 21300000, guid: 7222d66ad89644d468937bedbfac915c, type: 3}
-  leftIcon: {fileID: 21300000, guid: 9b58ebe2ccf27f14e84068c1d362c5d1, type: 3}
-  rightIcon: {fileID: 21300000, guid: bb14d3c4fd6eaa24e862c1d029bb679c, type: 3}
+  canPass: {fileID: 21300000, guid: 7222d66ad89644d468937bedbfac915c, type: 3}
+  cannotPass: {fileID: 21300000, guid: 5485765da1aeef94f8c6b3c201814abb, type: 3}

@@ -10,6 +10,7 @@ public class Football : NetworkBehaviour
     [SyncVar] public bool isOnGround;
     [SyncVar(hook = nameof(HandleIsThrown))] public bool isThrown;
     [SyncVar] public bool isFalling;
+    public GoblinScript goblinWithBall;
 
     [Header("Ball Components")]
     [SerializeField] private SpriteRenderer myRenderer;
@@ -29,6 +30,30 @@ public class Football : NetworkBehaviour
     Vector3[] FumblePoints = new Vector3[3];
     [SyncVar] public bool isFumbled = false;
     public float fumbleCount = 0.0f;
+
+    [Header("Kicked Football")]
+    Vector3[] KickedBallPoints = new Vector3[3];
+    [SyncVar(hook = nameof(HandleIsKicked))] public bool isKicked = false;
+    public float kickCount = 0.0f;
+    public float kickCountModifier = 0.5f;
+    public float minKickDist = 10f;
+    public float maxKickDist = 40f;
+    public float xDistanceOfKick = 0.0f;
+    [SerializeField] GameObject footballShadowPrefab;
+    GameObject footballShadowObject;
+    [SerializeField] GameObject footballLandingTargetPrefab;
+    GameObject footballLandingTargetObject;
+    public float localKickCount = 0.0f;
+    public float localKickCountModifier;
+    Vector3 localShadowStartPosition = Vector3.zero;
+    Vector3 localShadowEndPosition = Vector3.zero;
+
+    [Header("Football Bounces")]
+    [SyncVar] public bool isBouncing;
+    [SyncVar] public int numberOfBounces;
+    float bounceProgressCount = 0.0f;
+    bool bounceForward = false;
+    Vector3[] BouncingBallPoints = new Vector3[3];
 
     [SerializeField] public CinemachineVirtualCamera myCamera;
     public GamePlayer localPlayer;
@@ -50,7 +75,16 @@ public class Football : NetworkBehaviour
         }*/
 
         myCameraMarker = Camera.main.GetComponent < CameraMarker > ();
-            
+
+        footballShadowObject = Instantiate(footballShadowPrefab, this.transform);
+        footballShadowObject.SetActive(false);
+        footballShadowObject.transform.localPosition = Vector3.zero;
+
+        /*footballLandingTargetObject = Instantiate(footballLandingTargetPrefab, this.transform);
+        footballLandingTargetObject.SetActive(false);
+        footballLandingTargetObject.transform.localPosition = Vector3.zero;*/
+
+
     }
     // Start is called before the first frame update
     void Start()
@@ -96,6 +130,27 @@ public class Football : NetworkBehaviour
         else
         {
             myCameraMarker.DeActivateFootballMarker();
+        }
+
+        if (isClient)
+        {
+            if ((isKicked || isBouncing) && !isHeld)
+            {
+                if (localKickCount < 1.0f)
+                {
+                    localKickCount += localKickCountModifier * Time.deltaTime;
+                    Vector3 localM1 = Vector3.Lerp(localShadowStartPosition, localShadowEndPosition, localKickCount);
+                    footballShadowObject.transform.position = localM1;
+                    if (localKickCount >= 1.0f)
+                    {
+                        footballShadowObject.SetActive(false);
+                    }
+                }
+                else
+                {
+                    footballShadowObject.SetActive(false);
+                }
+            }
         }
     }
     private void FixedUpdate()
@@ -190,8 +245,53 @@ public class Football : NetworkBehaviour
                     
 
             }
+            if (isKicked && !isHeld)
+            {
+                if (kickCount < 1.0f)
+                {
+                    kickCount += kickCountModifier * Time.fixedDeltaTime;
+                    Vector3 m1 = Vector3.Lerp(KickedBallPoints[0], KickedBallPoints[1], kickCount);
+                    Vector3 m2 = Vector3.Lerp(KickedBallPoints[1], KickedBallPoints[2], kickCount);
+                    this.transform.position = Vector3.Lerp(m1, m2, kickCount);
+                    if (kickCount >= 1.0f)
+                    {
+                        //isKicked = false;
+                        HandleIsKicked(this.isKicked, false);
+                        //animator.SetBool("isFumbled", false);
+                        RpcActivateFootballShadow(false);
+                    }
+                }
+                else
+                {
+                    //isKicked = false;
+                    HandleIsKicked(this.isKicked, false);
+                    //animator.SetBool("isFumbled", false);
+                    RpcActivateFootballShadow(false);
+                }
+            }
+            if (isBouncing && !isHeld)
+            {
+                if (bounceProgressCount < 1.0f)
+                {
+                    bounceProgressCount += 2.0f * Time.fixedDeltaTime;
+                    Vector3 m1 = Vector3.Lerp(BouncingBallPoints[0], BouncingBallPoints[1], bounceProgressCount);
+                    Vector3 m2 = Vector3.Lerp(BouncingBallPoints[1], BouncingBallPoints[2], bounceProgressCount);
+                    this.transform.position = Vector3.Lerp(m1, m2, bounceProgressCount);
+                    if (bounceProgressCount >= 1.0f)
+                    {
+                        BounceFootball(false);
+                    }
+                }
+                else
+                {
+                    BounceFootball(false);
+                }
+
+
+            }
 
         }
+        
     }
     public IEnumerator FallDown()
     {
@@ -251,12 +351,12 @@ public class Football : NetworkBehaviour
     public void PlayerPickUpFootball(uint goblinNetId)
     {
         Debug.Log("PlayerPickUpFootball");
-        if (!isHeld)
+        if (!isHeld && !isKicked) // replace "isKicked" with something that makes it so the football can only be caught near the beginning and end of the kicking arc
         {
             GameObject goblinToCheck = NetworkIdentity.spawned[goblinNetId].gameObject;
             GoblinScript goblinToCheckScript = goblinToCheck.GetComponent<GoblinScript>();            
             
-            if (!goblinToCheckScript.isGoblinKnockedOut && !goblinToCheckScript.isSliding && !goblinToCheckScript.isDiving && !goblinToCheckScript.isBlocking && !goblinToCheckScript.isPunching)
+            if (!goblinToCheckScript.isGoblinKnockedOut && !goblinToCheckScript.isSliding && !goblinToCheckScript.isDiving && !goblinToCheckScript.isBlocking && !goblinToCheckScript.isPunching && !goblinToCheckScript.isKicking)
             {
                 float distanceToBall = Vector3.Distance(goblinToCheck.transform.position, this.transform.position);
                 Debug.Log("CmdPlayerPickUpFootball: distance to ball is: " + distanceToBall.ToString() + " from goblin with netid of " + goblinNetId.ToString());
@@ -267,6 +367,7 @@ public class Football : NetworkBehaviour
 
                     goblinToCheckScript.HandleHasBall(goblinToCheckScript.doesCharacterHaveBall, true);
                     this.HandleIsHeld(this.isHeld, true);
+                    goblinWithBall = goblinToCheckScript;
                     RpcBallIsHeld(true);
 
                 }
@@ -284,6 +385,18 @@ public class Football : NetworkBehaviour
                     isFumbled = false;
                     animator.SetBool("isFumbled", false);
                 }
+                if (isKicked)
+                {
+                    //isKicked = false;
+                    HandleIsKicked(this.isKicked, false);
+                    animator.SetBool("isFumbled", false);
+                }
+                if (isBouncing)
+                {
+                    //isKicked = false;
+                    isBouncing = false;
+                    animator.SetBool("isFumbled", false);
+                }
             }
             
 
@@ -298,7 +411,11 @@ public class Football : NetworkBehaviour
     public void HandleIsHeld(bool oldValue, bool newValue)
     {
         if (isServer)
+        {
             isHeld = newValue;
+            if (!newValue)
+                goblinWithBall = null;
+        }            
         if (isClient)
         {
             myRenderer.enabled = !newValue;
@@ -311,7 +428,7 @@ public class Football : NetworkBehaviour
         GoblinScript throwingGoblinScript = NetworkIdentity.spawned[throwingGoblinNetId].GetComponent<GoblinScript>();
         GoblinScript goblinToThrowToScript = NetworkIdentity.spawned[goblinToThrowToNetId].GetComponent<GoblinScript>();
 
-        if (throwingGoblinScript.doesCharacterHaveBall && !goblinToThrowToScript.doesCharacterHaveBall)
+        if (throwingGoblinScript.doesCharacterHaveBall && !goblinToThrowToScript.doesCharacterHaveBall && !throwingGoblinScript.isKicking && !throwingGoblinScript.isDiving)
         {
             throwingGoblinScript.HandleHasBall(throwingGoblinScript.doesCharacterHaveBall, false);
             this.HandleIsHeld(isHeld, false);
@@ -369,6 +486,66 @@ public class Football : NetworkBehaviour
         animator.SetBool("isFumbled", true);
 
     }
+    [Server]
+    public void KickFootballDownField(bool isKickingGoblinGrey)
+    {
+        Debug.Log("KickFootballDownField with isKickingGoblinGrey: " + isKickingGoblinGrey.ToString());
+        this.HandleIsHeld(isHeld, false);
+
+        int directionToKickModifier = 1;
+        if (isKickingGoblinGrey)
+            directionToKickModifier = -1;
+
+            
+        // Starting position of the kick
+        Vector3 footballPosition = transform.position;
+        KickedBallPoints[0] = footballPosition;
+
+        // Get destination of ball / where the ball lands
+        float destinationY = Random.Range(-6.0f, 5.2f);
+        float differenceInY = destinationY - footballPosition.y;
+        float distanceTraveled = Random.Range(minKickDist, maxKickDist);
+        xDistanceOfKick = distanceTraveled;
+        float destinationX = footballPosition.x + (distanceTraveled * directionToKickModifier);
+        KickedBallPoints[2] = new Vector3(destinationX, destinationY, footballPosition.z); // destination point
+
+        // get direction of kick for bounching later
+        if (destinationX > footballPosition.x)
+            bounceForward = true;
+        else
+            bounceForward = false;
+
+        // Get the "control point" or the height of the ball
+        float controlX = ((destinationX - footballPosition.x ) / 2) + footballPosition.x;
+        //float controlY = (distanceTraveled + (differenceInY)) / 2;
+        float controlY = distanceTraveled + footballPosition.y;
+        KickedBallPoints[1] = new Vector3(controlX, controlY, footballPosition.z);// control point
+
+        kickCount = 0.0f;
+        //kickCountModifier = 0.8f;
+
+        if (distanceTraveled < 15f)
+            kickCountModifier = 1.25f;
+        else if (distanceTraveled < 20f)
+            kickCountModifier = 1.05f;
+        else if (distanceTraveled < 25f)
+            kickCountModifier = 0.85f;
+        else if (distanceTraveled < 30f)
+            kickCountModifier = 0.725f;
+        else if (distanceTraveled < 35f)
+            kickCountModifier = 0.65f;
+        else if (distanceTraveled < 40f)
+            kickCountModifier = 0.6f;
+        else
+            kickCountModifier = 0.6f;
+
+
+        //isKicked = true;
+        HandleIsKicked(this.isKicked, true);
+        animator.SetBool("isFumbled", true);
+        RpcActivateFootballShadow(true);
+        RpcShadowPosition(KickedBallPoints[0], KickedBallPoints[2], kickCountModifier);
+    }
     void HandleIsThrown(bool oldValue, bool newValue)
     {
         if (isServer)
@@ -393,4 +570,114 @@ public class Football : NetworkBehaviour
     {
         Debug.Log("Football IS NOW visibile");
     }*/
+    void HandleIsKicked(bool oldValue, bool newValue)
+    {
+        if (isServer)
+        {
+            isKicked = newValue;
+            if (!newValue && !isHeld)
+                BounceFootball(true);
+        }        
+        if (isClient)
+        {
+            if (!newValue)
+            {
+                myCollider.enabled = false;
+                myCollider.enabled = true;
+                if (footballLandingTargetObject)
+                {
+                    footballLandingTargetObject.SetActive(false);
+                    GameObject destroyObject = footballLandingTargetObject;
+                    Destroy(destroyObject);
+                    footballLandingTargetObject = null;
+                }
+                if (footballShadowObject.activeInHierarchy)
+                    footballShadowObject.SetActive(false);
+            }
+        }
+    }
+    [ClientRpc]
+    void RpcActivateFootballShadow(bool shadow)
+    {
+        footballShadowObject.SetActive(shadow);
+        if (!shadow)
+        {
+            
+        }
+
+        
+    }
+    [ClientRpc]
+    void RpcShadowPosition(Vector3 startPosition, Vector3 endPosition, float kickCountModifier)
+    {
+        //footballShadowObject.transform.position = newRpcShadowPosition;
+        localKickCount = 0.0f;
+        localKickCountModifier = kickCountModifier;
+        localShadowStartPosition = startPosition;
+        localShadowEndPosition = endPosition;
+
+        if (footballLandingTargetObject == null)
+        {
+            footballLandingTargetObject = Instantiate(footballLandingTargetPrefab);
+            footballLandingTargetObject.transform.position = endPosition;
+            footballLandingTargetObject.SetActive(true);
+        }
+        
+    }
+    [Server]
+    void BounceFootball(bool firstBounce)
+    {
+        if (firstBounce)
+        {
+            numberOfBounces = 0;
+            isBouncing = true;
+        }
+        else
+        {
+            numberOfBounces++;
+        }
+
+        bool anotherBounce = false;
+        if (numberOfBounces == 0)
+            anotherBounce = true;
+        else
+        {
+            float rangeMin = (numberOfBounces * 15);
+            if (Random.Range(rangeMin, 50) < xDistanceOfKick)
+                anotherBounce = true;
+            else
+                anotherBounce = false;
+        }
+
+
+        if (anotherBounce)
+        {
+            int directionToBounce = 0;
+            if (bounceForward)
+                directionToBounce = 1;
+            else
+                directionToBounce = -1;
+
+            BouncingBallPoints[0] = this.transform.position;
+            Vector3 bounceControlPoint = BouncingBallPoints[0];
+            float controlYDist = Random.Range(1.0f, 1.5f);
+            bounceControlPoint.y += controlYDist;
+            float controlXDist = (Random.Range(1.0f, 2.25f)) * directionToBounce;
+            bounceControlPoint.x += controlXDist;
+            BouncingBallPoints[1] = bounceControlPoint;
+
+            BouncingBallPoints[2] = BouncingBallPoints[1];
+            BouncingBallPoints[2].x += controlXDist;
+            BouncingBallPoints[2].y = BouncingBallPoints[0].y;
+
+            bounceProgressCount = 0.0f;
+            animator.SetBool("isFumbled", true);
+        }
+        else
+        {
+            isBouncing = false;
+            animator.SetBool("isFumbled", false);
+        }
+            
+    }
 }
