@@ -57,7 +57,7 @@ public class Football : NetworkBehaviour
 
     [SerializeField] public CinemachineVirtualCamera myCamera;
     public GamePlayer localPlayer;
-    CameraMarker myCameraMarker;
+    public CameraMarker myCameraMarker;
 
     public override void OnStartClient()
     {
@@ -76,14 +76,22 @@ public class Football : NetworkBehaviour
 
         myCameraMarker = Camera.main.GetComponent < CameraMarker > ();
 
-        footballShadowObject = Instantiate(footballShadowPrefab, this.transform);
+        footballShadowObject = Instantiate(footballShadowPrefab);
         footballShadowObject.SetActive(false);
         footballShadowObject.transform.localPosition = Vector3.zero;
 
         /*footballLandingTargetObject = Instantiate(footballLandingTargetPrefab, this.transform);
         footballLandingTargetObject.SetActive(false);
         footballLandingTargetObject.transform.localPosition = Vector3.zero;*/
-
+        try
+        {
+            GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
+            localPlayer.ReportPlayerSpawnedFootball();
+        }
+        catch
+        {
+            Debug.Log("Football.cs: Could not find local game player object");
+        }
 
     }
     // Start is called before the first frame update
@@ -129,12 +137,20 @@ public class Football : NetworkBehaviour
         }
         else
         {
-            myCameraMarker.DeActivateFootballMarker();
+            try
+            {
+                myCameraMarker.DeActivateFootballMarker();
+            }
+            catch
+            {
+                Debug.Log("Football.cs: couldn't run camera thing? myCameraMarker.DeActivateFootballMarker();");
+            }
+            
         }
 
-        if (isClient)
+        /*if (isClient)
         {
-            if ((isKicked || isBouncing) && !isHeld)
+            if (isKicked && !isHeld)
             {
                 if (localKickCount < 1.0f)
                 {
@@ -151,7 +167,7 @@ public class Football : NetworkBehaviour
                     footballShadowObject.SetActive(false);
                 }
             }
-        }
+        }*/
     }
     private void FixedUpdate()
     {
@@ -258,7 +274,7 @@ public class Football : NetworkBehaviour
                         //isKicked = false;
                         HandleIsKicked(this.isKicked, false);
                         //animator.SetBool("isFumbled", false);
-                        RpcActivateFootballShadow(false);
+                        RpcActivateFootballShadow(false, this.transform.position);
                     }
                 }
                 else
@@ -266,7 +282,7 @@ public class Football : NetworkBehaviour
                     //isKicked = false;
                     HandleIsKicked(this.isKicked, false);
                     //animator.SetBool("isFumbled", false);
-                    RpcActivateFootballShadow(false);
+                    RpcActivateFootballShadow(false, this.transform.position);
                 }
             }
             if (isBouncing && !isHeld)
@@ -291,7 +307,27 @@ public class Football : NetworkBehaviour
             }
 
         }
-        
+        if (isClient)
+        {
+            if (isKicked && !isHeld)
+            {
+                if (localKickCount < 1.0f)
+                {
+                    localKickCount += localKickCountModifier * Time.fixedDeltaTime;
+                    Vector3 localM1 = Vector3.Lerp(localShadowStartPosition, localShadowEndPosition, localKickCount);
+                    footballShadowObject.transform.position = localM1;
+                    if (localKickCount >= 1.0f)
+                    {
+                        footballShadowObject.SetActive(false);
+                    }
+                }
+                else
+                {
+                    footballShadowObject.SetActive(false);
+                }
+            }
+        }
+
     }
     public IEnumerator FallDown()
     {
@@ -486,7 +522,7 @@ public class Football : NetworkBehaviour
         animator.SetBool("isFumbled", true);
 
     }
-    [Server]
+    /*[Server]
     public void KickFootballDownField(bool isKickingGoblinGrey)
     {
         Debug.Log("KickFootballDownField with isKickingGoblinGrey: " + isKickingGoblinGrey.ToString());
@@ -543,7 +579,67 @@ public class Football : NetworkBehaviour
         //isKicked = true;
         HandleIsKicked(this.isKicked, true);
         animator.SetBool("isFumbled", true);
-        RpcActivateFootballShadow(true);
+        RpcActivateFootballShadow(true, KickedBallPoints[0]);
+        RpcShadowPosition(KickedBallPoints[0], KickedBallPoints[2], kickCountModifier);
+    }*/
+    [Server]
+    public void KickFootballDownField(bool isKickingGoblinGrey, float kickPower, float maxDistance, float minDistance)
+    {
+        Debug.Log("KickFootballDownField with isKickingGoblinGrey: " + isKickingGoblinGrey.ToString() + " kick poweR: " + kickPower.ToString() + " max distance: " + maxDistance.ToString() + " min distance: " + minDistance.ToString());
+        this.HandleIsHeld(isHeld, false);
+
+        int directionToKickModifier = 1;
+        if (isKickingGoblinGrey)
+            directionToKickModifier = -1;
+
+
+        // Starting position of the kick
+        Vector3 footballPosition = transform.position;
+        KickedBallPoints[0] = footballPosition;
+
+        // Get destination of ball / where the ball lands
+        float destinationY = Random.Range(-6.0f, 5.2f);
+        float differenceInY = destinationY - footballPosition.y;
+        float distanceTraveled = ((maxDistance - minDistance) * kickPower) + minDistance;
+        xDistanceOfKick = distanceTraveled;
+        float destinationX = footballPosition.x + (distanceTraveled * directionToKickModifier);
+        KickedBallPoints[2] = new Vector3(destinationX, destinationY, footballPosition.z); // destination point
+
+        // get direction of kick for bounching later
+        if (destinationX > footballPosition.x)
+            bounceForward = true;
+        else
+            bounceForward = false;
+
+        // Get the "control point" or the height of the ball
+        float controlX = ((destinationX - footballPosition.x) / 2) + footballPosition.x;
+        //float controlY = (distanceTraveled + (differenceInY)) / 2;
+        float controlY = distanceTraveled + footballPosition.y;
+        KickedBallPoints[1] = new Vector3(controlX, controlY, footballPosition.z);// control point
+
+        kickCount = 0.0f;
+        //kickCountModifier = 0.8f;
+
+        if (distanceTraveled < 15f)
+            kickCountModifier = 1.25f;
+        else if (distanceTraveled < 20f)
+            kickCountModifier = 1.05f;
+        else if (distanceTraveled < 25f)
+            kickCountModifier = 0.85f;
+        else if (distanceTraveled < 30f)
+            kickCountModifier = 0.725f;
+        else if (distanceTraveled < 35f)
+            kickCountModifier = 0.65f;
+        else if (distanceTraveled < 40f)
+            kickCountModifier = 0.6f;
+        else
+            kickCountModifier = 0.6f;
+
+
+        //isKicked = true;
+        HandleIsKicked(this.isKicked, true);
+        animator.SetBool("isFumbled", true);
+        RpcActivateFootballShadow(true, KickedBallPoints[0]);
         RpcShadowPosition(KickedBallPoints[0], KickedBallPoints[2], kickCountModifier);
     }
     void HandleIsThrown(bool oldValue, bool newValue)
@@ -597,9 +693,11 @@ public class Football : NetworkBehaviour
         }
     }
     [ClientRpc]
-    void RpcActivateFootballShadow(bool shadow)
+    void RpcActivateFootballShadow(bool shadow, Vector3 shadowStartPosition)
     {
+        footballShadowObject.transform.position = shadowStartPosition;
         footballShadowObject.SetActive(shadow);
+
         if (!shadow)
         {
             

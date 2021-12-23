@@ -14,6 +14,12 @@ public class GamePlayer : NetworkBehaviour
     [SyncVar] public int playerNumber;
     [SyncVar] public bool IsGameLeader;
 
+    [Header("Coin Toss Info")]
+    public bool inputManagerActivated = false;
+    [SyncVar(hook = nameof(HandleDoesPlayerChooseCoin))] public bool doesPlayerChooseCoin;
+    [SyncVar(hook = nameof(HandleHeadsOrTails))] public string headsOrTailsPlayer;
+    [SyncVar(hook = nameof(HandleDidPlayerChooseCoinYet))] public bool didPlayerChooseCoinYet;
+
     [Header("Characters")]
     [SerializeField] private GameObject grenadierPrefab;
     [SerializeField] private GameObject skrimisherPrefab;
@@ -54,41 +60,56 @@ public class GamePlayer : NetworkBehaviour
     }
     public override void OnStartAuthority()
     {
-        Debug.Log("OnStartAuthority");
+        Debug.Log("OnStartAuthority for " + this.PlayerName);
         base.OnStartAuthority();
         gameObject.name = "LocalGamePlayer";
         gameObject.tag = "LocalGamePlayer";
 
-        InputManager.Controls.Player.SwitchQ.performed += _ => SwitchToQGoblin();
+
+        //Have these enabled when the "Gameplay" phase starts?
+        /*InputManager.Controls.Player.SwitchQ.performed += _ => SwitchToQGoblin();
         InputManager.Controls.Player.SwitchE.performed += _ => SwitchToEGoblin();
         InputManager.Controls.Player.Attack.performed += _ => GoblinAttack();
         InputManager.Controls.Player.Slide.performed += _ => SlideGoblin();
         InputManager.Controls.Player.Dive.performed += _ => DiveGoblin();
         InputManager.Controls.Player.Block.performed += _ => StartBlockGoblin();
         InputManager.Controls.Player.Block.canceled += _ => StopBlockGoblin();
-        InputManager.Controls.Player.KickFootball.performed += _ => KickFootball();
+        //InputManager.Controls.Player.KickFootball.performed += _ => KickFootball();
+        InputManager.Controls.Player.KickFootball.performed += _ => StartKickPower();
+        InputManager.Controls.Player.KickFootball.canceled += _ => EndKickPower();
+        */
 
-        myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
+        //myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
 
         /*TrackFootballScript footballTracker = Camera.main.GetComponent<TrackFootballScript>();
         if (!footballTracker.myPlayer)
         {
             footballTracker.myPlayer = this;
         }*/
-        CameraMarker myCameraMarker = Camera.main.GetComponent<CameraMarker>();
+        /*CameraMarker myCameraMarker = Camera.main.GetComponent<CameraMarker>();
         if (!myCameraMarker.myPlayer)
-            myCameraMarker.myPlayer = this;
+            myCameraMarker.myPlayer = this;*/
 
+        //CoinTossControlls(true);
     }
 
     public override void OnStartClient()
     {
-        Debug.Log("OnStartClient Spawned GamePlayer with ConnectionId: " + ConnectionId.ToString());
+        Debug.Log("OnStartClient Spawned GamePlayer with ConnectionId: " + ConnectionId.ToString() + this.PlayerName);
+        DontDestroyOnLoad(gameObject);
         base.OnStartClient();
         Game.GamePlayers.Add(this);
         Debug.Log("OnStartClient: Will check if player has authority GamePlayer with ConnectionId: " + ConnectionId.ToString());
+        /*if (hasAuthority)
+        {
+            myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
+            CameraMarker myCameraMarker = Camera.main.GetComponent<CameraMarker>();
+            if (!myCameraMarker.myPlayer)
+                myCameraMarker.myPlayer = this;
+        }
         if (hasAuthority)
         {
+            Debug.Log("OnStartClient: try to get team name, spawn football, and spawn goblin team for connection id: " + ConnectionId.ToString() + this.PlayerName);
             //CmdSpawnPlayerCharacters();
             CmdGetTeamName();
             CmdSpawnFootball();
@@ -97,12 +118,56 @@ public class GamePlayer : NetworkBehaviour
         }
         if (hasAuthority)
         {
+            Debug.Log("OnStartClient: try to find football for connection id: " + ConnectionId.ToString() + this.PlayerName);
             football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
             if (football)
                 football.localPlayer = this;
-        }
-        
+        }*/
 
+    }
+    [Server]
+    public void SetPlayerName(string playerName)
+    {
+        this.PlayerName = playerName;
+    }
+    [Server]
+    public void SetConnectionId(int connId)
+    {
+        this.ConnectionId = connId;
+    }
+    [Server]
+    public void SetPlayerNumber(int playerNum)
+    {
+        this.playerNumber = playerNum;
+    }
+    public void InitializeLocalGamePlayer()
+    {
+        if (hasAuthority)
+        {
+            Debug.Log("InitializeLocalGamePlayer: Get camera stuff");
+            myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
+            CameraMarker myCameraMarker = Camera.main.GetComponent<CameraMarker>();
+            if (!myCameraMarker.myPlayer)
+                myCameraMarker.myPlayer = this;
+            Debug.Log("InitializeLocalGamePlayer: try to get team name, spawn football, and spawn goblin team for connection id: " + ConnectionId.ToString() + this.PlayerName);
+            //CmdSpawnPlayerCharacters();
+            CmdGetTeamName();
+            CmdDoesPlayerChooseCoin();
+            CmdSpawnFootball();
+            CmdSpawnPlayerCharacters();
+
+            Debug.Log("InitializeLocalGamePlayer: try to find football for connection id: " + ConnectionId.ToString() + this.PlayerName);
+            football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+            if (football)
+                football.localPlayer = this;
+
+            CmdPlayerFinishedLoading();
+        }
+    }
+    [Command]
+    void CmdPlayerFinishedLoading()
+    {
+        Game.ReportPlayerFinishedLoading(this.playerNumber);
     }
     [Command]
     void CmdSpawnFootball()
@@ -398,7 +463,7 @@ public class GamePlayer : NetworkBehaviour
         {
             if (!selectGoblin.isSliding && !selectGoblin.isDiving && !selectGoblin.isGoblinKnockedOut && !selectGoblin.isPunching)
             {
-                selectGoblin.KickFootballGoblin();
+                //selectGoblin.KickFootballGoblin();
             }
         }
     }
@@ -407,4 +472,159 @@ public class GamePlayer : NetworkBehaviour
     {
         serverSelectGoblin = NetworkIdentity.spawned[goblinNetId].gameObject.GetComponent<GoblinScript>();
     }
+    void StartKickPower()
+    {
+        Debug.Log("StartKickPower");
+        if (selectGoblin.doesCharacterHaveBall)
+            selectGoblin.StartKickPower();
+    }
+    void EndKickPower()
+    {
+        Debug.Log("EndKickPower");
+        if (selectGoblin.doesCharacterHaveBall)
+            selectGoblin.StopKickPower();
+    }
+    public void ReportPlayerSpawnedFootball()
+    {
+        if (hasAuthority)
+            CmdReportFootballSpawned();
+    }
+    [Command]
+    void CmdReportFootballSpawned()
+    {
+        Game.ReportFootballSpawnedForPlayer(this.playerNumber);
+    }
+    public void ReportPlayerGoblinSpawned()
+    {
+        if (hasAuthority)
+            CmdReportPlayerGoblinSpawned();
+    }
+    [Command]
+    void CmdReportPlayerGoblinSpawned()
+    {
+        Game.ReportGoblinSpawnedForPlayer(this.playerNumber);
+    }
+    public void DoneLoadingGameplayStuff()
+    {
+        RpcDoneLoadingGameplayStuff();
+    }
+    [ClientRpc]
+    void RpcDoneLoadingGameplayStuff()
+    {
+        if (hasAuthority)
+        {
+            Game.DestroyWaitingForPlayersCanvas();
+            GameplayManager.instance.ActivateCoinTossUI(true);
+        }
+            
+    }
+    public void EnableGoblinMovement(bool enableOrDisable)
+    {
+        if (hasAuthority)
+        {
+            foreach (GoblinScript goblin in goblinTeam)
+            {
+                goblin.EnableGoblinMovement(enableOrDisable);
+            }
+        }
+    }
+    [Command]
+    void CmdDoesPlayerChooseCoin()
+    {
+        if (this.playerNumber == 2)
+            HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, true);
+        else
+            HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, false);
+    }
+    void HandleDoesPlayerChooseCoin(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            doesPlayerChooseCoin = newValue;
+        if (isClient)
+        {
+            if (hasAuthority)
+            {
+                CoinTossControlls(newValue);
+                CoinTossManager.instance.ActivateSelectStuffToShowtoCoinSelecter(newValue);
+                CoinTossManager.instance.SetInitialSelectionText(newValue);
+            }
+                
+        }
+    }
+    public void CoinTossControlls(bool activate)
+    {
+        if (activate)
+        {
+            if (doesPlayerChooseCoin)
+            {
+                inputManagerActivated = true;
+                InputManager.Controls.Player.SelectHeads.performed += _ => SelectCoin("heads");
+                InputManager.Controls.Player.SelectTails.performed += _ => SelectCoin("tails");
+                InputManager.Controls.Player.SubmitCoin.performed += _ => SubmitCoinSelection();
+            }            
+        }
+        else
+        {
+            InputManager.Controls.Player.SelectHeads.Disable();
+            InputManager.Controls.Player.SelectTails.Disable();
+            InputManager.Controls.Player.SubmitCoin.Disable();
+        }
+    }
+    void SelectCoin(string headsOrTails)
+    {
+        Debug.Log("SelectCoin: " + headsOrTails);
+        if (hasAuthority)
+            CmdSelectCoin(headsOrTails);
+    }
+    [Command]
+    void CmdSelectCoin(string headsOrTails)
+    {
+        if (doesPlayerChooseCoin && !didPlayerChooseCoinYet)
+        {
+            headsOrTailsPlayer = headsOrTails;
+        }            
+    }
+    void HandleHeadsOrTails(string oldValue, string newValue)
+    {
+        if (isServer)
+            headsOrTailsPlayer = newValue;
+        if (isClient)
+        {
+            if (hasAuthority && doesPlayerChooseCoin)
+            {
+                CoinTossManager.instance.SelectionArrow(newValue);
+            }
+        }
+    }
+    void SubmitCoinSelection()
+    {
+        Debug.Log("SubmitCoinSelection: " + headsOrTailsPlayer);
+        if (!String.IsNullOrWhiteSpace(headsOrTailsPlayer) && hasAuthority)
+        {
+            CmdSubmitCoinSelection();
+        }
+    }
+    [Command]
+    void CmdSubmitCoinSelection()
+    {
+        //didPlayerChooseCoinYet = true;
+        if (!didPlayerChooseCoinYet)
+        {
+            CoinTossManager.instance.ServerPlayerSelectedTheirCoin();
+            CoinTossManager.instance.FlipCoin();
+            HandleDidPlayerChooseCoinYet(didPlayerChooseCoinYet, true);            
+        }
+        
+    }
+    void HandleDidPlayerChooseCoinYet(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            didPlayerChooseCoinYet = newValue;
+        if (isClient)
+        {
+            CoinTossManager.instance.PlayerSelectedCoin(headsOrTailsPlayer);
+        }
+    }
+
+
 }

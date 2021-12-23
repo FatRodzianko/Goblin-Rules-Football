@@ -461,6 +461,7 @@ Transform:
   - {fileID: 2406654514932145285}
   - {fileID: 5219235952543781879}
   - {fileID: 7090856612988747930}
+  - {fileID: 5489254380469092861}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -620,12 +621,13 @@ MonoBehaviour:
   ownerPlayerNumber: 0
   ownerNetId: 0
   myGamePlayer: {fileID: 0}
+  serverGamePlayer: {fileID: 0}
   MaxHealth: 75
   MaxStamina: 4
   StaminaDrain: 1.75
   StaminaRecovery: 1.5
   MaxSpeed: 11.5
-  MaxDamage: 20
+  MaxDamage: 30
   health: 0
   stamina: 0
   speed: 0
@@ -667,6 +669,18 @@ MonoBehaviour:
   DivingRoutineRunning: 0
   throwingRoutine: 0
   isBlocking: 0
+  isKicking: 0
+  KickPowerBarHolder: {fileID: 5489254380469092858}
+  KickPowerBarFillerImage: {fileID: 5489254381653759693}
+  powerBarActive: 0
+  GoblinMaxKickDistance: 30
+  GoblinMinKickDistance: 8
+  GoblinPowerBarSpeed: 3.25
+  GoblinKickPower: 0
+  currentPowerBarScale: 0
+  powerBarDirection: 1
+  gameFootball: {fileID: 0}
+  canGoblinReceivePass: 0
   isStaminaRecoveryRoutineRunning: 0
   isHealthRecoveryRoutineRunning: 0
   canGoblinRegainHealth: 0
@@ -787,3 +801,79 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98ce64bb6f7810541acc5799795f76d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1001 &7943655635125078902
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 6877901074420270456}
+    m_Modifications:
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706444, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_Name
+      value: KickPowerBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706444, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+--- !u!1 &5489254380469092858 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2454522754988706444, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+  m_PrefabInstance: {fileID: 7943655635125078902}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5489254380469092861 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+  m_PrefabInstance: {fileID: 7943655635125078902}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5489254381653759693 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2454522753803591099, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+  m_PrefabInstance: {fileID: 7943655635125078902}
+  m_PrefabAsset: {fileID: 0}

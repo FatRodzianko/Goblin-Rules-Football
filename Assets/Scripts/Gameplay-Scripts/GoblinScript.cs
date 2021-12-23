@@ -34,6 +34,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public float damage;
     [SyncVar] public float ballCarrySpeedModifier = 1.0f;
     [SyncVar] public float blockingSpeedModifier = 1.0f;
+    
 
     [Header("Character selection stuff")]
     [SyncVar(hook = nameof(HandleCharacterSelected))] public bool isCharacterSelected = false;
@@ -94,6 +95,20 @@ public class GoblinScript : NetworkBehaviour
 
     [Header("Kicking Info")]
     [SyncVar(hook = nameof(HandleIsKicking))] public bool isKicking = false;
+    [SerializeField] GameObject KickPowerBarHolder;
+    [SerializeField] GameObject KickPowerBarFillerImage;
+    public bool powerBarActive = false;
+    [SyncVar] public float GoblinMaxKickDistance = 40f;
+    [SyncVar] public float GoblinMinKickDistance = 10f;
+    [SyncVar] public float GoblinPowerBarSpeed = 1f;
+    [SyncVar] public float GoblinKickPower = 0f;
+    public float currentPowerBarScale = 0f;
+    public int powerBarDirection = 1;
+
+    [Header("wasPunchedSpeedModifier Info")]
+    public bool isWasPunchedRoutineRunning = false;
+    IEnumerator isWasPunched;
+    public float wasPunchedSpeedModifier = 1.0f;
 
     [Header("Can the Goblin Pass stuff")]
     public Football gameFootball;
@@ -131,11 +146,11 @@ public class GoblinScript : NetworkBehaviour
             if (transform.position.x > 0f)
                 CmdFlipRenderer(true);
         }
-        InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
+        /*InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
         InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
 
         InputManager.Controls.Player.Sprint.performed += _ => IsPlayerSprinting(true);
-        InputManager.Controls.Player.Sprint.canceled += _ => IsPlayerSprinting(false);        
+        InputManager.Controls.Player.Sprint.canceled += _ => IsPlayerSprinting(false);        */
         
     }
     public override void OnStartServer()
@@ -144,6 +159,25 @@ public class GoblinScript : NetworkBehaviour
         if (!gameFootball)
         {
             gameFootball = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+        }
+    }
+    public void EnableGoblinMovement(bool allowMovement)
+    {
+        if (allowMovement)
+        {
+            InputManager.Controls.Player.Move.Enable();
+            InputManager.Controls.Player.Sprint.Enable();
+
+            InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
+            InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
+
+            InputManager.Controls.Player.Sprint.performed += _ => IsPlayerSprinting(true);
+            InputManager.Controls.Player.Sprint.canceled += _ => IsPlayerSprinting(false);
+        }
+        else
+        {
+            InputManager.Controls.Player.Move.Disable();
+            InputManager.Controls.Player.Sprint.Disable();
         }
     }
     void GoblinStartingPosition(bool isPlayerGameLeader)
@@ -168,6 +202,16 @@ public class GoblinScript : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+
+        try
+        {
+            GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
+            localPlayer.ReportPlayerGoblinSpawned();
+        }
+        catch
+        {
+            Debug.Log("GoblinScript.cs: Could not find local game player object");
+        }
         //rb.bodyType = RigidbodyType2D.Kinematic;
     }
     // Start is called before the first frame update
@@ -326,6 +370,26 @@ public class GoblinScript : NetworkBehaviour
             else
             {
                 HandleCanGoblinReceivePass(this.canGoblinReceivePass, true);
+            }
+        }
+        if (isClient)
+        {
+            // Update the kick powerbar stuff
+            if (powerBarActive && doesCharacterHaveBall)
+            {
+                currentPowerBarScale += Time.deltaTime * GoblinPowerBarSpeed * powerBarDirection;
+                if (currentPowerBarScale > 1f)
+                {
+                    currentPowerBarScale = 1f;
+                    powerBarDirection = -1;
+                }
+                else if (currentPowerBarScale < 0f)
+                {
+                    currentPowerBarScale = 0f;
+                    powerBarDirection = 1;
+                }
+                    
+                KickPowerBarFillerImage.transform.localScale = new Vector3(currentPowerBarScale, 1f, 1f);
             }
         }
     }
@@ -508,6 +572,8 @@ public class GoblinScript : NetworkBehaviour
             {
                 GameObject football = GameObject.FindGameObjectWithTag("football");
                 football.transform.parent = null;
+                if (hasAuthority && powerBarActive)
+                    ResetPowerBar();
             }
         }
     }
@@ -661,9 +727,9 @@ public class GoblinScript : NetworkBehaviour
         else
         {
             if(!isFatigued)
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier);
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier);
             else
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier) * 0.5f;
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier) * 0.5f;
         }
             
     }
@@ -807,6 +873,12 @@ public class GoblinScript : NetworkBehaviour
 
                     regainHealthRoutine = RegainHealth();
                     StartCoroutine(regainHealthRoutine);
+
+                    // Slow down goblin after they are punched
+                    if (isWasPunchedRoutineRunning)
+                        StopCoroutine(isWasPunched);
+                    isWasPunched = WasPunchedRoutine();
+                    StartCoroutine(isWasPunched);
                 }
             }
             
@@ -1217,17 +1289,18 @@ public class GoblinScript : NetworkBehaviour
             }
         }
     }
-    public void KickFootballGoblin()
+    public void KickFootballGoblin(float kickPower)
     {
         if (hasAuthority && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
-            CmdKickFootball();
+            CmdKickFootball(kickPower);
     }
     [Command]
-    void CmdKickFootball()
+    void CmdKickFootball(float kickPower)
     {
-        if (!isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
+        if (!isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing && kickPower <= 1f && kickPower >= 0f)
         {
             HandleIsKicking(this.isKicking, true);
+            GoblinKickPower = kickPower;
         }
     }
     public void HandleIsKicking(bool oldValue, bool newValue)
@@ -1270,7 +1343,7 @@ public class GoblinScript : NetworkBehaviour
             newLocalPosition.x += 1.0f;
         footballScript.transform.localPosition = newLocalPosition;
 
-        footballScript.KickFootballDownField(isGoblinGrey);
+        footballScript.KickFootballDownField(isGoblinGrey, GoblinKickPower, GoblinMaxKickDistance, GoblinMinKickDistance);
     }
     public void StopKicking()
     {
@@ -1296,5 +1369,42 @@ public class GoblinScript : NetworkBehaviour
             }
             
         }
+    }
+    public void StartKickPower()
+    {
+        KickPowerBarHolder.SetActive(true);
+        powerBarActive = true;
+    }
+    public void StopKickPower()
+    {
+        KickPowerBarHolder.SetActive(false);
+        powerBarActive = false;
+        KickFootballGoblin(KickPowerBarFillerImage.transform.localScale.x);
+        ResetPowerBar();
+    }
+    void ResetPowerBar()
+    {
+        KickPowerBarHolder.SetActive(false);
+        Vector3 resetScale = new Vector3 (0f, 1f, 1f);
+        KickPowerBarFillerImage.transform.localScale = resetScale;
+        powerBarActive = false;
+        currentPowerBarScale = 0f;
+        powerBarDirection = 1;
+        //if(hasAuthority)
+            //CmdResetKickPower();
+    }
+    /*[Command]
+    void CmdResetKickPower()
+    {
+        GoblinKickPower = 0f;
+    }*/
+    [Server]
+    public IEnumerator WasPunchedRoutine()
+    {
+        isWasPunchedRoutineRunning = true;
+        wasPunchedSpeedModifier = 0.8f;
+        yield return new WaitForSeconds(3.0f);
+        wasPunchedSpeedModifier = 1.0f;
+        isWasPunchedRoutineRunning = false;
     }
 }

@@ -353,6 +353,7 @@ Transform:
   - {fileID: 2413999569851917830}
   - {fileID: 7923495680454927536}
   - {fileID: 876253897932530254}
+  - {fileID: 2233147570338094046}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -495,12 +496,13 @@ MonoBehaviour:
   ownerPlayerNumber: 0
   ownerNetId: 0
   myGamePlayer: {fileID: 0}
+  serverGamePlayer: {fileID: 0}
   MaxHealth: 135
   MaxStamina: 3
   StaminaDrain: 1.5
   StaminaRecovery: 1
   MaxSpeed: 8.5
-  MaxDamage: 55
+  MaxDamage: 75
   health: 0
   stamina: 0
   speed: 0
@@ -542,6 +544,18 @@ MonoBehaviour:
   DivingRoutineRunning: 0
   throwingRoutine: 0
   isBlocking: 0
+  isKicking: 0
+  KickPowerBarHolder: {fileID: 2233147570338094041}
+  KickPowerBarFillerImage: {fileID: 2233147571271093486}
+  powerBarActive: 0
+  GoblinMaxKickDistance: 35
+  GoblinMinKickDistance: 10
+  GoblinPowerBarSpeed: 2.5
+  GoblinKickPower: 0
+  currentPowerBarScale: 0
+  powerBarDirection: 1
+  gameFootball: {fileID: 0}
+  canGoblinReceivePass: 0
   isStaminaRecoveryRoutineRunning: 0
   isHealthRecoveryRoutineRunning: 0
   canGoblinRegainHealth: 0
@@ -770,11 +784,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f9f967b2d38df0b4da165510d0bfec6a, type: 3}
---- !u!4 &3108347039324135288 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4362380316837619779, guid: f9f967b2d38df0b4da165510d0bfec6a, type: 3}
-  m_PrefabInstance: {fileID: 1704991656619439931}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &401195133845898319 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1312812734278955892, guid: f9f967b2d38df0b4da165510d0bfec6a, type: 3}
@@ -786,3 +795,84 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98ce64bb6f7810541acc5799795f76d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &3108347039324135288 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4362380316837619779, guid: f9f967b2d38df0b4da165510d0bfec6a, type: 3}
+  m_PrefabInstance: {fileID: 1704991656619439931}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4390319773757493589
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 6607051740916151463}
+    m_Modifications:
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706444, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_Name
+      value: KickPowerBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 2454522754988706444, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+--- !u!1 &2233147570338094041 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2454522754988706444, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+  m_PrefabInstance: {fileID: 4390319773757493589}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2233147570338094046 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2454522754988706443, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+  m_PrefabInstance: {fileID: 4390319773757493589}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2233147571271093486 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2454522753803591099, guid: 653b01ff1c7fbaf47a7c795d8f5e1fe3, type: 3}
+  m_PrefabInstance: {fileID: 4390319773757493589}
+  m_PrefabAsset: {fileID: 0}

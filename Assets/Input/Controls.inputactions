@@ -76,6 +76,30 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "SelectHeads",
+                    "type": "Button",
+                    "id": "a5cb37ee-fb69-41c5-b9fa-1d1d669c7e86",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "SelectTails",
+                    "type": "Button",
+                    "id": "3f40d423-1b15-4334-ac2d-2444862699f2",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "SubmitCoin",
+                    "type": "Button",
+                    "id": "c9b0432a-e8be-4f24-a82e-6b2f3abd5d4d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -274,6 +298,39 @@
                     "processors": "",
                     "groups": "Keyboard and Mouse",
                     "action": "KickFootball",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "53f9ab38-37f9-4b7b-9790-dcb08db17122",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "SelectHeads",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "88a3727d-4704-4b20-becc-6e4c4e094945",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "SelectTails",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1ff50729-4375-481f-afa9-7ee0475450b5",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "SubmitCoin",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

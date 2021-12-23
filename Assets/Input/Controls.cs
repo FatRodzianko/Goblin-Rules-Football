@@ -89,6 +89,30 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""SelectHeads"",
+                    ""type"": ""Button"",
+                    ""id"": ""a5cb37ee-fb69-41c5-b9fa-1d1d669c7e86"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""SelectTails"",
+                    ""type"": ""Button"",
+                    ""id"": ""3f40d423-1b15-4334-ac2d-2444862699f2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""SubmitCoin"",
+                    ""type"": ""Button"",
+                    ""id"": ""c9b0432a-e8be-4f24-a82e-6b2f3abd5d4d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -289,6 +313,39 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""action"": ""KickFootball"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""53f9ab38-37f9-4b7b-9790-dcb08db17122"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""SelectHeads"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""88a3727d-4704-4b20-becc-6e4c4e094945"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""SelectTails"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1ff50729-4375-481f-afa9-7ee0475450b5"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""SubmitCoin"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -323,6 +380,9 @@ public class @Controls : IInputActionCollection, IDisposable
         m_Player_Dive = m_Player.FindAction("Dive", throwIfNotFound: true);
         m_Player_Block = m_Player.FindAction("Block", throwIfNotFound: true);
         m_Player_KickFootball = m_Player.FindAction("KickFootball", throwIfNotFound: true);
+        m_Player_SelectHeads = m_Player.FindAction("SelectHeads", throwIfNotFound: true);
+        m_Player_SelectTails = m_Player.FindAction("SelectTails", throwIfNotFound: true);
+        m_Player_SubmitCoin = m_Player.FindAction("SubmitCoin", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -381,6 +441,9 @@ public class @Controls : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Dive;
     private readonly InputAction m_Player_Block;
     private readonly InputAction m_Player_KickFootball;
+    private readonly InputAction m_Player_SelectHeads;
+    private readonly InputAction m_Player_SelectTails;
+    private readonly InputAction m_Player_SubmitCoin;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -394,6 +457,9 @@ public class @Controls : IInputActionCollection, IDisposable
         public InputAction @Dive => m_Wrapper.m_Player_Dive;
         public InputAction @Block => m_Wrapper.m_Player_Block;
         public InputAction @KickFootball => m_Wrapper.m_Player_KickFootball;
+        public InputAction @SelectHeads => m_Wrapper.m_Player_SelectHeads;
+        public InputAction @SelectTails => m_Wrapper.m_Player_SelectTails;
+        public InputAction @SubmitCoin => m_Wrapper.m_Player_SubmitCoin;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -430,6 +496,15 @@ public class @Controls : IInputActionCollection, IDisposable
                 @KickFootball.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickFootball;
                 @KickFootball.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickFootball;
                 @KickFootball.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickFootball;
+                @SelectHeads.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSelectHeads;
+                @SelectHeads.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSelectHeads;
+                @SelectHeads.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSelectHeads;
+                @SelectTails.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSelectTails;
+                @SelectTails.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSelectTails;
+                @SelectTails.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSelectTails;
+                @SubmitCoin.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSubmitCoin;
+                @SubmitCoin.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSubmitCoin;
+                @SubmitCoin.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSubmitCoin;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -461,6 +536,15 @@ public class @Controls : IInputActionCollection, IDisposable
                 @KickFootball.started += instance.OnKickFootball;
                 @KickFootball.performed += instance.OnKickFootball;
                 @KickFootball.canceled += instance.OnKickFootball;
+                @SelectHeads.started += instance.OnSelectHeads;
+                @SelectHeads.performed += instance.OnSelectHeads;
+                @SelectHeads.canceled += instance.OnSelectHeads;
+                @SelectTails.started += instance.OnSelectTails;
+                @SelectTails.performed += instance.OnSelectTails;
+                @SelectTails.canceled += instance.OnSelectTails;
+                @SubmitCoin.started += instance.OnSubmitCoin;
+                @SubmitCoin.performed += instance.OnSubmitCoin;
+                @SubmitCoin.canceled += instance.OnSubmitCoin;
             }
         }
     }
@@ -485,5 +569,8 @@ public class @Controls : IInputActionCollection, IDisposable
         void OnDive(InputAction.CallbackContext context);
         void OnBlock(InputAction.CallbackContext context);
         void OnKickFootball(InputAction.CallbackContext context);
+        void OnSelectHeads(InputAction.CallbackContext context);
+        void OnSelectTails(InputAction.CallbackContext context);
+        void OnSubmitCoin(InputAction.CallbackContext context);
     }
 }
