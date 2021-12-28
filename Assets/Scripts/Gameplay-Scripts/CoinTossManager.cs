@@ -24,7 +24,14 @@ public class CoinTossManager : NetworkBehaviour
 
     [Header("Coin Toss Results")]
     [SyncVar] public bool didPlayerSelectCoin;
+    [SyncVar] public string playerSelectedCoin;
     [SyncVar(hook = nameof(HandleHeadsOrTailsOnServer))] public string headsOrTailsServer;
+
+    [Header("Coin Toss Animation Object")]
+    [SerializeField] GameObject coinTossAnimationPrefab;
+    [SerializeField] GameObject coinTossAnimationObject;
+    [SerializeField] Animator myAnimator;
+    IEnumerator coinAnimationRoutine;
 
 
     public override void OnStartClient()
@@ -114,11 +121,91 @@ public class CoinTossManager : NetworkBehaviour
     void HandleHeadsOrTailsOnServer(string oldValue, string newValue)
     {
         if (isServer)
+        {
             headsOrTailsServer = newValue;
+            StartCoinTossAnimation(newValue);
+        }            
         if (isClient)
         {
-            coinTossResultsText.gameObject.SetActive(true);
-            coinTossResultsText.text = newValue.ToUpper();
+            //coinTossResultsText.gameObject.SetActive(true);
+            //coinTossResultsText.text = newValue.ToUpper();
+        }
+    }
+    void StartCoinTossAnimation(string headsOrTails)
+    {
+        if (!coinTossAnimationObject)
+        {
+            coinTossAnimationObject = Instantiate(coinTossAnimationPrefab);
+            NetworkServer.Spawn(coinTossAnimationObject);
+            myAnimator = coinTossAnimationObject.GetComponent<Animator>();
+            RpcCoinResultsText("-");
+            coinAnimationRoutine = RunCoinTossAnimation(headsOrTails);
+            StartCoroutine(coinAnimationRoutine);
+        }
+    }
+    [ClientRpc]
+    void RpcCoinResultsText(string textResults)
+    {
+        EnterToSubmitGroup.SetActive(false);
+        coinTossResultsText.gameObject.SetActive(true);
+        coinTossResultsText.text = textResults.ToUpper();
+    }
+    [Server]
+    public IEnumerator RunCoinTossAnimation(string headsOrTails)
+    {
+        yield return new WaitForSeconds(1.0f);
+        RpcHideHeadsOrTailsChoices(playerSelectedCoin);
+        yield return new WaitForSeconds(1.0f);
+        DidPlayerWinCoinToss();
+        RpcCoinResultsText(headsOrTails);
+        if(headsOrTails == "heads")
+            myAnimator.SetBool("Heads", true);
+        else
+            myAnimator.SetBool("Tails", true);
+    }
+    [ClientRpc]
+    void RpcHideHeadsOrTailsChoices(string headsOrTailsSelected)
+    {
+        if(headsOrTailsSelected == "tails")
+            HeadsCoinImageGroup.SetActive(false);
+        else
+            TailsCoinImageGroup.SetActive(false);
+    }
+    [Server]
+    void DidPlayerWinCoinToss()
+    {
+        if (playerSelectedCoin == headsOrTailsServer)
+        {
+            Debug.Log("DidPlayerWinCoinToss: Grey team WON coin toss");
+            RpcWinnerOfCoinToss(true);
+        }
+        else
+        {
+            RpcWinnerOfCoinToss(false);
+            Debug.Log("DidPlayerWinCoinToss: Grey team LOST coin toss");
+        }
+    }
+    [ClientRpc]
+    void RpcWinnerOfCoinToss(bool didSelectingPlayerWin)
+    {
+        if (didSelectingPlayerWin)
+        {
+            if (LocalGamePlayerScript.doesPlayerChooseCoin)
+            {
+                SelectionBoardText.text = "You WON the coin toss!";
+            }
+            else
+                SelectionBoardText.text = "Grey team won the coin toss...";
+
+        }
+        else
+        {
+            if (LocalGamePlayerScript.doesPlayerChooseCoin)
+            {
+                SelectionBoardText.text = "You lost the coin toss...";
+            }
+            else
+                SelectionBoardText.text = "Grey team LOST the coin toss!";
         }
     }
 }

@@ -10318,6 +10318,9 @@ MonoBehaviour:
   - {fileID: 1732903889}
   didPlayerSelectCoin: 0
   headsOrTailsServer: 
+  coinTossAnimationPrefab: {fileID: 3032652114343227805, guid: 06b524f09905dd347b1c744ed0f17f7f, type: 3}
+  coinTossAnimationObject: {fileID: 0}
+  myAnimator: {fileID: 0}
 --- !u!4 &997077334
 Transform:
   m_ObjectHideFlags: 0

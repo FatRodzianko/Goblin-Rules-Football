@@ -454,7 +454,8 @@ public class GamePlayer : NetworkBehaviour
     }
     public void FollowSelectedGoblin(Transform goblinToFollow)
     {
-        myCamera.Follow = goblinToFollow.transform;
+        if(GameplayManager.instance.gamePhase != "cointoss")
+            myCamera.Follow = goblinToFollow.transform;
     }
     void KickFootball()
     {
@@ -610,9 +611,10 @@ public class GamePlayer : NetworkBehaviour
         //didPlayerChooseCoinYet = true;
         if (!didPlayerChooseCoinYet)
         {
+            CoinTossManager.instance.playerSelectedCoin = headsOrTailsPlayer;
             CoinTossManager.instance.ServerPlayerSelectedTheirCoin();
             CoinTossManager.instance.FlipCoin();
-            HandleDidPlayerChooseCoinYet(didPlayerChooseCoinYet, true);            
+            HandleDidPlayerChooseCoinYet(didPlayerChooseCoinYet, true);
         }
         
     }
