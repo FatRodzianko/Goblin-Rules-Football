@@ -113,6 +113,22 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""KickoffAngleUp"",
+                    ""type"": ""Button"",
+                    ""id"": ""17025a10-3409-4827-b080-5450f3dc888e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""KickoffAngleDown"",
+                    ""type"": ""Button"",
+                    ""id"": ""e0908c98-d87c-48fa-aea3-a5ee05663511"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -346,6 +362,28 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""action"": ""SubmitCoin"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0057af4b-ca38-4196-8825-27c6a2d5d680"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""KickoffAngleUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7c8e8fef-aebb-4ee9-9344-cf40b0bdd414"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""KickoffAngleDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -383,6 +421,8 @@ public class @Controls : IInputActionCollection, IDisposable
         m_Player_SelectHeads = m_Player.FindAction("SelectHeads", throwIfNotFound: true);
         m_Player_SelectTails = m_Player.FindAction("SelectTails", throwIfNotFound: true);
         m_Player_SubmitCoin = m_Player.FindAction("SubmitCoin", throwIfNotFound: true);
+        m_Player_KickoffAngleUp = m_Player.FindAction("KickoffAngleUp", throwIfNotFound: true);
+        m_Player_KickoffAngleDown = m_Player.FindAction("KickoffAngleDown", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -444,6 +484,8 @@ public class @Controls : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_SelectHeads;
     private readonly InputAction m_Player_SelectTails;
     private readonly InputAction m_Player_SubmitCoin;
+    private readonly InputAction m_Player_KickoffAngleUp;
+    private readonly InputAction m_Player_KickoffAngleDown;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -460,6 +502,8 @@ public class @Controls : IInputActionCollection, IDisposable
         public InputAction @SelectHeads => m_Wrapper.m_Player_SelectHeads;
         public InputAction @SelectTails => m_Wrapper.m_Player_SelectTails;
         public InputAction @SubmitCoin => m_Wrapper.m_Player_SubmitCoin;
+        public InputAction @KickoffAngleUp => m_Wrapper.m_Player_KickoffAngleUp;
+        public InputAction @KickoffAngleDown => m_Wrapper.m_Player_KickoffAngleDown;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -505,6 +549,12 @@ public class @Controls : IInputActionCollection, IDisposable
                 @SubmitCoin.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSubmitCoin;
                 @SubmitCoin.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSubmitCoin;
                 @SubmitCoin.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSubmitCoin;
+                @KickoffAngleUp.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickoffAngleUp;
+                @KickoffAngleUp.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickoffAngleUp;
+                @KickoffAngleUp.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickoffAngleUp;
+                @KickoffAngleDown.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickoffAngleDown;
+                @KickoffAngleDown.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickoffAngleDown;
+                @KickoffAngleDown.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnKickoffAngleDown;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -545,6 +595,12 @@ public class @Controls : IInputActionCollection, IDisposable
                 @SubmitCoin.started += instance.OnSubmitCoin;
                 @SubmitCoin.performed += instance.OnSubmitCoin;
                 @SubmitCoin.canceled += instance.OnSubmitCoin;
+                @KickoffAngleUp.started += instance.OnKickoffAngleUp;
+                @KickoffAngleUp.performed += instance.OnKickoffAngleUp;
+                @KickoffAngleUp.canceled += instance.OnKickoffAngleUp;
+                @KickoffAngleDown.started += instance.OnKickoffAngleDown;
+                @KickoffAngleDown.performed += instance.OnKickoffAngleDown;
+                @KickoffAngleDown.canceled += instance.OnKickoffAngleDown;
             }
         }
     }
@@ -572,5 +628,7 @@ public class @Controls : IInputActionCollection, IDisposable
         void OnSelectHeads(InputAction.CallbackContext context);
         void OnSelectTails(InputAction.CallbackContext context);
         void OnSubmitCoin(InputAction.CallbackContext context);
+        void OnKickoffAngleUp(InputAction.CallbackContext context);
+        void OnKickoffAngleDown(InputAction.CallbackContext context);
     }
 }

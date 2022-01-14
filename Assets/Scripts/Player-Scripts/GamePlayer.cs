@@ -20,6 +20,11 @@ public class GamePlayer : NetworkBehaviour
     [SyncVar(hook = nameof(HandleHeadsOrTails))] public string headsOrTailsPlayer;
     [SyncVar(hook = nameof(HandleDidPlayerChooseCoinYet))] public bool didPlayerChooseCoinYet;
 
+    [Header("Kick or Receive Stuff")]
+    [SyncVar(hook = nameof(HandleDoesPlayerChooseKickOrReceive))] public bool doesPlayerChooseKickOrReceive;
+    [SyncVar(hook = nameof(HandleKickOrReceivePlayer))] public string kickOrReceivePlayer;
+    [SyncVar(hook = nameof(HandleDidPlayerChooseKickOrReceiveYet))] public bool didPlayerChooseKickOrReceiveYet;
+
     [Header("Characters")]
     [SerializeField] private GameObject grenadierPrefab;
     [SerializeField] private GameObject skrimisherPrefab;
@@ -29,6 +34,7 @@ public class GamePlayer : NetworkBehaviour
     [Header("My Goblin Team")]
     public SyncList<uint> goblinTeamNetIds = new SyncList<uint>();
     public List<GoblinScript> goblinTeam = new List<GoblinScript>();
+    public List<GoblinScript> goblinTeamOnServer = new List<GoblinScript>();
     public GoblinScript selectGoblin;
     public GoblinScript qGoblin;
     public GoblinScript eGoblin;
@@ -44,6 +50,15 @@ public class GamePlayer : NetworkBehaviour
 
     [SerializeField] CinemachineVirtualCamera myCamera;
     public Football football;
+
+    [Header("Input Manager Controls")]
+    public bool coinTossControllsEnabled = false;
+    public bool kickOrReceiveControlsEnabled = false;
+    public bool qeSwitchingEnabled = false;
+    public bool kickingControlsEnabled = false;
+    public bool kickoffAimArrowControlsEnabled = false;
+    public bool goblinMovementEnabled = false;
+    public bool gameplayActionsEnabled = false;
 
 
     private NetworkManagerGRF game;
@@ -67,7 +82,7 @@ public class GamePlayer : NetworkBehaviour
 
 
         //Have these enabled when the "Gameplay" phase starts?
-        /*InputManager.Controls.Player.SwitchQ.performed += _ => SwitchToQGoblin();
+        /*InputManager.Controls.Player.SwitchQ.performed += _ => SwitchToQGoblin(true);
         InputManager.Controls.Player.SwitchE.performed += _ => SwitchToEGoblin();
         InputManager.Controls.Player.Attack.performed += _ => GoblinAttack();
         InputManager.Controls.Player.Slide.performed += _ => SlideGoblin();
@@ -219,6 +234,7 @@ public class GamePlayer : NetworkBehaviour
             if (!IsGameLeader)
                 newGrenadierScript.goblinType += "-grey";
             newGrenadierScript.serverGamePlayer = this;
+            goblinTeamOnServer.Add(newGrenadierScript);
 
 
             GameObject newBerserker = Instantiate(berserkerPrefab, transform.position, Quaternion.identity);
@@ -242,6 +258,7 @@ public class GamePlayer : NetworkBehaviour
             if (!IsGameLeader)
                 newBerserkerScript.goblinType += "-grey";
             newBerserkerScript.serverGamePlayer = this;
+            goblinTeamOnServer.Add(newBerserkerScript);
 
             GameObject newSkirmisher = Instantiate(skrimisherPrefab, transform.position, Quaternion.identity);
             if (IsGameLeader)
@@ -263,10 +280,12 @@ public class GamePlayer : NetworkBehaviour
             newSkirmisherScript.goblinType = "skirmisher";
             if (!IsGameLeader)
                 newSkirmisherScript.goblinType += "-grey";
+            goblinTeamOnServer.Add(newSkirmisherScript);
 
             newSkirmisherScript.serverGamePlayer = this;
 
             areCharactersSpawnedYet = true;
+
         }
     }
     public void AddToGoblinTeam(GoblinScript GoblinToAdd)
@@ -293,9 +312,9 @@ public class GamePlayer : NetworkBehaviour
         }
 
     }
-    public void SwitchToQGoblin()
+    public void SwitchToQGoblin(bool fromKeyPress)
     {
-        Debug.Log("SwitchToQGoblin: " + canSwitchGoblin.ToString());
+        Debug.Log("SwitchToQGoblin: " + canSwitchGoblin.ToString() + " from key press? " + fromKeyPress.ToString() );
         if ((canSwitchGoblin && !selectGoblin.isKicking && !selectGoblin.isDiving) || qGoblin.doesCharacterHaveBall)
         {
             if (doesTeamHaveBall && !qGoblin.canGoblinReceivePass)
@@ -331,6 +350,7 @@ public class GamePlayer : NetworkBehaviour
             {
                 FollowSelectedGoblin(selectGoblin.transform);
             }
+            Debug.Log("SwitchToQGoblin switching to goblin: " + selectGoblin.name);
             CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
         }
         
@@ -376,6 +396,7 @@ public class GamePlayer : NetworkBehaviour
             {
                 FollowSelectedGoblin(selectGoblin.transform);
             }
+            Debug.Log("SwitchToEGoblin switching to goblin: " + selectGoblin.name);
             CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
 
         }
@@ -471,6 +492,7 @@ public class GamePlayer : NetworkBehaviour
     [Command]
     public void CmdSetSelectedGoblinOnServer(uint goblinNetId)
     {
+        Debug.Log("CmdSetSelectedGoblinOnServer: player " + this.PlayerName + " is switching to goblin with netid " + goblinNetId.ToString());
         serverSelectGoblin = NetworkIdentity.spawned[goblinNetId].gameObject.GetComponent<GoblinScript>();
     }
     void StartKickPower()
@@ -523,9 +545,24 @@ public class GamePlayer : NetworkBehaviour
     {
         if (hasAuthority)
         {
-            foreach (GoblinScript goblin in goblinTeam)
+            if (enableOrDisable)
             {
-                goblin.EnableGoblinMovement(enableOrDisable);
+                if (!goblinMovementEnabled)
+                {
+                    foreach (GoblinScript goblin in goblinTeam)
+                    {
+                        goblin.EnableGoblinMovement(enableOrDisable);
+                    }
+                    goblinMovementEnabled = true;
+                }
+            }
+            else
+            {
+                foreach (GoblinScript goblin in goblinTeam)
+                {
+                    goblin.EnableGoblinMovement(enableOrDisable);
+                }
+                goblinMovementEnabled = false;
             }
         }
     }
@@ -537,7 +574,7 @@ public class GamePlayer : NetworkBehaviour
         else
             HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, false);
     }
-    void HandleDoesPlayerChooseCoin(bool oldValue, bool newValue)
+    public void HandleDoesPlayerChooseCoin(bool oldValue, bool newValue)
     {
         if (isServer)
             doesPlayerChooseCoin = newValue;
@@ -558,10 +595,17 @@ public class GamePlayer : NetworkBehaviour
         {
             if (doesPlayerChooseCoin)
             {
-                inputManagerActivated = true;
-                InputManager.Controls.Player.SelectHeads.performed += _ => SelectCoin("heads");
-                InputManager.Controls.Player.SelectTails.performed += _ => SelectCoin("tails");
-                InputManager.Controls.Player.SubmitCoin.performed += _ => SubmitCoinSelection();
+                if (!coinTossControllsEnabled)
+                {
+                    InputManager.Controls.Player.SelectHeads.Enable();
+                    InputManager.Controls.Player.SelectTails.Enable();
+                    InputManager.Controls.Player.SubmitCoin.Enable();
+                    InputManager.Controls.Player.SelectHeads.performed += _ => SelectCoin("heads");
+                    InputManager.Controls.Player.SelectTails.performed += _ => SelectCoin("tails");
+                    InputManager.Controls.Player.SubmitCoin.performed += _ => SubmitCoinSelection();
+                    coinTossControllsEnabled = true;
+                }
+                
             }            
         }
         else
@@ -569,6 +613,36 @@ public class GamePlayer : NetworkBehaviour
             InputManager.Controls.Player.SelectHeads.Disable();
             InputManager.Controls.Player.SelectTails.Disable();
             InputManager.Controls.Player.SubmitCoin.Disable();
+            coinTossControllsEnabled = false;
+        }
+    }
+    public void KickOrReceiveControls(bool activate)
+    {
+        if (activate)
+        {
+            Debug.Log("KickOrReceiveControls: doesPlayerChooseKickOrReceive " + doesPlayerChooseKickOrReceive.ToString());
+            if (doesPlayerChooseKickOrReceive)
+            {
+                
+            }
+            if (!kickOrReceiveControlsEnabled)
+            {
+                Debug.Log("KickOrReceiveControls: controls enabled.");
+                InputManager.Controls.Player.SelectHeads.Enable();
+                InputManager.Controls.Player.SelectTails.Enable();
+                InputManager.Controls.Player.SubmitCoin.Enable();
+                InputManager.Controls.Player.SelectHeads.performed += _ => SelectKickOrReceive("receive");
+                InputManager.Controls.Player.SelectTails.performed += _ => SelectKickOrReceive("kick");
+                InputManager.Controls.Player.SubmitCoin.performed += _ => SubmitKickOrReceiveSelection();
+                kickOrReceiveControlsEnabled = true;
+            }
+        }
+        else
+        {
+            InputManager.Controls.Player.SelectHeads.Disable();
+            InputManager.Controls.Player.SelectTails.Disable();
+            InputManager.Controls.Player.SubmitCoin.Disable();
+            kickOrReceiveControlsEnabled = false;
         }
     }
     void SelectCoin(string headsOrTails)
@@ -627,6 +701,391 @@ public class GamePlayer : NetworkBehaviour
             CoinTossManager.instance.PlayerSelectedCoin(headsOrTailsPlayer);
         }
     }
+    public void HandleDoesPlayerChooseKickOrReceive(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            doesPlayerChooseKickOrReceive = newValue;
+        if (isClient)
+        {
+            if (hasAuthority)
+            {
+                //if(newValue)
+                   // CoinTossControlls(!newValue);
+                //KickOrReceiveControls(newValue);                
+                CoinTossManager.instance.ActivateSelectStuffToShowtoReceiveOrKickSelecter(newValue);
+                CoinTossManager.instance.SetInitialSelectionText(newValue);
+            }
 
+        }
+    }
+    void SelectKickOrReceive(string kickOrReceive)
+    {
+        Debug.Log("SelectKickOrReceive: " + kickOrReceive);
+        if (hasAuthority)
+            CmdSelectKickOrReceive(kickOrReceive);
+    }
+    [Command]
+    void CmdSelectKickOrReceive(string kickOrReceive)
+    {
+        Debug.Log("CmdSelectKickOrReceive: " + kickOrReceive + " from player " + this.PlayerName);
+        if (doesPlayerChooseKickOrReceive && !didPlayerChooseKickOrReceiveYet)
+        {
+            kickOrReceivePlayer = kickOrReceive;
+        }
+    }
+    void SubmitKickOrReceiveSelection()
+    {
+        Debug.Log("SubmitKickOrReceiveSelection: " + kickOrReceivePlayer);
+        if (!String.IsNullOrWhiteSpace(kickOrReceivePlayer) && hasAuthority)
+        {
+            CmdSubmitKickOrReceiveSelection();
+        }
+    }
+    [Command]
+    void CmdSubmitKickOrReceiveSelection()
+    {
+        //didPlayerChooseCoinYet = true;
+        if (!didPlayerChooseKickOrReceiveYet)
+        {
+            CoinTossManager.instance.playerKickOrReceive = kickOrReceivePlayer;
+            CoinTossManager.instance.ServerPlayerSelectedKickOrReceive();
+            HandleDidPlayerChooseKickOrReceiveYet(didPlayerChooseKickOrReceiveYet, true);
+        }
+    }
+    [ClientRpc]
+    public void RpcCoinTossAndKickOrReceiveControllerActivation(bool activateCoinTossControlls, bool activateKickOrReceiveControlls)
+    {
+        if (hasAuthority)
+        {
+            Debug.Log("RpcCoinTossAndKickOrReceiveControllerActivation: " + activateCoinTossControlls.ToString() + " " + activateKickOrReceiveControlls.ToString());
+            CoinTossControlls(activateCoinTossControlls);
+            KickOrReceiveControls(activateKickOrReceiveControlls);
+        }        
+    }
+    void HandleKickOrReceivePlayer(string oldValue, string newValue)
+    {
+        if (isServer)
+            kickOrReceivePlayer = newValue;
+        if (isClient)
+        {
+            if (hasAuthority && doesPlayerChooseKickOrReceive)
+            {
+                CoinTossManager.instance.KickOrReceiveSelectionArrow(newValue);
+            }
+        }
+    }
+    void HandleDidPlayerChooseKickOrReceiveYet(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            didPlayerChooseKickOrReceiveYet = newValue;
+        if (isClient)
+        {
+            CoinTossManager.instance.PlayerSelectedKickOrReceive(kickOrReceivePlayer, teamName);
+        }
+    }
+    [ClientRpc]
+    public void RpcRepositionTeamForKickOff(bool isKicking)
+    {
+        Debug.Log("PositionTeamForKickOff: for player " + this.PlayerName + ". Is the player kicking? " + isKicking.ToString());
+        if (hasAuthority)
+        {
+            EnableKickingControls(isKicking);
+            EnableKickoffAimArrowControls(isKicking);
+            EnableQESwitchingControls(!isKicking);
+            if (isKicking)
+            {
+                if (teamName == "Grey")
+                {
+                    foreach (GoblinScript goblin in goblinTeam)
+                    {
+                        if (goblin.goblinType.Contains("grenadier"))
+                        {
+                            goblin.transform.position = new Vector3(0f, 1f, 0f);
+                            //goblin.ToggleGoblinBodyCollider();
+                            goblin.EnableKickoffAimArrow(true);
+                        }
+                        else if (goblin.goblinType.Contains("berserker"))
+                        {
+                            goblin.transform.position = new Vector3(1f, -3f, 0f);
+                        }
+                        else
+                        {
+                            goblin.transform.position = new Vector3(1f, 4f, 0f);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (GoblinScript goblin in goblinTeam)
+                    {
+                        if (goblin.goblinType.Contains("grenadier"))
+                        {
+                            goblin.transform.position = new Vector3(0f, 1f, 0f);
+                            goblin.EnableKickoffAimArrow(true);
+                        }
+                        else if (goblin.goblinType.Contains("berserker"))
+                        {
+                            goblin.transform.position = new Vector3(-1f, -3f, 0f);
+                        }
+                        else
+                        {
+                            goblin.transform.position = new Vector3(-1f, 4f, 0f);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (teamName == "Grey")
+                {
+                    foreach (GoblinScript goblin in goblinTeam)
+                    {
+                        if (goblin.goblinType.Contains("grenadier"))
+                        {
+                            goblin.transform.position = new Vector3(11f, 3f, 0f);
+                            //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(11f, 3f));
+                        }
+                        else if (goblin.goblinType.Contains("skirmisher"))
+                        {
+                            goblin.transform.position = new Vector3(20f, 0f, 0f);
+                            //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(20f, 0f));
+                        }
+                        else
+                        {
+                            goblin.transform.position = new Vector3(11f, -2f, 0f);
+                            //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(11f, -2f));
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (GoblinScript goblin in goblinTeam)
+                    {
+                        if (goblin.goblinType.Contains("grenadier"))
+                        {
+                            goblin.transform.position = new Vector3(-11f, 3f, 0f);
+                            //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(-11f, 3f));
+                        }
+                        else if (goblin.goblinType.Contains("skirmisher"))
+                        {
+                            goblin.transform.position = new Vector3(-20f, 0f, 0f);
+                            //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(-20f, 0f));
+                        }
+                        else
+                        {
+                            goblin.transform.position = new Vector3(-11f, -2f, 0f);
+                            //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(-11f, -2f));
+                        }
+                    }
+                }
+            }
+        }
+        
+    }
+    public void EnableQESwitchingControls(bool activate)
+    {
+        Debug.Log("EnableQESwitchingControls: for player " + this.PlayerName + " " + activate.ToString());
+        if (activate)
+        {
+            if (!qeSwitchingEnabled)
+            {
+                Debug.Log("EnableQESwitchingControls: enabling the controls.");
+                InputManager.Controls.Player.SwitchQ.Enable();
+                InputManager.Controls.Player.SwitchE.Enable();
+                InputManager.Controls.Player.SwitchQ.performed += _ => SwitchToQGoblin(true);
+                InputManager.Controls.Player.SwitchE.performed += _ => SwitchToEGoblin();
+                qeSwitchingEnabled = true;
+            }
+            
+        }
+        else
+        {
+            InputManager.Controls.Player.SwitchQ.Disable();
+            InputManager.Controls.Player.SwitchE.Disable();
+            qeSwitchingEnabled = false;
+        }
+    }
+    public void EnableKickingControls(bool activate)
+    {
+        Debug.Log("EnableKickingControls: for player " + this.PlayerName + " " + activate.ToString());
+        if (activate)
+        {
+            if (!kickingControlsEnabled)
+            {
+                InputManager.Controls.Player.KickFootball.Enable();
+                InputManager.Controls.Player.KickFootball.performed += _ => StartKickPower();
+                InputManager.Controls.Player.KickFootball.canceled += _ => EndKickPower();
+                kickingControlsEnabled = true;
+            }            
+        }
+        else
+        {
+            InputManager.Controls.Player.KickFootball.Disable();
+            kickingControlsEnabled = false;
+        }
+    }
+    public void EnableKickoffAimArrowControls(bool activate)
+    {
+        Debug.Log("EnableKickoffAimArrowControls: for player " + this.PlayerName + " " + activate.ToString());
+        if (activate)
+        {
+            if (!kickoffAimArrowControlsEnabled)
+            {
+                //InputManager.Controls.Player.KickFootball.Enable();
+                //InputManager.Controls.Player.KickFootball.performed += _ => StartKickPower();
+                //InputManager.Controls.Player.KickFootball.canceled += _ => EndKickPower();
+                InputManager.Controls.Player.KickoffAngleUp.Enable();
+                InputManager.Controls.Player.KickoffAngleDown.Enable();
+                InputManager.Controls.Player.KickoffAngleUp.performed += _ => StartAimArrowDirection(true);
+                InputManager.Controls.Player.KickoffAngleUp.canceled += _ => EndAimArrowDirection();
+                InputManager.Controls.Player.KickoffAngleDown.performed += _ => StartAimArrowDirection(false);
+                InputManager.Controls.Player.KickoffAngleDown.canceled += _ => EndAimArrowDirection();
+                kickoffAimArrowControlsEnabled = true;
+            }
+        }
+        else
+        {
+            InputManager.Controls.Player.KickoffAngleUp.Disable();
+            InputManager.Controls.Player.KickoffAngleDown.Disable();
+            kickoffAimArrowControlsEnabled = false;
+        }
+    }
+    void StartAimArrowDirection(bool aimUp)
+    {
+        selectGoblin.StartAimArrowDirection(aimUp);
+    }
+    void EndAimArrowDirection()
+    {
+        selectGoblin.EndAimArrowDirection();
+    }
+    [ClientRpc]
+    public void RpcActivateGameplayControls(bool activate)
+    {
+        if (hasAuthority)
+        {
+            Debug.Log("ActivateGameplayControls for player " + this.PlayerName);
+            EnableKickoffAimArrowControls(false);
+            EnableQESwitchingControls(activate);
+            EnableKickingControls(activate);
+            EnableGoblinMovement(activate);
+            EnableGameplayActions(activate);
+        }
+    }
+    void EnableGameplayActions(bool activate)
+    {
+        Debug.Log("EnableGameplayActions: for player " + this.PlayerName + " " + activate.ToString());
+        if (activate)
+        {
+            if (!gameplayActionsEnabled)
+            {
+                Debug.Log("EnableGameplayActions: controls enabled for player " + this.PlayerName);
+                InputManager.Controls.Player.Slide.Enable();
+                InputManager.Controls.Player.Dive.Enable();
+                InputManager.Controls.Player.Block.Enable();
+                InputManager.Controls.Player.Attack.Enable();
 
+                InputManager.Controls.Player.Attack.performed += _ => GoblinAttack();
+                InputManager.Controls.Player.Slide.performed += _ => SlideGoblin();
+                InputManager.Controls.Player.Dive.performed += _ => DiveGoblin();
+                InputManager.Controls.Player.Block.performed += _ => StartBlockGoblin();
+                InputManager.Controls.Player.Block.canceled += _ => StopBlockGoblin();
+                gameplayActionsEnabled = true;
+            }
+            
+        }
+        else
+        {
+            InputManager.Controls.Player.Slide.Disable();
+            InputManager.Controls.Player.Dive.Disable();
+            InputManager.Controls.Player.Block.Disable();
+            InputManager.Controls.Player.Attack.Disable();
+            gameplayActionsEnabled = false;
+        }
+    }
+    [TargetRpc]
+    public void RpcRepositionForKickAfter(NetworkConnection target, bool isKickingPlayer, uint scoringGoblin, float yPosition)
+    {
+        if (hasAuthority)
+        {
+            Debug.Log("RpcRepositionForKickAfter: " + isKickingPlayer.ToString() + " for player: " + this.name + " y position: " + yPosition.ToString());
+            if (isKickingPlayer)
+            {
+                GameObject scoringGoblinObject = NetworkIdentity.spawned[scoringGoblin].gameObject;
+                Vector3 kickingPosition = scoringGoblinObject.transform.position;
+                if (teamName == "Grey")
+                {
+                    kickingPosition.x = -30f;
+                }
+                else
+                {
+                    kickingPosition.x = 30f;
+                }
+                kickingPosition.y = yPosition;
+                scoringGoblinObject.transform.position = kickingPosition;
+
+                int yPositionModifier = 1;
+                foreach (GoblinScript goblin in goblinTeam)
+                {
+                    if (goblin.GetComponent<NetworkIdentity>().netId == scoringGoblin)
+                    {
+                        if (goblin.isCharacterSelected)
+                            FollowSelectedGoblin(goblin.transform);
+                        else if (goblin.isQGoblin)
+                            SwitchToQGoblin(false);
+                        else if (goblin.isEGoblin)
+                            SwitchToEGoblin();
+                        continue;
+                    }                        
+                    yPositionModifier *= -1;
+                    Vector3 newPosition = goblin.transform.position;
+                    newPosition.x = 0f;
+                    newPosition.y = 3 * yPositionModifier;
+                    goblin.transform.position = newPosition;
+                }
+            }
+            else
+            {
+                int yPositionModifier = 1;
+                foreach (GoblinScript goblin in goblinTeam)
+                {
+                    Vector3 newPosition = goblin.transform.position;
+                    if (goblin.goblinType.Contains( "skirmisher"))
+                    {
+                        newPosition.y = yPosition;
+                        if (teamName == "Grey")
+                        {
+                            newPosition.x = 41f;
+                        }
+                        else
+                        {
+                            newPosition.x = -41f;
+                        }
+                        goblin.transform.position = newPosition;
+
+                        if (goblin.isCharacterSelected)
+                            FollowSelectedGoblin(goblin.transform);
+                        else if (goblin.isQGoblin)
+                            SwitchToQGoblin(false);
+                        else if (goblin.isEGoblin)
+                            SwitchToEGoblin();
+                        continue;
+                    }
+                    yPositionModifier *= -1;
+
+                    if (teamName == "Grey")
+                    {
+                        newPosition.x = 43.5f;
+                    }
+                    else
+                    {
+                        newPosition.x = -43.5f;
+                    }
+                    newPosition.y = 3 * yPositionModifier;
+                    goblin.transform.position = newPosition;
+                }
+            }
+            
+
+        }
+    }
 }

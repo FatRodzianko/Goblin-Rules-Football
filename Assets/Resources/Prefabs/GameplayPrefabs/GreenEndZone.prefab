@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6763324082975904655}
   - component: {fileID: 7684636316266305126}
-  - component: {fileID: 9206789277533397389}
+  - component: {fileID: 2951504533133173420}
+  - component: {fileID: -6307194105892466323}
   m_Layer: 14
   m_Name: GreenEndZone
   m_TagString: GreenEndZone
@@ -45,7 +46,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -2.625, y: 0}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -58,7 +59,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 5.25, y: 13.028244}
   m_EdgeRadius: 0
---- !u!114 &9206789277533397389
+--- !u!114 &2951504533133173420
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -75,3 +76,19 @@ MonoBehaviour:
   visible: 0
   m_AssetId: ad2a4216bf3f37d469c3eaab3d0ec716
   hasSpawned: 0
+--- !u!114 &-6307194105892466323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5285869411169573352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d587f687e0fbc5e4d8c9889806bb0348, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  endzoneCollider: {fileID: 0}
+  greenOrGrey: green

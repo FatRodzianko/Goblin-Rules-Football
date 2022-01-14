@@ -100,6 +100,22 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "KickoffAngleUp",
+                    "type": "Button",
+                    "id": "17025a10-3409-4827-b080-5450f3dc888e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "KickoffAngleDown",
+                    "type": "Button",
+                    "id": "e0908c98-d87c-48fa-aea3-a5ee05663511",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -331,6 +347,28 @@
                     "processors": "",
                     "groups": "Keyboard and Mouse",
                     "action": "SubmitCoin",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0057af4b-ca38-4196-8825-27c6a2d5d680",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "KickoffAngleUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7c8e8fef-aebb-4ee9-9344-cf40b0bdd414",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "KickoffAngleDown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

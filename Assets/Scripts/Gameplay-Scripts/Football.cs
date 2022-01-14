@@ -175,7 +175,7 @@ public class Football : NetworkBehaviour
         {
             if (isThrown)
             {
-                if (transform.position.y < 7.02f && transform.position.y > -6.7f)
+                if (transform.position.y < 7.02f && transform.position.y > -6.7f && transform.position.x > -44.5f && transform.position.x < 44.4f)
                 {
                     myRigidBody.MovePosition(myRigidBody.position + directionToThrow * speedOfThrow * Time.fixedDeltaTime);
                     //transform.position += (directionToThrow * speedOfThrow * Time.fixedDeltaTime);
@@ -205,14 +205,19 @@ public class Football : NetworkBehaviour
                     animator.SetBool("isThrown", isThrown);
                     if (transform.position.y >= 6.5f)
                         transform.position = new Vector2(transform.position.x, 5.6f);
-                    else
+                    else if (transform.position.y <= -6.5)
                         transform.position = new Vector2(transform.position.x, -6.5f);
+
+                    if (transform.position.x < -44.5f)
+                        transform.position = new Vector2(-44.5f, transform.position.y);
+                    else if (transform.position.x > 44.4f)
+                        transform.position = new Vector2(44.5f, transform.position.y);
                 }
 
             }
             if (isFalling && !isHeld)
             {
-                if (transform.position.y < 7.02f && transform.position.y > -6.7f)
+                if (transform.position.y < 7.02f && transform.position.y > -6.7f && transform.position.x > -44.5f && transform.position.x < 44.4f)
                 {
                     Vector2 directionToFall = directionToThrow;
                     directionToFall.y -= (fallSpeed * Time.fixedDeltaTime);
@@ -227,8 +232,13 @@ public class Football : NetworkBehaviour
                     animator.SetBool("isFalling", isFalling);
                     if (transform.position.y >= 6.5f)
                         transform.position = new Vector2(transform.position.x, 5.6f);
-                    else
+                    else if(transform.position.y <= -6.5)
                         transform.position = new Vector2(transform.position.x, -6.5f);
+
+                    if (transform.position.x < -44.5f)
+                        transform.position = new Vector2(-44.5f, transform.position.y);
+                    else if (transform.position.x > 44.4f)
+                        transform.position = new Vector2(44.5f, transform.position.y);
                 }
 
             }
@@ -238,6 +248,11 @@ public class Football : NetworkBehaviour
                     transform.position = new Vector2(transform.position.x, -6.5f);
                 else if(transform.position.y > 5.6f)
                     transform.position = new Vector2(transform.position.x, 5.6f);
+
+                if (transform.position.x < -44.5f)
+                    transform.position = new Vector2(-44.5f, transform.position.y);
+                else if (transform.position.x > 44.4f)
+                    transform.position = new Vector2(44.5f, transform.position.y);
             }
             if (isFumbled && !isHeld)
             {
@@ -395,8 +410,13 @@ public class Football : NetworkBehaviour
             if (!goblinToCheckScript.isGoblinKnockedOut && !goblinToCheckScript.isSliding && !goblinToCheckScript.isDiving && !goblinToCheckScript.isBlocking && !goblinToCheckScript.isPunching && !goblinToCheckScript.isKicking)
             {
                 float distanceToBall = Vector3.Distance(goblinToCheck.transform.position, this.transform.position);
+                if (GameplayManager.instance.gamePhase == "kickoff" && goblinToCheckScript.isGoblinGrey && goblinToCheckScript.name.Contains("grenadier"))
+                {
+                    Debug.Log("PlayerPickUpFootball: Grey team kicking football?");
+                    distanceToBall = 0f;
+                }
                 Debug.Log("CmdPlayerPickUpFootball: distance to ball is: " + distanceToBall.ToString() + " from goblin with netid of " + goblinNetId.ToString());
-                if (distanceToBall < 2.5f)
+                if (distanceToBall < 3.1f)
                 {
                     Debug.Log("CmdPlayerPickUpFootball: Goblin is close enough to pick up the ball");
                     //GoblinScript goblinToCheckScript = goblinToCheck.GetComponent<GoblinScript>();
@@ -511,11 +531,19 @@ public class Football : NetworkBehaviour
         Vector3 controlPoint = footballPosition;
         controlPoint.y += 1.25f;
         controlPoint.x -= (2.25f * directionModifier);
+        if (controlPoint.x > 44.4f)
+            controlPoint.x = 44.4f;
+        else if (controlPoint.x < -44.5f)
+            controlPoint.x = -44.5f;
         FumblePoints[1] = controlPoint; // control point
         controlPoint.x -= (2.25f * directionModifier);
         controlPoint.y -= 1.25f;
         if (controlPoint.y > 5.6f)
             controlPoint.y = 5.6f;
+        if (controlPoint.x > 44.4f)
+            controlPoint.x = 44.4f;
+        else if (controlPoint.x < -44.5f)
+            controlPoint.x = -44.5f;
         FumblePoints[2] = controlPoint; // destination point
         fumbleCount = 0.0f;
         isFumbled = true;
@@ -583,7 +611,7 @@ public class Football : NetworkBehaviour
         RpcShadowPosition(KickedBallPoints[0], KickedBallPoints[2], kickCountModifier);
     }*/
     [Server]
-    public void KickFootballDownField(bool isKickingGoblinGrey, float kickPower, float maxDistance, float minDistance)
+    public void KickFootballDownField(bool isKickingGoblinGrey, float kickPower, float kickAngle, float maxDistance, float minDistance)
     {
         Debug.Log("KickFootballDownField with isKickingGoblinGrey: " + isKickingGoblinGrey.ToString() + " kick poweR: " + kickPower.ToString() + " max distance: " + maxDistance.ToString() + " min distance: " + minDistance.ToString());
         this.HandleIsHeld(isHeld, false);
@@ -603,6 +631,44 @@ public class Football : NetworkBehaviour
         float distanceTraveled = ((maxDistance - minDistance) * kickPower) + minDistance;
         xDistanceOfKick = distanceTraveled;
         float destinationX = footballPosition.x + (distanceTraveled * directionToKickModifier);
+
+        if (GameplayManager.instance.gamePhase == "kickoff")
+        {
+            Debug.Log("KickFootballDownField: Calculating kick angle for kickoff using a kick angle of " + kickAngle.ToString() + " and a distance of " + distanceTraveled.ToString());
+            //Vector3 kickoffPos = new Vector3();
+            var degrees = kickAngle * directionToKickModifier;
+            var radians = degrees * Mathf.Deg2Rad;
+            var y = Mathf.Sin(radians);
+            y = y * distanceTraveled;
+            
+
+            if (y > 5.2f || y < -6.0f)
+            {
+                Debug.Log("KickFootballDownField: ball was kicked out of bounds. Checking where it should intersect.");
+                float slope = (y - footballPosition.y) / (destinationX - footballPosition.x);
+
+                if (y > 5.2f)
+                    y = 5.2f;
+                if (y < -6.0f)
+                    y = -6.0f;
+                float newX = ((y - footballPosition.y) / slope) - footballPosition.x;
+                
+                if ((newX * directionToKickModifier) < 10f)
+                    newX = (10.1f * directionToKickModifier);
+
+                Debug.Log("KickFootballDownField: Ball out of bounds. New x position will be " + newX.ToString());
+                destinationX = newX;
+            }
+            destinationY = y;
+            Debug.Log("KickFootballDownField: y value for kickoff is: " + destinationY.ToString());
+            differenceInY = destinationY - footballPosition.y;
+        }
+
+        if(destinationX > 44.4f)
+            destinationX = 44.4f;
+        else if (destinationX < -44.5f)
+            destinationX = -44.5f;
+
         KickedBallPoints[2] = new Vector3(destinationX, destinationY, footballPosition.z); // destination point
 
         // get direction of kick for bounching later
@@ -642,6 +708,11 @@ public class Football : NetworkBehaviour
         RpcActivateFootballShadow(true, KickedBallPoints[0]);
         RpcShadowPosition(KickedBallPoints[0], KickedBallPoints[2], kickCountModifier);
     }
+    [Server]
+    public void KickFootballForKickoff(bool isKickingGoblinGrey, float kickPower, float kickAngle, float maxDistance, float minDistance)
+    { 
+
+    }
     void HandleIsThrown(bool oldValue, bool newValue)
     {
         if (isServer)
@@ -673,6 +744,12 @@ public class Football : NetworkBehaviour
             isKicked = newValue;
             if (!newValue && !isHeld)
                 BounceFootball(true);
+            if (newValue && GameplayManager.instance.gamePhase == "kickoff")
+            {
+                GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameplay");
+                GameplayManager.instance.ActivateGameTimer(true);
+            }
+                
         }        
         if (isClient)
         {
@@ -762,6 +839,19 @@ public class Football : NetworkBehaviour
             bounceControlPoint.y += controlYDist;
             float controlXDist = (Random.Range(1.0f, 2.25f)) * directionToBounce;
             bounceControlPoint.x += controlXDist;
+
+            if (bounceControlPoint.x > 44.4f)
+            {
+                bounceControlPoint.x = 44.4f;
+                controlXDist = 0f;
+            }
+            else if (bounceControlPoint.x < -44.5f)
+            {
+                bounceControlPoint.x = -44.5f;
+                controlXDist = 0f;
+            }
+                
+
             BouncingBallPoints[1] = bounceControlPoint;
 
             BouncingBallPoints[2] = BouncingBallPoints[1];

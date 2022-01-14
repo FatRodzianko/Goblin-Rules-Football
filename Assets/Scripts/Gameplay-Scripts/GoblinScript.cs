@@ -59,6 +59,7 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] BoxCollider2D golbinBodyCollider;
     [SyncVar] public string goblinType;
     [SerializeField] private StatusBarScript myStatusBars;
+    [SerializeField] private GameObject touchdownHitbox;
 
 
     [Header("Character Game State Stuff")]
@@ -97,6 +98,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar(hook = nameof(HandleIsKicking))] public bool isKicking = false;
     [SerializeField] GameObject KickPowerBarHolder;
     [SerializeField] GameObject KickPowerBarFillerImage;
+    [SerializeField] GameObject KickoffAimArrow;
     public bool powerBarActive = false;
     [SyncVar] public float GoblinMaxKickDistance = 40f;
     [SyncVar] public float GoblinMinKickDistance = 10f;
@@ -104,6 +106,12 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public float GoblinKickPower = 0f;
     public float currentPowerBarScale = 0f;
     public int powerBarDirection = 1;
+    public float kickoffAngle = 0f;
+    [SyncVar] public float GoblinKickoffAngle = 0f;
+    float kickoffAngleSpeed = 30f;
+    public bool aimArrowButtonHeldDown = false;
+    public bool aimArrowUp = false;
+    
 
     [Header("wasPunchedSpeedModifier Info")]
     public bool isWasPunchedRoutineRunning = false;
@@ -233,6 +241,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void SelectThisCharacter()
     {
+        Debug.Log("SelectThisCharacter " + this.name);
         if (hasAuthority)
             CmdSelectThisCharacter();
     }
@@ -244,6 +253,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void UnSelectThisCharacter()
     {
+        Debug.Log("UnSelectThisCharacter " + this.name);
         if (hasAuthority)
             CmdUnSelectThisCharacter();
     }
@@ -264,7 +274,7 @@ public class GoblinScript : NetworkBehaviour
                 if (newValue)
                 {
                     rb.bodyType = RigidbodyType2D.Dynamic;
-                    //myGamePlayer.FollowSelectedGoblin(this.transform);
+                    myGamePlayer.FollowSelectedGoblin(this.transform);
                 }
                 else
                 {
@@ -280,6 +290,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void SetQGoblin(bool isQ)
     {
+        Debug.Log("SetQGoblin " + isQ.ToString());
         if (hasAuthority)
         {
             CmdSetQGoblin(isQ);
@@ -291,6 +302,7 @@ public class GoblinScript : NetworkBehaviour
     [Command]
     void CmdSetQGoblin(bool isQ)
     {
+        Debug.Log("CmdSetQGoblin " + isQ.ToString() + " "  + this.name);
         HandleIsQGoblin(isQGoblin, isQ);
     }
     public void HandleIsQGoblin(bool oldValue, bool newValue)
@@ -310,6 +322,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void SetEGoblin(bool isE)
     {
+        Debug.Log("SetEGoblin " + isE.ToString() + " " + this.name);
         if (hasAuthority)
         {
             CmdSetEGoblin(isE);
@@ -321,6 +334,7 @@ public class GoblinScript : NetworkBehaviour
     [Command]
     void CmdSetEGoblin(bool isE)
     {
+        Debug.Log("CmdSetEGoblin " + isE.ToString());
         HandleIsEGoblin(isEGoblin, isE);
     }
 
@@ -390,6 +404,25 @@ public class GoblinScript : NetworkBehaviour
                 }
                     
                 KickPowerBarFillerImage.transform.localScale = new Vector3(currentPowerBarScale, 1f, 1f);
+            }
+            if (aimArrowButtonHeldDown && doesCharacterHaveBall && GameplayManager.instance.gamePhase == "kickoff")
+            {
+                int angleMultiplier = 1;
+                if (aimArrowUp)
+                    angleMultiplier = 1;
+                else
+                    angleMultiplier = -1;
+                if (isGoblinGrey)
+                    angleMultiplier *= -1;
+
+                kickoffAngle += (Time.deltaTime * kickoffAngleSpeed) * angleMultiplier;
+                if (kickoffAngle > 45f)
+                    kickoffAngle = 45f;
+                if(kickoffAngle < -45f)
+                    kickoffAngle = -45f;
+
+                //KickoffAimArrow.transform.Rotate(0f, 0f, kickoffAngle, Space.Self);
+                KickoffAimArrow.transform.localRotation = Quaternion.Euler(0f, 0f, kickoffAngle);
             }
         }
     }
@@ -500,6 +533,16 @@ public class GoblinScript : NetworkBehaviour
         newLocalScale = slideBoxCollider.transform.localScale;
         newLocalScale.x = newScaleX;
         slideBoxCollider.transform.localScale = newLocalScale;
+
+        if (flip)
+        {
+            touchdownHitbox.transform.localScale = new Vector3(-1f, 1f, 1f);
+        }
+        else
+        {
+            touchdownHitbox.transform.localScale = new Vector3(1f, 1f, 1f);
+        }
+
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -563,7 +606,7 @@ public class GoblinScript : NetworkBehaviour
                         }
                         else if (this.isQGoblin)
                         {
-                            myGamePlayer.SwitchToQGoblin();
+                            myGamePlayer.SwitchToQGoblin(false);
                         }
                     }
                 }
@@ -675,6 +718,10 @@ public class GoblinScript : NetworkBehaviour
         {
             if (newValue)
                 animator.SetBool("isGrey", newValue);
+            if (newValue && hasAuthority)
+            {
+                FlipKickoffAimArrow();
+            }
         }
     }
     void IsPlayerSprinting(bool isPlayerSprinting)
@@ -1289,18 +1336,22 @@ public class GoblinScript : NetworkBehaviour
             }
         }
     }
-    public void KickFootballGoblin(float kickPower)
+    public void KickFootballGoblin(float kickPower, float kickAngle)
     {
         if (hasAuthority && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
-            CmdKickFootball(kickPower);
+        {
+            CmdKickFootball(kickPower, kickAngle);
+        }
+            
     }
     [Command]
-    void CmdKickFootball(float kickPower)
+    void CmdKickFootball(float kickPower, float kickAngle)
     {
         if (!isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing && kickPower <= 1f && kickPower >= 0f)
         {
             HandleIsKicking(this.isKicking, true);
             GoblinKickPower = kickPower;
+            GoblinKickoffAngle = kickAngle;
         }
     }
     public void HandleIsKicking(bool oldValue, bool newValue)
@@ -1343,7 +1394,8 @@ public class GoblinScript : NetworkBehaviour
             newLocalPosition.x += 1.0f;
         footballScript.transform.localPosition = newLocalPosition;
 
-        footballScript.KickFootballDownField(isGoblinGrey, GoblinKickPower, GoblinMaxKickDistance, GoblinMinKickDistance);
+        footballScript.KickFootballDownField(isGoblinGrey, GoblinKickPower, GoblinKickoffAngle, GoblinMaxKickDistance, GoblinMinKickDistance);
+        
     }
     public void StopKicking()
     {
@@ -1379,8 +1431,16 @@ public class GoblinScript : NetworkBehaviour
     {
         KickPowerBarHolder.SetActive(false);
         powerBarActive = false;
-        KickFootballGoblin(KickPowerBarFillerImage.transform.localScale.x);
+        KickFootballGoblin(KickPowerBarFillerImage.transform.localScale.x, kickoffAngle);
         ResetPowerBar();
+        if (GameplayManager.instance.gamePhase == "kickoff")
+        {
+            KickoffAimArrow.SetActive(false);
+            KickoffAimArrow.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            kickoffAngle = 0f;
+        }
+            
+
     }
     void ResetPowerBar()
     {
@@ -1406,5 +1466,30 @@ public class GoblinScript : NetworkBehaviour
         yield return new WaitForSeconds(3.0f);
         wasPunchedSpeedModifier = 1.0f;
         isWasPunchedRoutineRunning = false;
+    }
+    public void ToggleGoblinBodyCollider()
+    {
+        golbinBodyCollider.gameObject.SetActive(false);
+        golbinBodyCollider.gameObject.SetActive(true);
+    }
+    void FlipKickoffAimArrow()
+    {
+        Vector3 newPosition = KickoffAimArrow.transform.localPosition;
+        newPosition.x *= -1;
+        KickoffAimArrow.transform.localPosition = newPosition;
+        KickoffAimArrow.GetComponent<SpriteRenderer>().flipX = true;
+    }
+    public void EnableKickoffAimArrow(bool activate)
+    {
+        KickoffAimArrow.SetActive(activate);
+    }
+    public void StartAimArrowDirection(bool aimUp)
+    {
+        aimArrowButtonHeldDown = true;
+        aimArrowUp = aimUp;
+    }
+    public void EndAimArrowDirection()
+    {
+        aimArrowButtonHeldDown = false;
     }
 }

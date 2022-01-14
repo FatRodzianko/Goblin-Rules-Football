@@ -16,6 +16,7 @@ TagManager:
   - GreenEndZone
   - UICamera
   - LobbyPlayer
+  - touchdown-hitbox
   layers:
   - Default
   - TransparentFX
