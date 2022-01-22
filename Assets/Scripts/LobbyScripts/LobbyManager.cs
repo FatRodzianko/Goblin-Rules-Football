@@ -41,7 +41,7 @@ public class LobbyManager : MonoBehaviour
     {
         MakeInstance();
         ReadyUpButton.gameObject.SetActive(true);
-        ReadyUpButton.GetComponentInChildren<TextMeshProUGUI>().text = "READY UP";
+        ReadyUpButton.GetComponentInChildren<TextMeshProUGUI>().text = "Ready up";
         StartGameButton.gameObject.SetActive(false);
         FindLobbiesPanel.SetActive(true);
     }

@@ -28,6 +28,7 @@ public class GameplayManager : NetworkBehaviour
     public GamePlayer receivingPlayer;
 
     [Header("Touchdown")]
+    [SerializeField] GameObject TouchDownPanel;
     [SerializeField] TextMeshProUGUI touchDownText;
     [SerializeField] TextMeshProUGUI touchDownTeamText;
 
@@ -36,6 +37,17 @@ public class GameplayManager : NetworkBehaviour
     public GamePlayer blockingPlayer;
     [SyncVar] public float yPositionOfKickAfter;
     [SyncVar] public uint scoringGoblinNetId;
+    [SerializeField] GameObject KickAfterPositionControlsPanel;
+    [SerializeField] GameObject KickAfterTimerBeforeKickPanel;
+    [SerializeField] GameObject TimerInstructionsBoard;
+    [SerializeField] TextMeshProUGUI TimerInstructionsText;
+    [SerializeField] TextMeshProUGUI KickAfterTimerText;
+    [SyncVar(hook = nameof(HandleKickAfterTimerUpdate))] int KickAfterTimer;
+    [SerializeField] GameObject KickAfterWasKickGoodPanel;
+    [SerializeField] TextMeshProUGUI TheKickWasText;
+    [SerializeField] TextMeshProUGUI KickWasGoodText;
+    [SerializeField] TextMeshProUGUI KickWasNotGoodText;
+    [SerializeField] TextMeshProUGUI KickWasBlockedText;
 
     [Header("Game timer")]
     [SerializeField] TextMeshProUGUI timerText;
@@ -138,12 +150,28 @@ public class GameplayManager : NetworkBehaviour
             gamePhase = newValue;
             if (newValue == "kickoff")
                 RepositionTeamsForKickOff();
-            else if (newValue == "gameplay")
+            if (newValue == "gameplay")
                 ActivateGameplayControls(true);
-            else if (newValue == "kick-after-attempt")
+            if (newValue == "kick-after-attempt")
             {
                 SetKickAfterPlayers(scoringGoblinNetId);
             }
+            if (oldValue == "kick-after-attempt")
+            {
+                try
+                {
+                    GoblinScript goblinThatKicked = NetworkIdentity.spawned[scoringGoblinNetId].GetComponent<GoblinScript>();
+                    goblinThatKicked.isKickAfterPositionSet = false;
+                    goblinThatKicked.isKickAfterGoblin = false;
+                    scoringGoblinNetId = 0;
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("GameplayManager: HandleGamePhase: failed to reset scoring goblin info after kick attempt. Reason: " + e);
+                }
+                
+            }
+            
         }            
         if (isClient)
         {
@@ -175,6 +203,10 @@ public class GameplayManager : NetworkBehaviour
             if (newValue == "kick-after-attempt")
             {
                 HideTouchDownText();
+            }
+            if (oldValue == "kick-after-attempt")
+            {
+                ResetKickAfterPositionBoolValue();
             }
         }
     }
@@ -228,6 +260,7 @@ public class GameplayManager : NetworkBehaviour
             touchDownTeamText.text = "GREEN";
         }
         touchDownTeamText.gameObject.SetActive(true);
+        TouchDownPanel.SetActive(true);
         touchDownText.GetComponent<TouchDownTextGradient>().ActivateGradient();
         touchDownTeamText.GetComponent<TouchDownTextGradient>().SetGreenOrGreyColor(wasGrey);
         GameObject scoringGoblin = NetworkIdentity.spawned[goblinId].gameObject;
@@ -298,13 +331,16 @@ public class GameplayManager : NetworkBehaviour
     void HideTouchDownText()
     {
         Debug.Log("HideTouchDownText");
+        TouchDownPanel.SetActive(false);
         touchDownText.gameObject.SetActive(false);
         touchDownTeamText.gameObject.SetActive(false);
     }
     [Server]
     void SetKickAfterPlayers(uint scoringGoblin)
     {
+        Debug.Log("SetKickAfterPlayers: the scoring goblin was: " + scoringGoblin.ToString());
         GoblinScript scoringGoblinScript = NetworkIdentity.spawned[scoringGoblin].GetComponent<GoblinScript>();
+        scoringGoblinScript.isKickAfterGoblin = true;
         foreach (GamePlayer player in Game.GamePlayers)
         {
             if (scoringGoblinScript.ownerConnectionId == player.ConnectionId)
@@ -321,6 +357,189 @@ public class GameplayManager : NetworkBehaviour
             }
         }
     }
+    public void ActivateKickAfterPositionControlsPanel(bool activate)
+    {
+        KickAfterPositionControlsPanel.SetActive(activate);
+    }
+    [Server]
+    public void DisableKickAfterPositioningControls()
+    {
+        scoringPlayer.RpcDisableKickAfterPositioningControls(scoringPlayer.connectionToClient);
+    }
+    [Server]
+    public void StartKickAfterTimer()
+    {
+        scoringPlayer.RpcStartKickAfterTimer(scoringPlayer.connectionToClient, true);
+        blockingPlayer.RpcStartKickAfterTimer(blockingPlayer.connectionToClient, false);
+        IEnumerator kickAfterCountdown = KickAfterTimerCountDown();
+        StartCoroutine(kickAfterCountdown);
+    }
+    public void ActivateKickAfterTimerUI(bool isKickingPlayer)
+    {
+        KickAfterPositionControlsPanel.SetActive(false);
+        KickAfterTimerBeforeKickPanel.SetActive(true);
+        KickAfterTimerText.gameObject.SetActive(true);
+        if (isKickingPlayer)
+        {
+            TimerInstructionsText.text = "You will kick after the countdown!";
+            TimerInstructionsText.color = Color.white;
+        }
+        else
+        {
+            TimerInstructionsText.text = "You can try and block the kick after the countdown!";
+            TimerInstructionsText.color = Color.white;
+        }
+            
+    }
+    [Server]
+    IEnumerator KickAfterTimerCountDown()
+    {
+        KickAfterTimer = 3;
+        yield return new WaitForSeconds(1.0f);
+        KickAfterTimer = 2;
+        yield return new WaitForSeconds(1.0f);
+        KickAfterTimer = 1;
+        yield return new WaitForSeconds(1.0f);
+        RpcDisableKickAfterTimerUI();
+
+        scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, true);
+        blockingPlayer.RpcActivateKickAfterKickingControls(blockingPlayer.connectionToClient, false);
+
+        scoringPlayer.RpcActivateKickAfterBlockingControls(scoringPlayer.connectionToClient, false);
+        blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, true);
+
+        scoringPlayer.RpcKickAfterUpdateInsctructionsText(scoringPlayer.connectionToClient, true);
+        blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.connectionToClient, false);
 
 
+    }
+    void HandleKickAfterTimerUpdate(int oldValue, int newValue)
+    {
+        if (isServer)
+            KickAfterTimer = newValue;
+        if (isClient)
+        {
+            KickAfterTimerText.text = newValue.ToString();
+        }
+    }
+    [ClientRpc]
+    void RpcDisableKickAfterTimerUI()
+    {
+        KickAfterTimerText.gameObject.SetActive(false);
+    }
+    public void KickAfterUpdateInsctructionsText(bool isKickingPlayer)
+    {
+        if (isKickingPlayer)
+        {
+            TimerInstructionsText.text = "\"Tab\" to submit kick accuracy and power!";
+            TimerInstructionsText.color = Color.yellow;
+        }
+        else
+        {
+            TimerInstructionsText.text = "Run/slide into the kicker to block the kick!";
+            TimerInstructionsText.color = Color.yellow;
+        }            
+    }
+    [Server]
+    public void KickAfterWasKickGoodOrBad(bool isKickGood)
+    {
+        Debug.Log("KickAfterWasKickGoodOrBad: Was the kick after attempt good? " + isKickGood.ToString());
+        bool isScoringPlayerGrey = false;
+        if (scoringPlayer.teamName == "Grey")
+            isScoringPlayerGrey = true;
+
+        if (isKickGood)
+        {
+            if (scoringPlayer.teamName == "Grey")
+            {
+                greyScore += 2;
+                //isScoringPlayerGrey = true;
+            }
+            else
+            {
+                greenScore += 2;
+            }
+        }
+        RpcKickAfterWasKickGoodOrBad(isKickGood, isScoringPlayerGrey);
+        
+
+
+    }
+    [ClientRpc]
+    void RpcKickAfterWasKickGoodOrBad(bool isKickGood, bool isScoringPlayerGrey)
+    {
+        KickAfterPositionControlsPanel.SetActive(false);
+        KickAfterTimerBeforeKickPanel.SetActive(false);
+        KickAfterWasKickGoodPanel.SetActive(true);
+        TheKickWasText.gameObject.SetActive(true);
+        if (isKickGood)
+        {
+            KickWasNotGoodText.gameObject.SetActive(false);
+            KickWasGoodText.gameObject.SetActive(true);
+            KickWasGoodText.GetComponent<TouchDownTextGradient>().ActivateGradient();
+        }
+        else
+        {
+            KickWasNotGoodText.gameObject.SetActive(true);
+            KickWasGoodText.gameObject.SetActive(false);
+            KickWasNotGoodText.GetComponent<TouchDownTextGradient>().SetGreenOrGreyColor(isScoringPlayerGrey);
+        }
+
+    }
+    [Server]
+    public void TransitionFromKickAfterAttemptToKickOff()
+    {
+        IEnumerator TransitionFromKickAfterAttemptToKickOff = TransitionFromKickAfterAttemptToKickOffRoutine();
+        StartCoroutine(TransitionFromKickAfterAttemptToKickOff);
+    }
+    [Server]
+    public void DisableKickAfterAttemptControls()
+    {
+        try
+        {
+            scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, false);
+            blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, false);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("DisableKickAfterAttemptControls: failed for reason: " + e);
+        }
+        
+    }
+    IEnumerator TransitionFromKickAfterAttemptToKickOffRoutine()
+    {
+        yield return new WaitForSeconds(3.0f);        
+        RpcDisableKickAfterWasKickGoodOrBadUI();
+        GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "kickoff");
+    }
+    [ClientRpc]
+    void RpcDisableKickAfterWasKickGoodOrBadUI()
+    {
+        KickAfterWasKickGoodPanel.SetActive(false);
+        TheKickWasText.gameObject.SetActive(false);
+        KickWasNotGoodText.gameObject.SetActive(false);
+        KickWasGoodText.gameObject.SetActive(false);
+        KickWasBlockedText.gameObject.SetActive(false);
+    }
+    [Client]
+    void ResetKickAfterPositionBoolValue()
+    {
+        LocalGamePlayerScript.areGoblinsRepositionedForKickAfter = false;
+    }
+    [Server]
+    public void KickAfterAttemptWasBlocked()
+    {
+        TransitionFromKickAfterAttemptToKickOff();
+        DisableKickAfterAttemptControls();
+        RpcKickAfterAttemptWasBlocked();
+    }
+    [ClientRpc]
+    void RpcKickAfterAttemptWasBlocked()
+    {
+        KickAfterPositionControlsPanel.SetActive(false);
+        KickAfterTimerBeforeKickPanel.SetActive(false);
+        KickAfterWasKickGoodPanel.SetActive(true);
+        TheKickWasText.gameObject.SetActive(true);
+        KickWasBlockedText.gameObject.SetActive(true);
+    }
 }

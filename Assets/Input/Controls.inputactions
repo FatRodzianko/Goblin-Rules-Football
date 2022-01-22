@@ -14,22 +14,6 @@
                     "interactions": ""
                 },
                 {
-                    "name": "SwitchQ",
-                    "type": "Button",
-                    "id": "aa787ddd-6c65-4d72-b5b2-4663ff4118ab",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "SwitchE",
-                    "type": "Button",
-                    "id": "c67e26c1-c2b2-4915-91ae-6d17099a6142",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
                     "name": "Sprint",
                     "type": "Button",
                     "id": "bda818f1-5aa6-4207-b58e-846839fd1004",
@@ -73,46 +57,6 @@
                     "name": "KickFootball",
                     "type": "Button",
                     "id": "f24a79c5-3d8d-418f-9dcb-b615f69ab95d",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "SelectHeads",
-                    "type": "Button",
-                    "id": "a5cb37ee-fb69-41c5-b9fa-1d1d669c7e86",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "SelectTails",
-                    "type": "Button",
-                    "id": "3f40d423-1b15-4334-ac2d-2444862699f2",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "SubmitCoin",
-                    "type": "Button",
-                    "id": "c9b0432a-e8be-4f24-a82e-6b2f3abd5d4d",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "KickoffAngleUp",
-                    "type": "Button",
-                    "id": "17025a10-3409-4827-b080-5450f3dc888e",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "KickoffAngleDown",
-                    "type": "Button",
-                    "id": "e0908c98-d87c-48fa-aea3-a5ee05663511",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -231,28 +175,6 @@
                 },
                 {
                     "name": "",
-                    "id": "42bf3b80-b367-41b8-8533-c8e032f228c8",
-                    "path": "<Keyboard>/q",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard and Mouse",
-                    "action": "SwitchQ",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "9c21b70b-8b79-405c-a071-16d1b0f428ba",
-                    "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard and Mouse",
-                    "action": "SwitchE",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "75dc912d-82e1-4692-9286-20152d642ff8",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
@@ -316,32 +238,199 @@
                     "action": "KickFootball",
                     "isComposite": false,
                     "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "QESwitchGoblins",
+            "id": "33cc8087-1502-4497-8bdf-0aae50d5c5e8",
+            "actions": [
+                {
+                    "name": "SwitchE",
+                    "type": "Button",
+                    "id": "645949b3-5e11-4994-bb9e-09bb6e5b263f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 },
                 {
+                    "name": "SwitchQ",
+                    "type": "Button",
+                    "id": "6e197114-5723-4f60-9609-7193af1f1157",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
                     "name": "",
-                    "id": "53f9ab38-37f9-4b7b-9790-dcb08db17122",
-                    "path": "<Keyboard>/a",
+                    "id": "57cce0c2-ee55-4c9e-aa17-dafe77b070eb",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
-                    "action": "SelectHeads",
+                    "action": "SwitchE",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "88a3727d-4704-4b20-becc-6e4c4e094945",
+                    "id": "3458ddf3-e58e-45cd-ae3f-dde5d9b3fae6",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "SwitchQ",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "KickOff",
+            "id": "6200b16f-c2ab-46d6-beba-10e66e97c416",
+            "actions": [
+                {
+                    "name": "KickoffAngleDown",
+                    "type": "Button",
+                    "id": "c3e8d6cb-fa18-4a2d-8782-d558d6110166",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "KickoffAngleUp",
+                    "type": "Button",
+                    "id": "fa483f34-a5d1-4a28-a528-5625f7ef7a6d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "dd20070b-0c46-4e32-93a3-ebe616a5c65f",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "KickoffAngleDown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a8d8921a-3798-4b94-8be4-2bfddf7fb8db",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "KickoffAngleUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "KickAfterPositioning",
+            "id": "911f4aa8-2976-47b2-8bf9-923dda5fd402",
+            "actions": [
+                {
+                    "name": "KickAfterPositioning-Right",
+                    "type": "Button",
+                    "id": "895f1fd8-dbc4-4f7e-9abb-808e03531f05",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "KickAfterPositioning-Left",
+                    "type": "Button",
+                    "id": "676c79c3-a86a-40db-85ea-0433fd8b9827",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "SubmitPosition",
+                    "type": "Button",
+                    "id": "30e2c770-de22-418b-b714-061f92ca4248",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "7f604f11-12b0-4f6d-a584-5ebb66826ad4",
                     "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
-                    "action": "SelectTails",
+                    "action": "KickAfterPositioning-Right",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "1ff50729-4375-481f-afa9-7ee0475450b5",
+                    "id": "699a6a32-86a3-461f-8d27-4865725bbc91",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "KickAfterPositioning-Left",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "432cd9c7-b2a5-401a-b2cb-34f6213c9214",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "SubmitPosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "CoinTossKickReceive",
+            "id": "d5ad9933-d3c8-4edb-8c4e-b3456231221c",
+            "actions": [
+                {
+                    "name": "SubmitCoin",
+                    "type": "Button",
+                    "id": "2b94af5d-c306-4758-8a93-671351ddc2fa",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "SelectTails",
+                    "type": "Button",
+                    "id": "2f188232-0ce9-4482-b337-e22d22235267",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "SelectHeads",
+                    "type": "Button",
+                    "id": "161061fc-8b66-47ac-b458-65980f0a994e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "22b346f7-7d04-44cc-a88d-af5279771d88",
                     "path": "<Keyboard>/enter",
                     "interactions": "",
                     "processors": "",
@@ -352,23 +441,50 @@
                 },
                 {
                     "name": "",
-                    "id": "0057af4b-ca38-4196-8825-27c6a2d5d680",
-                    "path": "<Keyboard>/w",
+                    "id": "c1e7bd57-5ca1-4dd2-914d-1c16c5806f90",
+                    "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
-                    "action": "KickoffAngleUp",
+                    "action": "SelectTails",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "7c8e8fef-aebb-4ee9-9344-cf40b0bdd414",
-                    "path": "<Keyboard>/s",
+                    "id": "565b7e65-b3a2-4542-946f-d4097f5c7fb9",
+                    "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
-                    "action": "KickoffAngleDown",
+                    "action": "SelectHeads",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "KickAfterKicking",
+            "id": "e0cb3e75-95b3-41b9-a383-9e6b2bf377a2",
+            "actions": [
+                {
+                    "name": "KickAfterSubmit",
+                    "type": "Button",
+                    "id": "f6724e12-c3ed-4f95-906a-5ada47f70d2c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "990a44da-4b16-4e48-be40-14a2c5c8cecd",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "KickAfterSubmit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

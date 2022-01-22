@@ -104,6 +104,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public float GoblinMinKickDistance = 10f;
     [SyncVar] public float GoblinPowerBarSpeed = 1f;
     [SyncVar] public float GoblinKickPower = 0f;
+    
     public float currentPowerBarScale = 0f;
     public int powerBarDirection = 1;
     public float kickoffAngle = 0f;
@@ -111,7 +112,34 @@ public class GoblinScript : NetworkBehaviour
     float kickoffAngleSpeed = 30f;
     public bool aimArrowButtonHeldDown = false;
     public bool aimArrowUp = false;
-    
+
+    [Header("Kick After Repositioning Stuff")]
+    [SyncVar] public bool isKickAfterGoblin = false;
+    [SyncVar] public bool isKickAfterPositionSet = false;
+    [SyncVar] public float angleOfKickAttempt = 0f;
+    [SyncVar(hook =nameof(HandleKickAfterAccuracyDifficultyUpdate))] public float kickAfterAccuracyDifficulty = 0f;
+    //[SyncVar] public float kickAfterAccuracyBar1 = 0f;
+    //[SyncVar] public float kickAfterAccuracyBar2 = 0f;
+    bool repositioningButtonHeldDown = false;
+    bool repositioningToLeft = false;
+    Vector2 greenGoalPost = new Vector2(40f, 0.5f);
+    Vector2 greyGoalPost = new Vector2(-40f, 0.5f);
+    [SyncVar] public Vector2 kickAfterFinalPosition = Vector2.zero;
+
+    [Header("Kick After Accuracy Bar Stuff")]
+    [SerializeField] GameObject kickAfterAccuracyBar;
+    [SerializeField] GameObject kickAfterGuageLine;
+    [SerializeField] GameObject kickAfterMarkerLeft;
+    [SerializeField] GameObject kickAfterMarkerRight;
+    [SyncVar] public float accuracyValueSubmitted;
+    [SyncVar] public float powerValueSubmitted;
+    bool isGoblinDoingKickAfterAttempt = false;
+    bool isAccuracySubmittedYet = false;
+    bool isPowerSubmittedYet = false;
+    IEnumerator kickAfterMoveAccuracyGuageLineRoutine;
+    float currentAccuracyGaugeXPosition = -1f;
+    int currentAccuracyGaugeDirection = 1;
+    public float AccuracyBarSpeed = 0f;
 
     [Header("wasPunchedSpeedModifier Info")]
     public bool isWasPunchedRoutineRunning = false;
@@ -154,12 +182,14 @@ public class GoblinScript : NetworkBehaviour
             if (transform.position.x > 0f)
                 CmdFlipRenderer(true);
         }
-        /*InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
+        InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
         InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
 
         InputManager.Controls.Player.Sprint.performed += _ => IsPlayerSprinting(true);
-        InputManager.Controls.Player.Sprint.canceled += _ => IsPlayerSprinting(false);        */
-        
+        InputManager.Controls.Player.Sprint.canceled += _ => IsPlayerSprinting(false);
+        EnableGoblinMovement(false);
+
+
     }
     public override void OnStartServer()
     {
@@ -176,11 +206,11 @@ public class GoblinScript : NetworkBehaviour
             InputManager.Controls.Player.Move.Enable();
             InputManager.Controls.Player.Sprint.Enable();
 
-            InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
+           /*nputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
             InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
 
             InputManager.Controls.Player.Sprint.performed += _ => IsPlayerSprinting(true);
-            InputManager.Controls.Player.Sprint.canceled += _ => IsPlayerSprinting(false);
+            InputManager.Controls.Player.Sprint.canceled += _ => IsPlayerSprinting(false);*/
         }
         else
         {
@@ -385,6 +415,25 @@ public class GoblinScript : NetworkBehaviour
             {
                 HandleCanGoblinReceivePass(this.canGoblinReceivePass, true);
             }
+            if (this.isKickAfterGoblin && !this.isKickAfterPositionSet && GameplayManager.instance.gamePhase == "kick-after-attempt")
+            {
+                // Calculate accuracy stuff for kick after as player moves goblin
+                if (this.isGoblinGrey)
+                {
+                    Vector2 v2 = transform.position;
+                    angleOfKickAttempt = Mathf.Abs(Mathf.Atan2((v2.y - greyGoalPost.y), (v2.x - greyGoalPost.x)) * Mathf.Rad2Deg);
+
+                }
+                else
+                {
+                    Vector2 v2 = transform.position;
+                    /*Vector2 v1 = greenGoalPost;
+                    v2 = v1 - v2;*/
+                    angleOfKickAttempt = Mathf.Abs(Mathf.Atan2((greenGoalPost.y - v2.y), (greenGoalPost.x - v2.x)) * Mathf.Rad2Deg);
+                    //angleOfKickAttempt = Vector2.Angle(this.transform.position, greenGoalPost);
+                }
+                CalculateKickAfterAccuracyDifficulty(angleOfKickAttempt);
+            }
         }
         if (isClient)
         {
@@ -424,6 +473,47 @@ public class GoblinScript : NetworkBehaviour
                 //KickoffAimArrow.transform.Rotate(0f, 0f, kickoffAngle, Space.Self);
                 KickoffAimArrow.transform.localRotation = Quaternion.Euler(0f, 0f, kickoffAngle);
             }
+            if (repositioningButtonHeldDown && GameplayManager.instance.gamePhase == "kick-after-attempt" && !isKickAfterPositionSet)
+            {
+                int directionModifier = 1;
+                if (repositioningToLeft)
+                    directionModifier = -1;
+                Vector3 newPosition = this.transform.position;
+                newPosition.x += speed * Time.deltaTime * directionModifier;
+
+                if (this.isGoblinGrey && newPosition.x < -30f)
+                    newPosition.x = -30f;
+                else if (!this.isGoblinGrey && newPosition.x > 30f)
+                    newPosition.x = 30f;
+
+                if (this.isGoblinGrey)
+                {
+                    if (Vector2.Distance(newPosition, greyGoalPost) > GoblinMaxKickDistance)
+                        return;
+                }
+                else
+                {
+                    if (Vector2.Distance(newPosition, greenGoalPost) > GoblinMaxKickDistance)
+                        return;
+                }
+                
+                this.transform.position = newPosition;
+            }
+            if(isGoblinDoingKickAfterAttempt && !isAccuracySubmittedYet && !isPowerSubmittedYet && GameplayManager.instance.gamePhase == "kick-after-attempt")
+            {
+                currentAccuracyGaugeXPosition += Time.deltaTime * (GoblinPowerBarSpeed * 2.0f) * currentAccuracyGaugeDirection;
+                if (currentAccuracyGaugeXPosition > 1f)
+                {
+                    currentAccuracyGaugeXPosition = 1f;
+                    currentAccuracyGaugeDirection = -1;
+                }
+                else if (currentAccuracyGaugeXPosition < -1f)
+                {
+                    currentAccuracyGaugeXPosition = -1f;
+                    currentAccuracyGaugeDirection = 1;
+                }
+                kickAfterGuageLine.transform.localPosition = new Vector3(currentAccuracyGaugeXPosition, 0f, 0f);
+            }
         }
     }
     [ClientCallback]
@@ -433,7 +523,6 @@ public class GoblinScript : NetworkBehaviour
             CmdRegainHealth();
         Move();
     }
-
     [Client]
     private void SetMovement(Vector2 movement) => previousInput = movement;
 
@@ -602,11 +691,11 @@ public class GoblinScript : NetworkBehaviour
                     {
                         if (this.isEGoblin)
                         {
-                            myGamePlayer.SwitchToEGoblin();
+                            myGamePlayer.SwitchToEGoblin(false,Time.time);
                         }
                         else if (this.isQGoblin)
                         {
-                            myGamePlayer.SwitchToQGoblin(false);
+                            myGamePlayer.SwitchToQGoblin(false, Time.time);
                         }
                     }
                 }
@@ -756,7 +845,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (stamina > 0f)
                 {
-                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer) * 1.15f;
+                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier) * 1.15f;
                 }
                 //Update CanRecoverStamina Event here?
                 if (isStaminaRecoveryRoutineRunning)
@@ -768,7 +857,7 @@ public class GoblinScript : NetworkBehaviour
             }
             else if (isFatigued)
             {
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer) * 0.5f;
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier) * 0.5f;
             }
         }        
         else
@@ -967,7 +1056,11 @@ public class GoblinScript : NetworkBehaviour
             HandleHasBall(doesCharacterHaveBall, false);
             Football footballScript = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
             footballScript.FumbleFootball();
-
+        }
+        //Code here for ending kick-after-attempt?
+        if (GameplayManager.instance.gamePhase == "kick-after-attempt" && this.isKickAfterGoblin)
+        {
+            GameplayManager.instance.KickAfterAttemptWasBlocked();
         }
     }
     [Server]
@@ -1349,6 +1442,8 @@ public class GoblinScript : NetworkBehaviour
     {
         if (!isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing && kickPower <= 1f && kickPower >= 0f)
         {
+            if (GameplayManager.instance.gamePhase == "kick-after-attempt")
+                powerValueSubmitted = kickPower;
             HandleIsKicking(this.isKicking, true);
             GoblinKickPower = kickPower;
             GoblinKickoffAngle = kickAngle;
@@ -1393,6 +1488,12 @@ public class GoblinScript : NetworkBehaviour
         else
             newLocalPosition.x += 1.0f;
         footballScript.transform.localPosition = newLocalPosition;
+
+        if (GameplayManager.instance.gamePhase == "kick-after-attempt")
+        {
+            footballScript.KickAfterAttemptKick(isGoblinGrey, powerValueSubmitted, angleOfKickAttempt, GoblinMaxKickDistance, GoblinMinKickDistance, kickAfterAccuracyDifficulty, accuracyValueSubmitted, kickAfterFinalPosition);
+            return;
+        }
 
         footballScript.KickFootballDownField(isGoblinGrey, GoblinKickPower, GoblinKickoffAngle, GoblinMaxKickDistance, GoblinMinKickDistance);
         
@@ -1491,5 +1592,185 @@ public class GoblinScript : NetworkBehaviour
     public void EndAimArrowDirection()
     {
         aimArrowButtonHeldDown = false;
+    }
+    public void KickAfterRepositioning(bool moveLeft)
+    {
+        repositioningButtonHeldDown = true;
+        repositioningToLeft = moveLeft;
+    }
+    public void EndKickAfterRepositioning()
+    {
+        repositioningButtonHeldDown = false;
+    }
+    public void CheckIfGoblinNeedsToFlipForKickAfter(bool isPlayerKicking)
+    {
+        if (this.isGoblinGrey && !myRenderer.flipX)
+        {
+            this.CmdFlipRenderer(true);
+        }
+        else if (!this.isGoblinGrey && myRenderer.flipX)
+        {
+            this.CmdFlipRenderer(false);
+        }
+    }
+    [Server]
+    void CalculateKickAfterAccuracyDifficulty(float angle)
+    {
+        //kickAfterAccuracyDifficulty = 1 - ((angle / 100) * 3);
+        float newDifficulty = 1 - ((angle / 100) * 3);
+        if (newDifficulty > 0.9f)
+            newDifficulty = 0.9f;
+        if (newDifficulty < 0.1f)
+            newDifficulty = 0.1f;
+        //HandleKickAfterAccuracyDifficultyUpdate(this.kickAfterAccuracyDifficulty, (1 - ((angle / 100) * 3)));
+        HandleKickAfterAccuracyDifficultyUpdate(this.kickAfterAccuracyDifficulty, newDifficulty);
+        //kickAfterAccuracyBar1 = 0.5f - (kickAfterAccuracyDifficulty / 2);
+        //kickAfterAccuracyBar2 = 0.5f + (kickAfterAccuracyDifficulty / 2);
+    }
+    public void ActivateKickAfterAccuracyBar(bool activate)
+    {
+        kickAfterAccuracyBar.SetActive(activate);
+        kickAfterGuageLine.SetActive(false);
+    }
+    void HandleKickAfterAccuracyDifficultyUpdate(float oldValue, float newValue)
+    {
+        if (isServer)
+            kickAfterAccuracyDifficulty = newValue;
+        if (isClient)
+        {
+            if (hasAuthority)
+            {
+                Vector3 newPosition = new Vector3(newValue, 0f, 0f);
+                kickAfterMarkerRight.transform.localPosition = newPosition;
+                newPosition.x *= -1;
+                kickAfterMarkerLeft.transform.localPosition = newPosition;
+
+            }
+        }
+    }
+    public void SubmitKickAfterPositionToServer()
+    {
+        if (hasAuthority)
+            CmdSubmitKickAfterPositionToServer(transform.position);
+
+    }
+    [Command]
+    void CmdSubmitKickAfterPositionToServer(Vector3 kickAfterPosition)
+    {
+        if (Vector2.Distance(kickAfterPosition, this.transform.position) > 3.0f)
+            return;
+
+        kickAfterFinalPosition = kickAfterPosition;
+        isKickAfterPositionSet = true;
+        GameplayManager.instance.DisableKickAfterPositioningControls();
+        GameplayManager.instance.StartKickAfterTimer();
+        this.RpcKickAfterPositionFromServer(this.connectionToClient, kickAfterPosition);
+    }
+    [TargetRpc]
+    void RpcKickAfterPositionFromServer(NetworkConnection target, Vector2 newPosition)
+    {
+        if (hasAuthority)
+            this.transform.position = newPosition;
+    }
+    public void StartKickAfterKickAttempt()
+    {
+        isGoblinDoingKickAfterAttempt = true;
+        isAccuracySubmittedYet = false;
+        isPowerSubmittedYet = false;
+        kickAfterGuageLine.transform.localPosition = new Vector3(-1f, 0f, 0f);
+        currentAccuracyGaugeXPosition = -1f;
+        kickAfterGuageLine.SetActive(true);
+        //kickAfterMoveAccuracyGuageLineRoutine = KickAfterMoveAccuracyGuageLine();
+        //StartCoroutine(kickAfterMoveAccuracyGuageLineRoutine);
+    }
+    IEnumerator KickAfterMoveAccuracyGuageLine()
+    {
+        int directionModifer = 1;
+        Vector3 newLocalPosition = kickAfterGuageLine.transform.localPosition;
+        while (!isAccuracySubmittedYet)
+        {
+            yield return new WaitForSeconds(0.05f);
+            newLocalPosition.x += 0.1f * directionModifer;
+            if (newLocalPosition.x >= 1.0f)
+            {
+                newLocalPosition.x = 1.0f;
+                directionModifer = -1;
+            }
+            else if (newLocalPosition.x <= -1f)
+            {
+                newLocalPosition.x = -1f;
+                directionModifer = 1;
+            }
+            kickAfterGuageLine.transform.localPosition = newLocalPosition;
+        }
+        yield break;
+    }
+    public void SubmitKickAfterKicking()
+    {
+        if (!isAccuracySubmittedYet)
+        {
+            isAccuracySubmittedYet = true;
+            if (hasAuthority)
+                CmdSubmitKickAfterAccuracyValue(kickAfterGuageLine.transform.localPosition.x);
+            StartKickAfterPower();
+            //StopCoroutine(kickAfterMoveAccuracyGuageLineRoutine);
+        }
+        else if (isAccuracySubmittedYet && !isPowerSubmittedYet)
+        {
+            StopKickPower();
+        }
+            
+    }
+    void StartKickAfterPower()
+    {
+        Debug.Log("StartKickAfterPower");
+        kickAfterGuageLine.SetActive(false);
+        kickAfterAccuracyBar.SetActive(false);
+        StartKickPower();
+    }
+    [Command]
+    void CmdSubmitKickAfterAccuracyValue(float accuracyValue)
+    {
+        Debug.Log("CmdSubmitKickAfterAccuracyValue: " + accuracyValue);
+        accuracyValueSubmitted = accuracyValue;
+    }
+    [TargetRpc]
+    void RpcKickBlockedStopKickAfterAttempt(NetworkConnection target)
+    {
+        if (isGoblinDoingKickAfterAttempt)
+        {
+            isGoblinDoingKickAfterAttempt = false;
+            kickAfterGuageLine.SetActive(false);
+            kickAfterAccuracyBar.SetActive(false);
+            ResetPowerBar();
+        }
+            
+    }
+    [Server]
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (GameplayManager.instance.gamePhase == "kick-after-attempt")
+        {
+            if (collision.collider.tag == "Goblin")
+            {
+                GoblinScript collidingGoblin = collision.collider.GetComponent<GoblinScript>();
+                if (collidingGoblin.isKickAfterGoblin && collidingGoblin.isGoblinGrey != this.isGoblinGrey && collidingGoblin.isKickAfterPositionSet)
+                {
+                    Debug.Log("GoblinScript: OnCollisionEnter2D: The colliding goblin is the kick after goblin! Goblin: " + collidingGoblin.name);
+                    collidingGoblin.KickAfterGoblinWasRunInto();
+                }
+                /*if (this.isKickAfterGoblin)
+                {
+                    Debug.Log("GoblinScript: OnCollisionEnter2D: THIS GOBLIN is the kick after goblin! And another goblin ran into it! This goblin: " + this.name + " colliding Goblin: " + collidingGoblin.name);
+                    KickAfterGoblinWasRunInto();
+                }*/
+            }
+        }
+    }
+    [Server]
+    void KickAfterGoblinWasRunInto()
+    {
+        this.KnockOutGoblin(false);
+        RpcKickBlockedStopKickAfterAttempt(this.connectionToClient);
     }
 }

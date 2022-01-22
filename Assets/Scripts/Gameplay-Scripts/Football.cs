@@ -55,6 +55,10 @@ public class Football : NetworkBehaviour
     bool bounceForward = false;
     Vector3[] BouncingBallPoints = new Vector3[3];
 
+    [Header("Kick After Attempt")]
+    public bool isKickAfterAttemptGood;
+    bool hasKickAfterAttemptBeenSubmittedToGameManager;
+
     [SerializeField] public CinemachineVirtualCamera myCamera;
     public GamePlayer localPlayer;
     public CameraMarker myCameraMarker;
@@ -242,7 +246,7 @@ public class Football : NetworkBehaviour
                 }
 
             }
-            if (!isThrown && !isHeld && !isFalling)
+            if (!isThrown && !isHeld && !isFalling && GameplayManager.instance.gamePhase != "kick-after-attempt")
             { 
                 if(transform.position.y < -6.5f)
                     transform.position = new Vector2(transform.position.x, -6.5f);
@@ -290,6 +294,28 @@ public class Football : NetworkBehaviour
                         HandleIsKicked(this.isKicked, false);
                         //animator.SetBool("isFumbled", false);
                         RpcActivateFootballShadow(false, this.transform.position);
+                        // Send gameplay manager a notification if the kick came up short
+                        if (GameplayManager.instance.gamePhase == "kick-after-attempt" && !hasKickAfterAttemptBeenSubmittedToGameManager)
+                        {
+                            float xPosition = transform.position.x;
+                            if ((xPosition < 0 && xPosition > -40f) || (xPosition > 0 && xPosition < 40f))
+                            {
+                                Debug.Log("Football.cs: Football has crossed the goalpost. x position of: " + xPosition.ToString());
+                                GameplayManager.instance.KickAfterWasKickGoodOrBad(isKickAfterAttemptGood);
+                                hasKickAfterAttemptBeenSubmittedToGameManager = true;
+                            }
+                        }
+                    }
+                    // If this is a kick after attempt, check if the kick has crossed the goal posts
+                    if (GameplayManager.instance.gamePhase == "kick-after-attempt" && !hasKickAfterAttemptBeenSubmittedToGameManager)
+                    {
+                        float xPosition = transform.position.x;
+                        if ((xPosition < 0 && xPosition < -40f) || (xPosition > 0 && xPosition > 40f))
+                        {
+                            Debug.Log("Football.cs: Football has crossed the goalpost. x position of: " + xPosition.ToString());
+                            GameplayManager.instance.KickAfterWasKickGoodOrBad(isKickAfterAttemptGood);
+                            hasKickAfterAttemptBeenSubmittedToGameManager = true;
+                        }
                     }
                 }
                 else
@@ -298,6 +324,17 @@ public class Football : NetworkBehaviour
                     HandleIsKicked(this.isKicked, false);
                     //animator.SetBool("isFumbled", false);
                     RpcActivateFootballShadow(false, this.transform.position);
+                    // Send gameplay manager a notification if the kick came up short
+                    if (GameplayManager.instance.gamePhase == "kick-after-attempt" && !hasKickAfterAttemptBeenSubmittedToGameManager)
+                    {
+                        float xPosition = transform.position.x;
+                        if ((xPosition < 0 && xPosition > -40f) || (xPosition > 0 && xPosition < 40f))
+                        {
+                            Debug.Log("Football.cs: Football has crossed the goalpost. x position of: " + xPosition.ToString());
+                            GameplayManager.instance.KickAfterWasKickGoodOrBad(isKickAfterAttemptGood);
+                            hasKickAfterAttemptBeenSubmittedToGameManager = true;
+                        }
+                    }
                 }
             }
             if (isBouncing && !isHeld)
@@ -611,6 +648,156 @@ public class Football : NetworkBehaviour
         RpcShadowPosition(KickedBallPoints[0], KickedBallPoints[2], kickCountModifier);
     }*/
     [Server]
+    public void KickAfterAttemptKick(bool isKickingGoblinGrey, float kickPower, float kickAngle, float maxDistance, float minDistance, float accuracyDifficulty, float accuracySubmitted, Vector3 goblinPosition)
+    {
+        Debug.Log("KickAfterAttemptKick: for kick after attempt");
+        this.HandleIsHeld(isHeld, false);
+
+        isKickAfterAttemptGood = true;
+        hasKickAfterAttemptBeenSubmittedToGameManager = false;
+
+        Vector3 goalPostPosition = Vector3.zero;
+        float inaccurateKickYModifer = 1.0f;
+        if (isKickingGoblinGrey)
+            goalPostPosition = new Vector2(-40f, 0.5f);
+        else
+            goalPostPosition = new Vector2(40f, 0.5f);
+        float distanceToGoalPost = Vector2.Distance(goalPostPosition, goblinPosition);
+        float distanceTraveled = ((maxDistance - minDistance) * kickPower) + minDistance;
+        if (distanceTraveled >= distanceToGoalPost)
+        {
+            Debug.Log("KickAfterAttemptKick: Kick distance is GOOD! Distance needed: " + distanceToGoalPost.ToString() + " distance traveled: " + distanceTraveled.ToString());
+        }            
+        else
+        {
+            Debug.Log("KickAfterAttemptKick: Kick distance is BAD! The kick is not long enough! Distance needed: " + distanceToGoalPost.ToString() + " distance traveled: " + distanceTraveled.ToString());
+            isKickAfterAttemptGood = false;
+        }
+        if (Mathf.Abs(accuracySubmitted) <= accuracyDifficulty)
+        {
+            Debug.Log("KickAfterAttemptKick: Kick accuracy is GOOD! Accuracy difficulty: " + accuracyDifficulty.ToString() + " accuracy submitted: " + accuracySubmitted.ToString());
+        }
+        else
+        {
+            Debug.Log("KickAfterAttemptKick: Kick accuracy is BAD! Kick is wide left/right. Accuracy difficulty: " + accuracyDifficulty.ToString() + " accuracy submitted: " + accuracySubmitted.ToString());
+            isKickAfterAttemptGood = false;
+            if (accuracySubmitted < 0)
+            {
+                if (isKickingGoblinGrey)
+                {
+                    if (goblinPosition.y >= goalPostPosition.y)
+                        inaccurateKickYModifer = 2.1f;
+                    else
+                        inaccurateKickYModifer = 0.4f;
+                }
+                else
+                {
+                    if (goblinPosition.y >= goalPostPosition.y)
+                        inaccurateKickYModifer = 0.4f;
+                    else
+                        inaccurateKickYModifer = 2.1f;
+                }
+                
+            }
+            else
+            {
+                if (isKickingGoblinGrey)
+                {
+                    if (goblinPosition.y >= goalPostPosition.y)
+                        inaccurateKickYModifer = 0.4f;
+                    else
+                        inaccurateKickYModifer = 2.1f;
+                }
+                else
+                {
+                    if (goblinPosition.y >= goalPostPosition.y)
+                        inaccurateKickYModifer = 2.1f;
+                    else
+                        inaccurateKickYModifer = 0.4f;
+                }                
+            }
+        }
+
+        // look at this for calculating x,y position of endpoint when you know distance and angle:
+        //https://answers.unity.com/questions/759542/get-coordinate-with-angle-and-distance.html
+
+
+        int directionToKickModifier = 1;
+        if (isKickingGoblinGrey)
+            directionToKickModifier = -1;
+
+        int yModifier = 1;
+        if (goblinPosition.y >= goalPostPosition.y)
+            yModifier = -1;
+        Debug.Log("KickAfterAttemptKick: Calculating kick angle for kickoff using a kick angle of " + kickAngle.ToString() + " and a distance of " + distanceTraveled.ToString());
+        //var degrees = kickAngle * directionToKickModifier;
+        var degrees = (kickAngle * inaccurateKickYModifer);
+        var radians = degrees * Mathf.Deg2Rad;
+        var x = Mathf.Cos(radians);
+        var y = Mathf.Sin(radians);
+        x = x * distanceTraveled * directionToKickModifier;
+        y = y * distanceTraveled * yModifier;
+        Vector2 newPosition = new Vector2(x, y);
+        Vector2 goblinPosition2 = goblinPosition;
+        Vector2 newPosition2 = goblinPosition2 + newPosition;
+        Debug.Log("KickAfterAttemptKick: NEW POSITION for kick should be: " + newPosition.ToString() + " and NEW POSITION 2 is: " + newPosition2.ToString());
+
+
+        /*float slope = (goalPostPosition.y - goblinPosition.y) / (goalPostPosition.x / goblinPosition.x);
+        float c = 1 / (Mathf.Sqrt(1 + Mathf.Pow(slope, 2)));
+        float s = slope / (Mathf.Sqrt(1 + Mathf.Pow(slope, 2)));
+        Vector2 csPoint = new Vector2(c, s);
+        Vector2 footballPosition2 = goblinPosition;
+        Vector2 newEndPoint1 = footballPosition2 + (distanceTraveled * csPoint);
+        Vector2 newEndPoint2 = footballPosition2 - (distanceTraveled * csPoint);
+        Debug.Log("KickFootballDownField: NEW ENDPOINTS for kick after attempt. + endpoint: " + newEndPoint1.ToString() + " - endpoint " + newEndPoint2.ToString() + " c value: " + c.ToString() + " s value: " + s.ToString() + "slope was: " + slope.ToString());*/
+
+        //KickFootballDownField(isKickingGoblinGrey, kickPower, kickAngle, maxDistance, minDistance);
+
+        //Setup the kick control points for animation
+        KickedBallPoints[0] = goblinPosition; //start point
+        KickedBallPoints[2] = newPosition2; // destination point
+        float controlX = ((newPosition2.x - goblinPosition.x) / 2) + goblinPosition.x;
+        //float controlY = (distanceTraveled + (differenceInY)) / 2;
+        float controlY = distanceTraveled + goblinPosition.y;
+        KickedBallPoints[1] = new Vector3(controlX, controlY, goblinPosition.z);// control point
+
+
+        if (newPosition2.x > goblinPosition.x)
+            bounceForward = true;
+        else
+            bounceForward = false;
+
+        kickCount = 0.0f;
+        //kickCountModifier = 0.8f;
+
+        if (distanceTraveled < 15f)
+            kickCountModifier = 1.25f;
+        else if (distanceTraveled < 20f)
+            kickCountModifier = 1.05f;
+        else if (distanceTraveled < 25f)
+            kickCountModifier = 0.85f;
+        else if (distanceTraveled < 30f)
+            kickCountModifier = 0.725f;
+        else if (distanceTraveled < 35f)
+            kickCountModifier = 0.65f;
+        else if (distanceTraveled < 40f)
+            kickCountModifier = 0.6f;
+        else
+            kickCountModifier = 0.6f;
+
+        
+        //isKicked = true;
+        HandleIsKicked(this.isKicked, true);
+        animator.SetBool("isFumbled", true);
+        RpcActivateFootballShadow(true, KickedBallPoints[0]);
+        RpcShadowPosition(KickedBallPoints[0], KickedBallPoints[2], kickCountModifier);
+
+        //do stuff depending on if kick was good or bad
+        Debug.Log("KickAfterAttemptKick: Was the kick good??? " + isKickAfterAttemptGood.ToString() + "!!!");
+
+    }
+    [Server]
     public void KickFootballDownField(bool isKickingGoblinGrey, float kickPower, float kickAngle, float maxDistance, float minDistance)
     {
         Debug.Log("KickFootballDownField with isKickingGoblinGrey: " + isKickingGoblinGrey.ToString() + " kick poweR: " + kickPower.ToString() + " max distance: " + maxDistance.ToString() + " min distance: " + minDistance.ToString());
@@ -663,6 +850,26 @@ public class Football : NetworkBehaviour
             Debug.Log("KickFootballDownField: y value for kickoff is: " + destinationY.ToString());
             differenceInY = destinationY - footballPosition.y;
         }
+
+        /*if (GameplayManager.instance.gamePhase == "kick-after-attempt")
+        {
+            Debug.Log("KickFootballDownField: for kick after attempt");
+            Vector3 goalPostPosition = Vector3.zero;
+            if (isKickingGoblinGrey)
+                goalPostPosition = new Vector2(-40f, 0.5f);
+            else
+                goalPostPosition = new Vector2(40f, 0.5f);
+
+            float slope = (goalPostPosition.y - footballPosition.y) / (goalPostPosition.x / footballPosition.x);
+            float c = 1 / (Mathf.Sqrt(1 + Mathf.Pow(slope,2)));
+            float s = slope / (Mathf.Sqrt(1 + Mathf.Pow(slope, 2)));
+            Vector2 csPoint = new Vector2(c, s);
+            Vector2 footballPosition2 = footballPosition;
+            Vector2 newEndPoint1 = footballPosition2 + (distanceTraveled * csPoint);
+            Vector2 newEndPoint2 = footballPosition2 - (distanceTraveled * csPoint);
+            Debug.Log("KickFootballDownField: NEW ENDPOINTS for kick after attempt. + endpoint: " + newEndPoint1.ToString() + " - endpoint " + newEndPoint2.ToString() + " c value: " + c.ToString() + " s value: " + s.ToString() + "slope was: " + slope.ToString());
+
+        }*/
 
         if(destinationX > 44.4f)
             destinationX = 44.4f;
@@ -748,6 +955,14 @@ public class Football : NetworkBehaviour
             {
                 GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameplay");
                 GameplayManager.instance.ActivateGameTimer(true);
+            }
+            if (newValue && GameplayManager.instance.gamePhase == "kick-after-attempt")
+            {
+                GameplayManager.instance.DisableKickAfterAttemptControls();
+            }
+            if (!newValue && GameplayManager.instance.gamePhase == "kick-after-attempt")
+            {
+                GameplayManager.instance.TransitionFromKickAfterAttemptToKickOff();
             }
                 
         }        
@@ -840,16 +1055,20 @@ public class Football : NetworkBehaviour
             float controlXDist = (Random.Range(1.0f, 2.25f)) * directionToBounce;
             bounceControlPoint.x += controlXDist;
 
-            if (bounceControlPoint.x > 44.4f)
+            if (GameplayManager.instance.gamePhase != "kick-after-attempt")
             {
-                bounceControlPoint.x = 44.4f;
-                controlXDist = 0f;
+                if (bounceControlPoint.x > 44.4f)
+                {
+                    bounceControlPoint.x = 44.4f;
+                    controlXDist = 0f;
+                }
+                else if (bounceControlPoint.x < -44.5f)
+                {
+                    bounceControlPoint.x = -44.5f;
+                    controlXDist = 0f;
+                }
             }
-            else if (bounceControlPoint.x < -44.5f)
-            {
-                bounceControlPoint.x = -44.5f;
-                controlXDist = 0f;
-            }
+            
                 
 
             BouncingBallPoints[1] = bounceControlPoint;
@@ -867,5 +1086,16 @@ public class Football : NetworkBehaviour
             animator.SetBool("isFumbled", false);
         }
             
+    }
+    [Server]
+    public void MoveFootballToKickoffGoblin(uint goblinNetId)
+    {
+        GoblinScript goblin = NetworkIdentity.spawned[goblinNetId].GetComponent<GoblinScript>();
+        this.transform.position = new Vector3(0f,0f,0f);
+        if (this.isHeld)
+        {
+            goblinWithBall.HandleHasBall(goblinWithBall.doesCharacterHaveBall, false);
+            HandleIsHeld(this.isHeld, false);
+        }
     }
 }

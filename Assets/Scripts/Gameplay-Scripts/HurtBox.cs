@@ -23,5 +23,20 @@ public class HurtBox : MonoBehaviour
             Debug.Log("OnTriggerEnter2D: Hurtbox collided with punchbox from: " + collision.transform.parent.name);
             myParentScript.HurtBoxCollision(collision.transform.parent.GetComponent<GoblinScript>());
         }
+        //Can't collided with these due to layer physics stuff
+        /*
+        if (collision.tag == "goblin-body")
+        {
+            Debug.Log("HutrBox: collision with goblin body of: " + collision.transform.parent.name);
+        }
+        if (collision.tag == "Goblin")
+        {
+            Debug.Log("HutrBox: collision with Goblin (not goblin body) of: " + collision.name);
+        }
+        if (collision.tag == "hurtbox")
+        {
+            Debug.Log("HutrBox: collision with hurtbox of: " + collision.transform.parent.name);
+        }
+        */
     }
 }
