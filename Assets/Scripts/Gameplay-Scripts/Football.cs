@@ -357,6 +357,10 @@ public class Football : NetworkBehaviour
 
 
             }
+            if (GameplayManager.instance.gamePhase == "xtra-time" && !isHeld && !isThrown && !isFumbled && !isFalling && !isKicked)
+            {
+                GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
+            }
 
         }
         if (isClient)
@@ -1098,4 +1102,5 @@ public class Football : NetworkBehaviour
             HandleIsHeld(this.isHeld, false);
         }
     }
+   
 }

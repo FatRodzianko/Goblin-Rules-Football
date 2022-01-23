@@ -27,7 +27,7 @@ public class TouchDownTextGradient : MonoBehaviour
         {
             color1 = new Color(0.2f, 0.2f, 0.2f, 1.0f);
             color2 = new Color(0.4f, 0.4f, 0.4f, 1.0f);
-            color3 = new Color(0.6f, 0.6f, 0.6f, 1.0f);
+            color3 = new Color(0.3f, 0.3f, 0.3f, 1.0f);
             color4 = new Color(0f, 0f, 0f, 1.0f);
         }
         else

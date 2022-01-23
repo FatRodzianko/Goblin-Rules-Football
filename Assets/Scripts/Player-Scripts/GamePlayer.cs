@@ -219,6 +219,8 @@ public class GamePlayer : NetworkBehaviour
             EnableKickAfterPositioning(false);
             EnableKickAfterKicking(false);
             EnableKickingControls(false);
+
+            GameplayManager.instance.SetTimerText(GameplayManager.instance.timeLeftInGame);
         }
     }
     [Command]

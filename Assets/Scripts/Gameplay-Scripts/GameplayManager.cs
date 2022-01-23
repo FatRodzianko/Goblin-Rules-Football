@@ -49,6 +49,10 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] TextMeshProUGUI KickWasNotGoodText;
     [SerializeField] TextMeshProUGUI KickWasBlockedText;
 
+    [Header("Xtra Time")]
+    [SyncVar] public bool isXtraTime;
+
+
     [Header("Game timer")]
     [SerializeField] TextMeshProUGUI timerText;
     [SyncVar(hook = nameof(HandleGameTimerUpdate))] public float timeLeftInGame;
@@ -62,6 +66,16 @@ public class GameplayManager : NetworkBehaviour
     [SyncVar(hook = nameof(HandleGreyScoreUpdate))] int greyScore;
     [SerializeField] TextMeshProUGUI ScoreGreenText;
     [SerializeField] TextMeshProUGUI ScoreGreyText;
+    [SyncVar] string winningTeam;
+
+    [Header("Game Over")]
+    [SerializeField] GameObject GameOverScorePanel;
+    [SerializeField] TextMeshProUGUI theFinalScoreText;
+    [SerializeField] TextMeshProUGUI greenTeamNameText;
+    [SerializeField] TextMeshProUGUI greyTeamNameText;
+    [SerializeField] TextMeshProUGUI greenTeamScoreText;
+    [SerializeField] TextMeshProUGUI greyTeamScoreText;
+    [SerializeField] TextMeshProUGUI teamWinnerText;
 
 
     private NetworkManagerGRF game;
@@ -101,7 +115,9 @@ public class GameplayManager : NetworkBehaviour
         base.OnStartServer();
         //gamePhase = "cointoss";
         HandleGamePhase(gamePhase, "cointoss");
-        timeLeftInGame = 300f;
+        //timeLeftInGame = 300f;
+        //timeLeftInGame = 30f;
+        HandleGameTimerUpdate(0f, 15f);
         greenScore = 0;
         greyScore = 0;
     }
@@ -171,6 +187,15 @@ public class GameplayManager : NetworkBehaviour
                 }
                 
             }
+            if (newValue == "xtra-time")
+            {
+                isXtraTime = true;
+            }
+            if (newValue == "gameover")
+            {
+                Debug.Log("GameplayManager on Server: It's game over!");
+                DetermineWinnerOfGame();
+            }
             
         }            
         if (isClient)
@@ -208,6 +233,14 @@ public class GameplayManager : NetworkBehaviour
             {
                 ResetKickAfterPositionBoolValue();
             }
+            if (newValue == "xtra-time")
+            {
+                //timerText.GetComponent<TimeText>().StartXtraTime();
+            }
+            if (newValue == "gameover")
+            {
+                timerText.GetComponent<TimeText>().EndXtraTime();
+            }
         }
     }
     [Server]
@@ -229,7 +262,7 @@ public class GameplayManager : NetworkBehaviour
     public void TouchDownScored(bool wasGrey, uint goblinNetId, float yPosition)
     {
         Debug.Log("TouchDownScored: " + goblinNetId.ToString());
-        RpcTouchDownScored(wasGrey, goblinNetId);
+        
         //SetKickAfterPlayers(scoringGoblinNetId);
         this.scoringGoblinNetId = goblinNetId;
 
@@ -242,6 +275,17 @@ public class GameplayManager : NetworkBehaviour
         yPositionOfKickAfter = yPosition;
 
         ActivateGameplayControls(false);
+        if (isXtraTime)
+        {
+            int differenceInScores = greenScore - greyScore;
+            if (Mathf.Abs(differenceInScores) > 2)
+            {
+                HandleGamePhase(this.gamePhase, "gameover");
+                return;
+            }
+            
+        }
+        RpcTouchDownScored(wasGrey, goblinNetId);
         IEnumerator touchdownToKickAfterTransition = GameplayToKickAfterTransition();
         StartCoroutine(touchdownToKickAfterTransition);
     }
@@ -286,10 +330,19 @@ public class GameplayManager : NetworkBehaviour
     IEnumerator GameTimerCountdown()
     {
         isGameTimerRunning = true;
+        float timeLeftTracker;
         while (isGameTimerRunning)
         {
             yield return new WaitForSeconds(1.0f);
-            HandleGameTimerUpdate(timeLeftInGame, timeLeftInGame - 1);
+            timeLeftTracker = timeLeftInGame - 1;
+            
+            HandleGameTimerUpdate(timeLeftInGame, timeLeftTracker);
+            if (timeLeftTracker <= 0)
+            {
+                HandleGameTimerUpdate(timeLeftInGame, 0);
+                isGameTimerRunning = false;
+                HandleGamePhase(this.gamePhase, "xtra-time");
+            }
         }
         yield break;        
     }
@@ -299,10 +352,25 @@ public class GameplayManager : NetworkBehaviour
             timeLeftInGame = newValue;
         if (isClient)
         {
-            minutes = Mathf.Floor(newValue / 60).ToString("0");
+            /*minutes = Mathf.Floor(newValue / 60).ToString("0");
             seconds = Mathf.Floor(newValue % 60).ToString("00");
+            timerText.text = minutes + ":" + seconds;*/
+            SetTimerText(newValue);
+        }
+    }
+    public void SetTimerText(float timeToSet)
+    {
+        if (timeToSet > 0)
+        {
+            minutes = Mathf.Floor(timeToSet / 60).ToString("0");
+            seconds = Mathf.Floor(timeToSet % 60).ToString("00");
             timerText.text = minutes + ":" + seconds;
         }
+        else
+        {
+            timerText.GetComponent<TimeText>().StartXtraTime();
+        }
+        
     }
     void HandleGreenScoreUpdate(int oldValue, int newValue)
     {
@@ -311,6 +379,7 @@ public class GameplayManager : NetworkBehaviour
         if (isClient)
         {
             ScoreGreenText.text = newValue.ToString("00");
+            greenTeamScoreText.text = newValue.ToString("00");
         }
     }
     void HandleGreyScoreUpdate(int oldValue, int newValue)
@@ -320,6 +389,7 @@ public class GameplayManager : NetworkBehaviour
         if (isClient)
         {
             ScoreGreyText.text = newValue.ToString("00");
+            greyTeamScoreText.text = newValue.ToString("00");
         }
     }
     [Server]
@@ -461,9 +531,6 @@ public class GameplayManager : NetworkBehaviour
             }
         }
         RpcKickAfterWasKickGoodOrBad(isKickGood, isScoringPlayerGrey);
-        
-
-
     }
     [ClientRpc]
     void RpcKickAfterWasKickGoodOrBad(bool isKickGood, bool isScoringPlayerGrey)
@@ -484,7 +551,6 @@ public class GameplayManager : NetworkBehaviour
             KickWasGoodText.gameObject.SetActive(false);
             KickWasNotGoodText.GetComponent<TouchDownTextGradient>().SetGreenOrGreyColor(isScoringPlayerGrey);
         }
-
     }
     [Server]
     public void TransitionFromKickAfterAttemptToKickOff()
@@ -510,7 +576,15 @@ public class GameplayManager : NetworkBehaviour
     {
         yield return new WaitForSeconds(3.0f);        
         RpcDisableKickAfterWasKickGoodOrBadUI();
-        GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "kickoff");
+        if (isXtraTime)
+        {
+            GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
+        }
+        else
+        {
+            GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "kickoff");
+        }
+        
     }
     [ClientRpc]
     void RpcDisableKickAfterWasKickGoodOrBadUI()
@@ -541,5 +615,45 @@ public class GameplayManager : NetworkBehaviour
         KickAfterWasKickGoodPanel.SetActive(true);
         TheKickWasText.gameObject.SetActive(true);
         KickWasBlockedText.gameObject.SetActive(true);
+    }
+    [Server]
+    void DetermineWinnerOfGame()
+    {
+        if (greenScore > greyScore)
+        {
+            winningTeam = "green";
+        }
+        else if (greenScore < greyScore)
+        {
+            winningTeam = "grey";
+        }
+        else
+        {
+            winningTeam = "draw";
+        }
+        RpcWinnerOfGameDetermined(winningTeam);
+    }
+    [ClientRpc]
+    void RpcWinnerOfGameDetermined(string winnerOfGame)
+    {
+        greenTeamScoreText.text = greenScore.ToString();
+        greyTeamScoreText.text = greyScore.ToString();
+        GameOverScorePanel.SetActive(true);
+        if (winnerOfGame == "green")
+        {
+            teamWinnerText.text = "GREEN WINS!!!";
+            teamWinnerText.GetComponent<TouchDownTextGradient>().ActivateGradient();
+        }
+        else if (winnerOfGame == "grey")
+        {
+            teamWinnerText.text = "GREY WINS!!!";
+            teamWinnerText.GetComponent<TouchDownTextGradient>().ActivateGradient();
+        }
+        else if (winnerOfGame == "draw")
+        {
+            teamWinnerText.text = "IT'S A DRAW...";
+            teamWinnerText.GetComponent<TouchDownTextGradient>().SetGreenOrGreyColor(true);
+        }
+        
     }
 }

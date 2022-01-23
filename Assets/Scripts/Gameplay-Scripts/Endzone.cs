@@ -34,7 +34,7 @@ public class Endzone : NetworkBehaviour
             }*/
             
         }
-        if (collision.tag == "touchdown-hitbox" && GameplayManager.instance.gamePhase == "gameplay")
+        if (collision.tag == "touchdown-hitbox" && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
         {
             Debug.Log(this.name + ": collision with touchdown-hitbox");
             GoblinScript goblin = collision.transform.parent.GetComponent<GoblinScript>();
