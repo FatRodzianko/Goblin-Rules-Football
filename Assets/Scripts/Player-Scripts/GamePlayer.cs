@@ -48,6 +48,10 @@ public class GamePlayer : NetworkBehaviour
     [SyncVar] public string teamName;
     [SyncVar] public bool doesTeamHaveBall;
 
+    [Header("Power Ups")]
+    public List<PowerUp> myPowerUps = new List<PowerUp>();
+    public List<uint> serverPowerUpUints = new List<uint>();
+
     [Header("Football")]
     [SerializeField] private GameObject footballPrefab;
 
@@ -67,6 +71,7 @@ public class GamePlayer : NetworkBehaviour
     public bool gameplayActionsEnabled = false;
     public bool kickAfterPositioningEnabled = false;
     public bool kickAfterKickingEnabled = false;
+    public bool powerUpsEnabled = false;
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -141,6 +146,11 @@ public class GamePlayer : NetworkBehaviour
         //Kicking Controls
         InputManager.Controls.Player.KickFootball.performed += _ => StartKickPower();
         InputManager.Controls.Player.KickFootball.canceled += _ => EndKickPower();
+        //Power Up Controls
+        InputManager.Controls.PowerUps.PowerUp1.performed += _ => UsePowerUp(0);
+        InputManager.Controls.PowerUps.PowerUp2.performed += _ => UsePowerUp(1);
+        InputManager.Controls.PowerUps.PowerUp3.performed += _ => UsePowerUp(2);
+        InputManager.Controls.PowerUps.PowerUp4.performed += _ => UsePowerUp(3);
     }
 
     public override void OnStartClient()
@@ -219,6 +229,7 @@ public class GamePlayer : NetworkBehaviour
             EnableKickAfterPositioning(false);
             EnableKickAfterKicking(false);
             EnableKickingControls(false);
+            EnablePowerUpControls(false);
 
             GameplayManager.instance.SetTimerText(GameplayManager.instance.timeLeftInGame);
         }
@@ -342,6 +353,8 @@ public class GamePlayer : NetworkBehaviour
             GoblinToAdd.SelectThisCharacter();
             selectGoblin = GoblinToAdd;
             FollowSelectedGoblin(selectGoblin.transform);
+            if (hasAuthority)
+                CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
         }
         else if (!qGoblin)
         {
@@ -534,6 +547,12 @@ public class GamePlayer : NetworkBehaviour
     {
         if(GameplayManager.instance.gamePhase != "cointoss")
             myCamera.Follow = goblinToFollow.transform;
+    }
+    public void ResetCameraPositionForKickOff()
+    {
+        Vector3 newPosition = myCamera.transform.position;
+        newPosition.y = 0f;
+        myCamera.transform.position = newPosition;
     }
     void KickFootball()
     {
@@ -1035,6 +1054,7 @@ public class GamePlayer : NetworkBehaviour
             EnableKickingControls(activate);
             EnableGoblinMovement(activate);
             EnableGameplayActions(activate);
+            EnablePowerUpControls(activate);
         }
     }
     void EnableGameplayActions(bool activate)
@@ -1268,5 +1288,81 @@ public class GamePlayer : NetworkBehaviour
     {
         Debug.Log("SubmitKickAfterKicking");
         selectGoblin.SubmitKickAfterKicking();
+    }
+    [TargetRpc]
+    public void RpcPowerUpPickedUp(NetworkConnection target, uint powerUpNetId)
+    {
+        if (hasAuthority)
+        {
+            Debug.Log("RpcPowerUpPickedUp: " + this.PlayerName + " to pick up power up with this network id: " + powerUpNetId.ToString());
+            PowerUp powerUptoAdd = NetworkIdentity.spawned[powerUpNetId].GetComponent<PowerUp>();
+            myPowerUps.Add(powerUptoAdd);
+            PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
+        }        
+    }
+    void UsePowerUp(int powerUpNumber)
+    {
+        Debug.Log("UsePowerUp: Player is going to use power up: " + powerUpNumber.ToString());
+        if (powerUpNumber < myPowerUps.Count)
+        {
+            Debug.Log("UsePowerUp: Player is able to use power up: " + powerUpNumber.ToString());
+            if (hasAuthority)
+            {
+                uint powerUpNetId = myPowerUps[powerUpNumber].GetComponent<NetworkIdentity>().netId;
+                CmdUsePowerUp(powerUpNetId);
+            }
+        }
+    }
+    public void EnablePowerUpControls(bool activate)
+    {
+        Debug.Log("EnablePowerUpControls: for player " + this.PlayerName + " " + activate.ToString());
+        if (activate)
+        {
+            if (!powerUpsEnabled)
+            {
+                InputManager.Controls.PowerUps.Enable();
+
+                powerUpsEnabled = true;
+            }
+        }
+        else
+        {
+            InputManager.Controls.PowerUps.Disable();
+            powerUpsEnabled = false;
+        }
+    }
+    [Command]
+    void CmdUsePowerUp(uint powerUpNetId)
+    {
+        if (serverPowerUpUints.Contains(powerUpNetId))
+        {
+            Debug.Log("CmdUsePowerUp: Player: " + this.PlayerName + " can use powerup with netid of: " + powerUpNetId.ToString());
+            this.serverPowerUpUints.Remove(powerUpNetId);
+            PowerUpManager.instance.PlayerUsePowerUp(powerUpNetId, this.GetComponent<NetworkIdentity>().netId);
+        }
+        else
+        {
+            Debug.Log("CmdUsePowerUp: Player: " + this.PlayerName + " CANNOT use powerup with netid of: " + powerUpNetId.ToString() + " the server does not think the player owns that powerup.");
+        }
+    }
+    [TargetRpc]
+    public void RpcRemoveUsedPowerUp(NetworkConnection target, uint powerUpNetId)
+    {
+        if (myPowerUps.Count > 0)
+        {
+            /*foreach (PowerUp powerUp in myPowerUps)
+            {
+                if (powerUp.GetComponent<NetworkIdentity>().netId == powerUpNetId)
+                {
+                    myPowerUps.Remove(powerUp);
+                }
+            }*/
+        }        
+        PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
+    }
+    public void RemoveUsedPowerUps()
+    { 
+        if(hasAuthority)
+            PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
     }
 }

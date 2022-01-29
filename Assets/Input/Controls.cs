@@ -502,6 +502,90 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""PowerUps"",
+            ""id"": ""75c8ba50-df2f-4147-ba74-0d5155082826"",
+            ""actions"": [
+                {
+                    ""name"": ""PowerUp1"",
+                    ""type"": ""Button"",
+                    ""id"": ""e6ddc253-cbcd-4842-84d7-d80b079e241c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""PowerUp2"",
+                    ""type"": ""Button"",
+                    ""id"": ""8ab417a8-0d84-4c14-b000-81515aecf728"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""PowerUp3"",
+                    ""type"": ""Button"",
+                    ""id"": ""90cd0521-a802-4dc7-bd10-2b76eaf61e09"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""PowerUp4"",
+                    ""type"": ""Button"",
+                    ""id"": ""5109777a-bd0f-4e60-9da7-3f0c2ceecdb2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""4386d07e-be96-430e-93e3-82e6e7479b5f"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""PowerUp1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d02b4353-6c37-4cb3-a02e-29fe61caee8a"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""PowerUp2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""68300691-e92b-4ad6-ad0e-33fd494384f0"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""PowerUp3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""03ab04af-1edc-4cb0-b9c4-d4fa8786e186"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""PowerUp4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -553,6 +637,12 @@ public class @Controls : IInputActionCollection, IDisposable
         // KickAfterKicking
         m_KickAfterKicking = asset.FindActionMap("KickAfterKicking", throwIfNotFound: true);
         m_KickAfterKicking_KickAfterSubmit = m_KickAfterKicking.FindAction("KickAfterSubmit", throwIfNotFound: true);
+        // PowerUps
+        m_PowerUps = asset.FindActionMap("PowerUps", throwIfNotFound: true);
+        m_PowerUps_PowerUp1 = m_PowerUps.FindAction("PowerUp1", throwIfNotFound: true);
+        m_PowerUps_PowerUp2 = m_PowerUps.FindAction("PowerUp2", throwIfNotFound: true);
+        m_PowerUps_PowerUp3 = m_PowerUps.FindAction("PowerUp3", throwIfNotFound: true);
+        m_PowerUps_PowerUp4 = m_PowerUps.FindAction("PowerUp4", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -892,6 +982,63 @@ public class @Controls : IInputActionCollection, IDisposable
         }
     }
     public KickAfterKickingActions @KickAfterKicking => new KickAfterKickingActions(this);
+
+    // PowerUps
+    private readonly InputActionMap m_PowerUps;
+    private IPowerUpsActions m_PowerUpsActionsCallbackInterface;
+    private readonly InputAction m_PowerUps_PowerUp1;
+    private readonly InputAction m_PowerUps_PowerUp2;
+    private readonly InputAction m_PowerUps_PowerUp3;
+    private readonly InputAction m_PowerUps_PowerUp4;
+    public struct PowerUpsActions
+    {
+        private @Controls m_Wrapper;
+        public PowerUpsActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @PowerUp1 => m_Wrapper.m_PowerUps_PowerUp1;
+        public InputAction @PowerUp2 => m_Wrapper.m_PowerUps_PowerUp2;
+        public InputAction @PowerUp3 => m_Wrapper.m_PowerUps_PowerUp3;
+        public InputAction @PowerUp4 => m_Wrapper.m_PowerUps_PowerUp4;
+        public InputActionMap Get() { return m_Wrapper.m_PowerUps; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(PowerUpsActions set) { return set.Get(); }
+        public void SetCallbacks(IPowerUpsActions instance)
+        {
+            if (m_Wrapper.m_PowerUpsActionsCallbackInterface != null)
+            {
+                @PowerUp1.started -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp1;
+                @PowerUp1.performed -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp1;
+                @PowerUp1.canceled -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp1;
+                @PowerUp2.started -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp2;
+                @PowerUp2.performed -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp2;
+                @PowerUp2.canceled -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp2;
+                @PowerUp3.started -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp3;
+                @PowerUp3.performed -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp3;
+                @PowerUp3.canceled -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp3;
+                @PowerUp4.started -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp4;
+                @PowerUp4.performed -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp4;
+                @PowerUp4.canceled -= m_Wrapper.m_PowerUpsActionsCallbackInterface.OnPowerUp4;
+            }
+            m_Wrapper.m_PowerUpsActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @PowerUp1.started += instance.OnPowerUp1;
+                @PowerUp1.performed += instance.OnPowerUp1;
+                @PowerUp1.canceled += instance.OnPowerUp1;
+                @PowerUp2.started += instance.OnPowerUp2;
+                @PowerUp2.performed += instance.OnPowerUp2;
+                @PowerUp2.canceled += instance.OnPowerUp2;
+                @PowerUp3.started += instance.OnPowerUp3;
+                @PowerUp3.performed += instance.OnPowerUp3;
+                @PowerUp3.canceled += instance.OnPowerUp3;
+                @PowerUp4.started += instance.OnPowerUp4;
+                @PowerUp4.performed += instance.OnPowerUp4;
+                @PowerUp4.canceled += instance.OnPowerUp4;
+            }
+        }
+    }
+    public PowerUpsActions @PowerUps => new PowerUpsActions(this);
     private int m_KeyboardandMouseSchemeIndex = -1;
     public InputControlScheme KeyboardandMouseScheme
     {
@@ -936,5 +1083,12 @@ public class @Controls : IInputActionCollection, IDisposable
     public interface IKickAfterKickingActions
     {
         void OnKickAfterSubmit(InputAction.CallbackContext context);
+    }
+    public interface IPowerUpsActions
+    {
+        void OnPowerUp1(InputAction.CallbackContext context);
+        void OnPowerUp2(InputAction.CallbackContext context);
+        void OnPowerUp3(InputAction.CallbackContext context);
+        void OnPowerUp4(InputAction.CallbackContext context);
     }
 }

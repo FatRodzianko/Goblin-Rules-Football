@@ -122,8 +122,8 @@ public class GoblinScript : NetworkBehaviour
     //[SyncVar] public float kickAfterAccuracyBar2 = 0f;
     bool repositioningButtonHeldDown = false;
     bool repositioningToLeft = false;
-    Vector2 greenGoalPost = new Vector2(40f, 0.5f);
-    Vector2 greyGoalPost = new Vector2(-40f, 0.5f);
+    Vector2 greenGoalPost = new Vector2(40.3f, 0.5f);
+    Vector2 greyGoalPost = new Vector2(-40.3f, 0.5f);
     [SyncVar] public Vector2 kickAfterFinalPosition = Vector2.zero;
 
     [Header("Kick After Accuracy Bar Stuff")]
@@ -1320,6 +1320,11 @@ public class GoblinScript : NetworkBehaviour
                 DivingRoutine = DiveGoblinRoutine();
                 StartCoroutine(DivingRoutine);
             }
+            /*if (GameplayManager.instance.gamePhase == "xtra-time")
+            {
+                if (this.doesCharacterHaveBall)
+                    GameplayManager.instance.DidWinningGoblinDiveInXtraTimeToEndGame(this.isGoblinGrey);
+            }*/
         }
     }
     [Server]
@@ -1746,7 +1751,7 @@ public class GoblinScript : NetworkBehaviour
         }
             
     }
-    [Server]
+    [ServerCallback]
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (GameplayManager.instance.gamePhase == "kick-after-attempt")

@@ -98,6 +98,11 @@ public class Football : NetworkBehaviour
         }
 
     }
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        PowerUpManager.instance.GetFootballObject(this);
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -993,6 +998,12 @@ public class Football : NetworkBehaviour
     {
         footballShadowObject.transform.position = shadowStartPosition;
         footballShadowObject.SetActive(shadow);
+
+        /*if (GameplayManager.instance.gamePhase == "kick-after-attempt")
+        {
+            GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
+            localPlayer.FollowSelectedGoblin(footballShadowObject.transform);
+        }*/
 
         if (!shadow)
         {

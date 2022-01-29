@@ -78,7 +78,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: 310f370840a2c594b94b706a08d1f416, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -103,7 +103,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.030269444, y: 0.02987516}
+  m_Offset: {x: 0.02906312, y: 0.03349413}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -114,7 +114,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.813372, y: 0.56830883}
+  m_Size: {x: 0.69032717, y: 0.43078807}
   m_EdgeRadius: 0
 --- !u!50 &7510187484870184801
 Rigidbody2D:
@@ -190,12 +190,17 @@ MonoBehaviour:
   kickCountModifier: 0.5
   minKickDist: 10
   maxKickDist: 40
+  xDistanceOfKick: 0
   footballShadowPrefab: {fileID: 6110733450249199357, guid: 940fbaf286f5276479de05888960ef80, type: 3}
   footballLandingTargetPrefab: {fileID: 8210455033227271828, guid: f84d24a960000bf4f99e022d525534ad, type: 3}
   localKickCount: 0
   localKickCountModifier: 0
+  isBouncing: 0
+  numberOfBounces: 0
+  isKickAfterAttemptGood: 0
   myCamera: {fileID: 0}
   localPlayer: {fileID: 0}
+  myCameraMarker: {fileID: 0}
 --- !u!95 &573848318654464580
 Animator:
   serializedVersion: 3

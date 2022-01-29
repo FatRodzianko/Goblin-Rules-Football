@@ -489,6 +489,90 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "PowerUps",
+            "id": "75c8ba50-df2f-4147-ba74-0d5155082826",
+            "actions": [
+                {
+                    "name": "PowerUp1",
+                    "type": "Button",
+                    "id": "e6ddc253-cbcd-4842-84d7-d80b079e241c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "PowerUp2",
+                    "type": "Button",
+                    "id": "8ab417a8-0d84-4c14-b000-81515aecf728",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "PowerUp3",
+                    "type": "Button",
+                    "id": "90cd0521-a802-4dc7-bd10-2b76eaf61e09",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "PowerUp4",
+                    "type": "Button",
+                    "id": "5109777a-bd0f-4e60-9da7-3f0c2ceecdb2",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "4386d07e-be96-430e-93e3-82e6e7479b5f",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "PowerUp1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d02b4353-6c37-4cb3-a02e-29fe61caee8a",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "PowerUp2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "68300691-e92b-4ad6-ad0e-33fd494384f0",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "PowerUp3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "03ab04af-1edc-4cb0-b9c4-d4fa8786e186",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "PowerUp4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

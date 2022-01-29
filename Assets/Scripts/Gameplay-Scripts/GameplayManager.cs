@@ -62,8 +62,8 @@ public class GameplayManager : NetworkBehaviour
     string seconds;
 
     [Header("Score")]
-    [SyncVar(hook = nameof(HandleGreenScoreUpdate))] int greenScore;
-    [SyncVar(hook = nameof(HandleGreyScoreUpdate))] int greyScore;
+    [SyncVar(hook = nameof(HandleGreenScoreUpdate))] public int greenScore;
+    [SyncVar(hook = nameof(HandleGreyScoreUpdate))] public int greyScore;
     [SerializeField] TextMeshProUGUI ScoreGreenText;
     [SerializeField] TextMeshProUGUI ScoreGreyText;
     [SyncVar] string winningTeam;
@@ -117,7 +117,7 @@ public class GameplayManager : NetworkBehaviour
         HandleGamePhase(gamePhase, "cointoss");
         //timeLeftInGame = 300f;
         //timeLeftInGame = 30f;
-        HandleGameTimerUpdate(0f, 15f);
+        HandleGameTimerUpdate(0f, 150f);
         greenScore = 0;
         greyScore = 0;
     }
@@ -167,7 +167,14 @@ public class GameplayManager : NetworkBehaviour
             if (newValue == "kickoff")
                 RepositionTeamsForKickOff();
             if (newValue == "gameplay")
+            {
                 ActivateGameplayControls(true);
+                PowerUpManager.instance.StartGeneratingPowerUps(true);
+            }
+            if (oldValue == "gameplay")
+            {
+                PowerUpManager.instance.StartGeneratingPowerUps(false);
+            }                
             if (newValue == "kick-after-attempt")
             {
                 SetKickAfterPlayers(scoringGoblinNetId);
@@ -221,6 +228,7 @@ public class GameplayManager : NetworkBehaviour
                     gameplayCanvas.SetActive(true);
                 Debug.Log("Starting the Kickoff Phase");
                 //LocalGamePlayerScript.EnableGoblinMovement(true);
+                LocalGamePlayerScript.ResetCameraPositionForKickOff();
                 LocalGamePlayerScript.FollowSelectedGoblin(LocalGamePlayerScript.selectGoblin.transform);
                 LocalGamePlayerScript.CoinTossControlls(false);
                 LocalGamePlayerScript.KickOrReceiveControls(false);
@@ -655,5 +663,14 @@ public class GameplayManager : NetworkBehaviour
             teamWinnerText.GetComponent<TouchDownTextGradient>().SetGreenOrGreyColor(true);
         }
         
+    }
+    [Server]
+    public void DidWinningGoblinDiveInXtraTimeToEndGame(bool isGoblinGrey)
+    {
+        if ((isGoblinGrey && greyScore > greenScore) || (!isGoblinGrey && greyScore < greenScore))
+        {
+            HandleGamePhase(this.gamePhase, "gameover");
+        }
+
     }
 }

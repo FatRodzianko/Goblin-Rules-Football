@@ -17,6 +17,8 @@ TagManager:
   - UICamera
   - LobbyPlayer
   - touchdown-hitbox
+  - football-shadow
+  - PowerUp
   layers:
   - Default
   - TransparentFX
@@ -35,7 +37,7 @@ TagManager:
   - end-zone
   - GUI
   - touchdownHitbox
-  - 
+  - powerups
   - 
   - 
   - 
