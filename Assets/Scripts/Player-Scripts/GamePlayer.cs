@@ -285,6 +285,7 @@ public class GamePlayer : NetworkBehaviour
             newGrenadierScript.stamina = newGrenadierScript.MaxStamina;
             newGrenadierScript.speed = newGrenadierScript.MaxSpeed;
             newGrenadierScript.damage = newGrenadierScript.MaxDamage;
+            newGrenadierScript.defenseModifier = 1.0f;
             newGrenadierScript.goblinType = "grenadier";
             if (!IsGameLeader)
                 newGrenadierScript.goblinType += "-grey";
@@ -310,6 +311,7 @@ public class GamePlayer : NetworkBehaviour
             newBerserkerScript.speed = newBerserkerScript.MaxSpeed;
             Debug.Log("CmdSpawnPlayerCharacters: Setting the speed of the berserker to " + newBerserkerScript.speed.ToString() + " based in max speed of : " + newBerserkerScript.MaxSpeed.ToString());
             newBerserkerScript.damage = newBerserkerScript.MaxDamage;
+            newBerserkerScript.defenseModifier = 1.0f;
             newBerserkerScript.goblinType = "berserker";
             if (!IsGameLeader)
                 newBerserkerScript.goblinType += "-grey";
@@ -333,6 +335,7 @@ public class GamePlayer : NetworkBehaviour
             newSkirmisherScript.stamina = newSkirmisherScript.MaxStamina;
             newSkirmisherScript.speed = newSkirmisherScript.MaxSpeed;
             newSkirmisherScript.damage = newSkirmisherScript.MaxDamage;
+            newSkirmisherScript.defenseModifier = 1.0f;
             newSkirmisherScript.goblinType = "skirmisher";
             if (!IsGameLeader)
                 newSkirmisherScript.goblinType += "-grey";
@@ -1337,7 +1340,7 @@ public class GamePlayer : NetworkBehaviour
         if (serverPowerUpUints.Contains(powerUpNetId))
         {
             Debug.Log("CmdUsePowerUp: Player: " + this.PlayerName + " can use powerup with netid of: " + powerUpNetId.ToString());
-            this.serverPowerUpUints.Remove(powerUpNetId);
+            //this.serverPowerUpUints.Remove(powerUpNetId);
             PowerUpManager.instance.PlayerUsePowerUp(powerUpNetId, this.GetComponent<NetworkIdentity>().netId);
         }
         else

@@ -33,6 +33,7 @@ public class PowerUpManager : NetworkBehaviour
     [Header("Active Power Ups")]
     public List<GameObject> ActivePowerUps = new List<GameObject>();
     public List<uint> ActivePowerUpNetIds = new List<uint>();
+    public int blueShellCount = 0;
 
     [Header("Player Picked Up Power Ups")]
     public List<GameObject> PlayerPickedUpPowerUps = new List<GameObject>();
@@ -116,15 +117,36 @@ public class PowerUpManager : NetworkBehaviour
         if (ActivePowerUpNetIds.Count < 9)
         {
             float blueShellLikelihood = 0.95f;
-            if (gameFootball.isHeld)
+            GamePlayer playerDownBad = null;
+            /*if (gameFootball.isHeld)
             {
                 int differenceInScore = GameplayManager.instance.greenScore - GameplayManager.instance.greyScore;
-                if ((gameFootball.goblinWithBall.isGoblinGrey && differenceInScore > 14) || (!gameFootball.goblinWithBall.isGoblinGrey && differenceInScore < -14))
+                if ((gameFootball.goblinWithBall.isGoblinGrey && differenceInScore > 13) || (!gameFootball.goblinWithBall.isGoblinGrey && differenceInScore < -13))
                 {
                     Debug.Log("CheckIfAPowerUpDrops: Goblin with ball is down by more than 14 - increase blueshell likelihood");
                     blueShellLikelihood = 0.5f;
                 }
+            }*/
+            //Check if one player is losing by at least 14. If they are, increase likelihood of a blueshell powerup spawning near their player
+            int differenceInScore = GameplayManager.instance.greenScore - GameplayManager.instance.greyScore;
+            if ((differenceInScore > 13) || (differenceInScore < -13))
+            {
+                Debug.Log("CheckIfAPowerUpDrops: One team is down by at least 14 - increase blueshell likelihood");
+                blueShellLikelihood = 0.5f;
+                // Get the player that is down
+                foreach (GamePlayer player in Game.GamePlayers)
+                {
+                    if (differenceInScore > 13 && player.teamName == "Grey")
+                    {
+                        playerDownBad = player;
+                    }
+                    else if (differenceInScore < -13 && player.teamName == "Green")
+                    {
+                        playerDownBad = player;
+                    }
+                }
             }
+
             bool willPowerUpDrop = false;
             bool willPowerUpBeBlueShell = false;
 
@@ -133,11 +155,18 @@ public class PowerUpManager : NetworkBehaviour
 
             if (willPowerUpDrop)
             {
-                if (Random.Range(0f, 1f) > blueShellLikelihood)
+                if (Random.Range(0f, 1f) > blueShellLikelihood && blueShellCount < 2)
                     willPowerUpBeBlueShell = true;
             }
             if (willPowerUpDrop && willPowerUpBeBlueShell)
-                BlueShellPowerUpDrop();
+            {
+                if (playerDownBad == null)
+                {
+                    var rng = new System.Random();
+                    playerDownBad = Game.GamePlayers[rng.Next(Game.GamePlayers.Count)];
+                }
+                BlueShellPowerUpDrop(playerDownBad);
+            }                
             else if (willPowerUpDrop && !willPowerUpBeBlueShell)
                 NormalPowerUpDrop();
         }
@@ -155,7 +184,7 @@ public class PowerUpManager : NetworkBehaviour
 
         //Vector3 powerUpPosition = Vector3.zero;
         float yPosition = Random.Range(minY, maxY);
-        float xPosition = Random.Range(5f, 15f);
+        float xPosition = Random.Range(5f, 7.5f);
 
         /*if (gameFootball.isHeld && gameFootball.goblinWithBall != null)
         {
@@ -218,10 +247,73 @@ public class PowerUpManager : NetworkBehaviour
 
     }
     [ServerCallback]
-    void BlueShellPowerUpDrop()
-    {
-        Debug.Log("BlueShellPowerUpDrop");
-        //always spawn powerup near player who is losing? Don't pick a player randomly like it does for normal powerups
+    void BlueShellPowerUpDrop(GamePlayer playerDownBad)
+    {   
+        if (playerDownBad != null && blueShellCount < 2)
+        {
+            Debug.Log("BlueShellPowerUpDrop: Will spawn blue shell by player " + playerDownBad.PlayerName);
+            //always spawn powerup near player who is losing? Don't pick a player randomly like it does for normal powerups
+            var rng = new System.Random();
+            GameObject powerUptoSpawn = BlueShellPowerUps[rng.Next(BlueShellPowerUps.Length)];
+
+            //Vector3 powerUpPosition = Vector3.zero;
+            float yPosition = Random.Range(minY, maxY);
+            float xPosition = Random.Range(2.5f, 5f);
+            float negOrPos = Random.Range(0, 2) * 2 - 1;
+            xPosition *= negOrPos;
+            /*if (gameFootball.isHeld && gameFootball.goblinWithBall != null)
+            {
+                if (gameFootball.goblinWithBall.isGoblinGrey)
+                    xPosition = xPosition * -1f;
+
+                xPosition = gameFootball.goblinWithBall.transform.position.x + xPosition;
+            }
+            else
+            {
+                int negOrPos = Random.Range(0, 2) * 2 - 1;
+                xPosition = gameFootball.transform.position.x + (xPosition * negOrPos);
+            }*/
+
+            //Vector3 positionOfBlueShell = playerDownBad.selectGoblin.transform.position;
+
+
+            GameObject powerUp = Instantiate(powerUptoSpawn);
+            powerUp.transform.position = new Vector3((playerDownBad.serverSelectGoblin.transform.position.x + xPosition), yPosition, 0f);
+            //powerUp.transform.position = positionOfBlueShell;
+
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(powerUp.transform.position, 1.5f, powerUpLayer);
+            //if (Physics.CheckSphere(powerUp.transform.position, 1.5f))
+            if (colliders.Length > 0)
+            {
+                Debug.Log("NormalPowerUpDrop: Overlapping powerup detected. Moving object");
+                negOrPos = Random.Range(0, 2) * 2 - 1;
+
+                if (xPosition >= (maxX - 1.6f))
+                    xPosition -= 1.6f;
+                else if (xPosition <= (minX - 1.6f))
+                    xPosition += 1.6f;
+                else
+                {
+                    xPosition = 1.6f * negOrPos;
+                }
+
+                if (yPosition >= (maxY - 1.6f))
+                    yPosition -= 1.6f;
+                else if (yPosition <= (minY - 1.6f))
+                    yPosition += 1.6f;
+                else
+                {
+                    yPosition = 1.6f * negOrPos;
+                }
+
+                powerUp.transform.position = new Vector3(xPosition, yPosition, 0f);
+            }
+
+            NetworkServer.Spawn(powerUp);
+            ActivePowerUps.Add(powerUp);
+            ActivePowerUpNetIds.Add(powerUp.GetComponent<NetworkIdentity>().netId);
+            blueShellCount++;
+        }        
     }
     [Server]
     public void DestroyPowerUp(uint powerUpNetId)
@@ -231,6 +323,8 @@ public class PowerUpManager : NetworkBehaviour
         //ActivePowerUpNetIds.Remove(powerUpNetId);
         RemovePowerUpFromLists(powerUpNetId);
         RemovePowerUpOwnedByPlayer(powerUpNetId);
+        if (powerUptoDestroy.GetComponent<PowerUp>().isBlueShell)
+            blueShellCount--;
         NetworkServer.Destroy(powerUptoDestroy);
     }
     [Server]
@@ -294,16 +388,26 @@ public class PowerUpManager : NetworkBehaviour
         {
             Debug.Log("PowerUpManager PlayerUsePowerUp: The player with netid " + playerNetId.ToString() + " owns the powerup with net id: " + powerUpNetId.ToString());
             GameObject powerUpToUse = NetworkIdentity.spawned[powerUpNetId].gameObject;
-            powerUpToUse.GetComponent<PowerUp>().UsePowerUp();
 
-            GamePlayer player = NetworkIdentity.spawned[playerNetId].GetComponent<GamePlayer>();
-            player.serverPowerUpUints.Remove(powerUpNetId);
+            bool canPlayerUsePowerUp = powerUpToUse.GetComponent<PowerUp>().UsePowerUp();
 
-            PlayerPickedUpPowerUps.Remove(powerUpToUse);
-            PowerUpPlayerOwnerDictionary.Remove(powerUpNetId);
-            NetworkServer.Destroy(powerUpToUse);
-            //player.RpcRemoveUsedPowerUp(player.connectionToClient, powerUpNetId);
+            if (canPlayerUsePowerUp)
+            {
+                Debug.Log("PlayerUsePowerUp: Player successfully used their powerup. Removing the powerup from the game.");
+                GamePlayer player = NetworkIdentity.spawned[playerNetId].GetComponent<GamePlayer>();
+                player.serverPowerUpUints.Remove(powerUpNetId);
 
+                PlayerPickedUpPowerUps.Remove(powerUpToUse);
+                PowerUpPlayerOwnerDictionary.Remove(powerUpNetId);
+                if (powerUpToUse.GetComponent<PowerUp>().isBlueShell)
+                    blueShellCount--;
+                NetworkServer.Destroy(powerUpToUse);
+                //player.RpcRemoveUsedPowerUp(player.connectionToClient, powerUpNetId);
+            }
+            else
+            {
+                Debug.Log("PlayerUsePowerUp: Player WAS UNABLE TO use their powerup. PowerUp WILL NOT be removed from the game.");
+            }
         }
     }
 }

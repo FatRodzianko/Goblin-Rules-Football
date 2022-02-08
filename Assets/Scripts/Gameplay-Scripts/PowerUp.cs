@@ -13,9 +13,30 @@ public class PowerUp : NetworkBehaviour
     [Header("Power Up Stats")]
     [SerializeField] public Sprite mySprite;
     [SerializeField] public string powerUpAbility;
+    [SerializeField] public bool isBlueShell = false;
+
+    [Header("Power Up Objects")]
+    [SerializeField] GameObject PowerUpImageObject;
+    [SerializeField] GameObject PowerUpBorderObject;
+    int directionToMoveUpAndDown = 1;
+    Vector3 newPosition = Vector3.zero;
+    public float bounceSpeed = 0.25f;
+    [SerializeField] GameObject powerUpAnimationPrefab;
 
     public GamePlayer myPlayerOwner;
     public GamePlayer localPlayerOwner;
+    private NetworkManagerGRF game;
+    private NetworkManagerGRF Game
+    {
+        get
+        {
+            if (game != null)
+            {
+                return game;
+            }
+            return game = NetworkManagerGRF.singleton as NetworkManagerGRF;
+        }
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -27,10 +48,31 @@ public class PowerUp : NetworkBehaviour
         lifeTimeCounterRoutine = LifeTimeCounter();
         StartCoroutine(lifeTimeCounterRoutine);
     }
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        //newPosition = PowerUpImageObject.transform.localPosition;
+    }
     // Update is called once per frame
     void Update()
     {
-        
+        if (isClient && this.gameObject.activeInHierarchy)
+        {
+            newPosition.y += Time.deltaTime * directionToMoveUpAndDown * bounceSpeed;
+            if (newPosition.y > 0.1)
+            {
+                newPosition.y = 0.1f;
+                directionToMoveUpAndDown = -1;
+            }
+            if (newPosition.y < -0.1)
+            {
+                newPosition.y = -0.1f;
+                directionToMoveUpAndDown = 1;
+            }
+            PowerUpImageObject.transform.localPosition = newPosition;
+            PowerUpBorderObject.transform.localPosition = newPosition;
+
+        }
     }
     [ServerCallback]
     IEnumerator LifeTimeCounter()
@@ -112,20 +154,144 @@ public class PowerUp : NetworkBehaviour
 
     }
     [ServerCallback]
-    public void UsePowerUp()
+    public bool UsePowerUp()
     {
+        bool wasPowerUpUsed = false;
         if (this.powerUpAbility == "healNormal")
         {
-            HealNormal();
+            wasPowerUpUsed = HealNormal();
+            return wasPowerUpUsed;
         }
+        else if (this.powerUpAbility == "attackNormal")
+        {
+            wasPowerUpUsed = AttackNormal();
+            return wasPowerUpUsed;
+        }
+        else if (this.powerUpAbility == "defenseNormal")
+        {
+            wasPowerUpUsed = DefenseNormal();
+            return wasPowerUpUsed;
+        }
+        else if (this.powerUpAbility == "speedNormal")
+        {
+            wasPowerUpUsed = SpeedNormal();
+            return wasPowerUpUsed;
+        }
+        else if (this.powerUpAbility == "lightningBlueShell")
+        {
+            wasPowerUpUsed = LightningBlueShell();
+            return wasPowerUpUsed;
+        }
+        return wasPowerUpUsed;
     }
     [ServerCallback]
-    void HealNormal()
+    bool HealNormal()
     {
         if (myPlayerOwner != null && myPlayerOwner.serverSelectGoblin != null)
         {
-            Debug.Log("PowerUp HealNormal: Healing player " + myPlayerOwner.PlayerName + "'s goblin " + myPlayerOwner.serverSelectGoblin.name + " to full health");
-            myPlayerOwner.serverSelectGoblin.UpdateGoblinHealth(myPlayerOwner.serverSelectGoblin.health, myPlayerOwner.serverSelectGoblin.MaxHealth);
+            /*if (!myPlayerOwner.serverSelectGoblin.isGoblinKnockedOut)
+            {
+                Debug.Log("PowerUp HealNormal: Healing player " + myPlayerOwner.PlayerName + "'s goblin " + myPlayerOwner.serverSelectGoblin.name + " to full health");
+                myPlayerOwner.serverSelectGoblin.UpdateGoblinHealth(myPlayerOwner.serverSelectGoblin.health, myPlayerOwner.serverSelectGoblin.MaxHealth);
+                myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("healNormal");
+                return true;
+            }
+            else
+            {
+                return false;
+            }*/
+            myPlayerOwner.serverSelectGoblin.StartHealNormal();
+            myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("healNormal");
+            return true;
         }
+        else
+            return false;
+    }
+    [ServerCallback]
+    bool AttackNormal()
+    {
+        if (myPlayerOwner != null && myPlayerOwner.serverSelectGoblin != null)
+        {
+            if (!myPlayerOwner.serverSelectGoblin.attackNormal)
+            {
+                Debug.Log("PowerUp AttackNormal: Player " + myPlayerOwner.PlayerName + "'s goblin " + myPlayerOwner.serverSelectGoblin.name + " will have increased attack");
+                myPlayerOwner.serverSelectGoblin.StartAttackNormal();
+                myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("attackNormal");
+                return true;
+            }
+            else
+                return false;
+            
+        }
+        else
+            return false;
+    }
+    [ServerCallback]
+    bool DefenseNormal()
+    {
+        if (myPlayerOwner != null && myPlayerOwner.serverSelectGoblin != null)
+        {
+            if (!myPlayerOwner.serverSelectGoblin.defenseNormal)
+            {
+                Debug.Log("PowerUp DefenseNormal: Player " + myPlayerOwner.PlayerName + "'s goblin " + myPlayerOwner.serverSelectGoblin.name + " will have increased defense");
+                myPlayerOwner.serverSelectGoblin.StartDefenseNormal();
+                myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("defenseNormal");
+                return true;
+            }
+            else
+                return false;
+        }
+        else
+            return false;
+    }
+    [ServerCallback]
+    bool SpeedNormal()
+    {
+        if (myPlayerOwner != null && myPlayerOwner.serverSelectGoblin != null)
+        {
+            if (!myPlayerOwner.serverSelectGoblin.speedNormal)
+            {
+                Debug.Log("PowerUp SpeedNormal: Player " + myPlayerOwner.PlayerName + "'s goblin " + myPlayerOwner.serverSelectGoblin.name + " will have increased speed");
+                myPlayerOwner.serverSelectGoblin.StartSpeedNormal();
+                myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("speedNormal");
+                return true;
+            }
+            else
+                return false;
+        }
+        else
+            return false;
+
+    }
+    [ServerCallback]
+    bool LightningBlueShell()
+    {
+        if (myPlayerOwner != null)
+        {
+            GamePlayer opposingPlayer = null;
+            foreach (GamePlayer player in Game.GamePlayers)
+            {
+                if (player.ConnectionId != myPlayerOwner.ConnectionId)
+                {
+                    opposingPlayer = player;
+                    break;
+                }
+            }
+            //opposingPlayer.serverSelectGoblin.KnockOutGoblin(true);
+            GoblinScript goblinToStrike = opposingPlayer.serverSelectGoblin;
+            GameObject lightningStrikeObject = Instantiate(powerUpAnimationPrefab, opposingPlayer.serverSelectGoblin.transform);
+
+            lightningStrikeObject.GetComponent<LightningBlueShell>().goblinToStrikeNetId = goblinToStrike.GetComponent<NetworkIdentity>().netId;
+            //lightningStrikeObject.GetComponent<LightningBlueShell>().HandleGoblinToStrikeNetId(lightningStrikeObject.GetComponent<LightningBlueShell>().goblinToStrikeNetId, goblinToStrike.GetComponent<NetworkIdentity>().netId);
+            NetworkServer.Spawn(lightningStrikeObject);
+
+            //Vector3 newLocalPosition = new Vector3(0.33f, 1f, 0f);
+            //lightningStrikeObject.transform.localPosition = newLocalPosition;
+
+            return true;
+        }
+        else
+            return false;
+
     }
 }

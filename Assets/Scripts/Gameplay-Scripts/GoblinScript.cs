@@ -8,6 +8,8 @@ public class GoblinScript : NetworkBehaviour
     public float pressedTime = 0f;
     public float releasedTime = 0f;
 
+    [SerializeField] GameObject PowerUpParticleSystemPrefab;
+
 
     [Header("Player Owner Info")]
     [SyncVar] public string ownerName;
@@ -34,7 +36,9 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public float damage;
     [SyncVar] public float ballCarrySpeedModifier = 1.0f;
     [SyncVar] public float blockingSpeedModifier = 1.0f;
-    
+    [SyncVar] public float defenseModifier;
+    [SyncVar] public float speedModifierFromPowerUps = 1.0f;
+
 
     [Header("Character selection stuff")]
     [SyncVar(hook = nameof(HandleCharacterSelected))] public bool isCharacterSelected = false;
@@ -166,6 +170,11 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] private GameObject punchBoxCollider;
     [SerializeField] private GameObject hurtBoxCollider;
     [SerializeField] private GameObject slideBoxCollider;
+
+    [Header("PowerUp Effects")]
+    public bool attackNormal;
+    public bool defenseNormal;
+    public bool speedNormal;
 
     public override void OnStartAuthority()
     {
@@ -845,7 +854,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (stamina > 0f)
                 {
-                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier) * 1.15f;
+                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps) * 1.15f;
                 }
                 //Update CanRecoverStamina Event here?
                 if (isStaminaRecoveryRoutineRunning)
@@ -857,15 +866,15 @@ public class GoblinScript : NetworkBehaviour
             }
             else if (isFatigued)
             {
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier) * 0.5f;
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps) * 0.5f;
             }
         }        
         else
         {
             if(!isFatigued)
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier);
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps);
             else
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier) * 0.5f;
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps) * 0.5f;
         }
             
     }
@@ -888,7 +897,7 @@ public class GoblinScript : NetworkBehaviour
                 stamina = 0f;
                 //isFatigued = true;
                 HandleIsFatigued(isFatigued, true);
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer) * 0.5f;
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * speedModifierFromPowerUps) * 0.5f;
             }
         }
         
@@ -996,7 +1005,7 @@ public class GoblinScript : NetworkBehaviour
                 else
                     blockingModifier = 1.0f;
 
-                goblinReceivingDamage.health -= (goblinGivingDamage.damage * blockingModifier);
+                goblinReceivingDamage.health -= (goblinGivingDamage.damage * blockingModifier * defenseModifier);
                 if (goblinReceivingDamage.health <= 0f)
                 {
                     Debug.Log("DealDamageToGoblins: Goblin " + goblinReceivingDamage.name + "'s health is now below 0. Knocking them out.");
@@ -1026,6 +1035,35 @@ public class GoblinScript : NetworkBehaviour
         Debug.Log("KnockOutGoblin: " + knockedOut.ToString());
         if (this.health < 0f)
             this.health = 0f;
+        
+        //Make sure that all the isPunching, isDiving things are false so it doesn't fuck with controls
+        /*if (isPunching)
+            HandleIsPunching(this.isPunching, false);
+        if (isDiving)
+        {
+            HandleIsDiving(isDiving, false);
+            if (!DivingRoutineRunning)
+            {
+                DivingRoutine = DiveGoblinRoutine();
+                StartCoroutine(DivingRoutine);
+            }
+        }            
+        if(isKicking)
+            HandleIsKicking(this.isKicking, false);
+        if(isThrowing)
+            this.HandleIsThrowing(isThrowing, false);
+        if (isSliding)
+        {
+            isSliding = false;
+            slideSpeedModifer = 1.0f;
+        }
+        if (isSlidingRoutineRunning)
+        {
+            slideDirection = Vector2.zero;
+            isSlidingRoutineRunning = false;
+        }*/
+
+
         HandleIsGoblinKnockedOut(isGoblinKnockedOut, true);
         //isGoblinKnockedOut = true;
 
@@ -1122,10 +1160,32 @@ public class GoblinScript : NetworkBehaviour
             if (hasAuthority)
             {
                 if (isBlocking)
-                    CmdSetBlocking(false);
+                    CmdSetBlocking(false);                
+
                 // code for knocked out animation?
                 if (newValue)
+                {
                     animator.Play(goblinType + "-knocked-out");
+
+                    //Make sure that all the isPunching, isDiving things are false so it doesn't fuck with controls
+                    if (isPunching)
+                        CmdPunching(false);
+                    if (isDiving)
+                        CmdStopDiving();
+                    if (isThrowing)
+                        CmdStopThrowing();
+                    if (isSliding)
+                    {
+                        isSliding = false;
+                        slideSpeedModifer = 1.0f;
+                        slideDirection = Vector2.zero;
+                        isSlidingRoutineRunning = false;
+                        StopCoroutine(isSlidingRoutine);
+                    }
+                    if (isKicking)
+                        CmdStopKicking();
+                }
+                    
                 animator.SetBool("isKnockedOut", newValue);
 
             }
@@ -1172,7 +1232,12 @@ public class GoblinScript : NetworkBehaviour
     public void SlideGoblin()
     {
         if (hasAuthority)
+        {
+            if (isBlocking)
+                CmdSetBlocking(false);
             CmdSlideGoblin(previousInput);
+        }
+            
     }
     [Command]
     void CmdSlideGoblin(Vector2 directionToSlide)
@@ -1187,7 +1252,7 @@ public class GoblinScript : NetworkBehaviour
                 isSlidingRoutine = SlideGoblinRoutine();
                 StartCoroutine(isSlidingRoutine);
             }
-
+            
         }
     }
     public void HandleIsSliding(bool oldValue, bool newValue)
@@ -1265,6 +1330,8 @@ public class GoblinScript : NetworkBehaviour
                 if (!isGoblinKnockedOut && !isSliding && !isDiving && hasAuthority && !isPunching)
                 {
                     CmdStartDiving(previousInput);
+                    if (isBlocking)
+                        CmdSetBlocking(false);
                 }
             }
         }
@@ -1373,7 +1440,11 @@ public class GoblinScript : NetworkBehaviour
             HandleIsBlocking(this.isBlocking, isGoblinBlocking);
         }
         else
+        {
+            blockingSpeedModifier = 1.0f;
             HandleIsBlocking(this.isBlocking, false);
+        }
+            
 
     }
     public void HandleIsBlocking(bool oldValue, bool newValue)
@@ -1777,5 +1848,84 @@ public class GoblinScript : NetworkBehaviour
     {
         this.KnockOutGoblin(false);
         RpcKickBlockedStopKickAfterAttempt(this.connectionToClient);
+    }
+    [ServerCallback]
+    public void StartAttackNormal()
+    {
+        IEnumerator attackNormalRoutine = AttackNormalRoutine();
+        StartCoroutine(attackNormalRoutine);
+    }
+    [ServerCallback]
+    IEnumerator AttackNormalRoutine()
+    {
+        this.damage = MaxDamage * 1.5f;
+        attackNormal = true;
+        yield return new WaitForSeconds(3.0f);
+        this.damage = MaxDamage;
+        attackNormal = false;
+    }
+    [ServerCallback]
+    public void StartDefenseNormal()
+    {
+        IEnumerator defenseNormalRoutine = DefenseNormalRoutine();
+        StartCoroutine(defenseNormalRoutine);
+    }
+    [ServerCallback]
+    IEnumerator DefenseNormalRoutine()
+    {
+        defenseModifier = 0.5f;
+        defenseNormal = true;
+        yield return new WaitForSeconds(3.0f);
+        defenseModifier = 1.0f;
+        defenseNormal = false;
+    }
+    [ServerCallback]
+    public void StartSpeedNormal()
+    {
+        IEnumerator speedNormalRoutine = SpeedNormalRoutine();
+        StartCoroutine(speedNormalRoutine);
+    }
+    [ServerCallback]
+    IEnumerator SpeedNormalRoutine()
+    {
+        speedModifierFromPowerUps = 1.2f;
+        speedNormal = true;
+        yield return new WaitForSeconds(3.0f);
+        speedModifierFromPowerUps = 1.0f;
+        speedNormal = false;
+    }
+    [ClientRpc]
+    public void RpcPlayPowerUpParticle(string particleType)
+    {
+        GameObject newParticle = Instantiate(PowerUpParticleSystemPrefab, this.transform);
+        newParticle.GetComponent<PowerUpParticleSystem>().StartParticleSystem(particleType);
+    }
+    [Server]
+    public void StartHealNormal()
+    {
+        //Revive Goblin if they are knocked out
+        if (this.isGoblinKnockedOut)
+        {
+            if (isHealthRecoveryRoutineRunning)
+            {
+                isHealthRecoveryRoutineRunning = false;
+                StopCoroutine(healthRecoveryRoutine);
+            }
+            if (isTrippedTimerRunning)
+            {
+                isTrippedTimerRunning = false;
+                StopCoroutine(trippedTimerRoutine);
+            }
+            
+            
+            //this.health = (MaxHealth * 0.25f);
+            //isGoblinKnockedOut = false;
+            HandleIsGoblinKnockedOut(isGoblinKnockedOut, false);
+            if (isRegainHealthRoutineRunning)
+                StopCoroutine(regainHealthRoutine);
+            regainHealthRoutine = RegainHealth();
+            StartCoroutine(regainHealthRoutine);
+        }
+        this.UpdateGoblinHealth(this.health, this.MaxHealth);
     }
 }

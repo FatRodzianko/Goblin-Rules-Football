@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8456977640809881308
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8456977640809881309}
+  - component: {fileID: 8456977640809881298}
+  - component: {fileID: 8456977640809881299}
+  m_Layer: 0
+  m_Name: GameplayManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8456977640809881309
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8456977640809881308}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8456977640809881298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8456977640809881308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51dbc061db2bc8f4497f396a53150569, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  LocalGamePlayer: {fileID: 0}
+  LocalGamePlayerScript: {fileID: 0}
+  gameplayCanvas: {fileID: 0}
+  coinTossCanvas: {fileID: 0}
+  gamePhase: 
+  kickingPlayer: {fileID: 0}
+  receivingPlayer: {fileID: 0}
+  TouchDownPanel: {fileID: 0}
+  touchDownText: {fileID: 0}
+  touchDownTeamText: {fileID: 0}
+  scoringPlayer: {fileID: 0}
+  blockingPlayer: {fileID: 0}
+  yPositionOfKickAfter: 0
+  scoringGoblinNetId: 0
+  KickAfterPositionControlsPanel: {fileID: 0}
+  KickAfterTimerBeforeKickPanel: {fileID: 0}
+  TimerInstructionsBoard: {fileID: 0}
+  TimerInstructionsText: {fileID: 0}
+  KickAfterTimerText: {fileID: 0}
+  KickAfterWasKickGoodPanel: {fileID: 0}
+  TheKickWasText: {fileID: 0}
+  KickWasGoodText: {fileID: 0}
+  KickWasNotGoodText: {fileID: 0}
+  KickWasBlockedText: {fileID: 0}
+  isXtraTime: 0
+  timerText: {fileID: 0}
+  timeLeftInGame: 0
+  isGameTimerRunning: 0
+  greenScore: 0
+  greyScore: 0
+  ScoreGreenText: {fileID: 0}
+  ScoreGreyText: {fileID: 0}
+  GameOverScorePanel: {fileID: 0}
+  theFinalScoreText: {fileID: 0}
+  greenTeamNameText: {fileID: 0}
+  greyTeamNameText: {fileID: 0}
+  greenTeamScoreText: {fileID: 0}
+  greyTeamScoreText: {fileID: 0}
+  teamWinnerText: {fileID: 0}
+--- !u!114 &8456977640809881299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8456977640809881308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  visible: 0
+  m_AssetId: 
+  hasSpawned: 0

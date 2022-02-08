@@ -197,7 +197,7 @@ GameObject:
   - component: {fileID: 6225957963772815634}
   m_Layer: 8
   m_Name: diving-hitbox
-  m_TagString: goblin-body
+  m_TagString: hurtbox
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -551,6 +551,7 @@ MonoBehaviour:
   syncInterval: 0.1
   pressedTime: 0
   releasedTime: 0
+  PowerUpParticleSystemPrefab: {fileID: 8322833437944110266, guid: c3a63d0e2c40469468188066ca375472, type: 3}
   ownerName: 
   ownerConnectionId: 0
   ownerPlayerNumber: 0
@@ -569,6 +570,8 @@ MonoBehaviour:
   damage: 0
   ballCarrySpeedModifier: 1
   blockingSpeedModifier: 1
+  defenseModifier: 0
+  speedModifierFromPowerUps: 1
   isCharacterSelected: 0
   isQGoblin: 0
   isEGoblin: 0
@@ -644,6 +647,9 @@ MonoBehaviour:
   punchBoxCollider: {fileID: 1938259440732540568}
   hurtBoxCollider: {fileID: 7760457115166818820}
   slideBoxCollider: {fileID: 3478881138312106123}
+  attackNormal: 0
+  defenseNormal: 0
+  speedNormal: 0
 --- !u!114 &1312526304018659596
 MonoBehaviour:
   m_ObjectHideFlags: 0
