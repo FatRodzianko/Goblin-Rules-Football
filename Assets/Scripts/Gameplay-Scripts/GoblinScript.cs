@@ -137,7 +137,7 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] GameObject kickAfterMarkerRight;
     [SyncVar] public float accuracyValueSubmitted;
     [SyncVar] public float powerValueSubmitted;
-    bool isGoblinDoingKickAfterAttempt = false;
+    public bool isGoblinDoingKickAfterAttempt = false;
     bool isAccuracySubmittedYet = false;
     bool isPowerSubmittedYet = false;
     IEnumerator kickAfterMoveAccuracyGuageLineRoutine;
@@ -208,6 +208,7 @@ public class GoblinScript : NetworkBehaviour
             gameFootball = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
         }
     }
+
     public void EnableGoblinMovement(bool allowMovement)
     {
         if (allowMovement)
@@ -254,6 +255,10 @@ public class GoblinScript : NetworkBehaviour
         {
             GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
             localPlayer.ReportPlayerGoblinSpawned();
+            if (!gameFootball)
+            {
+                gameFootball = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+            }
         }
         catch
         {
@@ -598,6 +603,28 @@ public class GoblinScript : NetworkBehaviour
         {
             Vector2 direction = Vector2.ClampMagnitude(slideDirection, 1);
             rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
+        }
+        if (hasAuthority && !isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+        {
+            // Important thing here is "&& !isCharacterSelected"
+            // This will be what the goblin does when they are not selected. AI code will go here?
+            if (myGamePlayer.doesTeamHaveBall)
+            {
+                // AI behaviour when your team has the ball - stay near the player but "behind" them to receive a pass
+            }
+            else
+            {
+                // AI behavior when team does not have the ball - find the ball object and run toward it
+                if (gameFootball.isHeld)
+                {
+                    // if the football is held, the opposing team has the ball. Track that goblin down and punch them?
+                    animator.SetBool("isRunning", false);
+                }
+                else
+                {
+                    MoveTowardFootball();
+                }
+            }
         }
 
     }
@@ -1033,9 +1060,12 @@ public class GoblinScript : NetworkBehaviour
     public void KnockOutGoblin(bool knockedOut)
     {
         Debug.Log("KnockOutGoblin: " + knockedOut.ToString());
+        if (GameplayManager.instance.gamePhase == "kickoff")
+            return;
         if (this.health < 0f)
             this.health = 0f;
-        
+            
+
         //Make sure that all the isPunching, isDiving things are false so it doesn't fuck with controls
         /*if (isPunching)
             HandleIsPunching(this.isPunching, false);
@@ -1099,6 +1129,7 @@ public class GoblinScript : NetworkBehaviour
         if (GameplayManager.instance.gamePhase == "kick-after-attempt" && this.isKickAfterGoblin)
         {
             GameplayManager.instance.KickAfterAttemptWasBlocked();
+            RpcKickBlockedStopKickAfterAttempt(this.connectionToClient);
         }
     }
     [Server]
@@ -1813,14 +1844,15 @@ public class GoblinScript : NetworkBehaviour
     [TargetRpc]
     void RpcKickBlockedStopKickAfterAttempt(NetworkConnection target)
     {
-        if (isGoblinDoingKickAfterAttempt)
+        /*if (isGoblinDoingKickAfterAttempt || isKickAfterGoblin)
         {
-            isGoblinDoingKickAfterAttempt = false;
-            kickAfterGuageLine.SetActive(false);
-            kickAfterAccuracyBar.SetActive(false);
-            ResetPowerBar();
-        }
             
+        }*/
+        isGoblinDoingKickAfterAttempt = false;
+        kickAfterGuageLine.SetActive(false);
+        kickAfterAccuracyBar.SetActive(false);
+        ResetPowerBar();
+
     }
     [ServerCallback]
     private void OnCollisionEnter2D(Collision2D collision)
@@ -1927,5 +1959,44 @@ public class GoblinScript : NetworkBehaviour
             StartCoroutine(regainHealthRoutine);
         }
         this.UpdateGoblinHealth(this.health, this.MaxHealth);
+    }
+    void MoveTowardFootball()
+    {
+        float distToFootball = Vector3.Distance(this.transform.position, gameFootball.transform.position);
+
+        // Get the direction of the football in relation to the goblin
+        Vector3 directionToFootball = Vector3.zero;
+        if (gameFootball.isKicked)
+        {
+            GameObject footBallLandingSpot = GameObject.FindGameObjectWithTag("footballLandingTarget");
+            directionToFootball = (footBallLandingSpot.transform.position - this.transform.position).normalized;
+        }
+        else
+        {
+            directionToFootball = (gameFootball.transform.position - this.transform.position).normalized;
+        }
+        
+        Vector2 direction = Vector2.ClampMagnitude(directionToFootball, 1);
+
+        // Set whether the goblin is moving. If the "direction" to the football is 0, then they shouldn't be moving?
+        isRunning = false;
+        if (direction.x != 0 || direction.y != 0)
+            isRunning = true;
+
+        // Move the goblin toward the football
+        rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
+
+        // check the direction the goblin is moving. If they are moving left, make sprite face left. If right, sprite face right
+        if (direction.x > 0)
+        {
+            myRenderer.flipX = false;
+            CmdFlipRenderer(false);
+        }
+        else if (direction.x < 0)
+        {
+            myRenderer.flipX = true;
+            CmdFlipRenderer(true);
+        }
+        animator.SetBool("isRunning", isRunning);
     }
 }

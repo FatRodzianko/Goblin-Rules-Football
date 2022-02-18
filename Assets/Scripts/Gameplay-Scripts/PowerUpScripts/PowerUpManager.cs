@@ -116,7 +116,7 @@ public class PowerUpManager : NetworkBehaviour
     {
         if (ActivePowerUpNetIds.Count < 9)
         {
-            float blueShellLikelihood = 0.95f;
+            float blueShellLikelihood = 0.995f;
             GamePlayer playerDownBad = null;
             /*if (gameFootball.isHeld)
             {
@@ -275,7 +275,10 @@ public class PowerUpManager : NetworkBehaviour
             }*/
 
             //Vector3 positionOfBlueShell = playerDownBad.selectGoblin.transform.position;
-
+            if (xPosition > maxX)
+                xPosition = maxX;
+            else if (xPosition < minX)
+                xPosition = minX;
 
             GameObject powerUp = Instantiate(powerUptoSpawn);
             powerUp.transform.position = new Vector3((playerDownBad.serverSelectGoblin.transform.position.x + xPosition), yPosition, 0f);
@@ -285,7 +288,7 @@ public class PowerUpManager : NetworkBehaviour
             //if (Physics.CheckSphere(powerUp.transform.position, 1.5f))
             if (colliders.Length > 0)
             {
-                Debug.Log("NormalPowerUpDrop: Overlapping powerup detected. Moving object");
+                Debug.Log("BlueShellPowerUpDrop: Overlapping powerup detected. Moving object");
                 negOrPos = Random.Range(0, 2) * 2 - 1;
 
                 if (xPosition >= (maxX - 1.6f))

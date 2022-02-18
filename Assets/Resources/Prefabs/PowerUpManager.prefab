@@ -64,10 +64,13 @@ MonoBehaviour:
   - {fileID: 6338328385301744606, guid: ce390eea8b354e64bace36611d5808fa, type: 3}
   - {fileID: 6338328385301744606, guid: b111dfb0f7595b1459f7831a57d01a92, type: 3}
   - {fileID: 6338328385301744606, guid: a379c9878a060604fa8f87ab164281ba, type: 3}
+  - {fileID: 6338328385301744606, guid: 94ff1ac17a384534bb1df023a7ad758c, type: 3}
+  - {fileID: 6338328385301744606, guid: 7e50152eb6254d943b3abe28f3c878f2, type: 3}
   BlueShellPowerUps:
   - {fileID: 6338328385301744606, guid: d527c4aec4d2b174f89418209c3c1509, type: 3}
   ActivePowerUps: []
   ActivePowerUpNetIds: 
+  blueShellCount: 0
   PlayerPickedUpPowerUps: []
 --- !u!114 &2233148172896235089
 MonoBehaviour:

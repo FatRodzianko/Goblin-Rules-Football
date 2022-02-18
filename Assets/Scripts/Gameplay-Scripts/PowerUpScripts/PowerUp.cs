@@ -23,6 +23,10 @@ public class PowerUp : NetworkBehaviour
     public float bounceSpeed = 0.25f;
     [SerializeField] GameObject powerUpAnimationPrefab;
 
+    [Header("Thrown Objects")]
+    [SerializeField] GameObject thrownObjectPrefab;
+
+    [Header("Player Owner Info")]
     public GamePlayer myPlayerOwner;
     public GamePlayer localPlayerOwner;
     private NetworkManagerGRF game;
@@ -156,6 +160,15 @@ public class PowerUp : NetworkBehaviour
     [ServerCallback]
     public bool UsePowerUp()
     {
+        // Only allow for powerups to be used during gameplay and xtra-time phases
+        if (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time")
+        {
+            Debug.Log("UsePowerUp: player used powerup during gameplay or xtra-time phase. current phase: " + GameplayManager.instance.gamePhase);
+            //return false;
+        }
+        else
+            return false;
+
         bool wasPowerUpUsed = false;
         if (this.powerUpAbility == "healNormal")
         {
@@ -180,6 +193,16 @@ public class PowerUp : NetworkBehaviour
         else if (this.powerUpAbility == "lightningBlueShell")
         {
             wasPowerUpUsed = LightningBlueShell();
+            return wasPowerUpUsed;
+        }
+        else if (this.powerUpAbility == "bananaNormal")
+        {
+            wasPowerUpUsed = BananaNormal();
+            return wasPowerUpUsed;
+        }
+        else if (this.powerUpAbility == "bottleNormal")
+        {
+            wasPowerUpUsed = BottleNormal();
             return wasPowerUpUsed;
         }
         return wasPowerUpUsed;
@@ -293,5 +316,60 @@ public class PowerUp : NetworkBehaviour
         else
             return false;
 
+    }
+    [ServerCallback]
+    bool BananaNormal()
+    {
+        if (myPlayerOwner != null)
+        {
+            if (myPlayerOwner.serverSelectGoblin.isGoblinKnockedOut)
+                return false;
+            GameObject bananaObject = Instantiate(thrownObjectPrefab);
+            //bananaObject.transform.position = myPlayerOwner.transform.position;
+            bananaObject.transform.position = myPlayerOwner.serverSelectGoblin.transform.position;
+            NetworkServer.Spawn(bananaObject);
+
+            PowerUpThrownObject  bananaObjectScript = bananaObject.GetComponent<PowerUpThrownObject>();
+            bananaObjectScript.myPlayerOwner = myPlayerOwner;
+            bananaObjectScript.isThrown = false;
+            bananaObjectScript.throwSpeed = 2.5f;
+            bananaObjectScript.isDroppedObject = true;
+            bananaObjectScript.DropBehind(myPlayerOwner);
+
+            return true;
+        }
+        else
+            return false;
+    }
+    [ServerCallback]
+    bool BottleNormal()
+    {
+        if (myPlayerOwner != null)
+        {
+            if (myPlayerOwner.serverSelectGoblin.isGoblinKnockedOut)
+                return false;
+            GameObject bottleObject = Instantiate(thrownObjectPrefab);
+            //bottleObject.transform.position = myPlayerOwner.serverSelectGoblin.transform.position;            
+            int directionModifier = 1;
+            if (myPlayerOwner.serverSelectGoblin.GetComponent<SpriteRenderer>().flipX)
+                directionModifier *= -1;
+            Vector3 startingPosition = myPlayerOwner.serverSelectGoblin.transform.position;
+            startingPosition.x += (1f * directionModifier);
+            startingPosition.y += 0.5f;
+            
+            bottleObject.transform.position = startingPosition;
+            NetworkServer.Spawn(bottleObject);
+
+            PowerUpThrownObject bottleObjectScript = bottleObject.GetComponent<PowerUpThrownObject>();
+            bottleObjectScript.myPlayerOwner = myPlayerOwner;
+            bottleObjectScript.isThrown = false;
+            bottleObjectScript.throwSpeed = 1.5f;
+            //bananaObjectScript.isDroppedObject = true;
+            bottleObjectScript.ThrowForward(myPlayerOwner, startingPosition);
+
+            return true;
+        }
+        else
+            return false;
     }
 }

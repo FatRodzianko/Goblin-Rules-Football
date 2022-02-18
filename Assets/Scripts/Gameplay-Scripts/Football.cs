@@ -102,6 +102,7 @@ public class Football : NetworkBehaviour
     {
         base.OnStartServer();
         PowerUpManager.instance.GetFootballObject(this);
+        RandomEventManager.instance.GetFootballObject(this);
     }
     // Start is called before the first frame update
     void Start()

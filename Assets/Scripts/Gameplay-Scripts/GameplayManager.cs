@@ -170,10 +170,11 @@ public class GameplayManager : NetworkBehaviour
             {
                 ActivateGameplayControls(true);
                 PowerUpManager.instance.StartGeneratingPowerUps(true);
-            }
+                RandomEventManager.instance.StartGeneratingRandomEvents(true);            }
             if (oldValue == "gameplay")
             {
                 PowerUpManager.instance.StartGeneratingPowerUps(false);
+                RandomEventManager.instance.StartGeneratingRandomEvents(false);
             }                
             if (newValue == "kick-after-attempt")
             {
@@ -442,7 +443,15 @@ public class GameplayManager : NetworkBehaviour
     [Server]
     public void DisableKickAfterPositioningControls()
     {
-        scoringPlayer.RpcDisableKickAfterPositioningControls(scoringPlayer.connectionToClient);
+        try
+        {
+            scoringPlayer.RpcDisableKickAfterPositioningControls(scoringPlayer.connectionToClient);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("DisableKickAfterPositioningControls: Could not disable kick after position controls for player: " + scoringPlayer.PlayerName + ": " + e);
+        }
+        
     }
     [Server]
     public void StartKickAfterTimer()
@@ -612,6 +621,7 @@ public class GameplayManager : NetworkBehaviour
     public void KickAfterAttemptWasBlocked()
     {
         TransitionFromKickAfterAttemptToKickOff();
+        DisableKickAfterPositioningControls();
         DisableKickAfterAttemptControls();
         RpcKickAfterAttemptWasBlocked();
     }
