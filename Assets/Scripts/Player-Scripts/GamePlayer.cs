@@ -1125,6 +1125,8 @@ public class GamePlayer : NetworkBehaviour
                         else if (goblin.isEGoblin)
                             SwitchToEGoblin(false, Time.time);
 
+                        CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkIdentity>().netId);
+
                         goblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
 
                         continue;

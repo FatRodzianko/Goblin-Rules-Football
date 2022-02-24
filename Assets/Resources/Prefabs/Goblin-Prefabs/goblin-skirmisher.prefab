@@ -668,13 +668,13 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6877901074420270458}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
-  m_Mass: 0.0001
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_Mass: 1000000
+  m_LinearDrag: 1000000
+  m_AngularDrag: 1000000
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0
@@ -842,6 +842,7 @@ MonoBehaviour:
   kickAfterMarkerRight: {fileID: 6654117388901068638}
   accuracyValueSubmitted: 0
   powerValueSubmitted: 0
+  isGoblinDoingKickAfterAttempt: 0
   AccuracyBarSpeed: 7.25
   isWasPunchedRoutineRunning: 0
   wasPunchedSpeedModifier: 1
@@ -858,6 +859,17 @@ MonoBehaviour:
   attackNormal: 0
   defenseNormal: 0
   speedNormal: 0
+  state: 0
+  punchRange: 2.5
+  punchRate: 1
+  nextPunchTime: 0
+  slideRange: 3.5
+  slideRate: 2.5
+  nextSlideTime: 0
+  positionToRunTo: {x: 0, y: 0, z: 0}
+  goblinLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!114 &2300833731266782456
 MonoBehaviour:
   m_ObjectHideFlags: 0

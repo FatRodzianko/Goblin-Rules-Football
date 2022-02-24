@@ -462,6 +462,11 @@ public class Football : NetworkBehaviour
                     Debug.Log("PlayerPickUpFootball: Grey team kicking football?");
                     distanceToBall = 0f;
                 }
+                if ((GameplayManager.instance.gamePhase == "touchdown-transition" || GameplayManager.instance.gamePhase == "kick-after-attempt") && goblinToCheckScript.isKickAfterGoblin)
+                {
+                    Debug.Log("PlayerPickUpFootball: Need to return football to scoring goblin for kick after?");
+                    distanceToBall = 0f;
+                }
                 Debug.Log("CmdPlayerPickUpFootball: distance to ball is: " + distanceToBall.ToString() + " from goblin with netid of " + goblinNetId.ToString());
                 if (distanceToBall < 3.1f)
                 {
@@ -1107,7 +1112,10 @@ public class Football : NetworkBehaviour
     public void MoveFootballToKickoffGoblin(uint goblinNetId)
     {
         GoblinScript goblin = NetworkIdentity.spawned[goblinNetId].GetComponent<GoblinScript>();
-        this.transform.position = new Vector3(0f,0f,0f);
+        if(GameplayManager.instance.gamePhase == "kickoff")
+            this.transform.position = new Vector3(0f,0f,0f);
+        else
+            this.transform.position = goblin.transform.position;
         if (this.isHeld)
         {
             goblinWithBall.HandleHasBall(goblinWithBall.doesCharacterHaveBall, false);

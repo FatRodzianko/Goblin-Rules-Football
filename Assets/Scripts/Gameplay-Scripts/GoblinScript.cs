@@ -2,9 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 public class GoblinScript : NetworkBehaviour
 {
+    public enum State
+    {
+        ChaseFootball,
+        ChaseBallCarrier,
+        TeamHasBall,
+        AttackNearbyGoblin,
+    }
+
     public float pressedTime = 0f;
     public float releasedTime = 0f;
 
@@ -176,6 +185,23 @@ public class GoblinScript : NetworkBehaviour
     public bool defenseNormal;
     public bool speedNormal;
 
+    [Header("AI Stuff")]
+    public State state;
+    public float punchRange = 2.5f;
+    public float punchRate = 1.0f;
+    public float nextPunchTime = 0f;
+    public float slideRange = 3.5f;
+    public float slideRate = 2.5f;
+    public float nextSlideTime = 0f;
+    public Vector3 positionToRunTo = Vector3.zero;
+    float fieldMaxY = 6.25f;
+    float fieldMinY = -5f;
+    float fieldMaxX = 41f;
+    float fieldMinX = -41;
+    [SerializeField] LayerMask goblinLayerMask;
+    public GoblinScript goblinTarget;
+
+
     public override void OnStartAuthority()
     {
         base.OnStartAuthority();
@@ -317,12 +343,12 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (newValue)
                 {
-                    rb.bodyType = RigidbodyType2D.Dynamic;
+                    //rb.bodyType = RigidbodyType2D.Dynamic;
                     myGamePlayer.FollowSelectedGoblin(this.transform);
                 }
                 else
                 {
-                    rb.bodyType = RigidbodyType2D.Kinematic;
+                    //rb.bodyType = RigidbodyType2D.Kinematic;
                     if (isRunning)
                     {
                         isRunning = false;
@@ -608,9 +634,14 @@ public class GoblinScript : NetworkBehaviour
         {
             // Important thing here is "&& !isCharacterSelected"
             // This will be what the goblin does when they are not selected. AI code will go here?
+            // Check if there is a nearby goblin. If so, target them?
+            //bool isOpposingGoblinNearBy = FindNearByGoblinToTarget();
+            
             if (myGamePlayer.doesTeamHaveBall)
             {
                 // AI behaviour when your team has the ball - stay near the player but "behind" them to receive a pass
+                state = State.TeamHasBall;
+                goblinTarget = null;
             }
             else
             {
@@ -618,12 +649,60 @@ public class GoblinScript : NetworkBehaviour
                 if (gameFootball.isHeld)
                 {
                     // if the football is held, the opposing team has the ball. Track that goblin down and punch them?
-                    animator.SetBool("isRunning", false);
+                    //animator.SetBool("isRunning", false);
+                    //MoveTowrdBallCarrier();
+                    // Check to see if a new target is needed. If not keep current target
+                    bool newTargetNeeded = false;
+                    if (goblinTarget != null)
+                    {
+                        if (goblinTarget.isGoblinKnockedOut)
+                            newTargetNeeded = true;
+                        if (Vector3.Distance(this.transform.position, goblinTarget.transform.position) > 10f)
+                            newTargetNeeded = true;
+                    }
+                    else
+                    {
+                        newTargetNeeded = true;
+                    }
+                    // If a new target is needed, check to see if any goblins are nearby (<10f units away). If none are, then target the ball carrier
+                    if (newTargetNeeded)
+                    {
+                        goblinTarget = null;
+                        bool isOpposingGoblinNearBy = FindNearByGoblinToTarget();
+                        if (isOpposingGoblinNearBy)
+                        {
+                            state = State.AttackNearbyGoblin;
+                        }
+                        else
+                        {
+                            state = State.ChaseBallCarrier;
+                            //goblinTarget = null;
+                        }
+                    }
                 }
                 else
                 {
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
+                    state = State.ChaseFootball;
+                    goblinTarget = null;
                 }
+            }
+            switch (state)
+            {
+                default:
+                case State.ChaseFootball:
+                    MoveTowardFootball();
+                    break;
+                case State.ChaseBallCarrier:
+                    MoveTowrdBallCarrier();
+                    break;
+                case State.TeamHasBall:
+                    GetOpenForPass();
+                    break;
+                case State.AttackNearbyGoblin:
+                    MoveTowardGoblinTarget();
+                    break;
+
             }
         }
 
@@ -989,6 +1068,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void Attack()
     {
+        Debug.Log("Attack: from goblin " + this.name);
         if (!doesCharacterHaveBall && !isGoblinKnockedOut &&!isSliding && !isDiving)
         {
             if (isRunningOnServer)
@@ -1975,8 +2055,133 @@ public class GoblinScript : NetworkBehaviour
         {
             directionToFootball = (gameFootball.transform.position - this.transform.position).normalized;
         }
+
+        AIMoveTowardDirection(directionToFootball);
+        /*Vector2 direction = Vector2.ClampMagnitude(directionToFootball, 1);
+
+        // Set whether the goblin is moving. If the "direction" to the football is 0, then they shouldn't be moving?
+        isRunning = false;
+        if (direction.x != 0 || direction.y != 0)
+            isRunning = true;
+
+        // Move the goblin toward the football
+        rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
+
+        // check the direction the goblin is moving. If they are moving left, make sprite face left. If right, sprite face right
+        if (direction.x > 0)
+        {
+            myRenderer.flipX = false;
+            CmdFlipRenderer(false);
+        }
+        else if (direction.x < 0)
+        {
+            myRenderer.flipX = true;
+            CmdFlipRenderer(true);
+        }
+        animator.SetBool("isRunning", isRunning);*/
+    }
+    void MoveTowrdBallCarrier()
+    {
+        // Opposing team has the ball. Find the ball carrier and move toward them. If the AI is close enough, they should punch them
+        /*GoblinScript goblinWithBall = null;
+        try {
+            goblinWithBall = gameFootball.transform.parent.GetComponent<GoblinScript>();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("MoveTowrdBallCarrier: could not find goblin script of oglbin with the football. Reaseon: " + e);
+        }
+        if (goblinWithBall != null)*/
+
+        // check how far away the goblin with the ball is. If they are within 1, punch
+        //float distToBall = Vector3.Distance(this.transform.position, goblinWithBall.transform.position);
+        //float distToBall = Vector3.Distance(this.transform.position, gameFootball.transform.position);
+
+        Vector3 myPosition = this.transform.position;
+        Vector3 targetPosition = gameFootball.transform.position;
+        float distanceToTarget = Vector3.Distance(myPosition, targetPosition);
+
+
         
-        Vector2 direction = Vector2.ClampMagnitude(directionToFootball, 1);
+        bool slide = WillGoblinSlideTowardTarget(distanceToTarget);
+
+        if (slide)
+        {
+            SlideTowardGoblinTaget(targetPosition, myPosition);
+        }
+        else
+        {
+            bool punch = WillGoblinPunchTarget(distanceToTarget);
+            if (punch)
+            {
+                PunchGoblinTarget(targetPosition, myPosition);
+            }
+            // Move goblin toward their target
+            Vector3 diretionToBallCarrier = (targetPosition - myPosition).normalized;
+            if (distanceToTarget > 1.5f)
+                AIMoveTowardDirection(diretionToBallCarrier);
+            else
+            {
+                isRunning = false;
+                animator.SetBool("isRunning", isRunning);
+            }
+        }
+
+        // First check if the goblin will slide. If not, then check if they will punch.
+        /*if (distToBall < slideRange && Time.time > nextSlideTime && UnityEngine.Random.Range(0f, 1f) > 0.66f)
+        {
+            slide = true;
+        }
+        if (distToBall < punchRange && Time.time > nextPunchTime && !slide)
+            punch = true;
+        else
+            punch = false;*/
+        // verify you aren't punching your teammate
+        /*if (goblinWithBall.isGoblinGrey == this.isGoblinGrey)
+            punch = false;*/
+        //Debug.Log("MoveTowrdBallCarrier: punch is " + punch.ToString() + " dist to ball is " + distToBall.ToString() + " time versus nextPunchTime " + Time.time.ToString() + " " + nextPunchTime.ToString());
+        /*if (punch || slide)
+        {
+            Debug.Log("MoveTowrdBallCarrier: will punch now");
+            // ball carrier is close enough to punch. Start punching!
+            //First check to make sure you are facing the right direction to punch
+            if (gameFootball.transform.position.x < this.transform.position.x && !this.myRenderer.flipX)
+                CmdFlipRenderer(true);
+            else if (gameFootball.transform.position.x > this.transform.position.x && this.myRenderer.flipX)
+                CmdFlipRenderer(false);
+
+            if (punch)
+            {
+                this.Attack();
+                nextPunchTime = Time.time + punchRate;
+            }
+            if (slide)
+            {
+                Debug.Log("MoveTowrdBallCarrier: will SLIDE now");
+                Vector3 directionToMoveTo = (gameFootball.transform.position - this.transform.position).normalized;
+                Vector2 direction = Vector2.ClampMagnitude(directionToMoveTo, 1);
+                CmdSlideGoblin(direction);
+                nextSlideTime = Time.time + slideRate;
+            }
+        }
+
+        if (!slide)
+        {
+            // Move goblin to the ball carrier
+            Vector3 diretionToBallCarrier = (gameFootball.transform.position - this.transform.position).normalized;
+            if (distToBall > 1.5f)
+                AIMoveTowardDirection(diretionToBallCarrier);
+            else
+            {
+                isRunning = false;
+                animator.SetBool("isRunning", isRunning);
+            }
+        }*/
+                   
+    }
+    void AIMoveTowardDirection(Vector3 directionToMoveTo)
+    {
+        Vector2 direction = Vector2.ClampMagnitude(directionToMoveTo, 1);
 
         // Set whether the goblin is moving. If the "direction" to the football is 0, then they shouldn't be moving?
         isRunning = false;
@@ -1998,5 +2203,305 @@ public class GoblinScript : NetworkBehaviour
             CmdFlipRenderer(true);
         }
         animator.SetBool("isRunning", isRunning);
+    }
+    void GetOpenForPass()
+    {
+        //Find where teammate with ball is. Goblin will then make sure to get "behind" the ball carrier so they can receive a pass
+        //myGamePlayer.selectGoblin
+        int directionModifier = -1;
+        if (this.isGoblinGrey)
+            directionModifier = 1;
+
+        // Check to see if the saved position is too far away from the current ball carrier. If it is, get a new position
+        Vector3 ballCarrierPosition = myGamePlayer.selectGoblin.transform.position;
+        Vector3 currentPosition = this.transform.position;
+        bool newPositionToRunTo = false;
+        bool isBehindBallCarrier = false;
+
+        // check if the current position to run to is too far away from the ball carrier or not
+        float distToBallCarrier = Vector3.Distance(positionToRunTo, ballCarrierPosition);
+        if (distToBallCarrier > 10f)
+            newPositionToRunTo = true;
+        // Check to see if the goblin is close to their new position. If they are close enough, find a new one
+        float distToRunTo = Vector3.Distance(positionToRunTo, currentPosition);
+        if (distToRunTo <= 0.25f)
+            newPositionToRunTo = true;        
+        //check to make sure the current position the goblin is moving toward is "behind" the ball carrier so they can receive a pass. If they are infront of the ball carrier, they will need a new position to run to
+        if (this.isGoblinGrey && positionToRunTo.x > ballCarrierPosition.x)
+        {
+            isBehindBallCarrier = true;
+        }
+        else if (!this.isGoblinGrey && positionToRunTo.x < ballCarrierPosition.x)
+        {
+            isBehindBallCarrier = true;
+        }
+        else
+        {
+            newPositionToRunTo = true;
+            isBehindBallCarrier = false;
+        }
+
+        // If newPositionToRunTo is true, get the new position
+        if (newPositionToRunTo)
+        {
+            bool goblinBetween = false;
+            // First, check to see if a whole new position is needed, or to see if the goblin should just "stay the course" and keep its current Y position and just move forward
+            if (distToRunTo <= 0.25f)
+            {
+                // This will detect if any enemy goblins are between the goblin and the ball carrier. If yes, a new position will be chosen? The goblinLayerMask is the goblin-body layer
+                
+                Vector3 direction = (ballCarrierPosition - currentPosition).normalized;
+                RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, direction, distToBallCarrier, goblinLayerMask);
+                if (hits.Length > 0)
+                {
+                    for (int i = 0; i < hits.Length; i++)
+                    {
+                        GoblinScript goblin = hits[i].collider.transform.parent.GetComponent<GoblinScript>();
+                        if (goblin.isGoblinGrey != this.isGoblinGrey)
+                        {
+                            // Opposing goblin found between ball carrier and this goblin. New position will be needed
+                            //Debug.Log("GetOpenForPass: found goblin between " + this.name + " and the ball carrier. It is " + goblin.name);
+                            goblinBetween = true;
+                            break;
+                        }
+                    }
+                }
+                if (goblinBetween)
+                {
+                    // There is a goblin between this goblin and the ball carrier. Find a new position entirely
+                    //Debug.Log("GetOpenForPass: Goblin found between " + this.name + " and ball carrier");
+                    //Debug.Log("GetOpenForPass: Getting new position for " + this.name + " Was there a goblin between them? " + goblinBetween.ToString());
+                    ballCarrierPosition.x += (UnityEngine.Random.Range(2.5f, 7f) * directionModifier);
+                    if (ballCarrierPosition.x > fieldMaxX)
+                        ballCarrierPosition.x = (fieldMaxX - UnityEngine.Random.Range(0f, 4.0f));
+                    else if (ballCarrierPosition.x < fieldMinX)
+                        ballCarrierPosition.x = (fieldMinX + UnityEngine.Random.Range(0f, 4.0f));
+
+                    int negOrPos = UnityEngine.Random.Range(0, 2) * 2 - 1;
+                    ballCarrierPosition.y += (UnityEngine.Random.Range(0f, 4.0f) * negOrPos);
+                    if (ballCarrierPosition.y > fieldMaxY)
+                        ballCarrierPosition.y = (fieldMaxY - UnityEngine.Random.Range(0f, 3.0f));
+                    else if (ballCarrierPosition.y < fieldMinY)
+                        ballCarrierPosition.y = (fieldMinY - UnityEngine.Random.Range(0f, 3.0f));
+                }
+                else
+                {
+                    // NO goblin was found between. Just change the x position of the goblin to move forward. Y position can remain the same.
+                    //Debug.Log("GetOpenForPass: !!!NO!!! Goblin found between " + this.name + " and ball carrier");
+                    if (Mathf.Abs(currentPosition.x - ballCarrierPosition.x) <= 5.0f && (isBehindBallCarrier))
+                    {
+                        ballCarrierPosition.x = currentPosition.x;
+                    }
+                    else
+                    {
+                        ballCarrierPosition.x += (UnityEngine.Random.Range(2.5f, 7f) * directionModifier);
+                        if (ballCarrierPosition.x > fieldMaxX)
+                            ballCarrierPosition.x = (fieldMaxX - UnityEngine.Random.Range(0f, 4.0f));
+                        else if (ballCarrierPosition.x < fieldMinX)
+                            ballCarrierPosition.x = (fieldMinX + UnityEngine.Random.Range(0f, 4.0f));
+                    }                    
+
+                    // KEEP current Y position to run to
+                    ballCarrierPosition.y = currentPosition.y;
+                }
+            }
+            else
+            {
+                // There is a goblin between this goblin and the ball carrier. Find a new position entirely
+                //Debug.Log("GetOpenForPass: Goblin found between " + this.name + " and ball carrier");
+                //Debug.Log("GetOpenForPass: Getting new position for " + this.name + " Was there a goblin between them? " + goblinBetween.ToString());
+                ballCarrierPosition.x += (UnityEngine.Random.Range(2.5f, 7f) * directionModifier);
+                if (ballCarrierPosition.x > fieldMaxX)
+                    ballCarrierPosition.x = (fieldMaxX - UnityEngine.Random.Range(0f, 4.0f));
+                else if (ballCarrierPosition.x < fieldMinX)
+                    ballCarrierPosition.x = (fieldMinX + UnityEngine.Random.Range(0f, 4.0f));
+
+                int negOrPos = UnityEngine.Random.Range(0, 2) * 2 - 1;
+                ballCarrierPosition.y += (UnityEngine.Random.Range(0f, 4.0f) * negOrPos);
+                if (ballCarrierPosition.y > fieldMaxY)
+                    ballCarrierPosition.y = (fieldMaxY - UnityEngine.Random.Range(0f, 3.0f));
+                else if (ballCarrierPosition.y < fieldMinY)
+                    ballCarrierPosition.y = (fieldMinY - UnityEngine.Random.Range(0f, 3.0f));
+            }
+            /*else
+            {
+                // NO goblin was found between. Just change the x position of the goblin to move forward. Y position can remain the same.
+                Debug.Log("GetOpenForPass: !!!NO!!! Goblin found between " + this.name + " and ball carrier");
+                ballCarrierPosition.x += (UnityEngine.Random.Range(2.5f, 7f) * directionModifier);
+                if (ballCarrierPosition.x > fieldMaxX)
+                    ballCarrierPosition.x = (fieldMaxX - UnityEngine.Random.Range(0f, 4.0f));
+                else if (ballCarrierPosition.x < fieldMinX)
+                    ballCarrierPosition.x = (fieldMinX + UnityEngine.Random.Range(0f, 4.0f));
+
+                // KEEP current Y position to run to
+                ballCarrierPosition.y = currentPosition.y;
+            }*/
+            positionToRunTo = ballCarrierPosition;
+        }
+        //Get the new position that the goblin will go to to try and be behind the player        
+
+        //Debug.Log("GetOpenForPass: Moving goblin: " + this.name + " toward position: " + ballCarrierPosition.ToString());
+        Vector3 diretionToBallCarrier = (positionToRunTo - currentPosition).normalized;
+        AIMoveTowardDirection(diretionToBallCarrier);
+    }
+    [ClientRpc]
+    public void RpcResetGoblinStatuses()
+    {
+        if (hasAuthority)
+        {
+            if (isPunching)
+                CmdPunching(false);
+            if (isDiving)
+                CmdStopDiving();
+            if (isThrowing)
+                CmdStopThrowing();
+            if (isSliding)
+            {
+                isSliding = false;
+                slideSpeedModifer = 1.0f;
+                slideDirection = Vector2.zero;
+                isSlidingRoutineRunning = false;
+                StopCoroutine(isSlidingRoutine);
+            }
+            if (isBlocking)
+                CmdSetBlocking(false);
+            if (isKicking)
+                CmdStopKicking();
+
+            animator.SetBool("isRunning", false);
+            animator.SetBool("isSliding", false);
+            animator.SetBool("isBlocking", false);
+            if (!this.doesCharacterHaveBall)
+                animator.SetBool("withFootball", false);
+        }        
+    }
+    bool FindNearByGoblinToTarget()
+    {
+        // Get all goblins within 10f of this goblin
+        bool goblinNearBy = false;
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(this.transform.position, 10f, goblinLayerMask);
+        if (colliders.Length > 0)
+        {
+            foreach (Collider2D goblinBodyCollider in colliders)
+            {
+                // Check if the goblin is on the opposing team or not
+                GoblinScript goblinBodyColliderScript = goblinBodyCollider.transform.parent.GetComponent<GoblinScript>();
+                if (goblinBodyColliderScript.isGoblinGrey == this.isGoblinGrey)
+                {
+                    // Goblins are on the same team. Skip to next goblin
+                    continue;
+                }
+                if (goblinBodyColliderScript.isGoblinKnockedOut)
+                    continue;
+                else
+                {
+                    // If it is an opposing goblin, check to see if any other goblin on your team is targetting that goblin. If not, target them
+                    foreach (GoblinScript goblinOnMyTeam in myGamePlayer.goblinTeam)
+                    {
+                        // Don't check for this goblin or on the goblin the player has selected
+                        if (goblinOnMyTeam == this || goblinOnMyTeam.isCharacterSelected)
+                            continue;
+                        if (goblinOnMyTeam.goblinTarget != goblinBodyColliderScript)
+                        {
+                            this.goblinTarget = goblinBodyColliderScript;
+                            goblinNearBy = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else
+            goblinNearBy = false;
+        return goblinNearBy;
+    }
+    void MoveTowardGoblinTarget()
+    {
+        if (goblinTarget != null)
+        {
+            // Check for distance to goblin target. If they are within punch/slide range, then punch or slide them until they are knocked out?
+            bool didGoblinSlide = false;
+            bool didGoblinPunch = false;
+
+            Vector3 myPosition = this.transform.position;
+            Vector3 targetPosition = goblinTarget.transform.position;
+            float distanceToTarget = Vector3.Distance(myPosition, targetPosition);
+
+            // Check if the goblin will slide at their target
+            didGoblinSlide = WillGoblinSlideTowardTarget(distanceToTarget);
+
+            // If didGoblinSlide is true, slide the goblin toward their target
+            if (didGoblinSlide)
+            {
+                SlideTowardGoblinTaget(targetPosition, myPosition);
+            }
+            else // Goblin did not slide. Check to see if they can punch. Move goblin toward their target as well??
+            {
+                // Check to see if goblin is close enough to their target to punch them
+                didGoblinPunch = WillGoblinPunchTarget(distanceToTarget);
+                if (didGoblinPunch)
+                {
+                    PunchGoblinTarget(targetPosition, myPosition);
+                }
+
+                // Move goblin toward their target
+                Vector3 diretionToBallCarrier = (targetPosition - myPosition).normalized;
+                if (distanceToTarget > 1.5f)
+                    AIMoveTowardDirection(diretionToBallCarrier);
+                else
+                {
+                    isRunning = false;
+                    animator.SetBool("isRunning", isRunning);
+                }
+            }
+        }
+    }
+    bool WillGoblinSlideTowardTarget(float distanceToTarget)
+    {
+        bool willSlide = false;
+
+        if (distanceToTarget < this.slideRange && Time.time > this.nextSlideTime && UnityEngine.Random.Range(0f, 1f) > 0.66f)
+        {
+            willSlide = true;
+        }
+
+        return willSlide;
+    }
+    bool WillGoblinPunchTarget(float distanceToTarget)
+    {
+        bool willPunch = false;
+
+        if (distanceToTarget < this.punchRange && Time.time > this.nextPunchTime)
+            willPunch = true;
+
+        return willPunch;
+    }
+    void PunchGoblinTarget(Vector3 target, Vector3 myPosition)
+    {
+        // Make sure sprite is in the correct direction
+        //Vector3 myPosition = this.transform.position;
+        if (target.x < myPosition.x && !this.myRenderer.flipX)
+            CmdFlipRenderer(true);
+        else if (target.x > myPosition.x && this.myRenderer.flipX)
+            CmdFlipRenderer(false);
+
+        // Do the punch
+        this.Attack();
+        nextPunchTime = Time.time + punchRate;
+    }
+    void SlideTowardGoblinTaget(Vector3 target, Vector3 myPosition)
+    {
+        // Make sure sprite is in the correct direction
+        //Vector3 myPosition = this.transform.position;
+        if (target.x < myPosition.x && !this.myRenderer.flipX)
+            CmdFlipRenderer(true);
+        else if (target.x > myPosition.x && this.myRenderer.flipX)
+            CmdFlipRenderer(false);
+
+        // Do the slide 
+        Vector3 directionToMoveTo = (target - myPosition).normalized;
+        Vector2 direction = Vector2.ClampMagnitude(directionToMoveTo, 1);
+        CmdSlideGoblin(direction);
+        nextSlideTime = Time.time + slideRate;
     }
 }

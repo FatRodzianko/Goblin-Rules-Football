@@ -271,7 +271,9 @@ public class GameplayManager : NetworkBehaviour
     public void TouchDownScored(bool wasGrey, uint goblinNetId, float yPosition)
     {
         Debug.Log("TouchDownScored: " + goblinNetId.ToString());
-        
+        //Remove this place holder phase if it causes issues???
+        HandleGamePhase(this.gamePhase, "touchdown-transition");
+
         //SetKickAfterPlayers(scoringGoblinNetId);
         this.scoringGoblinNetId = goblinNetId;
 
@@ -420,6 +422,16 @@ public class GameplayManager : NetworkBehaviour
         Debug.Log("SetKickAfterPlayers: the scoring goblin was: " + scoringGoblin.ToString());
         GoblinScript scoringGoblinScript = NetworkIdentity.spawned[scoringGoblin].GetComponent<GoblinScript>();
         scoringGoblinScript.isKickAfterGoblin = true;
+        
+        // Make sure all goblins are healed after the touchdown. This is to make sure that kicking and blocking goblins are not still knocked out.
+        ResetAllGoblinStatuses();
+        // This is to double check and make sure that the kicking player has the ball for the kick-after attempt
+        if (!scoringGoblinScript.doesCharacterHaveBall)
+        {
+            //Football football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+            //football.MoveFootballToKickoffGoblin(scoringGoblinScript.GetComponent<NetworkIdentity>().netId);
+        }
+
         foreach (GamePlayer player in Game.GamePlayers)
         {
             if (scoringGoblinScript.ownerConnectionId == player.ConnectionId)
@@ -434,6 +446,15 @@ public class GameplayManager : NetworkBehaviour
                 receivingPlayer = player;
                 player.RpcRepositionForKickAfter(player.connectionToClient, false, scoringGoblin, yPositionOfKickAfter);
             }
+        }
+    }
+    [Server]
+    void ResetAllGoblinStatuses()
+    {
+        foreach (GameObject goblin in GameObject.FindGameObjectsWithTag("Goblin"))
+        {
+            goblin.GetComponent<GoblinScript>().StartHealNormal();
+            goblin.GetComponent<GoblinScript>().RpcResetGoblinStatuses();
         }
     }
     public void ActivateKickAfterPositionControlsPanel(bool activate)
