@@ -39,6 +39,17 @@ public class PowerUpManager : NetworkBehaviour
     public List<GameObject> PlayerPickedUpPowerUps = new List<GameObject>();
     public Dictionary<uint, uint> PowerUpPlayerOwnerDictionary = new Dictionary<uint, uint>();
 
+    [Header("UI to update for gamepad/keyboard controls")]
+    [SerializeField] private GameObject PowerUpText1;
+    [SerializeField] private GameObject PowerUpText2;
+    [SerializeField] private GameObject PowerUpText3;
+    [SerializeField] private GameObject PowerUpText4;
+    [SerializeField] private GameObject DpadImage1;
+    [SerializeField] private GameObject DpadImage2;
+    [SerializeField] private GameObject DpadImage3;
+    [SerializeField] private GameObject DpadImage4;
+
+
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
     {
@@ -64,6 +75,7 @@ public class PowerUpManager : NetworkBehaviour
         PowerUp2Image.GetComponent<Image>().sprite = EmptyPowerUpImage;
         PowerUp3Image.GetComponent<Image>().sprite = EmptyPowerUpImage;
         PowerUp4Image.GetComponent<Image>().sprite = EmptyPowerUpImage;
+        UpdatePowerUpBoardUIForGamepad(GamepadUIManager.instance.gamepadUI);
     }
     public void GetFootballObject(Football football)
     {
@@ -411,6 +423,50 @@ public class PowerUpManager : NetworkBehaviour
             {
                 Debug.Log("PlayerUsePowerUp: Player WAS UNABLE TO use their powerup. PowerUp WILL NOT be removed from the game.");
             }
+        }
+    }
+    [ClientCallback]
+    public void GamepadActivateSelectedPowerUpBorder(int index)
+    {
+        if (index <= 4)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == index)
+                {
+                    PowerUpUIImages[i].transform.GetChild(0).gameObject.SetActive(true);
+                }
+                else
+                {
+                    PowerUpUIImages[i].transform.GetChild(0).gameObject.SetActive(false);
+                }
+            }
+        }        
+    }
+    [Client]
+    void UpdatePowerUpBoardUIForGamepad(bool usingGamepad)
+    {
+        if (usingGamepad)
+        {
+            PowerUpText1.SetActive(false);
+            PowerUpText2.SetActive(false);
+            PowerUpText3.SetActive(false);
+            PowerUpText4.SetActive(false);
+            DpadImage1.SetActive(true);
+            DpadImage2.SetActive(true);
+            DpadImage3.SetActive(true);
+            DpadImage4.SetActive(true);
+        }
+        else
+        {
+            PowerUpText1.SetActive(true);
+            PowerUpText2.SetActive(true);
+            PowerUpText3.SetActive(true);
+            PowerUpText4.SetActive(true);
+            DpadImage1.SetActive(false);
+            DpadImage2.SetActive(false);
+            DpadImage3.SetActive(false);
+            DpadImage4.SetActive(false);
         }
     }
 }

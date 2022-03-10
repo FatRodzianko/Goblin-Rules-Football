@@ -385,7 +385,8 @@ GameObject:
   - component: {fileID: 1312526304018659596}
   - component: {fileID: -8192379567288139176}
   - component: {fileID: -3064175622459980871}
-  m_Layer: 0
+  - component: {fileID: -6517141973537039676}
+  m_Layer: 11
   m_Name: goblin-berserker
   m_TagString: Goblin
   m_Icon: {fileID: 0}
@@ -562,7 +563,7 @@ MonoBehaviour:
   MaxStamina: 3
   StaminaDrain: 1.5
   StaminaRecovery: 1
-  MaxSpeed: 8.5
+  MaxSpeed: 7
   MaxDamage: 75
   health: 0
   stamina: 0
@@ -580,6 +581,8 @@ MonoBehaviour:
   isPunching: 0
   eMarkerPrefab: {fileID: 3718499330716654528, guid: 764a42fe423f10f4e80ab9e989af2463, type: 3}
   qMarkerPrefab: {fileID: 7215489222767727815, guid: f42ce2cbcc7b04f4db61749caeea4077, type: 3}
+  ballMarkerPrefab: {fileID: 8734951556259946270, guid: 3e694e23f835fe5429d3b9e0adbe80e7, type: 3}
+  ballMarkerOpponentPrefab: {fileID: 8646642381975776926, guid: f48f3944d41465d43a09cde197662e18, type: 3}
   animator: {fileID: 6607051740916151483}
   rb: {fileID: 6607051740916151460}
   playerCollider: {fileID: 6607051740916151461}
@@ -628,6 +631,7 @@ MonoBehaviour:
   angleOfKickAttempt: 0
   kickAfterAccuracyDifficulty: 0
   kickAfterFinalPosition: {x: 0, y: 0}
+  hasGoblinBeenRepositionedForKickAfter: 0
   kickAfterAccuracyBar: {fileID: 1258794966180923639}
   kickAfterGuageLine: {fileID: 6209535210073167413}
   kickAfterMarkerLeft: {fileID: 1972194795019887124}
@@ -658,10 +662,17 @@ MonoBehaviour:
   slideRange: 3.5
   slideRate: 2.5
   nextSlideTime: 0
+  minDistanceFromTarget: 2
   positionToRunTo: {x: 0, y: 0, z: 0}
   goblinLayerMask:
     serializedVersion: 2
     m_Bits: 512
+  goblinTarget: {fileID: 0}
+  preDirection: {x: 0, y: 0}
+  postDirection: {x: 0, y: 0}
+  adjacentGoblinTime: 0
+  diveRate: 2.5
+  nextDiveTime: 0
 --- !u!114 &1312526304018659596
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -718,6 +729,31 @@ MonoBehaviour:
   interpolateRotation: 1
   interpolateScale: 1
   syncScale: 0
+--- !u!114 &-6517141973537039676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6607051740916151457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45ef928aa43e47047b20ce9ec5952d8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goblinLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 524288
+  avoidDirectionMultiplier: 1
+  avoidObjectMultiplier: 20
+  avoidForceProximityMultiplier: 100
+  avoidObjectDirectionFallOffSpeed: 20
+  avoidObjectsScanDistance: 1.9
+  goblinTarget: {fileID: 0}
+  isTargetingAGoblin: 0
 --- !u!1 &7760457115166818820
 GameObject:
   m_ObjectHideFlags: 0
@@ -812,7 +848,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.044042587, y: -0.09147382}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -823,7 +859,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.15, y: 3.15}
+  m_Size: {x: 1.7773285, y: 2.6960177}
   m_EdgeRadius: 0
 --- !u!1 &7877024649310081243
 GameObject:

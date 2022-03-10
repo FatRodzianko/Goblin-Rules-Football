@@ -41,7 +41,7 @@ TagManager:
   - touchdownHitbox
   - powerups
   - thrownObjects
-  - 
+  - pathFindingObstacles
   - 
   - 
   - 

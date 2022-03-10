@@ -51,6 +51,10 @@ public class GamePlayer : NetworkBehaviour
     [Header("Power Ups")]
     public List<PowerUp> myPowerUps = new List<PowerUp>();
     public List<uint> serverPowerUpUints = new List<uint>();
+    public int powerUpSelectedIndexNumber = 0;
+    public bool canSelectWithRightStickAgain = true;
+    public float nextPowerUpSelectTime = 0f;
+    public bool wasRightStickUsedToSelect = false;
 
     [Header("Football")]
     [SerializeField] private GameObject footballPrefab;
@@ -151,6 +155,13 @@ public class GamePlayer : NetworkBehaviour
         InputManager.Controls.PowerUps.PowerUp2.performed += _ => UsePowerUp(1);
         InputManager.Controls.PowerUps.PowerUp3.performed += _ => UsePowerUp(2);
         InputManager.Controls.PowerUps.PowerUp4.performed += _ => UsePowerUp(3);
+        // Power Up selection with right analog stick - Gamepads only?
+        //InputManager.Controls.SelectPowerUps.SelectLeft.performed += _ => GamepadPowerUpSelectLeftRight(true);
+        //InputManager.Controls.SelectPowerUps.SelectRight.performed += _ => GamepadPowerUpSelectLeftRight(false);
+        //InputManager.Controls.SelectPowerUps.SelectLeftOrRight.performed += ctx => GamepadPowerUpSelectWithRightStick(ctx.ReadValue<Vector2>());
+        //InputManager.Controls.SelectPowerUps.SelectLeftOrRight.canceled += ctx => GamepadResetSelectWithRightStick();
+        //InputManager.Controls.SelectPowerUps.SelectLeftOrRightComposite.performed += ctx => GamepadPowerUpSelectWithRightStickComposite(ctx.ReadValue<Vector2>());
+        //InputManager.Controls.SelectPowerUps.SubmitSelection.performed += _ => GamepadPowerUpSubmitSelection();
     }
 
     public override void OnStartClient()
@@ -1078,7 +1089,7 @@ public class GamePlayer : NetworkBehaviour
                 InputManager.Controls.Player.Dive.performed += _ => DiveGoblin();
                 InputManager.Controls.Player.Block.performed += _ => StartBlockGoblin();
                 InputManager.Controls.Player.Block.canceled += _ => StopBlockGoblin();*/
-                gameplayActionsEnabled = true;
+                //gameplayActionsEnabled = true;
             }
             
         }
@@ -1128,7 +1139,7 @@ public class GamePlayer : NetworkBehaviour
                         CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkIdentity>().netId);
 
                         goblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
-
+                        goblin.UpdateHasGoblinRepositionedForKickAfter();
                         continue;
                     }                        
                     yPositionModifier *= -1;
@@ -1136,6 +1147,7 @@ public class GamePlayer : NetworkBehaviour
                     newPosition.x = 0f;
                     newPosition.y = 3 * yPositionModifier;
                     goblin.transform.position = newPosition;
+                    goblin.UpdateHasGoblinRepositionedForKickAfter();
                 }
             }
             else
@@ -1165,6 +1177,7 @@ public class GamePlayer : NetworkBehaviour
                             SwitchToQGoblin(false, Time.time);
                         else if (goblin.isEGoblin)
                             SwitchToEGoblin(false, Time.time);
+                        goblin.UpdateHasGoblinRepositionedForKickAfter();
                         continue;
                     }
                     yPositionModifier *= -1;
@@ -1179,6 +1192,7 @@ public class GamePlayer : NetworkBehaviour
                     }
                     newPosition.y = 3 * yPositionModifier;
                     goblin.transform.position = newPosition;
+                    goblin.UpdateHasGoblinRepositionedForKickAfter();
                 }
             }
             // Enable positioning controls if the player is the kicking player
@@ -1305,16 +1319,24 @@ public class GamePlayer : NetworkBehaviour
             PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
         }        
     }
-    void UsePowerUp(int powerUpNumber)
+    public void UsePowerUp(int powerUpNumber)
     {
         Debug.Log("UsePowerUp: Player is going to use power up: " + powerUpNumber.ToString());
-        if (powerUpNumber < myPowerUps.Count)
+        if (powerUpNumber < myPowerUps.Count && powerUpNumber >= 0)
         {
             Debug.Log("UsePowerUp: Player is able to use power up: " + powerUpNumber.ToString());
             if (hasAuthority)
             {
-                uint powerUpNetId = myPowerUps[powerUpNumber].GetComponent<NetworkIdentity>().netId;
-                CmdUsePowerUp(powerUpNetId);
+                try
+                {
+                    uint powerUpNetId = myPowerUps[powerUpNumber].GetComponent<NetworkIdentity>().netId;
+                    CmdUsePowerUp(powerUpNetId);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("UsePowerUp: Player tried to get network id of a non-existent powerup: " + e);
+                }
+                
             }
         }
     }
@@ -1326,13 +1348,14 @@ public class GamePlayer : NetworkBehaviour
             if (!powerUpsEnabled)
             {
                 InputManager.Controls.PowerUps.Enable();
-
+                InputManager.Controls.SelectPowerUps.Enable();
                 powerUpsEnabled = true;
             }
         }
         else
         {
             InputManager.Controls.PowerUps.Disable();
+            InputManager.Controls.SelectPowerUps.Disable();
             powerUpsEnabled = false;
         }
     }
@@ -1366,8 +1389,110 @@ public class GamePlayer : NetworkBehaviour
         PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
     }
     public void RemoveUsedPowerUps()
-    { 
-        if(hasAuthority)
+    {
+        if (hasAuthority)
+        {
             PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
+            /*if (powerUpSelectedIndexNumber >= myPowerUps.Count)
+            {
+                powerUpSelectedIndexNumber = myPowerUps.Count - 1;
+                if(wasRightStickUsedToSelect)
+                    PowerUpManager.instance.GamepadActivateSelectedPowerUpBorder(powerUpSelectedIndexNumber);
+                if (powerUpSelectedIndexNumber == -1)
+                    wasRightStickUsedToSelect = false;
+            }*/   
+        }
+            
     }
+    /*void GamepadPowerUpSelectLeftRight(bool left)
+    {
+        Debug.Log("GamepadPowerUpSelectLeftRight: Left? " + left.ToString());
+        if (Time.time > nextPowerUpSelectTime)
+        {
+            if (left)
+            {
+                powerUpSelectedIndexNumber--;
+                if (powerUpSelectedIndexNumber < 0)
+                    powerUpSelectedIndexNumber = myPowerUps.Count - 1;
+                nextPowerUpSelectTime = Time.time + 0.5f;
+            }
+            else
+            {
+                powerUpSelectedIndexNumber++;
+                if (powerUpSelectedIndexNumber >= myPowerUps.Count)
+                    powerUpSelectedIndexNumber = 0;
+                nextPowerUpSelectTime = Time.time + 0.5f;
+            }
+            if(myPowerUps.Count > 0)
+                PowerUpManager.instance.GamepadActivateSelectedPowerUpBorder(powerUpSelectedIndexNumber);
+        }   
+    }
+    void GamepadPowerUpSelectWithRightStick(Vector2 selectDirection)
+    {
+        Debug.Log("GamepadPowerUpSelectWithRightStick: Direction: " + selectDirection.ToString());
+        if (Time.time > nextPowerUpSelectTime)
+        {
+            if (selectDirection.x <= -0.5f)
+            {
+                powerUpSelectedIndexNumber--;
+                if (powerUpSelectedIndexNumber < 0)
+                    powerUpSelectedIndexNumber = myPowerUps.Count - 1;
+                //canSelectWithRightStickAgain = false;
+                nextPowerUpSelectTime = Time.time + 0.4f;
+                wasRightStickUsedToSelect = true;
+            }
+            else if (selectDirection.x >= 0.5f)
+            {
+                powerUpSelectedIndexNumber++;
+                if (powerUpSelectedIndexNumber >= myPowerUps.Count)
+                    powerUpSelectedIndexNumber = 0;
+                //canSelectWithRightStickAgain = false;
+                nextPowerUpSelectTime = Time.time + 0.4f;
+                wasRightStickUsedToSelect = true;
+            }
+            if(powerUpSelectedIndexNumber > myPowerUps.Count)
+                powerUpSelectedIndexNumber = myPowerUps.Count - 1;
+            if (myPowerUps.Count > 0)
+                PowerUpManager.instance.GamepadActivateSelectedPowerUpBorder(powerUpSelectedIndexNumber);
+        }            
+    }
+    void GamepadPowerUpSelectWithRightStickComposite(Vector2 selectDirection)
+    {
+        Debug.Log("GamepadPowerUpSelectWithRightStickComposite: Direction: " + selectDirection.ToString());
+        if (Time.time > nextPowerUpSelectTime)
+        {
+            if (selectDirection.x == -1f)
+            {
+                powerUpSelectedIndexNumber--;
+                if (powerUpSelectedIndexNumber < 0)
+                    powerUpSelectedIndexNumber = myPowerUps.Count - 1;
+                //canSelectWithRightStickAgain = false;
+                nextPowerUpSelectTime = Time.time + 0.4f;
+                wasRightStickUsedToSelect = true;
+            }
+            else if (selectDirection.x == 1f)
+            {
+                powerUpSelectedIndexNumber++;
+                if (powerUpSelectedIndexNumber >= myPowerUps.Count)
+                    powerUpSelectedIndexNumber = 0;
+                //canSelectWithRightStickAgain = false;
+                nextPowerUpSelectTime = Time.time + 0.4f;
+                wasRightStickUsedToSelect = true;
+            }
+            if (powerUpSelectedIndexNumber > myPowerUps.Count)
+                powerUpSelectedIndexNumber = myPowerUps.Count - 1;
+            if (myPowerUps.Count > 0)
+                PowerUpManager.instance.GamepadActivateSelectedPowerUpBorder(powerUpSelectedIndexNumber);
+        }
+    }
+    void GamepadResetSelectWithRightStick()
+    {
+        canSelectWithRightStickAgain = true;
+    }
+    void GamepadPowerUpSubmitSelection()
+    {
+        Debug.Log("GamepadPowerUpSubmitSelection");
+        if (powerUpSelectedIndexNumber < myPowerUps.Count && powerUpSelectedIndexNumber >= 0)
+            UsePowerUp(powerUpSelectedIndexNumber);
+    }*/
 }

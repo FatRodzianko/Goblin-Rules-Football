@@ -334,6 +334,7 @@ public class PowerUp : NetworkBehaviour
             bananaObjectScript.isThrown = false;
             bananaObjectScript.throwSpeed = 2.5f;
             bananaObjectScript.isDroppedObject = true;
+            bananaObjectScript.dropTime = Time.time;
             bananaObjectScript.DropBehind(myPlayerOwner);
 
             return true;

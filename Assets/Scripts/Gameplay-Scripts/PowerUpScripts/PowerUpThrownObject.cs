@@ -22,10 +22,12 @@ public class PowerUpThrownObject : NetworkBehaviour
     [SyncVar(hook = nameof(HandleIsThrown))] public bool isThrown = false;
     public float throwCount = 0.0f;
     public float throwSpeed;
+    public float dropTime = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -53,6 +55,7 @@ public class PowerUpThrownObject : NetworkBehaviour
             else
             {
                 isThrown = false;
+
                 //this.GetComponent<BoxCollider2D>().enabled = false;
             }
         }
@@ -63,6 +66,10 @@ public class PowerUpThrownObject : NetworkBehaviour
         Debug.Log("OnTriggerEnter2D for PowerUpThrownObject: " + this.name);
         if (collision.tag == "Goblin" && isDroppedObject)
         {
+            // This is just to make sure that the goblin who threw the banana isn't immediately knocked out by their own banana
+            if ((dropTime + 0.2f) > Time.time && collision.GetComponent<GoblinScript>().serverGamePlayer == myPlayerOwner)
+                return;
+
             Debug.Log("PowerUpThrownObject: collided with goblin named: " + collision.transform.name);
             uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
             collision.transform.gameObject.GetComponent<GoblinScript>().KnockOutGoblin(false);

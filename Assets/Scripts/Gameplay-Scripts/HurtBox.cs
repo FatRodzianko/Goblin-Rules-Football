@@ -5,6 +5,8 @@ using UnityEngine;
 public class HurtBox : MonoBehaviour
 {
     GoblinScript myParentScript;
+    Collider2D lastPunchBox;
+    float nextPunchTime;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +22,16 @@ public class HurtBox : MonoBehaviour
     {
         if (collision.tag == "punchbox")
         {
+            if (lastPunchBox != null)
+            {
+                if (lastPunchBox == collision && Time.time < nextPunchTime)
+                    return;
+                else
+                {
+                    lastPunchBox = collision;
+                    nextPunchTime = Time.time + 0.15f;
+                }
+            }
             Debug.Log("OnTriggerEnter2D: Hurtbox collided with punchbox from: " + collision.transform.parent.name);
             myParentScript.HurtBoxCollision(collision.transform.parent.GetComponent<GoblinScript>());
         }

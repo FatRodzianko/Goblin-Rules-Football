@@ -28,6 +28,17 @@ public class CameraMarker : MonoBehaviour
     [SerializeField] Sprite qMarkerRightCanPass;
     [SerializeField] Sprite qMarkerRightCannotPass;
 
+    [SerializeField] Sprite rbMarkerLeftCanPass;
+    [SerializeField] Sprite rbMarkerLeftCannotPass;
+    [SerializeField] Sprite rbMarkerRightCanPass;
+    [SerializeField] Sprite rbMarkerRightCannotPass;
+
+    [SerializeField] Sprite lbMarkerLeftCanPass;
+    [SerializeField] Sprite lbMarkerLeftCannotPass;
+    [SerializeField] Sprite lbMarkerRightCanPass;
+    [SerializeField] Sprite lbMarkerRightCannotPass;
+
+
     Vector3 newPosition = Vector3.zero;
     Vector3 ballPosition = Vector3.zero;
 
@@ -42,6 +53,20 @@ public class CameraMarker : MonoBehaviour
         eMarkerRight.SetActive(false);
         qMarkerLeft.SetActive(false);
         qMarkerRight.SetActive(false);
+
+        if (GamepadUIManager.instance.gamepadUI)
+        {
+            eMarkerLeftCanPass = rbMarkerLeftCanPass;
+            eMarkerLeftCannotPass = rbMarkerLeftCannotPass;
+            eMarkerRightCanPass = rbMarkerRightCanPass;
+            eMarkerRightCannotPass = rbMarkerRightCannotPass;
+
+            qMarkerLeftCanPass = lbMarkerLeftCanPass;
+            qMarkerLeftCannotPass = lbMarkerLeftCannotPass;
+            qMarkerRightCanPass = lbMarkerRightCanPass;
+            qMarkerRightCannotPass = lbMarkerRightCannotPass;
+
+        }
     }
 
     // Update is called once per frame

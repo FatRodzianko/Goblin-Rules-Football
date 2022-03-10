@@ -15,12 +15,29 @@ public class QEMarkerScript : MonoBehaviour
     [SerializeField] SpriteRenderer myRenderer;
     [SerializeField] Sprite canPass;
     [SerializeField] Sprite cannotPass;
+    [SerializeField] Sprite keyBoardCanPass;
+    [SerializeField] Sprite gamePadCanPass;
+    [SerializeField] Sprite keyBoardCannotPass;
+    [SerializeField] Sprite gamePadCannotPass;
 
     // Start is called before the first frame update
     void Start()
     {
         savedLocalPosition = this.transform.localPosition;
         myCameraMarker = Camera.main.GetComponent<CameraMarker>();
+        // Get the sprite for gamepad ui or not?
+        if (GamepadUIManager.instance.gamepadUI)
+        {
+            canPass = gamePadCanPass;
+            cannotPass = gamePadCannotPass;
+        }
+        else
+        {
+            canPass = keyBoardCanPass;
+            cannotPass = keyBoardCannotPass;
+        }
+        myRenderer.sprite = canPass;
+
     }
 
     // Update is called once per frame

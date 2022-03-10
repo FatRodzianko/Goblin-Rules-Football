@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6403078655971916108}
   - component: {fileID: 1905642395117955021}
   - component: {fileID: -1690484788134790645}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: banana-thrown-object
   m_TagString: tripObject
   m_Icon: {fileID: 0}
@@ -144,13 +144,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  myCollider: {fileID: 6403078655971916108}
   mySpriteRenderer: {fileID: 2134500081350051485}
+  myAnimator: {fileID: 0}
   onGroundSprite: {fileID: 21300000, guid: a113efd781d77474f916bf47e61c303f, type: 3}
   collisionSprite: {fileID: 0}
+  playerCollisionAnimationName: 
+  groundCollisionAnimationName: 
   myPlayerOwner: {fileID: 0}
   isDroppedObject: 0
   isThrown: 0
   throwCount: 0
+  throwSpeed: 0
 --- !u!114 &-1690484788134790645
 MonoBehaviour:
   m_ObjectHideFlags: 0

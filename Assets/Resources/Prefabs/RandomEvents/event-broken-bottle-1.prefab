@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2608307681469939977}
   - component: {fileID: -188169599494258641}
   - component: {fileID: 7838096458167828575}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: event-broken-bottle-1
   m_TagString: tripObject
   m_Icon: {fileID: 0}

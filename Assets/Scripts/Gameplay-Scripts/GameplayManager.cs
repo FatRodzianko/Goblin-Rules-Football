@@ -77,6 +77,14 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] TextMeshProUGUI greyTeamScoreText;
     [SerializeField] TextMeshProUGUI teamWinnerText;
 
+    [Header("UI Stuff")]
+    [SerializeField] GameObject PossessionFootballGreen;
+    [SerializeField] GameObject PossessionFootballGrey;
+
+    [Header("UI to update for gamepad/keyboard controls")]
+    [SerializeField] private TextMeshProUGUI MoveLeftText;
+    [SerializeField] private TextMeshProUGUI MoveRightText;
+    [SerializeField] private TextMeshProUGUI EnterToSubmitText;
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -108,6 +116,7 @@ public class GameplayManager : NetworkBehaviour
         if (isClient)
         {
             GetLocalGamePlayer();
+            UpdateKickAfterControlsUIForGamepad(GamepadUIManager.instance.gamepadUI);
         }
     }
     public override void OnStartServer()
@@ -165,20 +174,30 @@ public class GameplayManager : NetworkBehaviour
         {
             gamePhase = newValue;
             if (newValue == "kickoff")
+            {
                 RepositionTeamsForKickOff();
+                ResetGoblinKickAfterRespositioningBool();
+                RpcNoTeamWithFootball();
+                ObstacleManager.instance.DisableCollidersOnObjects(false);
+            }
             if (newValue == "gameplay")
             {
                 ActivateGameplayControls(true);
                 PowerUpManager.instance.StartGeneratingPowerUps(true);
-                RandomEventManager.instance.StartGeneratingRandomEvents(true);            }
+                RandomEventManager.instance.StartGeneratingRandomEvents(true);
+                ObstacleManager.instance.DisableCollidersOnObjects(true);
+            }
             if (oldValue == "gameplay")
             {
                 PowerUpManager.instance.StartGeneratingPowerUps(false);
                 RandomEventManager.instance.StartGeneratingRandomEvents(false);
+                ObstacleManager.instance.DisableCollidersOnObjects(false);
             }                
             if (newValue == "kick-after-attempt")
             {
                 SetKickAfterPlayers(scoringGoblinNetId);
+                RpcNoTeamWithFootball();
+                ObstacleManager.instance.KickAfterWaitToEnableObstacleColliders();
             }
             if (oldValue == "kick-after-attempt")
             {
@@ -193,7 +212,7 @@ public class GameplayManager : NetworkBehaviour
                 {
                     Debug.Log("GameplayManager: HandleGamePhase: failed to reset scoring goblin info after kick attempt. Reason: " + e);
                 }
-                
+                ObstacleManager.instance.DisableCollidersOnObjects(false);
             }
             if (newValue == "xtra-time")
             {
@@ -539,7 +558,15 @@ public class GameplayManager : NetworkBehaviour
     {
         if (isKickingPlayer)
         {
-            TimerInstructionsText.text = "\"Tab\" to submit kick accuracy and power!";
+            if (GamepadUIManager.instance.gamepadUI)
+            {
+                TimerInstructionsText.text = "\"A\" to submit kick accuracy and power!";
+            }
+            else
+            {
+                TimerInstructionsText.text = "\"Tab\" to submit kick accuracy and power!";
+            }
+            
             TimerInstructionsText.color = Color.yellow;
         }
         else
@@ -703,5 +730,96 @@ public class GameplayManager : NetworkBehaviour
             HandleGamePhase(this.gamePhase, "gameover");
         }
 
+    }
+    [ServerCallback]
+    void ResetGoblinKickAfterRespositioningBool()
+    {
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            foreach (GoblinScript goblin in player.goblinTeamOnServer)
+            {
+                goblin.hasGoblinBeenRepositionedForKickAfter = false;
+            }
+        }
+    }
+    // Check to see if all goblins have be repositioned by the clients. If they have, wait 0.25f seconds and then check to make sure that the scoring goblin has the football
+    [ServerCallback]
+    public void AreAllGoblinsRepositionedForKickAfter()
+    {
+        bool doneRepositioning = true;
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            if (doneRepositioning)
+            {
+                foreach (GoblinScript goblin in player.goblinTeamOnServer)
+                {
+                    if (!goblin.hasGoblinBeenRepositionedForKickAfter)
+                    {
+                        doneRepositioning = false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (doneRepositioning)
+        {
+            Debug.Log("AreAllGoblinsRepositionedForKickAfter: All goblins have hasGoblinBeenRepositionedForKickAfter set to true. Continuing with kickafter");
+            IEnumerator waitForRepositioningSyncUp = WaitForRepositioningSyncUp();
+            StartCoroutine(waitForRepositioningSyncUp);
+        }
+        else
+        {
+            Debug.Log("AreAllGoblinsRepositionedForKickAfter: NOT all goblins have hasGoblinBeenRepositionedForKickAfter set to true. Waiting for kick after setup to finish...");
+        }
+    }
+    IEnumerator WaitForRepositioningSyncUp()
+    {
+        yield return new WaitForSeconds(0.25f);
+        GoblinScript scoringGoblinScript = NetworkIdentity.spawned[scoringGoblinNetId].GetComponent<GoblinScript>();
+        if (!scoringGoblinScript.doesCharacterHaveBall)
+        {
+            Football football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+            football.MoveFootballToKickoffGoblin(scoringGoblinNetId);
+        }
+    }
+    [Client]
+    public void UpdatePossessionOfFootballtoTeam(bool doesGreyTeamHaveBall)
+    {
+        Debug.Log("UpdatePossessionOfFootballtoTeam: Does grey team have the ball? " + doesGreyTeamHaveBall.ToString());
+        if (doesGreyTeamHaveBall)
+        {
+            PossessionFootballGrey.SetActive(true);
+            PossessionFootballGreen.SetActive(false);
+        }
+        else
+        {
+            PossessionFootballGrey.SetActive(false);
+            PossessionFootballGreen.SetActive(true);
+        }
+    }
+    [ClientRpc]
+    public void RpcNoTeamWithFootball()
+    {
+        NoTeamWithFootball();
+    }
+    public void NoTeamWithFootball()
+    {
+        PossessionFootballGrey.SetActive(false);
+        PossessionFootballGreen.SetActive(false);
+    }
+    void UpdateKickAfterControlsUIForGamepad(bool usingGamepad)
+    {
+        if (usingGamepad)
+        {
+            MoveLeftText.text = "<- to Move Left";
+            MoveRightText.text = "-> to Move Right";
+            EnterToSubmitText.text = "A to Submit";
+        }
+        else
+        {
+            MoveLeftText.text = "<- to Move Left";
+            MoveRightText.text = "-> to Move Right";
+            EnterToSubmitText.text = "\"Enter\" to Submit";
+        }
     }
 }

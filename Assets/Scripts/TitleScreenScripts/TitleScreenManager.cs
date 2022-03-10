@@ -18,6 +18,7 @@ public class TitleScreenManager : MonoBehaviour
 
     [Header("PlayerName UI")]
     [SerializeField] private TMP_InputField playerNameInputField;
+    [SerializeField] private Toggle GamepadToggle;
 
     [Header("Enter IP UI")]
     [SerializeField] private TMP_InputField IpAddressField;
@@ -81,6 +82,7 @@ public class TitleScreenManager : MonoBehaviour
             PlayerNamePanel.SetActive(false);
             HostOrJoinPanel.SetActive(true);
         }
+        GamepadUIManager.instance.gamepadUI = GamepadToggle.isOn;
     }
     public void HostGame()
     {

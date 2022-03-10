@@ -103,7 +103,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.02906312, y: 0.03349413}
+  m_Offset: {x: 0.031294808, y: 0.034609973}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -114,7 +114,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.69032717, y: 0.43078807}
+  m_Size: {x: 0.8108388, y: 0.56245816}
   m_EdgeRadius: 0
 --- !u!50 &7510187484870184801
 Rigidbody2D:
@@ -173,10 +173,12 @@ MonoBehaviour:
   isThrown: 0
   isFalling: 0
   goblinWithBall: {fileID: 0}
+  goblinWithBallNetId: 0
   myRenderer: {fileID: 7510187484870184807}
   myCollider: {fileID: 7510187484870184806}
   myRigidBody: {fileID: 7510187484870184801}
   animator: {fileID: 573848318654464580}
+  ballMarkerPrefab: {fileID: 8734951556259946270, guid: 3e694e23f835fe5429d3b9e0adbe80e7, type: 3}
   directionToThrow: {x: 0, y: 0}
   speedOfThrow: 15
   fallSpeed: 5

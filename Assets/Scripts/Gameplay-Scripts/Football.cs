@@ -11,12 +11,15 @@ public class Football : NetworkBehaviour
     [SyncVar(hook = nameof(HandleIsThrown))] public bool isThrown;
     [SyncVar] public bool isFalling;
     public GoblinScript goblinWithBall;
+    [SyncVar(hook = nameof(HandleGoblinWithBallNetId))] public uint goblinWithBallNetId;
 
     [Header("Ball Components")]
     [SerializeField] private SpriteRenderer myRenderer;
     [SerializeField] private BoxCollider2D myCollider;
     [SerializeField] private Rigidbody2D myRigidBody;
     [SerializeField] public Animator animator;
+    [SerializeField] private GameObject ballMarkerPrefab;
+    private GameObject ballMarkerObject;
 
     [Header("Throwing and Kicking Stuff?")]
     [SyncVar] public Vector2 directionToThrow = Vector2.zero;
@@ -28,7 +31,7 @@ public class Football : NetworkBehaviour
 
     [Header("Fumble Football Stuff")]
     Vector3[] FumblePoints = new Vector3[3];
-    [SyncVar] public bool isFumbled = false;
+    [SyncVar(hook = nameof(HandleIsFumbled))] public bool isFumbled = false;
     public float fumbleCount = 0.0f;
 
     [Header("Kicked Football")]
@@ -49,7 +52,7 @@ public class Football : NetworkBehaviour
     Vector3 localShadowEndPosition = Vector3.zero;
 
     [Header("Football Bounces")]
-    [SyncVar] public bool isBouncing;
+    [SyncVar(hook = nameof(HandleIsBouncing))] public bool isBouncing;
     [SyncVar] public int numberOfBounces;
     float bounceProgressCount = 0.0f;
     bool bounceForward = false;
@@ -96,6 +99,9 @@ public class Football : NetworkBehaviour
         {
             Debug.Log("Football.cs: Could not find local game player object");
         }
+        ballMarkerObject = Instantiate(ballMarkerPrefab, this.transform);
+        ballMarkerObject.SetActive(false);
+        ballMarkerObject.transform.localPosition = new Vector3(0.08f, 1f, 0f);
 
     }
     public override void OnStartServer()
@@ -365,7 +371,10 @@ public class Football : NetworkBehaviour
             }
             if (GameplayManager.instance.gamePhase == "xtra-time" && !isHeld && !isThrown && !isFumbled && !isFalling && !isKicked)
             {
-                GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
+                // have this start a counter for like 0.5f to allow for players to "catch" kicked balls before the game ends?
+                //GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
+                IEnumerator countdownToEndGame = CountdownToEndGame();
+                StartCoroutine(countdownToEndGame);
             }
 
         }
@@ -407,6 +416,14 @@ public class Football : NetworkBehaviour
             uint goblinNetId = collision.transform.parent.gameObject.GetComponent<NetworkIdentity>().netId;
             collision.transform.parent.gameObject.GetComponent<GoblinScript>().GoblinPickUpFootball();
             //CmdPlayerPickUpFootball(goblinNetId);
+        }
+        if (isServer && collision.tag == "tripObject")
+        {
+            if (!isThrown && !isKicked && !isHeld && !isFumbled && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+            {
+                Debug.Log("Football.cs: Football collided with a trip object: " + collision.gameObject.name);
+                FumbleFootball();
+            }
         }
     }
     /*[Command(requiresAuthority = false)]
@@ -468,7 +485,7 @@ public class Football : NetworkBehaviour
                     distanceToBall = 0f;
                 }
                 Debug.Log("CmdPlayerPickUpFootball: distance to ball is: " + distanceToBall.ToString() + " from goblin with netid of " + goblinNetId.ToString());
-                if (distanceToBall < 3.1f)
+                if (distanceToBall < 4.1f)
                 {
                     Debug.Log("CmdPlayerPickUpFootball: Goblin is close enough to pick up the ball");
                     //GoblinScript goblinToCheckScript = goblinToCheck.GetComponent<GoblinScript>();
@@ -476,6 +493,8 @@ public class Football : NetworkBehaviour
                     goblinToCheckScript.HandleHasBall(goblinToCheckScript.doesCharacterHaveBall, true);
                     this.HandleIsHeld(this.isHeld, true);
                     goblinWithBall = goblinToCheckScript;
+                    //goblinWithBallNetId = goblinToCheckScript.GetComponent<NetworkIdentity>().netId;
+                    this.HandleGoblinWithBallNetId(goblinWithBallNetId, goblinToCheckScript.GetComponent<NetworkIdentity>().netId);
                     RpcBallIsHeld(true);
 
                 }
@@ -522,12 +541,20 @@ public class Football : NetworkBehaviour
         {
             isHeld = newValue;
             if (!newValue)
+            {
                 goblinWithBall = null;
+                //GameplayManager.instance.RpcNoTeamWithFootball();
+            }
         }            
         if (isClient)
         {
             myRenderer.enabled = !newValue;
             myCollider.enabled = !newValue;
+            ballMarkerObject.SetActive(!newValue);
+            if (!newValue)
+            {
+                GameplayManager.instance.NoTeamWithFootball();
+            }   
         }
     }
     [Command(requiresAuthority = false)]
@@ -1122,5 +1149,75 @@ public class Football : NetworkBehaviour
             HandleIsHeld(this.isHeld, false);
         }
     }
-   
+    void HandleGoblinWithBallNetId(uint oldValue, uint newValue)
+    {
+        if (isServer)
+        {
+            goblinWithBallNetId = newValue;
+            
+
+        }
+        if (isClient)
+        {
+            if ((GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time") && this.isHeld && newValue != 0)
+            {
+                try
+                {
+                    GameplayManager.instance.UpdatePossessionOfFootballtoTeam(NetworkIdentity.spawned[goblinWithBallNetId].GetComponent<GoblinScript>().isGoblinGrey);
+                }
+                catch
+                {
+                    Debug.Log("HandleIsHeld: Could not update GameplayManager with the goblin with ball.");
+                }
+
+            }
+            /*else if (!newValue)
+            {
+                GameplayManager.instance.RpcNoTeamWithFootball();
+            }*/
+        }
+    }
+    void HandleIsFumbled(bool oldValue, bool newValue)
+    {
+        if (isServer)
+        {
+            isFumbled = newValue;
+            if (!newValue)
+            {
+                myCollider.enabled = false;
+                myCollider.enabled = true;
+            }
+        }
+        if (isClient)
+        { 
+
+        }
+    }
+    void HandleIsBouncing(bool oldValue, bool newValue)
+    {
+        if (isServer)
+        {
+            isBouncing = newValue;
+            if (!newValue)
+            {
+                myCollider.enabled = false;
+                myCollider.enabled = true;
+            }
+        }
+        if (isClient)
+        {
+
+        }
+    }
+    [ServerCallback]
+    IEnumerator CountdownToEndGame()
+    {
+        yield return new WaitForSeconds(0.25f);
+        if (!this.isHeld)
+        {
+            GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
+        }
+    }
+
+
 }

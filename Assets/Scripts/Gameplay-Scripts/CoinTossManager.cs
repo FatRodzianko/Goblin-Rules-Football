@@ -46,6 +46,14 @@ public class CoinTossManager : NetworkBehaviour
     [SerializeField] GameObject coinTossAnimationObject;
     [SerializeField] Animator myAnimator;
     IEnumerator coinAnimationRoutine;
+
+    [Header("UI to update for gamepad/keyboard controls")]
+    [SerializeField] private TextMeshProUGUI SelectHeadsText;
+    [SerializeField] private TextMeshProUGUI SelectTailsText;
+    [SerializeField] private TextMeshProUGUI EnterToSubmitText;
+    [SerializeField] private TextMeshProUGUI SelectReceiveText;
+    [SerializeField] private TextMeshProUGUI SelectKickText;
+
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
     {
@@ -63,6 +71,7 @@ public class CoinTossManager : NetworkBehaviour
     {
         base.OnStartClient();
         GetLocalGamePlayer();
+        UpdateUIForGamepad(GamepadUIManager.instance.gamepadUI);
     }
     // Start is called before the first frame update
     void Awake()
@@ -365,5 +374,25 @@ public class CoinTossManager : NetworkBehaviour
     {
         yield return new WaitForSeconds(2.0f);
         GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "kickoff");
+    }
+    [Client]
+    void UpdateUIForGamepad(bool usingGamepad)
+    {
+        if (usingGamepad)
+        {
+            SelectHeadsText.text = "<- to Select";
+            SelectTailsText.text = "-> to Select";
+            EnterToSubmitText.text = "A to Submit";
+            SelectReceiveText.text = "<- to Select";
+            SelectKickText.text = "-> to Select";
+        }
+        else
+        {
+            SelectHeadsText.text = "A to Select";
+            SelectTailsText.text = "D to Select";
+            EnterToSubmitText.text = "\"Enter\" to Submit";
+            SelectReceiveText.text = "A to Select";
+            SelectKickText.text = "D to Select";
+        }
     }
 }
