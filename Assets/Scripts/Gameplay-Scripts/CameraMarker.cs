@@ -151,10 +151,10 @@ public class CameraMarker : MonoBehaviour
     }
     public void ActivateFootballMarker(bool isLeft, bool isHeld, float yValue)
     {
-        if (yValue > 5.7f)
-            yValue = 5.7f;
-        else if (yValue < -6.5f)
-            yValue = -6.5f;
+        if (yValue > GameplayManager.instance.maxY)
+            yValue = GameplayManager.instance.maxY;
+        else if (yValue < GameplayManager.instance.minY)
+            yValue = GameplayManager.instance.minY;
 
         if (isLeft)
         {

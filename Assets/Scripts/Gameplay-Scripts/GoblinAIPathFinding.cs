@@ -12,7 +12,7 @@ public class GoblinAIPathFinding : MonoBehaviour
     [SerializeField] LayerMask goblinLayerMask;
     [SerializeField] LayerMask obstacleLayerMask;
     public float avoidDirectionMultiplier = 1f;
-    public float avoidObjectMultiplier = 20f;
+    public float avoidObjectMultiplier = 25f; // 20f
     public float avoidForceProximityMultiplier = 100;
     public float avoidObjectDirectionFallOffSpeed = 20f;
     private Vector2 lastPos = Vector2.zero;

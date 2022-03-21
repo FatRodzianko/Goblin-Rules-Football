@@ -36,6 +36,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public float StaminaRecovery;
     [SyncVar] public float MaxSpeed;
     [SyncVar] public int MaxDamage;
+    [SyncVar] public bool canCollide = true;
 
 
     [Header("Goblin Current Stats")]
@@ -47,6 +48,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public float blockingSpeedModifier = 1.0f;
     [SyncVar] public float defenseModifier;
     [SyncVar] public float speedModifierFromPowerUps = 1.0f;
+    [SyncVar] public float slowDownObstacleModifier = 1.0f;
 
 
     [Header("Character selection stuff")]
@@ -76,6 +78,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public string goblinType;
     [SerializeField] private StatusBarScript myStatusBars;
     [SerializeField] private GameObject touchdownHitbox;
+    [SerializeField] private GameObject divingHitbox;
 
 
     [Header("Character Game State Stuff")]
@@ -138,8 +141,8 @@ public class GoblinScript : NetworkBehaviour
     //[SyncVar] public float kickAfterAccuracyBar2 = 0f;
     bool repositioningButtonHeldDown = false;
     bool repositioningToLeft = false;
-    Vector2 greenGoalPost = new Vector2(40.3f, 0.5f);
-    Vector2 greyGoalPost = new Vector2(-40.3f, 0.5f);
+    Vector2 greenGoalPost = new Vector2(50.3f, -1.5f);
+    Vector2 greyGoalPost = new Vector2(-50.3f, -1.5f);
     [SyncVar] public Vector2 kickAfterFinalPosition = Vector2.zero;
     public bool hasGoblinBeenRepositionedForKickAfter = false;
 
@@ -198,13 +201,14 @@ public class GoblinScript : NetworkBehaviour
     public float slideRate = 2.5f;
     public float nextSlideTime = 0f;
     public float minDistanceFromTarget = 1.7f;
+    public float punchYMax = 1.15f;
     public Vector3 positionToRunTo = Vector3.zero;
-    float fieldMaxY = 6.25f;
-    float fieldMinY = -5f;
+    [SerializeField] float fieldMaxY; // = 6.25f;
+    [SerializeField] float fieldMinY; // = -5f;
     //float fieldMaxY = 5.99f;
     //float fieldMinY = -4.25f;
-    float fieldMaxX = 41f;
-    float fieldMinX = -41;
+    [SerializeField] float fieldMaxX; // = 41f;
+    [SerializeField] float fieldMinX; // = -41;
     [SerializeField] LayerMask goblinLayerMask;
     public GoblinScript goblinTarget;
     public Vector2 preDirection = Vector2.zero;
@@ -547,10 +551,14 @@ public class GoblinScript : NetworkBehaviour
                 Vector3 newPosition = this.transform.position;
                 newPosition.x += speed * Time.deltaTime * directionModifier;
 
-                if (this.isGoblinGrey && newPosition.x < -30f)
+                /*if (this.isGoblinGrey && newPosition.x < -30f)
                     newPosition.x = -30f;
                 else if (!this.isGoblinGrey && newPosition.x > 30f)
-                    newPosition.x = 30f;
+                    newPosition.x = 30f;*/
+                if (this.isGoblinGrey && newPosition.x < -40f)
+                    newPosition.x = -40f;
+                else if (!this.isGoblinGrey && newPosition.x > 40f)
+                    newPosition.x = 40f;
 
                 if (this.isGoblinGrey)
                 {
@@ -725,16 +733,16 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    MoveTowrdBallCarrier();
+                    //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    GetOpenForPass();
+                    //GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    MoveTowardGoblinTarget();
+                    //MoveTowardGoblinTarget();
                     break;
             }
         }
@@ -773,11 +781,15 @@ public class GoblinScript : NetworkBehaviour
 
         if (flip)
         {
-            touchdownHitbox.transform.localScale = new Vector3(-1f, 1f, 1f);
+            Vector3 newScale = new Vector3(-1f, 1f, 1f);
+            touchdownHitbox.transform.localScale = newScale;
+            divingHitbox.transform.localScale = newScale;
         }
         else
         {
-            touchdownHitbox.transform.localScale = new Vector3(1f, 1f, 1f);
+            Vector3 newScale = new Vector3(1f, 1f, 1f);
+            touchdownHitbox.transform.localScale = newScale;
+            divingHitbox.transform.localScale = newScale;
         }
 
     }
@@ -995,7 +1007,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (stamina > 0f)
                 {
-                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps) * 1.15f;
+                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier) * 1.15f;
                 }
                 //Update CanRecoverStamina Event here?
                 if (isStaminaRecoveryRoutineRunning)
@@ -1007,15 +1019,15 @@ public class GoblinScript : NetworkBehaviour
             }
             else if (isFatigued)
             {
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps) * 0.5f;
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier) * 0.5f;
             }
         }        
         else
         {
             if(!isFatigued)
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps);
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier);
             else
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps) * 0.5f;
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier) * 0.5f;
         }
             
     }
@@ -1038,7 +1050,7 @@ public class GoblinScript : NetworkBehaviour
                 stamina = 0f;
                 //isFatigued = true;
                 HandleIsFatigued(isFatigued, true);
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * speedModifierFromPowerUps) * 0.5f;
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier) * 0.5f;
             }
         }
         
@@ -2175,7 +2187,7 @@ public class GoblinScript : NetworkBehaviour
         }
         else
         {
-            bool punch = WillGoblinPunchTarget(distanceToTarget);
+            bool punch = WillGoblinPunchTarget(distanceToTarget, myPosition.y, targetPosition.y);
             if (punch)
             {
                 PunchGoblinTarget(targetPosition, myPosition);
@@ -2527,7 +2539,7 @@ public class GoblinScript : NetworkBehaviour
             else // Goblin did not slide. Check to see if they can punch. Move goblin toward their target as well??
             {
                 // Check to see if goblin is close enough to their target to punch them
-                didGoblinPunch = WillGoblinPunchTarget(distanceToTarget);
+                didGoblinPunch = WillGoblinPunchTarget(distanceToTarget, myPosition.y, targetPosition.y);
                 if (didGoblinPunch)
                 {
                     PunchGoblinTarget(targetPosition, myPosition);
@@ -2562,11 +2574,11 @@ public class GoblinScript : NetworkBehaviour
 
         return willSlide;
     }
-    bool WillGoblinPunchTarget(float distanceToTarget)
+    bool WillGoblinPunchTarget(float distanceToTarget, float myYPosition, float targetYPosition)
     {
         bool willPunch = false;
 
-        if (distanceToTarget < this.punchRange && Time.time > this.nextPunchTime)
+        if (distanceToTarget < this.punchRange && Time.time > this.nextPunchTime && Mathf.Abs(myYPosition - targetYPosition) <= punchYMax)
             willPunch = true;
 
         return willPunch;
@@ -2658,5 +2670,26 @@ public class GoblinScript : NetworkBehaviour
         this.hasGoblinBeenRepositionedForKickAfter = true;
         GameplayManager.instance.AreAllGoblinsRepositionedForKickAfter();
     }
-   
+    [ServerCallback]
+    public void SlowDownObstacleEffect(bool stillColliding)
+    {
+        if (stillColliding)
+            slowDownObstacleModifier = 0.5f;
+        else
+            slowDownObstacleModifier = 1.0f;
+    }
+    [ServerCallback]
+    public void KickAfterWaitToEnableObstacleColliders()
+    {
+        canCollide = false;
+        IEnumerator waitToEnableObstacleColliders = WaitToEnableObstacleColliders();
+        StartCoroutine(waitToEnableObstacleColliders);
+    }
+    [ServerCallback]
+    IEnumerator WaitToEnableObstacleColliders()
+    {
+        yield return new WaitForSeconds(0.666f);
+        canCollide = true;
+    }
+
 }

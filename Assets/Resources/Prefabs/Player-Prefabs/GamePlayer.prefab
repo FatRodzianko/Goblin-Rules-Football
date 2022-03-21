@@ -50,17 +50,66 @@ MonoBehaviour:
   ConnectionId: 0
   playerNumber: 0
   IsGameLeader: 0
+  inputManagerActivated: 0
+  doesPlayerChooseCoin: 0
+  headsOrTailsPlayer: 
+  didPlayerChooseCoinYet: 0
+  doesPlayerChooseKickOrReceive: 0
+  kickOrReceivePlayer: 
+  didPlayerChooseKickOrReceiveYet: 0
   grenadierPrefab: {fileID: 2813347414334592412, guid: f7720441b1bc157408ea0350600bb10c, type: 3}
   skrimisherPrefab: {fileID: 6877901074420270458, guid: 34a417c9969d212469e52634d54a7943, type: 3}
   berserkerPrefab: {fileID: 6607051740916151457, guid: 69a9098d43dc0264282833d6ed2fe98e, type: 3}
   areCharactersSpawnedYet: 0
   goblinTeam: []
+  goblinTeamOnServer: []
   selectGoblin: {fileID: 0}
   qGoblin: {fileID: 0}
   eGoblin: {fileID: 0}
+  canSwitchGoblin: 1
+  serverSelectGoblin: {fileID: 0}
+  qeTime: 0
   teamName: 
   doesTeamHaveBall: 0
+  myPowerUps: []
+  serverPowerUpUints: 
+  powerUpSelectedIndexNumber: 0
+  canSelectWithRightStickAgain: 1
+  nextPowerUpSelectTime: 0
+  wasRightStickUsedToSelect: 0
   footballPrefab: {fileID: 7510187484870184805, guid: d923fcf193d3397489944bf36faac783, type: 3}
+  footballStartingPosition: {x: 0, y: -2, z: 0}
+  myCamera: {fileID: 0}
+  football: {fileID: 0}
+  areGoblinsRepositionedForKickAfter: 0
+  coinTossControllsEnabled: 0
+  kickOrReceiveControlsEnabled: 0
+  qeSwitchingEnabled: 0
+  kickingControlsEnabled: 0
+  kickoffAimArrowControlsEnabled: 0
+  goblinMovementEnabled: 0
+  gameplayActionsEnabled: 0
+  kickAfterPositioningEnabled: 0
+  kickAfterKickingEnabled: 0
+  powerUpsEnabled: 0
+  GreenGrenadierStartingPosition: {x: -9, y: 2.45, z: 0}
+  GreenBerserkerStartingPosition: {x: -9, y: -2, z: 0}
+  GreenSkirmisherStartingPosition: {x: -9, y: -6.45, z: 0}
+  GreyGrenadierStartingPosition: {x: 9, y: 2.45, z: 0}
+  GreyBerserkerStartingPosition: {x: 9, y: -2, z: 0}
+  GreySkirmisherStartingPosition: {x: 9, y: -6.45, z: 0}
+  KickingPositionGreenGrenadier: {x: 0, y: -0.75, z: 0}
+  KickingPositionGreenBerserker: {x: -1, y: -6, z: 0}
+  KickingPositionGreenSkirmisher: {x: -1, y: 4, z: 0}
+  KickingPositionGreyGrenadier: {x: 0, y: -0.75, z: 0}
+  KickingPositionGreyBerserker: {x: 1, y: -6, z: 0}
+  KickingPositionGreySkirmisher: {x: 1, y: 4, z: 0}
+  ReceivingPositionGreenGrenadier: {x: -11, y: 3, z: 0}
+  ReceivingPositionGreenBerserker: {x: -11, y: -5, z: 0}
+  ReceivingPositionGreenSkirmisher: {x: -22.5, y: -1, z: 0}
+  ReceivingPositionGreyGrenadier: {x: 11, y: 3, z: 0}
+  ReceivingPositionGreyBerserker: {x: 11, y: -5, z: 0}
+  ReceivingPositionGreySkirmisher: {x: 22.5, y: -1, z: 0}
 --- !u!114 &5546099445483979728
 MonoBehaviour:
   m_ObjectHideFlags: 0

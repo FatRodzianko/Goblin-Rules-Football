@@ -1789,6 +1789,10 @@ PrefabInstance:
       value: Assets/Scenes/TitleScreen.unity
       objectReference: {fileID: 0}
     - target: {fileID: 7248241285292473032, guid: f1860f60764b4524ca601f38c3de6418, type: 3}
+      propertyPath: networkAddress
+      value: 127.0.0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7248241285292473032, guid: f1860f60764b4524ca601f38c3de6418, type: 3}
       propertyPath: lobbyPlayerPrefab
       value: 
       objectReference: {fileID: 9114685772438749880, guid: db9cd257207cc0548a0ed4cba8b158a5, type: 3}

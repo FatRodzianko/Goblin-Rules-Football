@@ -95,7 +95,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.020319939, y: -0.19419432}
+  m_Offset: {x: 0.020319939, y: -0.27626473}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -106,7 +106,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.1923027, y: 2.506164}
+  m_Size: {x: 1.1923027, y: 1.3153342}
   m_EdgeRadius: 0
 --- !u!1 &637862076695335927
 GameObject:
@@ -695,7 +695,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -1.25}
+  m_Offset: {x: 0.012821674, y: -1.2701488}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5625, y: 0.5}
@@ -706,7 +706,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.5, y: 0.75}
+  m_Size: {x: 1.3351488, y: 0.5411873}
   m_EdgeRadius: 0
 --- !u!95 &6877901074420270406
 Animator:
@@ -781,6 +781,7 @@ MonoBehaviour:
   blockingSpeedModifier: 1
   defenseModifier: 0
   speedModifierFromPowerUps: 1
+  slowDownObstacleModifier: 1
   isCharacterSelected: 0
   isQGoblin: 0
   isEGoblin: 0
@@ -800,6 +801,7 @@ MonoBehaviour:
   goblinType: 
   myStatusBars: {fileID: 1014713823953464259}
   touchdownHitbox: {fileID: 6054045470784628437}
+  divingHitbox: {fileID: 637862076695335927}
   isGoblinGrey: 0
   doesCharacterHaveBall: 0
   isThrowing: 0
@@ -864,14 +866,19 @@ MonoBehaviour:
   defenseNormal: 0
   speedNormal: 0
   state: 0
-  punchRange: 2.5
+  punchRange: 2
   punchRate: 1
   nextPunchTime: 0
   slideRange: 3.5
   slideRate: 2.5
   nextSlideTime: 0
-  minDistanceFromTarget: 2
+  minDistanceFromTarget: 1.5
+  punchYMax: 1.1
   positionToRunTo: {x: 0, y: 0, z: 0}
+  fieldMaxY: 7.75
+  fieldMinY: -9.5
+  fieldMaxX: 52
+  fieldMinX: -52
   goblinLayerMask:
     serializedVersion: 2
     m_Bits: 512
@@ -942,7 +949,7 @@ MonoBehaviour:
   avoidObjectMultiplier: 20
   avoidForceProximityMultiplier: 100
   avoidObjectDirectionFallOffSpeed: 20
-  avoidObjectsScanDistance: 1.7
+  avoidObjectsScanDistance: 2.2
   goblinTarget: {fileID: 0}
   isTargetingAGoblin: 0
 --- !u!1001 &2030262381902485687

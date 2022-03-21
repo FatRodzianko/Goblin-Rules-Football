@@ -144,7 +144,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  myCollider: {fileID: 6403078655971916108}
   mySpriteRenderer: {fileID: 2134500081350051485}
   myAnimator: {fileID: 0}
   onGroundSprite: {fileID: 21300000, guid: a113efd781d77474f916bf47e61c303f, type: 3}
@@ -156,6 +155,7 @@ MonoBehaviour:
   isThrown: 0
   throwCount: 0
   throwSpeed: 0
+  dropTime: 0
 --- !u!114 &-1690484788134790645
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -111,8 +111,9 @@ public class NetworkManagerGRF : NetworkManager
     {
         if (CanStartGame() && SceneManager.GetActiveScene().name == "LobbyScene")
         {
-            ServerChangeScene("Gameplay");
-            
+            //ServerChangeScene("Gameplay");
+            ServerChangeScene("Gameplay-768-432");
+
         }
     }
     private bool CanStartGame()
@@ -133,7 +134,8 @@ public class NetworkManagerGRF : NetworkManager
     {
         Debug.Log("ServerChangeScene: Changing to the following scene: " + newSceneName);
         //Changing from the menu to the scene
-        if ((SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene") && newSceneName == "Gameplay")
+        //if ((SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene") && newSceneName == "Gameplay")
+        if ((SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene") && newSceneName == "Gameplay-768-432")
         {
             Debug.Log("Changing scene to: " + newSceneName);
             for (int i = LobbyPlayers.Count - 1; i >= 0; i--)
@@ -203,7 +205,8 @@ public class NetworkManagerGRF : NetworkManager
     public override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling)
     {
         Debug.Log("OnClientChangeScene. Old scene: " + SceneManager.GetActiveScene().name + " new scene: " + newSceneName);
-        if (newSceneName == "Gameplay")
+        //if (newSceneName == "Gameplay")
+        if (newSceneName == "Gameplay-768-432")
         {
             waitingForPlayersObject = Instantiate(WaitingForPlayersCanvas);
             DontDestroyOnLoad(waitingForPlayersObject);

@@ -380,11 +380,11 @@ public class CoinTossManager : NetworkBehaviour
     {
         if (usingGamepad)
         {
-            SelectHeadsText.text = "<- to Select";
-            SelectTailsText.text = "-> to Select";
+            SelectHeadsText.text = "Lb to Select";
+            SelectTailsText.text = "Rb to Select";
             EnterToSubmitText.text = "A to Submit";
-            SelectReceiveText.text = "<- to Select";
-            SelectKickText.text = "-> to Select";
+            SelectReceiveText.text = "Lb to Select";
+            SelectKickText.text = "Rb to Select";
         }
         else
         {

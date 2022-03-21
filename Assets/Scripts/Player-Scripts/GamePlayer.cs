@@ -58,6 +58,7 @@ public class GamePlayer : NetworkBehaviour
 
     [Header("Football")]
     [SerializeField] private GameObject footballPrefab;
+    [SerializeField] private Vector3 footballStartingPosition; // old res position Vector3(0f, 0f, 0f);
 
     [SerializeField] CinemachineVirtualCamera myCamera;
     public Football football;
@@ -76,6 +77,30 @@ public class GamePlayer : NetworkBehaviour
     public bool kickAfterPositioningEnabled = false;
     public bool kickAfterKickingEnabled = false;
     public bool powerUpsEnabled = false;
+
+    [Header("Goblin Starting Positions")]
+    [SerializeField] Vector3 GreenGrenadierStartingPosition; //(-9f, 4.45f, 0f)
+    [SerializeField] Vector3 GreenBerserkerStartingPosition; //(-9f, 0f, 0f)
+    [SerializeField] Vector3 GreenSkirmisherStartingPosition; //(-9f, -4.45f, 0f)
+    [SerializeField] Vector3 GreyGrenadierStartingPosition; //(9f, 4.45f, 0f)
+    [SerializeField] Vector3 GreyBerserkerStartingPosition; //(9f, 0f, 0f)
+    [SerializeField] Vector3 GreySkirmisherStartingPosition; //(9f, -4.45f, 0f
+
+    [Header("Goblin Kicking Positions")]
+    [SerializeField] Vector3 KickingPositionGreenGrenadier; //(0f, 1f, 0f)
+    [SerializeField] Vector3 KickingPositionGreenBerserker; //(-1f, -3f, 0f)
+    [SerializeField] Vector3 KickingPositionGreenSkirmisher; //(-1f, 4f, 0f)
+    [SerializeField] Vector3 KickingPositionGreyGrenadier; //(0f, 1f, 0f)
+    [SerializeField] Vector3 KickingPositionGreyBerserker; //(1f, -3f, 0f)
+    [SerializeField] Vector3 KickingPositionGreySkirmisher; //(1f, 4f, 0f)
+
+    [Header("Goblin Receiving Positions")]
+    [SerializeField] Vector3 ReceivingPositionGreenGrenadier; // (-11f, 3f, 0f)
+    [SerializeField] Vector3 ReceivingPositionGreenBerserker; // (-11f, -2f, 0f)
+    [SerializeField] Vector3 ReceivingPositionGreenSkirmisher; // (-20f, 0f, 0f)
+    [SerializeField] Vector3 ReceivingPositionGreyGrenadier; // (11f, 3f, 0f)
+    [SerializeField] Vector3 ReceivingPositionGreyBerserker; // (11f, -2f, 0f)
+    [SerializeField] Vector3 ReceivingPositionGreySkirmisher; // (20f, 0f, 0f)
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -259,7 +284,7 @@ public class GamePlayer : NetworkBehaviour
         if (!doesFootballExist)
         {
             GameObject newFootball = Instantiate(footballPrefab);
-            newFootball.transform.position = new Vector3(0f, 0f, 0f);
+            newFootball.transform.position = footballStartingPosition;
             NetworkServer.Spawn(newFootball);
         }
     }
@@ -281,10 +306,10 @@ public class GamePlayer : NetworkBehaviour
             Debug.Log("Executing SpawnPlayerCharacters on the server for player " + this.PlayerName + this.ConnectionId.ToString());
             GameObject newGrenadier = Instantiate(grenadierPrefab);
             if (IsGameLeader)
-                newGrenadier.transform.position = new Vector3(-9f, 4.45f, 0f);
+                newGrenadier.transform.position = GreenGrenadierStartingPosition;
             else
             {
-                newGrenadier.transform.position = new Vector3(9f, 4.45f, 0f);
+                newGrenadier.transform.position = GreyGrenadierStartingPosition;
                 //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
             }
             NetworkServer.Spawn(newGrenadier, connectionToClient);
@@ -306,10 +331,10 @@ public class GamePlayer : NetworkBehaviour
 
             GameObject newBerserker = Instantiate(berserkerPrefab, transform.position, Quaternion.identity);
             if (IsGameLeader)
-                newBerserker.transform.position = new Vector3(-9f, 0f, 0f);
+                newBerserker.transform.position = GreenBerserkerStartingPosition;
             else
             {
-                newBerserker.transform.position = new Vector3(9f, 0f, 0f);
+                newBerserker.transform.position = GreyBerserkerStartingPosition;
                 //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
             }
             NetworkServer.Spawn(newBerserker, connectionToClient);
@@ -331,10 +356,10 @@ public class GamePlayer : NetworkBehaviour
 
             GameObject newSkirmisher = Instantiate(skrimisherPrefab, transform.position, Quaternion.identity);
             if (IsGameLeader)
-                newSkirmisher.transform.position = new Vector3(-9f, -4.45f, 0f);
+                newSkirmisher.transform.position = GreenSkirmisherStartingPosition;
             else
             {
-                newSkirmisher.transform.position = new Vector3(9f, -4.45f, 0f);
+                newSkirmisher.transform.position = GreySkirmisherStartingPosition;
                 //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
             }
             NetworkServer.Spawn(newSkirmisher, connectionToClient);
@@ -882,18 +907,18 @@ public class GamePlayer : NetworkBehaviour
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
-                            goblin.transform.position = new Vector3(0f, 1f, 0f);
+                            goblin.transform.position = KickingPositionGreyGrenadier;
                             //goblin.ToggleGoblinBodyCollider();
                             goblin.EnableKickoffAimArrow(true);
                             CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkIdentity>().netId);
                         }
                         else if (goblin.goblinType.Contains("berserker"))
                         {
-                            goblin.transform.position = new Vector3(1f, -3f, 0f);
+                            goblin.transform.position = KickingPositionGreyBerserker;
                         }
                         else
                         {
-                            goblin.transform.position = new Vector3(1f, 4f, 0f);
+                            goblin.transform.position = KickingPositionGreySkirmisher;
                         }
                     }
                 }
@@ -903,17 +928,17 @@ public class GamePlayer : NetworkBehaviour
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
-                            goblin.transform.position = new Vector3(0f, 1f, 0f);
+                            goblin.transform.position = KickingPositionGreenGrenadier;
                             goblin.EnableKickoffAimArrow(true);
                             CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkIdentity>().netId);
                         }
                         else if (goblin.goblinType.Contains("berserker"))
                         {
-                            goblin.transform.position = new Vector3(-1f, -3f, 0f);
+                            goblin.transform.position = KickingPositionGreenBerserker;
                         }
                         else
                         {
-                            goblin.transform.position = new Vector3(-1f, 4f, 0f);
+                            goblin.transform.position = KickingPositionGreenSkirmisher;
                         }
                     }
                 }
@@ -926,17 +951,17 @@ public class GamePlayer : NetworkBehaviour
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
-                            goblin.transform.position = new Vector3(11f, 3f, 0f);
+                            goblin.transform.position = ReceivingPositionGreyGrenadier;
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(11f, 3f));
                         }
                         else if (goblin.goblinType.Contains("skirmisher"))
                         {
-                            goblin.transform.position = new Vector3(20f, 0f, 0f);
+                            goblin.transform.position = ReceivingPositionGreySkirmisher;
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(20f, 0f));
                         }
                         else
                         {
-                            goblin.transform.position = new Vector3(11f, -2f, 0f);
+                            goblin.transform.position = ReceivingPositionGreyBerserker;
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(11f, -2f));
                         }
                     }
@@ -947,17 +972,17 @@ public class GamePlayer : NetworkBehaviour
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
-                            goblin.transform.position = new Vector3(-11f, 3f, 0f);
+                            goblin.transform.position = ReceivingPositionGreenGrenadier;
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(-11f, 3f));
                         }
                         else if (goblin.goblinType.Contains("skirmisher"))
                         {
-                            goblin.transform.position = new Vector3(-20f, 0f, 0f);
+                            goblin.transform.position = ReceivingPositionGreenSkirmisher;
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(-20f, 0f));
                         }
                         else
                         {
-                            goblin.transform.position = new Vector3(-11f, -2f, 0f);
+                            goblin.transform.position = ReceivingPositionGreenBerserker;
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(-11f, -2f));
                         }
                     }
@@ -1114,11 +1139,13 @@ public class GamePlayer : NetworkBehaviour
                 Vector3 kickingPosition = scoringGoblinObject.transform.position;
                 if (teamName == "Grey")
                 {
-                    kickingPosition.x = -30f;
+                    //kickingPosition.x = -30f;
+                    kickingPosition.x = -40f;
                 }
                 else
                 {
-                    kickingPosition.x = 30f;
+                    //kickingPosition.x = 30f;
+                    kickingPosition.x = 40f;
                 }
                 kickingPosition.y = yPosition;
                 scoringGoblinObject.transform.position = kickingPosition;
@@ -1163,11 +1190,13 @@ public class GamePlayer : NetworkBehaviour
                         newPosition.y = yPosition;
                         if (teamName == "Grey")
                         {
-                            newPosition.x = 41f;
+                            //newPosition.x = 41f;
+                            newPosition.x = 52;
                         }
                         else
                         {
-                            newPosition.x = -41f;
+                            //newPosition.x = -41f;
+                            newPosition.x = -52f;
                         }
                         goblin.transform.position = newPosition;
 
@@ -1184,11 +1213,13 @@ public class GamePlayer : NetworkBehaviour
 
                     if (teamName == "Grey")
                     {
-                        newPosition.x = 43.5f;
+                        //newPosition.x = 43.5f;
+                        newPosition.x = 55f;
                     }
                     else
                     {
                         newPosition.x = -43.5f;
+                        newPosition.x = -55f;
                     }
                     newPosition.y = 3 * yPositionModifier;
                     goblin.transform.position = newPosition;

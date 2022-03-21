@@ -18,10 +18,10 @@ public class ObstacleManager : NetworkBehaviour
     [SerializeField] float minDistanceFromOtherObstacles;
 
     [Header("Field Boundaries")]
-    [SerializeField] float minY;
-    [SerializeField] float maxY;
-    [SerializeField] float minX;
-    [SerializeField] float maxX;
+    [SerializeField] float minY; // -6 f
+    [SerializeField] float maxY; // 5 f
+    [SerializeField] float minX; // -37. 5
+    [SerializeField] float maxX; // 38. 75 f
 
     private void Awake()
     {
@@ -54,7 +54,8 @@ public class ObstacleManager : NetworkBehaviour
     {
         Debug.Log("GenerateObstacles executed on server");
         var rng = new System.Random();
-        int numberToSpawn = rng.Next(4, 8);
+        //int numberToSpawn = rng.Next(4, 8);
+        int numberToSpawn = rng.Next(7, 15);
         Debug.Log("GenerateObstacles: Number of obstacles to generate: " + numberToSpawn.ToString());
         for (int i = 0; i < numberToSpawn; i++)
         {

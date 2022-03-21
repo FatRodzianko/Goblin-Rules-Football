@@ -72,8 +72,17 @@ public class PowerUpThrownObject : NetworkBehaviour
 
             Debug.Log("PowerUpThrownObject: collided with goblin named: " + collision.transform.name);
             uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
-            collision.transform.gameObject.GetComponent<GoblinScript>().KnockOutGoblin(false);
-            NetworkServer.Destroy(this.gameObject);
+
+            GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
+            if (goblinScript.canCollide)
+            {
+                goblinScript.KnockOutGoblin(false);
+                NetworkServer.Destroy(this.gameObject);
+            }
+
+
+            //collision.transform.gameObject.GetComponent<GoblinScript>().KnockOutGoblin(false);
+            //NetworkServer.Destroy(this.gameObject);
 
             //CmdPlayerPickUpFootball(goblinNetId);
         }
@@ -107,19 +116,19 @@ public class PowerUpThrownObject : NetworkBehaviour
         Vector3 controlPoint = startingPosition;
         controlPoint.y += 0.5f;
         controlPoint.x -= (1f * directionToDrop);
-        if (controlPoint.x > 44.4f)
-            controlPoint.x = 44.4f;
-        else if (controlPoint.x < -44.5f)
-            controlPoint.x = -44.5f;
+        if (controlPoint.x > GameplayManager.instance.maxX)
+            controlPoint.x = GameplayManager.instance.maxX;
+        else if (controlPoint.x < GameplayManager.instance.minX)
+            controlPoint.x = GameplayManager.instance.minX;
         throwPoints[1] = controlPoint; // control point aka the mid point of throwing arc
         controlPoint.x -= (1f * directionToDrop);
         controlPoint.y -= 1.5f;
-        if (controlPoint.y > 5.6f)
-            controlPoint.y = 5.6f;
-        if (controlPoint.x > 44.4f)
-            controlPoint.x = 44.4f;
-        else if (controlPoint.x < -44.5f)
-            controlPoint.x = -44.5f;
+        if (controlPoint.y > GameplayManager.instance.maxY)
+            controlPoint.y = GameplayManager.instance.maxY;
+        if (controlPoint.x > GameplayManager.instance.maxX)
+            controlPoint.x = GameplayManager.instance.maxX;
+        else if (controlPoint.x < GameplayManager.instance.minX)
+            controlPoint.x = GameplayManager.instance.minX;
         throwPoints[2] = controlPoint; // destination point
         throwCount = 0.0f;
         isThrown = true;

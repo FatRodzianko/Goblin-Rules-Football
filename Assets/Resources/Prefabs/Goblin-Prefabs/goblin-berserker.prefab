@@ -44,7 +44,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.25235653, y: -0.38810587}
+  m_Offset: {x: 0.26842356, y: -0.38810587}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -55,7 +55,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.0475311, y: 2.4737883}
+  m_Size: {x: 1.7904634, y: 2.4737883}
   m_EdgeRadius: 0
 --- !u!1 &1938259440732540568
 GameObject:
@@ -504,7 +504,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -1.25}
+  m_Offset: {x: -0.023116112, y: -1.2464436}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.33333334, y: 0.5}
@@ -515,7 +515,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.9, y: 0.75}
+  m_Size: {x: 1.6759472, y: 0.57929254}
   m_EdgeRadius: 0
 --- !u!95 &6607051740916151483
 Animator:
@@ -573,6 +573,7 @@ MonoBehaviour:
   blockingSpeedModifier: 1
   defenseModifier: 0
   speedModifierFromPowerUps: 1
+  slowDownObstacleModifier: 1
   isCharacterSelected: 0
   isQGoblin: 0
   isEGoblin: 0
@@ -592,6 +593,7 @@ MonoBehaviour:
   goblinType: 
   myStatusBars: {fileID: 401195133845898319}
   touchdownHitbox: {fileID: 651132603682445336}
+  divingHitbox: {fileID: 4360437957124845248}
   isGoblinGrey: 0
   doesCharacterHaveBall: 0
   isThrowing: 0
@@ -656,14 +658,19 @@ MonoBehaviour:
   defenseNormal: 0
   speedNormal: 0
   state: 0
-  punchRange: 2.5
+  punchRange: 3
   punchRate: 1
   nextPunchTime: 0
   slideRange: 3.5
   slideRate: 2.5
   nextSlideTime: 0
   minDistanceFromTarget: 2
+  punchYMax: 1.5
   positionToRunTo: {x: 0, y: 0, z: 0}
+  fieldMaxY: 7.75
+  fieldMinY: -9.5
+  fieldMaxX: 52
+  fieldMinX: -52
   goblinLayerMask:
     serializedVersion: 2
     m_Bits: 512
@@ -751,7 +758,7 @@ MonoBehaviour:
   avoidObjectMultiplier: 20
   avoidForceProximityMultiplier: 100
   avoidObjectDirectionFallOffSpeed: 20
-  avoidObjectsScanDistance: 1.9
+  avoidObjectsScanDistance: 2
   goblinTarget: {fileID: 0}
   isTargetingAGoblin: 0
 --- !u!1 &7760457115166818820
@@ -848,7 +855,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.044042587, y: -0.09147382}
+  m_Offset: {x: -0.09147358, y: -0.17955995}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -859,7 +866,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.7773285, y: 2.6960177}
+  m_Size: {x: 1.36883, y: 1.5472336}
   m_EdgeRadius: 0
 --- !u!1 &7877024649310081243
 GameObject:

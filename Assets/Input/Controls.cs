@@ -465,7 +465,7 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""type"": ""Button"",
                     ""id"": ""895f1fd8-dbc4-4f7e-9abb-808e03531f05"",
                     ""expectedControlType"": ""Button"",
-                    ""processors"": ""AxisDeadzone(min=0.125,max=0.925)"",
+                    ""processors"": """",
                     ""interactions"": """"
                 },
                 {
@@ -473,7 +473,7 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""type"": ""Button"",
                     ""id"": ""676c79c3-a86a-40db-85ea-0433fd8b9827"",
                     ""expectedControlType"": ""Button"",
-                    ""processors"": ""AxisDeadzone(min=0.125,max=0.925)"",
+                    ""processors"": """",
                     ""interactions"": """"
                 },
                 {
@@ -500,7 +500,7 @@ public class @Controls : IInputActionCollection, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""5b884ca7-b665-4e8c-976b-5ca4e25bf41e"",
-                    ""path"": ""<XInputController>/leftStick/right"",
+                    ""path"": ""<XInputController>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""GamePad"",
@@ -522,7 +522,7 @@ public class @Controls : IInputActionCollection, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""a8a8693e-749f-430b-805f-450fde97d837"",
-                    ""path"": ""<XInputController>/leftStick/left"",
+                    ""path"": ""<XInputController>/leftShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""GamePad"",
@@ -571,7 +571,7 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""type"": ""Button"",
                     ""id"": ""2f188232-0ce9-4482-b337-e22d22235267"",
                     ""expectedControlType"": ""Button"",
-                    ""processors"": ""AxisDeadzone(min=0.125,max=0.925)"",
+                    ""processors"": """",
                     ""interactions"": """"
                 },
                 {
@@ -579,7 +579,7 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""type"": ""Button"",
                     ""id"": ""161061fc-8b66-47ac-b458-65980f0a994e"",
                     ""expectedControlType"": ""Button"",
-                    ""processors"": ""AxisDeadzone(min=0.125,max=0.925)"",
+                    ""processors"": """",
                     ""interactions"": """"
                 }
             ],
@@ -620,7 +620,7 @@ public class @Controls : IInputActionCollection, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""38794d6d-51d1-48eb-b3e8-0b99fa2bcd36"",
-                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""path"": ""<XInputController>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""GamePad"",
@@ -642,7 +642,7 @@ public class @Controls : IInputActionCollection, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""0f6a2941-3324-4978-a06f-d0e03ddee7c7"",
-                    ""path"": ""<XInputController>/leftStick/left"",
+                    ""path"": ""<XInputController>/leftShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""GamePad"",

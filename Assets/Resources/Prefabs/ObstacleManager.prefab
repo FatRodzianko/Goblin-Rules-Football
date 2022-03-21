@@ -52,6 +52,11 @@ MonoBehaviour:
   - {fileID: 7560812431173461022, guid: fe2b6ecc60f7ac342985f78d95099931, type: 3}
   - {fileID: 5248033758807034884, guid: ee11721aab40fcb459abadba3b11a78c, type: 3}
   - {fileID: 49278375553431807, guid: d8db81f3971f809468af2a080bc64c19, type: 3}
+  - {fileID: 49278375553431807, guid: 710d3d1140691f84ba64e044796baf6d, type: 3}
+  - {fileID: 49278375553431807, guid: 2bdbef4a128244e4e9cd64e519bfc458, type: 3}
+  - {fileID: 49278375553431807, guid: 0b79dd99e970f0642859dc80afa94702, type: 3}
+  - {fileID: 49278375553431807, guid: 138b88d1a68143d49ad6ee3a9bb4ce97, type: 3}
+  - {fileID: 49278375553431807, guid: b5456c3561f79fd44b0ae95011fe7943, type: 3}
   ObstaclesToSpawn: []
   SpawnedObstacles: []
   NoPlacePositions:

@@ -86,6 +86,13 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI MoveRightText;
     [SerializeField] private TextMeshProUGUI EnterToSubmitText;
 
+    [Header("Field Parameters")]
+    [SerializeField] public float maxY; // 5. 6f
+    [SerializeField] public float minY; // -6. 5f
+    [SerializeField] public float maxX; // 44. 4f
+    [SerializeField] public float minX; // -44. 5f
+
+
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
     {
@@ -179,6 +186,7 @@ public class GameplayManager : NetworkBehaviour
                 ResetGoblinKickAfterRespositioningBool();
                 RpcNoTeamWithFootball();
                 ObstacleManager.instance.DisableCollidersOnObjects(false);
+                EnableGoblinCollidersOnServer(false);
             }
             if (newValue == "gameplay")
             {
@@ -186,18 +194,21 @@ public class GameplayManager : NetworkBehaviour
                 PowerUpManager.instance.StartGeneratingPowerUps(true);
                 RandomEventManager.instance.StartGeneratingRandomEvents(true);
                 ObstacleManager.instance.DisableCollidersOnObjects(true);
+                EnableGoblinCollidersOnServer(true);
             }
             if (oldValue == "gameplay")
             {
                 PowerUpManager.instance.StartGeneratingPowerUps(false);
                 RandomEventManager.instance.StartGeneratingRandomEvents(false);
                 ObstacleManager.instance.DisableCollidersOnObjects(false);
+                EnableGoblinCollidersOnServer(false);
             }                
             if (newValue == "kick-after-attempt")
             {
                 SetKickAfterPlayers(scoringGoblinNetId);
                 RpcNoTeamWithFootball();
                 ObstacleManager.instance.KickAfterWaitToEnableObstacleColliders();
+                DisableGoblinColliderForKickAfter();
             }
             if (oldValue == "kick-after-attempt")
             {
@@ -213,10 +224,13 @@ public class GameplayManager : NetworkBehaviour
                     Debug.Log("GameplayManager: HandleGamePhase: failed to reset scoring goblin info after kick attempt. Reason: " + e);
                 }
                 ObstacleManager.instance.DisableCollidersOnObjects(false);
+                EnableGoblinCollidersOnServer(false);
             }
             if (newValue == "xtra-time")
             {
                 isXtraTime = true;
+                EnableGoblinCollidersOnServer(true);
+                ObstacleManager.instance.DisableCollidersOnObjects(true);
             }
             if (newValue == "gameover")
             {
@@ -811,8 +825,8 @@ public class GameplayManager : NetworkBehaviour
     {
         if (usingGamepad)
         {
-            MoveLeftText.text = "<- to Move Left";
-            MoveRightText.text = "-> to Move Right";
+            MoveLeftText.text = "Lb to Move Left";
+            MoveRightText.text = "Rb to Move Right";
             EnterToSubmitText.text = "A to Submit";
         }
         else
@@ -820,6 +834,30 @@ public class GameplayManager : NetworkBehaviour
             MoveLeftText.text = "<- to Move Left";
             MoveRightText.text = "-> to Move Right";
             EnterToSubmitText.text = "\"Enter\" to Submit";
+        }
+    }
+    [ServerCallback]
+    void EnableGoblinCollidersOnServer(bool enable)
+    {
+        GameObject[] goblinObjects = GameObject.FindGameObjectsWithTag("Goblin");
+        if (goblinObjects.Length > 0)
+        {
+            foreach (GameObject goblinObject in goblinObjects)
+            {
+                goblinObject.GetComponent<GoblinScript>().canCollide = enable;
+            }
+        }
+    }
+    [ServerCallback]
+    void DisableGoblinColliderForKickAfter()
+    {
+        GameObject[] goblinObjects = GameObject.FindGameObjectsWithTag("Goblin");
+        if (goblinObjects.Length > 0)
+        {
+            foreach (GameObject goblinObject in goblinObjects)
+            {
+                goblinObject.GetComponent<GoblinScript>().KickAfterWaitToEnableObstacleColliders();
+            }
         }
     }
 }

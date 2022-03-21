@@ -13,8 +13,7 @@ public class CanvasScaler : MonoBehaviour
         //AdjustScalingFactor();
     }
     void Start()
-    {
-        
+    {        
         AdjustScalingFactor();
     }
 
@@ -31,6 +30,7 @@ public class CanvasScaler : MonoBehaviour
         }
         UnityEngine.UI.CanvasScaler c = GetComponent<UnityEngine.UI.CanvasScaler>();
         //   scaler.AdjustScalingFactor() = MainCamera.GetComponent<PixelPerfectCamera>().pixelRatio;
-        c.scaleFactor = MainCamera.GetComponent<PixelPerfectCamera>().pixelRatio; ;
+        c.scaleFactor = MainCamera.GetComponent<PixelPerfectCamera>().pixelRatio;
+        //c.scaleFactor = (MainCamera.GetComponent<PixelPerfectCamera>().pixelRatio) * 1.5f;
     }
 }

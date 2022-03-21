@@ -20,10 +20,10 @@ public class PowerUpManager : NetworkBehaviour
 
     Football gameFootball;
 
-    int maxY = 5;
-    int minY = -6;
-    int maxX = 38;
-    int minX = -38;
+    [SerializeField] float maxY; // = 5;
+    [SerializeField] float minY; // = -6;
+    [SerializeField] float maxX; // = 38;
+    [SerializeField] float minX; // = -38;
 
     [SerializeField] GameObject[] NormalPowerUps;
     [SerializeField] GameObject[] BlueShellPowerUps;

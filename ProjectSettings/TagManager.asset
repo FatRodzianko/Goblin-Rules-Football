@@ -58,3 +58,6 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: ui-markers
+    uniqueID: 747716661
+    locked: 0

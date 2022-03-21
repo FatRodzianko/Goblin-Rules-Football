@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using Cinemachine;
+using UnityEngine.SceneManagement;
 public class Football : NetworkBehaviour
 {
     [Header("State of the Ball")]
@@ -23,7 +24,8 @@ public class Football : NetworkBehaviour
 
     [Header("Throwing and Kicking Stuff?")]
     [SyncVar] public Vector2 directionToThrow = Vector2.zero;
-    [SyncVar] public float speedOfThrow = 15f;
+    [SerializeField] [SyncVar] public float speedOfThrow; //  = 15 f;
+    [SerializeField] float maxThrowDistance; // 10. 0f
     [SyncVar] public float fallSpeed = 3f;
     [SyncVar] public float distanceFell;
     [SyncVar] public Vector2 startingPositionOfThrow;
@@ -65,6 +67,18 @@ public class Football : NetworkBehaviour
     [SerializeField] public CinemachineVirtualCamera myCamera;
     public GamePlayer localPlayer;
     public CameraMarker myCameraMarker;
+
+    [Header("Field Max Parameters")]
+    [SerializeField] float ThrownMaxY; // 7. 02f // 8. 5f
+    [SerializeField] float ThrownMinY; // -6. 7f // -11. 07f
+    [SerializeField] float ThrownMaxX; // 44. 4f // 59. 44f
+    [SerializeField] float ThrownMinX; // -44. 5f // -59. 5f
+    [SerializeField] float GroundedMaxY; // 5. 6f // 7. 1f
+    [SerializeField] float GroundedMinY; // -6. 5f // -11. 0f
+    [SerializeField] Vector3 GoalPostForGrey; // GoalPostForGrey; // -50.3, -1.5
+    [SerializeField] Vector3 GoalPostForGreen; // GoalPostForGreen; // 50.3 , -1.5
+    [SerializeField] float KickFootballMaxY; // 5. 2f // 6. 7f
+    [SerializeField] float KickFootballMinY; // -6. 0f // -10. 5f
 
     public override void OnStartClient()
     {
@@ -191,7 +205,7 @@ public class Football : NetworkBehaviour
         {
             if (isThrown)
             {
-                if (transform.position.y < 7.02f && transform.position.y > -6.7f && transform.position.x > -44.5f && transform.position.x < 44.4f)
+                if (transform.position.y < ThrownMaxY && transform.position.y > ThrownMinY && transform.position.x > ThrownMinX && transform.position.x < ThrownMaxX)
                 {
                     myRigidBody.MovePosition(myRigidBody.position + directionToThrow * speedOfThrow * Time.fixedDeltaTime);
                     //transform.position += (directionToThrow * speedOfThrow * Time.fixedDeltaTime);
@@ -203,7 +217,7 @@ public class Football : NetworkBehaviour
                         animator.SetBool("isSideways", false);
                     //gameObject.transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, Mathf.Abs(Vector2.Angle(new Vector2(1f, 0f), directionToThrow)+90f));
                     distanceTraveled = Vector2.Distance(transform.position, startingPositionOfThrow);
-                    if (distanceTraveled > 10.0f)
+                    if (distanceTraveled > maxThrowDistance)
                     {
                         isThrown = false;
                         animator.SetBool("isThrown", isThrown);
@@ -219,21 +233,21 @@ public class Football : NetworkBehaviour
                     directionToThrow = Vector2.zero;
                     isThrown = false;
                     animator.SetBool("isThrown", isThrown);
-                    if (transform.position.y >= 6.5f)
-                        transform.position = new Vector2(transform.position.x, 5.6f);
-                    else if (transform.position.y <= -6.5)
-                        transform.position = new Vector2(transform.position.x, -6.5f);
+                    if (transform.position.y >= (GroundedMaxY - 0.52f))
+                        transform.position = new Vector2(transform.position.x, GroundedMaxY);
+                    else if (transform.position.y <= GroundedMinY)
+                        transform.position = new Vector2(transform.position.x, GroundedMinY);
 
-                    if (transform.position.x < -44.5f)
-                        transform.position = new Vector2(-44.5f, transform.position.y);
-                    else if (transform.position.x > 44.4f)
-                        transform.position = new Vector2(44.5f, transform.position.y);
+                    if (transform.position.x < ThrownMinX)
+                        transform.position = new Vector2(ThrownMinX, transform.position.y);
+                    else if (transform.position.x > ThrownMaxX)
+                        transform.position = new Vector2(ThrownMaxX, transform.position.y);
                 }
 
             }
             if (isFalling && !isHeld)
             {
-                if (transform.position.y < 7.02f && transform.position.y > -6.7f && transform.position.x > -44.5f && transform.position.x < 44.4f)
+                if (transform.position.y < ThrownMaxY && transform.position.y > ThrownMinY && transform.position.x > ThrownMinX && transform.position.x < ThrownMaxX)
                 {
                     Vector2 directionToFall = directionToThrow;
                     directionToFall.y -= (fallSpeed * Time.fixedDeltaTime);
@@ -246,29 +260,29 @@ public class Football : NetworkBehaviour
                     animator.SetBool("isThrown", isThrown);
                     isFalling = false;
                     animator.SetBool("isFalling", isFalling);
-                    if (transform.position.y >= 6.5f)
-                        transform.position = new Vector2(transform.position.x, 5.6f);
-                    else if(transform.position.y <= -6.5)
-                        transform.position = new Vector2(transform.position.x, -6.5f);
+                    if (transform.position.y >= (GroundedMaxY - 0.52f))
+                        transform.position = new Vector2(transform.position.x, GroundedMaxY);
+                    else if(transform.position.y <= GroundedMinY)
+                        transform.position = new Vector2(transform.position.x, GroundedMinY);
 
-                    if (transform.position.x < -44.5f)
-                        transform.position = new Vector2(-44.5f, transform.position.y);
-                    else if (transform.position.x > 44.4f)
-                        transform.position = new Vector2(44.5f, transform.position.y);
+                    if (transform.position.x < ThrownMinX)
+                        transform.position = new Vector2(ThrownMinX, transform.position.y);
+                    else if (transform.position.x > ThrownMaxX)
+                        transform.position = new Vector2(ThrownMaxX, transform.position.y);
                 }
 
             }
             if (!isThrown && !isHeld && !isFalling && GameplayManager.instance.gamePhase != "kick-after-attempt")
             { 
-                if(transform.position.y < -6.5f)
-                    transform.position = new Vector2(transform.position.x, -6.5f);
-                else if(transform.position.y > 5.6f)
-                    transform.position = new Vector2(transform.position.x, 5.6f);
+                if(transform.position.y < GroundedMinY)
+                    transform.position = new Vector2(transform.position.x, GroundedMinY);
+                else if(transform.position.y > GroundedMaxY)
+                    transform.position = new Vector2(transform.position.x, GroundedMaxY);
 
-                if (transform.position.x < -44.5f)
-                    transform.position = new Vector2(-44.5f, transform.position.y);
-                else if (transform.position.x > 44.4f)
-                    transform.position = new Vector2(44.5f, transform.position.y);
+                if (transform.position.x < ThrownMinX)
+                    transform.position = new Vector2(ThrownMinX, transform.position.y);
+                else if (transform.position.x > ThrownMaxX)
+                    transform.position = new Vector2(ThrownMaxX, transform.position.y);
             }
             if (isFumbled && !isHeld)
             {
@@ -310,7 +324,7 @@ public class Football : NetworkBehaviour
                         if (GameplayManager.instance.gamePhase == "kick-after-attempt" && !hasKickAfterAttemptBeenSubmittedToGameManager)
                         {
                             float xPosition = transform.position.x;
-                            if ((xPosition < 0 && xPosition > -40f) || (xPosition > 0 && xPosition < 40f))
+                            if ((xPosition < 0 && xPosition > GoalPostForGrey.x) || (xPosition > 0 && xPosition < GoalPostForGreen.x))
                             {
                                 Debug.Log("Football.cs: Football has crossed the goalpost. x position of: " + xPosition.ToString());
                                 GameplayManager.instance.KickAfterWasKickGoodOrBad(isKickAfterAttemptGood);
@@ -322,7 +336,7 @@ public class Football : NetworkBehaviour
                     if (GameplayManager.instance.gamePhase == "kick-after-attempt" && !hasKickAfterAttemptBeenSubmittedToGameManager)
                     {
                         float xPosition = transform.position.x;
-                        if ((xPosition < 0 && xPosition < -40f) || (xPosition > 0 && xPosition > 40f))
+                        if ((xPosition < 0 && xPosition < GoalPostForGrey.x) || (xPosition > 0 && xPosition > GoalPostForGreen.x))
                         {
                             Debug.Log("Football.cs: Football has crossed the goalpost. x position of: " + xPosition.ToString());
                             GameplayManager.instance.KickAfterWasKickGoodOrBad(isKickAfterAttemptGood);
@@ -340,7 +354,7 @@ public class Football : NetworkBehaviour
                     if (GameplayManager.instance.gamePhase == "kick-after-attempt" && !hasKickAfterAttemptBeenSubmittedToGameManager)
                     {
                         float xPosition = transform.position.x;
-                        if ((xPosition < 0 && xPosition > -40f) || (xPosition > 0 && xPosition < 40f))
+                        if ((xPosition < 0 && xPosition > GoalPostForGrey.x) || (xPosition > 0 && xPosition < GoalPostForGreen.x))
                         {
                             Debug.Log("Football.cs: Football has crossed the goalpost. x position of: " + xPosition.ToString());
                             GameplayManager.instance.KickAfterWasKickGoodOrBad(isKickAfterAttemptGood);
@@ -576,8 +590,8 @@ public class Football : NetworkBehaviour
             //float angletoThrow = Vector2.Angle(new Vector2(1f, 0f), direction);
             //Debug.Log("CmdThrowFootball: angle of the throw is " + angletoThrow.ToString());
             // this.transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, angletoThrow);
-            if (transform.position.y >= 7.02f)
-                transform.position = new Vector2(transform.position.x, 7.01f);
+            if (transform.position.y >= ThrownMaxY)
+                transform.position = new Vector2(transform.position.x, (ThrownMaxY - 0.1f));
 
 
             //this.GetComponent<Rigidbody2D>().AddForce()
@@ -600,9 +614,9 @@ public class Football : NetworkBehaviour
 
         //Set fumble control points
         Vector3 footballPosition = transform.position;
-        /*if (footballPosition.y > 5.6f)
+        /*if (footballPosition.y > GroundedMaxY)
         {
-            footballPosition.y = 5.6f;
+            footballPosition.y = GroundedMaxY;
             this.transform.position = footballPosition;
         }*/
 
@@ -610,19 +624,19 @@ public class Football : NetworkBehaviour
         Vector3 controlPoint = footballPosition;
         controlPoint.y += 1.25f;
         controlPoint.x -= (2.25f * directionModifier);
-        if (controlPoint.x > 44.4f)
-            controlPoint.x = 44.4f;
-        else if (controlPoint.x < -44.5f)
-            controlPoint.x = -44.5f;
+        if (controlPoint.x > ThrownMaxX)
+            controlPoint.x = ThrownMaxX;
+        else if (controlPoint.x < ThrownMinX)
+            controlPoint.x = ThrownMinX;
         FumblePoints[1] = controlPoint; // control point
         controlPoint.x -= (2.25f * directionModifier);
         controlPoint.y -= 1.25f;
-        if (controlPoint.y > 5.6f)
-            controlPoint.y = 5.6f;
-        if (controlPoint.x > 44.4f)
-            controlPoint.x = 44.4f;
-        else if (controlPoint.x < -44.5f)
-            controlPoint.x = -44.5f;
+        if (controlPoint.y > GroundedMaxY)
+            controlPoint.y = GroundedMaxY;
+        if (controlPoint.x > ThrownMaxX)
+            controlPoint.x = ThrownMaxX;
+        else if (controlPoint.x < ThrownMinX)
+            controlPoint.x = ThrownMinX;
         FumblePoints[2] = controlPoint; // destination point
         fumbleCount = 0.0f;
         isFumbled = true;
@@ -645,7 +659,7 @@ public class Football : NetworkBehaviour
         KickedBallPoints[0] = footballPosition;
 
         // Get destination of ball / where the ball lands
-        float destinationY = Random.Range(-6.0f, 5.2f);
+        float destinationY = Random.Range(KickFootballMinY, KickFootballMaxY);
         float differenceInY = destinationY - footballPosition.y;
         float distanceTraveled = Random.Range(minKickDist, maxKickDist);
         xDistanceOfKick = distanceTraveled;
@@ -701,9 +715,9 @@ public class Football : NetworkBehaviour
         Vector3 goalPostPosition = Vector3.zero;
         float inaccurateKickYModifer = 1.0f;
         if (isKickingGoblinGrey)
-            goalPostPosition = new Vector2(-40f, 0.5f);
+            goalPostPosition = GoalPostForGrey;
         else
-            goalPostPosition = new Vector2(40f, 0.5f);
+            goalPostPosition = GoalPostForGreen;
         float distanceToGoalPost = Vector2.Distance(goalPostPosition, goblinPosition);
         float distanceTraveled = ((maxDistance - minDistance) * kickPower) + minDistance;
         if (distanceTraveled >= distanceToGoalPost)
@@ -855,7 +869,7 @@ public class Football : NetworkBehaviour
         KickedBallPoints[0] = footballPosition;
 
         // Get destination of ball / where the ball lands
-        float destinationY = Random.Range(-6.0f, 5.2f);
+        float destinationY = Random.Range(KickFootballMinY, KickFootballMaxY);
         float differenceInY = destinationY - footballPosition.y;
         float distanceTraveled = ((maxDistance - minDistance) * kickPower) + minDistance;
         xDistanceOfKick = distanceTraveled;
@@ -869,17 +883,22 @@ public class Football : NetworkBehaviour
             var radians = degrees * Mathf.Deg2Rad;
             var y = Mathf.Sin(radians);
             y = y * distanceTraveled;
-            
+            if(SceneManager.GetActiveScene().name.Contains("768-432"))
+                footballPosition.y = -1.5f;
+            y += footballPosition.y;
 
-            if (y > 5.2f || y < -6.0f)
+            if (y > KickFootballMaxY || y < KickFootballMinY)
             {
                 Debug.Log("KickFootballDownField: ball was kicked out of bounds. Checking where it should intersect.");
                 float slope = (y - footballPosition.y) / (destinationX - footballPosition.x);
 
-                if (y > 5.2f)
-                    y = 5.2f;
-                if (y < -6.0f)
-                    y = -6.0f;
+                // This is to make sure the kick off isn't adjusted "up" on the higher resolution scene?
+                //y += footballPosition.y;
+
+                if (y > KickFootballMaxY)
+                    y = KickFootballMaxY;
+                if (y < KickFootballMinY)
+                    y = KickFootballMinY;
                 float newX = ((y - footballPosition.y) / slope) - footballPosition.x;
                 
                 if ((newX * directionToKickModifier) < 10f)
@@ -888,6 +907,8 @@ public class Football : NetworkBehaviour
                 Debug.Log("KickFootballDownField: Ball out of bounds. New x position will be " + newX.ToString());
                 destinationX = newX;
             }
+            // This is to make sure the kick off isn't adjusted "up" on the higher resolution scene?
+            //destinationY = footballPosition.y + y;
             destinationY = y;
             Debug.Log("KickFootballDownField: y value for kickoff is: " + destinationY.ToString());
             differenceInY = destinationY - footballPosition.y;
@@ -898,9 +919,9 @@ public class Football : NetworkBehaviour
             Debug.Log("KickFootballDownField: for kick after attempt");
             Vector3 goalPostPosition = Vector3.zero;
             if (isKickingGoblinGrey)
-                goalPostPosition = new Vector2(-40f, 0.5f);
+                goalPostPosition = new Vector2GoalPostForGrey;
             else
-                goalPostPosition = new Vector2(40f, 0.5f);
+                goalPostPosition = new Vector2GoalPostForGreen;
 
             float slope = (goalPostPosition.y - footballPosition.y) / (goalPostPosition.x / footballPosition.x);
             float c = 1 / (Mathf.Sqrt(1 + Mathf.Pow(slope,2)));
@@ -913,10 +934,10 @@ public class Football : NetworkBehaviour
 
         }*/
 
-        if(destinationX > 44.4f)
-            destinationX = 44.4f;
-        else if (destinationX < -44.5f)
-            destinationX = -44.5f;
+        if(destinationX > ThrownMaxX)
+            destinationX = ThrownMaxX;
+        else if (destinationX < ThrownMinX)
+            destinationX = ThrownMinX;
 
         KickedBallPoints[2] = new Vector3(destinationX, destinationY, footballPosition.z); // destination point
 
@@ -1105,14 +1126,14 @@ public class Football : NetworkBehaviour
 
             if (GameplayManager.instance.gamePhase != "kick-after-attempt")
             {
-                if (bounceControlPoint.x > 44.4f)
+                if (bounceControlPoint.x > ThrownMaxX)
                 {
-                    bounceControlPoint.x = 44.4f;
+                    bounceControlPoint.x = ThrownMaxX;
                     controlXDist = 0f;
                 }
-                else if (bounceControlPoint.x < -44.5f)
+                else if (bounceControlPoint.x < ThrownMinX)
                 {
-                    bounceControlPoint.x = -44.5f;
+                    bounceControlPoint.x = ThrownMinX;
                     controlXDist = 0f;
                 }
             }
@@ -1140,7 +1161,7 @@ public class Football : NetworkBehaviour
     {
         GoblinScript goblin = NetworkIdentity.spawned[goblinNetId].GetComponent<GoblinScript>();
         if(GameplayManager.instance.gamePhase == "kickoff")
-            this.transform.position = new Vector3(0f,0f,0f);
+            this.transform.position = new Vector3(0f,-2f,0f);
         else
             this.transform.position = goblin.transform.position;
         if (this.isHeld)

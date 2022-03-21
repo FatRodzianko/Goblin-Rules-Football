@@ -19,6 +19,7 @@ public class QEMarkerScript : MonoBehaviour
     [SerializeField] Sprite gamePadCanPass;
     [SerializeField] Sprite keyBoardCannotPass;
     [SerializeField] Sprite gamePadCannotPass;
+    [SerializeField] float maxY; // 8. 5f
 
     // Start is called before the first frame update
     void Start()
@@ -44,10 +45,10 @@ public class QEMarkerScript : MonoBehaviour
     void Update()
     {
         myTransformPosition = this.transform.position;
-        if (myTransformPosition.y >= 8.5f)
+        if (myTransformPosition.y >= maxY)
         {
             newPosition = myTransformPosition;
-            newPosition.y = 8.5f;
+            newPosition.y = maxY;
             this.transform.position = newPosition;
         }
         else

@@ -50,7 +50,9 @@ public class BrokenGlassEvent : NetworkBehaviour
         {
             Debug.Log("PowerUpThrownObject: collided with goblin named: " + collision.transform.name);
             uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
-            collision.transform.gameObject.GetComponent<GoblinScript>().KnockOutGoblin(false);
+            GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
+            if(goblinScript.canCollide)
+                goblinScript.KnockOutGoblin(false);
             //NetworkServer.Destroy(this.gameObject);
             //CmdPlayerPickUpFootball(goblinNetId);
         }
@@ -58,9 +60,12 @@ public class BrokenGlassEvent : NetworkBehaviour
     void ThrowBottlesAtField()
     {
         //Get Y position for bottles
-        float yPosition = 11f;
+        /*float yPosition = 11f;
         if (this.transform.position.y < -0.5f)
-            yPosition = -11f;
+            yPosition = -11f;*/
+        float yPosition = 15.5f;
+        if (this.transform.position.y < -2f)
+            yPosition = -15.5f;
         float xPosition = this.transform.position.x;
         IEnumerator throwBottleRoutine = ThrowBottlesRoutine(yPosition, xPosition);
         StartCoroutine(throwBottleRoutine);

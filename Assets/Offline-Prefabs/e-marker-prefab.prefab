@@ -70,8 +70,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 747716661
+  m_SortingLayer: 1
   m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: 5f724f321d654b648959102f5ea6e9ad, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -105,3 +105,4 @@ MonoBehaviour:
   gamePadCanPass: {fileID: 21300000, guid: c86e6e3f6ef31e8469c8b6634e6945e6, type: 3}
   keyBoardCannotPass: {fileID: 21300000, guid: 29aef983c0b64db4291a39d131d040d3, type: 3}
   gamePadCannotPass: {fileID: 21300000, guid: 157b30ccb1171ad499cea76329576f55, type: 3}
+  maxY: 10.75

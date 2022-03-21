@@ -17,6 +17,12 @@ public class RandomEventManager : NetworkBehaviour
 
     public static RandomEventManager instance;
 
+    [Header("Field Parameters")]
+    [SerializeField] float maxY; // = 5.0f;
+    [SerializeField] float minY; // = -6.0f;
+    [SerializeField] float maxX; // = 41.5f;
+    [SerializeField] float minX; // = -41.5f;
+
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
     {
@@ -135,10 +141,10 @@ public class RandomEventManager : NetworkBehaviour
     void BottlesEvent()
     {
         //Define placement boundaries for the broken bottles
-        float maxY = 5.0f;
+        /*float maxY = 5.0f;
         float minY = -6.0f;
         float maxX = 41.5f;
-        float minX = -41.5f;
+        float minX = -41.5f;*/
 
         //Get position of the goblin with the ball and the direction they are facing. use that to determine where the random event will spawn
         GoblinScript goblinWithBall = gameFootball.goblinWithBall;
