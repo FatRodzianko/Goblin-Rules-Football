@@ -1,4 +1,4 @@
-Plugin Version: 3.36
+Plugin Version: 3.39
 
 # Smooth Sync
 Performs interpolation and extrapolation in order to make your objects smooth and more accurate over the network.

@@ -244,7 +244,63 @@ namespace Smooth
                 if (sendVelocity) smoothSync.lastVelocityWhenStateWasSent = state.velocity;
                 if (sendAngularVelocity) smoothSync.lastAngularVelocityWhenStateWasSent = state.angularVelocity;
             }
+            
+            byte messageLength = 0;
+            messageLength += 1; // messageLength
+            messageLength += 1; // encoded info
+            messageLength += sizeof(uint); // netID
+            messageLength += sizeof(uint); // sync index
+            messageLength += sizeof(float); // owner timestamp
+            if (sendPosition)
+            {
+                byte componentSize = sizeof(float);
+                if (smoothSync.isPositionCompressed) componentSize = sizeof(ushort);
+                if (smoothSync.isSyncingXPosition) messageLength += componentSize;
+                if (smoothSync.isSyncingYPosition) messageLength += componentSize;
+                if (smoothSync.isSyncingZPosition) messageLength += componentSize;
+            }
+            if (sendRotation)
+            {
+                byte componentSize = sizeof(float);
+                if (smoothSync.isRotationCompressed) componentSize = sizeof(ushort);
+                if (smoothSync.isSyncingXRotation) messageLength += componentSize;
+                if (smoothSync.isSyncingYRotation) messageLength += componentSize;
+                if (smoothSync.isSyncingZRotation) messageLength += componentSize;
+            }
+            if (sendScale)
+            {
+                byte componentSize = sizeof(float);
+                if (smoothSync.isScaleCompressed) componentSize = sizeof(ushort);
+                if (smoothSync.isSyncingXScale) messageLength += componentSize;
+                if (smoothSync.isSyncingYScale) messageLength += componentSize;
+                if (smoothSync.isSyncingZScale) messageLength += componentSize;
+            }
+            if (sendVelocity)
+            {
+                byte componentSize = sizeof(float);
+                if (smoothSync.isVelocityCompressed) componentSize = sizeof(ushort);
+                if (smoothSync.isSyncingXVelocity) messageLength += componentSize;
+                if (smoothSync.isSyncingYVelocity) messageLength += componentSize;
+                if (smoothSync.isSyncingZVelocity) messageLength += componentSize;
+            }
+            if (sendAngularVelocity)
+            {
+                byte componentSize = sizeof(float);
+                if (smoothSync.isAngularVelocityCompressed) componentSize = sizeof(ushort);
+                if (smoothSync.isSyncingXAngularVelocity) messageLength += componentSize;
+                if (smoothSync.isSyncingYAngularVelocity) messageLength += componentSize;
+                if (smoothSync.isSyncingZAngularVelocity) messageLength += componentSize;
+            }
+            if (smoothSync.isSmoothingAuthorityChanges && NetworkServer.active)
+            {
+                messageLength += 1;
+            }
+            if (smoothSync.automaticallyResetTime)
+            {
+                messageLength += 1;
+            }
 
+            writer.WriteByte(messageLength);
             writer.WriteByte(encodeSyncInformation(sendPosition, sendRotation, sendScale,
                 sendVelocity, sendAngularVelocity, sendAtPositionalRestTag, sendAtRotationalRestTag));
             writer.WriteNetworkIdentity(smoothSync.netID);
@@ -448,8 +504,14 @@ namespace Smooth
             msg.state = new StateMirror();
             var state = msg.state;
 
-            // The first received byte tells us what we need to be syncing.
+            byte bytesRead = 0;
+
+            // The first received byte tell us how many bytes to read
+            byte messageLength = reader.ReadByte();
+            bytesRead += 1;
+            // The second received byte tells us what we need to be syncing.
             byte syncInfoByte = reader.ReadByte();
+            bytesRead += 1;
             bool syncPosition = shouldSyncPosition(syncInfoByte);
             bool syncRotation = shouldSyncRotation(syncInfoByte);
             bool syncScale = shouldSyncScale(syncInfoByte);
@@ -459,22 +521,21 @@ namespace Smooth
             state.atRotationalRest = shouldBeAtRotationalRest(syncInfoByte);
 
             NetworkIdentity networkIdentity = reader.ReadNetworkIdentity();
+            bytesRead += sizeof(uint);
+
             if (networkIdentity == null)
             {
-                Debug.LogWarning("Could not find target for network StateMirror message.");
-                return new NetworkStateMirror();
+                reader.ReadBytes(messageLength - bytesRead);
+                return msg;
             }
-            uint netID = networkIdentity.netId;
-            int syncIndex = (int)reader.ReadUInt();
-            state.ownerTimestamp = reader.ReadFloat();
 
             // Find the GameObject
-            GameObject ob = NetworkIdentity.spawned[netID].gameObject;
+            GameObject ob = networkIdentity.gameObject;
 
             if (!ob)
             {
-                Debug.LogWarning("Could not find target for network StateMirror message.");
-                return new NetworkStateMirror();
+                reader.ReadBytes(messageLength - bytesRead);
+                return msg;
             }
 
             // It doesn't matter which SmoothSync is returned since they all have the same list.
@@ -482,18 +543,22 @@ namespace Smooth
 
             if (!msg.smoothSync)
             {
-                Debug.LogWarning("Could not find target for network StateMirror message.");
-                return new NetworkStateMirror();
+                reader.ReadBytes(messageLength - bytesRead);
+                return msg;
             }
 
             // Find the correct object to sync according to the syncIndex.
+            int syncIndex = (int)reader.ReadUInt();
             for (int i = 0; i < msg.smoothSync.childObjectSmoothSyncs.Length; i++)
             {
                 if (msg.smoothSync.childObjectSmoothSyncs[i].syncIndex == syncIndex)
                 {
                     msg.smoothSync = msg.smoothSync.childObjectSmoothSyncs[i];
+                    break;
                 }
             }
+
+            state.ownerTimestamp = reader.ReadFloat();
 
             var smoothSync = msg.smoothSync;
 

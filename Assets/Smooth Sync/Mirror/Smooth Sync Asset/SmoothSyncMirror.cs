@@ -1944,6 +1944,7 @@ namespace Smooth
         /// <summary>Is automatically called on authority change on server.</summary>
         public void AssignAuthorityCallback(NetworkConnection conn, NetworkIdentity theNetID, bool authorityState)
         {
+            //var target = NetworkServer.spawned[theNetID.netId];
             var target = NetworkIdentity.spawned[theNetID.netId];
             if (target == null)
             {
@@ -2374,7 +2375,7 @@ namespace Smooth
             }
         }
 
-        static void HandleSync(NetworkConnection conn, NetworkStateMirror networkState)
+        public static void HandleSync(NetworkConnection conn, NetworkStateMirror networkState)
         {
             if (NetworkServer.active)
             {

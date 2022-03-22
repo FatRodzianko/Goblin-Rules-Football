@@ -22,6 +22,8 @@ public class GameplayManager : NetworkBehaviour
 
     [Header("Gameplay Statuses")]
     [SyncVar(hook=nameof(HandleGamePhase))] public string gamePhase;
+    [SyncVar] public bool firstHalfCompleted = false; // tracks when the first half has completed and when the game should transition to halftime or game over
+    [SyncVar] public string firstHalfKickingTeam; // name of the team that kicked in the first half (green or grey). That team will receive to start the second half
 
     [Header("Kickoff Info")]
     public GamePlayer kickingPlayer;
@@ -54,6 +56,7 @@ public class GameplayManager : NetworkBehaviour
 
 
     [Header("Game timer")]
+    [SerializeField] float lengthOfHalves;
     [SerializeField] TextMeshProUGUI timerText;
     [SyncVar(hook = nameof(HandleGameTimerUpdate))] public float timeLeftInGame;
     IEnumerator gameTimeRoutine;
@@ -133,7 +136,7 @@ public class GameplayManager : NetworkBehaviour
         HandleGamePhase(gamePhase, "cointoss");
         //timeLeftInGame = 300f;
         //timeLeftInGame = 30f;
-        HandleGameTimerUpdate(0f, 150f);
+        HandleGameTimerUpdate(0f, lengthOfHalves);
         greenScore = 0;
         greyScore = 0;
     }
@@ -177,6 +180,7 @@ public class GameplayManager : NetworkBehaviour
     }
     public void HandleGamePhase(string oldValue, string newValue)
     {
+        // Possible Game phases should be: cointoss, kickoff, gameplay, touchdown-transition, kick-after-attempt, xtra-time, halftime, gameover
         if (isServer)
         {
             gamePhase = newValue;
@@ -232,6 +236,14 @@ public class GameplayManager : NetworkBehaviour
                 EnableGoblinCollidersOnServer(true);
                 ObstacleManager.instance.DisableCollidersOnObjects(true);
             }
+            if (newValue == "halftime")
+            {
+                Debug.Log("GameplayManager on Server: Halftime reached. Starting transition to the second half.");
+                if (isXtraTime)
+                    isXtraTime = false;
+                ActivateGameplayControls(false);
+                TransitionToSecondHalf();
+            }
             if (newValue == "gameover")
             {
                 Debug.Log("GameplayManager on Server: It's game over!");
@@ -279,6 +291,10 @@ public class GameplayManager : NetworkBehaviour
             {
                 //timerText.GetComponent<TimeText>().StartXtraTime();
             }
+            if (newValue == "halftime")
+            {
+                timerText.GetComponent<TimeText>().EndFirstHalfExtraTime();
+            }
             if (newValue == "gameover")
             {
                 timerText.GetComponent<TimeText>().EndXtraTime();
@@ -319,15 +335,14 @@ public class GameplayManager : NetworkBehaviour
         yPositionOfKickAfter = yPosition;
 
         ActivateGameplayControls(false);
-        if (isXtraTime)
+        if (isXtraTime && firstHalfCompleted)
         {
             int differenceInScores = greenScore - greyScore;
             if (Mathf.Abs(differenceInScores) > 2)
             {
                 HandleGamePhase(this.gamePhase, "gameover");
                 return;
-            }
-            
+            }            
         }
         RpcTouchDownScored(wasGrey, goblinNetId);
         IEnumerator touchdownToKickAfterTransition = GameplayToKickAfterTransition();
@@ -655,9 +670,13 @@ public class GameplayManager : NetworkBehaviour
     {
         yield return new WaitForSeconds(3.0f);        
         RpcDisableKickAfterWasKickGoodOrBadUI();
-        if (isXtraTime)
+        if (isXtraTime && firstHalfCompleted)
         {
             GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
+        }
+        else if (isXtraTime && !firstHalfCompleted)
+        {
+            GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "halftime");
         }
         else
         {
@@ -716,6 +735,7 @@ public class GameplayManager : NetworkBehaviour
     [ClientRpc]
     void RpcWinnerOfGameDetermined(string winnerOfGame)
     {
+        theFinalScoreText.text = "THE FINAL SCORE";
         greenTeamScoreText.text = greenScore.ToString();
         greyTeamScoreText.text = greyScore.ToString();
         GameOverScorePanel.SetActive(true);
@@ -859,5 +879,57 @@ public class GameplayManager : NetworkBehaviour
                 goblinObject.GetComponent<GoblinScript>().KickAfterWaitToEnableObstacleColliders();
             }
         }
+    }
+    [ServerCallback]
+    public void SaveFirstHalfKickingTeam()
+    {
+        Debug.Log("SaveFirstHalfKickingTeam: team that is kicking is: " + kickingPlayer.teamName);
+        if (!String.IsNullOrWhiteSpace(kickingPlayer.teamName))
+        {
+            firstHalfKickingTeam = kickingPlayer.teamName;
+        }
+
+    }
+    [ServerCallback]
+    void TransitionToSecondHalf()
+    {
+        GetSecondHalfKickingTeam();
+        IEnumerator transitionToSecondHalfRoutine = TransitionToSecondHalfRoutine();
+        StartCoroutine(transitionToSecondHalfRoutine);
+    }
+    [ServerCallback]
+    void GetSecondHalfKickingTeam()
+    {
+        Debug.Log("GetSecondHalfKickingTeam");
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            if (player.teamName == firstHalfKickingTeam)
+            {
+                receivingPlayer = player;
+            }
+            else
+            {
+                kickingPlayer = player;
+            }
+        }
+    }
+    [ServerCallback]
+    IEnumerator TransitionToSecondHalfRoutine()
+    {
+        RpcHalfTimeTransition(true, kickingPlayer.teamName);
+        yield return new WaitForSeconds(10f);
+        RpcHalfTimeTransition(false, kickingPlayer.teamName);
+        this.firstHalfCompleted = true;
+        ResetAllGoblinStatuses();
+        this.HandleGamePhase(this.gamePhase, "kickoff");
+        this.HandleGameTimerUpdate(this.timeLeftInGame, lengthOfHalves);
+    }
+    [ClientRpc]
+    void RpcHalfTimeTransition(bool enable, string kickingTeam)
+    {
+        theFinalScoreText.text = "End of First Half. " + kickingTeam + " will kick to start the Second Half.";
+        greenTeamScoreText.text = greenScore.ToString();
+        greyTeamScoreText.text = greyScore.ToString();
+        GameOverScorePanel.SetActive(enable);
     }
 }

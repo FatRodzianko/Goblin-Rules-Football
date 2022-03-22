@@ -18,13 +18,19 @@ public class ServerAuthorityExamplePlayerController : NetworkBehaviour
 
     SmoothSyncMirror smoothSync;
 
-	void Start ()
+	void Awake ()
     {
         rb = GetComponent<Rigidbody>();
         smoothSync = GetComponent<SmoothSyncMirror>();
     }
-    
-	void Update ()
+
+    public override void OnStartServer()
+    {
+        rb.isKinematic = false;
+        base.OnStartServer();
+    }
+
+    void Update ()
     {
         if (hasAuthority)
         {

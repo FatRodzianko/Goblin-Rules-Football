@@ -1236,7 +1236,14 @@ public class Football : NetworkBehaviour
         yield return new WaitForSeconds(0.25f);
         if (!this.isHeld)
         {
-            GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
+            if (!GameplayManager.instance.firstHalfCompleted)
+            {
+                GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "halftime");
+            }
+            else
+            {
+                GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
+            }            
         }
     }
 

@@ -10,6 +10,7 @@ public class TouchDownTextGradient : MonoBehaviour
     [SerializeField] Color color2;
     [SerializeField] Color color3;
     [SerializeField] Color color4;
+    bool isColorChangeRunning = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -42,11 +43,16 @@ public class TouchDownTextGradient : MonoBehaviour
     }
     public void ActivateGradient()
     {
-        IEnumerator touchDownTextRoutine = GradientRoutine();
-        StartCoroutine(touchDownTextRoutine);
+        if (!isColorChangeRunning)
+        {
+            IEnumerator touchDownTextRoutine = GradientRoutine();
+            StartCoroutine(touchDownTextRoutine);
+        }
+        
     }
     public IEnumerator GradientRoutine()
     {
+        isColorChangeRunning = true;
         touchDownText.colorGradient = new VertexGradient(color1, color2, color3, color4);
         yield return new WaitForSeconds(0.1f);
         touchDownText.colorGradient = new VertexGradient(color4, color1, color2, color3);
@@ -127,5 +133,6 @@ public class TouchDownTextGradient : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         touchDownText.colorGradient = new VertexGradient(color2, color3, color4, color1);
         yield return new WaitForSeconds(0.1f);
+        isColorChangeRunning = false;
     }
 }

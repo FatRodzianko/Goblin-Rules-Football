@@ -330,6 +330,7 @@ public class CoinTossManager : NetworkBehaviour
     {
         didPlayerSelectKickOrReceive = true;
         bool didPlayerChooseReceive = false;
+
         foreach (GamePlayer player in Game.GamePlayers)
         {
             if (player.doesPlayerChooseKickOrReceive)
@@ -364,6 +365,7 @@ public class CoinTossManager : NetworkBehaviour
         }
         if (GameplayManager.instance.kickingPlayer != null && GameplayManager.instance.receivingPlayer != null)
         {
+            GameplayManager.instance.SaveFirstHalfKickingTeam();
             StartKickOffPhase = StartKickOffPhaseRoutine();
             StartCoroutine(StartKickOffPhase);
         }

@@ -93609,6 +93609,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 905907879}
     - target: {fileID: 8456977640809881298, guid: dcc63033471145348880d77a042ceb7d, type: 3}
+      propertyPath: lengthOfHalves
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8456977640809881298, guid: dcc63033471145348880d77a042ceb7d, type: 3}
       propertyPath: teamWinnerText
       value: 
       objectReference: {fileID: 1647905333}

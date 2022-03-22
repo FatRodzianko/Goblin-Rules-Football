@@ -47,4 +47,10 @@ public class TimeText : MonoBehaviour
         }
         yield break;
     }
+    public void EndFirstHalfExtraTime()
+    {
+        StopCoroutine(xtraTimeRoutine);
+        isXtraTimeRoutineRunning = false;
+        timeText.color = new Color(1f, 0.5f, 0f);
+    }
 }
