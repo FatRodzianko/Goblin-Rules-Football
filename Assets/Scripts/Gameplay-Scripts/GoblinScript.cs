@@ -49,6 +49,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public float defenseModifier;
     [SyncVar] public float speedModifierFromPowerUps = 1.0f;
     [SyncVar] public float slowDownObstacleModifier = 1.0f;
+    [SyncVar] public float possessionSpeedBonus = 1.0f;
 
 
     [Header("Character selection stuff")]
@@ -1000,6 +1001,15 @@ public class GoblinScript : NetworkBehaviour
         //Debug.Log("CmdIsPlayerSprinting: " + isPlayerSprinting.ToString());
 
         isSprintingOnServer = isPlayerSprinting;
+        // Get speed modifer for the possession bonus from this goblin's player owner. Possession bonus is divided by 3. So, of possession bonus is 20% (aka 1.2f) then it should make them 6.7% faster (1.067f)
+        /*float possessionSpeedBonus = (this.serverGamePlayer.possessionBonus - 1.0f);
+        if (possessionSpeedBonus > 0)
+        {
+            possessionSpeedBonus /= 3f;            
+        }
+        possessionSpeedBonus += 1.0f;*/
+
+        //Debug.Log("CmdIsPlayerSprinting: possessionSpeedBonus is: " + possessionSpeedBonus.ToString() + " for goblin: " + this.name + " owned by " + this.serverGamePlayer.PlayerName);
 
         if (isPlayerSprinting)
         {
@@ -1007,7 +1017,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (stamina > 0f)
                 {
-                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier) * 1.15f;
+                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * 1.15f;
                 }
                 //Update CanRecoverStamina Event here?
                 if (isStaminaRecoveryRoutineRunning)
@@ -1019,15 +1029,15 @@ public class GoblinScript : NetworkBehaviour
             }
             else if (isFatigued)
             {
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier) * 0.5f;
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * 0.5f;
             }
         }        
         else
         {
             if(!isFatigued)
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier);
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus);
             else
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier) * 0.5f;
+                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * 0.5f;
         }
             
     }
@@ -1043,7 +1053,7 @@ public class GoblinScript : NetworkBehaviour
         {
             if (stamina > 0f)
             {
-                stamina -= (Time.fixedDeltaTime * StaminaDrain);
+                stamina -= (Time.fixedDeltaTime * (StaminaDrain / this.serverGamePlayer.possessionBonus));
             }
             else
             {
@@ -1089,7 +1099,7 @@ public class GoblinScript : NetworkBehaviour
         {
             if (stamina <= MaxStamina)
             {
-                stamina += (Time.fixedDeltaTime * StaminaRecovery);
+                stamina += (Time.fixedDeltaTime * StaminaRecovery * this.serverGamePlayer.possessionBonus);
                 if (stamina > MaxStamina)
                 {
                     stamina = MaxStamina;
@@ -1162,7 +1172,7 @@ public class GoblinScript : NetworkBehaviour
 
                 float damageDealt = goblinGivingDamage.damage * blockingModifier * defenseModifier;
                 Debug.Log("DealDamageToGoblins: Goblin " + goblinReceivingDamage.name + " will receive the following amount of damage: " + damageDealt.ToString());
-                goblinReceivingDamage.health -= (goblinGivingDamage.damage * blockingModifier * defenseModifier);
+                goblinReceivingDamage.health -= (goblinGivingDamage.damage * (blockingModifier / goblinReceivingDamage.serverGamePlayer.possessionBonus) * defenseModifier);
                 if (goblinReceivingDamage.health <= 0f)
                 {
                     Debug.Log("DealDamageToGoblins: Goblin " + goblinReceivingDamage.name + "'s health is now below 0. Knocking them out.");
@@ -1183,6 +1193,10 @@ public class GoblinScript : NetworkBehaviour
                     StartCoroutine(isWasPunched);
                 }
             }
+            if (goblinGivingDamage.isCharacterSelected)
+            {
+                TeamManager.instance.PunchHit(goblinGivingDamage.serverGamePlayer);
+            }
             
         }
     }
@@ -1194,8 +1208,8 @@ public class GoblinScript : NetworkBehaviour
             return;
         if (this.health < 0f)
             this.health = 0f;
-            
 
+        
         //Make sure that all the isPunching, isDiving things are false so it doesn't fuck with controls
         /*if (isPunching)
             HandleIsPunching(this.isPunching, false);
@@ -1254,12 +1268,18 @@ public class GoblinScript : NetworkBehaviour
             HandleHasBall(doesCharacterHaveBall, false);
             Football footballScript = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
             footballScript.FumbleFootball();
+            if (GameplayManager.instance.gamePhase != "kick-after-attempt")
+                TeamManager.instance.FumbleBall(this.serverGamePlayer.isTeamGrey);
         }
         //Code here for ending kick-after-attempt?
         if (GameplayManager.instance.gamePhase == "kick-after-attempt" && this.isKickAfterGoblin)
         {
             GameplayManager.instance.KickAfterAttemptWasBlocked();
             RpcKickBlockedStopKickAfterAttempt(this.connectionToClient);
+        }
+        else
+        {
+            TeamManager.instance.KnockedOutOrTripped(this.serverGamePlayer.isTeamGrey, knockedOut);
         }
     }
     [Server]
@@ -1295,14 +1315,13 @@ public class GoblinScript : NetworkBehaviour
         yield return new WaitForSeconds(2.0f);
         isRegainHealthRoutineRunning = false;
         canGoblinRegainHealth = true;
-
     }
     [Command]
     void CmdRegainHealth()
     {
         if (canGoblinRegainHealth && health < MaxHealth)
         {
-            health += 1.0f * Time.fixedDeltaTime;
+            health += (2.0f * this.serverGamePlayer.possessionBonus) * Time.fixedDeltaTime;
             if (health >= MaxHealth)
             {
                 health = MaxHealth;
@@ -1360,6 +1379,7 @@ public class GoblinScript : NetworkBehaviour
     [Command]
     void CmdGoblinPickUpFootball()
     {
+        Debug.Log("CmdGoblinPickUpFootball: for goblin: " + this.name + " owned by player " + this.serverGamePlayer.PlayerName);
         GameObject.FindGameObjectWithTag("football").GetComponent<Football>().PlayerPickUpFootball(this.GetComponent<NetworkIdentity>().netId);
     }
     public void UpdateGoblinHealth(float oldValue, float newValue)
@@ -1412,6 +1432,8 @@ public class GoblinScript : NetworkBehaviour
             {
                 isSlidingRoutine = SlideGoblinRoutine();
                 StartCoroutine(isSlidingRoutine);
+                if (this.isCharacterSelected)
+                    TeamManager.instance.SlideTackle(this.serverGamePlayer, false);
             }
             
         }
@@ -1458,6 +1480,8 @@ public class GoblinScript : NetworkBehaviour
         {
             if (this.ownerConnectionId != slidingGoblin.ownerConnectionId)
                 slidingGoblin.TripGoblin();
+            if (this.isCharacterSelected)
+                TeamManager.instance.SlideTackle(this.serverGamePlayer, true);
         }
     }
     public void TripGoblin()
@@ -1667,6 +1691,8 @@ public class GoblinScript : NetworkBehaviour
     {
         //isPunching = punching;
         HandleIsPunching(isPunching, punching);
+        if (this.isCharacterSelected && punching)
+            TeamManager.instance.ThrownPunch(this.serverGamePlayer);
     }
     public void HandleIsPunching(bool oldValue, bool newValue)
     {
@@ -1678,6 +1704,10 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (newValue && isBlocking)
                     CmdSetBlocking(false);
+                if (!newValue)
+                {
+                    ToggleGoblinBodyCollider();
+                }
             }
         }
     }
@@ -1699,6 +1729,8 @@ public class GoblinScript : NetworkBehaviour
             HandleIsKicking(this.isKicking, true);
             GoblinKickPower = kickPower;
             GoblinKickoffAngle = kickAngle;
+            
+
         }
     }
     public void HandleIsKicking(bool oldValue, bool newValue)
@@ -1746,9 +1778,9 @@ public class GoblinScript : NetworkBehaviour
             footballScript.KickAfterAttemptKick(isGoblinGrey, powerValueSubmitted, angleOfKickAttempt, GoblinMaxKickDistance, GoblinMinKickDistance, kickAfterAccuracyDifficulty, accuracyValueSubmitted, kickAfterFinalPosition);
             return;
         }
-
-        footballScript.KickFootballDownField(isGoblinGrey, GoblinKickPower, GoblinKickoffAngle, GoblinMaxKickDistance, GoblinMinKickDistance);
-        
+        if (this.isCharacterSelected && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+            TeamManager.instance.KickDownfield(this.serverGamePlayer);
+        footballScript.KickFootballDownField(isGoblinGrey, GoblinKickPower, GoblinKickoffAngle, GoblinMaxKickDistance, GoblinMinKickDistance);        
     }
     public void StopKicking()
     {
@@ -1917,6 +1949,7 @@ public class GoblinScript : NetworkBehaviour
         GameplayManager.instance.DisableKickAfterPositioningControls();
         GameplayManager.instance.StartKickAfterTimer();
         this.RpcKickAfterPositionFromServer(this.connectionToClient, kickAfterPosition);
+        
     }
     [TargetRpc]
     void RpcKickAfterPositionFromServer(NetworkConnection target, Vector2 newPosition)

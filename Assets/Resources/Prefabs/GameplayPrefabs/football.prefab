@@ -279,10 +279,10 @@ MonoBehaviour:
   snapPositionThreshold: 0.1
   snapRotationThreshold: 0
   snapScaleThreshold: 0
-  positionLerpSpeed: 0.5
+  positionLerpSpeed: 0.8
   rotationLerpSpeed: 0
   scaleLerpSpeed: 0
-  timeCorrectionSpeed: 0.2
+  timeCorrectionSpeed: 0.1
   snapTimeThreshold: 0.3
   syncPosition: 1
   syncRotation: 7

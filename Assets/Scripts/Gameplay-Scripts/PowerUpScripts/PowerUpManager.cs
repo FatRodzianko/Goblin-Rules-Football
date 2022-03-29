@@ -369,6 +369,9 @@ public class PowerUpManager : NetworkBehaviour
             PowerUpPlayerOwnerDictionary.Add(powerUpNetId, playerOwner);
             GameObject powerUpToAdd = NetworkIdentity.spawned[powerUpNetId].gameObject;
             PlayerPickedUpPowerUps.Add(powerUpToAdd);
+            // Track when a team has picked up a power up
+            GamePlayer player = NetworkIdentity.spawned[playerOwner].GetComponent<GamePlayer>();
+            TeamManager.instance.PowerUpCollectedOrUsed(player, false);
         }
     }
     [Client]
@@ -418,6 +421,9 @@ public class PowerUpManager : NetworkBehaviour
                     blueShellCount--;
                 NetworkServer.Destroy(powerUpToUse);
                 //player.RpcRemoveUsedPowerUp(player.connectionToClient, powerUpNetId);
+
+                // Track when a team has picked up a power up
+                TeamManager.instance.PowerUpCollectedOrUsed(player, true);
             }
             else
             {

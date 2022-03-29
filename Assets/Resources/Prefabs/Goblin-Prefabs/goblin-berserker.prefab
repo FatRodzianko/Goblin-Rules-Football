@@ -298,18 +298,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.0030784607, y: -1.25}
+  m_Offset: {x: -0.023116112, y: -1.2464436}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
+    pivot: {x: 0.33333334, y: 0.5}
+    oldSize: {x: 3, y: 3}
+    newSize: {x: 3, y: 3}
+    adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.632658, y: 0.75}
+  m_Size: {x: 1.6759472, y: 0.57929254}
   m_EdgeRadius: 0
 --- !u!1 &5553823835414022836
 GameObject:
@@ -565,6 +565,7 @@ MonoBehaviour:
   StaminaRecovery: 1
   MaxSpeed: 7
   MaxDamage: 75
+  canCollide: 1
   health: 0
   stamina: 0
   speed: 0

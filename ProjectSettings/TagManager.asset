@@ -21,6 +21,7 @@ TagManager:
   - PowerUp
   - tripObject
   - footballLandingTarget
+  - teamObject
   layers:
   - Default
   - TransparentFX

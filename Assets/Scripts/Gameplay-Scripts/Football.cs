@@ -80,6 +80,19 @@ public class Football : NetworkBehaviour
     [SerializeField] float KickFootballMaxY; // 5. 2f // 6. 7f
     [SerializeField] float KickFootballMinY; // -6. 0f // -10. 5f
 
+    private NetworkManagerGRF game;
+    private NetworkManagerGRF Game
+    {
+        get
+        {
+            if (game != null)
+            {
+                return game;
+            }
+            return game = NetworkManagerGRF.singleton as NetworkManagerGRF;
+        }
+    }
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -479,7 +492,7 @@ public class Football : NetworkBehaviour
     [Server]
     public void PlayerPickUpFootball(uint goblinNetId)
     {
-        Debug.Log("PlayerPickUpFootball");
+        Debug.Log("PlayerPickUpFootball: isHeld: " + this.isHeld.ToString() + " isKicked: " + this.isKicked.ToString());
         if (!isHeld && !isKicked) // replace "isKicked" with something that makes it so the football can only be caught near the beginning and end of the kicking arc
         {
             GameObject goblinToCheck = NetworkIdentity.spawned[goblinNetId].gameObject;
@@ -557,7 +570,12 @@ public class Football : NetworkBehaviour
             if (!newValue)
             {
                 goblinWithBall = null;
+                goblinWithBallNetId = 0;
                 //GameplayManager.instance.RpcNoTeamWithFootball();
+                foreach (GamePlayer player in Game.GamePlayers)
+                {
+                    player.UpdatePlayerPossessionTracker(false);
+                }
             }
         }            
         if (isClient)
@@ -602,6 +620,7 @@ public class Football : NetworkBehaviour
                 animator.SetBool("isSideways", true);
             else
                 animator.SetBool("isSideways", false);*/
+            TeamManager.instance.PassThrown(throwingGoblinScript.serverGamePlayer);
         }
     }
     [Server]
@@ -1175,8 +1194,29 @@ public class Football : NetworkBehaviour
         if (isServer)
         {
             goblinWithBallNetId = newValue;
-            
+            if ((GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time") && this.isHeld && newValue != 0)
+            {
+                try
+                {
+                    GoblinScript goblinScript = NetworkIdentity.spawned[goblinWithBallNetId].GetComponent<GoblinScript>();
+                    foreach (GamePlayer player in Game.GamePlayers)
+                    {
+                        if (player.ConnectionId == goblinScript.serverGamePlayer.ConnectionId)
+                        {
+                            player.UpdatePlayerPossessionTracker(true);
+                        }
+                        else
+                        {
+                            player.UpdatePlayerPossessionTracker(false);
+                        }
+                    }
+                }
+                catch
+                {
+                    Debug.Log("HandleIsHeld: Could not update player possession tracker with the goblin with ball.");
+                }
 
+            }
         }
         if (isClient)
         {

@@ -50,6 +50,7 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] TextMeshProUGUI KickWasGoodText;
     [SerializeField] TextMeshProUGUI KickWasNotGoodText;
     [SerializeField] TextMeshProUGUI KickWasBlockedText;
+    bool kickAfterRoutineRunning = false;
 
     [Header("Xtra Time")]
     [SyncVar] public bool isXtraTime;
@@ -83,6 +84,8 @@ public class GameplayManager : NetworkBehaviour
     [Header("UI Stuff")]
     [SerializeField] GameObject PossessionFootballGreen;
     [SerializeField] GameObject PossessionFootballGrey;
+    [SerializeField] GameObject PossessionBarGreen;
+    [SerializeField] GameObject PossessionBarGrey;
 
     [Header("UI to update for gamepad/keyboard controls")]
     [SerializeField] private TextMeshProUGUI MoveLeftText;
@@ -166,6 +169,7 @@ public class GameplayManager : NetworkBehaviour
     }
     public void ActivateCoinTossUI(bool activate)
     {
+        Debug.Log("ActivateCoinTossUI: " + activate.ToString());
         coinTossCanvas.SetActive(activate);
     }
     public void EnableGoblinMovement()
@@ -191,6 +195,7 @@ public class GameplayManager : NetworkBehaviour
                 RpcNoTeamWithFootball();
                 ObstacleManager.instance.DisableCollidersOnObjects(false);
                 EnableGoblinCollidersOnServer(false);
+                StopPossessionRoutinesForPlayers();
             }
             if (newValue == "gameplay")
             {
@@ -199,6 +204,8 @@ public class GameplayManager : NetworkBehaviour
                 RandomEventManager.instance.StartGeneratingRandomEvents(true);
                 ObstacleManager.instance.DisableCollidersOnObjects(true);
                 EnableGoblinCollidersOnServer(true);
+                if (isXtraTime)
+                    isXtraTime = false;
             }
             if (oldValue == "gameplay")
             {
@@ -213,6 +220,7 @@ public class GameplayManager : NetworkBehaviour
                 RpcNoTeamWithFootball();
                 ObstacleManager.instance.KickAfterWaitToEnableObstacleColliders();
                 DisableGoblinColliderForKickAfter();
+                StopPossessionRoutinesForPlayers();
             }
             if (oldValue == "kick-after-attempt")
             {
@@ -239,10 +247,9 @@ public class GameplayManager : NetworkBehaviour
             if (newValue == "halftime")
             {
                 Debug.Log("GameplayManager on Server: Halftime reached. Starting transition to the second half.");
-                if (isXtraTime)
-                    isXtraTime = false;
                 ActivateGameplayControls(false);
                 TransitionToSecondHalf();
+                StopPossessionRoutinesForPlayers();
             }
             if (newValue == "gameover")
             {
@@ -334,6 +341,7 @@ public class GameplayManager : NetworkBehaviour
 
         yPositionOfKickAfter = yPosition;
 
+        TeamManager.instance.TouchdownScored(wasGrey);
         ActivateGameplayControls(false);
         if (isXtraTime && firstHalfCompleted)
         {
@@ -347,6 +355,7 @@ public class GameplayManager : NetworkBehaviour
         RpcTouchDownScored(wasGrey, goblinNetId);
         IEnumerator touchdownToKickAfterTransition = GameplayToKickAfterTransition();
         StartCoroutine(touchdownToKickAfterTransition);
+        StopPossessionRoutinesForPlayers();
     }
     [ClientRpc]
     void RpcTouchDownScored(bool wasGrey, uint goblinId)
@@ -463,6 +472,7 @@ public class GameplayManager : NetworkBehaviour
         TouchDownPanel.SetActive(false);
         touchDownText.gameObject.SetActive(false);
         touchDownTeamText.gameObject.SetActive(false);
+        touchDownText.GetComponent<TouchDownTextGradient>().isColorChangeRunning = false;
     }
     [Server]
     void SetKickAfterPlayers(uint scoringGoblin)
@@ -494,7 +504,7 @@ public class GameplayManager : NetworkBehaviour
                 receivingPlayer = player;
                 player.RpcRepositionForKickAfter(player.connectionToClient, false, scoringGoblin, yPositionOfKickAfter);
             }
-        }
+        }        
     }
     [Server]
     void ResetAllGoblinStatuses()
@@ -625,6 +635,7 @@ public class GameplayManager : NetworkBehaviour
             }
         }
         RpcKickAfterWasKickGoodOrBad(isKickGood, isScoringPlayerGrey);
+        TeamManager.instance.KickAfterAttempts(scoringPlayer.isTeamGrey, isKickGood);
     }
     [ClientRpc]
     void RpcKickAfterWasKickGoodOrBad(bool isKickGood, bool isScoringPlayerGrey)
@@ -649,8 +660,23 @@ public class GameplayManager : NetworkBehaviour
     [Server]
     public void TransitionFromKickAfterAttemptToKickOff()
     {
-        IEnumerator TransitionFromKickAfterAttemptToKickOff = TransitionFromKickAfterAttemptToKickOffRoutine();
-        StartCoroutine(TransitionFromKickAfterAttemptToKickOff);
+        /*if (isXtraTime && !firstHalfCompleted)
+        {
+            HandleGamePhase(this.gamePhase, "halftime");
+        }
+        else
+        {
+            IEnumerator TransitionFromKickAfterAttemptToKickOff = TransitionFromKickAfterAttemptToKickOffRoutine();
+            StartCoroutine(TransitionFromKickAfterAttemptToKickOff);
+        }*/
+        Debug.Log("TransitionFromKickAfterAttemptToKickOff running on the server. kickAfterRoutineRunning is set to: " + kickAfterRoutineRunning.ToString());
+        if (!kickAfterRoutineRunning)
+        {
+            IEnumerator TransitionFromKickAfterAttemptToKickOff = TransitionFromKickAfterAttemptToKickOffRoutine();
+            StartCoroutine(TransitionFromKickAfterAttemptToKickOff);
+        }
+        
+
     }
     [Server]
     public void DisableKickAfterAttemptControls()
@@ -668,6 +694,7 @@ public class GameplayManager : NetworkBehaviour
     }
     IEnumerator TransitionFromKickAfterAttemptToKickOffRoutine()
     {
+        kickAfterRoutineRunning = true;
         yield return new WaitForSeconds(3.0f);        
         RpcDisableKickAfterWasKickGoodOrBadUI();
         if (isXtraTime && firstHalfCompleted)
@@ -676,13 +703,15 @@ public class GameplayManager : NetworkBehaviour
         }
         else if (isXtraTime && !firstHalfCompleted)
         {
+            Debug.Log("TransitionFromKickAfterAttemptToKickOffRoutine: it should be halftime now!");
             GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "halftime");
         }
         else
         {
+            Debug.Log("TransitionFromKickAfterAttemptToKickOffRoutine: not halftime. Kickoff time!");
             GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "kickoff");
         }
-        
+        kickAfterRoutineRunning = false;        
     }
     [ClientRpc]
     void RpcDisableKickAfterWasKickGoodOrBadUI()
@@ -692,6 +721,7 @@ public class GameplayManager : NetworkBehaviour
         KickWasNotGoodText.gameObject.SetActive(false);
         KickWasGoodText.gameObject.SetActive(false);
         KickWasBlockedText.gameObject.SetActive(false);
+        KickWasGoodText.GetComponent<TouchDownTextGradient>().isColorChangeRunning = false;
     }
     [Client]
     void ResetKickAfterPositionBoolValue()
@@ -705,6 +735,9 @@ public class GameplayManager : NetworkBehaviour
         DisableKickAfterPositioningControls();
         DisableKickAfterAttemptControls();
         RpcKickAfterAttemptWasBlocked();
+        TeamManager.instance.BlockedKick(blockingPlayer.isTeamGrey);
+        TeamManager.instance.KickAfterAttempts(scoringPlayer.isTeamGrey, false);
+
     }
     [ClientRpc]
     void RpcKickAfterAttemptWasBlocked()
@@ -917,7 +950,7 @@ public class GameplayManager : NetworkBehaviour
     IEnumerator TransitionToSecondHalfRoutine()
     {
         RpcHalfTimeTransition(true, kickingPlayer.teamName);
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(7f);
         RpcHalfTimeTransition(false, kickingPlayer.teamName);
         this.firstHalfCompleted = true;
         ResetAllGoblinStatuses();
@@ -931,5 +964,22 @@ public class GameplayManager : NetworkBehaviour
         greenTeamScoreText.text = greenScore.ToString();
         greyTeamScoreText.text = greyScore.ToString();
         GameOverScorePanel.SetActive(enable);
+    }
+    [ServerCallback]
+    void StopPossessionRoutinesForPlayers()
+    {
+        Debug.Log("StopPossessionRoutinesForPlayers");
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            player.StopAllPossessionRoutines();
+        }
+    }
+    [Client]
+    public void UpdatePossessionBar(bool isGreen, float possession)
+    {
+        if (isGreen)
+            PossessionBarGreen.GetComponent<PossessionBar>().UpdatePossessionBar(possession);
+        else
+            PossessionBarGrey.GetComponent<PossessionBar>().UpdatePossessionBar(possession);
     }
 }

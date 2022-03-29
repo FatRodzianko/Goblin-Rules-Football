@@ -10,7 +10,7 @@ public class TouchDownTextGradient : MonoBehaviour
     [SerializeField] Color color2;
     [SerializeField] Color color3;
     [SerializeField] Color color4;
-    bool isColorChangeRunning = false;
+    public bool isColorChangeRunning = false;
     // Start is called before the first frame update
     void Start()
     {
