@@ -6,6 +6,8 @@ using System.Linq;
 using System;
 using Cinemachine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
+using UnityEngine.EventSystems;
 
 public class GamePlayer : NetworkBehaviour
 {
@@ -14,6 +16,10 @@ public class GamePlayer : NetworkBehaviour
     [SyncVar] public int ConnectionId;
     [SyncVar] public int playerNumber;
     [SyncVar] public bool IsGameLeader;
+    [SerializeField] InputSystemUIInputModule inputSystemUIInputModule;
+    [SerializeField] InputActionReference moveReference;
+    [SerializeField] InputActionReference submitReference;
+    [SerializeField] InputActionAsset defaultInputActions;
 
     [Header("Coin Toss Info")]
     public bool inputManagerActivated = false;
@@ -78,6 +84,7 @@ public class GamePlayer : NetworkBehaviour
     public bool kickAfterPositioningEnabled = false;
     public bool kickAfterKickingEnabled = false;
     public bool powerUpsEnabled = false;
+    public bool menuNavigationEnabled = false;
 
     [Header("Possession Tracker")]
     [SyncVar(hook = nameof(HandlePossessionPoints))] public float possessionPoints = 0f;
@@ -279,6 +286,7 @@ public class GamePlayer : NetworkBehaviour
             EnableKickAfterKicking(false);
             EnableKickingControls(false);
             EnablePowerUpControls(false);
+            EnableMenuNavigationControls(false);
 
             GameplayManager.instance.SetTimerText(GameplayManager.instance.timeLeftInGame);
         }
@@ -593,6 +601,27 @@ public class GamePlayer : NetworkBehaviour
             if (!selectGoblin.isSliding && !selectGoblin.isDiving && !selectGoblin.isGoblinKnockedOut && !selectGoblin.isPunching)
             {
                 selectGoblin.StartBlocking();
+                if (hasAuthority)
+                {
+                    try
+                    {
+                        GameObject cowboy = GameObject.FindGameObjectWithTag("cowboy");
+                        if (cowboy != null)
+                        {
+                            if (cowboy.GetComponent<CowboyScript>().isVisibileToClient)
+                                CmdTryToGiveCowboyYeehaw();
+                            else
+                                Debug.Log("StartBlockGoblin: Cowboy is not visible on the client");
+                        }
+                        
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log("StartBlockGoblin: Error trying to find the cowboy object. Error: " + e);
+                    }
+                    
+                }
+                    
             }
         }
     }
@@ -945,6 +974,8 @@ public class GamePlayer : NetworkBehaviour
                         {
                             goblin.transform.position = KickingPositionGreySkirmisher;
                         }
+                        // Make sure grey goblins are facing to the left
+                        goblin.FlipRenderer(true);
                     }
                 }
                 else
@@ -965,6 +996,8 @@ public class GamePlayer : NetworkBehaviour
                         {
                             goblin.transform.position = KickingPositionGreenSkirmisher;
                         }
+                        // Make sure green goblins are facing to the right
+                        goblin.FlipRenderer(false);
                     }
                 }
             }
@@ -989,6 +1022,8 @@ public class GamePlayer : NetworkBehaviour
                             goblin.transform.position = ReceivingPositionGreyBerserker;
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(11f, -2f));
                         }
+                        // Make sure grey goblins are facing to the left
+                        goblin.FlipRenderer(true);
                     }
                 }
                 else
@@ -1010,6 +1045,8 @@ public class GamePlayer : NetworkBehaviour
                             goblin.transform.position = ReceivingPositionGreenBerserker;
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(-11f, -2f));
                         }
+                        // Make sure green goblins are facing to the right
+                        goblin.FlipRenderer(false);
                     }
                 }
             }
@@ -1119,6 +1156,15 @@ public class GamePlayer : NetworkBehaviour
             EnableGoblinMovement(activate);
             EnableGameplayActions(activate);
             EnablePowerUpControls(activate);
+        }
+    }
+    [ClientRpc]
+    public void RpcActivateMenuNavigationControls(bool activate)
+    {
+        if (hasAuthority)
+        {
+            Debug.Log("RpcActivateMenuNavigationControls for player " + this.PlayerName);
+            EnableMenuNavigationControls(activate);
         }
     }
     void EnableGameplayActions(bool activate)
@@ -1779,6 +1825,75 @@ public class GamePlayer : NetworkBehaviour
         foreach (GoblinScript goblin in goblinTeamOnServer)
         {
             goblin.possessionSpeedBonus = possessionSpeedBonus;
+        }
+    }
+    [Command]
+    void CmdTryToGiveCowboyYeehaw()
+    {
+        if ((GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time" || GameplayManager.instance.gamePhase == "kick-after-attempt") && CowboyManager.instance.isCowboySpawned)
+        {
+            // Get position of the Cowboy
+            try
+            {
+                GameObject cowboy = GameObject.FindGameObjectWithTag("cowboy");
+                if (Vector2.Distance(cowboy.transform.position, this.serverSelectGoblin.transform.position) <= 32.5f)
+                {
+                    Debug.Log("CmdTryToGiveCowboyYeehaw: Goblin and cowboy should be within range? Trying to give a yeehaw");
+                    cowboy.GetComponent<CowboyScript>().PlayerIsGivingYeehaw(this.GetComponent<NetworkIdentity>().netId);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log("CmdTryToGiveCowboyYeehaw: Error finding cowboy or whatever: " + e);
+            }
+            
+        }
+    }
+    public void ExitToMainMenu()
+    {
+        if (hasAuthority)
+        {
+            if (isServer)
+            {
+                Game.StopHost();
+                //Game.HostShutDownServer();
+            }
+            else
+            {
+                Game.StopClient();
+                //Game.HostShutDownServer();
+            }
+        }
+    }
+    public void EnableMenuNavigationControls(bool activate)
+    {
+        Debug.Log("EnableMenuNavigationControls: for player " + this.PlayerName + " " + activate.ToString());
+        if (activate)
+        {
+            if (!menuNavigationEnabled)
+            {
+                
+                
+                var uiModule = (InputSystemUIInputModule)EventSystem.current.currentInputModule;
+                //uiModule.move = moveReference;
+                //uiModule.submit = submitReference;
+                uiModule.move = InputActionReference.Create(InputManager.Controls.UI.Navigate);
+                uiModule.submit = InputActionReference.Create(InputManager.Controls.UI.Submit);
+                uiModule.enabled = true;
+                var eventSystem = EventSystem.current;
+                eventSystem.enabled = true;
+                InputManager.Controls.UI.Enable();
+                menuNavigationEnabled = true;
+                Debug.Log("EnableMenuNavigationControls: Is move enabled: " + moveReference.action.enabled.ToString() + " is submit enabled " + submitReference.action.enabled.ToString() + " is the UI controls enabled?: " + InputManager.Controls.UI.enabled.ToString());
+                /*GameObject mainMenuButton = GameObject.FindGameObjectWithTag("mainMenuButton");
+                var eventSystem = EventSystem.current;
+                eventSystem.SetSelectedGameObject(mainMenuButton, new BaseEventData(eventSystem));*/
+            }
+        }
+        else
+        {
+            InputManager.Controls.UI.Disable();
+            menuNavigationEnabled = false;
         }
     }
 }

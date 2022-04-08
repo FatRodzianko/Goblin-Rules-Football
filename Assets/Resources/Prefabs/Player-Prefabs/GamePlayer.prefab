@@ -50,6 +50,10 @@ MonoBehaviour:
   ConnectionId: 0
   playerNumber: 0
   IsGameLeader: 0
+  inputSystemUIInputModule: {fileID: 0}
+  moveReference: {fileID: 2739214424016785584, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
+  submitReference: {fileID: 8772204883310439263, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
+  defaultInputActions: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   inputManagerActivated: 0
   doesPlayerChooseCoin: 0
   headsOrTailsPlayer: 
@@ -71,6 +75,7 @@ MonoBehaviour:
   qeTime: 0
   teamName: 
   doesTeamHaveBall: 0
+  isTeamGrey: 0
   myPowerUps: []
   serverPowerUpUints: 
   powerUpSelectedIndexNumber: 0
@@ -92,6 +97,14 @@ MonoBehaviour:
   kickAfterPositioningEnabled: 0
   kickAfterKickingEnabled: 0
   powerUpsEnabled: 0
+  menuNavigationEnabled: 0
+  possessionPoints: 0
+  gainPossessionPointsRate: 2.5
+  isGainingPossesionPointsRoutineRunning: 0
+  isLosingPossesionPointsRoutineRunning: 0
+  isNoPossessionCooldownRoutineRunning: 0
+  didNoPossessionCooldownRoutineComplete: 0
+  possessionBonus: 1
   GreenGrenadierStartingPosition: {x: -9, y: 2.45, z: 0}
   GreenBerserkerStartingPosition: {x: -9, y: -2, z: 0}
   GreenSkirmisherStartingPosition: {x: -9, y: -6.45, z: 0}

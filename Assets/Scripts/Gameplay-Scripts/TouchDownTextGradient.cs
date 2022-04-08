@@ -6,6 +6,7 @@ using TMPro;
 public class TouchDownTextGradient : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI touchDownText;
+    [SerializeField] TextMeshPro textTest;
     [SerializeField] Color color1;
     [SerializeField] Color color2;
     [SerializeField] Color color3;
@@ -49,6 +50,16 @@ public class TouchDownTextGradient : MonoBehaviour
             StartCoroutine(touchDownTextRoutine);
         }
         
+    }
+    public void ActivateYeehawGradient()
+    {
+        if (!isColorChangeRunning)
+        {
+            Debug.Log("ActivateYeehawGradient");
+            IEnumerator touchDownTextRoutine = YeehawGradientRoutine();
+            StartCoroutine(touchDownTextRoutine);
+        }
+
     }
     public IEnumerator GradientRoutine()
     {
@@ -134,5 +145,173 @@ public class TouchDownTextGradient : MonoBehaviour
         touchDownText.colorGradient = new VertexGradient(color2, color3, color4, color1);
         yield return new WaitForSeconds(0.1f);
         isColorChangeRunning = false;
+    }
+    public IEnumerator YeehawGradientRoutine()
+    {
+        Debug.Log("YeehawGradientRoutine: Starting");
+        isColorChangeRunning = true;
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color1, color2, color3, color4);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color4, color1, color2, color3);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color3, color4, color1, color2);
+        yield return new WaitForSeconds(0.1f);
+        textTest.colorGradient = new VertexGradient(color2, color3, color4, color1);
+        yield return new WaitForSeconds(0.1f);
+        isColorChangeRunning = false;
+        this.gameObject.SetActive(false);
+        Debug.Log("YeehawGradientRoutine: Ending");
     }
 }

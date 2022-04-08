@@ -209,7 +209,7 @@ public class LobbyManager : MonoBehaviour
                 break;
             }
         }
-        if (areAllPlayersReady)
+        if (areAllPlayersReady && Game.LobbyPlayers.Count >= Game.minPlayers)
         {
             Debug.Log("CheckIfAllPlayersAreReady: All players are ready!");
             if (localLobbyPlayerScript.IsGameLeader)

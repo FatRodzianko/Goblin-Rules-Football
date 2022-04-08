@@ -7,6 +7,8 @@ using System.Linq;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;   
 
 public class GameplayManager : NetworkBehaviour
 {
@@ -80,6 +82,7 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] TextMeshProUGUI greenTeamScoreText;
     [SerializeField] TextMeshProUGUI greyTeamScoreText;
     [SerializeField] TextMeshProUGUI teamWinnerText;
+    [SerializeField] GameObject GameOverScrollPanelObject;
 
     [Header("UI Stuff")]
     [SerializeField] GameObject PossessionFootballGreen;
@@ -97,6 +100,10 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] public float minY; // -6. 5f
     [SerializeField] public float maxX; // 44. 4f
     [SerializeField] public float minX; // -44. 5f
+
+    [Header("Event System Stuff")]
+    [SerializeField] EventSystem eventSystem;
+    [SerializeField] InputSystemUIInputModule inputSystem;
 
 
     private NetworkManagerGRF game;
@@ -203,6 +210,7 @@ public class GameplayManager : NetworkBehaviour
                 PowerUpManager.instance.StartGeneratingPowerUps(true);
                 RandomEventManager.instance.StartGeneratingRandomEvents(true);
                 ObstacleManager.instance.DisableCollidersOnObjects(true);
+                CowboyManager.instance.StartGeneratingCowboys(true);
                 EnableGoblinCollidersOnServer(true);
                 if (isXtraTime)
                     isXtraTime = false;
@@ -212,6 +220,7 @@ public class GameplayManager : NetworkBehaviour
                 PowerUpManager.instance.StartGeneratingPowerUps(false);
                 RandomEventManager.instance.StartGeneratingRandomEvents(false);
                 ObstacleManager.instance.DisableCollidersOnObjects(false);
+                CowboyManager.instance.StartGeneratingCowboys(false);
                 EnableGoblinCollidersOnServer(false);
             }                
             if (newValue == "kick-after-attempt")
@@ -255,6 +264,8 @@ public class GameplayManager : NetworkBehaviour
             {
                 Debug.Log("GameplayManager on Server: It's game over!");
                 DetermineWinnerOfGame();
+                ActivateGameplayControls(false);
+                ActivateMenuNavigationControls(true);
             }
             
         }            
@@ -321,6 +332,14 @@ public class GameplayManager : NetworkBehaviour
         foreach (GamePlayer player in Game.GamePlayers)
         {
             player.RpcActivateGameplayControls(activate);
+        }
+    }
+    [Server]
+    void ActivateMenuNavigationControls(bool activate)
+    {
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            player.RpcActivateMenuNavigationControls(activate);
         }
     }
     [Server]
@@ -772,22 +791,24 @@ public class GameplayManager : NetworkBehaviour
         greenTeamScoreText.text = greenScore.ToString();
         greyTeamScoreText.text = greyScore.ToString();
         GameOverScorePanel.SetActive(true);
+        
         if (winnerOfGame == "green")
         {
             teamWinnerText.text = "GREEN WINS!!!";
-            teamWinnerText.GetComponent<TouchDownTextGradient>().ActivateGradient();
+            //teamWinnerText.GetComponent<TouchDownTextGradient>().ActivateGradient();
         }
         else if (winnerOfGame == "grey")
         {
             teamWinnerText.text = "GREY WINS!!!";
-            teamWinnerText.GetComponent<TouchDownTextGradient>().ActivateGradient();
+            //teamWinnerText.GetComponent<TouchDownTextGradient>().ActivateGradient();
         }
         else if (winnerOfGame == "draw")
         {
             teamWinnerText.text = "IT'S A DRAW...";
             teamWinnerText.GetComponent<TouchDownTextGradient>().SetGreenOrGreyColor(true);
         }
-        
+        GameOverScrollPanelObject.GetComponent<ImageAnimation>().UnScrollEndOfGame(winnerOfGame);
+
     }
     [Server]
     public void DidWinningGoblinDiveInXtraTimeToEndGame(bool isGoblinGrey)
@@ -952,6 +973,7 @@ public class GameplayManager : NetworkBehaviour
         RpcHalfTimeTransition(true, kickingPlayer.teamName);
         yield return new WaitForSeconds(7f);
         RpcHalfTimeTransition(false, kickingPlayer.teamName);
+        yield return new WaitForSeconds(1f);
         this.firstHalfCompleted = true;
         ResetAllGoblinStatuses();
         this.HandleGamePhase(this.gamePhase, "kickoff");
@@ -960,10 +982,16 @@ public class GameplayManager : NetworkBehaviour
     [ClientRpc]
     void RpcHalfTimeTransition(bool enable, string kickingTeam)
     {
+        Debug.Log("RpcHalfTimeTransition: enable? " + enable.ToString());
         theFinalScoreText.text = "End of First Half. " + kickingTeam + " will kick to start the Second Half.";
         greenTeamScoreText.text = greenScore.ToString();
         greyTeamScoreText.text = greyScore.ToString();
-        GameOverScorePanel.SetActive(enable);
+        if(enable)
+            GameOverScorePanel.SetActive(enable);
+        if(enable)
+            GameOverScrollPanelObject.GetComponent<ImageAnimation>().UnScrollHalfTime();
+        else
+            GameOverScrollPanelObject.GetComponent<ImageAnimation>().ReRollScroll();
     }
     [ServerCallback]
     void StopPossessionRoutinesForPlayers()
@@ -981,5 +1009,13 @@ public class GameplayManager : NetworkBehaviour
             PossessionBarGreen.GetComponent<PossessionBar>().UpdatePossessionBar(possession);
         else
             PossessionBarGrey.GetComponent<PossessionBar>().UpdatePossessionBar(possession);
+    }
+    public void MainMenuButton()
+    {
+        LocalGamePlayerScript.ExitToMainMenu();
+    }
+    public void ExitToDesktopButton()
+    {
+        Application.Quit();
     }
 }

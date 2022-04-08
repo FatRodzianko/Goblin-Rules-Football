@@ -17,6 +17,12 @@ TextureImporter:
   - first:
       213: -1892686510357262445
     second: smoking-cowboy-walking_4
+  - first:
+      213: -2239391763480437382
+    second: smoking-cowboy-walking_5
+  - first:
+      213: 1928665151641787358
+    second: smoking-cowboy-walking_6
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -206,6 +212,48 @@ TextureImporter:
       bones: []
       spriteID: 39f4bfe85a3dbb5e0800000000000000
       internalID: -1892686510357262445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: smoking-cowboy-walking_5
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 0
+        width: 16
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7d10d05e051ce0e0800000000000000
+      internalID: -2239391763480437382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: smoking-cowboy-walking_6
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 16
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: edb9846acbef3ca10800000000000000
+      internalID: 1928665151641787358
       vertices: []
       indices: 
       edges: []

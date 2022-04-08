@@ -150,7 +150,7 @@ public class CoinTossManager : NetworkBehaviour
         string result = headsTails[rng.Next(headsTails.Length)];
 
         Debug.Log("FlipCoin: " + result);
-        HandleHeadsOrTailsOnServer(headsOrTailsServer, "tails");
+        HandleHeadsOrTailsOnServer(headsOrTailsServer, result);
     }
     void HandleHeadsOrTailsOnServer(string oldValue, string newValue)
     {

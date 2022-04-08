@@ -22,6 +22,8 @@ TagManager:
   - tripObject
   - footballLandingTarget
   - teamObject
+  - cowboy
+  - mainMenuButton
   layers:
   - Default
   - TransparentFX

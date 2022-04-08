@@ -783,6 +783,7 @@ MonoBehaviour:
   defenseModifier: 0
   speedModifierFromPowerUps: 1
   slowDownObstacleModifier: 1
+  possessionSpeedBonus: 1
   isCharacterSelected: 0
   isQGoblin: 0
   isEGoblin: 0
@@ -868,10 +869,10 @@ MonoBehaviour:
   speedNormal: 0
   state: 0
   punchRange: 2
-  punchRate: 1
+  punchRate: 1.75
   nextPunchTime: 0
   slideRange: 3.5
-  slideRate: 2.5
+  slideRate: 4
   nextSlideTime: 0
   minDistanceFromTarget: 1.5
   punchYMax: 1.1

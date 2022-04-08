@@ -1024,7 +1024,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7248241285292473032, guid: f1860f60764b4524ca601f38c3de6418, type: 3}
   m_PrefabInstance: {fileID: 543682785}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1142487430}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 023388a2e14ac9a4e83601c6c83ba5ea, type: 3}
@@ -1781,6 +1781,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7248241285292473032, guid: f1860f60764b4524ca601f38c3de6418, type: 3}
+      propertyPath: minPlayers
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7248241285292473032, guid: f1860f60764b4524ca601f38c3de6418, type: 3}
       propertyPath: onlineScene
       value: Assets/Scenes/LobbyScene.unity
       objectReference: {fileID: 0}
@@ -1800,6 +1804,10 @@ PrefabInstance:
       propertyPath: WaitingForPlayersCanvas
       value: 
       objectReference: {fileID: 2342166639519145750, guid: f0686eca83607064299e7e8ce9ee42ce, type: 3}
+    - target: {fileID: 7248241285292473032, guid: f1860f60764b4524ca601f38c3de6418, type: 3}
+      propertyPath: PersistNetworkManagerToOfflineScene
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7248241285292473035, guid: f1860f60764b4524ca601f38c3de6418, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -2516,6 +2524,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1106801599}
   m_CullTransparentMesh: 1
+--- !u!1 &1142487430 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7248241285292473039, guid: f1860f60764b4524ca601f38c3de6418, type: 3}
+  m_PrefabInstance: {fileID: 543682785}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1142487431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142487430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8aea0e7e97cb8345883cb2051d27fc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1317329227
 GameObject:
   m_ObjectHideFlags: 0

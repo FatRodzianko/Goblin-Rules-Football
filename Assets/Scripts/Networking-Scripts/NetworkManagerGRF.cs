@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class NetworkManagerGRF : NetworkManager
 {
-    [SerializeField] public int minPlayers = 1;
+    [SerializeField] public int minPlayers = 2;
     [SerializeField] private LobbyPlayer lobbyPlayerPrefab;
     [SerializeField] private GamePlayer gamePlayerPrefab;
     

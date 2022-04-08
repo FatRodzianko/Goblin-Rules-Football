@@ -749,6 +749,14 @@ public class GoblinScript : NetworkBehaviour
         }
 
     }
+    public void FlipRenderer(bool flip)
+    { 
+        if(hasAuthority)
+        {
+            if (this.myRenderer.flipX != flip)
+                CmdFlipRenderer(flip);
+        }
+    }
     [Command]
     void CmdFlipRenderer(bool flip)
     {

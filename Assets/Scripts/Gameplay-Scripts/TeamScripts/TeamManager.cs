@@ -175,4 +175,18 @@ public class TeamManager : NetworkBehaviour
             }
         }
     }
+    public void YeehawCowboy(GamePlayer player)
+    {
+        if (player != null)
+        {
+            foreach (Team team in teams)
+            {
+                if (team.isGrey == player.isTeamGrey && team.teamPlayers.Contains(player))
+                {
+                    team.cowboysYeehawed += 1;
+                    team.SendYeehawsToTeammates();
+                }
+            }
+        }
+    }
 }

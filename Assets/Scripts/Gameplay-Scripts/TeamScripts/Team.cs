@@ -11,22 +11,22 @@ public class Team : NetworkBehaviour
     
 
     [Header("Team Stats")]
-    [SyncVar] public int punchesThrown;
-    [SyncVar] public int punchesHit;
-    [SyncVar] public int slideTackles;
-    [SyncVar] public int slideTacklesHit;
-    [SyncVar] public int kicksDownfield;
-    [SyncVar] public int passesThrown;
-    [SyncVar] public int powerUpsCollected;
-    [SyncVar] public int powerUpsUsed;
-    [SyncVar] public int cowboysYeehawed;
-    [SyncVar] public int timesKnockedOut;
+    [SyncVar] public int punchesThrown; //
+    [SyncVar] public int punchesHit; //
+    [SyncVar] public int slideTackles; //
+    [SyncVar] public int slideTacklesHit; //
+    [SyncVar] public int kicksDownfield; // 
+    [SyncVar] public int passesThrown; // 
+    [SyncVar] public int powerUpsCollected; // 
+    [SyncVar] public int powerUpsUsed; // 
+    [SyncVar] public int cowboysYeehawed; //
+    [SyncVar] public int timesKnockedOut; // 
     [SyncVar] public int timesTripped;
-    [SyncVar] public int touchdownsScored;
-    [SyncVar] public int kickAfterAttempts;
-    [SyncVar] public int kickAfterAttemptsMade;
-    [SyncVar] public int kicksBlocked;
-    [SyncVar] public int fumbles;
+    [SyncVar] public int touchdownsScored; //
+    [SyncVar] public int kickAfterAttempts; //
+    [SyncVar] public int kickAfterAttemptsMade; //
+    [SyncVar] public int kicksBlocked; //
+    [SyncVar] public int fumbles; // 
 
     // Start is called before the first frame update
     void Start()
@@ -46,5 +46,20 @@ public class Team : NetworkBehaviour
         {
             teamPlayers.Add(player);
         }
+    }
+    [ServerCallback]
+    public void SendYeehawsToTeammates()
+    {
+        foreach (GamePlayer player in teamPlayers)
+        {
+            RpcPlayYeehawSound(player.connectionToClient);
+        }
+    }
+    [TargetRpc]
+    void RpcPlayYeehawSound(NetworkConnection target)
+    {
+        Debug.Log("RpcPlayYeehawSound: placeholder until YEEHAW sound is added");
+        CowboyScript cowboy = GameObject.FindGameObjectWithTag("cowboy").GetComponent<CowboyScript>();
+        cowboy.ActivateYeehawText();
     }
 }
