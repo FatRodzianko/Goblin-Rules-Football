@@ -375,6 +375,7 @@ public class GoblinScript : NetworkBehaviour
                 if (newValue)
                 {
                     //rb.bodyType = RigidbodyType2D.Dynamic;
+                    Debug.Log("HandleCharacterSelected: Following new selected character");
                     myGamePlayer.FollowSelectedGoblin(this.transform);
                 }
                 else
@@ -1364,11 +1365,12 @@ public class GoblinScript : NetworkBehaviour
                         CmdStopThrowing();
                     if (isSliding)
                     {
-                        isSliding = false;
+                        /*isSliding = false;
                         slideSpeedModifer = 1.0f;
                         slideDirection = Vector2.zero;
-                        isSlidingRoutineRunning = false;
                         StopCoroutine(isSlidingRoutine);
+                        isSlidingRoutineRunning = false;*/
+                        CmdStopSliding();
                     }
                     if (isKicking)
                         CmdStopKicking();
@@ -1378,6 +1380,15 @@ public class GoblinScript : NetworkBehaviour
 
             }
         }
+    }
+    [Command]
+    void CmdStopSliding()
+    {
+        isSliding = false;
+        slideSpeedModifer = 1.0f;
+        slideDirection = Vector2.zero;
+        StopCoroutine(isSlidingRoutine);
+        isSlidingRoutineRunning = false;
     }
     public void GoblinPickUpFootball()
     {
@@ -1431,7 +1442,7 @@ public class GoblinScript : NetworkBehaviour
     [Command]
     void CmdSlideGoblin(Vector2 directionToSlide)
     {
-        if (isRunningOnServer && directionToSlide != Vector2.zero && !doesCharacterHaveBall && !isSliding && !isFatigued && !isPunching)
+        if (isRunningOnServer && directionToSlide != Vector2.zero && !doesCharacterHaveBall && !isSliding && !isFatigued && !isPunching && !isGoblinKnockedOut)
         {
             Debug.Log("CmdSlideGoblin: Goblin will slide in direction of: " + directionToSlide.ToString());
             slideDirection = directionToSlide;
@@ -1452,7 +1463,6 @@ public class GoblinScript : NetworkBehaviour
             isSliding = newValue;
         if (isClient)
         {
-
             if (hasAuthority)
             {
                 animator.SetBool("isSliding", newValue);
@@ -1621,6 +1631,8 @@ public class GoblinScript : NetworkBehaviour
             // stop player from sprinting when blocking
             if (isSprinting)
                 IsPlayerSprinting(false);
+            if (isKicking)
+                CmdStopKicking();
         }
             
     }

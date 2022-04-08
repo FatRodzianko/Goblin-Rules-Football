@@ -480,7 +480,7 @@ public class GamePlayer : NetworkBehaviour
                 currentSelectedGoblin.ThrowBall(currentQGoblin);
                 IEnumerator stopSwitch = PreventGoblinSwitch();
                 StartCoroutine(stopSwitch);
-                FollowSelectedGoblin(GameObject.FindGameObjectWithTag("football").transform);
+                //FollowSelectedGoblin(GameObject.FindGameObjectWithTag("football").transform);
             }
             else
             {
@@ -532,10 +532,12 @@ public class GamePlayer : NetworkBehaviour
 
                 IEnumerator stopSwitch = PreventGoblinSwitch();
                 StartCoroutine(stopSwitch);
-                FollowSelectedGoblin(GameObject.FindGameObjectWithTag("football").transform);
+                Debug.Log("SwitchToEGoblin: Throwing: set the football to follow");
+                //FollowSelectedGoblin(GameObject.FindGameObjectWithTag("football").transform);
             }
             else
             {
+                Debug.Log("SwitchToEGoblin: Throwing: set the GOBLIN to follow");
                 FollowSelectedGoblin(selectGoblin.transform);
             }
             Debug.Log("SwitchToEGoblin switching to goblin: " + selectGoblin.name);
