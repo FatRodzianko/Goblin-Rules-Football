@@ -735,16 +735,16 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    //MoveTowardFootball();
+                    MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    //MoveTowrdBallCarrier();
+                    MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    //GetOpenForPass();
+                    GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    //MoveTowardGoblinTarget();
+                    MoveTowardGoblinTarget();
                     break;
             }
         }

@@ -4,11 +4,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class TitleScreenManager : MonoBehaviour
 {
     public static TitleScreenManager instance;
     [SerializeField] private NetworkManagerGRF networkManager;
+    [SerializeField] EventSystem eventSystem;
 
     [Header("Panels")]
     [SerializeField] private GameObject mainMenuPanel;
@@ -27,6 +29,12 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private Button returnToMainMenu;
 
     private const string PlayerPrefsNameKey = "PlayerName";
+
+    [Header("First Selected UI stuff?")]
+    [SerializeField] GameObject startGameButton;
+    [SerializeField] GameObject confirmNameButton;
+    [SerializeField] GameObject hostGameButton;
+    [SerializeField] GameObject connectToIPButton;
 
     private void Awake()
     {
@@ -56,12 +64,14 @@ public class TitleScreenManager : MonoBehaviour
         HostOrJoinPanel.SetActive(false);
         EnterIPAddressPanel.SetActive(false);
         returnToMainMenu.gameObject.SetActive(false);
+        eventSystem.SetSelectedGameObject(startGameButton, new BaseEventData(eventSystem));
     }
     public void StartGame()
     {
         //SceneManager.LoadScene("Gameplay");
         mainMenuPanel.SetActive(false);
         PlayerNamePanel.SetActive(true);
+        eventSystem.SetSelectedGameObject(confirmNameButton, new BaseEventData(eventSystem));
         GetSavedPlayerName();
         returnToMainMenu.gameObject.SetActive(true);
     }
@@ -81,6 +91,17 @@ public class TitleScreenManager : MonoBehaviour
             PlayerPrefs.SetString(PlayerPrefsNameKey, playerName);
             PlayerNamePanel.SetActive(false);
             HostOrJoinPanel.SetActive(true);
+            eventSystem.SetSelectedGameObject(hostGameButton, new BaseEventData(eventSystem));
+        }
+        else if (string.IsNullOrEmpty(playerNameInputField.text))
+        {
+            // this is for if the player is using a gamepad and cant enter input?
+            int ranNumber = Random.Range(1, 70);
+            playerName = "NoName" + ranNumber.ToString();
+            PlayerPrefs.SetString(PlayerPrefsNameKey, playerName);
+            PlayerNamePanel.SetActive(false);
+            HostOrJoinPanel.SetActive(true);
+            eventSystem.SetSelectedGameObject(hostGameButton, new BaseEventData(eventSystem));
         }
         GamepadUIManager.instance.gamepadUI = GamepadToggle.isOn;
     }
@@ -95,6 +116,7 @@ public class TitleScreenManager : MonoBehaviour
     {
         HostOrJoinPanel.SetActive(false);
         EnterIPAddressPanel.SetActive(true);
+        eventSystem.SetSelectedGameObject(connectToIPButton, new BaseEventData(eventSystem));
     }
     public void ConnectToGame()
     {
