@@ -402,6 +402,7 @@ MonoBehaviour:
   qMarkerPrefab: {fileID: 7215489222767727815, guid: f42ce2cbcc7b04f4db61749caeea4077, type: 3}
   ballMarkerPrefab: {fileID: 8734951556259946270, guid: 3e694e23f835fe5429d3b9e0adbe80e7, type: 3}
   ballMarkerOpponentPrefab: {fileID: 8646642381975776926, guid: f48f3944d41465d43a09cde197662e18, type: 3}
+  youMarkerPrefab: {fileID: 2365294622797267576, guid: 9dd0ec51e5d8d7b41854ab9f06a96426, type: 3}
   animator: {fileID: 2813347414334592408}
   rb: {fileID: 2557221095958938091}
   playerCollider: {fileID: 2744254212339382137}

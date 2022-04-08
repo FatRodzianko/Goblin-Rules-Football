@@ -68,6 +68,8 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] private GameObject ballMarkerPrefab;
     [SerializeField] private GameObject ballMarkerOpponentPrefab;
     private GameObject ballMarkerObject;
+    [SerializeField] private GameObject youMarkerPrefab;
+    private GameObject youMarkerObject;
 
     [Header("Character Properties")]    
     public Animator animator;
@@ -311,7 +313,11 @@ public class GoblinScript : NetworkBehaviour
         //rb.bodyType = RigidbodyType2D.Kinematic;
 
         if (hasAuthority)
+        {
             ballMarkerObject = Instantiate(ballMarkerPrefab);
+            youMarkerObject = Instantiate(youMarkerPrefab);
+            
+        }   
         else
             ballMarkerObject = Instantiate(ballMarkerOpponentPrefab);
         ballMarkerObject.transform.SetParent(this.transform);
@@ -319,6 +325,12 @@ public class GoblinScript : NetworkBehaviour
         markerPosition.y += 0.75f;
         ballMarkerObject.transform.localPosition = markerPosition;
         ballMarkerObject.SetActive(false);
+        if (hasAuthority)
+        {
+            youMarkerObject.transform.SetParent(this.transform);
+            youMarkerObject.transform.localPosition = markerPosition;
+            youMarkerObject.SetActive(false);
+        }
     }
     // Start is called before the first frame update
     private void Awake()
@@ -387,6 +399,8 @@ public class GoblinScript : NetworkBehaviour
                         animator.SetBool("isRunning", isRunning);
                     }
                 }
+                if(!this.doesCharacterHaveBall && youMarkerObject != null)
+                    youMarkerObject.SetActive(newValue);
             }
         }
     }
@@ -735,16 +749,16 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    MoveTowrdBallCarrier();
+                    //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
                     GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    MoveTowardGoblinTarget();
+                    //MoveTowardGoblinTarget();
                     break;
             }
         }
@@ -848,6 +862,10 @@ public class GoblinScript : NetworkBehaviour
                 animator.SetBool("withFootball", newValue);
                 CmdCheckIfTeamStillHasBall();
                 CmdSetBallCarrySpeedModifier();
+                if(newValue && youMarkerObject != null)
+                    youMarkerObject.SetActive(false);
+                else if(!newValue && this.isCharacterSelected && youMarkerObject != null)
+                    youMarkerObject.SetActive(true);
             }
             if (newValue)
             {
