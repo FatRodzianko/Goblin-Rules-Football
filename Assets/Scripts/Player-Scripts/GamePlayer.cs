@@ -21,6 +21,10 @@ public class GamePlayer : NetworkBehaviour
     [SerializeField] InputActionReference submitReference;
     [SerializeField] InputActionAsset defaultInputActions;
 
+    [Header("1v1 or 3v3 stuff")]
+    [SyncVar] public bool is1v1 = false;
+    [SyncVar] public string goblinType;
+
     [Header("Coin Toss Info")]
     public bool inputManagerActivated = false;
     [SyncVar(hook = nameof(HandleDoesPlayerChooseCoin))] public bool doesPlayerChooseCoin;

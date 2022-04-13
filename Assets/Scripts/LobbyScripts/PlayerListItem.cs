@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using TMPro;
-
+using System;
 
 public class PlayerListItem : MonoBehaviour
 {
@@ -14,12 +14,15 @@ public class PlayerListItem : MonoBehaviour
     public bool isPlayerReady;
     //public ulong playerSteamId;
     //private bool avatarRetrieved;
+    public bool isTeamGrey;
 
     [SerializeField] private TextMeshProUGUI PlayerNameText;
     [SerializeField] private TextMeshProUGUI PlayerReadyStatus;
     [SerializeField] private RawImage playerAvatar;
     [SerializeField] Color readyColor;
     [SerializeField] Color notReadyColor;
+    [SerializeField] private GameObject GoblinTypeDropdown;
+    [SerializeField] private TextMeshProUGUI goblinSelected;
 
     public GameObject localLobbyPlayerObject;
     public LobbyPlayer localLobbyPlayerScript;
@@ -30,7 +33,8 @@ public class PlayerListItem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        FindLocalLobbyPlayer();
+        IsThisForLocalLobbyPlayer();
     }
 
     // Update is called once per frame
@@ -63,6 +67,67 @@ public class PlayerListItem : MonoBehaviour
         localLobbyPlayerObject = GameObject.Find("LocalLobbyPlayer");
         localLobbyPlayerScript = localLobbyPlayerObject.GetComponent<LobbyPlayer>();
         isLocalPlayerFoundYet = true;
+    }
+    public void IsThisForLocalLobbyPlayer()
+    {
+        if (this.PlayerName == localLobbyPlayerScript.PlayerName && this.ConnectionId == localLobbyPlayerScript.ConnectionId)
+        {
+            if (localLobbyPlayerScript.myPlayerListItem == null)
+                localLobbyPlayerScript.myPlayerListItem = this;
+            ActivateGoblinDropdown();
+        }
+        else
+        {
+            if (!LobbyManager.instance.is1v1)
+            {
+                GoblinTypeDropdown.SetActive(false);
+                //goblinSelected.gameObject.SetActive(false);
+                //Debug.Log("ActivateGoblinSelectedText: IsThisForLocalLobbyPlayer");
+            }
+                
+        }
+    }
+    public void ActivateGoblinDropdown()
+    {
+        if (!LobbyManager.instance.is1v1)
+        {
+            if (localLobbyPlayerScript.isGoblinSelected)
+            {
+                GoblinTypeDropdown.SetActive(false);
+                goblinSelected.gameObject.SetActive(true);
+            }
+            else
+            {
+                GoblinTypeDropdown.SetActive(true);
+                goblinSelected.gameObject.SetActive(false);
+            }
+        }
+    }
+    public void SelectGoblinButton()
+    {
+        if (this.PlayerName == localLobbyPlayerScript.PlayerName && this.ConnectionId == localLobbyPlayerScript.ConnectionId)
+        {
+            int dropDownIndex = GoblinTypeDropdown.GetComponent<TMP_Dropdown>().value;
+            string goblinSelected = GoblinTypeDropdown.GetComponent<TMP_Dropdown>().options[dropDownIndex].text;
+            Debug.Log("SelectGoblinButton: Index of dropdown: " + dropDownIndex.ToString() + " and the text at that index: " + goblinSelected);
+            localLobbyPlayerScript.SelectGoblin(goblinSelected);
+        }
+    }
+    public void SetGoblinSelectedText(string selectedGoblinText)
+    {
+        Debug.Log("SetGoblinSelectedText: for playerlistitem for player: " + this.PlayerName + " set the goblin text to: " + selectedGoblinText);
+        goblinSelected.text = selectedGoblinText;
+    }
+    public void ActivateGoblinSelectedText(bool enable)
+    {
+        Debug.Log("ActivateGoblinSelectedText: for player: " + this.PlayerName + " enable goblin selected text? " + enable.ToString());
+        goblinSelected.gameObject.SetActive(enable);
+    }
+    public void UpdateGoblinsAvailable(List<string> goblinsAvailable)
+    {
+        Debug.Log("UpdateGoblinsAvailable: Number in list: " + goblinsAvailable.Count.ToString());
+        GoblinTypeDropdown.GetComponent<TMP_Dropdown>().ClearOptions();
+        GoblinTypeDropdown.GetComponent<TMP_Dropdown>().AddOptions(goblinsAvailable);
     }
     /*void GetPlayerAvatar()
     {
@@ -112,4 +177,30 @@ public class PlayerListItem : MonoBehaviour
             return;
         }
     }*/
+    public void SetPlayerTeam(bool isGrey)
+    {
+        Debug.Log("SetPlayerTeam: To Grey? " + isGrey.ToString() + " for player: " + this.PlayerName + " " + this.ConnectionId);
+        if (this.isTeamGrey != isGrey)
+        {
+            this.isTeamGrey = isGrey;
+            if (isLocalPlayerFoundYet)
+            {
+                if(this.ConnectionId == localLobbyPlayerScript.ConnectionId)
+                    localLobbyPlayerScript.UpdateTeam(isGrey);
+            }
+            else
+            {
+                try
+                {
+                    LobbyPlayer playerScript = GameObject.Find("LocalLobbyPlayer").GetComponent<LobbyPlayer>();
+                    if (playerScript.ConnectionId == this.ConnectionId)
+                        playerScript.UpdateTeam(isGrey);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("SetPlayerTeam: " + e);
+                }
+            }
+        }
+    }
 }

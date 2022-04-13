@@ -16,6 +16,7 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI LobbyNameText;
     [SerializeField] private GameObject ContentPanel;
     [SerializeField] private GameObject PlayerListItemPrefab;
+    [SerializeField] private GameObject PlayerListItem3v3Prefab;
     [SerializeField] private Button ReadyUpButton;
     [SerializeField] private Button StartGameButton;
 
@@ -23,6 +24,30 @@ public class LobbyManager : MonoBehaviour
     private List<PlayerListItem> playerListItems = new List<PlayerListItem>();
     public GameObject localLobbyPlayerObject;
     public LobbyPlayer localLobbyPlayerScript;
+
+    [Header("1v1 or 3v3")]
+    public bool is1v1 = false;
+
+
+    [Header("1v1 UI")]
+    [SerializeField] GameObject panel1v1;
+
+    [Header("3v3 UI")]
+    [SerializeField] GameObject panel3v3;
+    [SerializeField] GameObject greenContentPanel;
+    [SerializeField] GameObject greyContentPanel;
+    private List<PlayerListItem> greenPlayerListItems = new List<PlayerListItem>();
+    private List<PlayerListItem> greyPlayerListItems = new List<PlayerListItem>();
+    [SerializeField] GameObject GreenChangeGoblinButton;
+    [SerializeField] GameObject GreyChangeGoblinButton;
+
+    [Header("3v3 Team Stuff?")]
+    public List<string> GreenGoblinsAvailable = new List<string>() { "Grenadier", "Berserker", "Skirmisher" };
+    public List<string> GreyGoblinsAvailable = new List<string>() { "Grenadier", "Berserker", "Skirmisher" };
+    public List<string> GreenGoblinsSelected = new List<string>();
+    public List<string> GreyGoblinsSelected = new List<string>();
+    public List<LobbyPlayer> GreenTeamMembers = new List<LobbyPlayer>();
+    public List<LobbyPlayer> GreyTeamMembers = new List<LobbyPlayer>();
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -40,10 +65,10 @@ public class LobbyManager : MonoBehaviour
     private void Awake()
     {
         MakeInstance();
-        ReadyUpButton.gameObject.SetActive(true);
+        
         ReadyUpButton.GetComponentInChildren<TextMeshProUGUI>().text = "Ready up";
         StartGameButton.gameObject.SetActive(false);
-        FindLobbiesPanel.SetActive(true);
+        //FindLobbiesPanel.SetActive(true);
     }
     // Start is called before the first frame update
     void Start()
@@ -65,6 +90,26 @@ public class LobbyManager : MonoBehaviour
     {
         localLobbyPlayerObject = GameObject.Find("LocalLobbyPlayer");
         localLobbyPlayerScript = localLobbyPlayerObject.GetComponent<LobbyPlayer>();
+        this.is1v1 = localLobbyPlayerScript.is1v1;
+        ReadyUpButton.gameObject.SetActive(this.is1v1);
+        Activate1v1or3v3Panels();
+        /*if (!this.is1v1)
+            localLobbyPlayerScript.StartUpdateTeamListsOnLobbyManager();*/
+    }
+    void Activate1v1or3v3Panels()
+    {
+        if (is1v1)
+        {
+            panel1v1.SetActive(true);
+            panel3v3.SetActive(false);
+        }
+        else
+        {
+            panel1v1.SetActive(false);
+            panel3v3.SetActive(true);
+            ActivateChangeGoblinButton();
+        }
+            
     }
     public void UpdateLobbyName()
     {
@@ -94,32 +139,9 @@ public class LobbyManager : MonoBehaviour
         Debug.Log("Executing CreatePlayerListItems. This many players to create: " + Game.LobbyPlayers.Count.ToString());
         foreach (LobbyPlayer player in Game.LobbyPlayers)
         {
-            Debug.Log("CreatePlayerListItems: Creating playerlistitem for player: " + player.PlayerName);
-            GameObject newPlayerListItem = Instantiate(PlayerListItemPrefab) as GameObject;
-            PlayerListItem newPlayerListItemScript = newPlayerListItem.GetComponent<PlayerListItem>();
-
-            newPlayerListItemScript.PlayerName = player.PlayerName;
-            newPlayerListItemScript.ConnectionId = player.ConnectionId;
-            newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
-            //newPlayerListItemScript.playerSteamId = player.playerSteamId;
-            newPlayerListItemScript.SetPlayerListItemValues();
-
-
-            newPlayerListItem.transform.SetParent(ContentPanel.transform);
-            newPlayerListItem.transform.localScale = Vector3.one;
-
-            playerListItems.Add(newPlayerListItemScript);
-        }
-        havePlayerListItemsBeenCreated = true;
-    }
-    private void CreateNewPlayerListItems()
-    {
-        Debug.Log("Executing CreateNewPlayerListItems");
-        foreach (LobbyPlayer player in Game.LobbyPlayers)
-        {
-            if (!playerListItems.Any(b => b.ConnectionId == player.ConnectionId))
+            if (is1v1 || player.is1v1)
             {
-                Debug.Log("CreateNewPlayerListItems: Player not found in playerListItems: " + player.PlayerName);
+                Debug.Log("CreatePlayerListItems:  1v1 playerlistitem for player: " + player.PlayerName);
                 GameObject newPlayerListItem = Instantiate(PlayerListItemPrefab) as GameObject;
                 PlayerListItem newPlayerListItemScript = newPlayerListItem.GetComponent<PlayerListItem>();
 
@@ -134,6 +156,207 @@ public class LobbyManager : MonoBehaviour
                 newPlayerListItem.transform.localScale = Vector3.one;
 
                 playerListItems.Add(newPlayerListItemScript);
+            }
+            else
+            {
+                Debug.Log("CreatePlayerListItems:  3v3 playerlistitem for player: " + player.PlayerName);
+                GameObject newPlayerListItem = Instantiate(PlayerListItem3v3Prefab) as GameObject;
+                PlayerListItem newPlayerListItemScript = newPlayerListItem.GetComponent<PlayerListItem>();
+
+                newPlayerListItemScript.PlayerName = player.PlayerName;
+                newPlayerListItemScript.ConnectionId = player.ConnectionId;
+                newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
+                //newPlayerListItemScript.playerSteamId = player.playerSteamId;
+                newPlayerListItemScript.SetPlayerListItemValues();
+                /*if (player.isGoblinSelected && !string.IsNullOrWhiteSpace(player.goblinType))
+                {
+                    newPlayerListItemScript.ActivateGoblinSelectedText(player.isGoblinSelected);
+                    newPlayerListItemScript.SetGoblinSelectedText(player.goblinType);
+                }*/
+
+                /*if (player.IsGameLeader)
+                {
+                    Debug.Log("CreatePlayerListItems:  3v3 playerlistitem player is game leader: " + player.PlayerName);
+                    newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                    newPlayerListItem.transform.localScale = Vector3.one;
+                    greenPlayerListItems.Add(newPlayerListItemScript);
+                    newPlayerListItemScript.SetPlayerTeam(false);
+                }
+                else
+                {
+                    if (greenPlayerListItems.Count > greyPlayerListItems.Count)
+                    {
+                        Debug.Log("CreatePlayerListItems:  3v3 playerlistitem more green team member than grey: "+ greenPlayerListItems.Count.ToString() +" " + greyPlayerListItems.Count.ToString() + " " + player.PlayerName);
+                        newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                        newPlayerListItem.transform.localScale = Vector3.one;
+                        greyPlayerListItems.Add(newPlayerListItemScript);
+                        newPlayerListItemScript.SetPlayerTeam(true);
+                    }
+                    else if (greenPlayerListItems.Count < greyPlayerListItems.Count)
+                    {
+                        Debug.Log("CreatePlayerListItems:  3v3 playerlistitem more grey team member than green: " + greenPlayerListItems.Count.ToString() + " " + greyPlayerListItems.Count.ToString() + " " + player.PlayerName);
+                        newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                        newPlayerListItem.transform.localScale = Vector3.one;
+                        greenPlayerListItems.Add(newPlayerListItemScript);
+                        newPlayerListItemScript.SetPlayerTeam(false);
+                    }
+                    else
+                    {
+                        Debug.Log("CreatePlayerListItems:  3v3 playerlistitem equal number on both teams: " + greenPlayerListItems.Count.ToString() + " " + greyPlayerListItems.Count.ToString() + " " + player.PlayerName);
+                        string[] headsTails = new[]
+                        { "green","grey"};
+                        var rng = new System.Random();
+                        string result = headsTails[rng.Next(headsTails.Length)];
+                        if (result == "green")
+                        {
+                            newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                            newPlayerListItem.transform.localScale = Vector3.one;
+                            greenPlayerListItems.Add(newPlayerListItemScript);
+                            newPlayerListItemScript.SetPlayerTeam(false);
+                        }
+                        else
+                        {
+                            newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                            newPlayerListItem.transform.localScale = Vector3.one;
+                            greyPlayerListItems.Add(newPlayerListItemScript);
+                            newPlayerListItemScript.SetPlayerTeam(true);
+                        }
+                    }
+                }*/
+                /*newPlayerListItem.transform.SetParent(ContentPanel.transform);
+                newPlayerListItem.transform.localScale = Vector3.one;*/
+
+                if (player.isTeamGrey)
+                {
+                    newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                    newPlayerListItem.transform.localScale = Vector3.one;
+                    if (!greyPlayerListItems.Contains(newPlayerListItemScript))
+                        greyPlayerListItems.Add(newPlayerListItemScript);
+                }
+                else
+                {
+                    newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                    newPlayerListItem.transform.localScale = Vector3.one;
+                    if (!greenPlayerListItems.Contains(newPlayerListItemScript))
+                        greenPlayerListItems.Add(newPlayerListItemScript);
+                }
+                playerListItems.Add(newPlayerListItemScript);
+            }
+            
+        }
+        havePlayerListItemsBeenCreated = true;
+    }
+    private void CreateNewPlayerListItems()
+    {
+        Debug.Log("Executing CreateNewPlayerListItems");
+        foreach (LobbyPlayer player in Game.LobbyPlayers)
+        {
+            if (!playerListItems.Any(b => b.ConnectionId == player.ConnectionId))
+            {
+                if (is1v1)
+                {
+                    Debug.Log("CreateNewPlayerListItems: Player not found in 1v1 playerListItems: " + player.PlayerName);
+                    GameObject newPlayerListItem = Instantiate(PlayerListItemPrefab) as GameObject;
+                    PlayerListItem newPlayerListItemScript = newPlayerListItem.GetComponent<PlayerListItem>();
+
+                    newPlayerListItemScript.PlayerName = player.PlayerName;
+                    newPlayerListItemScript.ConnectionId = player.ConnectionId;
+                    newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
+                    //newPlayerListItemScript.playerSteamId = player.playerSteamId;
+                    newPlayerListItemScript.SetPlayerListItemValues();
+
+
+                    newPlayerListItem.transform.SetParent(ContentPanel.transform);
+                    newPlayerListItem.transform.localScale = Vector3.one;
+
+                    playerListItems.Add(newPlayerListItemScript);
+                }
+                else
+                {
+                    Debug.Log("CreateNewPlayerListItems: Player not found in 3v3 playerListItems: " + player.PlayerName);
+                    GameObject newPlayerListItem = Instantiate(PlayerListItem3v3Prefab) as GameObject;
+                    PlayerListItem newPlayerListItemScript = newPlayerListItem.GetComponent<PlayerListItem>();
+
+                    newPlayerListItemScript.PlayerName = player.PlayerName;
+                    newPlayerListItemScript.ConnectionId = player.ConnectionId;
+                    newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
+                    //newPlayerListItemScript.playerSteamId = player.playerSteamId;
+                    newPlayerListItemScript.SetPlayerListItemValues();
+                    playerListItems.Add(newPlayerListItemScript);
+                    /*if (player.isTeamGrey)
+                    {
+                        newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                        newPlayerListItem.transform.localScale = Vector3.one;
+                        if (!greyPlayerListItems.Contains(newPlayerListItemScript))
+                            greyPlayerListItems.Add(newPlayerListItemScript);
+                    }
+                    else
+                    {
+                        newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                        newPlayerListItem.transform.localScale = Vector3.one;
+                        if (!greenPlayerListItems.Contains(newPlayerListItemScript))
+                            greenPlayerListItems.Add(newPlayerListItemScript);
+                    }*/
+                    if (player.IsGameLeader)
+                    {
+                        Debug.Log("CreateNewPlayerListItems:  3v3 playerlistitem player is game leader: " + player.PlayerName);
+                        newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                        newPlayerListItem.transform.localScale = Vector3.one;
+                        if (!greenPlayerListItems.Contains(newPlayerListItemScript))
+                            greenPlayerListItems.Add(newPlayerListItemScript);
+                        newPlayerListItemScript.SetPlayerTeam(false);
+                    }
+                    /*else
+                    {
+                        if (greenPlayerListItems.Count > greyPlayerListItems.Count)
+                        {
+                            Debug.Log("CreateNewPlayerListItems:  3v3 playerlistitem more green team member than grey: " + greenPlayerListItems.Count.ToString() + " " + greyPlayerListItems.Count.ToString() + " " + player.PlayerName);
+                            newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                            newPlayerListItem.transform.localScale = Vector3.one;
+                            if (!greyPlayerListItems.Contains(newPlayerListItemScript))
+                                greyPlayerListItems.Add(newPlayerListItemScript);
+                            newPlayerListItemScript.SetPlayerTeam(true);
+                        }
+                        else if (greenPlayerListItems.Count < greyPlayerListItems.Count)
+                        {
+                            Debug.Log("CreateNewPlayerListItems:  3v3 playerlistitem more grey team member than green: " + greenPlayerListItems.Count.ToString() + " " + greyPlayerListItems.Count.ToString() + " " + player.PlayerName);
+                            newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                            newPlayerListItem.transform.localScale = Vector3.one;
+                            if (!greenPlayerListItems.Contains(newPlayerListItemScript))
+                                greenPlayerListItems.Add(newPlayerListItemScript);
+                            newPlayerListItemScript.SetPlayerTeam(false);
+                        }
+                        else
+                        {
+                            Debug.Log("CreateNewPlayerListItems:  3v3 playerlistitem equal number on both teams: " + greenPlayerListItems.Count.ToString() + " " + greyPlayerListItems.Count.ToString() + " " + player.PlayerName);
+                            string[] headsTails = new[]
+                            { "green","grey"};
+                            var rng = new System.Random();
+                            string result = headsTails[rng.Next(headsTails.Length)];
+                            if (result == "green")
+                            {
+                                newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                                newPlayerListItem.transform.localScale = Vector3.one;
+                                if (!greenPlayerListItems.Contains(newPlayerListItemScript))
+                                    greenPlayerListItems.Add(newPlayerListItemScript);
+                                newPlayerListItemScript.SetPlayerTeam(false);
+                            }
+                            else
+                            {
+                                newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                                newPlayerListItem.transform.localScale = Vector3.one;
+                                if (!greyPlayerListItems.Contains(newPlayerListItemScript))
+                                    greyPlayerListItems.Add(newPlayerListItemScript);
+                                newPlayerListItemScript.SetPlayerTeam(true);
+                            }
+                        }
+                    }*/
+                    /*newPlayerListItem.transform.SetParent(ContentPanel.transform);
+                    newPlayerListItem.transform.localScale = Vector3.one;*/
+
+                    //playerListItems.Add(newPlayerListItemScript);
+                }
+                
             }
         }
 
@@ -175,6 +398,56 @@ public class LobbyManager : MonoBehaviour
 
                     if (player == localLobbyPlayerScript)
                         ChangeReadyUpButtonText();
+                    // If a 3v3 game, check if player changed teams
+                    if (!is1v1)
+                    {
+                        if (player.isTeamGrey != playerListItemScript.isTeamGrey)
+                        {
+                            Debug.Log("UpdatePlayerListItems: ConnectionId: " +player.ConnectionId.ToString() + " Player " + player.PlayerName + "'s team is grey: " + player.isTeamGrey.ToString() + " and their list item is: " + playerListItemScript.isTeamGrey.ToString() + " Updating...");
+                            playerListItemScript.isTeamGrey = player.isTeamGrey;
+                            if (player.isTeamGrey)
+                            {
+                                if (greenPlayerListItems.Contains(playerListItemScript))
+                                    greenPlayerListItems.Remove(playerListItemScript);
+                                if (!greyPlayerListItems.Contains(playerListItemScript))
+                                    greyPlayerListItems.Add(playerListItemScript);
+                                playerListItemScript.gameObject.transform.SetParent(greyContentPanel.transform);
+                                playerListItemScript.gameObject.transform.localScale = Vector3.one;
+                            }
+                            else
+                            {
+                                if (!greenPlayerListItems.Contains(playerListItemScript))
+                                    greenPlayerListItems.Add(playerListItemScript);
+                                if (greyPlayerListItems.Contains(playerListItemScript))
+                                    greyPlayerListItems.Remove(playerListItemScript);
+                                playerListItemScript.gameObject.transform.SetParent(greenContentPanel.transform);
+                                playerListItemScript.gameObject.transform.localScale = Vector3.one;
+                            }
+                            ActivateChangeGoblinButton();
+                        }
+                        if (player.isGoblinSelected && !string.IsNullOrWhiteSpace(player.goblinType))
+                        {
+                            playerListItemScript.ActivateGoblinSelectedText(player.isGoblinSelected);
+                            playerListItemScript.SetGoblinSelectedText(player.goblinType);
+                        }
+                        if (playerListItemScript.gameObject.transform.parent == null)
+                        {
+                            if (player.isTeamGrey)
+                            {
+                                playerListItemScript.gameObject.transform.SetParent(greyContentPanel.transform);
+                                playerListItemScript.gameObject.transform.localScale = Vector3.one;
+                                if (!greyPlayerListItems.Contains(playerListItemScript))
+                                    greyPlayerListItems.Add(playerListItemScript);
+                            }
+                            else
+                            {
+                                playerListItemScript.gameObject.transform.SetParent(greenContentPanel.transform);
+                                playerListItemScript.gameObject.transform.localScale = Vector3.one;
+                                if (!greenPlayerListItems.Contains(playerListItemScript))
+                                    greenPlayerListItems.Add(playerListItemScript);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -224,6 +497,87 @@ public class LobbyManager : MonoBehaviour
                 StartGameButton.gameObject.SetActive(false);
         }
     }
+    public void JoinTeamGreen()
+    {
+        Debug.Log("JoinTeamGreen");
+        localLobbyPlayerScript.UpdateTeam(false);
+    }
+    public void JoinTeamGrey()
+    {
+        Debug.Log("JoinTeamGrey");
+        localLobbyPlayerScript.UpdateTeam(true);
+    }
+    public void ActivateChangeGoblinButton()
+    {
+        Debug.Log("ActivateChangeGoblinButton. Is local lobby player grey? " + localLobbyPlayerScript.isTeamGrey.ToString());
+        if (localLobbyPlayerScript.isGoblinSelected)
+        {
+            ReadyUpButton.gameObject.SetActive(true);
+            if (localLobbyPlayerScript.isTeamGrey)
+            {
+                GreyChangeGoblinButton.SetActive(true);
+                GreyChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Change Goblin";
+                GreenChangeGoblinButton.SetActive(false);
+            }
+            else
+            {
+                GreyChangeGoblinButton.SetActive(false);
+                GreenChangeGoblinButton.SetActive(true);
+                GreenChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Change Goblin";
+            }
+        }
+        else
+        {
+            ReadyUpButton.gameObject.SetActive(false);
+            if (localLobbyPlayerScript.isTeamGrey)
+            {
+                GreyChangeGoblinButton.SetActive(true);
+                GreyChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Select Goblin";
+                GreenChangeGoblinButton.SetActive(false);
+            }
+            else
+            {
+                GreyChangeGoblinButton.SetActive(false);
+                GreenChangeGoblinButton.SetActive(true);
+                GreenChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Select Goblin";
+            }
+        }
+    }
+    public void SelectGoblinButtonPressed()
+    {
+        Debug.Log("SelectGoblinButtonPressed");
+        if (localLobbyPlayerScript.isGoblinSelected)
+        {
+            localLobbyPlayerScript.UnselectGoblin();
+        }
+        else
+        {
+            localLobbyPlayerScript.myPlayerListItem.SelectGoblinButton();
+        }
+    }
+    public void UpdateGoblinSelectedTextOnPlayerListItems(LobbyPlayer player)
+    {
+        foreach (PlayerListItem playerListItem in playerListItems)
+        {
+            if (player.ConnectionId == playerListItem.ConnectionId && player.PlayerName == playerListItem.PlayerName)
+            {
+                playerListItem.SetGoblinSelectedText(player.goblinType);
+                //playerListItem.ActivateGoblinSelectedText(player.isGoblinSelected);
+            }
+        }
+    }
+    public void UpdateGoblinSelectedBoolOnPlayerListItems(LobbyPlayer player)
+    {
+        foreach (PlayerListItem playerListItem in playerListItems)
+        {
+            if (player.ConnectionId == playerListItem.ConnectionId && player.PlayerName == playerListItem.PlayerName)
+            {
+                //playerListItem.SetGoblinSelectedText(player.goblinType);
+                playerListItem.ActivateGoblinSelectedText(player.isGoblinSelected);
+            }
+        }
+    }
+    
     public void DestroyPlayerListItems()
     {
         foreach (PlayerListItem playerListItem in playerListItems)
@@ -240,6 +594,7 @@ public class LobbyManager : MonoBehaviour
     }
     public void PlayerQuitLobby()
     {
+        localLobbyPlayerScript.UnselectGoblin();
         localLobbyPlayerScript.QuitLobby();
     }
 }

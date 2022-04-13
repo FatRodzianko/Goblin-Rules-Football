@@ -22,6 +22,10 @@ public class NetworkManagerGRF : NetworkManager
     public List<int> playersWithFootballSpawned = new List<int>();
     public bool areFootballsSpawned = false;
 
+    [Header("Game Info")]
+    public bool is1v1 = false;
+
+
     public List<GamePlayer> GamePlayers { get; } = new List<GamePlayer>();
     public List<LobbyPlayer> LobbyPlayers { get; } = new List<LobbyPlayer>();
 
@@ -87,6 +91,7 @@ public class NetworkManagerGRF : NetworkManager
             lobbyPlayerInstance.ConnectionId = conn.connectionId;
             lobbyPlayerInstance.playerNumber = LobbyPlayers.Count + 1;
             //lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.current_lobbyID, LobbyPlayers.Count);
+            lobbyPlayerInstance.is1v1 = this.is1v1;
 
             NetworkServer.AddPlayerForConnection(conn, lobbyPlayerInstance.gameObject);
             Debug.Log("Player added. Player name: " + lobbyPlayerInstance.PlayerName + ". Player connection id: " + lobbyPlayerInstance.ConnectionId.ToString());
@@ -148,6 +153,7 @@ public class NetworkManagerGRF : NetworkManager
                 gamePlayerInstance.SetPlayerNumber(LobbyPlayers[i].playerNumber);
                 gamePlayerInstance.IsGameLeader = LobbyPlayers[i].IsGameLeader;
                 //gamePlayerInstance.playerSteamId = LobbyPlayers[i].playerSteamId;
+                gamePlayerInstance.is1v1 = LobbyPlayers[i].is1v1;
 
                 NetworkServer.Destroy(conn.identity.gameObject);
                 NetworkServer.ReplacePlayerForConnection(conn, gamePlayerInstance.gameObject, true);

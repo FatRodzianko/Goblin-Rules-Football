@@ -17,6 +17,7 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private GameObject PlayerNamePanel;
     [SerializeField] private GameObject HostOrJoinPanel;
     [SerializeField] private GameObject EnterIPAddressPanel;
+    [SerializeField] private GameObject CreateGameInfoPanel;
 
     [Header("PlayerName UI")]
     [SerializeField] private TMP_InputField playerNameInputField;
@@ -28,6 +29,9 @@ public class TitleScreenManager : MonoBehaviour
     [Header("Misc. UI")]
     [SerializeField] private Button returnToMainMenu;
 
+    [Header("Create Game Options")]
+    [SerializeField] private Toggle toggle3v3;
+
     private const string PlayerPrefsNameKey = "PlayerName";
 
     [Header("First Selected UI stuff?")]
@@ -35,6 +39,7 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] GameObject confirmNameButton;
     [SerializeField] GameObject hostGameButton;
     [SerializeField] GameObject connectToIPButton;
+    [SerializeField] GameObject createLobbyButton;
 
     private void Awake()
     {
@@ -64,6 +69,7 @@ public class TitleScreenManager : MonoBehaviour
         HostOrJoinPanel.SetActive(false);
         EnterIPAddressPanel.SetActive(false);
         returnToMainMenu.gameObject.SetActive(false);
+        CreateGameInfoPanel.SetActive(false);
         eventSystem.SetSelectedGameObject(startGameButton, new BaseEventData(eventSystem));
     }
     public void StartGame()
@@ -74,6 +80,7 @@ public class TitleScreenManager : MonoBehaviour
         eventSystem.SetSelectedGameObject(confirmNameButton, new BaseEventData(eventSystem));
         GetSavedPlayerName();
         returnToMainMenu.gameObject.SetActive(true);
+        GamepadUIManager.instance.gamepadUI = GamepadToggle.isOn;
     }
     private void GetSavedPlayerName()
     {
@@ -103,13 +110,34 @@ public class TitleScreenManager : MonoBehaviour
             HostOrJoinPanel.SetActive(true);
             eventSystem.SetSelectedGameObject(hostGameButton, new BaseEventData(eventSystem));
         }
-        GamepadUIManager.instance.gamepadUI = GamepadToggle.isOn;
+        //GamepadUIManager.instance.gamepadUI = GamepadToggle.isOn;
     }
     public void HostGame()
     {
         Debug.Log("Hosting a game...");
-        networkManager.StartHost();
+        /*networkManager.StartHost();
         HostOrJoinPanel.SetActive(false);
+        returnToMainMenu.gameObject.SetActive(false);*/
+        HostOrJoinPanel.SetActive(false);
+        CreateGameInfoPanel.SetActive(true);
+        eventSystem.SetSelectedGameObject(createLobbyButton, new BaseEventData(eventSystem));
+    }
+    public void CreateLobby()
+    {
+        if (toggle3v3.isOn)
+        {
+            networkManager.is1v1 = false;
+            networkManager.maxConnections = 6;
+            networkManager.minPlayers = 6;
+        }
+        else
+        {
+            networkManager.is1v1 = true;
+            networkManager.maxConnections = 2;
+            networkManager.minPlayers = 2;
+        }
+        networkManager.StartHost();
+        CreateGameInfoPanel.SetActive(false);
         returnToMainMenu.gameObject.SetActive(false);
     }
     public void JoinGame()
