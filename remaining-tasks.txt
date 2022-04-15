@@ -1,0 +1,519 @@
+### Remaining tasks
+(x) Punch animations while goblins are running
+- - - grenadier completed!
+- - - skirmisher completed!
+- - - Berserker completed!
+(x) Have camera follow selected goblin. Move the camera to the side when the player gets near the edge?
+- - - https://www.youtube.com/watch?v=2jTY11Am0Ig&t=30s
+- - - https://answers.unity.com/questions/266454/top-down-2d-gamehow-to-make-the-camera-move-on-hit.html
+- - - have camera follow football if the football is thrown?
+- - - it works?
+
+(x) If the ball is not in the player's view, have some sort of flag/marker display where the ball is on the side
+- - - change the ball marker if it is held by an opponent?
+(x) maybe the same as above for the Q/E goblins?
+- - - change this so it's something like a UI canvas or the camera only spawning something in the UI. Not on the goblin/football itself. 
+- - - Hopefully that gets rid of the jitteR?
+- - - Camera will have script to enable/disable the ball marker and Q/E markers
+- - - Football and Goblins will track when they are off the screen. When they are, call function in Camera script to enable the marker
+- - - - - - when they are on screen, call function to disable marker
+- - - - - - send Y axis value to camera function to update that. Never changed the x value? Hopefully that gets rid of the jitter
+- kicking a football down field
+- - (x) animate the kicking motion?
+- - - calculate how far the football goes?
+- - (x) draw shadow on ground that follows the football's path? (have football go off screen until it lands?)
+- - - - - - use "linear interpolation" to calculate the point along the line from where football started to football destination?
+- - - - - - apparently Vector3.Lerp can do this? https://docs.unity3d.com/ScriptReference/Vector3.Lerp.html second example with using a start time, time elapsed with time.time, and "speed" to calculate distance covered along the line? (kickCount is already tracking distance covered in a lerp function?)
+- - - - - - have a function that "moves" the shadow to the point calculate from the vector3 calculating the X distance of the arc? (Vector3 m2 = Vector3.Lerp(KickedBallPoints[1], KickedBallPoints[2], kickCount);)
+- - (x) mark on the field where the football will land with an X or something (maybe it's really big and gets smaller as the football is closer to landing
+- - (x) figure out how to make the football "bonuce" off the ground if it isn't caught?
+- - (x) have a "kick meter" that moves back and forth. Player holds down key to kick, meter appears, when player releases the key the value of the meter is passed to the kick function to determine the distance of the kick
+- - - - - - https://www.youtube.com/watch?v=664cm2nTxRU
+- - - - - - https://pavcreations.com/archery-combat-mechanic-in-2d-pixel-perfect-unity-game/2/
+- - - - - - https://pavcreations.com/archery-combat-mechanic-in-2d-pixel-perfect-unity-game/
+- - - When there are "field goals" instead of a power bar coming up, a "accuracy bar" will come up
+- - - - - - when goblin is within a certain range of the endzone
+- - - - - - bar moves back and forth until player releases button. Has to end with the button in between two values, represented by some sort of bar or different color?
+(x) make it so you can't pass forward - only if the other goblins are "behind" or even with you
+- - - have the Q/E markers turn red or something when they can't be passed to
+- - - based on X value of the goblin with the ball
+- - - Make the Q/E markers the grey/red color if you can't pass to them
+- Game UI stuff for things like score, time remaining, powerups?
+- - - "pixel perfect fonts" https://pavcreations.com/pixel-perfect-fonts-in-unity-the-practical-guide/
+- - - Two cameras, one for UI and one for the game? https://pavcreations.com/pixel-perfect-graphics-in-unity-the-practical-guide/
+- - - Fonts: https://www.fontspace.com/category/8-bit
+- - - another pixelperfect font tutorial: https://medium.com/@dan.liberatore/pixel-perfect-text-and-ui-in-unity-2021-56d60ba9370f
+- - - - - - font from that tutorial: https://fontstruct.com/fontstructions/show/908795/pixel_unicode
+- For tracking possession in UI: When the football is isHeld, check what team that goblin is, update possession UI
+- - - When the ball is thrown, don't update possession right away. Wait until isThrown is false. If it is false and isHeld is false, remove all possession UI
+
+
+(x) Create a "GameplayManager" type thing that starts off the process of spawning goblin teams, football, and setting the camera stuff?
+(x) Have goblins slowed down when they get punched for a second?
+(x) Wait for all players to load a scene before spawning the new game player objects?
+- - - When the server changes the scene, have the following happen?
+- - - Client spawns some sort of UI that covers the screen - in OnClientChangeScene?
+- - - - - - make sure UI object is DontDestroyOnLoad?
+- - - Then, in OnClientSceneChanged, after the scene has changed, remove the UI that blocks the screen?
+(x) - - When a player is spawned/ finished loading the scene, have the gameplay object send a command to the server to say they are down loading.
+- - - when all players are loaded, spawn the goblins?
+
+### Gameplay "phases" once the game starts
+(x) Coin Flip to determine who will receive/kick
+- - - Greys to be considered the "away" team?
+- - (x) Animate a coin being flipped
+- - (x) Have player choose heads / tails. Two options with arrow on top/below player switches between? look at code from choose commander in cardconquest
+- - - Some way of indicating to player they they are either the green or grey team in the UI?
+- - - Maybe draw a referee goblin? They stand between the two spawned teams and flip the coin?
+- - - "insert" image or picture-in-picture image of the coin flipping and landing on ground - text comes up saying heads or tails?
+- - (x) after coin toss, the "winning" player decides to kick or receive?
+- - (x) make it so the camera doesn't follow the goblin yet during coin selection?
+- Kickoff phase
+- - (x) Move kicking and receiving teams to their starting positions - moved by the server
+- - - - - - Probably have some "zoomed out" view of the field shown that is a brief animation of the teams moving to their kickoff locations. More of a long term goal. Not really needed right now? This is just meant as a "break" or transition between the action of the coin flip and kick after attempts to let the player know a kickoff is about to happen
+- - - - - (x) issue with grey kicking team not picking up ball because server thinks distance between goblin and ball is too great
+- - (x) enable Q/E switching for the receiving team? Not needed for the kicking team?
+- - - - - (x) "EnableQESwitchingControls" is being called twice
+- - (x) Kicking team chooses power/direction of kick?
+- - - Receiving team has Goblins lined up in triangle formation? Berserker/grenadier near front and skirmisher near the end zone
+- - - Big shadow covers where ball will land. Gets smaller as the ball moves closer to landing zone, until it makes the target
+- - - Maybe have possibility of onside kick of ball goes 10 yards/whatever specified distance
+- - (x) Finishing "drawing" the whole field
+- - (x) Create field goal posts in endzone?
+- Regular "Game" phase
+- - - goblins running around. Passing. Punching each other. Can collect and user power ups that spawn. Also obstacles randomly spawn in front of ball carrier?
+- - (x) timer goes down during this phase - start when ball is kicked. Server controlled.
+- - (x) create "bounds" of the field with colliders - along sidelines and endzones
+- - - - - - +-44.5 for max football x value
+- - (x) make it so goblins and the football can't go past the endzones
+- - (x) remove goal posts from the tilemap and just add them as objects in the game so they render correctly. also add the colliders to the posts so players can't run through them
+- - (x) detect when players enter an endzone. If they have the ball and dive, detect touchdown
+- - (x) stop timer when touchdown is scored
+- - (x) add 5 points to team score when touchdown scored
+- - (x) save Y value of football/goblin when touchdown happens. Used for the point after phase
+- - - generate random powerups that spawn throughout the field. Players can pick them up
+- - - have random "events" that spawn obstacles in front of the player with the ball that they have to dodge - holes, fallen trees, broken glass bottles?
+- "Touchdown" phase
+- - - goblin must touch ball down in endzone to score. Use the roll button to touchdown
+- - - if goblin doesn't touchdown, opposing team can try and punch the ball free
+- - - save Y value of where ball was touched down for next phase
+- - - touchdown worth 5 points
+- Point after phase
+- - (x) team that scored touchdown must kick a ball through uprights for extra 2 points
+- - (x) ball must be kicked from same Y axis value as where ball was touched down
+- - (x) scoring team can move ball back as far as they want for best "angle"
+- - - - - (x) calculate the angle as the player moves back/forward - indicate how much "easier" the kick is based on angle
+- - - - - (x) The two bars on the "accuracy" meter will move further apart for easier kick, closer together for harder kicks
+- - - - - (x) Have the kicking player "submit" the distance to kick from with enter?
+- - (x) goblin that touched the ball down is the one who kicks it. Goblins will have kicking stats that affect what angles they can kick from and their kicking power/accuracy
+- - - - - - indicate to player in some way the max distance the goblin can kick, have some sort of red line drawn for max distance?
+- - (x) when the scoring team is kicking, an accuracy "meter" pops up. A bar moves back and forth real fast. Player must stop the bar between two markers. This is done twice. First for power, then accuracy
+- - (x) while the scoring player is trying to kick with the meters, defending player can have a goblin run toward the kicker. If the defending goblin makes it to the kicker before the kick is off, the kick is blocked
+- - - timer in UI blocks accuracy bar when player scores at bottom of the endzone - make it so goblins always display over UI or something?
+- - - - - - same issue when scoring up top - powerup UI can block goblin heads and stuff
+- - - - - - set the y dead zone on the virtual camera to 0.525? Will require adding more tiles to the top and bottom to fill out the screen
+- - - ISSUES AFTER KICK IS GOOD/BAD
+- - - - - (x) the "kick off angle" value doesn't get updated on the new kick off. same with the kick power for the kickoff
+- - - - - (x) When a goblin scores another touchdown, their "is kick after position set" is set to true, so they can't move
+- - - - - (x) the previous scoring goblin still has their "is kick after goblin" value set to true
+- Back to kick off phase. Scoring team kicks
+- Xtra Time
+- - (x) When the timer gets to 0, start "Xtra Time"
+- - (x) The game will keep going until the ball touches the ground/a touchdown is scored
+- - - - - (x) if the ball is fumbled and not caught in the air, thrown and lands ont he ground, kicked and land on ground, score a touchdown
+- - - Allowed to pass/kick/whatever normal gameplay controls
+- - (x) If a touchdown is scored, check the final score
+- - - - - (x) if the touchdown scorer has the lead, no kick after is required
+- - - - - (x) if they are down by 2 or less, they get to attempt the kick after
+- - - if the winning team takes a dive/roll with the ball, that should end the game?
+- - - - - - nah, they just have to kick it away?
+- Powerups
+- - (x) During gameplay and xtra-time, powerups spawn randomly on the field
+- - - if a player controlled goblin runs into one, they "pickup" the powerup
+- - - powerups get added to player's powerup inventory, max of 4 powerups
+- - (x) check if spawned powerups are overlapping - move the newly spawned one if they are? move it a random x/y amount
+- - x When a player heals a knocked out player, it should immediately revive them? Right now, they still wait and when they aren't knocked out, their health is at 25%, wasting the heal
+- - - After a touchdown, delete all powerups that are on the field to start over?
+- - - - - - or make it so the kicking goblin can't pick it up? only real issue is that the player picks up stuff when they are being moved on the server. Maybe disable their colliders or something in the functions that reposition them?
+- - x "animate" the powerups by having them move up and down slowly
+- - x add a "shadow" under the powerups
+- - x have a visual effect on the goblin using a powerup. Hearts rise from heal, swords from attack, shields from defense, etc.?
+- - - instead of having player powerups stored as a list, store as an array. remove the array [index] when power up is used. Allow for blank/null powerups in the 1/2/3/4
+- - - - - - right now, if a player has 4 powerups and uses #2, that causes 3 and 4 to move down to 2 and 3, respectively. Can make it confusing for the player
+- - - - - - instead, when #2 is used in this scenario, it should just be a blank/empty power up and 3/4 stay where they are?
+
+- "Random Events"
+- - - random things should happen during the game, especially around the ball handler
+- - - spawn obstacles like logs, broken glass (???), cracks in the ground
+- - - - - - if the player doesn't dodge/roll over them, the player is knocked out
+- - - for the "crack in the ground" event, maybe have skeleton hands reach out? Like a chasm to hell is opening up?
+
+### Normal Power Up Ideas
+x Heal (full heal maybe?)
+x Increase Attack Damage (1.5x? 2x?) for 2 seconds
+x Increase "Defense" - Halve damage taken for 2 seconds
+x Increase speed of your selected goblin for 2 seconds?
+- Prevent tripping? maybe that should be a blue shell?
+x banana peel. Throw a banana out in front of you if you don't have ball, behind if you do. Causes anyone who runs into it to trip
+- glass bottle to throw
+- - - have it so bananas cause goblins to trip if they touch them on the ground. Bottles knock them out if you hit them during the throw?
+- - - maybe only have the bottle do like 50 damage. Instant KO seems harsh?
+- - - Glass bottle shatter animation?
+
+### Blue Shell Ideas
+x Lightning strike - immediately knock out the opposing player with the ball (maybe make it so you can lightning yourself as well for an achievement?)
+- Decrease speed of all opposing player goblins for 2-3 seconds?
+- Invincibility - like a mario star. Your goblin flashes for a short time. Instantly knocks out any opposing goblin they touch
+
+### AI for unselected goblins?
+# brackeys 2d pathing finding with A* - enemy finds player and figures out path to them. so, for goblins, have them find the ball/carrier and run toward them?
+https://www.youtube.com/watch?v=jvtFUfJ6CP8
+# 2d follow ai with unity?
+https://www.youtube.com/watch?v=jlklOd8PEQE
+# Simple Enemy AI in Unity (State Machine, Find Target, Chase, Attack)
+https://www.youtube.com/watch?v=db0KWYaWfeM
+# The Ultimate beginner's guide to AI with Unity & C#
+https://www.youtube.com/watch?v=dmQyfWxUNPw
+# Enemy AI playlist from same video person as above
+https://www.youtube.com/playlist?list=PLBIb_auVtBwDgHLhYc-NG633rTbTPim9z
+# ADVANCED AI IN UNITY (Made EASY) - STATE MACHINE BEHAVIORS
+https://www.youtube.com/watch?v=dYi-i83sq5g&list=PLBIb_auVtBwDgHLhYc-NG633rTbTPim9z&index=7
+# Brackeys A* tutorial?
+https://www.youtube.com/watch?v=jvtFUfJ6CP8&t=35s
+# A* Project (astar a star)
+https://arongranberg.com/astar/
+# A* doesn't seem to work well. Go through Code Monkey's Grid + A* custom tutorials on how to do it custom?
+https://www.youtube.com/playlist?list=PLzDRvYVwl53uhO8yhqxcyjDImRjO9W722
+https://www.youtube.com/watch?v=alU04hvz6L4
+# Try to make custom version of "steering algorithm" to avoid nearby goblins? Also called boids separation or flocking?
+https://forum.unity.com/threads/polarith-ai-free-pro-movement-pathfinding-steering.466846/
+https://gamedevelopment.tutsplus.com/tutorials/3-simple-rules-of-flocking-behaviors-alignment-cohesion-and-separation--gamedev-3444
+https://github.com/RafaelKuebler/Flocking/blob/master/Assets/Scripts/Flocking.cs
+https://chrishammond.ca/2017/10/10/boids-2d-unity-approach/
+- - - Most important thing here appears to be the "GetAvoidDirection" function
+- - - Find all units around you. Get their direction from you
+
+### Issues?
+x if a goblin is knocked out while punching, the isPunching variable gets stuck at true. This prevents player from doing things like picking up a football or performing other actions like diving, sliding, kicking, etc.
+- - x When a goblin gets knocked out, will need to make sure that isPunching, isDiving, isSliding, isKicking, etc. are set to false?
+x When you dive while blocking, your speed resets back to the slower blocking speed. Need to reset the blocking modifier?
+- field is too short now... make it 100 yards instead of the 80. Will need to update the x min/max values through out D:
+x Thrown objects look "weird", especially from the client. Maybe make it so they use velocity/momentum/force from the character?
+- - - https://www.youtube.com/watch?v=_xMhkK6GTXA - throwing objects
+- - - attach rigid bodies and move with rigidbody.moveposition?
+- - - tenatively going to say this is fixed? Or at least good enough
+- UI Issues
+- - x top ui blocks Q/E markers
+- - x bottom UI blocks accuracy and power meters during kick after attempts, if player is kicking from very bottom of screen
+- Now that goblins move with AI, the kinematic/dynamic rigidbodies may not "work"
+- - - when not selected, they are kinematic and can pass through each other and the sidelines
+- - x when they are all dynamic, they push each other around and stuff? is that bad now? maybe start allowing for that?
+- When a player scores a touchdown but is then knocked out and loses the football, the ball stays on the ground during the kick-after
+- - - add the following checks???
+- - x check to see if the goblin to kick is knocked out. If they are, make them not-knocked out
+- - x check to see if the football is not held, or held by the wrong goblin. If so, move the goblin to the kick off goblin
+- - x maybe add a new phase called "touchdown-transition" or something that disables goblin AI movement and also you can't pick up a football during it?
+- - - This happened again, but I have no idea how...
+- - - Solution idea:
+- - - at the start of every kickoff, have the server set a "doneRepositioningForKickAfter" value to false
+- - - at the start of kick-after-attempt, every player has to move their goblins
+- - - when the goblin has been moved, they will call a command to set "doneRepositioningForKickAfter" to true
+- - - the server checks to see if all 6 have had their doneRepositioningForKickAfter value set to true. When they do, wait 0.2 seconds or something and move the football to the kick after kicker
+- - - - - - the wait is to account for any sync issues of goblins from the client still moving on the server after doneRepositioningForKickAfter was set to true
+- - - - - - it will only need to move the football if the kicker doesn't have it already
+x the "off ball" goblins on your team move around too quickly
+- - - try to make it so once they have a Y position, they don't change it and only change their X position forward
+- - - they will only change their Y if an enemy goblin is between them and the player? Or just change it after a few seconds/one second?
+x Should probably add another "State" for the AI where they check to see if an enemy goblin is nearby. If they do, they chase that goblin and attack them?
+x Diving no longer works any more... maybe have the rigidbody switch between dynamic and kinematic when they dive?
+- - x because I changed the goblins to be on the "goblin-player" layer. The diving footbox was colliding with goblin-player. Changed physics settings so diving footbox no longer colliders with goblin-player
+- Gamepad controls:
+- - x if you hold the right stick in one position to use a powerup too long, the game freaks out and messes up the powerup usage
+- - - - - - afterward, you can no longer use the right stick for the power up
+- - - - - - when you use the number on keyboard, or the d-pad, the powerup is called twice: once for the press, the second for the release
+- - - - - - easies to trigger this bug with the first power up (right stick to the left), but can be done with others
+- - - - - - error message: unity only pass-through actions should be left in performed state by default interaction
+- - - - - - suggested fix from a forum: "Fixed by changing some actions shared between the controller and keyboard from "Button" to "Pass Through" type action. "
+- - x set the UI/Submit in the event handler to the right analog stick press - that will find the local gameplayer and tell them which button to submit?
+- - x maybe on select/deselect, check for localgameplayer and then update the local gameplayer's powerupselect index?
+- - x video on UI selection with gamepad https://www.youtube.com/watch?v=Hn804Wgr3KE
+x Possible to deal a lot of damage to a goblin and quick knock them out?
+- - x I think this is fixed? Added some logic so the same punch box collider wont set off the damage goblin script if it happens more than once at the same time?
+- Have some ramp up/down on the speed for sliding and diving
+- - - slide will be slower for first ~0.5 seconds, then get faster
+- - - opposite for the dive: faster at first then slow down the last 0.5s?
+x Have gameplay manager update the possession footballs when the ball is held and not held?
+- Game crashed when the server throw a bottle at the client. Not sure what caused the issue?
+- Don't change possession icons when the ball is thrown
+- - - make sure that isThrown is always set by the server first
+- - - if the ball is not held but is thrown, don't change possession. When isThrown is set to false, have client check if the ball is held and then change possession arrow
+- - x works on server but due to syncing on isHeld and isThrown on the client, the client doesn't update correctly. Might as well just have the possession arrow change?
+x goblins can now dive through goal posts since they are on the pathfinding obstacles layer. Maybe add empty game objects with the same size colliders, on a different layer like sidelines(???) to make sure they can't dive through but that the AI will still navigate around?
+x punch box for the berserker is way to big. Make it so it is smaller and follows his club?
+x Make the diving hurtbox smaller for all goblins? 
+- - - right now it is huge so it fits all of the animation frames without moving
+- - - have the dive box "follow" the goblin and adjust its size depending on the frames
+- - - will need to remember to "flip" the diving hurtbox when the goblin changes direction?
+- - - - - - This is already done to other colliders in the RpcFlipRenderer function. Just add the diving hurtbox to that?
+- when the AI slides, they can change direction? They should be stuck moving in the one direction they slide toward
+- - - maybe make it so the AI checks stop/don't happen when isSliding is true?
+- Goblins aren't avoid obstacles very well... Maybe set them and goblins on the same layer for the avoidance stuff?
+- - - or flip the logic. The goblins are on the layer that uses the vectors to avoid. The obstacles are on the layer where they scan to avoid?
+- AI is still having problems picking up football on the ground? Really not sure what is causing that...
+x change the kick after repositioning buttons for gamepad to rb/lb instead of the analog sticks?
+- because I made the footboxes shorter, goblins now can get "higher" than the goalposts and render behind them
+- - - lower the pivot point of the goalpost sprite by a small amount or make the footboxes bigger?
+- - - also looks like the collider on the upper goal post is too high up. Move it down 1 pixel at least?
+x when a goblin punches while running over football, and then stops still over the football, they have to run back and forth before being able to pick up the football
+- - x when isPunching is done, have the goblin's body collider toggle on and off?
+- - x appears to have worked. also, making this is what was causing AIs from not being able to pick up the ball? Hopefully...
+x For kick off, make sure goblin is facing correct direction? Green goblin at least was facing wrong direction once
+- - - also, make sure to center the camera for the kick off?
+- - - issues appear to mostly be after halftime???
+- for 3v3 game, when player is auto switched, the goblin dropdown doesn't update
+- - - keeps same dropdown from their old team?
+- - - it looks like it is the player who chose had wantsToSwitch set first that has the issue (the first player to switch). The second player to switch gets the right list
+
+
+### Bottle Throwing event
+- Server will spawn the "event-broken-bottle-1" object
+- object will start with box collider off and spriterenderer set to "None"
+- Thrown bottles will be a prefab attached to the broken glass object
+- script starts the bottle throwing - broke glass object spawns bottles with a start and end point for the throw
+- - - start point Y position will change to be above or below screen depending on where the broken glass is
+- when bottle hits end point, broken glass object turns on collider and sprite renderer
+
+### Random Obstacle Spawner
+- Spawn between 4-8 obstacles on the map - the stones and logs that will trip goblins if they run into them
+- have designated locations that can't be spawned on - Middle of the field, where the goblins stand during the coin toss, where goblins line up on kickoffs
+- - - create an array of Vector3/2's of the points they can't spawn near
+- - - have the ObstacleManager spawn the obstacle at a random location within the bounds of the field
+- - - when the object is spawned, have the object check if it is on a "bad" spot. If so, move it some specified amount
+- - - have the obstacle manager keep track of where the obstacles are. Make sure they aren't too close to one another. If they are, choose a new spot
+- Have some sort of way for the football to check if it lands on an obstacles
+- - x only when the football is not isKicked or isThrown
+- - x have the football do a bounce/fumble in a random direction away from the obstacle?
+- - x check the X value of the football and the trip object. If the football's X is greater, bounce to the right. Less, bounce left. Same, choose random direction to bounce?
+- Two kinds of obstacles
+- - - tripping obstacles - things like rocks and logs where if a player runs into them, they trip
+- - - "slow down" obstacles - things like puddles or "shrubs?"/bushes that when a goblin runs into them, slows them by like 30% or something?
+x Generate Obstacles
+x Place Obstacles
+x Verify Obstacle Position
+
+
+### Possession tracker?
+x Under the possession footballs, track how long each player/team has "possessed" the ball
+x possession meter rises as they hold onto the ball. Slowly drops if the other team has the ball. Nothing happens if nobody has the ball?
+- Effects of increased possession:
+- - - goblins move a little faster - specifically when they are carrying the ball. The "ballCarrySpeedModifier" will actually increase instead of decrease?
+- - - goblins will have increased max health when carrying the ball? Or maybe take less damage when carrying the ball?
+- - - the goal is really just to help break deadlocks of no one being quite able to score. If you can at least hold onto the ball longer than your opponent, you will get an advantage
+x Possession meters and their effects will reset after a touchdown is scored
+- Have something for when a player is down by a lot. Maybe have their possession meter increase at a faster rate? Start the post-touchdown gameplay with 25% of their possession meter already filled?
+
+### AI tasks
+- Make it so goblins will try and "find" someone to attack
+- - - check to see if any goblins are close enough to them to attack. If there are, select one as a target
+- - - move toward the target and punch when close enough
+- - - if the target moves too far away, find a new one/do something else like move toward the ball
+- - - stop targetting once target goblin is knocked out - move onto next task or find new target
+- For the "off ball" goblins when your team has the ball
+- - x don't make it so they are constantly changing their positions once they reach one. Have them keep their "y value" and just modify the X forward/whatever
+- - x don't want them jumping back and forther between points. Maybe check to see if an enemy is "between" them somehow?
+- Watch the path finding videos and probably try and implement them as a separate script for goblins?
+- - - hoping this will help them avoid "trippable" objects like the broken glass, bananas, and later rocks/logs
+- - - also maybe have them try and avoid enemy goblins somewhat? Except for the ball carrier?
+- - - at minimum, needs to find path around teammates so the goblins don't just push each other around trying to get to points
+- Goblins can be "blocked" from their target if opposing goblins "pin" them to the walls sort of
+- - - maybe track "last position" and if it hasn't changed for a second, start punching or something?
+- - - then make it so a knocked out goblin can't block you?
+- - - or have the goblin dive through the blockage? Diving should remove the collider and allow them to pass through
+- - - need to rethink how I am doing this. Currently results in just kind of random diving. Maybe instead make it based on colliders? If a non-selected goblin runs into a goblin that isn't their target, dive?
+
+### some ai logic?
+- Check what goblins on your team are targetting who
+- If a goblin is targetting the ball carrier, select a different goblin to target
+- if your goblin target is knocked out, target a different goblin?
+
+### New controls
+# keyboard
+- change it so only arrow keys move - WASD will no longer move
+- move attack/block off of the mouse and onto a/d?
+
+### UI/Gamepad stuff
+x Add a "ball" marker that goes over the head of the goblin with the ball and the football when it is not held?
+x Add "Rb" and "Lb" markers to replace the Q/E markers if the player is using a gamepad
+- Start creating gamepad alternative markers (like the a/d to select the coin and enter to submit) that are used when the player is using a gamepad
+x maybe make it so the player decides at the beginning or title screen to use either a gamepad or keyboard controls
+- - - This will detect if any gamepads are present: "if (Input.GetJoystickNames().Length > 0)"
+- - - detecting new gamepads/controllers and updating images as they are connected to the game? https://aidantakami.com/2021/02/02/detecting-the-players-controller-type-with-the-unity-input-system/
+- - - decided to have the player just check a box for "using gamepad" to get a setting saved for gamepad UI
+- - - - - - should make sure that in the future when there is an in-game settings window, the player will have an option to switch the UI between keyboard/gamepad stuff?
+- Things that will need to be updated:
+Cointoss UI:
+
+
+### Resolution and UI issues:
+- Field feels a bit too narrow/short. Figure out a way to make it wider/taller to give goblins more room to run in?
+- - - Current reference resoluation is 512x288 which is a 16:9 resolution that is divisible by 16 on both axises
+- - - - - - next 16:9 resolution that is divisible by 16 is 768x432?
+- - - - - - would need to set the "Ortho Size" on the cm vcam1 to 13.5. (Currently at 9 for the 512x288 resolution)
+- Instead of having the UI for score/time/powerups be a canvas and ui, just have it be images/sprites attached to the camera? Similar to the Q/E/Ball markers?
+#Possible "fix" without having to mess with the screen resolution or anything like that:
+- Make a second camera called UI-Camera
+- - - Depth Only. Culling masking everything
+- - - Depth of 1
+- - - child of Main Camera
+- Set CanvasGameplay to "Screen Space - Camera" and select UI-Camera
+- - - Set layer of canvas to UI
+- Change the tiles that are not on the field of play to the "AboveGround" tilemap
+- - - set layer of AboveGround to UI
+- - - will need to "fill out" all the extra space/empty tiles to something to prevent weird rendering issues
+- Main Camera
+- - - Set to depth only
+- - - remove UI layer from the culling masking
+- - - depth of 0
+- THIS DOESN'T WORK BECAUSE IT RUINS THE PIXEL PERFECT AND THE PIXELS ARE COMPLETELY FUCKED UP
+#Going with higher resolution of 768x432 for now
+- Canvases were all messed up as "Constant Pixel Size"
+- for the time being, setting them all to "Scale with Screen Size"
+- - - I believe thise means they aren't really going to be "pixel perfect" and may need to redo the UI objects
+- - - make the UI objects have more pixels or whatever
+- - - at the very least, need to start repositioning stuff so it is at the top and bottom of the screen
+
+### Sound Design stuff
+- Basic stuff on how to use audacity for sounds?
+https://www.youtube.com/watch?v=Kux_LvRl57U&t=376s
+- Blipsounds channel - general tutorials on sound creation/design for games
+https://www.youtube.com/c/Blipsounds
+
+### Field Max/Min stuff to still update:
+x powerup generation
+x obstacle generation
+x random event generation
+x powerup object
+x random event object
+x obstacle object
+x ball possession icon is in the wrong spot
+x UI icons on camera for Q/E and Ball stuff
+x kick after UI help boxes need to be moved down
+x kicking maxY/minY
+x dpad symbols on powerups need to be moved up
+x kick was good/bad text comes up too early?
+x kickoff - when kicking straight ahead, the ball is landing too high? like it's been shifted up?
+- - x manually set the y position in football.cs to -1.5f
+- - x need to fix how this is adjusting the max/min incorrectly
+- - x I think this is fixed now?
+x still need to "test" AI behavior
+- - - AI seems to behave same as before - that is, chaotics and hard to play!
+x football throwing speed and distance should be increased?
+- - x original speed of 15 and distance 10. Change to 20/15
+x Q/E markers above goblins need to be adjusted to be allowed higher
+- - x also make sure their sprite sorting layer is the ui-marker?
+- probably more?
+
+### How to "fake" the UI as being behind goblins
+- Recreate all the UI elements as sprites attached to the camera
+- - - recreate the "groups" that are used by scripts - CanvasGameplay, CanvasCoinToss, etc as empty objects that are parents to all the sprites
+- Instead of having the power ups as UI buttons that you navigate through, they will be sprites
+- - - then, create transparent/invisible buttons that correspond to those powerup sprites
+- - - the invisibile buttons will still be navigable with the UI controls, so when they are selected/submitted you can make the same calls as when the powerups were real buttons
+- - - this will hopefully allow for the powerup board to render behind goblins, but still appear to be navigable like they are ui elements
+- the thing that may cause issues is text...
+
+### Next steps...
+- Create "halves" for the game
+- - x Keep track of who kicked/received to start the game
+- - x after first gameplay/xtra time ends, go to half time
+- - x Whoever kicked to start the game will now receive in second half
+- - x make sure gameplay controls are disabled when it's halftime - right now, players can move during the second half kickoff
+- - x timer text flashes during second half
+- - - game timer stops counting down at 1 for some reason in second half?
+- - - - - x phase goes to extra time, but the "xtra-time" text doesn't reappear?
+- - - make sure to test that if player scores touchdown during first half xtra-time that they still kick the kickafter
+- - - - - x right now, game over gets called after the kick after attempt
+- - - - - x after the kick after attempt during first half extra time, the game transitions straight to the kickoff and not the halftime phase
+- - - - - x the halftime phase is reached and the UI pops up for it, but the transition to kickoff after kick-after overrides it
+- - - - - x add check for kick-after-attempt to only go to kickoff if it is not extra time/halftime?
+- - x touchdown text/kick good or back text no longer flashes in second half?
+- - - - - x just had to reset the isColorChangeRunning bool to false when they are deactivated
+- - - need a UI indicator for what half it is. Probably in the middle of the score board? Make the scoreboard a little bigger?
+- Allow players to quit the game when the game ends and get back to main menu
+x Have a possession "tracker"
+- - x bonuses for longer possessions
+- - - - - x longer you have possession, faster you move/heal/recover stamina? Something along those lines
+- - x have the bonuses reset after a touchdown is scored
+- - x should have a UI indicator / bar to show possession progress
+- - x goes up when you have the ball, slowly falls back down when you don't (after a "cooldown" timer or whatever it will start to go down after a few seconds so you don't start losing posssession just when you throw the ball or whatever)
+- - x UI indicator will be color coded/change colors when a player reaches new "level" of possession bonus -> blue to yellow or something (try to make it color blind friendly?)
+- - - - - x color blind pallettes?: https://davidmathlogic.com/colorblind/#%23D81B60-%231E88E5-%23FFC107-%23004D40
+x "Cowboy Goblin" that appears on the screen near the stands
+- - - if it is in your viewport and you press block to raise your hand, you get a "yeehaw"
+- - - - - x right now this is just based on distance, calculated on the server. Maybe first have a client side check that uses the camera view port?
+- - - game will track how many times you yeehawed the cowboy and display at the end
+- - x doesn't actually count for anything in terms of score or whatever
+- - x Cowboy enters from one of two identified locations (make them look like stadium tunnels?
+- - x add one more animation from of the cowboy bringing their rear leg forward a bit like the last frame of the other goblin run animations
+- - x Create a smoking animation where the cowboy grabs their cig and lets out a puff of smoke?
+- - - - - x still need to make the particle effect for the exhale of smoke
+- - x need to flip the location of the cigarette smoke particle effect when the goblin turns
+- Drop kick during gameplay to score (stre
+- - - allow players to score 3 points with a drop kick
+- - - player can double press the kick button to do a drop kick
+- - - - - - will bring up the same accuracy and power bars as a kick after attempt?
+- - - - - - kick button once on each to submit
+- - - - - - double tap again to cancel and hide UI
+- - - when drop kick activated, server will recalculate accuracy bars based on goblin position
+- - - some sort of indicator to players that they are in range? or just have them kick normally and if it is short its short and they miss?
+- - - - - - allow players to try dropkick even if they are way too far away
+- - - - - - a missed dropkick would just be handled like any other kick downfield - gameplay carries on normally
+x view stats at end of game
+- - - shows comparison of stats for each team, tracked on the team objects
+- - - how to get event system "Move/Submit" to change to the UI controls? Also, set the "Main Menu" button as the default selected instead of the powerups
+- - - - - - https://forum.unity.com/threads/how-to-switch-the-actions-asset-in-the-input-system-ui-input-module-at-runtime.933000/ ???
+
+
+### Possession tracker
+- States to track and have a countdown for:
+- - x when your team has the ball and gain possession points
+- - x when you don't have the ball and lose possession points
+- - x cooldown after you lose possession but before you lose possession points
+
+### Possession bonuses:
+- decrease stamina drain
+- increase stamina recovery
+- decrease damage taken
+- increase health recovery
+- speed increase by 1/3rd of possession bonus
+
+### UI Updates
+- Half time and end of game UI needs to be updated
+- - x Minimum: have some sort of panel that the text is on so it is easier to read
+- - x have the rescroll be faster than unscroll?
+- After the end of game, option to view stats?
+- - x have the scroll rescroll and and then unscroll a new panel?
+
+### Update to 3v3
+- Create Lobby Menu
+- - - option for 1v1 or 3v3
+- - - - - - sets the maximum number of connections variable on the NetworkManager
+- - - - - - sets bool for is1v1 or is3v3 or something on NetworkManager - will change how gameplayer and other things work?
+- Lobby Menu
+- - x allow players to choose team
+- - - - - - force 3 max players per team
+- - - - - - allow player to set "wants to switch" to true. Used when teams are full (or at least one team has 3)
+- - - - - - if two players, one on each team, have "wants to switch" true, then they switch
+- - - - - - - - - no switch if only one player?
+- - x choose goblin (grenadier/berserker/skirmisher)
+- - - - - x from dropdown
+- - - - - x change goblin button?
+- - - - - x update dropdowns to only show available goblins
+- - - - - x make sure when a player quits, their goblin is added back to "available" goblins
+- - - - - x when a player joins a lobby, update lobby items to include any selected goblins
+- - - - - x when player first joins, update their dropdown list based on what team they are put on?
+- Coin Toss
+- - - make it so the Grenadier of each team is the "captian"
+- - - the captain will be the one to select heads/tails and kick/receive
+- Gameplay
+- - - still show Q/E goblins for teammates, but you can't "switch" to them
