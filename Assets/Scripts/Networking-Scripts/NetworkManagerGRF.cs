@@ -154,6 +154,12 @@ public class NetworkManagerGRF : NetworkManager
                 gamePlayerInstance.IsGameLeader = LobbyPlayers[i].IsGameLeader;
                 //gamePlayerInstance.playerSteamId = LobbyPlayers[i].playerSteamId;
                 gamePlayerInstance.is1v1 = LobbyPlayers[i].is1v1;
+                if (!this.is1v1)
+                {
+                    gamePlayerInstance.isTeamGrey = LobbyPlayers[i].isTeamGrey;
+                    gamePlayerInstance.goblinType = LobbyPlayers[i].goblinType;
+                }
+                
 
                 NetworkServer.Destroy(conn.identity.gameObject);
                 NetworkServer.ReplacePlayerForConnection(conn, gamePlayerInstance.gameObject, true);

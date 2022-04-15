@@ -317,15 +317,18 @@ public class GamePlayer : NetworkBehaviour
     void CmdGetTeamName()
     {
         Debug.Log("CmdGetTeamName for GamePlayer with ConnectionId: " + ConnectionId.ToString());
-        if (IsGameLeader)
+        if (is1v1) // 1v1 games is the host is always green. 3v3 players pick in lobby so it doesn't need to be set here
         {
-            teamName = "Green";
-            isTeamGrey = false;
-        }
-        else
-        {
-            teamName = "Grey";
-            isTeamGrey = true;
+            if (IsGameLeader)
+            {
+                teamName = "Green";
+                isTeamGrey = false;
+            }
+            else
+            {
+                teamName = "Grey";
+                isTeamGrey = true;
+            }
         }
         foreach (Team team in TeamManager.instance.teams)
         {
@@ -340,84 +343,172 @@ public class GamePlayer : NetworkBehaviour
         Debug.Log("CmdSpawnPlayerCharacters for GamePlayer with ConnectionId: " + ConnectionId.ToString());
         if (!areCharactersSpawnedYet)
         {
-            Debug.Log("Executing SpawnPlayerCharacters on the server for player " + this.PlayerName + this.ConnectionId.ToString());
-            GameObject newGrenadier = Instantiate(grenadierPrefab);
-            if (IsGameLeader)
-                newGrenadier.transform.position = GreenGrenadierStartingPosition;
+            if (is1v1) // for 1v1 games, spawn all three goblins for each player
+            {
+                Debug.Log("Executing SpawnPlayerCharacters on the server for player " + this.PlayerName + this.ConnectionId.ToString());
+                GameObject newGrenadier = Instantiate(grenadierPrefab);
+                if (IsGameLeader)
+                    newGrenadier.transform.position = GreenGrenadierStartingPosition;
+                else
+                {
+                    newGrenadier.transform.position = GreyGrenadierStartingPosition;
+                    //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
+                }
+                NetworkServer.Spawn(newGrenadier, connectionToClient);
+                goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkIdentity>().netId);
+                GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
+                newGrenadierScript.ownerConnectionId = this.ConnectionId;
+                newGrenadierScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newGrenadierScript.health = newGrenadierScript.MaxHealth;
+                newGrenadierScript.stamina = newGrenadierScript.MaxStamina;
+                newGrenadierScript.speed = newGrenadierScript.MaxSpeed;
+                newGrenadierScript.damage = newGrenadierScript.MaxDamage;
+                newGrenadierScript.defenseModifier = 1.0f;
+                newGrenadierScript.goblinType = "grenadier";
+                if (!IsGameLeader)
+                    newGrenadierScript.goblinType += "-grey";
+                newGrenadierScript.serverGamePlayer = this;
+                goblinTeamOnServer.Add(newGrenadierScript);
+
+
+                GameObject newBerserker = Instantiate(berserkerPrefab, transform.position, Quaternion.identity);
+                if (IsGameLeader)
+                    newBerserker.transform.position = GreenBerserkerStartingPosition;
+                else
+                {
+                    newBerserker.transform.position = GreyBerserkerStartingPosition;
+                    //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
+                }
+                NetworkServer.Spawn(newBerserker, connectionToClient);
+                goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkIdentity>().netId);
+                GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
+                newBerserkerScript.ownerConnectionId = this.ConnectionId;
+                newBerserkerScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newBerserkerScript.health = newBerserkerScript.MaxHealth;
+                newBerserkerScript.stamina = newBerserkerScript.MaxStamina;
+                newBerserkerScript.speed = newBerserkerScript.MaxSpeed;
+                Debug.Log("CmdSpawnPlayerCharacters: Setting the speed of the berserker to " + newBerserkerScript.speed.ToString() + " based in max speed of : " + newBerserkerScript.MaxSpeed.ToString());
+                newBerserkerScript.damage = newBerserkerScript.MaxDamage;
+                newBerserkerScript.defenseModifier = 1.0f;
+                newBerserkerScript.goblinType = "berserker";
+                if (!IsGameLeader)
+                    newBerserkerScript.goblinType += "-grey";
+                newBerserkerScript.serverGamePlayer = this;
+                goblinTeamOnServer.Add(newBerserkerScript);
+
+                GameObject newSkirmisher = Instantiate(skrimisherPrefab, transform.position, Quaternion.identity);
+                if (IsGameLeader)
+                    newSkirmisher.transform.position = GreenSkirmisherStartingPosition;
+                else
+                {
+                    newSkirmisher.transform.position = GreySkirmisherStartingPosition;
+                    //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
+                }
+                NetworkServer.Spawn(newSkirmisher, connectionToClient);
+                goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkIdentity>().netId);
+                GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
+                newSkirmisherScript.ownerConnectionId = this.ConnectionId;
+                newSkirmisherScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newSkirmisherScript.health = newSkirmisherScript.MaxHealth;
+                newSkirmisherScript.stamina = newSkirmisherScript.MaxStamina;
+                newSkirmisherScript.speed = newSkirmisherScript.MaxSpeed;
+                newSkirmisherScript.damage = newSkirmisherScript.MaxDamage;
+                newSkirmisherScript.defenseModifier = 1.0f;
+                newSkirmisherScript.goblinType = "skirmisher";
+                if (!IsGameLeader)
+                    newSkirmisherScript.goblinType += "-grey";
+                goblinTeamOnServer.Add(newSkirmisherScript);
+
+                newSkirmisherScript.serverGamePlayer = this;
+
+                areCharactersSpawnedYet = true;
+            }
             else
             {
-                newGrenadier.transform.position = GreyGrenadierStartingPosition;
-                //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
+                Debug.Log("CmdSpawnPlayerCharacters: Spawning 3v3 character for player: " + this.PlayerName + " for team grey? " + this.isTeamGrey.ToString() + " and their character will be: " + this.goblinType);
+                if (this.goblinType == "Grenadier")
+                {
+                    //Debug.Log("Executing SpawnPlayerCharacters on the server for player " + this.PlayerName + this.ConnectionId.ToString());
+                    GameObject newGrenadier = Instantiate(grenadierPrefab);
+                    if (!this.isTeamGrey)
+                        newGrenadier.transform.position = GreenGrenadierStartingPosition;
+                    else
+                    {
+                        newGrenadier.transform.position = GreyGrenadierStartingPosition;
+                        //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
+                    }
+                    NetworkServer.Spawn(newGrenadier, connectionToClient);
+                    goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkIdentity>().netId);
+                    GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
+                    newGrenadierScript.ownerConnectionId = this.ConnectionId;
+                    newGrenadierScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                    newGrenadierScript.health = newGrenadierScript.MaxHealth;
+                    newGrenadierScript.stamina = newGrenadierScript.MaxStamina;
+                    newGrenadierScript.speed = newGrenadierScript.MaxSpeed;
+                    newGrenadierScript.damage = newGrenadierScript.MaxDamage;
+                    newGrenadierScript.defenseModifier = 1.0f;
+                    newGrenadierScript.goblinType = "grenadier";
+                    if (this.isTeamGrey)
+                        newGrenadierScript.goblinType += "-grey";
+                    newGrenadierScript.serverGamePlayer = this;
+                    goblinTeamOnServer.Add(newGrenadierScript);
+                }
+                else if (this.goblinType == "Berserker")
+                {
+                    GameObject newBerserker = Instantiate(berserkerPrefab, transform.position, Quaternion.identity);
+                    if (!this.isTeamGrey)
+                        newBerserker.transform.position = GreenBerserkerStartingPosition;
+                    else
+                    {
+                        newBerserker.transform.position = GreyBerserkerStartingPosition;
+                        //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
+                    }
+                    NetworkServer.Spawn(newBerserker, connectionToClient);
+                    goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkIdentity>().netId);
+                    GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
+                    newBerserkerScript.ownerConnectionId = this.ConnectionId;
+                    newBerserkerScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                    newBerserkerScript.health = newBerserkerScript.MaxHealth;
+                    newBerserkerScript.stamina = newBerserkerScript.MaxStamina;
+                    newBerserkerScript.speed = newBerserkerScript.MaxSpeed;
+                    //Debug.Log("CmdSpawnPlayerCharacters: Setting the speed of the berserker to " + newBerserkerScript.speed.ToString() + " based in max speed of : " + newBerserkerScript.MaxSpeed.ToString());
+                    newBerserkerScript.damage = newBerserkerScript.MaxDamage;
+                    newBerserkerScript.defenseModifier = 1.0f;
+                    newBerserkerScript.goblinType = "berserker";
+                    if (this.isTeamGrey)
+                        newBerserkerScript.goblinType += "-grey";
+                    newBerserkerScript.serverGamePlayer = this;
+                    goblinTeamOnServer.Add(newBerserkerScript);
+                }
+                else if (this.goblinType == "Skirmisher")
+                {
+                    GameObject newSkirmisher = Instantiate(skrimisherPrefab, transform.position, Quaternion.identity);
+                    if (!this.isTeamGrey)
+                        newSkirmisher.transform.position = GreenSkirmisherStartingPosition;
+                    else
+                    {
+                        newSkirmisher.transform.position = GreySkirmisherStartingPosition;
+                        //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
+                    }
+                    NetworkServer.Spawn(newSkirmisher, connectionToClient);
+                    goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkIdentity>().netId);
+                    GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
+                    newSkirmisherScript.ownerConnectionId = this.ConnectionId;
+                    newSkirmisherScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                    newSkirmisherScript.health = newSkirmisherScript.MaxHealth;
+                    newSkirmisherScript.stamina = newSkirmisherScript.MaxStamina;
+                    newSkirmisherScript.speed = newSkirmisherScript.MaxSpeed;
+                    newSkirmisherScript.damage = newSkirmisherScript.MaxDamage;
+                    newSkirmisherScript.defenseModifier = 1.0f;
+                    newSkirmisherScript.goblinType = "skirmisher";
+                    if (this.isTeamGrey)
+                        newSkirmisherScript.goblinType += "-grey";
+                    goblinTeamOnServer.Add(newSkirmisherScript);
+
+                    newSkirmisherScript.serverGamePlayer = this;
+                }
             }
-            NetworkServer.Spawn(newGrenadier, connectionToClient);
-            goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkIdentity>().netId);
-            GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
-            newGrenadierScript.ownerConnectionId = this.ConnectionId;
-            newGrenadierScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
-            newGrenadierScript.health = newGrenadierScript.MaxHealth;
-            newGrenadierScript.stamina = newGrenadierScript.MaxStamina;
-            newGrenadierScript.speed = newGrenadierScript.MaxSpeed;
-            newGrenadierScript.damage = newGrenadierScript.MaxDamage;
-            newGrenadierScript.defenseModifier = 1.0f;
-            newGrenadierScript.goblinType = "grenadier";
-            if (!IsGameLeader)
-                newGrenadierScript.goblinType += "-grey";
-            newGrenadierScript.serverGamePlayer = this;
-            goblinTeamOnServer.Add(newGrenadierScript);
-
-
-            GameObject newBerserker = Instantiate(berserkerPrefab, transform.position, Quaternion.identity);
-            if (IsGameLeader)
-                newBerserker.transform.position = GreenBerserkerStartingPosition;
-            else
-            {
-                newBerserker.transform.position = GreyBerserkerStartingPosition;
-                //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
-            }
-            NetworkServer.Spawn(newBerserker, connectionToClient);
-            goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkIdentity>().netId);
-            GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
-            newBerserkerScript.ownerConnectionId = this.ConnectionId;
-            newBerserkerScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
-            newBerserkerScript.health = newBerserkerScript.MaxHealth;
-            newBerserkerScript.stamina = newBerserkerScript.MaxStamina;
-            newBerserkerScript.speed = newBerserkerScript.MaxSpeed;
-            Debug.Log("CmdSpawnPlayerCharacters: Setting the speed of the berserker to " + newBerserkerScript.speed.ToString() + " based in max speed of : " + newBerserkerScript.MaxSpeed.ToString());
-            newBerserkerScript.damage = newBerserkerScript.MaxDamage;
-            newBerserkerScript.defenseModifier = 1.0f;
-            newBerserkerScript.goblinType = "berserker";
-            if (!IsGameLeader)
-                newBerserkerScript.goblinType += "-grey";
-            newBerserkerScript.serverGamePlayer = this;
-            goblinTeamOnServer.Add(newBerserkerScript);
-
-            GameObject newSkirmisher = Instantiate(skrimisherPrefab, transform.position, Quaternion.identity);
-            if (IsGameLeader)
-                newSkirmisher.transform.position = GreenSkirmisherStartingPosition;
-            else
-            {
-                newSkirmisher.transform.position = GreySkirmisherStartingPosition;
-                //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
-            }
-            NetworkServer.Spawn(newSkirmisher, connectionToClient);
-            goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkIdentity>().netId);
-            GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
-            newSkirmisherScript.ownerConnectionId = this.ConnectionId;
-            newSkirmisherScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
-            newSkirmisherScript.health = newSkirmisherScript.MaxHealth;
-            newSkirmisherScript.stamina = newSkirmisherScript.MaxStamina;
-            newSkirmisherScript.speed = newSkirmisherScript.MaxSpeed;
-            newSkirmisherScript.damage = newSkirmisherScript.MaxDamage;
-            newSkirmisherScript.defenseModifier = 1.0f;
-            newSkirmisherScript.goblinType = "skirmisher";
-            if (!IsGameLeader)
-                newSkirmisherScript.goblinType += "-grey";
-            goblinTeamOnServer.Add(newSkirmisherScript);
-
-            newSkirmisherScript.serverGamePlayer = this;
-
             areCharactersSpawnedYet = true;
-
         }
     }
     public void AddToGoblinTeam(GoblinScript GoblinToAdd)

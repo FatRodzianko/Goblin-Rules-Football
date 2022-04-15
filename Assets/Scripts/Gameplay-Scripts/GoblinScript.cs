@@ -230,8 +230,17 @@ public class GoblinScript : NetworkBehaviour
         {
             myGamePlayer = localPlayer;
             myGamePlayer.AddToGoblinTeam(this);
-            if (!myGamePlayer.IsGameLeader)
-                CmdMakeGoblinGrey();
+            if (GameplayManager.instance.is1v1)
+            {
+                if (!myGamePlayer.IsGameLeader)
+                    CmdMakeGoblinGrey();
+            }
+            else
+            { 
+                if(myGamePlayer.isTeamGrey)
+                    CmdMakeGoblinGrey();
+            }
+            
 
             //GoblinStartingPosition(myGamePlayer.IsGameLeader);
             if (transform.position.x > 0f)

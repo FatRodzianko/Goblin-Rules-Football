@@ -144,17 +144,101 @@ public class LobbyPlayer : NetworkBehaviour
             {
                 Debug.Log("CmdUpdateTeam: " + this.PlayerName + " is trying to switch to GREY but GREY is full. Setting wantsToSwitch To True");
                 this.HandleWantsToSwitchTeams(this.wantsToSwitchTeams, true);
+                CheckIfOtherPlayersWantToSwitch(this);
                 return;
             }
             else if (!isGrey && LobbyManager.instance.GreenTeamMembers.Count >= 3)
             {
                 Debug.Log("CmdUpdateTeam: " + this.PlayerName + " is trying to switch to GREEN but GREEN is full. Setting wantsToSwitch To True");
                 this.HandleWantsToSwitchTeams(this.wantsToSwitchTeams, true);
+                CheckIfOtherPlayersWantToSwitch(this);
                 return;
             }
             this.HandleIsTeamGrey(this.isTeamGrey, isGrey);
+            if (this.wantsToSwitchTeams)
+                this.HandleWantsToSwitchTeams(this.wantsToSwitchTeams, false);
             UpdateAllPlayersOnAvailableGoblins(isGrey);
         }
+    }
+    [ServerCallback]
+    void CheckIfOtherPlayersWantToSwitch(LobbyPlayer playerRequestingSwitch)
+    {
+        Debug.Log("CheckIfOtherPlayersWantToSwitch for player: " + playerRequestingSwitch.PlayerName);
+        foreach (LobbyPlayer player in Game.LobbyPlayers)
+        {
+            if (player.wantsToSwitchTeams && player != playerRequestingSwitch && player.isTeamGrey != playerRequestingSwitch.isTeamGrey)
+            {
+                Debug.Log("CheckIfOtherPlayersWantToSwitch: Found player that wants to switch: " + player.PlayerName);
+                if (playerRequestingSwitch.isGoblinSelected && !string.IsNullOrWhiteSpace(playerRequestingSwitch.goblinType))
+                {
+                    playerRequestingSwitch.UnselectGoblinOnServer();
+                }
+                UpdateAllPlayersOnAvailableGoblins(playerRequestingSwitch.isTeamGrey);
+                playerRequestingSwitch.HandleIsTeamGrey(playerRequestingSwitch.isTeamGrey, !playerRequestingSwitch.isTeamGrey);
+                playerRequestingSwitch.HandleWantsToSwitchTeams(playerRequestingSwitch.wantsToSwitchTeams, false);
+
+
+                if (player.isGoblinSelected && !string.IsNullOrWhiteSpace(player.goblinType))
+                {
+                    player.UnselectGoblinOnServer();
+                }
+                UpdateAllPlayersOnAvailableGoblins(player.isTeamGrey);
+                player.HandleIsTeamGrey(player.isTeamGrey, !player.isTeamGrey);
+                player.HandleWantsToSwitchTeams(player.wantsToSwitchTeams, false);
+                break;
+            }
+        }
+    }
+    [ServerCallback]
+    void CheckIfTeamIsNoLongerFull()
+    {
+        foreach (LobbyPlayer player in Game.LobbyPlayers)
+        {
+            if (player.wantsToSwitchTeams)
+            {
+                if (player.isTeamGrey)
+                {
+                    Debug.Log("CheckIfTeamIsNoLongerFull: player " + player.PlayerName + " is on team grey and wants to switch to team green.");
+                    if (LobbyManager.instance.GreenTeamMembers.Count >= 3)
+                    {
+                        Debug.Log("CheckIfTeamIsNoLongerFull: player " + player.PlayerName + " is on team grey and wants to switch to team green BUT green is full. checking next player...");
+                        continue;
+                    }
+                    else
+                    {
+                        Debug.Log("CheckIfTeamIsNoLongerFull: player " + player.PlayerName + " is on team grey and wants to switch to team green AND green has a spot open. Switching player");
+                        if (player.isGoblinSelected && !string.IsNullOrWhiteSpace(player.goblinType))
+                        {
+                            player.UnselectGoblinOnServer();
+                        }
+                        UpdateAllPlayersOnAvailableGoblins(player.isTeamGrey);
+                        player.HandleIsTeamGrey(player.isTeamGrey, !player.isTeamGrey);
+                        player.HandleWantsToSwitchTeams(player.wantsToSwitchTeams, false);
+                    }
+                }
+                else
+                {
+                    Debug.Log("CheckIfTeamIsNoLongerFull: player " + player.PlayerName + " is on team green and wants to switch to team grey.");
+                    if (LobbyManager.instance.GreyTeamMembers.Count >= 3)
+                    {
+                        Debug.Log("CheckIfTeamIsNoLongerFull: player " + player.PlayerName + " is on team green and wants to switch to team grey BUT green is full. checking next player...");
+                        continue;
+                    }
+                    else
+                    {
+                        Debug.Log("CheckIfTeamIsNoLongerFull: player " + player.PlayerName + " is on team green and wants to switch to team grey AND grey has a spot open. Switching player");
+                        if (player.isGoblinSelected && !string.IsNullOrWhiteSpace(player.goblinType))
+                        {
+                            player.UnselectGoblinOnServer();
+                        }
+                        UpdateAllPlayersOnAvailableGoblins(player.isTeamGrey);
+                        player.HandleIsTeamGrey(player.isTeamGrey, !player.isTeamGrey);
+                        player.HandleWantsToSwitchTeams(player.wantsToSwitchTeams, false);
+                    }
+                }
+            }
+        }
+        UpdateTeamListsOnLobbyManager();
     }
     public void StartUpdateTeamListsOnLobbyManager()
     {
@@ -187,7 +271,10 @@ public class LobbyPlayer : NetworkBehaviour
                     LobbyManager.instance.GreyTeamMembers.Remove(player);
             }
         }
+        /*if(LobbyManager.instance.GreenTeamMembers.Count >= 3 || LobbyManager.instance.GreyTeamMembers.Count >= 3)
+            CheckIfTeamIsNoLongerFull();*/
     }
+    
     void HandleIsTeamGrey(bool oldValue, bool newValue)
     {
         if (isServer)
@@ -386,7 +473,7 @@ public class LobbyPlayer : NetworkBehaviour
     public void RpcSendPlayersUpdatedAvailableGoblinList(NetworkConnection target, List<string> availableGoblins)
     {
         Debug.Log("RpcSendPlayersUpdatedAvailableGoblinList: for player: " + this.PlayerName + " is team grey? " + this.isTeamGrey.ToString() + " and list available: " + availableGoblins.Count.ToString() + " for UpdateGoblinsAvailable");
-        if(hasAuthority)
+        if(hasAuthority && !LobbyManager.instance.is1v1)
             this.myPlayerListItem.UpdateGoblinsAvailable(availableGoblins);
     }
     /*[ClientRpc]

@@ -14,6 +14,9 @@ public class GameplayManager : NetworkBehaviour
 {
     public static GameplayManager instance;
 
+    [Header("Game Info")]
+    [SyncVar] public bool is1v1 = false;
+
     [Header("Local GamePlayers")]
     [SerializeField] private GameObject LocalGamePlayer;
     [SerializeField] private GamePlayer LocalGamePlayerScript;
@@ -142,6 +145,8 @@ public class GameplayManager : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
+        this.is1v1 = Game.is1v1;
+        Debug.Log("GameplayManager: is 1v1 is set to: " + this.is1v1);
         //gamePhase = "cointoss";
         HandleGamePhase(gamePhase, "cointoss");
         //timeLeftInGame = 300f;
