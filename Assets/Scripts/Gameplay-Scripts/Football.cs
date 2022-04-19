@@ -506,6 +506,11 @@ public class Football : NetworkBehaviour
                     Debug.Log("PlayerPickUpFootball: Grey team kicking football?");
                     distanceToBall = 0f;
                 }
+                if (GameplayManager.instance.gamePhase == "kickoff" && goblinToCheckScript.ownerConnectionId == GameplayManager.instance.kickingPlayer.ConnectionId && goblinToCheckScript.name.Contains("grenadier"))
+                {
+                    Debug.Log("PlayerPickUpFootball: kicking team is kicking football?");
+                    distanceToBall = 0f;
+                }
                 if ((GameplayManager.instance.gamePhase == "touchdown-transition" || GameplayManager.instance.gamePhase == "kick-after-attempt") && goblinToCheckScript.isKickAfterGoblin)
                 {
                     Debug.Log("PlayerPickUpFootball: Need to return football to scoring goblin for kick after?");
@@ -594,6 +599,8 @@ public class Football : NetworkBehaviour
     {
         GoblinScript throwingGoblinScript = NetworkIdentity.spawned[throwingGoblinNetId].GetComponent<GoblinScript>();
         GoblinScript goblinToThrowToScript = NetworkIdentity.spawned[goblinToThrowToNetId].GetComponent<GoblinScript>();
+        if (!goblinToThrowToScript.canGoblinReceivePass)
+            return;
 
         if (throwingGoblinScript.doesCharacterHaveBall && !goblinToThrowToScript.doesCharacterHaveBall && !throwingGoblinScript.isKicking && !throwingGoblinScript.isDiving)
         {

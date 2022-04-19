@@ -53,6 +53,7 @@ public class GamePlayer : NetworkBehaviour
     public bool canSwitchGoblin = true;
     public GoblinScript serverSelectGoblin;
     public double qeTime;
+    public Team myTeam;
 
     [Header("Team Info")]
     [SyncVar] public string teamName;
@@ -333,7 +334,18 @@ public class GamePlayer : NetworkBehaviour
         foreach (Team team in TeamManager.instance.teams)
         {
             if (team.isGrey == this.isTeamGrey)
+            {
                 team.AddPlayerToTeam(this);
+                if (!this.is1v1)
+                {
+                    if (this.goblinType == "Grenadier")
+                        team.captain = this;
+                    if(this.isTeamGrey)
+                        teamName = "Grey";
+                    else
+                        teamName = "Green";
+                }
+            }   
         }
             
     }
@@ -515,27 +527,129 @@ public class GamePlayer : NetworkBehaviour
     {
         if (!goblinTeam.Contains(GoblinToAdd))
             goblinTeam.Add(GoblinToAdd);
-        if (GoblinToAdd.gameObject.name.ToLower().Contains("grenadier"))
+        if (this.is1v1)
         {
-            GoblinToAdd.SelectThisCharacter();
-            selectGoblin = GoblinToAdd;
-            FollowSelectedGoblin(selectGoblin.transform);
-            if (hasAuthority)
-                CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
+            if (GoblinToAdd.gameObject.name.ToLower().Contains("grenadier"))
+            {
+                GoblinToAdd.SelectThisCharacter();
+                selectGoblin = GoblinToAdd;
+                FollowSelectedGoblin(selectGoblin.transform);
+                if (hasAuthority)
+                    CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
+            }
+            else if (!qGoblin)
+            {
+                qGoblin = GoblinToAdd;
+                GoblinToAdd.UnSelectThisCharacter();
+                GoblinToAdd.SetQGoblin(true);
+            }
+            else if (!eGoblin)
+            {
+                eGoblin = GoblinToAdd;
+                GoblinToAdd.UnSelectThisCharacter();
+                GoblinToAdd.SetEGoblin(true);
+            }
         }
-        else if (!qGoblin)
+        else
         {
-            qGoblin = GoblinToAdd;
-            GoblinToAdd.UnSelectThisCharacter();
-            GoblinToAdd.SetQGoblin(true);
+            Debug.Log("AddToGoblinTeam: for player " + this.PlayerName + " goblin name is: " + GoblinToAdd.gameObject.name.ToLower() + " and goblin type is: " + this.goblinType.ToLower());
+            if (GoblinToAdd.gameObject.name.ToLower().Contains(this.goblinType.ToLower()))
+            {
+                GoblinToAdd.SelectThisCharacter();
+                selectGoblin = GoblinToAdd;
+                FollowSelectedGoblin(selectGoblin.transform);
+                if (hasAuthority)
+                {
+                    uint goblinNetId = selectGoblin.GetComponent<NetworkIdentity>().netId;
+                    CmdSetSelectedGoblinOnServer(goblinNetId);
+                    CmdAddToGoblinTeamOnTeamObject(goblinNetId);
+                }
+                    
+            }
         }
-        else if (!eGoblin)
+    }
+    [Command]
+    void CmdAddToGoblinTeamOnTeamObject(uint goblinNetId)
+    {
+        GoblinScript goblinScript = NetworkIdentity.spawned[goblinNetId].gameObject.GetComponent<GoblinScript>();
+        if (this.isTeamGrey)
         {
-            eGoblin = GoblinToAdd;
-            GoblinToAdd.UnSelectThisCharacter();
-            GoblinToAdd.SetEGoblin(true);
+            if (!TeamManager.instance.greyTeam.goblins.Contains(goblinScript))
+            {
+                TeamManager.instance.greyTeam.goblins.Add(goblinScript);
+                TeamManager.instance.greyTeam.goblinNetIds.Add(goblinNetId);
+            }
         }
+        else
+        {
+            if (!TeamManager.instance.greenTeam.goblins.Contains(goblinScript))
+            {
+                TeamManager.instance.greenTeam.goblins.Add(goblinScript);
+                TeamManager.instance.greenTeam.goblinNetIds.Add(goblinNetId);
+            }
+        }
+    }
+    // For 3v3 games, get all goblins on player's team. Then set the ones they don't control to their Q/E goblins?
+    public void GetGoblinTeammatesFor3v3()
+    {
+        Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " are they grey team? " + this.isTeamGrey.ToString());
+        if (TeamManager.instance.greyTeam == null || TeamManager.instance.greenTeam)
+            TeamManager.instance.GetLocalTeamObjects();
+        if (this.isTeamGrey)
+            myTeam = TeamManager.instance.greyTeam;
+        else
+            myTeam = TeamManager.instance.greenTeam;
+        //if (myTeam)
+        //{
+        //}
+        try
+        {
+            Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " size of my team " + myTeam.goblinNetIds.Count.ToString());
+            foreach (uint goblinNetId in myTeam.goblinNetIds)
+            {
+                GoblinScript goblinScript = NetworkIdentity.spawned[goblinNetId].gameObject.GetComponent<GoblinScript>();
+                if (goblinScript != selectGoblin)
+                {
+                    if (qGoblin == null)
+                    {
+                        qGoblin = goblinScript;
+                        qGoblin.SetQGoblinLocally3v3(true);
+                        Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " setting qGoblin to: " + qGoblin.name);
+                    }
+                    else if (eGoblin == null)
+                    {
+                        eGoblin = goblinScript;
+                        eGoblin.SetEGoblinLocally3v3(true);
+                        Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " setting eGoblin to: " + eGoblin.name);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " error: " + e);
+        }
+        CmdGetGoblinTeammatesFor3v3OnServer();
+    }
+    [Command]
+    void CmdGetGoblinTeammatesFor3v3OnServer()
+    {
+        Team myTeamForServer;
+        if (this.isTeamGrey)
+            myTeamForServer = TeamManager.instance.greyTeam;
+        else
+            myTeamForServer = TeamManager.instance.greenTeam;
 
+        if (myTeamForServer)
+        {
+            foreach (uint goblinTeammate in myTeamForServer.goblinNetIds)
+            {
+                if (!this.goblinTeamNetIds.Contains(goblinTeammate))
+                {
+                    goblinTeamNetIds.Add(goblinTeammate);
+                }
+            }
+        }
     }
     public void SwitchToQGoblin(bool fromKeyPress, double startTimeSubmitted)
     {
@@ -545,45 +659,59 @@ public class GamePlayer : NetworkBehaviour
             return;
         else
             qeTime = startTimeSubmitted;
-
-        if ((canSwitchGoblin && !selectGoblin.isKicking && !selectGoblin.isDiving) || qGoblin.doesCharacterHaveBall)
+        if (this.is1v1)
         {
-            if (doesTeamHaveBall && !qGoblin.canGoblinReceivePass)
-                return;
-            GoblinScript currentSelectedGoblin = selectGoblin;
-            GoblinScript currentQGoblin = qGoblin;
-
-            currentSelectedGoblin.UnSelectThisCharacter();
-            currentQGoblin.SelectThisCharacter();
-
-            selectGoblin = currentQGoblin;
-            qGoblin = currentSelectedGoblin;
-
-            currentQGoblin.SetQGoblin(false);
-            currentSelectedGoblin.SetQGoblin(true);
-
-            Debug.Log("SwitchToQGoblin: Does current selected goblin have the ball? " + currentSelectedGoblin.doesCharacterHaveBall.ToString());
-            if (currentSelectedGoblin.doesCharacterHaveBall)
+            if ((canSwitchGoblin && !selectGoblin.isKicking && !selectGoblin.isDiving) || qGoblin.doesCharacterHaveBall)
             {
+                if (doesTeamHaveBall && !qGoblin.canGoblinReceivePass)
+                    return;
+                GoblinScript currentSelectedGoblin = selectGoblin;
+                GoblinScript currentQGoblin = qGoblin;
 
-                //ChangeBallHandler(currentSelectedGoblin, currentQGoblin);
-                //ThrowBallToGoblin(currentSelectedGoblin, currentQGoblin);
-                IEnumerator stopSelectedGoblin = currentSelectedGoblin.CantMove();
-                IEnumerator stopQGoblin = currentQGoblin.CantMove();
-                StartCoroutine(stopSelectedGoblin);
-                StartCoroutine(stopQGoblin);
-                currentSelectedGoblin.ThrowBall(currentQGoblin);
+                currentSelectedGoblin.UnSelectThisCharacter();
+                currentQGoblin.SelectThisCharacter();
+
+                selectGoblin = currentQGoblin;
+                qGoblin = currentSelectedGoblin;
+
+                currentQGoblin.SetQGoblin(false);
+                currentSelectedGoblin.SetQGoblin(true);
+
+                Debug.Log("SwitchToQGoblin: Does current selected goblin have the ball? " + currentSelectedGoblin.doesCharacterHaveBall.ToString());
+                if (currentSelectedGoblin.doesCharacterHaveBall)
+                {
+
+                    //ChangeBallHandler(currentSelectedGoblin, currentQGoblin);
+                    //ThrowBallToGoblin(currentSelectedGoblin, currentQGoblin);
+                    IEnumerator stopSelectedGoblin = currentSelectedGoblin.CantMove();
+                    IEnumerator stopQGoblin = currentQGoblin.CantMove();
+                    StartCoroutine(stopSelectedGoblin);
+                    StartCoroutine(stopQGoblin);
+                    currentSelectedGoblin.ThrowBall(currentQGoblin);
+                    IEnumerator stopSwitch = PreventGoblinSwitch();
+                    StartCoroutine(stopSwitch);
+                    //FollowSelectedGoblin(GameObject.FindGameObjectWithTag("football").transform);
+                }
+                else
+                {
+                    FollowSelectedGoblin(selectGoblin.transform);
+                }
+                Debug.Log("SwitchToQGoblin switching to goblin: " + selectGoblin.name);
+                CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
+            }
+        }
+        else
+        {
+            if (!selectGoblin.isKicking && !selectGoblin.isDiving && !selectGoblin.isPunching && !selectGoblin.isGoblinKnockedOut && selectGoblin.doesCharacterHaveBall)
+            {
+                if (doesTeamHaveBall && !qGoblin.canGoblinReceivePass)
+                    return;
+                selectGoblin.ThrowBall(qGoblin);
                 IEnumerator stopSwitch = PreventGoblinSwitch();
                 StartCoroutine(stopSwitch);
-                //FollowSelectedGoblin(GameObject.FindGameObjectWithTag("football").transform);
             }
-            else
-            {
-                FollowSelectedGoblin(selectGoblin.transform);
-            }
-            Debug.Log("SwitchToQGoblin switching to goblin: " + selectGoblin.name);
-            CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
         }
+        
         
     }
     public void SwitchToEGoblin(bool fromKeyPress, double startTimeSubmitted)
@@ -594,52 +722,64 @@ public class GamePlayer : NetworkBehaviour
             return;
         else
             qeTime = startTimeSubmitted;
-
-        if ((canSwitchGoblin && !selectGoblin.isKicking && !selectGoblin.isDiving) || eGoblin.doesCharacterHaveBall)
+        if (this.is1v1)
         {
-            if (doesTeamHaveBall && !eGoblin.canGoblinReceivePass)
-                return;
-            GoblinScript currentSelectedGoblin = selectGoblin;
-            GoblinScript currentEGoblin = eGoblin;
-
-            currentSelectedGoblin.UnSelectThisCharacter();
-            currentEGoblin.SelectThisCharacter();
-
-            selectGoblin = currentEGoblin;
-            eGoblin = currentSelectedGoblin;
-
-            currentEGoblin.SetEGoblin(false);
-            currentSelectedGoblin.SetEGoblin(true);
-
-
-            Debug.Log("SwitchToEGoblin: Does current selected goblin have the ball? " + currentSelectedGoblin.doesCharacterHaveBall.ToString());
-            if (currentSelectedGoblin.doesCharacterHaveBall)
+            if ((canSwitchGoblin && !selectGoblin.isKicking && !selectGoblin.isDiving) || eGoblin.doesCharacterHaveBall)
             {
-                //ChangeBallHandler(currentSelectedGoblin, currentEGoblin);
-                //ThrowBallToGoblin(currentSelectedGoblin, currentEGoblin);
+                if (doesTeamHaveBall && !eGoblin.canGoblinReceivePass)
+                    return;
+                GoblinScript currentSelectedGoblin = selectGoblin;
+                GoblinScript currentEGoblin = eGoblin;
 
-                IEnumerator stopSelectedGoblin = currentSelectedGoblin.CantMove();
-                IEnumerator stopEGoblin = currentEGoblin.CantMove();
-                StartCoroutine(stopSelectedGoblin);
-                StartCoroutine(stopEGoblin);
+                currentSelectedGoblin.UnSelectThisCharacter();
+                currentEGoblin.SelectThisCharacter();
 
-                currentSelectedGoblin.ThrowBall(currentEGoblin);
+                selectGoblin = currentEGoblin;
+                eGoblin = currentSelectedGoblin;
 
+                currentEGoblin.SetEGoblin(false);
+                currentSelectedGoblin.SetEGoblin(true);
+
+
+                Debug.Log("SwitchToEGoblin: Does current selected goblin have the ball? " + currentSelectedGoblin.doesCharacterHaveBall.ToString());
+                if (currentSelectedGoblin.doesCharacterHaveBall)
+                {
+                    //ChangeBallHandler(currentSelectedGoblin, currentEGoblin);
+                    //ThrowBallToGoblin(currentSelectedGoblin, currentEGoblin);
+
+                    IEnumerator stopSelectedGoblin = currentSelectedGoblin.CantMove();
+                    IEnumerator stopEGoblin = currentEGoblin.CantMove();
+                    StartCoroutine(stopSelectedGoblin);
+                    StartCoroutine(stopEGoblin);
+
+                    currentSelectedGoblin.ThrowBall(currentEGoblin);
+
+                    IEnumerator stopSwitch = PreventGoblinSwitch();
+                    StartCoroutine(stopSwitch);
+                    Debug.Log("SwitchToEGoblin: Throwing: set the football to follow");
+                    //FollowSelectedGoblin(GameObject.FindGameObjectWithTag("football").transform);
+                }
+                else
+                {
+                    Debug.Log("SwitchToEGoblin: Throwing: set the GOBLIN to follow");
+                    FollowSelectedGoblin(selectGoblin.transform);
+                }
+                Debug.Log("SwitchToEGoblin switching to goblin: " + selectGoblin.name);
+                CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
+
+            }
+        }
+        else
+        {
+            if (!selectGoblin.isKicking && !selectGoblin.isDiving && !selectGoblin.isPunching && !selectGoblin.isGoblinKnockedOut && selectGoblin.doesCharacterHaveBall)
+            {
+                if (doesTeamHaveBall && !eGoblin.canGoblinReceivePass)
+                    return;
+                selectGoblin.ThrowBall(eGoblin);
                 IEnumerator stopSwitch = PreventGoblinSwitch();
                 StartCoroutine(stopSwitch);
-                Debug.Log("SwitchToEGoblin: Throwing: set the football to follow");
-                //FollowSelectedGoblin(GameObject.FindGameObjectWithTag("football").transform);
             }
-            else
-            {
-                Debug.Log("SwitchToEGoblin: Throwing: set the GOBLIN to follow");
-                FollowSelectedGoblin(selectGoblin.transform);
-            }
-            Debug.Log("SwitchToEGoblin switching to goblin: " + selectGoblin.name);
-            CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
-
         }
-        
     }
     void ChangeBallHandler(GoblinScript oldBallHandler, GoblinScript newBallHandler)
     {
@@ -800,12 +940,17 @@ public class GamePlayer : NetworkBehaviour
     [ClientRpc]
     void RpcDoneLoadingGameplayStuff()
     {
+        Debug.Log("RpcDoneLoadingGameplayStuff: for player: " + this.PlayerName + " and is 1v1? " + this.is1v1);
         if (hasAuthority)
         {
             Game.DestroyWaitingForPlayersCanvas();
             GameplayManager.instance.ActivateCoinTossUI(true);
-        }
-            
+            /*if (!this.is1v1) // for a 3v3 game, tell clients to find all goblins on their team and make ones that aren't their own goblin be with the Q/E goblin
+            {
+                Debug.Log("RpcDoneLoadingGameplayStuff: for player: " + this.PlayerName);
+                GetGoblinTeammatesFor3v3();
+            }*/
+        }   
     }
     public void EnableGoblinMovement(bool enableOrDisable)
     {
@@ -835,10 +980,23 @@ public class GamePlayer : NetworkBehaviour
     [Command]
     void CmdDoesPlayerChooseCoin()
     {
-        if (this.playerNumber == 2)
-            HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, true);
+        if (this.is1v1)
+        {
+            if (this.playerNumber == 2)
+                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, true);
+            else
+                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, false);
+        }
         else
-            HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, false);
+        {
+            if (this.isTeamGrey && this.goblinType == "Grenadier")
+            {
+                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, true);
+            }
+            else
+                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, false);
+        }
+        
     }
     public void HandleDoesPlayerChooseCoin(bool oldValue, bool newValue)
     {
@@ -1149,6 +1307,106 @@ public class GamePlayer : NetworkBehaviour
             }
         }
         
+    }
+    [TargetRpc]
+    public void RpcRepositionTeamForKickOff3v3(NetworkConnection target, bool isTeamKicking, bool isKickingPlayer)
+    {
+        Debug.Log("RpcRepositionTeamForKickOff3v3: for player: " + this.PlayerName + " is their team kicking? " + isTeamKicking.ToString() + " are they the kicking player? " + isKickingPlayer.ToString());
+        if (hasAuthority)
+        {
+            EnableKickingControls(isKickingPlayer);
+            EnableKickoffAimArrowControls(isKickingPlayer);
+            EnableQESwitchingControls(!isTeamKicking);
+            if (isTeamKicking)
+            {
+                if (this.goblinType == "Grenadier")
+                {
+                    if (this.isTeamGrey)
+                    {
+                        selectGoblin.transform.position = KickingPositionGreyGrenadier;
+                        selectGoblin.FlipRenderer(true);
+                    }
+                    else
+                    {
+                        selectGoblin.transform.position = KickingPositionGreenGrenadier;
+                        selectGoblin.FlipRenderer(false);
+                    }
+                    if (isKickingPlayer)
+                    {
+                        selectGoblin.EnableKickoffAimArrow(true);
+                        CmdRequestFootballForKickOffGoblin(selectGoblin.GetComponent<NetworkIdentity>().netId);
+                    }
+                }
+                else if (this.goblinType == "Berserker")
+                {
+                    if (this.isTeamGrey)
+                    {
+                        selectGoblin.transform.position = KickingPositionGreyBerserker;
+                        selectGoblin.FlipRenderer(true);
+                    }
+                    else
+                    {
+                        selectGoblin.transform.position = KickingPositionGreenBerserker;
+                        selectGoblin.FlipRenderer(false);
+                    }
+                }
+                if (this.goblinType == "Skirmisher")
+                {
+                    if (this.isTeamGrey)
+                    {
+                        selectGoblin.transform.position = KickingPositionGreySkirmisher;
+                        selectGoblin.FlipRenderer(true);
+                    }
+                    else
+                    {
+                        selectGoblin.transform.position = KickingPositionGreenSkirmisher;
+                        selectGoblin.FlipRenderer(false);
+                    }
+                }
+            }
+            else
+            {
+                if (this.goblinType == "Grenadier")
+                {
+                    if (this.isTeamGrey)
+                    {
+                        selectGoblin.transform.position = ReceivingPositionGreyGrenadier;
+                        selectGoblin.FlipRenderer(true);
+                    }
+                    else
+                    {
+                        selectGoblin.transform.position = ReceivingPositionGreenGrenadier;
+                        selectGoblin.FlipRenderer(false);
+                    }
+                }
+                else if (this.goblinType == "Berserker")
+                {
+                    if (this.isTeamGrey)
+                    {
+                        selectGoblin.transform.position = ReceivingPositionGreyBerserker;
+                        selectGoblin.FlipRenderer(true);
+                    }
+                    else
+                    {
+                        selectGoblin.transform.position = ReceivingPositionGreenBerserker;
+                        selectGoblin.FlipRenderer(false);
+                    }
+                }
+                if (this.goblinType == "Skirmisher")
+                {
+                    if (this.isTeamGrey)
+                    {
+                        selectGoblin.transform.position = ReceivingPositionGreySkirmisher;
+                        selectGoblin.FlipRenderer(true);
+                    }
+                    else
+                    {
+                        selectGoblin.transform.position = ReceivingPositionGreenSkirmisher;
+                        selectGoblin.FlipRenderer(false);
+                    }
+                }
+            }
+        }
     }
     [Command]
     void CmdRequestFootballForKickOffGoblin(uint goblinNetId)

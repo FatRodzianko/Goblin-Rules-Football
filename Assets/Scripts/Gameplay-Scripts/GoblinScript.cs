@@ -56,6 +56,8 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar(hook = nameof(HandleCharacterSelected))] public bool isCharacterSelected = false;
     [SyncVar(hook = nameof(HandleIsQGoblin))] public bool isQGoblin = false;
     [SyncVar(hook = nameof(HandleIsEGoblin))] public bool isEGoblin = false;
+    public bool isQGoblinLocally3v3 = false;
+    public bool isEGoblinLocally3v3 = false;
     public bool canGoblinMove = true;
     public bool isGoblinPunching = false;
     [SyncVar(hook = nameof(HandleIsPunching))] public bool isPunching = false;
@@ -357,9 +359,6 @@ public class GoblinScript : NetworkBehaviour
         //eMarker.transform.localPosition = new Vector3(0f, 2f, 0f);
         eMarker.transform.localPosition = markerPosition;
         eMarker.SetActive(false);
-
-        
-
     }
     public void SelectThisCharacter()
     {
@@ -418,7 +417,10 @@ public class GoblinScript : NetworkBehaviour
         Debug.Log("SetQGoblin " + isQ.ToString());
         if (hasAuthority)
         {
-            CmdSetQGoblin(isQ);
+            if(GameplayManager.instance.is1v1)
+                CmdSetQGoblin(isQ);
+            else
+                SetQGoblinLocally3v3(isQ);
             if (isBlocking)
                 CmdSetBlocking(false);
         }
@@ -445,12 +447,30 @@ public class GoblinScript : NetworkBehaviour
             }
         }
     }
+    public void SetQGoblinLocally3v3(bool enable)
+    {
+        Debug.Log("SetQGoblinLocally3v3: " + enable.ToString() + " for goblin " + this.name);
+        qMarker.SetActive(enable);
+        if (!enable)
+        {
+            qMarker.GetComponent<QEMarkerScript>().DeactivateGoblinMarkerOnCamera();
+        }
+        /*if (!this.doesCharacterHaveBall)
+            qMarker.SetActive(true);*/
+        if (this.doesCharacterHaveBall)
+            qMarker.SetActive(false);
+        if (!this.isQGoblinLocally3v3)
+            this.isQGoblinLocally3v3 = true;
+    }
     public void SetEGoblin(bool isE)
     {
         Debug.Log("SetEGoblin " + isE.ToString() + " " + this.name);
         if (hasAuthority)
         {
-            CmdSetEGoblin(isE);
+            if (GameplayManager.instance.is1v1)
+                CmdSetEGoblin(isE);
+            else
+                SetEGoblinLocally3v3(isE);
             if (isBlocking)
                 CmdSetBlocking(false);
         }
@@ -474,6 +494,22 @@ public class GoblinScript : NetworkBehaviour
                 eMarker.SetActive(newValue);
             }
         }
+    }
+    // Only set E goblin locally for 3v3 games since it will be different for each player on the team. No need (or ability to) sync the Q/E goblins between players on same team.
+    public void SetEGoblinLocally3v3(bool enable)
+    {
+        Debug.Log("SetEGoblinLocally3v3: " + enable.ToString() + " for goblin " + this.name);
+        eMarker.SetActive(enable);
+        if (!enable)
+        {
+            eMarker.GetComponent<QEMarkerScript>().DeactivateGoblinMarkerOnCamera();
+        }
+        /*if(!this.doesCharacterHaveBall)
+            eMarker.SetActive(true);*/
+        if (this.doesCharacterHaveBall)
+            qMarker.SetActive(false);
+        if (!this.isEGoblinLocally3v3)
+            this.isEGoblinLocally3v3 = true;
     }
     private void Update()
     {
@@ -905,6 +941,13 @@ public class GoblinScript : NetworkBehaviour
                 if (hasAuthority && powerBarActive)
                     ResetPowerBar();
             }
+            if (!GameplayManager.instance.is1v1)
+            {
+                if (isEGoblinLocally3v3)
+                    SetEGoblinLocally3v3(!newValue);
+                if (isQGoblinLocally3v3)
+                    SetQGoblinLocally3v3(!newValue);
+            }
             ballMarkerObject.SetActive(newValue);
         }
     }
@@ -916,10 +959,28 @@ public class GoblinScript : NetworkBehaviour
         {
             Debug.Log("CmdCheckIfTeamStillHasBall: Goblin has ball. Goblin's team still has ball. Setting doesTeamHaveBall to true for player: " + goblinOwnerScript.PlayerName);
             goblinOwnerScript.doesTeamHaveBall = true;
+            if (!GameplayManager.instance.is1v1)
+            {
+                if (goblinOwnerScript.isTeamGrey)
+                {
+                    foreach (GamePlayer player in TeamManager.instance.greyTeam.teamPlayers)
+                    {
+                        player.doesTeamHaveBall = true;
+                    }
+                }
+                else
+                {
+                    foreach (GamePlayer player in TeamManager.instance.greenTeam.teamPlayers)
+                    {
+                        player.doesTeamHaveBall = true;
+                    }
+                }
+            }
         }
         else
         {
             bool anyGoblinHaveBall = false;
+            List<uint> goblinNetIds = new List<uint>();
             foreach (uint goblinNetId in goblinOwnerScript.goblinTeamNetIds)
             {
                 GoblinScript goblinNetIdScript = NetworkIdentity.spawned[goblinNetId].gameObject.GetComponent<GoblinScript>();
@@ -931,6 +992,23 @@ public class GoblinScript : NetworkBehaviour
             }
             Debug.Log("CmdCheckIfTeamStillHasBall: Do any goblins on " + goblinOwnerScript.PlayerName + " team have the ball? " + anyGoblinHaveBall.ToString());
             goblinOwnerScript.doesTeamHaveBall = anyGoblinHaveBall;
+            if (!GameplayManager.instance.is1v1)
+            {
+                if (goblinOwnerScript.isTeamGrey)
+                {
+                    foreach (GamePlayer player in TeamManager.instance.greyTeam.teamPlayers)
+                    {
+                        player.doesTeamHaveBall = anyGoblinHaveBall;
+                    }
+                }
+                else
+                {
+                    foreach (GamePlayer player in TeamManager.instance.greenTeam.teamPlayers)
+                    {
+                        player.doesTeamHaveBall = anyGoblinHaveBall;
+                    }
+                }
+            }
         }
     }
     public void ThrowBall(GoblinScript goblinToThrowTo)
@@ -1850,6 +1928,13 @@ public class GoblinScript : NetworkBehaviour
             {
                 qMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(newValue);
                 eMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(newValue);
+            }
+            if (!GameplayManager.instance.is1v1)
+            { 
+                if(isQGoblinLocally3v3)
+                    qMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(newValue);
+                if(isEGoblinLocally3v3)
+                    eMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(newValue);
             }
             
         }

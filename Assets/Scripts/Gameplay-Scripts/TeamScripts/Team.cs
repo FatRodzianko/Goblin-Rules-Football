@@ -8,6 +8,9 @@ public class Team : NetworkBehaviour
     [Header("Team Info")]
     [SyncVar] public bool isGrey = false;
     public List<GamePlayer> teamPlayers = new List<GamePlayer>();
+    public GamePlayer captain;
+    public List<GoblinScript> goblins = new List<GoblinScript>();
+    public SyncList<uint> goblinNetIds = new SyncList<uint>();
     
 
     [Header("Team Stats")]

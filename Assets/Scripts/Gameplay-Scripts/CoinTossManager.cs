@@ -147,8 +147,8 @@ public class CoinTossManager : NetworkBehaviour
         string[] headsTails = new[]
         { "heads","tails"};
         var rng = new System.Random();
-        string result = headsTails[rng.Next(headsTails.Length)];
-
+        //string result = headsTails[rng.Next(headsTails.Length)];
+        string result = "tails";
         Debug.Log("FlipCoin: " + result);
         HandleHeadsOrTailsOnServer(headsOrTailsServer, result);
     }
@@ -213,38 +213,108 @@ public class CoinTossManager : NetworkBehaviour
         {
             Debug.Log("DidPlayerWinCoinToss: Grey team WON coin toss");
             RpcWinnerOfCoinToss(true);
-            foreach (GamePlayer player in Game.GamePlayers)
+            if (GameplayManager.instance.is1v1)
             {
-                if (player.teamName == "Grey")
-                {                    
-                    player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, true);
-                    player.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
-                }
-                else
+                foreach (GamePlayer player in Game.GamePlayers)
                 {
-                    player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, false);
-                    player.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                    if (player.teamName == "Grey")
+                    {
+                        player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, true);
+                        player.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
+                    }
+                    else
+                    {
+                        player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, false);
+                        player.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                    }
                 }
             }
+            else // set the team captain as the one to choose kick or receive. Loop through teams and then teamplayers to set the control scheme correctly
+            {
+                foreach (Team team in TeamManager.instance.teams)
+                {
+                    if (team.isGrey)
+                    {
+                        foreach (GamePlayer teamPlayer in team.teamPlayers)
+                        {
+                            if (teamPlayer == team.captain)
+                            {
+                                teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, true);
+                                teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
+                            }
+                            else
+                            {
+                                teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
+                                teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (GamePlayer teamPlayer in team.teamPlayers)
+                        {
+                            teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
+                            teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                        }
+                    }
+
+                }
+            }
+            
             didGreyWinCoinToss = true;
         }
-        else
+        else // set the team captain as the one to choose kick or receive. Loop through teams and then teamplayers to set the control scheme correctly
         {
             RpcWinnerOfCoinToss(false);
             Debug.Log("DidPlayerWinCoinToss: Grey team LOST coin toss");
-            foreach (GamePlayer player in Game.GamePlayers)
+            if (GameplayManager.instance.is1v1)
             {
-                if (player.teamName == "Grey")
+                foreach (GamePlayer player in Game.GamePlayers)
                 {
-                    player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, false);
-                    player.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
-                }
-                else
-                {
-                    player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, true);
-                    player.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
+                    if (player.teamName == "Grey")
+                    {
+                        player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, false);
+                        player.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                    }
+                    else
+                    {
+                        player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, true);
+                        player.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
+                    }
                 }
             }
+            else
+            {
+                foreach (Team team in TeamManager.instance.teams)
+                {
+                    if (!team.isGrey)
+                    {
+                        foreach (GamePlayer teamPlayer in team.teamPlayers)
+                        {
+                            if (teamPlayer == team.captain)
+                            {
+                                teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, true);
+                                teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
+                            }
+                            else
+                            {
+                                teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
+                                teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (GamePlayer teamPlayer in team.teamPlayers)
+                        {
+                            teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
+                            teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                        }
+                    }
+
+                }
+            }
+            
             didGreyWinCoinToss = false;
         }
         ActivateKickOrReceiveChoice = ActivateKickOrReceive(didGreyWinCoinToss);
@@ -331,37 +401,87 @@ public class CoinTossManager : NetworkBehaviour
         didPlayerSelectKickOrReceive = true;
         bool didPlayerChooseReceive = false;
 
-        foreach (GamePlayer player in Game.GamePlayers)
+        if (GameplayManager.instance.is1v1)
         {
-            if (player.doesPlayerChooseKickOrReceive)
+            foreach (GamePlayer player in Game.GamePlayers)
             {
-                if (player.kickOrReceivePlayer == "receive")
+                if (player.doesPlayerChooseKickOrReceive)
                 {
-                    GameplayManager.instance.receivingPlayer = player;
-                    didPlayerChooseReceive = true;
+                    if (player.kickOrReceivePlayer == "receive")
+                    {
+                        GameplayManager.instance.receivingPlayer = player;
+                        didPlayerChooseReceive = true;
+                    }
+                    else
+                    {
+                        GameplayManager.instance.kickingPlayer = player;
+                        didPlayerChooseReceive = false;
+                    }
+                    break;
                 }
-                else
+            }
+            foreach (GamePlayer player in Game.GamePlayers)
+            {
+                if (!player.doesPlayerChooseKickOrReceive)
                 {
-                    GameplayManager.instance.kickingPlayer = player;
-                    didPlayerChooseReceive = false;
+                    if (didPlayerChooseReceive)
+                    {
+                        GameplayManager.instance.kickingPlayer = player;
+                    }
+                    else
+                    {
+                        GameplayManager.instance.receivingPlayer = player;
+                    }
+                    break;
                 }
-                break;
             }
         }
-        foreach (GamePlayer player in Game.GamePlayers)
+        else // for 3v3 games, set the kickingTeam and receivingTeam variables on gameplay manager. Set the captain of the kicking team to the kickingPlayer
         {
-            if (!player.doesPlayerChooseKickOrReceive)
+            bool isGreyKickingTeam = false;
+            foreach (GamePlayer player in Game.GamePlayers)
             {
-                if (didPlayerChooseReceive)
+                if (player.doesPlayerChooseKickOrReceive)
                 {
-                    GameplayManager.instance.kickingPlayer = player;
+                    if (player.kickOrReceivePlayer == "receive")
+                    {
+                        GameplayManager.instance.receivingPlayer = player;
+                        didPlayerChooseReceive = true;
+                        if (player.isTeamGrey)
+                            isGreyKickingTeam = false;
+                        else
+                            isGreyKickingTeam = true;
+                    }
+                    else
+                    {
+                        //Debug.Log("ServerPlayerSelectedKickOrReceive: setting kickingPlayer to: " + player.PlayerName);
+                        //GameplayManager.instance.kickingPlayer = player;
+                        didPlayerChooseReceive = false;
+                        if (player.isTeamGrey)
+                            isGreyKickingTeam = true;
+                        else
+                            isGreyKickingTeam = false;
+                    }
+                    break;
                 }
-                else
-                {
-                    GameplayManager.instance.receivingPlayer = player;
-                }
-                break;
             }
+            if (isGreyKickingTeam)
+            {
+                Debug.Log("ServerPlayerSelectedKickOrReceive: Grey team is kicking." + isGreyKickingTeam.ToString() + " setting kickingPlayer to kicking team captain is: " + TeamManager.instance.greyTeam.captain.PlayerName);
+                GameplayManager.instance.kickingTeam = TeamManager.instance.greyTeam;
+                GameplayManager.instance.kickingPlayer = TeamManager.instance.greyTeam.captain;
+                GameplayManager.instance.receivingTeam = TeamManager.instance.greenTeam;
+                GameplayManager.instance.receivingPlayer = TeamManager.instance.greenTeam.captain;
+            }
+            else
+            {
+                Debug.Log("ServerPlayerSelectedKickOrReceive: Green team is kicking." + isGreyKickingTeam.ToString() + " setting kickingPlayer to kicking team captain is: " + TeamManager.instance.greenTeam.captain.PlayerName);
+                GameplayManager.instance.kickingTeam = TeamManager.instance.greenTeam;
+                GameplayManager.instance.kickingPlayer = TeamManager.instance.greenTeam.captain;
+                GameplayManager.instance.receivingTeam = TeamManager.instance.greyTeam;
+                GameplayManager.instance.receivingPlayer = TeamManager.instance.greyTeam.captain;
+            }
+                
         }
         if (GameplayManager.instance.kickingPlayer != null && GameplayManager.instance.receivingPlayer != null)
         {

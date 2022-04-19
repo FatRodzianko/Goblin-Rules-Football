@@ -70,8 +70,6 @@ public class QEMarkerScript : MonoBehaviour
         {
             myCameraMarker.DeactivateGoblinMarker(isQ);
         }
-
-        
     }
     private void FixedUpdate()
     {
@@ -90,5 +88,9 @@ public class QEMarkerScript : MonoBehaviour
             canPassToThisGoblin = false;
         }
             
+    }
+    public void DeactivateGoblinMarkerOnCamera()
+    {
+        myCameraMarker.DeactivateGoblinMarker(isQ);
     }
 }

@@ -33,6 +33,8 @@ public class GameplayManager : NetworkBehaviour
     [Header("Kickoff Info")]
     public GamePlayer kickingPlayer;
     public GamePlayer receivingPlayer;
+    public Team kickingTeam;
+    public Team receivingTeam;
 
     [Header("Touchdown")]
     [SerializeField] GameObject TouchDownPanel;
@@ -301,6 +303,8 @@ public class GameplayManager : NetworkBehaviour
                 LocalGamePlayerScript.FollowSelectedGoblin(LocalGamePlayerScript.selectGoblin.transform);
                 LocalGamePlayerScript.CoinTossControlls(false);
                 LocalGamePlayerScript.KickOrReceiveControls(false);
+                if(!this.is1v1)
+                    LocalGamePlayerScript.GetGoblinTeammatesFor3v3();
             }
             if (newValue == "kick-after-attempt")
             {
@@ -328,8 +332,27 @@ public class GameplayManager : NetworkBehaviour
     void RepositionTeamsForKickOff()
     {
         Debug.Log("RepositionTeamsForKickOff in gamemanager");
-        receivingPlayer.RpcRepositionTeamForKickOff(false);
-        kickingPlayer.RpcRepositionTeamForKickOff(true);
+        if (this.is1v1)
+        {
+            receivingPlayer.RpcRepositionTeamForKickOff(false);
+            kickingPlayer.RpcRepositionTeamForKickOff(true);
+        }
+        else
+        {
+            foreach (GamePlayer player in kickingTeam.teamPlayers)
+            {
+                bool isThisTheKickingPlayer = false;
+                if (player == kickingPlayer)
+                    isThisTheKickingPlayer = true;
+                player.RpcRepositionTeamForKickOff3v3(player.connectionToClient, true, isThisTheKickingPlayer);
+            }
+            foreach (GamePlayer player in receivingTeam.teamPlayers)
+            {
+
+                player.RpcRepositionTeamForKickOff3v3(player.connectionToClient, false, false);
+            }
+        }
+        
     }
     [Server]
     void ActivateGameplayControls(bool activate)

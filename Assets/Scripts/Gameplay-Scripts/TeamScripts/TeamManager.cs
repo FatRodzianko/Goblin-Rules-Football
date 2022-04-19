@@ -7,11 +7,18 @@ public class TeamManager : NetworkBehaviour
 {
     public static TeamManager instance;
     public List<Team> teams = new List<Team>();
+    public Team greenTeam;
+    public Team greyTeam;
     // Start is called before the first frame update
     private void Awake()
     {
         MakeInstance();
         FindTeamObjects();
+    }
+    private void Start()
+    {
+        if(greyTeam == null || greenTeam == null || teams.Count <= 0)
+            FindTeamObjects();
     }
     void MakeInstance()
     {
@@ -20,6 +27,7 @@ public class TeamManager : NetworkBehaviour
     }
     void FindTeamObjects()
     {
+        Debug.Log("FindTeamObjects");
         GameObject[] teamObjects = GameObject.FindGameObjectsWithTag("teamObject");
         if (teamObjects.Length > 0)
         {
@@ -28,8 +36,17 @@ public class TeamManager : NetworkBehaviour
                 Team teamObjectScript = teamObject.GetComponent<Team>();
                 if (teamObjectScript != null && !teams.Contains(teamObjectScript))
                     teams.Add(teamObjectScript);
+                if (teamObjectScript.isGrey)
+                    greyTeam = teamObjectScript;
+                else
+                    greenTeam = teamObjectScript;
             }
         }
+    }
+    public void GetLocalTeamObjects()
+    {
+        if (greyTeam == null || greenTeam == null || teams.Count <= 0)
+            FindTeamObjects();
     }
     // Update is called once per frame
     void Update()

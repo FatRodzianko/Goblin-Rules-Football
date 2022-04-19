@@ -513,7 +513,21 @@ x view stats at end of game
 - - - - - x when a player joins a lobby, update lobby items to include any selected goblins
 - - - - - x when player first joins, update their dropdown list based on what team they are put on?
 - Coin Toss
-- - - make it so the Grenadier of each team is the "captian"
-- - - the captain will be the one to select heads/tails and kick/receive
+- - x make it so the Grenadier of each team is the "captian"
+- - x the captain will be the one to select heads/tails and kick/receive
+- Kick off
+- - - the team captain will always kick
+- - x repositioning: must be redone so each player only repositions their goblin
+- - x set kicking/receiving team instead of kicking/receiving player?
+- - - - - x then loop through teams to have players repositioning themselves
+- - - - - x only have kicking team captain activate kicking controls
+- - - - - x still set the kicking team captain as "kickingPlayer"?
 - Gameplay
 - - - still show Q/E goblins for teammates, but you can't "switch" to them
+- - - - - x will need to go through each goblin on local players team and set the Q/E goblins locally. Shouldn't need to be on the server?
+- - - - - x after cointoss round starts, find all goblin characters. If they are the same time as you, and aren't your selected character/goblinType, make them either the Q/E goblin?
+- - - - - x save who the Q/E goblins are locally on the gameplayer and goblin character
+- - - - - x when a Q/E player is off screen and they pick up the ball, their side q/e marker stays up until they get rid of the ball?
+- - - currently players can always pass, despite being "in front of" the teammate with the ball
+- - - - - - whether you can pass or not is based on if serverGamePlayer.doesTeamHaveBall is set to true. If it is true, the server checks if the goblin is further downfield than the ball, if it is false, it doesn't check
+- - - - - - serverGamePlayer.doesTeamHaveBall currently only works correctly for 1v1. Need to update for 3v3?
