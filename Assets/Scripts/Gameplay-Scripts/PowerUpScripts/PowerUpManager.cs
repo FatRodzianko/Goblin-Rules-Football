@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.UI;
+using TMPro;
 
 public class PowerUpManager : NetworkBehaviour
 {
@@ -14,6 +15,7 @@ public class PowerUpManager : NetworkBehaviour
     [SerializeField] GameObject PowerUp3Image;
     [SerializeField] GameObject PowerUp4Image;
     [SerializeField] GameObject[] PowerUpUIImages;
+    [SerializeField] GameObject[] PowerUpUIRemainingUses;
     [SerializeField] Sprite EmptyPowerUpImage;
 
     [SerializeField] LayerMask powerUpLayer;
@@ -377,12 +379,28 @@ public class PowerUpManager : NetworkBehaviour
     [Client]
     public void UpdatePowerUpUIImages(List<PowerUp> myPowerUps)
     {
+        Debug.Log("UpdatePowerUpUIImages");
         for (int i = 0; i < 4; i++)
         {
-            if ((i+1) > myPowerUps.Count)
+            if ((i + 1) > myPowerUps.Count)
+            {
                 PowerUpUIImages[i].GetComponent<Image>().sprite = EmptyPowerUpImage;
+                PowerUpUIRemainingUses[i].SetActive(false);
+            }   
             else
+            {
                 PowerUpUIImages[i].GetComponent<Image>().sprite = myPowerUps[i].mySprite;
+                if (myPowerUps[i].multipleUses)
+                {
+                    PowerUpUIRemainingUses[i].GetComponent<TextMeshProUGUI>().text = myPowerUps[i].remainingUses.ToString();
+                    PowerUpUIRemainingUses[i].SetActive(true);
+                }
+                else
+                {
+                    PowerUpUIRemainingUses[i].SetActive(false);
+                }
+            }
+                
             /*if (i == 1)
             {
                 if (i > myPowerUps.Count)
@@ -406,24 +424,37 @@ public class PowerUpManager : NetworkBehaviour
         {
             Debug.Log("PowerUpManager PlayerUsePowerUp: The player with netid " + playerNetId.ToString() + " owns the powerup with net id: " + powerUpNetId.ToString());
             GameObject powerUpToUse = NetworkIdentity.spawned[powerUpNetId].gameObject;
+            PowerUp powerUpToUseScript = powerUpToUse.GetComponent<PowerUp>();
 
-            bool canPlayerUsePowerUp = powerUpToUse.GetComponent<PowerUp>().UsePowerUp();
+            //bool canPlayerUsePowerUp = powerUpToUse.GetComponent<PowerUp>().UsePowerUp();
+            bool canPlayerUsePowerUp = powerUpToUseScript.UsePowerUp();
 
             if (canPlayerUsePowerUp)
             {
-                Debug.Log("PlayerUsePowerUp: Player successfully used their powerup. Removing the powerup from the game.");
+                powerUpToUseScript.remainingUses--;
                 GamePlayer player = NetworkIdentity.spawned[playerNetId].GetComponent<GamePlayer>();
-                player.serverPowerUpUints.Remove(powerUpNetId);
+                if (powerUpToUseScript.remainingUses <= 0)
+                {
+                    Debug.Log("PlayerUsePowerUp: Player successfully used their powerup. Removing the powerup from the game.");
+                    
+                    player.serverPowerUpUints.Remove(powerUpNetId);
 
-                PlayerPickedUpPowerUps.Remove(powerUpToUse);
-                PowerUpPlayerOwnerDictionary.Remove(powerUpNetId);
-                if (powerUpToUse.GetComponent<PowerUp>().isBlueShell)
-                    blueShellCount--;
-                NetworkServer.Destroy(powerUpToUse);
+                    PlayerPickedUpPowerUps.Remove(powerUpToUse);
+                    PowerUpPlayerOwnerDictionary.Remove(powerUpNetId);
+                    if (powerUpToUse.GetComponent<PowerUp>().isBlueShell)
+                        blueShellCount--;
+                    NetworkServer.Destroy(powerUpToUse);
+                    // Track when a team has picked up a power up
+                    TeamManager.instance.PowerUpCollectedOrUsed(player, true);
+                }
+                else
+                {
+                    Debug.Log("PlayerUsePowerUp: Player successfully used their powerup. PowerUp still has remaining uses: " + powerUpToUseScript.remainingUses.ToString());
+                }
+                
                 //player.RpcRemoveUsedPowerUp(player.connectionToClient, powerUpNetId);
 
-                // Track when a team has picked up a power up
-                TeamManager.instance.PowerUpCollectedOrUsed(player, true);
+                
             }
             else
             {

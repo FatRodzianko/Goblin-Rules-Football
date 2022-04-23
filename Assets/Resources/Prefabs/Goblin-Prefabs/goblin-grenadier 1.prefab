@@ -228,40 +228,139 @@ MonoBehaviour:
   syncInterval: 0.1
   pressedTime: 0
   releasedTime: 0
+  PowerUpParticleSystemPrefab: {fileID: 0}
   ownerName: 
   ownerConnectionId: 0
   ownerPlayerNumber: 0
   ownerNetId: 0
   myGamePlayer: {fileID: 0}
+  serverGamePlayer: {fileID: 0}
   MaxHealth: 100
   MaxStamina: 4
   StaminaDrain: 1.5
   StaminaRecovery: 1.25
   MaxSpeed: 10
   MaxDamage: 0
+  canCollide: 1
   health: 0
   stamina: 0
   speed: 0
   damage: 0
   ballCarrySpeedModifier: 1
+  blockingSpeedModifier: 1
+  defenseModifier: 0
+  speedModifierFromPowerUps: 1
+  slowDownObstacleModifier: 1
+  possessionSpeedBonus: 1
   isCharacterSelected: 0
   isQGoblin: 0
   isEGoblin: 0
+  isQGoblinLocally3v3: 0
+  isEGoblinLocally3v3: 0
   canGoblinMove: 1
+  isGoblinPunching: 0
+  isPunching: 0
   eMarkerPrefab: {fileID: 3718499330716654528, guid: 764a42fe423f10f4e80ab9e989af2463, type: 3}
   qMarkerPrefab: {fileID: 7215489222767727815, guid: f42ce2cbcc7b04f4db61749caeea4077, type: 3}
-  isRunning: 0
-  isSprinting: 0
-  isFatigued: 0
+  ballMarkerPrefab: {fileID: 0}
+  ballMarkerOpponentPrefab: {fileID: 0}
+  youMarkerPrefab: {fileID: 0}
   animator: {fileID: 2813347414334592408}
   rb: {fileID: 2557221095958938091}
   playerCollider: {fileID: 2744254212339382137}
   previousInput: {x: 0, y: 0}
   myRenderer: {fileID: 2813347414334592415}
   golbinBodyCollider: {fileID: 7555222060970059303}
+  goblinType: 
+  myStatusBars: {fileID: 0}
+  touchdownHitbox: {fileID: 0}
+  divingHitbox: {fileID: 0}
   isGoblinGrey: 0
   doesCharacterHaveBall: 0
   isThrowing: 0
+  isRunningOnServer: 0
+  isRunning: 0
+  isSprinting: 0
+  shiftHeldDown: 0
+  isSprintingOnServer: 0
+  canRecoveryStamina: 1
+  isFatigued: 0
+  isGoblinKnockedOut: 0
+  isSliding: 0
+  slideDirection: {x: 0, y: 0}
+  isSlidingRoutineRunning: 0
+  slideSpeedModifer: 1
+  isDiving: 0
+  DivingRoutineRunning: 0
+  throwingRoutine: 0
+  isBlocking: 0
+  isKicking: 0
+  KickPowerBarHolder: {fileID: 0}
+  KickPowerBarFillerImage: {fileID: 0}
+  KickoffAimArrow: {fileID: 0}
+  powerBarActive: 0
+  GoblinMaxKickDistance: 40
+  GoblinMinKickDistance: 10
+  GoblinPowerBarSpeed: 1
+  GoblinKickPower: 0
+  currentPowerBarScale: 0
+  powerBarDirection: 1
+  kickoffAngle: 0
+  GoblinKickoffAngle: 0
+  aimArrowButtonHeldDown: 0
+  aimArrowUp: 0
+  isKickAfterGoblin: 0
+  isKickAfterPositionSet: 0
+  angleOfKickAttempt: 0
+  kickAfterAccuracyDifficulty: 0
+  kickAfterFinalPosition: {x: 0, y: 0}
+  hasGoblinBeenRepositionedForKickAfter: 0
+  kickAfterAccuracyBar: {fileID: 0}
+  kickAfterGuageLine: {fileID: 0}
+  kickAfterMarkerLeft: {fileID: 0}
+  kickAfterMarkerRight: {fileID: 0}
+  accuracyValueSubmitted: 0
+  powerValueSubmitted: 0
+  isGoblinDoingKickAfterAttempt: 0
+  AccuracyBarSpeed: 0
+  isWasPunchedRoutineRunning: 0
+  wasPunchedSpeedModifier: 1
+  gameFootball: {fileID: 0}
+  canGoblinReceivePass: 0
+  isStaminaRecoveryRoutineRunning: 0
+  isHealthRecoveryRoutineRunning: 0
+  canGoblinRegainHealth: 0
+  isRegainHealthRoutineRunning: 0
+  isTrippedTimerRunning: 0
+  punchBoxCollider: {fileID: 0}
+  hurtBoxCollider: {fileID: 0}
+  slideBoxCollider: {fileID: 0}
+  attackNormal: 0
+  defenseNormal: 0
+  speedNormal: 0
+  state: 0
+  punchRange: 2.5
+  punchRate: 1
+  nextPunchTime: 0
+  slideRange: 3.5
+  slideRate: 2.5
+  nextSlideTime: 0
+  minDistanceFromTarget: 1.7
+  punchYMax: 1.15
+  positionToRunTo: {x: 0, y: 0, z: 0}
+  fieldMaxY: 0
+  fieldMinY: 0
+  fieldMaxX: 0
+  fieldMinX: 0
+  goblinLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  goblinTarget: {fileID: 0}
+  preDirection: {x: 0, y: 0}
+  postDirection: {x: 0, y: 0}
+  adjacentGoblinTime: 0
+  diveRate: 2.5
+  nextDiveTime: 0
 --- !u!95 &2813347414334592408
 Animator:
   serializedVersion: 3

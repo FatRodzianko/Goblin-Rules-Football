@@ -340,10 +340,14 @@ public class GamePlayer : NetworkBehaviour
                 {
                     if (this.goblinType == "Grenadier")
                         team.captain = this;
-                    if(this.isTeamGrey)
+                    if (this.isTeamGrey)
                         teamName = "Grey";
                     else
                         teamName = "Green";
+                }
+                else
+                {
+                    team.captain = this;
                 }
             }   
         }
@@ -358,13 +362,18 @@ public class GamePlayer : NetworkBehaviour
             if (is1v1) // for 1v1 games, spawn all three goblins for each player
             {
                 Debug.Log("Executing SpawnPlayerCharacters on the server for player " + this.PlayerName + this.ConnectionId.ToString());
+                //Team teamOnServer;
                 GameObject newGrenadier = Instantiate(grenadierPrefab);
                 if (IsGameLeader)
+                {
                     newGrenadier.transform.position = GreenGrenadierStartingPosition;
+                    //teamOnServer = TeamManager.instance.greenTeam;
+                }   
                 else
                 {
                     newGrenadier.transform.position = GreyGrenadierStartingPosition;
                     //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
+                    //teamOnServer = TeamManager.instance.greyTeam;
                 }
                 NetworkServer.Spawn(newGrenadier, connectionToClient);
                 goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkIdentity>().netId);
@@ -381,6 +390,7 @@ public class GamePlayer : NetworkBehaviour
                     newGrenadierScript.goblinType += "-grey";
                 newGrenadierScript.serverGamePlayer = this;
                 goblinTeamOnServer.Add(newGrenadierScript);
+                //teamOnServer.add
 
 
                 GameObject newBerserker = Instantiate(berserkerPrefab, transform.position, Quaternion.identity);
@@ -549,6 +559,12 @@ public class GamePlayer : NetworkBehaviour
                 GoblinToAdd.UnSelectThisCharacter();
                 GoblinToAdd.SetEGoblin(true);
             }
+
+            if (this.isTeamGrey)
+                myTeam = TeamManager.instance.greyTeam;
+            else
+                myTeam = TeamManager.instance.greenTeam;
+            CmdAddToGoblinTeamOnTeamObject(GoblinToAdd.GetComponent<NetworkIdentity>().netId);
         }
         else
         {
@@ -1658,6 +1674,85 @@ public class GamePlayer : NetworkBehaviour
             areGoblinsRepositionedForKickAfter = true;
         }
     }
+    [TargetRpc]
+    public void RpcRepositionForKickAfterFor3v3(NetworkConnection target, bool isKickingPlayer, bool isKickingTeam, uint scoringGoblin, float yPosition, int yPositionModifier)
+    {
+        Debug.Log("RpcRepositionForKickAfterFor3v3: for player: " + this.PlayerName);
+        if (hasAuthority && !areGoblinsRepositionedForKickAfter)
+        {
+            if (isKickingTeam)
+            {
+                // Set the position of the kicking goblin and all that???
+                GameObject scoringGoblinObject = NetworkIdentity.spawned[scoringGoblin].gameObject;
+                Vector3 kickingPosition = scoringGoblinObject.transform.position;
+                if (this.isTeamGrey)
+                {
+                    kickingPosition.x = -40f;
+                }
+                else
+                {
+                    kickingPosition.x = 40f;
+                }
+                kickingPosition.y = yPosition;
+                if (isKickingPlayer)
+                {
+                    Debug.Log("RpcRepositionForKickAfterFor3v3: this player is the kicking player on the kicking team: " + this.PlayerName);
+                    CmdRequestFootballForKickOffGoblin(selectGoblin.GetComponent<NetworkIdentity>().netId);
+                    selectGoblin.transform.position = kickingPosition;
+                    selectGoblin.UpdateHasGoblinRepositionedForKickAfter();
+                    selectGoblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
+                }
+                else
+                {
+                    Debug.Log("RpcRepositionForKickAfterFor3v3: this player is NOT the kicking player but they are on the kicking team: " + this.PlayerName);
+                    Vector3 newPosition = selectGoblin.transform.position;
+                    newPosition.x = 0f;
+                    newPosition.y = 3 * yPositionModifier;
+                    selectGoblin.transform.position = newPosition;
+                    selectGoblin.UpdateHasGoblinRepositionedForKickAfter();
+                }
+            }
+            else
+            {
+                Debug.Log("RpcRepositionForKickAfterFor3v3: this player IS NOT ON THE KICKING TEAM: " + this.PlayerName);
+                Vector3 newPosition = Vector3.zero;
+                if (this.goblinType == "Skirmisher")
+                {
+                    Debug.Log("RpcRepositionForKickAfterFor3v3: this player IS NOT ON THE KICKING TEAM and their goblin is the skirmisher, or the blocking goblin?: " + this.PlayerName);
+                    newPosition.y = yPosition;
+                    if (this.isTeamGrey)
+                        newPosition.x = 52f;
+                    else
+                        newPosition.x = -52f;
+                    //selectGoblin.transform.position = newPosition;
+                    //FollowSelectedGoblin(selectGoblin.transform);
+                }
+                else if (this.goblinType == "Grenadier")
+                {
+                    newPosition.y = 3f;
+                    if (this.isTeamGrey)
+                        newPosition.x = 55f;
+                    else
+                        newPosition.x = -55f;
+                }
+                else if (this.goblinType == "Berserker")
+                {
+                    newPosition.y = -3f;
+                    if (this.isTeamGrey)
+                        newPosition.x = 55f;
+                    else
+                        newPosition.x = -55f;
+                }
+                selectGoblin.transform.position = newPosition;
+                FollowSelectedGoblin(selectGoblin.transform);
+                selectGoblin.UpdateHasGoblinRepositionedForKickAfter();
+            }
+
+            EnableKickAfterPositioning(isKickingPlayer);
+            GameplayManager.instance.ActivateKickAfterPositionControlsPanel(isKickingPlayer);
+            areGoblinsRepositionedForKickAfter = true;
+        }
+    }
     public void EnableKickAfterPositioning(bool activate)
     {
         Debug.Log("EnableKickAfterPositioning: for player " + this.PlayerName + " " + activate.ToString());
@@ -1705,6 +1800,7 @@ public class GamePlayer : NetworkBehaviour
     [TargetRpc]
     public void RpcStartKickAfterTimer(NetworkConnection target, bool isKickingPlayer)
     {
+        Debug.Log("RpcStartKickAfterTimer: for player: " + this.PlayerName + " is kicking playeR: " + isKickingPlayer.ToString());
         if (hasAuthority)
             GameplayManager.instance.ActivateKickAfterTimerUI(isKickingPlayer);
     }
@@ -1994,7 +2090,7 @@ public class GamePlayer : NetworkBehaviour
             }
         }
     }
-    void HandlePossessionPoints(float oldValue, float newValue)
+    public void HandlePossessionPoints(float oldValue, float newValue)
     {
         if (isServer)
         {
@@ -2002,10 +2098,10 @@ public class GamePlayer : NetworkBehaviour
         }
         if (isClient)
         {
-            if (this.teamName.ToLower().Contains("green"))
+            /*if (this.teamName.ToLower().Contains("green"))
                 GameplayManager.instance.UpdatePossessionBar(true, newValue);
             else
-                GameplayManager.instance.UpdatePossessionBar(false, newValue);
+                GameplayManager.instance.UpdatePossessionBar(false, newValue);*/
         }
     }
     [ServerCallback]
@@ -2154,12 +2250,12 @@ public class GamePlayer : NetworkBehaviour
         HandlePossessionPoints(this.possessionPoints, 0f);
         possessionBonus = 1.0f;
     }
-    void HandlePossessionBonus(float oldValue, float newValue)
+    public void HandlePossessionBonus(float oldValue, float newValue)
     {
         if (isServer)
         {
             possessionBonus = newValue;
-            UpdatePossessionSpeedBonusForGoblinTeam(newValue);
+            //UpdatePossessionSpeedBonusForGoblinTeam(newValue);
         }
         if (isClient)
         { 
@@ -2250,5 +2346,10 @@ public class GamePlayer : NetworkBehaviour
             InputManager.Controls.UI.Disable();
             menuNavigationEnabled = false;
         }
+    }
+    public void UpdatePowerUpRemainingUses()
+    {
+        if(hasAuthority)
+            PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
     }
 }

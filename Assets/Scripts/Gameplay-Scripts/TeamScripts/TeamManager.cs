@@ -9,6 +9,8 @@ public class TeamManager : NetworkBehaviour
     public List<Team> teams = new List<Team>();
     public Team greenTeam;
     public Team greyTeam;
+    public float blockedKickTime;
+    public float kickAfterAttemptTime;
     // Start is called before the first frame update
     private void Awake()
     {
@@ -149,8 +151,13 @@ public class TeamManager : NetworkBehaviour
     }
     public void KickAfterAttempts(bool isGrey, bool wasGood)
     {
+        Debug.Log("KickAfterAttempts: was team grey? " + isGrey.ToString() + " was the kick good? " + wasGood.ToString() + " at time " + Time.time.ToString());
+        if (Time.time <= (kickAfterAttemptTime + 0.25f))
+            return;
+        else
+            kickAfterAttemptTime = Time.time;
         foreach (Team team in teams)
-        {
+        {   
             if (team.isGrey == isGrey)
             {
                 team.kickAfterAttempts += 1;
@@ -161,6 +168,10 @@ public class TeamManager : NetworkBehaviour
     }
     public void BlockedKick(bool isGrey)
     {
+        if (Time.time <= (blockedKickTime + 0.25f))
+            return;
+        else
+            blockedKickTime = Time.time;
         foreach (Team team in teams)
         {
             if (team.isGrey == isGrey)

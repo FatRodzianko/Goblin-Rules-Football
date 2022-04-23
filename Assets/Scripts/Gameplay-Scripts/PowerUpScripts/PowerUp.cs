@@ -14,6 +14,8 @@ public class PowerUp : NetworkBehaviour
     [SerializeField] public Sprite mySprite;
     [SerializeField] public string powerUpAbility;
     [SerializeField] public bool isBlueShell = false;
+    [SerializeField] [SyncVar(hook = nameof(HandleRemainingUses))] public int remainingUses = 1;
+    [SerializeField] public bool multipleUses = false;
 
     [Header("Power Up Objects")]
     [SerializeField] GameObject PowerUpImageObject;
@@ -223,8 +225,22 @@ public class PowerUp : NetworkBehaviour
             {
                 return false;
             }*/
-            myPlayerOwner.serverSelectGoblin.StartHealNormal();
-            myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("healNormal");
+            //myPlayerOwner.serverSelectGoblin.StartHealNormal();
+            //myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("healNormal");
+            Team playerTeam;
+            if (myPlayerOwner.isTeamGrey)
+                playerTeam = TeamManager.instance.greyTeam;
+            else
+                playerTeam = TeamManager.instance.greenTeam;
+
+            if (playerTeam)
+            {
+                foreach (GoblinScript goblin in playerTeam.goblins)
+                {
+                    goblin.StartHealNormal();
+                    goblin.RpcPlayPowerUpParticle("healNormal");
+                }
+            }
             return true;
         }
         else
@@ -238,8 +254,22 @@ public class PowerUp : NetworkBehaviour
             if (!myPlayerOwner.serverSelectGoblin.attackNormal)
             {
                 Debug.Log("PowerUp AttackNormal: Player " + myPlayerOwner.PlayerName + "'s goblin " + myPlayerOwner.serverSelectGoblin.name + " will have increased attack");
-                myPlayerOwner.serverSelectGoblin.StartAttackNormal();
-                myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("attackNormal");
+                //myPlayerOwner.serverSelectGoblin.StartAttackNormal();
+                //myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("attackNormal");
+                Team playerTeam;
+                if (myPlayerOwner.isTeamGrey)
+                    playerTeam = TeamManager.instance.greyTeam;
+                else
+                    playerTeam = TeamManager.instance.greenTeam;
+
+                if (playerTeam)
+                {
+                    foreach (GoblinScript goblin in playerTeam.goblins)
+                    {
+                        goblin.StartAttackNormal();
+                        goblin.RpcPlayPowerUpParticle("attackNormal");
+                    }
+                }
                 return true;
             }
             else
@@ -257,8 +287,22 @@ public class PowerUp : NetworkBehaviour
             if (!myPlayerOwner.serverSelectGoblin.defenseNormal)
             {
                 Debug.Log("PowerUp DefenseNormal: Player " + myPlayerOwner.PlayerName + "'s goblin " + myPlayerOwner.serverSelectGoblin.name + " will have increased defense");
-                myPlayerOwner.serverSelectGoblin.StartDefenseNormal();
-                myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("defenseNormal");
+                //myPlayerOwner.serverSelectGoblin.StartDefenseNormal();
+                //myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("defenseNormal");
+                Team playerTeam;
+                if (myPlayerOwner.isTeamGrey)
+                    playerTeam = TeamManager.instance.greyTeam;
+                else
+                    playerTeam = TeamManager.instance.greenTeam;
+
+                if (playerTeam)
+                {
+                    foreach (GoblinScript goblin in playerTeam.goblins)
+                    {
+                        goblin.StartDefenseNormal();
+                        goblin.RpcPlayPowerUpParticle("defenseNormal");
+                    }
+                }
                 return true;
             }
             else
@@ -275,8 +319,22 @@ public class PowerUp : NetworkBehaviour
             if (!myPlayerOwner.serverSelectGoblin.speedNormal)
             {
                 Debug.Log("PowerUp SpeedNormal: Player " + myPlayerOwner.PlayerName + "'s goblin " + myPlayerOwner.serverSelectGoblin.name + " will have increased speed");
-                myPlayerOwner.serverSelectGoblin.StartSpeedNormal();
-                myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("speedNormal");
+                //myPlayerOwner.serverSelectGoblin.StartSpeedNormal();
+                //myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("speedNormal");
+                Team playerTeam;
+                if (myPlayerOwner.isTeamGrey)
+                    playerTeam = TeamManager.instance.greyTeam;
+                else
+                    playerTeam = TeamManager.instance.greenTeam;
+
+                if (playerTeam)
+                {
+                    foreach (GoblinScript goblin in playerTeam.goblins)
+                    {
+                        goblin.StartSpeedNormal();
+                        goblin.RpcPlayPowerUpParticle("speedNormal");
+                    }
+                }
                 return true;
             }
             else
@@ -291,7 +349,7 @@ public class PowerUp : NetworkBehaviour
     {
         if (myPlayerOwner != null)
         {
-            GamePlayer opposingPlayer = null;
+            /*GamePlayer opposingPlayer = null;
             foreach (GamePlayer player in Game.GamePlayers)
             {
                 if (player.ConnectionId != myPlayerOwner.ConnectionId)
@@ -309,7 +367,48 @@ public class PowerUp : NetworkBehaviour
             NetworkServer.Spawn(lightningStrikeObject);
 
             //Vector3 newLocalPosition = new Vector3(0.33f, 1f, 0f);
-            //lightningStrikeObject.transform.localPosition = newLocalPosition;
+            //lightningStrikeObject.transform.localPosition = newLocalPosition;*/
+            /*GoblinScript goblinToStrike;
+            uint goblinToStrikeNetId;
+            Football football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+            if (football.isHeld && football.goblinWithBallNetId != 0)
+            {
+                goblinToStrike = NetworkIdentity.spawned[football.goblinWithBallNetId].GetComponent<GoblinScript>();
+                goblinToStrikeNetId = football.goblinWithBallNetId;
+            }
+            else
+            {
+                Team opposingTeam;
+                if (myPlayerOwner.isTeamGrey)
+                    opposingTeam = TeamManager.instance.greenTeam;
+                else
+                    opposingTeam = TeamManager.instance.greyTeam;
+
+            }*/
+            Team teamToStrike;
+            Football football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+            if (football.isHeld && football.goblinWithBallNetId != 0)
+            {
+                GoblinScript goblinWithBall = NetworkIdentity.spawned[football.goblinWithBallNetId].GetComponent<GoblinScript>();
+                if (goblinWithBall.isGoblinGrey)
+                    teamToStrike = TeamManager.instance.greyTeam;
+                else
+                    teamToStrike = TeamManager.instance.greenTeam;
+            }
+            else
+            { 
+                if(myPlayerOwner.isTeamGrey)
+                    teamToStrike = TeamManager.instance.greenTeam;
+                else
+                    teamToStrike = TeamManager.instance.greyTeam;
+            }
+
+            foreach (GoblinScript goblin in teamToStrike.goblins)
+            {
+                GameObject lightningStrikeObject = Instantiate(powerUpAnimationPrefab, goblin.transform);
+                lightningStrikeObject.GetComponent<LightningBlueShell>().goblinToStrikeNetId = goblin.GetComponent<NetworkIdentity>().netId;
+                NetworkServer.Spawn(lightningStrikeObject);
+            }
 
             return true;
         }
@@ -372,5 +471,19 @@ public class PowerUp : NetworkBehaviour
         }
         else
             return false;
+    }
+    public void HandleRemainingUses(int oldValue, int newValue)
+    { 
+        if(isServer)
+        {
+            remainingUses = newValue;
+        }
+        if (isClient)
+        {
+            if (localPlayerOwner)
+            {
+                localPlayerOwner.UpdatePowerUpRemainingUses();
+            }
+        }
     }
 }

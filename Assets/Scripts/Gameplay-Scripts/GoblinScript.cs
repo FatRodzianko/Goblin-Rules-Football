@@ -197,6 +197,10 @@ public class GoblinScript : NetworkBehaviour
     public bool defenseNormal;
     public bool speedNormal;
 
+    [Header("Sprite Effects?")]
+    [SerializeField] private SpriteFlash spriteFlash;
+    [SerializeField] private GameObject fatigueSweatDrop;
+
     [Header("AI Stuff")]
     public State state;
     public float punchRange = 2.5f;
@@ -861,6 +865,11 @@ public class GoblinScript : NetworkBehaviour
             divingHitbox.transform.localScale = newScale;
         }
 
+        FlipFatigueSweatIndicator();
+        /*Vector3 newPosition = fatigueSweatDrop.transform.localPosition;
+        newPosition.x *= -1;
+        fatigueSweatDrop.transform.localPosition = newPosition;*/
+
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -1186,6 +1195,10 @@ public class GoblinScript : NetworkBehaviour
         if (isClient)
         {
             myStatusBars.ChangeStaminaBarColor(newValue);
+            /*fatigueSweatDrop.SetActive(newValue);
+            if(newValue)
+                spriteFlash.Flash(Color.yellow);*/
+            FatigueIndicators(newValue);
             if (hasAuthority)
             {
                 if (newValue)
@@ -1257,7 +1270,9 @@ public class GoblinScript : NetworkBehaviour
     {
         if (isServer)
         {
-            if(this.ownerConnectionId != punchingGoblin.ownerConnectionId)
+            /*if(this.ownerConnectionId != punchingGoblin.ownerConnectionId)
+                DealDamageToGoblins(this, punchingGoblin);*/
+            if (this.isGoblinGrey != punchingGoblin.isGoblinGrey)
                 DealDamageToGoblins(this, punchingGoblin);
         }
             
@@ -1311,7 +1326,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 TeamManager.instance.PunchHit(goblinGivingDamage.serverGamePlayer);
             }
-            
+            goblinReceivingDamage.RpcPunchedFlashSprite();
         }
     }
     [Server]
@@ -1601,10 +1616,16 @@ public class GoblinScript : NetworkBehaviour
     {
         if (isServer)
         {
-            if (this.ownerConnectionId != slidingGoblin.ownerConnectionId)
+            /*if (this.ownerConnectionId != slidingGoblin.ownerConnectionId)
                 slidingGoblin.TripGoblin();
             if (this.isCharacterSelected)
-                TeamManager.instance.SlideTackle(this.serverGamePlayer, true);
+                TeamManager.instance.SlideTackle(this.serverGamePlayer, true);*/
+            if (this.isGoblinGrey != slidingGoblin.isGoblinGrey)
+            {
+                slidingGoblin.TripGoblin();
+                if (this.isCharacterSelected)
+                    TeamManager.instance.SlideTackle(this.serverGamePlayer, true);
+            }   
         }
     }
     public void TripGoblin()
@@ -1619,7 +1640,8 @@ public class GoblinScript : NetworkBehaviour
             }
             else
             {
-                this.KnockOutGoblin(false);
+                if(!this.defenseNormal)
+                    this.KnockOutGoblin(false);
             }
         }
 
@@ -2091,6 +2113,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void StartKickAfterKickAttempt()
     {
+        Debug.Log("StartKickAfterKickAttempt: for goblin " + this.name);
         isGoblinDoingKickAfterAttempt = true;
         isAccuracySubmittedYet = false;
         isPowerSubmittedYet = false;
@@ -2200,7 +2223,7 @@ public class GoblinScript : NetworkBehaviour
     [ServerCallback]
     IEnumerator AttackNormalRoutine()
     {
-        this.damage = MaxDamage * 1.5f;
+        this.damage = MaxDamage * 2.0f;
         attackNormal = true;
         yield return new WaitForSeconds(3.0f);
         this.damage = MaxDamage;
@@ -2215,7 +2238,7 @@ public class GoblinScript : NetworkBehaviour
     [ServerCallback]
     IEnumerator DefenseNormalRoutine()
     {
-        defenseModifier = 0.5f;
+        defenseModifier = 0.35f;
         defenseNormal = true;
         yield return new WaitForSeconds(3.0f);
         defenseModifier = 1.0f;
@@ -2856,5 +2879,37 @@ public class GoblinScript : NetworkBehaviour
         yield return new WaitForSeconds(0.666f);
         canCollide = true;
     }
-
+    [ClientRpc]
+    public void RpcPunchedFlashSprite()
+    {
+        Debug.Log("RpcPunchedFlashSprite: for goblin " + this.name);
+        spriteFlash.Flash(Color.white);
+    }
+    public void FatigueIndicators(bool enable)
+    {
+        Debug.Log("FatigueIndicators: for goblin " + this.name + " " + enable.ToString());
+        if (enable)
+        {  
+            spriteFlash.Flash(Color.yellow);
+        }
+        fatigueSweatDrop.SetActive(enable);
+    }
+    public void FlipFatigueSweatIndicator()
+    {
+        bool flipSweat = false;
+        Vector3 newPosition = fatigueSweatDrop.transform.localPosition;
+        if (myRenderer.flipX && newPosition.x < 0)
+        {
+            flipSweat = true;
+        }
+        if (!myRenderer.flipX && newPosition.x > 0)
+        {
+            flipSweat = true;
+        }
+        if (flipSweat)
+        {
+            newPosition.x *= -1;
+            fatigueSweatDrop.transform.localPosition = newPosition;
+        }
+    }
 }

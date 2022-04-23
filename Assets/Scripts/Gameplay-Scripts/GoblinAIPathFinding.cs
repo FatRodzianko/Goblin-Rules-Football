@@ -198,7 +198,7 @@ public class GoblinAIPathFinding : MonoBehaviour
             if (t == 0)
             {
                 //raycast forward
-                currentRayDir = currentDirection * (avoidObjectsScanDistance + 0.5f);
+                currentRayDir = currentDirection * (avoidObjectsScanDistance + 0.75f);
                 //raycastHit2DResult = Physics2D.Raycast(this.transform.position, currentRayDir, avoidObjectsScanDistance + 0.5f, 1 << LayerMask.NameToLayer("sidelines"));
                 raycastHit2DResult = Physics2D.Raycast(colliderPosition, currentRayDir, avoidObjectsScanDistance + 0.5f, obstacleLayerMask);
                 //raycastHit2DResult = Physics2D.Raycast(colliderPosition, currentRayDir, avoidObjectsScanDistance + 0.5f, 1 << LayerMask.NameToLayer("pathFindingObstacles"));

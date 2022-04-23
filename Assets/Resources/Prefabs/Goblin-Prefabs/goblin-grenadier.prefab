@@ -202,6 +202,7 @@ GameObject:
   - component: {fileID: -9162589318982535215}
   - component: {fileID: 7590740301646765950}
   - component: {fileID: 8176173775456769324}
+  - component: {fileID: 2057881179304844266}
   m_Layer: 11
   m_Name: goblin-grenadier
   m_TagString: Goblin
@@ -233,6 +234,7 @@ Transform:
   - {fileID: 4279645667533102649}
   - {fileID: 7941051993537306295}
   - {fileID: 7740115142962034820}
+  - {fileID: 8532709458500292538}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -395,6 +397,8 @@ MonoBehaviour:
   isCharacterSelected: 0
   isQGoblin: 0
   isEGoblin: 0
+  isQGoblinLocally3v3: 0
+  isEGoblinLocally3v3: 0
   canGoblinMove: 1
   isGoblinPunching: 0
   isPunching: 0
@@ -476,6 +480,8 @@ MonoBehaviour:
   attackNormal: 0
   defenseNormal: 0
   speedNormal: 0
+  spriteFlash: {fileID: 2057881179304844266}
+  fatigueSweatDrop: {fileID: 6807671954434496010}
   state: 0
   punchRange: 2.5
   punchRate: 1.75
@@ -582,6 +588,20 @@ MonoBehaviour:
   avoidObjectsScanDistance: 2
   goblinTarget: {fileID: 0}
   isTargetingAGoblin: 0
+--- !u!114 &2057881179304844266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2813347414334592412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51b65a4ad900f8e4ea42faccde0700ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashMaterial: {fileID: 2100000, guid: 3cd0b6c203e71604690af0ec8cbbd256, type: 2}
+  duration: 0.125
 --- !u!1 &2913983596207522181
 GameObject:
   m_ObjectHideFlags: 0
@@ -1218,6 +1238,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f9f967b2d38df0b4da165510d0bfec6a, type: 3}
+--- !u!4 &2412685904178791634 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4362380316837619779, guid: f9f967b2d38df0b4da165510d0bfec6a, type: 3}
+  m_PrefabInstance: {fileID: 2157748435311684753}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1137670165432246245 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1312812734278955892, guid: f9f967b2d38df0b4da165510d0bfec6a, type: 3}
@@ -1229,10 +1254,80 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98ce64bb6f7810541acc5799795f76d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &2412685904178791634 stripped
+--- !u!1001 &2608992611803938088
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2813347414334592414}
+    m_Modifications:
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_RootOrder
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8812618028991916834, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_Name
+      value: fatigue-sweat-drop
+      objectReference: {fileID: 0}
+    - target: {fileID: 8812618028991916834, guid: 90010161d92a49c43806b7a235520730, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 90010161d92a49c43806b7a235520730, type: 3}
+--- !u!1 &6807671954434496010 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8812618028991916834, guid: 90010161d92a49c43806b7a235520730, type: 3}
+  m_PrefabInstance: {fileID: 2608992611803938088}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8532709458500292538 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 4362380316837619779, guid: f9f967b2d38df0b4da165510d0bfec6a, type: 3}
-  m_PrefabInstance: {fileID: 2157748435311684753}
+  m_CorrespondingSourceObject: {fileID: 5935540891937125010, guid: 90010161d92a49c43806b7a235520730, type: 3}
+  m_PrefabInstance: {fileID: 2608992611803938088}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4343575268371067831
 PrefabInstance:

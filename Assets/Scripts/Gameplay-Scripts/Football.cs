@@ -577,10 +577,12 @@ public class Football : NetworkBehaviour
                 goblinWithBall = null;
                 goblinWithBallNetId = 0;
                 //GameplayManager.instance.RpcNoTeamWithFootball();
-                foreach (GamePlayer player in Game.GamePlayers)
+                /*foreach (GamePlayer player in Game.GamePlayers)
                 {
                     player.UpdatePlayerPossessionTracker(false);
-                }
+                }*/
+                TeamManager.instance.greenTeam.UpdatePlayerPossessionTracker(false);
+                TeamManager.instance.greyTeam.UpdatePlayerPossessionTracker(false);
             }
         }            
         if (isClient)
@@ -1206,7 +1208,7 @@ public class Football : NetworkBehaviour
                 try
                 {
                     GoblinScript goblinScript = NetworkIdentity.spawned[goblinWithBallNetId].GetComponent<GoblinScript>();
-                    foreach (GamePlayer player in Game.GamePlayers)
+                    /*foreach (GamePlayer player in Game.GamePlayers)
                     {
                         if (player.ConnectionId == goblinScript.serverGamePlayer.ConnectionId)
                         {
@@ -1216,6 +1218,16 @@ public class Football : NetworkBehaviour
                         {
                             player.UpdatePlayerPossessionTracker(false);
                         }
+                    }*/
+                    if (goblinScript.isGoblinGrey)
+                    {
+                        TeamManager.instance.greyTeam.UpdatePlayerPossessionTracker(true);
+                        TeamManager.instance.greenTeam.UpdatePlayerPossessionTracker(false);
+                    }
+                    else
+                    {
+                        TeamManager.instance.greenTeam.UpdatePlayerPossessionTracker(true);
+                        TeamManager.instance.greyTeam.UpdatePlayerPossessionTracker(false);
                     }
                 }
                 catch

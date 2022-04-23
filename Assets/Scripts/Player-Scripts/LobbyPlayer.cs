@@ -130,6 +130,8 @@ public class LobbyPlayer : NetworkBehaviour
                 if (this.isGoblinSelected)
                     CmdUnselectGoblin();
                 CmdUpdateTeam(isGrey);
+                if (this.isPlayerReady)
+                    CmdChangePlayerReadyStatus();
             }
         }
             
@@ -281,6 +283,7 @@ public class LobbyPlayer : NetworkBehaviour
         {
             this.isTeamGrey = newValue;
             UpdateTeamListsOnLobbyManager();
+            UpdateAllPlayersOnAvailableGoblins(newValue);
         }   
         if (isClient)
         {
@@ -326,7 +329,12 @@ public class LobbyPlayer : NetworkBehaviour
     public void UnselectGoblin()
     {
         if (hasAuthority)
+        {
             CmdUnselectGoblin();
+            if (this.isPlayerReady)
+                CmdChangePlayerReadyStatus();
+        }
+            
     }
     [Command]
     void CmdUnselectGoblin()
@@ -430,6 +438,8 @@ public class LobbyPlayer : NetworkBehaviour
             {
                 LobbyManager.instance.ActivateChangeGoblinButton();
                 myPlayerListItem.ActivateGoblinDropdown();
+                if (!newValue && this.isPlayerReady)
+                    CmdChangePlayerReadyStatus();
             }
             LobbyManager.instance.UpdateGoblinSelectedBoolOnPlayerListItems(this);
         }

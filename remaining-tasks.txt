@@ -270,9 +270,12 @@ x when a goblin punches while running over football, and then stops still over t
 x For kick off, make sure goblin is facing correct direction? Green goblin at least was facing wrong direction once
 - - - also, make sure to center the camera for the kick off?
 - - - issues appear to mostly be after halftime???
-- for 3v3 game, when player is auto switched, the goblin dropdown doesn't update
-- - - keeps same dropdown from their old team?
-- - - it looks like it is the player who chose had wantsToSwitch set first that has the issue (the first player to switch). The second player to switch gets the right list
+x for 3v3 game, when player is auto switched, the goblin dropdown doesn't update
+- - x keeps same dropdown from their old team?
+- - x it looks like it is the player who chose had wantsToSwitch set first that has the issue (the first player to switch). The second player to switch gets the right list
+x need to change ready status to unready when player switches teams or clicks on change goblin?
+- areAllGoblinsLoaded failed to set to true once in a 3v3 game. It was after I did a lot of team switching and players quitting the lobby and then rejoining
+- - - ReportGoblinSpawnedForPlayer in NetworkManagerGRF is probably what needs to be troubleshot?
 
 
 ### Bottle Throwing event
@@ -469,8 +472,8 @@ x "Cowboy Goblin" that appears on the screen near the stands
 - - - - - - allow players to try dropkick even if they are way too far away
 - - - - - - a missed dropkick would just be handled like any other kick downfield - gameplay carries on normally
 x view stats at end of game
-- - - shows comparison of stats for each team, tracked on the team objects
-- - - how to get event system "Move/Submit" to change to the UI controls? Also, set the "Main Menu" button as the default selected instead of the powerups
+- - x shows comparison of stats for each team, tracked on the team objects
+- - x how to get event system "Move/Submit" to change to the UI controls? Also, set the "Main Menu" button as the default selected instead of the powerups
 - - - - - - https://forum.unity.com/threads/how-to-switch-the-actions-asset-in-the-input-system-ui-input-module-at-runtime.933000/ ???
 
 
@@ -497,13 +500,13 @@ x view stats at end of game
 ### Update to 3v3
 - Create Lobby Menu
 - - - option for 1v1 or 3v3
-- - - - - - sets the maximum number of connections variable on the NetworkManager
-- - - - - - sets bool for is1v1 or is3v3 or something on NetworkManager - will change how gameplayer and other things work?
+- - - - - x sets the maximum number of connections variable on the NetworkManager
+- - - - - x sets bool for is1v1 or is3v3 or something on NetworkManager - will change how gameplayer and other things work?
 - Lobby Menu
 - - x allow players to choose team
-- - - - - - force 3 max players per team
-- - - - - - allow player to set "wants to switch" to true. Used when teams are full (or at least one team has 3)
-- - - - - - if two players, one on each team, have "wants to switch" true, then they switch
+- - - - - x force 3 max players per team
+- - - - - x allow player to set "wants to switch" to true. Used when teams are full (or at least one team has 3)
+- - - - - x if two players, one on each team, have "wants to switch" true, then they switch
 - - - - - - - - - no switch if only one player?
 - - x choose goblin (grenadier/berserker/skirmisher)
 - - - - - x from dropdown
@@ -512,6 +515,9 @@ x view stats at end of game
 - - - - - x make sure when a player quits, their goblin is added back to "available" goblins
 - - - - - x when a player joins a lobby, update lobby items to include any selected goblins
 - - - - - x when player first joins, update their dropdown list based on what team they are put on?
+- - - - - - when player is auto switched, the goblin dropdown doesn't update
+- - - - - - - - - keeps same dropdown from their old team?
+- - - - - - - - - it looks like it is the player who chose had wantsToSwitch set first that has the issue (the first player to switch). The second player to switch gets the right list
 - Coin Toss
 - - x make it so the Grenadier of each team is the "captian"
 - - x the captain will be the one to select heads/tails and kick/receive
@@ -529,5 +535,55 @@ x view stats at end of game
 - - - - - x save who the Q/E goblins are locally on the gameplayer and goblin character
 - - - - - x when a Q/E player is off screen and they pick up the ball, their side q/e marker stays up until they get rid of the ball?
 - - - currently players can always pass, despite being "in front of" the teammate with the ball
-- - - - - - whether you can pass or not is based on if serverGamePlayer.doesTeamHaveBall is set to true. If it is true, the server checks if the goblin is further downfield than the ball, if it is false, it doesn't check
-- - - - - - serverGamePlayer.doesTeamHaveBall currently only works correctly for 1v1. Need to update for 3v3?
+- - - - - x whether you can pass or not is based on if serverGamePlayer.doesTeamHaveBall is set to true. If it is true, the server checks if the goblin is further downfield than the ball, if it is false, it doesn't check
+- - - - - x serverGamePlayer.doesTeamHaveBall currently only works correctly for 1v1. Need to update for 3v3?
+- - - Possession issues
+- - - - - x possession is currently only for one player on a team. In 3v3, this is causing some weird issue where a players possession fluctuates between 0 and a bunch of possession if a teammate has the ball but they do not
+- - - - - x need to make possession team based and stored on the team object going forward instead of the player? At least for 3v3 games?
+- - x punches hurt teammates right now in 3v3. Need to add check to make sure you aren't punching a teammate
+- - - ball marker shouldn't be yellow when a teammate has it?
+- Kick after
+- - x save the scoring player so that they are the ones who kick
+- - x save kickingTeam and blockingTeam
+- - - - - x will be used for both kick after and the kickoff
+- - x recreate kick-after-repositioning so you only move your own goblin if a 3v3 game?
+- - x blocking team currently can't move
+- - - kicking player and blocking skirmisher were placed correctly. Everyone else was just put in their respective endzone
+- - - - - - only tested with green scoring with their skirmisher who was NOT the game host
+- - - blocking player set incorrectly. Looks to have just chosen the first player that wasn't the scoring player, even though they were on the same team
+- - - "Kick was good" text worked. Did not test missed kicked or blocked kick
+- - - goblins correctly repositioned for their kickoff positions, but the football was not moved to the kickoff position or kickoff goblin?
+- - x game crashes when player submits their kick after position
+- - - - - x was trying to make a "blocking player" do stuff but the blocking player was never set
+- - x kick after kicker doesn't get the accuracy bar to come up after the timer
+- - x after kick after attempt, blocking team can move around during kick off. Their movement controls aren't disabled
+- - - - - x double check?
+- Stats
+- - x blocked kicks counted twice on grey team?
+
+### Changes to powerups
+- Have more powerups affect all goblins on your team, not just the one that you have selected?
+- - x attack
+- - x defense
+- - x heal
+- - x speed?
+- Have attack/defense/speed buffs last longer? 10 seconds maybe?
+- - - if it affects all goblins, probably keep it to the shorter time?
+- Defense
+- - x increase defense damage buffs
+- - x make it so you can't be tripped by a slide tackle?
+- - - - - - still will be tripped by obstacles
+- Attack
+- - x increase attack damage - 1 hit KOs unless they have the defense buff?
+- Lightning bolt
+- - x find ball carrier - regardless of their team - and zap them?
+- - x can accidently zap your own team?
+- - x if no one has the ball, zap the opposing captain/selected goblin?
+- Make throwable/droppable powerups have more than 1 use
+- - x Banana
+- - x bottle
+
+
+### Sports game AI stuff?
+https://www.youtube.com/watch?v=Ud7RNhO_VRU
+https://designagame.eu/2015/04/making-a-sport-game-in-unity-model-prototype/

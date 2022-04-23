@@ -44,6 +44,8 @@ public class GameplayManager : NetworkBehaviour
     [Header("Kick After Attempt")]
     public GamePlayer scoringPlayer;
     public GamePlayer blockingPlayer;
+    public Team scoringTeam;
+    public Team blockingTeam;
     [SyncVar] public float yPositionOfKickAfter;
     [SyncVar] public uint scoringGoblinNetId;
     [SerializeField] GameObject KickAfterPositionControlsPanel;
@@ -537,21 +539,68 @@ public class GameplayManager : NetworkBehaviour
             //football.MoveFootballToKickoffGoblin(scoringGoblinScript.GetComponent<NetworkIdentity>().netId);
         }
 
-        foreach (GamePlayer player in Game.GamePlayers)
+        if (this.is1v1)
         {
-            if (scoringGoblinScript.ownerConnectionId == player.ConnectionId)
+            foreach (GamePlayer player in Game.GamePlayers)
             {
-                scoringPlayer = player;
-                kickingPlayer = player;
-                player.RpcRepositionForKickAfter(player.connectionToClient, true, scoringGoblin, yPositionOfKickAfter);
+                if (scoringGoblinScript.ownerConnectionId == player.ConnectionId)
+                {
+                    scoringPlayer = player;
+                    kickingPlayer = player;
+                    player.RpcRepositionForKickAfter(player.connectionToClient, true, scoringGoblin, yPositionOfKickAfter);
+                }
+                else
+                {
+                    blockingPlayer = player;
+                    receivingPlayer = player;
+                    player.RpcRepositionForKickAfter(player.connectionToClient, false, scoringGoblin, yPositionOfKickAfter);
+                }
+            }
+        }
+        else
+        {
+            if (scoringGoblinScript.isGoblinGrey)
+            {
+                scoringTeam = TeamManager.instance.greyTeam;
+                blockingTeam = TeamManager.instance.greenTeam;
             }
             else
             {
-                blockingPlayer = player;
-                receivingPlayer = player;
-                player.RpcRepositionForKickAfter(player.connectionToClient, false, scoringGoblin, yPositionOfKickAfter);
+                scoringTeam = TeamManager.instance.greenTeam;
+                blockingTeam = TeamManager.instance.greyTeam;
             }
-        }        
+            // Set kicking and receiving team/player based on who scored and who will be blocking
+            kickingTeam = scoringTeam;
+            kickingPlayer = scoringTeam.captain;
+            receivingTeam = blockingTeam;
+            receivingPlayer = blockingTeam.captain;
+            blockingPlayer = blockingTeam.captain;
+            // get the owner of the goblin who scored to know who to give kick after controls to and so on
+            foreach (GamePlayer player in Game.GamePlayers)
+            {
+                if (scoringGoblinScript.ownerConnectionId == player.ConnectionId)
+                {
+                    scoringPlayer = player;
+                    break;
+                }
+            }
+            int yModifier = 1;
+            // Reposition goblins for scoring team
+            foreach (GamePlayer player in scoringTeam.teamPlayers)
+            {
+                if (player == scoringPlayer)
+                    player.RpcRepositionForKickAfterFor3v3(player.connectionToClient, true, true, scoringGoblin, yPositionOfKickAfter, 1);
+                else
+                {
+                    yModifier *= -1;
+                    player.RpcRepositionForKickAfterFor3v3(player.connectionToClient, false, true, scoringGoblin, yPositionOfKickAfter, yModifier);
+                }
+            }
+            foreach (GamePlayer player in blockingTeam.teamPlayers)
+            {
+                player.RpcRepositionForKickAfterFor3v3(player.connectionToClient, false, false, scoringGoblin, yPositionOfKickAfter, 1);
+            }
+        }      
     }
     [Server]
     void ResetAllGoblinStatuses()
@@ -582,13 +631,29 @@ public class GameplayManager : NetworkBehaviour
     [Server]
     public void StartKickAfterTimer()
     {
-        scoringPlayer.RpcStartKickAfterTimer(scoringPlayer.connectionToClient, true);
-        blockingPlayer.RpcStartKickAfterTimer(blockingPlayer.connectionToClient, false);
+        Debug.Log("StartKickAfterTimer: for 1v1? " + this.is1v1.ToString());
+        if (this.is1v1)
+        {
+            scoringPlayer.RpcStartKickAfterTimer(scoringPlayer.connectionToClient, true);
+            blockingPlayer.RpcStartKickAfterTimer(blockingPlayer.connectionToClient, false);
+        }
+        else
+        {
+            foreach (GamePlayer player in scoringTeam.teamPlayers)
+            {
+                player.RpcStartKickAfterTimer(player.connectionToClient, true);
+            }
+            foreach (GamePlayer player in blockingTeam.teamPlayers)
+            {
+                player.RpcStartKickAfterTimer(player.connectionToClient, false);
+            }
+        }
         IEnumerator kickAfterCountdown = KickAfterTimerCountDown();
         StartCoroutine(kickAfterCountdown);
     }
     public void ActivateKickAfterTimerUI(bool isKickingPlayer)
     {
+        Debug.Log("ActivateKickAfterTimerUI: is kicking playeR? " + isKickingPlayer.ToString());
         KickAfterPositionControlsPanel.SetActive(false);
         KickAfterTimerBeforeKickPanel.SetActive(true);
         KickAfterTimerText.gameObject.SetActive(true);
@@ -607,6 +672,7 @@ public class GameplayManager : NetworkBehaviour
     [Server]
     IEnumerator KickAfterTimerCountDown()
     {
+        Debug.Log("KickAfterTimerCountDown: started");
         KickAfterTimer = 3;
         yield return new WaitForSeconds(1.0f);
         KickAfterTimer = 2;
@@ -614,17 +680,37 @@ public class GameplayManager : NetworkBehaviour
         KickAfterTimer = 1;
         yield return new WaitForSeconds(1.0f);
         RpcDisableKickAfterTimerUI();
+        if (this.is1v1)
+        {
+            scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, true);
+            blockingPlayer.RpcActivateKickAfterKickingControls(blockingPlayer.connectionToClient, false);
 
-        scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, true);
-        blockingPlayer.RpcActivateKickAfterKickingControls(blockingPlayer.connectionToClient, false);
+            scoringPlayer.RpcActivateKickAfterBlockingControls(scoringPlayer.connectionToClient, false);
+            blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, true);
 
-        scoringPlayer.RpcActivateKickAfterBlockingControls(scoringPlayer.connectionToClient, false);
-        blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, true);
-
-        scoringPlayer.RpcKickAfterUpdateInsctructionsText(scoringPlayer.connectionToClient, true);
-        blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.connectionToClient, false);
-
-
+            scoringPlayer.RpcKickAfterUpdateInsctructionsText(scoringPlayer.connectionToClient, true);
+            blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.connectionToClient, false);
+        }
+        else
+        {
+            foreach (GamePlayer player in scoringTeam.teamPlayers)
+            {
+                if (player == scoringPlayer)
+                {
+                    Debug.Log("KickAfterTimerCountDown: send true to RpcActivateKickAfterKickingControls for scoring playeR: " + player.PlayerName);
+                    player.RpcActivateKickAfterKickingControls(player.connectionToClient, true);
+                }
+                player.RpcActivateKickAfterBlockingControls(player.connectionToClient, false);
+                player.RpcKickAfterUpdateInsctructionsText(player.connectionToClient, true);
+            }
+            foreach (GamePlayer player in blockingTeam.teamPlayers)
+            { 
+                player.RpcActivateKickAfterKickingControls(player.connectionToClient, false);
+                player.RpcActivateKickAfterBlockingControls(player.connectionToClient, true);
+                player.RpcKickAfterUpdateInsctructionsText(player.connectionToClient, false);
+            }
+        }
+        Debug.Log("KickAfterTimerCountDown: ended");
     }
     void HandleKickAfterTimerUpdate(int oldValue, int newValue)
     {
@@ -730,8 +816,22 @@ public class GameplayManager : NetworkBehaviour
     {
         try
         {
-            scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, false);
-            blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, false);
+            if (this.is1v1)
+            {
+                scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, false);
+                blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, false);
+            }
+            else
+            {
+                foreach (GamePlayer player in scoringTeam.teamPlayers)
+                {
+                    player.RpcActivateKickAfterKickingControls(player.connectionToClient, false);
+                }
+                foreach (GamePlayer player in blockingTeam.teamPlayers)
+                {
+                    player.RpcActivateKickAfterBlockingControls(player.connectionToClient, false);
+                }
+            }
         }
         catch (Exception e)
         {
@@ -782,8 +882,17 @@ public class GameplayManager : NetworkBehaviour
         DisableKickAfterPositioningControls();
         DisableKickAfterAttemptControls();
         RpcKickAfterAttemptWasBlocked();
-        TeamManager.instance.BlockedKick(blockingPlayer.isTeamGrey);
-        TeamManager.instance.KickAfterAttempts(scoringPlayer.isTeamGrey, false);
+        if (this.is1v1)
+        {
+            TeamManager.instance.BlockedKick(blockingPlayer.isTeamGrey);
+            TeamManager.instance.KickAfterAttempts(scoringPlayer.isTeamGrey, false);
+        }
+        else
+        {
+            TeamManager.instance.BlockedKick(blockingTeam.isGrey);
+            TeamManager.instance.KickAfterAttempts(scoringTeam.isGrey, false);
+        }
+        
 
     }
     [ClientRpc]
@@ -983,7 +1092,8 @@ public class GameplayManager : NetworkBehaviour
     void GetSecondHalfKickingTeam()
     {
         Debug.Log("GetSecondHalfKickingTeam");
-        foreach (GamePlayer player in Game.GamePlayers)
+
+        /*foreach (GamePlayer player in Game.GamePlayers)
         {
             if (player.teamName == firstHalfKickingTeam)
             {
@@ -993,6 +1103,20 @@ public class GameplayManager : NetworkBehaviour
             {
                 kickingPlayer = player;
             }
+        }*/
+        if (firstHalfKickingTeam.ToLower().Contains("green"))
+        {
+            receivingTeam = TeamManager.instance.greenTeam;
+            receivingPlayer = receivingTeam.captain;
+            kickingTeam = TeamManager.instance.greyTeam;
+            kickingPlayer = kickingTeam.captain;
+        }
+        else
+        {
+            receivingTeam = TeamManager.instance.greyTeam;
+            receivingPlayer = receivingTeam.captain;
+            kickingTeam = TeamManager.instance.greenTeam;
+            kickingPlayer = kickingTeam.captain;
         }
     }
     [ServerCallback]
@@ -1025,10 +1149,12 @@ public class GameplayManager : NetworkBehaviour
     void StopPossessionRoutinesForPlayers()
     {
         Debug.Log("StopPossessionRoutinesForPlayers");
-        foreach (GamePlayer player in Game.GamePlayers)
+        /*foreach (GamePlayer player in Game.GamePlayers)
         {
             player.StopAllPossessionRoutines();
-        }
+        }*/
+        TeamManager.instance.greenTeam.StopAllPossessionRoutines();
+        TeamManager.instance.greyTeam.StopAllPossessionRoutines();
     }
     [Client]
     public void UpdatePossessionBar(bool isGreen, float possession)
