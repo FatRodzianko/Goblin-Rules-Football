@@ -384,6 +384,7 @@ MonoBehaviour:
   MaxSpeed: 8
   MaxDamage: 45
   canCollide: 1
+  soundType: grenadier
   health: 0
   stamina: 0
   speed: 0
@@ -480,6 +481,7 @@ MonoBehaviour:
   attackNormal: 0
   defenseNormal: 0
   speedNormal: 0
+  invinvibilityBlueShell: 0
   spriteFlash: {fileID: 2057881179304844266}
   fatigueSweatDrop: {fileID: 6807671954434496010}
   state: 0

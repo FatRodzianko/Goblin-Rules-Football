@@ -10,6 +10,7 @@ public class PowerUpParticleSystem : MonoBehaviour
     [SerializeField] Sprite attackNormalSprite;
     [SerializeField] Sprite defenseNormalSprite;
     [SerializeField] Sprite speedNormalSprite;
+    [SerializeField] Sprite invincibilityBlueShellSprite;
 
     // Start is called before the first frame update
     void Start()
@@ -44,6 +45,11 @@ public class PowerUpParticleSystem : MonoBehaviour
         {
             main.duration = 3.0f;
             myParticleSystem.textureSheetAnimation.SetSprite(0, speedNormalSprite);
+        }
+        else if (particleType == "invincibilityBlueShell")
+        {
+            main.duration = 5.0f;
+            myParticleSystem.textureSheetAnimation.SetSprite(0, invincibilityBlueShellSprite);
         }
         myParticleSystem.Play();
     }

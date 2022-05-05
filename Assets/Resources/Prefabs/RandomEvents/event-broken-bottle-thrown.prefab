@@ -182,3 +182,5 @@ MonoBehaviour:
   startPoint: {x: 0, y: 0, z: 0}
   endPoint: {x: 0, y: 0, z: 0}
   myAnimator: {fileID: 238845812732257690}
+  myParentEvent: {fileID: 0}
+  sfxClipName: bottle-break

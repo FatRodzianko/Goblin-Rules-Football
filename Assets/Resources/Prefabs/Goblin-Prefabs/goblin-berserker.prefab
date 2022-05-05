@@ -568,6 +568,7 @@ MonoBehaviour:
   MaxSpeed: 7
   MaxDamage: 75
   canCollide: 1
+  soundType: berserker
   health: 0
   stamina: 0
   speed: 0
@@ -664,6 +665,7 @@ MonoBehaviour:
   attackNormal: 0
   defenseNormal: 0
   speedNormal: 0
+  invinvibilityBlueShell: 0
   spriteFlash: {fileID: 8889782622450591458}
   fatigueSweatDrop: {fileID: 3526369216015651541}
   state: 0

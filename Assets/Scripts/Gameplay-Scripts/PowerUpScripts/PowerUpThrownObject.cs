@@ -18,11 +18,15 @@ public class PowerUpThrownObject : NetworkBehaviour
 
     [Header("Throw/drop info")]
     [SyncVar] public bool isDroppedObject;
+    [SyncVar] public bool slowObject;
     Vector3[] throwPoints = new Vector3[3];
     [SyncVar(hook = nameof(HandleIsThrown))] public bool isThrown = false;
     public float throwCount = 0.0f;
     public float throwSpeed;
     public float dropTime = 0f;
+
+    [Header("SFX Stuff")]
+    [SerializeField] public string sfxClipName;
 
     // Start is called before the first frame update
     void Start()
@@ -64,6 +68,8 @@ public class PowerUpThrownObject : NetworkBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log("OnTriggerEnter2D for PowerUpThrownObject: " + this.name);
+        if (slowObject)
+            return;
         if (collision.tag == "Goblin" && isDroppedObject)
         {
             // This is just to make sure that the goblin who threw the banana isn't immediately knocked out by their own banana
@@ -94,7 +100,37 @@ public class PowerUpThrownObject : NetworkBehaviour
             isThrown = false;
             this.GetComponent<BoxCollider2D>().enabled = false;
             myAnimator.Play(playerCollisionAnimationName);
-            
+        }
+    }
+    [ServerCallback]
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        Debug.Log("OnTriggerStay2D for ObstacleObject: " + this.name);
+        if (!slowObject)
+            return;
+        if (collision.tag == "Goblin")
+        {
+            if (slowObject && !isThrown)
+            {
+                Debug.Log("ObstacleObject: still colliding with goblin named: " + collision.transform.name);
+                collision.transform.gameObject.GetComponent<GoblinScript>().SlowDownObstacleEffect(true);
+            }
+        }
+    }
+    [ServerCallback]
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        Debug.Log("OnTriggerStay2D for ObstacleObject: " + this.name);
+        if (!slowObject)
+            return;
+        if (collision.tag == "Goblin")
+        {
+            if (slowObject && !isThrown)
+            {
+                Debug.Log("ObstacleObject: still colliding with goblin named: " + collision.transform.name);
+                collision.transform.gameObject.GetComponent<GoblinScript>().SlowDownObstacleEffect(false);
+                NetworkServer.Destroy(this.gameObject);
+            }
         }
     }
     public void DropBehind(GamePlayer playerOwner)
@@ -108,6 +144,7 @@ public class PowerUpThrownObject : NetworkBehaviour
         {
             Debug.Log("DropBehind: flip x is true");
             directionToDrop = -1;
+            RpcFlipXOfSpriteRenderer(true);
         }
 
         //Calculate directory of object to throw
@@ -208,5 +245,13 @@ public class PowerUpThrownObject : NetworkBehaviour
     void RpcEnableSpriteRenderer(bool activate)
     {
         mySpriteRenderer.enabled = activate;
+    }
+    [ClientCallback]
+    public void PlaySFXClip()
+    {
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x < 0 || screenPoint.x > 1)
+            return;
+        SoundManager.instance.PlaySound(sfxClipName, 0.75f);
     }
 }

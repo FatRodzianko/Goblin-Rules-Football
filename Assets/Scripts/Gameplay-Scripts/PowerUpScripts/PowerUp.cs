@@ -207,6 +207,16 @@ public class PowerUp : NetworkBehaviour
             wasPowerUpUsed = BottleNormal();
             return wasPowerUpUsed;
         }
+        else if (this.powerUpAbility == "invincibilityBlueShell")
+        {
+            wasPowerUpUsed = InvincibilityBlueShell();
+            return wasPowerUpUsed;
+        }
+        else if (this.powerUpAbility == "glueNormal")
+        {
+            wasPowerUpUsed = GlueNormal();
+            return wasPowerUpUsed;
+        }
         return wasPowerUpUsed;
     }
     [ServerCallback]
@@ -466,6 +476,61 @@ public class PowerUp : NetworkBehaviour
             bottleObjectScript.throwSpeed = 1.5f;
             //bananaObjectScript.isDroppedObject = true;
             bottleObjectScript.ThrowForward(myPlayerOwner, startingPosition);
+
+            return true;
+        }
+        else
+            return false;
+    }
+    [ServerCallback]
+    bool InvincibilityBlueShell()
+    {
+        if (myPlayerOwner != null)
+        {
+            // First, heal all goblins on your team
+            Team playerTeam;
+            if (myPlayerOwner.isTeamGrey)
+                playerTeam = TeamManager.instance.greyTeam;
+            else
+                playerTeam = TeamManager.instance.greenTeam;
+
+            if (playerTeam)
+            {
+                foreach (GoblinScript goblin in playerTeam.goblins)
+                {
+                    goblin.StartHealNormal();
+                    //goblin.RpcPlayPowerUpParticle("healNormal");
+                }
+            }
+
+            // Set the selected goblin to invincible
+            myPlayerOwner.serverSelectGoblin.StartInvinvibilityBlueShell();
+            myPlayerOwner.serverSelectGoblin.RpcPlayPowerUpParticle("invincibilityBlueShell");
+
+            return true;
+        }
+        else
+            return false;
+    }
+    [ServerCallback]
+    bool GlueNormal()
+    {
+        if (myPlayerOwner != null)
+        {
+            if (myPlayerOwner.serverSelectGoblin.isGoblinKnockedOut)
+                return false;
+            GameObject glueObject = Instantiate(thrownObjectPrefab);
+            //glueObject.transform.position = myPlayerOwner.transform.position;
+            glueObject.transform.position = myPlayerOwner.serverSelectGoblin.transform.position;
+            NetworkServer.Spawn(glueObject);
+
+            PowerUpThrownObject glueObjectScript = glueObject.GetComponent<PowerUpThrownObject>();
+            glueObjectScript.myPlayerOwner = myPlayerOwner;
+            glueObjectScript.isThrown = false;
+            glueObjectScript.throwSpeed = 2.5f;
+            glueObjectScript.isDroppedObject = true;
+            glueObjectScript.dropTime = Time.time;
+            glueObjectScript.DropBehind(myPlayerOwner);
 
             return true;
         }

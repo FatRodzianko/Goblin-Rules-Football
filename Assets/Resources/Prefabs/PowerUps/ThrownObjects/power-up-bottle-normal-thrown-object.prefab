@@ -220,9 +220,12 @@ MonoBehaviour:
   groundCollisionAnimationName: bottle-break-ground-powerup
   myPlayerOwner: {fileID: 0}
   isDroppedObject: 0
+  slowObject: 0
   isThrown: 0
   throwCount: 0
   throwSpeed: 0
+  dropTime: 0
+  sfxClipName: bottle-break
 --- !u!61 &1164805296021302863
 BoxCollider2D:
   m_ObjectHideFlags: 0

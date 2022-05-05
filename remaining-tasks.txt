@@ -579,11 +579,52 @@ x view stats at end of game
 - - x find ball carrier - regardless of their team - and zap them?
 - - x can accidently zap your own team?
 - - x if no one has the ball, zap the opposing captain/selected goblin?
+- - - probably change this so it is always the opposing team? or at least always the team in the lead?
 - Make throwable/droppable powerups have more than 1 use
 - - x Banana
 - - x bottle
+- New Powerups
+- - - Invincibility Star (blue shell)
+- - - - - x makes player invulnerable to damage and cannot be tripped by slide tackle or trip objects
+- - - - - x last for short period of time: 3-5 seconds?
+- - - - - x makes player slightly faster? Maybe just don't have a ball carrier slowdown if you have the star activated so the player still moves fast with the ball?
+- - - - - x player will need to flash while invuln. Need to modify the spriteFlash script to keep flashing repeatedly until told to stop? Flash multiple colors?
+- - - - - x no ball carrier speed debuff
+- - - - - x stamina does not drain while sprinting
+- - - Glue
+- - - - - x dropped items
+- - - - - x leaves patch of ground that slows people who walk on it
+- - - - - x need to make the puddle object and the splooge drops that "fall" from the player?
+- - - Bomb?
+- - - - - x drop items
+- - - - - x bomb flashes for 2-3 seconds then blows up
+- - - - - x any goblin (friend or foe) within a radius of the bomb is knocked out?
+- - - - - x explosion sprite example https://image.shutterstock.com/image-vector/pixel-art-explosions-game-icons-260nw-1120961030.jpg
 
 
 ### Sports game AI stuff?
 https://www.youtube.com/watch?v=Ud7RNhO_VRU
 https://designagame.eu/2015/04/making-a-sport-game-in-unity-model-prototype/
+
+### Sounds?
+https://sonniss.com/gameaudiogdc#1605031000603-356b3fd2-7003
+- Initial sounds to make:
+- - - punch
+- - - - - - whoosing punch sound before hit (quiet?) - swing stuff in front of mic like spatula and cloths hanger
+- - - - - - impact sound if punch lands (loud?er?) - hit something with wooden dowel? jacket? pillow? chair?
+- - - bomb explosion
+- - - powerup pickup
+- - - gain ball possession
+- - - - - - different sound for your team gaining possession versus opponent gaining possession
+- - - ball fumbled sound? Or ball bouncing sound?
+- - - kicked ball
+- - - audience sound
+- - - - - - cheering for touchdowns?
+- - - - - - maybe make cheering/booing sounds and have them play depending on if your team or opponent did a good thing? Or just home/away (green is home, grey away?)
+- - - walking through water/glue for slowdowns (plop plop plop?)
+- - - brush/weeds slow down sound (some sort of scraping sound?)
+- - - running into trip obstacle
+- - - - - - thud for rock/log
+- - - - - - "slimey" thud for banana peel
+- - - running sound? sound of feet stepping on ground
+

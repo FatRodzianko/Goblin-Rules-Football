@@ -776,6 +776,7 @@ MonoBehaviour:
   MaxSpeed: 9
   MaxDamage: 30
   canCollide: 1
+  soundType: skirmisher
   health: 0
   stamina: 0
   speed: 0
@@ -872,6 +873,7 @@ MonoBehaviour:
   attackNormal: 0
   defenseNormal: 0
   speedNormal: 0
+  invinvibilityBlueShell: 0
   spriteFlash: {fileID: -2641077922915985335}
   fatigueSweatDrop: {fileID: 9030179477220425553}
   state: 0

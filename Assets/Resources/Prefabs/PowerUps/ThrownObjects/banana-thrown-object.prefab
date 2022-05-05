@@ -152,6 +152,7 @@ MonoBehaviour:
   groundCollisionAnimationName: 
   myPlayerOwner: {fileID: 0}
   isDroppedObject: 0
+  slowObject: 0
   isThrown: 0
   throwCount: 0
   throwSpeed: 0

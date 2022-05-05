@@ -88261,7 +88261,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7777778, y: 1}
+    m_SensorSize: {x: 1.3333334, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -106612,6 +106612,22 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 882359792}
     - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
+      propertyPath: NormalPowerUps.Array.size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
+      propertyPath: BlueShellPowerUps.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
+      propertyPath: NormalPowerUps.Array.data[6]
+      value: 
+      objectReference: {fileID: 6338328385301744606, guid: 8e42d4cd6d9ee92458f35b3375477802, type: 3}
+    - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
+      propertyPath: NormalPowerUps.Array.data[7]
+      value: 
+      objectReference: {fileID: 6338328385301744606, guid: 797fe3d57f83e1c4cac6233eead345af, type: 3}
+    - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
       propertyPath: PowerUpUIImages.Array.data[0]
       value: 
       objectReference: {fileID: 1172659878}
@@ -106627,6 +106643,10 @@ PrefabInstance:
       propertyPath: PowerUpUIImages.Array.data[3]
       value: 
       objectReference: {fileID: 882359792}
+    - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
+      propertyPath: BlueShellPowerUps.Array.data[1]
+      value: 
+      objectReference: {fileID: 6338328385301744606, guid: 2f0ae1708a3d76c4681dd7555cac3cd7, type: 3}
     - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
       propertyPath: PowerUpUIRemainingUses.Array.size
       value: 4

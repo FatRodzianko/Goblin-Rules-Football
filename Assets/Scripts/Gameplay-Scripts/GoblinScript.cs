@@ -37,6 +37,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public float MaxSpeed;
     [SyncVar] public int MaxDamage;
     [SyncVar] public bool canCollide = true;
+    public string soundType;
 
 
     [Header("Goblin Current Stats")]
@@ -196,6 +197,7 @@ public class GoblinScript : NetworkBehaviour
     public bool attackNormal;
     public bool defenseNormal;
     public bool speedNormal;
+    public bool invinvibilityBlueShell;
 
     [Header("Sprite Effects?")]
     [SerializeField] private SpriteFlash spriteFlash;
@@ -804,7 +806,7 @@ public class GoblinScript : NetworkBehaviour
                     //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    GetOpenForPass();
+                    //GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
                     //MoveTowardGoblinTarget();
@@ -1172,7 +1174,7 @@ public class GoblinScript : NetworkBehaviour
     [Command]
     void CmdDrainStamina()
     {
-        if (isRunningOnServer)
+        if (isRunningOnServer && !this.invinvibilityBlueShell)
         {
             if (stamina > 0f)
             {
@@ -1238,7 +1240,7 @@ public class GoblinScript : NetworkBehaviour
     [Command]
     void CmdSetBallCarrySpeedModifier()
     {
-        if (doesCharacterHaveBall)
+        if (doesCharacterHaveBall && !this.invinvibilityBlueShell)
             ballCarrySpeedModifier = 0.9f;
         else
             ballCarrySpeedModifier = 1.0f;
@@ -1268,6 +1270,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void HurtBoxCollision(GoblinScript punchingGoblin)
     {
+
         if (isServer)
         {
             /*if(this.ownerConnectionId != punchingGoblin.ownerConnectionId)
@@ -1275,12 +1278,25 @@ public class GoblinScript : NetworkBehaviour
             if (this.isGoblinGrey != punchingGoblin.isGoblinGrey)
                 DealDamageToGoblins(this, punchingGoblin);
         }
+        if (isClient)
+        {
+            if (this.isGoblinGrey != punchingGoblin.isGoblinGrey)
+            {
+                // play sound based on punching goblin?
+                if (punchingGoblin.isGoblinOnScreen())
+                {
+                    SoundManager.instance.PlaySound("hit-by-" + punchingGoblin.soundType, 1.0f);
+                }
+            }
+        }
             
     }
     [Server]
     void DealDamageToGoblins(GoblinScript goblinReceivingDamage, GoblinScript goblinGivingDamage)
     {
         Debug.Log("DealDamageToGoblins: " + goblinGivingDamage.name + " is taking damage from " + goblinGivingDamage.name);
+        if (goblinReceivingDamage.invinvibilityBlueShell)
+            return;
         if (!goblinReceivingDamage.isGoblinKnockedOut)
         {
             // If A Goblin is hit while diving, immediately knock them out.
@@ -1333,6 +1349,8 @@ public class GoblinScript : NetworkBehaviour
     public void KnockOutGoblin(bool knockedOut)
     {
         Debug.Log("KnockOutGoblin: " + knockedOut.ToString());
+        if (this.invinvibilityBlueShell)
+            return;
         if (GameplayManager.instance.gamePhase == "kickoff")
             return;
         if (this.health < 0f)
@@ -2293,6 +2311,32 @@ public class GoblinScript : NetworkBehaviour
         }
         this.UpdateGoblinHealth(this.health, this.MaxHealth);
     }
+    [Server]
+    public void StartInvinvibilityBlueShell()
+    {
+        Debug.Log("StartInvinvibilityBlueShell: for goblin: " + this.name);
+        IEnumerator invinvibilityBlueShellRoutine = InvinvibilityBlueShellRoutine();
+        StartCoroutine(invinvibilityBlueShellRoutine);
+    }
+    [ServerCallback]
+    IEnumerator InvinvibilityBlueShellRoutine()
+    {
+        invinvibilityBlueShell = true;
+        if (this.doesCharacterHaveBall)
+            ballCarrySpeedModifier = 1.0f;
+        this.RpcInvincibilityMultiFlash();
+        yield return new WaitForSeconds(5.0f);
+        invinvibilityBlueShell = false;
+        if (this.doesCharacterHaveBall)
+            ballCarrySpeedModifier = 0.9f;
+
+    }
+    [ClientRpc]
+    public void RpcInvincibilityMultiFlash()
+    {
+        Debug.Log("RpcInvincibilityMultiFlash: for goblin " + this.name);
+        spriteFlash.MultiFlash(5.0f, Color.yellow, Color.blue, Color.magenta);
+    }
     void MoveTowardFootball()
     {
         // Reset the ai script for targetting goblin
@@ -2911,5 +2955,31 @@ public class GoblinScript : NetworkBehaviour
             newPosition.x *= -1;
             fatigueSweatDrop.transform.localPosition = newPosition;
         }
+    }
+    [ClientCallback]
+    public void BerserkerSwingSound()
+    {
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x < 0 || screenPoint.x > 1)
+            return;
+        SoundManager.instance.PlaySound("berserker-swing", 0.75f);
+    }
+    public bool isGoblinOnScreen()
+    {
+        bool onscreen = false;
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x < 0 || screenPoint.x > 1)
+        {
+            onscreen = false;
+        }
+        else
+            onscreen = true;
+        return onscreen;
+    }
+    [ClientRpc]
+    public void RpcHitByGoblin(string type)
+    {
+        Debug.Log("RpcHitByGoblin: goblin type: " + type);
+        SoundManager.instance.PlaySound("hit-by-" + type, 1.0f);
     }
 }

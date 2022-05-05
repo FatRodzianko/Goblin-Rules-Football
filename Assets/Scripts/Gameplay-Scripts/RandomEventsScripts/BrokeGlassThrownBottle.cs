@@ -12,6 +12,10 @@ public class BrokeGlassThrownBottle : NetworkBehaviour
     float throwCount = 0f;
     [SerializeField] public Animator myAnimator;
     public GameObject myParentEvent;
+
+    [Header("SFX Stuff")]
+    [SerializeField] public string sfxClipName;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -72,5 +76,13 @@ public class BrokeGlassThrownBottle : NetworkBehaviour
             if (!myParent.myCollider.enabled)
                 myParent.myCollider.enabled = true;
         }
+    }
+    [ClientCallback]
+    public void PlaySFXClip()
+    {
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x < 0 || screenPoint.x > 1)
+            return;
+        SoundManager.instance.PlaySound(sfxClipName, 0.3f);
     }
 }
