@@ -169,3 +169,8 @@ MonoBehaviour:
   syncInterval: 0.1
   myCollider: {fileID: 0}
   isTripObject: 0
+  isSlowObject: 1
+  isGlue: 0
+  isWater: 1
+  isBrush: 0
+  sfxClipName: 

@@ -9,6 +9,8 @@ public class BombPowerUp : NetworkBehaviour
     IEnumerator countDownRoutine;
     [SerializeField] Animator myAnimator;
     [SerializeField] LayerMask goblinLayer;
+    bool isTimerSFXPlaying = false;
+    bool isExploded = false;
 
     // Start is called before the first frame update
     void Start()
@@ -17,9 +19,9 @@ public class BombPowerUp : NetworkBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-
+        PlayTimerSound();
     }
     [ServerCallback]
     public void StartBombCountDown()
@@ -35,6 +37,7 @@ public class BombPowerUp : NetworkBehaviour
     IEnumerator CountdownRoutine()
     {
         isCountdownRunning = true;
+        RpcStartTimerSound();
         yield return new WaitForSeconds(3.0f);
         myAnimator.SetBool("explode", true);
     }
@@ -60,5 +63,60 @@ public class BombPowerUp : NetworkBehaviour
     public void DestroyMe()
     {
         NetworkServer.Destroy(this.gameObject);
+    }
+    [ClientCallback]
+    public void SFXBombExplode()
+    {
+        if (IsOnScreen())
+        {
+            isExploded = true;
+            StopTimerSound();
+            SoundManager.instance.PlaySound("bomb-explode", 1f);
+        }
+    }
+    public bool IsOnScreen()
+    {
+        bool onscreen = false;
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x < 0 || screenPoint.x > 1)
+        {
+            onscreen = false;
+        }
+        else
+            onscreen = true;
+        return onscreen;
+    }
+    [ClientRpc]
+    void RpcStartTimerSound()
+    {
+        PlayTimerSound();
+    }
+    [ClientCallback]
+    void PlayTimerSound()
+    {
+        if (IsOnScreen())
+        {
+            if (!isTimerSFXPlaying && !isExploded)
+            {
+                SoundManager.instance.PlaySound("bomb-timer", 0.75f);
+                isTimerSFXPlaying = true;
+            }
+        }
+        else
+        {
+            if (isTimerSFXPlaying)
+                StopTimerSound();
+        }
+    }
+    [ClientCallback]
+    void StopTimerSound()
+    {
+        SoundManager.instance.StopSound("bomb-timer");
+        //SoundManager.instance.StopPlaying("bomb-timer");
+        isTimerSFXPlaying = false;
+    }
+    private void OnDestroy()
+    {
+        SoundManager.instance.StopSound("bomb-timer");
     }
 }

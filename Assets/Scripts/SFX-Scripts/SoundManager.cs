@@ -19,7 +19,6 @@ public class SoundManager : MonoBehaviour
         foreach (Sound s in sounds)
         {
             s.source = gameObject.AddComponent<AudioSource>();
-
             s.source.clip = s.clip;
             s.source.outputAudioMixerGroup = mixerGroup;
             //s.source.volume = s.volume;
@@ -42,6 +41,8 @@ public class SoundManager : MonoBehaviour
         if (s == null)
             return;
         Debug.Log("PlaySound: " + name);
+        if (!s.source.enabled)
+            s.source.enabled = true;
         s.source.volume = volume;
         s.source.Play();
         //audioSource.PlayOneShot(s.clip, volume);
@@ -51,7 +52,24 @@ public class SoundManager : MonoBehaviour
         Sound s = Array.Find(sounds, sound => sound.name == name);
         if (s == null)
             return;
-        Debug.Log("StopSound: " + name);
+        Debug.Log("StopSound: " + name + " ");
+        //s.source.mute = true;
+        s.source.Stop();
+        
+        Debug.Log("StopSound: " + name + " is still playing? " + s.source.isPlaying.ToString());
+    }
+    public void StopPlaying(string sound)
+    {
+        Sound s = Array.Find(sounds, item => item.name == sound);
+        if (s == null)
+        {
+            Debug.LogWarning("Sound: " + name + " not found!");
+            return;
+        }
+
+        //s.source.volume = s.volume * (1f + UnityEngine.Random.Range(-s.volumeVariance / 2f, s.volumeVariance / 2f));
+        //s.source.pitch = s.pitch * (1f + UnityEngine.Random.Range(-s.pitchVariance / 2f, s.pitchVariance / 2f));
+
         s.source.Stop();
     }
 }

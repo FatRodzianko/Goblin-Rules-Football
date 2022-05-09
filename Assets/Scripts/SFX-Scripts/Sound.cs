@@ -14,6 +14,5 @@ public class Sound
     public float pitch;
     public bool isLooping;
 
-    [HideInInspector]
     public AudioSource source;
 }

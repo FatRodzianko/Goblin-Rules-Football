@@ -4191,7 +4191,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 352276157}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 473847785}
@@ -88261,7 +88261,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.3333334, y: 1}
+    m_SensorSize: {x: 1.7777778, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -106613,7 +106613,7 @@ PrefabInstance:
       objectReference: {fileID: 882359792}
     - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
       propertyPath: NormalPowerUps.Array.size
-      value: 8
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
       propertyPath: BlueShellPowerUps.Array.size
@@ -106627,6 +106627,10 @@ PrefabInstance:
       propertyPath: NormalPowerUps.Array.data[7]
       value: 
       objectReference: {fileID: 6338328385301744606, guid: 797fe3d57f83e1c4cac6233eead345af, type: 3}
+    - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
+      propertyPath: NormalPowerUps.Array.data[8]
+      value: 
+      objectReference: {fileID: 6338328385301744606, guid: 293f849b1f659984da1007a0705296b4, type: 3}
     - target: {fileID: 2233148172896235088, guid: a51f66a03ccc660488154403f8087a38, type: 3}
       propertyPath: PowerUpUIImages.Array.data[0]
       value: 

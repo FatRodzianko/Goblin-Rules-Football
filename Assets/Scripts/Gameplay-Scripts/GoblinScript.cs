@@ -203,6 +203,11 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] private SpriteFlash spriteFlash;
     [SerializeField] private GameObject fatigueSweatDrop;
 
+    [Header("SFX Stuff")]
+    [SyncVar] public bool onWaterSlowDown;
+    [SyncVar] public bool onBrushSlowDown;
+    [SyncVar] public bool onGlueSlowDown;
+
     [Header("AI Stuff")]
     public State state;
     public float punchRange = 2.5f;
@@ -229,6 +234,7 @@ public class GoblinScript : NetworkBehaviour
     public float nextDiveTime = 0f;
     GoblinAIPathFinding myGoblinAIPathFindingScript;
 
+    
 
     public override void OnStartAuthority()
     {
@@ -2331,6 +2337,15 @@ public class GoblinScript : NetworkBehaviour
             ballCarrySpeedModifier = 0.9f;
 
     }
+    [Server]
+    public void StartStaminaNormal()
+    {
+        this.UpdateGoblinStamina(this.stamina, this.MaxStamina);
+        if (this.isFatigued)
+        {
+            this.HandleIsFatigued(this.isFatigued, false);
+        }
+    }
     [ClientRpc]
     public void RpcInvincibilityMultiFlash()
     {
@@ -2706,7 +2721,15 @@ public class GoblinScript : NetworkBehaviour
             animator.SetBool("isBlocking", false);
             if (!this.doesCharacterHaveBall)
                 animator.SetBool("withFootball", false);
+            this.CmdResetFootstepModifers();
         }        
+    }
+    [Command]
+    void CmdResetFootstepModifers()
+    {
+        this.onGlueSlowDown = false;
+        this.onWaterSlowDown = false;
+        this.onBrushSlowDown = false;
     }
     bool FindNearByGoblinToTarget()
     {
@@ -2905,7 +2928,7 @@ public class GoblinScript : NetworkBehaviour
     [ServerCallback]
     public void SlowDownObstacleEffect(bool stillColliding)
     {
-        if (stillColliding)
+        if (stillColliding && !this.invinvibilityBlueShell)
             slowDownObstacleModifier = 0.5f;
         else
             slowDownObstacleModifier = 1.0f;
@@ -2981,5 +3004,53 @@ public class GoblinScript : NetworkBehaviour
     {
         Debug.Log("RpcHitByGoblin: goblin type: " + type);
         SoundManager.instance.PlaySound("hit-by-" + type, 1.0f);
+    }
+    public void FootstepSFX1()
+    {
+        if (!isGoblinOnScreen())
+            return;
+        float volume = 0.7f;
+        if (this.hasAuthority && this.isCharacterSelected)
+            volume = 0.7f;
+        else
+            volume = 0.45f;
+
+        string footstepType = GetFootstepSFXType(true);
+
+        SoundManager.instance.PlaySound(footstepType, volume);
+    }
+    public void FootstepSFX2()
+    {
+        if (!isGoblinOnScreen())
+            return;
+        float volume = 0.7f;
+        if (this.hasAuthority && this.isCharacterSelected)
+            volume = 0.7f;
+        else
+            volume = 0.35f;
+
+        string footstepType = GetFootstepSFXType(false);
+
+        SoundManager.instance.PlaySound(footstepType, volume);
+    }
+    public string GetFootstepSFXType(bool step1)
+    {
+        string stepType = "";
+
+        if (onGlueSlowDown)
+            stepType = "glue-footstep";
+        else if(onWaterSlowDown)
+            stepType = "water-footstep";
+        else if (onBrushSlowDown)
+            stepType = "brush-footstep";
+        else
+            stepType = "footstep";
+
+        if (step1)
+            stepType = stepType + "-1";
+        else
+            stepType = stepType + "-2";
+
+        return stepType;
     }
 }

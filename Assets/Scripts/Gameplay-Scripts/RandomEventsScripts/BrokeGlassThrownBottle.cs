@@ -78,11 +78,13 @@ public class BrokeGlassThrownBottle : NetworkBehaviour
         }
     }
     [ClientCallback]
-    public void PlaySFXClip()
+    public void PlaySFXClipEvent()
     {
+        //Debug.Log("PlaySFXClipEvent");
         Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
         if (screenPoint.x < 0 || screenPoint.x > 1)
             return;
-        SoundManager.instance.PlaySound(sfxClipName, 0.3f);
+        //Debug.Log("PlaySFXClipEvent: didn't return");
+        SoundManager.instance.PlaySound(sfxClipName, 0.5f);
     }
 }

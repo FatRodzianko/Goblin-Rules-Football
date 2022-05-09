@@ -609,11 +609,11 @@ https://designagame.eu/2015/04/making-a-sport-game-in-unity-model-prototype/
 ### Sounds?
 https://sonniss.com/gameaudiogdc#1605031000603-356b3fd2-7003
 - Initial sounds to make:
-- - - punch
-- - - - - - whoosing punch sound before hit (quiet?) - swing stuff in front of mic like spatula and cloths hanger
-- - - - - - impact sound if punch lands (loud?er?) - hit something with wooden dowel? jacket? pillow? chair?
-- - - bomb explosion
-- - - powerup pickup
+- - x punch
+- - - - - x whoosing punch sound before hit (quiet?) - swing stuff in front of mic like spatula and cloths hanger
+- - - - - x impact sound if punch lands (loud?er?) - hit something with wooden dowel? jacket? pillow? chair?
+- - x bomb explosion
+- - x powerup pickup
 - - - gain ball possession
 - - - - - - different sound for your team gaining possession versus opponent gaining possession
 - - - ball fumbled sound? Or ball bouncing sound?
@@ -621,10 +621,20 @@ https://sonniss.com/gameaudiogdc#1605031000603-356b3fd2-7003
 - - - audience sound
 - - - - - - cheering for touchdowns?
 - - - - - - maybe make cheering/booing sounds and have them play depending on if your team or opponent did a good thing? Or just home/away (green is home, grey away?)
-- - - walking through water/glue for slowdowns (plop plop plop?)
-- - - brush/weeds slow down sound (some sort of scraping sound?)
+- - x walking through water/glue for slowdowns (plop plop plop?)
+- - x brush/weeds slow down sound (some sort of scraping sound?)
 - - - running into trip obstacle
 - - - - - - thud for rock/log
 - - - - - - "slimey" thud for banana peel
-- - - running sound? sound of feet stepping on ground
+- - x running sound? sound of feet stepping on ground
 
+### Sound issues
+x water slow down effects
+- - - right now on a loop an starts when they enter, stops when they exit
+- - - this can cause the clip to end in the middle of the sound or stop before the sounds really "finishes" the first time and sounds bad?
+- - - have some way to trigger it in the animation for each "step"?
+- - - videos for footstep sounds
+- - - - - - https://www.youtube.com/watch?v=5fBKnZM1XE8 "Varying your footsteps based on the terrain in Unity"
+- - - - - - https://www.youtube.com/watch?v=Bnm8mzxnwP8 "Adding Footstep Sounds to your Unity game with Animation Events"
+- - - remember to get rid of the old code for the slow down sounds on the water and brush...
+- - x need to add animation event to all run animations for each goblin type, and for each green/grey. Yay...

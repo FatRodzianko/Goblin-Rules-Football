@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8221639201626328205}
   - component: {fileID: 8221639201626328204}
-  - component: {fileID: 8221639201626328195}
   m_Layer: 0
   m_Name: SoundManager
   m_TagString: Untagged
@@ -44,103 +43,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91d7bfd61ab8a1d4a97f9bacce5f624c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioMixer: {fileID: 0}
-  mixerGroup: {fileID: 0}
-  sounds: []
-  audioSource: {fileID: 8221639201626328195}
---- !u!82 &8221639201626328195
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8221639201626328194}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  audioMixer: {fileID: 24100000, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
+  mixerGroup: {fileID: 3654047802629225012, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
+  sounds:
+  - name: berserker-swing
+    clip: {fileID: 8300000, guid: a83dbc2f95346c248996f61c4406d2ef, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: hit-by-berserker
+    clip: {fileID: 8300000, guid: 49f9893f2ab53f54da27bc56a58b141d, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: hit-by-skirmisher
+    clip: {fileID: 8300000, guid: 4d23b97cca3e36d48bd892b38775ae68, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: hit-by-grenadier
+    clip: {fileID: 8300000, guid: c929b5e896af0654d83bc68653abc6a5, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: bottle-break
+    clip: {fileID: 8300000, guid: 4d761320d13de1b459bf65ed1847b9d8, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: pickup-powerup
+    clip: {fileID: 8300000, guid: ad897cedfd828444f8a81958974fc45f, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: bomb-explode
+    clip: {fileID: 8300000, guid: 29b038e330fce6f4591c9d97a2ba1cf8, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: bomb-timer
+    clip: {fileID: 8300000, guid: fc7bbca1bfdbeaf4f8e9880a7d502ed8, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}

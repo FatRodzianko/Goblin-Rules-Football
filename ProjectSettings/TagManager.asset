@@ -45,7 +45,7 @@ TagManager:
   - powerups
   - thrownObjects
   - pathFindingObstacles
-  - 
+  - obstacleBlocker
   - 
   - 
   - 

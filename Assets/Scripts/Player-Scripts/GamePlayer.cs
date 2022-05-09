@@ -1870,6 +1870,7 @@ public class GamePlayer : NetworkBehaviour
             PowerUp powerUptoAdd = NetworkIdentity.spawned[powerUpNetId].GetComponent<PowerUp>();
             myPowerUps.Add(powerUptoAdd);
             PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
+            SoundManager.instance.PlaySound("pickup-powerup", 0.75f);
         }        
     }
     public void UsePowerUp(int powerUpNumber)

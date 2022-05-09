@@ -125,6 +125,12 @@ public class PowerUp : NetworkBehaviour
 
             if (playerOwner.serverPowerUpUints.Count < 4)
             {
+                if (this.isBlueShell)
+                {
+                    Debug.Log("PowerUp: player is trying to pick up blueshell powerup. Is the player on team grey? " + goblin.isGoblinGrey.ToString());
+                    if (!CanPlayerPickUpBlueShell(goblin.isGoblinGrey))
+                        return;
+                }
                 Debug.Log("PowerUp: " + playerOwner.PlayerName + " has space to pick up powerup " + this.name);
                 uint powerUpNetId = this.GetComponent<NetworkIdentity>().netId;
                 uint playerOwnerNetID = playerOwner.GetComponent<NetworkIdentity>().netId;
@@ -215,6 +221,11 @@ public class PowerUp : NetworkBehaviour
         else if (this.powerUpAbility == "glueNormal")
         {
             wasPowerUpUsed = GlueNormal();
+            return wasPowerUpUsed;
+        }
+        else if (this.powerUpAbility == "staminaNormal")
+        {
+            wasPowerUpUsed = StaminaNormal();
             return wasPowerUpUsed;
         }
         return wasPowerUpUsed;
@@ -396,7 +407,8 @@ public class PowerUp : NetworkBehaviour
 
             }*/
             Team teamToStrike;
-            Football football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+            // old thing where it always stricks the ball carrying team? seems not good?
+            /*Football football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
             if (football.isHeld && football.goblinWithBallNetId != 0)
             {
                 GoblinScript goblinWithBall = NetworkIdentity.spawned[football.goblinWithBallNetId].GetComponent<GoblinScript>();
@@ -411,7 +423,13 @@ public class PowerUp : NetworkBehaviour
                     teamToStrike = TeamManager.instance.greenTeam;
                 else
                     teamToStrike = TeamManager.instance.greyTeam;
-            }
+            }*/
+
+            // new thing always strike opposing team
+            if (myPlayerOwner.isTeamGrey)
+                teamToStrike = TeamManager.instance.greenTeam;
+            else
+                teamToStrike = TeamManager.instance.greyTeam;
 
             foreach (GoblinScript goblin in teamToStrike.goblins)
             {
@@ -537,6 +555,30 @@ public class PowerUp : NetworkBehaviour
         else
             return false;
     }
+    [ServerCallback]
+    bool StaminaNormal()
+    {
+        if (myPlayerOwner != null && myPlayerOwner.serverSelectGoblin != null)
+        {
+            Team playerTeam;
+            if (myPlayerOwner.isTeamGrey)
+                playerTeam = TeamManager.instance.greyTeam;
+            else
+                playerTeam = TeamManager.instance.greenTeam;
+
+            if (playerTeam)
+            {
+                foreach (GoblinScript goblin in playerTeam.goblins)
+                {
+                    goblin.StartStaminaNormal();
+                    goblin.RpcPlayPowerUpParticle("staminaNormal");
+                }
+            }
+            return true;
+        }
+        else
+            return false;
+    }
     public void HandleRemainingUses(int oldValue, int newValue)
     { 
         if(isServer)
@@ -550,5 +592,30 @@ public class PowerUp : NetworkBehaviour
                 localPlayerOwner.UpdatePowerUpRemainingUses();
             }
         }
+    }
+    bool CanPlayerPickUpBlueShell(bool isGoblinGrey)
+    {
+        bool canPickUp = false;
+
+        if (GameplayManager.instance.greyScore > GameplayManager.instance.greenScore)
+        {
+            if (isGoblinGrey)
+                canPickUp = false;
+            else
+                canPickUp = true;
+        }
+        else if (GameplayManager.instance.greyScore < GameplayManager.instance.greenScore)
+        {
+            if (isGoblinGrey)
+                canPickUp = true;
+            else
+                canPickUp = false;
+        }
+        else if (GameplayManager.instance.greyScore == GameplayManager.instance.greenScore)
+        {
+            canPickUp = false;
+        }
+
+        return canPickUp;
     }
 }

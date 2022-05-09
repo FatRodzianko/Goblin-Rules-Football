@@ -82,8 +82,8 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0
-    functionName: PlaySFXClip
+  - time: 0.11666667
+    functionName: PlaySFXClipEvent
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

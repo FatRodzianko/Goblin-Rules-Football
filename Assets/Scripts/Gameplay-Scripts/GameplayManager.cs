@@ -1164,6 +1164,21 @@ public class GameplayManager : NetworkBehaviour
         else
             PossessionBarGrey.GetComponent<PossessionBar>().UpdatePossessionBar(possession);
     }
+    [ClientCallback]
+    public void PlayPossessionChangedSFX(bool doesGreyTeamHaveBall)
+    {
+        if (LocalGamePlayerScript)
+        {
+            if (LocalGamePlayerScript.isTeamGrey == doesGreyTeamHaveBall)
+            {
+                Debug.Log("PlayPossessionChangedSFX: team GAINED possession of the ball.");
+            }
+            else
+            {
+                Debug.Log("PlayPossessionChangedSFX: team LOST possession of the ball.");
+            }
+        }
+    }
     public void MainMenuButton()
     {
         LocalGamePlayerScript.ExitToMainMenu();

@@ -157,6 +157,8 @@ MonoBehaviour:
   throwCount: 0
   throwSpeed: 0
   dropTime: 0
+  isGlue: 1
+  sfxClipName: 
 --- !u!114 &-1690484788134790645
 MonoBehaviour:
   m_ObjectHideFlags: 0

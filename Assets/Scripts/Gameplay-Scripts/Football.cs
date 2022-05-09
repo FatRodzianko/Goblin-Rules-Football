@@ -13,6 +13,7 @@ public class Football : NetworkBehaviour
     [SyncVar] public bool isFalling;
     public GoblinScript goblinWithBall;
     [SyncVar(hook = nameof(HandleGoblinWithBallNetId))] public uint goblinWithBallNetId;
+    public Team teamWithBallLast;
 
     [Header("Ball Components")]
     [SerializeField] private SpriteRenderer myRenderer;
@@ -529,6 +530,22 @@ public class Football : NetworkBehaviour
                     this.HandleGoblinWithBallNetId(goblinWithBallNetId, goblinToCheckScript.GetComponent<NetworkIdentity>().netId);
                     RpcBallIsHeld(true);
 
+                    if (teamWithBallLast == null)
+                    {
+                        if (goblinToCheckScript.isGoblinGrey)
+                            teamWithBallLast = TeamManager.instance.greyTeam;
+                        else
+                            teamWithBallLast = TeamManager.instance.greenTeam;
+                    }
+                    if (teamWithBallLast.isGrey != goblinToCheckScript.isGoblinGrey)
+                    {
+                        Debug.Log("PlayerPickUpFootball: team that previously had the ball was grey? " + teamWithBallLast.isGrey.ToString() + " and the goblin picking up the ball is grey? " + goblinToCheckScript.isGoblinGrey.ToString());
+                        if (goblinToCheckScript.isGoblinGrey)
+                            teamWithBallLast = TeamManager.instance.greyTeam;
+                        else
+                            teamWithBallLast = TeamManager.instance.greenTeam;
+                        RpcChangePossessionSFX(goblinToCheckScript.isGoblinGrey);
+                    }
                 }
                 if (isThrown)
                 {
@@ -1305,6 +1322,9 @@ public class Football : NetworkBehaviour
             }            
         }
     }
-
-
+    [ClientRpc]
+    void RpcChangePossessionSFX(bool doesGreyTeamHaveBallNow)
+    {
+        GameplayManager.instance.PlayPossessionChangedSFX(doesGreyTeamHaveBallNow);
+    }
 }

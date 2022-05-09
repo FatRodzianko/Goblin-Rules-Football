@@ -4825,3 +4825,4 @@ MonoBehaviour:
   defenseNormalSprite: {fileID: 21300000, guid: d00f3d1cf80f05e4d9a0ad47d57cd585, type: 3}
   speedNormalSprite: {fileID: 21300000, guid: 180ae6bc62d0a8c4f9b96eb29cd3d123, type: 3}
   invincibilityBlueShellSprite: {fileID: 21300000, guid: 28cec28df63a16e4b8431048a2eba15f, type: 3}
+  staminaNormalSprite: {fileID: 21300000, guid: 7865a3f34ca99be459caf58cb7992586, type: 3}

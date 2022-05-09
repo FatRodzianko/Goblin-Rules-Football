@@ -25,6 +25,11 @@ public class PowerUpThrownObject : NetworkBehaviour
     public float throwSpeed;
     public float dropTime = 0f;
 
+    [Header("SFX Types")]
+    public bool isGlue;
+    public bool isWater;
+    public bool isBrush;
+
     [Header("SFX Stuff")]
     [SerializeField] public string sfxClipName;
 
@@ -114,6 +119,9 @@ public class PowerUpThrownObject : NetworkBehaviour
             {
                 Debug.Log("ObstacleObject: still colliding with goblin named: " + collision.transform.name);
                 collision.transform.gameObject.GetComponent<GoblinScript>().SlowDownObstacleEffect(true);
+                collision.transform.gameObject.GetComponent<GoblinScript>().onGlueSlowDown = this.isGlue;
+                collision.transform.gameObject.GetComponent<GoblinScript>().onWaterSlowDown = this.isWater;
+                collision.transform.gameObject.GetComponent<GoblinScript>().onBrushSlowDown = this.isBrush;
             }
         }
     }
@@ -129,6 +137,9 @@ public class PowerUpThrownObject : NetworkBehaviour
             {
                 Debug.Log("ObstacleObject: still colliding with goblin named: " + collision.transform.name);
                 collision.transform.gameObject.GetComponent<GoblinScript>().SlowDownObstacleEffect(false);
+                collision.transform.gameObject.GetComponent<GoblinScript>().onGlueSlowDown = false;
+                collision.transform.gameObject.GetComponent<GoblinScript>().onWaterSlowDown = false;
+                collision.transform.gameObject.GetComponent<GoblinScript>().onBrushSlowDown = false;
                 NetworkServer.Destroy(this.gameObject);
             }
         }

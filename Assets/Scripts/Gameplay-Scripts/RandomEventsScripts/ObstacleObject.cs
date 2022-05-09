@@ -7,6 +7,16 @@ public class ObstacleObject : NetworkBehaviour
 {
     [SerializeField] Collider2D myCollider;
     [SerializeField] bool isTripObject;
+    public bool isSlowObject;
+
+    [Header("SFX Types")]
+    public bool isGlue;
+    public bool isWater;
+    public bool isBrush;
+
+    [Header("SFX Stuff")]
+    [SerializeField] public string sfxClipName;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -54,6 +64,13 @@ public class ObstacleObject : NetworkBehaviour
             {
                 Debug.Log("ObstacleObject: still colliding with goblin named: " + collision.transform.name);
                 collision.transform.gameObject.GetComponent<GoblinScript>().SlowDownObstacleEffect(true);
+                if (isSlowObject)
+                {
+                    collision.transform.gameObject.GetComponent<GoblinScript>().onWaterSlowDown = this.isWater;
+                    collision.transform.gameObject.GetComponent<GoblinScript>().onBrushSlowDown = this.isBrush;
+                    collision.transform.gameObject.GetComponent<GoblinScript>().onGlueSlowDown = this.isGlue;
+                }
+
             }
         }
     }
@@ -66,8 +83,26 @@ public class ObstacleObject : NetworkBehaviour
             {
                 Debug.Log("ObstacleObject: still colliding with goblin named: " + collision.transform.name);
                 collision.transform.gameObject.GetComponent<GoblinScript>().SlowDownObstacleEffect(false);
+                if (isSlowObject)
+                {
+                    collision.transform.gameObject.GetComponent<GoblinScript>().onWaterSlowDown = false;
+                    collision.transform.gameObject.GetComponent<GoblinScript>().onBrushSlowDown = false;
+                    collision.transform.gameObject.GetComponent<GoblinScript>().onGlueSlowDown = false;
+                }   
             }
         }
+    }
+    public bool IsOnScreen()
+    {
+        bool onscreen = false;
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x < 0 || screenPoint.x > 1)
+        {
+            onscreen = false;
+        }
+        else
+            onscreen = true;
+        return onscreen;
     }
 
 }
