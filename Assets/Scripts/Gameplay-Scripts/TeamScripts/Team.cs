@@ -77,6 +77,7 @@ public class Team : NetworkBehaviour
         Debug.Log("RpcPlayYeehawSound: placeholder until YEEHAW sound is added");
         CowboyScript cowboy = GameObject.FindGameObjectWithTag("cowboy").GetComponent<CowboyScript>();
         cowboy.ActivateYeehawText();
+        SoundManager.instance.PlaySound("yeehaw", 1.0f);
     }
     void HandlePossessionPoints(float oldValue, float newValue)
     {

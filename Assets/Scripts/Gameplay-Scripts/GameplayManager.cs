@@ -426,6 +426,8 @@ public class GameplayManager : NetworkBehaviour
         touchDownTeamText.GetComponent<TouchDownTextGradient>().SetGreenOrGreyColor(wasGrey);
         GameObject scoringGoblin = NetworkIdentity.spawned[goblinId].gameObject;
         LocalGamePlayerScript.FollowSelectedGoblin(scoringGoblin.transform);
+        SoundManager.instance.PlaySound("touchdown-cheer", 0.75f);
+        SoundManager.instance.PlaySound("touchdown-touchdown", 1.0f);
     }
     [Server]
     public void ActivateGameTimer(bool activate)
@@ -782,12 +784,16 @@ public class GameplayManager : NetworkBehaviour
             KickWasNotGoodText.gameObject.SetActive(false);
             KickWasGoodText.gameObject.SetActive(true);
             KickWasGoodText.GetComponent<TouchDownTextGradient>().ActivateGradient();
+            SoundManager.instance.PlaySound("kick-its-good", 1.0f);
+            SoundManager.instance.PlaySound("touchdown-cheer", 0.75f);
         }
         else
         {
             KickWasNotGoodText.gameObject.SetActive(true);
             KickWasGoodText.gameObject.SetActive(false);
             KickWasNotGoodText.GetComponent<TouchDownTextGradient>().SetGreenOrGreyColor(isScoringPlayerGrey);
+            SoundManager.instance.PlaySound("kick-no-good", 1.0f);
+            SoundManager.instance.PlaySound("touchdown-cheer", 0.75f);
         }
     }
     [Server]
@@ -903,6 +909,8 @@ public class GameplayManager : NetworkBehaviour
         KickAfterWasKickGoodPanel.SetActive(true);
         TheKickWasText.gameObject.SetActive(true);
         KickWasBlockedText.gameObject.SetActive(true);
+        SoundManager.instance.PlaySound("kick-blocked", 1.0f);
+        SoundManager.instance.PlaySound("touchdown-cheer", 0.75f);
     }
     [Server]
     void DetermineWinnerOfGame()
@@ -1172,10 +1180,12 @@ public class GameplayManager : NetworkBehaviour
             if (LocalGamePlayerScript.isTeamGrey == doesGreyTeamHaveBall)
             {
                 Debug.Log("PlayPossessionChangedSFX: team GAINED possession of the ball.");
+                SoundManager.instance.PlaySound("gain-possession", 1.0f);
             }
             else
             {
                 Debug.Log("PlayPossessionChangedSFX: team LOST possession of the ball.");
+                SoundManager.instance.PlaySound("lose-possession", 1.0f);
             }
         }
     }

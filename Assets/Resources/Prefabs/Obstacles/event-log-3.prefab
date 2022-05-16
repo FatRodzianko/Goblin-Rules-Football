@@ -170,6 +170,11 @@ MonoBehaviour:
   syncInterval: 0.1
   myCollider: {fileID: 0}
   isTripObject: 1
+  isSlowObject: 0
+  isGlue: 0
+  isWater: 0
+  isBrush: 0
+  sfxClipName: trip-wood
 --- !u!1 &8932315372137136483
 GameObject:
   m_ObjectHideFlags: 0

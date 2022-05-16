@@ -157,6 +157,11 @@ MonoBehaviour:
   throwCount: 0
   throwSpeed: 0
   dropTime: 0
+  isGlue: 0
+  isWater: 0
+  isBrush: 0
+  sfxClipName: trip-banana
+  playSoundOnDestroy: 1
 --- !u!114 &-1690484788134790645
 MonoBehaviour:
   m_ObjectHideFlags: 0

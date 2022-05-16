@@ -33,26 +33,42 @@ public class ObstacleObject : NetworkBehaviour
     {
         myCollider.enabled = enable;
     }
-    [ServerCallback]
+    //[ServerCallback]
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("OnTriggerEnter2D for ObstacleObject: " + this.name);
-        if (collision.tag == "Goblin")
+        if (isServer)
         {
-            if (isTripObject)
+            Debug.Log("OnTriggerEnter2D for ObstacleObject: " + this.name);
+            if (collision.tag == "Goblin")
             {
-                Debug.Log("ObstacleObject: collided with goblin named: " + collision.transform.name);
-                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+                if (isTripObject)
+                {
+                    Debug.Log("ObstacleObject: collided with goblin named: " + collision.transform.name);
+                    uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
 
-                GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
-                if (goblinScript.canCollide)
-                    goblinScript.KnockOutGoblin(false);
+                    GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
+                    if (goblinScript.canCollide)
+                        goblinScript.KnockOutGoblin(false);
 
-                //collision.transform.gameObject.GetComponent<GoblinScript>().KnockOutGoblin(false);
-                //NetworkServer.Destroy(this.gameObject);
-                //CmdPlayerPickUpFootball(goblinNetId);
+                    //collision.transform.gameObject.GetComponent<GoblinScript>().KnockOutGoblin(false);
+                    //NetworkServer.Destroy(this.gameObject);
+                    //CmdPlayerPickUpFootball(goblinNetId);
+                    /*if (!string.IsNullOrWhiteSpace(sfxClipName))
+                        this.RpcPlaySFXClip();*/
+                }
             }
         }
+        if (isClient)
+        {
+            if (collision.tag == "Goblin")
+            {
+                if (isTripObject)
+                {
+                    this.PlaySFXClip();
+                }
+            }
+        }
+        
     }
     [ServerCallback]
     private void OnTriggerStay2D(Collider2D collision)
@@ -103,6 +119,25 @@ public class ObstacleObject : NetworkBehaviour
         else
             onscreen = true;
         return onscreen;
+    }
+    [ClientRpc]
+    void RpcPlaySFXClip()
+    {
+        if (this.IsOnScreen() && !string.IsNullOrWhiteSpace(sfxClipName))
+        {
+            SoundManager.instance.PlaySound(sfxClipName, 0.75f);
+        }
+    }
+    [ClientCallback]
+    void PlaySFXClip()
+    {
+        if (GameplayManager.instance.gamePhase == "touchdown-transition")
+            return;
+        if (this.IsOnScreen() && !string.IsNullOrWhiteSpace(sfxClipName))
+        {
+            SoundManager.instance.PlaySound(sfxClipName, 1.0f);
+        }
+
     }
 
 }

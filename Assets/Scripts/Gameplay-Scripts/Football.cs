@@ -536,6 +536,7 @@ public class Football : NetworkBehaviour
                             teamWithBallLast = TeamManager.instance.greyTeam;
                         else
                             teamWithBallLast = TeamManager.instance.greenTeam;
+                        RpcChangePossessionSFX(goblinToCheckScript.isGoblinGrey);
                     }
                     if (teamWithBallLast.isGrey != goblinToCheckScript.isGoblinGrey)
                     {
@@ -922,6 +923,8 @@ public class Football : NetworkBehaviour
 
         if (GameplayManager.instance.gamePhase == "kickoff")
         {
+            // Reset the "last team with possession value for the sound stuff?
+            this.teamWithBallLast = null;
             Debug.Log("KickFootballDownField: Calculating kick angle for kickoff using a kick angle of " + kickAngle.ToString() + " and a distance of " + distanceTraveled.ToString());
             //Vector3 kickoffPos = new Vector3();
             var degrees = kickAngle * directionToKickModifier;
@@ -1131,6 +1134,9 @@ public class Football : NetworkBehaviour
     [Server]
     void BounceFootball(bool firstBounce)
     {
+        // Tell clients to playing the bouncing ball sound?
+        this.RpcBounceFootballSFX();
+
         if (firstBounce)
         {
             numberOfBounces = 0;
@@ -1325,6 +1331,31 @@ public class Football : NetworkBehaviour
     [ClientRpc]
     void RpcChangePossessionSFX(bool doesGreyTeamHaveBallNow)
     {
-        GameplayManager.instance.PlayPossessionChangedSFX(doesGreyTeamHaveBallNow);
+        Debug.Log("Football.cs RpcChangePossessionSFX: is team with ball grey? " + doesGreyTeamHaveBallNow.ToString());
+        if(GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time")
+            GameplayManager.instance.PlayPossessionChangedSFX(doesGreyTeamHaveBallNow);
+    }
+    [ClientRpc]
+    void RpcBounceFootballSFX()
+    {
+        this.BounceFootballSFX();
+    }
+    [ClientCallback]
+    void BounceFootballSFX()
+    {
+        if (this.IsFootballOnScreen())
+            SoundManager.instance.PlaySound("bounce-ball", 0.8f);
+    }
+    public bool IsFootballOnScreen()
+    {
+        bool onscreen = false;
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x < 0 || screenPoint.x > 1)
+        {
+            onscreen = false;
+        }
+        else
+            onscreen = true;
+        return onscreen;
     }
 }

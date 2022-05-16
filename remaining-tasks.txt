@@ -608,25 +608,47 @@ https://designagame.eu/2015/04/making-a-sport-game-in-unity-model-prototype/
 
 ### Sounds?
 https://sonniss.com/gameaudiogdc#1605031000603-356b3fd2-7003
+https://www.leshylabs.com/apps/sfMaker/
+- looping sounds in audacity:
+https://gamedevbeginner.com/create-looping-sound-effects-for-games-for-free-with-audacity/
+- audacity effects
+https://www.makeuseof.com/tag/5-amazing-sound-fx-can-make-audacity/
+- video game sound 101
+https://www.youtube.com/watch?v=2EkZjppztyo
 - Initial sounds to make:
 - - x punch
 - - - - - x whoosing punch sound before hit (quiet?) - swing stuff in front of mic like spatula and cloths hanger
 - - - - - x impact sound if punch lands (loud?er?) - hit something with wooden dowel? jacket? pillow? chair?
 - - x bomb explosion
 - - x powerup pickup
-- - - gain ball possession
-- - - - - - different sound for your team gaining possession versus opponent gaining possession
-- - - ball fumbled sound? Or ball bouncing sound?
-- - - kicked ball
+- - x gain ball possession
+- - - - - x different sound for your team gaining possession versus opponent gaining possession
+- - - - - - Right now these are crowd sounds for cheering/booing. Maybe change it to something more like "good beep" versus "bad beep"?
+- - x ball fumbled sound? Or ball bouncing sound?
+- - - - - x can probably be same or similar to the kicked ball sound but quieter? Maybe add some of the "brush" sound in the background for bouncing off grass?
+- - - - - x sb011.wav btw
+- - x kicked ball
 - - - audience sound
-- - - - - - cheering for touchdowns?
+- - - - - x cheering for touchdowns?
 - - - - - - maybe make cheering/booing sounds and have them play depending on if your team or opponent did a good thing? Or just home/away (green is home, grey away?)
 - - x walking through water/glue for slowdowns (plop plop plop?)
 - - x brush/weeds slow down sound (some sort of scraping sound?)
 - - - running into trip obstacle
-- - - - - - thud for rock/log
-- - - - - - "slimey" thud for banana peel
+- - - - - x thud for rock/log
+- - - - - x "slimey" thud for banana peel
 - - x running sound? sound of feet stepping on ground
+- rewarding vs. punishing sounds?
+- - - https://www.youtube.com/watch?v=wHOyLvVQJa0
+- - - https://www.youtube.com/watch?v=KbOWQA5BO-A "Designing your own SFX in Audacity: Perfecting Audio with Keith Alexander"
+x ui sounds
+- - - just a "click" sound or something when something in the UI is selected?
+- PowerUp sounds
+- - - sounds for each powerup?
+x sliding sound
+- kick after sounds
+- - x "it's good!"
+- - x "The kick is no good..."
+x Yeehaw
 
 ### Sound issues
 x water slow down effects

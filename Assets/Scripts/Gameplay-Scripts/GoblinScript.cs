@@ -207,6 +207,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public bool onWaterSlowDown;
     [SyncVar] public bool onBrushSlowDown;
     [SyncVar] public bool onGlueSlowDown;
+    public bool firstFootStep = false;
 
     [Header("AI Stuff")]
     public State state;
@@ -1292,6 +1293,8 @@ public class GoblinScript : NetworkBehaviour
                 if (punchingGoblin.isGoblinOnScreen())
                 {
                     SoundManager.instance.PlaySound("hit-by-" + punchingGoblin.soundType, 1.0f);
+                    if (punchingGoblin.soundType == "berserker")
+                        SoundManager.instance.StopSound("berserker-swing");
                 }
             }
         }
@@ -1615,7 +1618,12 @@ public class GoblinScript : NetworkBehaviour
                     if (!golbinBodyCollider.gameObject.activeInHierarchy)
                         golbinBodyCollider.gameObject.SetActive(true);
                 }
+                
             }
+            if(this.isGoblinOnScreen() && newValue)
+                SoundManager.instance.PlaySound("slide", 0.75f);
+            else
+                SoundManager.instance.StopSound("slide");
         }
     }
     [Server]
@@ -1928,7 +1936,11 @@ public class GoblinScript : NetworkBehaviour
     {
         Debug.Log("KickTheFootball");
         if (hasAuthority && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
+        {
             CmdKickTheFootball();
+        }
+        KickedFootballSFX();
+            
     }
     [Command]
     void CmdKickTheFootball()
@@ -3004,10 +3016,12 @@ public class GoblinScript : NetworkBehaviour
     {
         Debug.Log("RpcHitByGoblin: goblin type: " + type);
         SoundManager.instance.PlaySound("hit-by-" + type, 1.0f);
+        if(this.goblinType.Contains("berserker"))
+            SoundManager.instance.StopSound("berserker-swing");
     }
     public void FootstepSFX1()
     {
-        if (!isGoblinOnScreen())
+        /*if (!isGoblinOnScreen())
             return;
         float volume = 0.7f;
         if (this.hasAuthority && this.isCharacterSelected)
@@ -3017,11 +3031,12 @@ public class GoblinScript : NetworkBehaviour
 
         string footstepType = GetFootstepSFXType(true);
 
-        SoundManager.instance.PlaySound(footstepType, volume);
+        SoundManager.instance.PlaySound(footstepType, volume);*/
+        FootstepSFXAllInOne();
     }
     public void FootstepSFX2()
     {
-        if (!isGoblinOnScreen())
+        /*if (!isGoblinOnScreen())
             return;
         float volume = 0.7f;
         if (this.hasAuthority && this.isCharacterSelected)
@@ -3030,6 +3045,33 @@ public class GoblinScript : NetworkBehaviour
             volume = 0.35f;
 
         string footstepType = GetFootstepSFXType(false);
+
+        SoundManager.instance.PlaySound(footstepType, volume);*/
+        FootstepSFXAllInOne();
+    }
+    void FootstepSFXAllInOne()
+    {
+        if (!isGoblinOnScreen())
+            return;
+        //string stepNumber = "-1";
+        if (firstFootStep)
+        {
+            //stepNumber = "-2";
+            firstFootStep = false;
+        }
+        else
+        {
+            //stepNumber = "-1";
+            firstFootStep = true;
+        }
+
+        float volume = 0.7f;
+        if (this.hasAuthority && this.isCharacterSelected)
+            volume = 0.7f;
+        else
+            volume = 0.35f;
+
+        string footstepType = GetFootstepSFXType(firstFootStep);
 
         SoundManager.instance.PlaySound(footstepType, volume);
     }
@@ -3052,5 +3094,10 @@ public class GoblinScript : NetworkBehaviour
             stepType = stepType + "-2";
 
         return stepType;
+    }
+    void KickedFootballSFX()
+    {
+        if (this.isGoblinOnScreen())
+            SoundManager.instance.PlaySound("kicked-ball", 1.0f);
     }
 }

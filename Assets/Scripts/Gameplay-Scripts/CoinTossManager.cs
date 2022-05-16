@@ -118,6 +118,7 @@ public class CoinTossManager : NetworkBehaviour
             HeadsSelectionArrow.SetActive(false);
             TailsSelectionArrow.SetActive(true);
         }
+        SoundManager.instance.PlaySound("ui-click", 1.0f);
     }
     public void SetInitialSelectionText(bool isPlayerSelecting)
     {
@@ -388,6 +389,7 @@ public class CoinTossManager : NetworkBehaviour
             ReceiveSelectionArrow.SetActive(false);
             KickSelectionArrow.SetActive(true);
         }
+        SoundManager.instance.PlaySound("ui-click", 1.0f);
     }
     public void PlayerSelectedKickOrReceive(string kickOrReceive, string teamName)
     {

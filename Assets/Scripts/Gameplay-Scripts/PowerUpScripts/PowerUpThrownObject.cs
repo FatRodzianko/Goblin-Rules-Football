@@ -32,6 +32,7 @@ public class PowerUpThrownObject : NetworkBehaviour
 
     [Header("SFX Stuff")]
     [SerializeField] public string sfxClipName;
+    [SerializeField] bool playSoundOnDestroy;
 
     // Start is called before the first frame update
     void Start()
@@ -92,10 +93,13 @@ public class PowerUpThrownObject : NetworkBehaviour
             }
 
 
+            /*if (!string.IsNullOrWhiteSpace(sfxClipName))
+                this.RpcPlaySFXClip();*/
+
             //collision.transform.gameObject.GetComponent<GoblinScript>().KnockOutGoblin(false);
             //NetworkServer.Destroy(this.gameObject);
 
-            //CmdPlayerPickUpFootball(goblinNetId);
+                //CmdPlayerPickUpFootball(goblinNetId);
         }
         if (collision.tag == "goblin-body" && !isDroppedObject)
         {
@@ -257,12 +261,40 @@ public class PowerUpThrownObject : NetworkBehaviour
     {
         mySpriteRenderer.enabled = activate;
     }
-    [ClientCallback]
+    /*[ClientCallback]
     public void PlaySFXClip()
     {
         Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
         if (screenPoint.x < 0 || screenPoint.x > 1)
             return;
         SoundManager.instance.PlaySound(sfxClipName, 0.75f);
+    }*/
+    public bool IsOnScreen()
+    {
+        bool onscreen = false;
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x < 0 || screenPoint.x > 1)
+        {
+            onscreen = false;
+        }
+        else
+            onscreen = true;
+        return onscreen;
+    }
+    [ClientCallback]
+    void PlaySFXClip()
+    {
+        Debug.Log("PowerUpThrownObject: RpcPlaySFXClip for " + this.name);
+        if (this.IsOnScreen() && !string.IsNullOrWhiteSpace(sfxClipName))
+        {
+            SoundManager.instance.PlaySound(sfxClipName, 0.75f);
+        }
+    }
+    private void OnDestroy()
+    {
+        if (isClient && playSoundOnDestroy)
+        {
+            this.PlaySFXClip();
+        }
     }
 }
