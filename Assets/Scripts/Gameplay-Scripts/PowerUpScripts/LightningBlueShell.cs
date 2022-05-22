@@ -46,7 +46,9 @@ public class LightningBlueShell : NetworkBehaviour
             {
                 Debug.Log("LightningBlueShell.cs Strike Goblin: failed to strike goblin: " + e);
             }
-        }       
+        }
+        if (isClient)
+            PlayThunderSound();
     }
     public void DestroyAnimationObject()
     {
@@ -73,5 +75,25 @@ public class LightningBlueShell : NetworkBehaviour
                 Debug.Log("LightnightBlueShell.cs: could not set goblin to strike as parent: " + e);
             }
         }
+    }
+    [ClientCallback]
+    public void PlayThunderSound()
+    {
+        if (IsOnScreen())
+        {
+            SoundManager.instance.PlaySound("powerup-used-ilightningBlueShell", 0.8f);
+        }
+    }
+    public bool IsOnScreen()
+    {
+        bool onscreen = false;
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        if (screenPoint.x < 0 || screenPoint.x > 1)
+        {
+            onscreen = false;
+        }
+        else
+            onscreen = true;
+        return onscreen;
     }
 }

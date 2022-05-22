@@ -208,6 +208,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public bool onBrushSlowDown;
     [SyncVar] public bool onGlueSlowDown;
     public bool firstFootStep = false;
+    [SerializeField] GoblinSoundManager mySoundManager;
 
     [Header("AI Stuff")]
     public State state;
@@ -1296,6 +1297,13 @@ public class GoblinScript : NetworkBehaviour
                     if (punchingGoblin.soundType == "berserker")
                         SoundManager.instance.StopSound("berserker-swing");
                 }
+                if (this.isGoblinOnScreen())
+                {
+                    if(this.hasAuthority && this.isCharacterSelected)
+                        this.mySoundManager.PlaySound(this.soundType + "-hit", 1.0f);
+                    else
+                        this.mySoundManager.PlaySound(this.soundType + "-hit", 0.8f);
+                }
             }
         }
             
@@ -1525,6 +1533,17 @@ public class GoblinScript : NetworkBehaviour
                     
                 animator.SetBool("isKnockedOut", newValue);
 
+            }
+            if (newValue && isGoblinOnScreen())
+            {
+                if(hasAuthority && this.isCharacterSelected)
+                    mySoundManager.PlaySound("goblin-knocked-out", 0.75f);
+                else
+                    mySoundManager.PlaySound("goblin-knocked-out", 0.4f);
+            }
+            else
+            {
+                mySoundManager.StopSound("goblin-knocked-out");
             }
         }
     }
@@ -2300,6 +2319,16 @@ public class GoblinScript : NetworkBehaviour
     {
         GameObject newParticle = Instantiate(PowerUpParticleSystemPrefab, this.transform);
         newParticle.GetComponent<PowerUpParticleSystem>().StartParticleSystem(particleType);
+
+        if (particleType.Contains("invincibilityBlueShell"))
+        { 
+            mySoundManager.PlaySound("powerup-used-" + particleType, 0.8f);
+            return;
+        }
+        if (isGoblinOnScreen())
+        {
+            SoundManager.instance.PlaySound("powerup-used-" + particleType, 0.8f);
+        }
     }
     [Server]
     public void StartHealNormal()
@@ -2347,7 +2376,14 @@ public class GoblinScript : NetworkBehaviour
         invinvibilityBlueShell = false;
         if (this.doesCharacterHaveBall)
             ballCarrySpeedModifier = 0.9f;
+        //SoundManager.instance.StopSound("powerup-used-invincibilityBlueShell");
+        RpcStopInvincibilitySound();
 
+    }
+    [ClientRpc]
+    public void RpcStopInvincibilitySound()
+    {
+        mySoundManager.StopSound("powerup-used-invincibilityBlueShell");
     }
     [Server]
     public void StartStaminaNormal()
@@ -3065,11 +3101,11 @@ public class GoblinScript : NetworkBehaviour
             firstFootStep = true;
         }
 
-        float volume = 0.7f;
+        float volume = 0.0f;
         if (this.hasAuthority && this.isCharacterSelected)
-            volume = 0.7f;
+            volume = 0.5f;
         else
-            volume = 0.35f;
+            volume = 0.25f;
 
         string footstepType = GetFootstepSFXType(firstFootStep);
 

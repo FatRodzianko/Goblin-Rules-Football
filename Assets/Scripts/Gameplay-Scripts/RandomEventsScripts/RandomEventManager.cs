@@ -15,6 +15,12 @@ public class RandomEventManager : NetworkBehaviour
     [Header("Thrown Bottle Event")]
     [SerializeField] GameObject brokenGlassPrefab;
 
+    [Header("Split Ground Event")]
+    [SerializeField] GameObject splitGroundPrefab;
+
+    [Header("Streaker Goblin Event")]
+    [SerializeField] GameObject streakerGoblinPrefab;
+
     public static RandomEventManager instance;
 
     [Header("Field Parameters")]
@@ -136,6 +142,14 @@ public class RandomEventManager : NetworkBehaviour
         {
             BottlesEvent();
         }
+        else if (eventType == "split-ground")
+        {
+            SplitGroundEvent();
+        }
+        else if (eventType == "streaker-goblin")
+        {
+            StreakerGoblinEvent();
+        }
     }
     [ServerCallback]
     void BottlesEvent()
@@ -152,16 +166,22 @@ public class RandomEventManager : NetworkBehaviour
         if (goblinWithBall.GetComponent<SpriteRenderer>().flipX)
             directionModifier = -1;
         Vector3 positionOfEvent = goblinWithBall.transform.position;
-        
-        //Cancel the random event if the goblin is too close to max x position
-        if (Mathf.Abs(positionOfEvent.x) > (maxX - 7.5f))
+        if (IsGoblinTooCloseToEndzoneForEvent(positionOfEvent))
         {
             Debug.Log("BottlesEvent: Goblin with ball was too close to max x value. Cancelling random event");
             return;
         }
 
+        //Cancel the random event if the goblin is too close to max x position
+        /*if (Mathf.Abs(positionOfEvent.x) > (maxX - 7.5f))
+        {
+            Debug.Log("BottlesEvent: Goblin with ball was too close to max x value. Cancelling random event");
+            return;
+            
+        }*/
+
         //Set event location Y position to be within bounds
-        positionOfEvent.y -= 1.25f;
+        /*positionOfEvent.y -= 1.25f;
         if (positionOfEvent.y > maxY)
             positionOfEvent.y = maxY;
         else if(positionOfEvent.y < minY)
@@ -173,10 +193,118 @@ public class RandomEventManager : NetworkBehaviour
         if (positionOfEvent.x > maxX)
             positionOfEvent.x = maxX;
         else if (positionOfEvent.x < minX)
-            positionOfEvent.x = minX;
+            positionOfEvent.x = minX;*/
+
+        positionOfEvent = PositionOfEvent(positionOfEvent, 0f, 0f, directionModifier);
 
         GameObject randomEvent = Instantiate(brokenGlassPrefab);
         randomEvent.transform.position = positionOfEvent;
         NetworkServer.Spawn(randomEvent);
+    }
+    [ServerCallback]
+    void SplitGroundEvent()
+    {
+        Debug.Log("Executing SplitGroundEvent on the server.");
+        GoblinScript goblinWithBall = gameFootball.goblinWithBall;
+        int directionModifier = 1;
+        if (goblinWithBall.GetComponent<SpriteRenderer>().flipX)
+            directionModifier = -1;
+        Vector3 positionOfEvent = goblinWithBall.transform.position;
+        if (IsGoblinTooCloseToEndzoneForEvent(positionOfEvent))
+        {
+            Debug.Log("BottlesEvent: Goblin with ball was too close to max x value. Cancelling random event");
+            return;
+        }
+
+        positionOfEvent = PositionOfEvent(positionOfEvent, 1.1f, 0f, directionModifier);
+
+        GameObject randomEvent = Instantiate(splitGroundPrefab);
+        randomEvent.transform.position = positionOfEvent;
+        NetworkServer.Spawn(randomEvent);
+    }
+    [ServerCallback]
+    void StreakerGoblinEvent()
+    {
+        Debug.Log("Executing StreakerGoblinEvent on the server.");
+        GoblinScript goblinWithBall = gameFootball.goblinWithBall;
+        int directionModifier = 1;
+        if (goblinWithBall.GetComponent<SpriteRenderer>().flipX)
+            directionModifier = -1;
+        Vector3 positionOfEvent = goblinWithBall.transform.position;
+        if (IsGoblinTooCloseToEndzoneForEvent(positionOfEvent))
+        {
+            Debug.Log("BottlesEvent: Goblin with ball was too close to max x value. Cancelling random event");
+            return;
+        }
+
+        positionOfEvent = PositionOfEvent(positionOfEvent, 0f, 2.0f, directionModifier);
+
+        //Get y position of streaker to spawn from
+        float topY = 10f;
+        float bottomY = -12.5f;
+
+        if (positionOfEvent.y >= 0.6f)
+        {
+            positionOfEvent.y = topY;
+        }
+        else
+        {
+            positionOfEvent.y = bottomY;
+        }
+
+        //Spawn three streaker objects?
+        GameObject randomEvent = Instantiate(streakerGoblinPrefab);
+        randomEvent.transform.position = positionOfEvent;
+        NetworkServer.Spawn(randomEvent);
+        //Second streaker
+        float xModifier = Random.Range(1.0f, 3.0f);
+        positionOfEvent.x += xModifier;
+        GameObject randomEvent2 = Instantiate(streakerGoblinPrefab);
+        randomEvent2.transform.position = positionOfEvent;
+        NetworkServer.Spawn(randomEvent2);
+        // streaker 3
+        xModifier = Random.Range(1.0f, 3.0f);
+        GameObject randomEvent3 = Instantiate(streakerGoblinPrefab);
+        positionOfEvent.x -= xModifier;
+        randomEvent3.transform.position = positionOfEvent;
+        NetworkServer.Spawn(randomEvent3);
+        //streakerGoblinPrefab.GetComponent<StreakerEvent>().StartAnimation(positionOfEvent);
+    }
+    [ServerCallback]
+    bool IsGoblinTooCloseToEndzoneForEvent(Vector3 positionOfEvent)
+    {
+        bool isTooClose = false;
+
+        //Cancel the random event if the goblin is too close to max x position
+        if (Mathf.Abs(positionOfEvent.x) > (maxX - 7.5f))
+        {
+            isTooClose = true;
+        }
+
+        return isTooClose;
+    }
+    [ServerCallback]
+    Vector3 PositionOfEvent(Vector3 currentPosition, float yModifier, float xModifier, int directionModifier)
+    {
+        Vector3 newEventPosition = currentPosition;
+
+        //Set event location Y position to be within bounds
+        newEventPosition.y -= 1.25f;
+        if (newEventPosition.y > (maxY - yModifier))
+            newEventPosition.y = (maxY - yModifier);
+        else if (newEventPosition.y < (minY + yModifier))
+            newEventPosition.y = (minY + yModifier);
+
+        //Get X position of event. Make the distance from the player random between 3.5 - 7 units away from player?
+        float xPosition = Random.Range(7.5f, 10.5f);
+        newEventPosition.x += (xPosition * directionModifier);
+        if (newEventPosition.x > (maxX - xModifier))
+            newEventPosition.x = (maxX - xModifier);
+        else if (newEventPosition.x < (minX + xModifier))
+            newEventPosition.x = (minX + xModifier);
+
+        Debug.Log("PositionOfEvent: Old position: " + currentPosition.ToString() + " New Position: " + newEventPosition.ToString());
+
+        return newEventPosition;
     }
 }

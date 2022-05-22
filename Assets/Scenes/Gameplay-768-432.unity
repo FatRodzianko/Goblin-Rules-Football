@@ -107220,6 +107220,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6151445950945864180, guid: e5232139c179729448b7ca08d8646732, type: 3}
+      propertyPath: sceneId
+      value: 1618967834
+      objectReference: {fileID: 0}
     - target: {fileID: 7040836425982099120, guid: e5232139c179729448b7ca08d8646732, type: 3}
       propertyPath: m_Name
       value: RandomEventManager
@@ -107239,6 +107243,22 @@ PrefabInstance:
     - target: {fileID: 8656080087540272624, guid: e5232139c179729448b7ca08d8646732, type: 3}
       propertyPath: minY
       value: -10.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656080087540272624, guid: e5232139c179729448b7ca08d8646732, type: 3}
+      propertyPath: streakerGoblinPrefab
+      value: 
+      objectReference: {fileID: 2997265154557420998, guid: a98994709727ac44eb0508496daed00f, type: 3}
+    - target: {fileID: 8656080087540272624, guid: e5232139c179729448b7ca08d8646732, type: 3}
+      propertyPath: EventTypes.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656080087540272624, guid: e5232139c179729448b7ca08d8646732, type: 3}
+      propertyPath: EventTypes.Array.data[1]
+      value: split-ground
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656080087540272624, guid: e5232139c179729448b7ca08d8646732, type: 3}
+      propertyPath: EventTypes.Array.data[2]
+      value: streaker-goblin
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e5232139c179729448b7ca08d8646732, type: 3}

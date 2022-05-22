@@ -505,6 +505,9 @@ public class PowerUp : NetworkBehaviour
     {
         if (myPlayerOwner != null)
         {
+            if (myPlayerOwner.serverSelectGoblin.invinvibilityBlueShell)
+                return false;
+
             // First, heal all goblins on your team
             Team playerTeam;
             if (myPlayerOwner.isTeamGrey)

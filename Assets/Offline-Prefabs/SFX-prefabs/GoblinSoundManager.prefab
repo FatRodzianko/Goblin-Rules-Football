@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8221639201626328194
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8221639201626328205}
+  - component: {fileID: 2934658420567190961}
+  m_Layer: 0
+  m_Name: GoblinSoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8221639201626328205
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8221639201626328194}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2934658420567190961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8221639201626328194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f83d0be01fc100d41840c4730432810f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myGoblin: {fileID: 0}
+  audioMixer: {fileID: 24100000, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
+  mixerGroup: {fileID: 3654047802629225012, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
+  sounds:
+  - name: goblin-knocked-out
+    clip: {fileID: 8300000, guid: 8261034ad38767f4b9f0b2ffcf0ae661, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}
+  - name: powerup-used-invincibilityBlueShell
+    clip: {fileID: 8300000, guid: ff58a594ef454f44594a019ab3183ed5, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}
+  - name: grenadier-hit
+    clip: {fileID: 8300000, guid: cf8fea2ae256835419485a0142c282e8, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: berserker-hit
+    clip: {fileID: 8300000, guid: 79b0a86dcdf9c9e468ce309e6d963583, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: skirmisher-hit
+    clip: {fileID: 8300000, guid: e432fd7d90ee5414e924d78e160b605c, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}

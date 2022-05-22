@@ -44,8 +44,10 @@ public class SoundManager : MonoBehaviour
         if (!s.source.enabled)
             s.source.enabled = true;
         s.source.volume = volume;
-        s.source.Play();
-        //audioSource.PlayOneShot(s.clip, volume);
+        if(s.isLooping)
+            s.source.Play();
+        else
+            s.source.PlayOneShot(s.clip, volume);
     }
     public void StopSound(string name)
     {

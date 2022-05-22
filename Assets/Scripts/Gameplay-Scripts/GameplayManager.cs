@@ -1152,6 +1152,12 @@ public class GameplayManager : NetworkBehaviour
             GameOverScrollPanelObject.GetComponent<ImageAnimation>().UnScrollHalfTime();
         else
             GameOverScrollPanelObject.GetComponent<ImageAnimation>().ReRollScroll();
+
+        // sounds stuff?
+        if (enable)
+        {
+            SoundManager.instance.PlaySound("ref-whistle", 1.0f);
+        }
     }
     [ServerCallback]
     void StopPossessionRoutinesForPlayers()
