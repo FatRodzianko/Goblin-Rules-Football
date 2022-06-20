@@ -51,6 +51,14 @@ public class PowerUpManager : NetworkBehaviour
     [SerializeField] private GameObject DpadImage3;
     [SerializeField] private GameObject DpadImage4;
 
+    [Header("AI PowerUp UI")]
+    [SerializeField] GameObject AIPowerUpUIHolder;
+    [SerializeField] GameObject AIPowerUp1Image;
+    [SerializeField] GameObject AIPowerUp2Image;
+    [SerializeField] GameObject AIPowerUp3Image;
+    [SerializeField] GameObject AIPowerUp4Image;
+    [SerializeField] GameObject[] AIPowerUpUIImages;
+    [SerializeField] GameObject[] AIPowerUpUIRemainingUses;
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -78,6 +86,14 @@ public class PowerUpManager : NetworkBehaviour
         PowerUp3Image.GetComponent<Image>().sprite = EmptyPowerUpImage;
         PowerUp4Image.GetComponent<Image>().sprite = EmptyPowerUpImage;
         UpdatePowerUpBoardUIForGamepad(GamepadUIManager.instance.gamepadUI);
+        if (GameplayManager.instance.isSinglePlayer)
+        {
+            AIPowerUpUIHolder.SetActive(true);
+        }
+        else
+        {
+            AIPowerUpUIHolder.SetActive(false);
+        }
     }
     public void GetFootballObject(Football football)
     {
@@ -117,7 +133,7 @@ public class PowerUpManager : NetworkBehaviour
         float randomWaitTime;
         while (isPowerUpGeneratorRunning)
         {
-            randomWaitTime = Random.Range(0.75f, 5.5f);
+            randomWaitTime = Random.Range(0.5f, 3.5f);
             yield return new WaitForSeconds(randomWaitTime);
             CheckIfAPowerUpDrops();
             //yield break; 
@@ -128,9 +144,9 @@ public class PowerUpManager : NetworkBehaviour
     [ServerCallback]
     void CheckIfAPowerUpDrops()
     {
-        if (ActivePowerUpNetIds.Count < 9)
+        if (ActivePowerUpNetIds.Count < 13)
         {
-            float blueShellLikelihood = 0.995f;
+            float blueShellLikelihood = 1.0f;
             GamePlayer playerDownBad = null;
             /*if (gameFootball.isHeld)
             {
@@ -146,7 +162,7 @@ public class PowerUpManager : NetworkBehaviour
             if ((differenceInScore > 13) || (differenceInScore < -13))
             {
                 Debug.Log("CheckIfAPowerUpDrops: One team is down by at least 14 - increase blueshell likelihood");
-                blueShellLikelihood = 0.5f;
+                blueShellLikelihood = 0.55f;
                 // Get the player that is down
                 foreach (GamePlayer player in Game.GamePlayers)
                 {
@@ -164,7 +180,7 @@ public class PowerUpManager : NetworkBehaviour
             bool willPowerUpDrop = false;
             bool willPowerUpBeBlueShell = false;
 
-            if (Random.Range(0f, 1f) > 0.5f)
+            if (Random.Range(0f, 1f) > 0.35f)
                 willPowerUpDrop = true;
 
             if (willPowerUpDrop)
@@ -415,6 +431,32 @@ public class PowerUpManager : NetworkBehaviour
                 else
                     PowerUp2Image.GetComponent<Image>().sprite = myPowerUps[i].mySprite;
             }*/
+        }
+    }
+    [Client]
+    public void AIUpdateAIPowerUpUIImages(List<PowerUp> myAIPowerUps)
+    {
+        Debug.Log("UpdateAIPowerUpUIImages");
+        for (int i = 0; i < 4; i++)
+        {
+            if ((i + 1) > myAIPowerUps.Count)
+            {
+                AIPowerUpUIImages[i].GetComponent<Image>().sprite = EmptyPowerUpImage;
+                AIPowerUpUIRemainingUses[i].SetActive(false);
+            }
+            else
+            {
+                AIPowerUpUIImages[i].GetComponent<Image>().sprite = myAIPowerUps[i].mySprite;
+                if (myAIPowerUps[i].multipleUses)
+                {
+                    AIPowerUpUIRemainingUses[i].GetComponent<TextMeshProUGUI>().text = myAIPowerUps[i].remainingUses.ToString();
+                    AIPowerUpUIRemainingUses[i].SetActive(true);
+                }
+                else
+                {
+                    AIPowerUpUIRemainingUses[i].SetActive(false);
+                }
+            }
         }
     }
     [ServerCallback]

@@ -1,0 +1,239 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &746005145141606358
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 677765127462633066}
+  - component: {fileID: 554441546451090241}
+  - component: {fileID: 5546099445483979728}
+  - component: {fileID: 8925233755424393115}
+  m_Layer: 0
+  m_Name: AIPlayer
+  m_TagString: GamePlayer
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &677765127462633066
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746005145141606358}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &554441546451090241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746005145141606358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5656914e82f7a914fb06f9e07604ebda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  PlayerName: AIPlayer
+  ConnectionId: 0
+  playerNumber: 0
+  IsGameLeader: 0
+  inputSystemUIInputModule: {fileID: 0}
+  moveReference: {fileID: 2739214424016785584, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
+  submitReference: {fileID: 8772204883310439263, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
+  defaultInputActions: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  is1v1: 0
+  isSinglePlayer: 0
+  goblinType: 
+  inputManagerActivated: 0
+  doesPlayerChooseCoin: 0
+  headsOrTailsPlayer: 
+  didPlayerChooseCoinYet: 0
+  doesPlayerChooseKickOrReceive: 0
+  kickOrReceivePlayer: 
+  didPlayerChooseKickOrReceiveYet: 0
+  grenadierPrefab: {fileID: 2813347414334592412, guid: f7720441b1bc157408ea0350600bb10c, type: 3}
+  skrimisherPrefab: {fileID: 6877901074420270458, guid: 34a417c9969d212469e52634d54a7943, type: 3}
+  berserkerPrefab: {fileID: 6607051740916151457, guid: 69a9098d43dc0264282833d6ed2fe98e, type: 3}
+  areCharactersSpawnedYet: 0
+  goblinTeam: []
+  goblinTeamOnServer: []
+  selectGoblin: {fileID: 0}
+  qGoblin: {fileID: 0}
+  eGoblin: {fileID: 0}
+  canSwitchGoblin: 1
+  serverSelectGoblin: {fileID: 0}
+  qeTime: 0
+  myTeam: {fileID: 0}
+  teamName: 
+  doesTeamHaveBall: 0
+  isTeamGrey: 0
+  myPowerUps: []
+  serverPowerUpUints: 
+  powerUpSelectedIndexNumber: 0
+  canSelectWithRightStickAgain: 1
+  nextPowerUpSelectTime: 0
+  wasRightStickUsedToSelect: 0
+  footballPrefab: {fileID: 7510187484870184805, guid: d923fcf193d3397489944bf36faac783, type: 3}
+  footballStartingPosition: {x: 0, y: -2, z: 0}
+  myCamera: {fileID: 0}
+  football: {fileID: 0}
+  areGoblinsRepositionedForKickAfter: 0
+  coinTossControllsEnabled: 0
+  kickOrReceiveControlsEnabled: 0
+  qeSwitchingEnabled: 0
+  kickingControlsEnabled: 0
+  kickoffAimArrowControlsEnabled: 0
+  goblinMovementEnabled: 0
+  gameplayActionsEnabled: 0
+  kickAfterPositioningEnabled: 0
+  kickAfterKickingEnabled: 0
+  powerUpsEnabled: 0
+  menuNavigationEnabled: 0
+  possessionPoints: 0
+  gainPossessionPointsRate: 2.5
+  isGainingPossesionPointsRoutineRunning: 0
+  isLosingPossesionPointsRoutineRunning: 0
+  isNoPossessionCooldownRoutineRunning: 0
+  didNoPossessionCooldownRoutineComplete: 0
+  possessionBonus: 1
+  myAiPlayer: {fileID: 8925233755424393115}
+  GreenGrenadierStartingPosition: {x: -9, y: 2.45, z: 0}
+  GreenBerserkerStartingPosition: {x: -9, y: -2, z: 0}
+  GreenSkirmisherStartingPosition: {x: -9, y: -6.45, z: 0}
+  GreyGrenadierStartingPosition: {x: 9, y: 2.45, z: 0}
+  GreyBerserkerStartingPosition: {x: 9, y: -2, z: 0}
+  GreySkirmisherStartingPosition: {x: 9, y: -6.45, z: 0}
+  KickingPositionGreenGrenadier: {x: 0, y: -0.75, z: 0}
+  KickingPositionGreenBerserker: {x: -1, y: -6, z: 0}
+  KickingPositionGreenSkirmisher: {x: -1, y: 4, z: 0}
+  KickingPositionGreyGrenadier: {x: 0, y: -0.75, z: 0}
+  KickingPositionGreyBerserker: {x: 1, y: -6, z: 0}
+  KickingPositionGreySkirmisher: {x: 1, y: 4, z: 0}
+  ReceivingPositionGreenGrenadier: {x: -11, y: 3, z: 0}
+  ReceivingPositionGreenBerserker: {x: -11, y: -5, z: 0}
+  ReceivingPositionGreenSkirmisher: {x: -22.5, y: -1, z: 0}
+  ReceivingPositionGreyGrenadier: {x: 11, y: 3, z: 0}
+  ReceivingPositionGreyBerserker: {x: 11, y: -5, z: 0}
+  ReceivingPositionGreySkirmisher: {x: 22.5, y: -1, z: 0}
+--- !u!114 &5546099445483979728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746005145141606358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  visible: 0
+  m_AssetId: 99ad0a2136d863b43b69c51e64ec3a12
+  hasSpawned: 0
+--- !u!114 &8925233755424393115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746005145141606358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68a900518080f104881aadf254242c78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  myPlayerScript: {fileID: 0}
+  minKickAngle: -45
+  maxKickAngle: 45
+  minKickPower: 0
+  maxKickPower: 1
+  greenEndzone: {x: -56, y: -1.5, z: 0}
+  greyEndzone: {x: 56, y: -1.5, z: 0}
+  myEndzone: {x: 0, y: 0, z: 0}
+  myGoalPost: {x: 0, y: 0, z: 0}
+  greenEndzoneXValue: -50
+  greyEndzoneXValue: 50
+  myEndzoneXValue: 0
+  positionToRunToward: {x: 0, y: 0, z: 0}
+  goblinPlayerLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  goblinBodyLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  fieldYMax: 7.75
+  fieldYMin: -9.5
+  surroundingGoblinColliders:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  surroundingGoblinCollidersLength: 0
+  enemyGoblins:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  enemyGoblinsLength: 0
+  teammateGoblins:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  teammateGoblinsLength: 0
+  closeEnemyGoblins:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  closeEnemyGoblinsLength: 0
+  goblinToPassTo: {fileID: 0}
+  areEnemyGoblinsNearby: 0
+  willKickDownField: 0
+  willPass: 0
+  passCheckLastTime: 0
+  passCheckRate: 0.15
+  kickCheckLastTime: 0
+  kickCheckRate: 0.15
+  blockKick: 0
+  kickKickAfter: 0
+  kickAfterGoblin: {fileID: 0}
+  minAccuracyDifficultySetting: 0.85
+  minKickAfterDistance: 15
+  maxAcceptableDistance: 0
+  finalPositionReached: 0
+  isPowerUpRoutineRunning: 0
+  isPowerUpCoolDownRoutineRunning: 0
+  hasDefensePowerUp: 0
+  defensePowerUpIndex: 0
+  hasAttackPowerUp: 0
+  attackPowerUpIndex: 0
+  hasSpeedPowerUp: 0
+  speedPowerUpIndex: 0
+  hasStaminaPowerUp: 0
+  staminaPowerUpIndex: 0
+  hasHealthPowerUp: 0
+  healthPowerUpIndex: 0
+  hasBlueShellLightning: 0
+  blueShellLightningIndex: 0
+  hasBlueShellInvinciblity: 0
+  blueShellInvinciblityIndex: 0
+  hasBottlePowerUp: 0
+  bottlePowerUpIndex: 0

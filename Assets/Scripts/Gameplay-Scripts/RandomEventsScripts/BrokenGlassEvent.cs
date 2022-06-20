@@ -42,20 +42,36 @@ public class BrokenGlassEvent : NetworkBehaviour
         NetworkServer.Destroy(this.gameObject);
         yield break;
     }
-    [ServerCallback]
+    //[ServerCallback]
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("OnTriggerEnter2D for PowerUpThrownObject: " + this.name);
-        if (collision.tag == "Goblin")
+        if (isServer)
         {
-            Debug.Log("PowerUpThrownObject: collided with goblin named: " + collision.transform.name);
-            uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
-            GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
-            if(goblinScript.canCollide)
-                goblinScript.KnockOutGoblin(false);
-            //NetworkServer.Destroy(this.gameObject);
-            //CmdPlayerPickUpFootball(goblinNetId);
+            Debug.Log("OnTriggerEnter2D for PowerUpThrownObject: " + this.name);
+            if (collision.tag == "Goblin")
+            {
+                Debug.Log("PowerUpThrownObject: collided with goblin named: " + collision.transform.name);
+                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+                GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
+                if (goblinScript.canCollide && !goblinScript.isGoblinKnockedOut)
+                    goblinScript.KnockOutGoblin(false);
+                //NetworkServer.Destroy(this.gameObject);
+                //CmdPlayerPickUpFootball(goblinNetId);
+            }
         }
+        if (isClient)
+        {
+            if (collision.tag == "Goblin")
+            {
+                //this.PlaySFXClip();
+                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+
+                GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
+                if (goblinScript.canCollide)
+                    goblinScript.CollisionWithObstacleObject(false);
+            }
+        }
+        
     }
     void ThrowBottlesAtField()
     {

@@ -5,8 +5,8 @@ using UnityEngine;
 public class HurtBox : MonoBehaviour
 {
     GoblinScript myParentScript;
-    Collider2D lastPunchBox;
-    float nextPunchTime;
+    public Collider2D lastPunchBox;
+    public float nextPunchTime;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,8 +32,24 @@ public class HurtBox : MonoBehaviour
                     nextPunchTime = Time.time + 0.15f;
                 }
             }
-            Debug.Log("OnTriggerEnter2D: Hurtbox collided with punchbox from: " + collision.transform.parent.name);
-            myParentScript.HurtBoxCollision(collision.transform.parent.GetComponent<GoblinScript>());
+            else
+            {
+                lastPunchBox = collision;
+            }
+            PunchBoxScript punchBoxScript = collision.gameObject.GetComponent<PunchBoxScript>();
+            GoblinScript punchingGoblin = collision.transform.parent.GetComponent<GoblinScript>();
+            if (Time.time > punchBoxScript.nextPunchTime && !this.myParentScript.isGoblinKnockedOut && this.myParentScript.isGoblinGrey != punchingGoblin.isGoblinGrey)
+            {
+                Debug.Log("OnTriggerEnter2D: Hurtbox on " + this.transform.parent.name + ":" + this.myParentScript.ownerConnectionId.ToString() +  " collided with punchbox from: " + collision.transform.parent.name + ":" + punchingGoblin.ownerConnectionId.ToString() + " AFTER nextPunchTime. The punch will count!");
+                punchBoxScript.nextPunchTime = Time.time + punchBoxScript.nextPunchRate;
+                //myParentScript.HurtBoxCollision(collision.transform.parent.GetComponent<GoblinScript>());
+                myParentScript.HurtBoxCollision(punchingGoblin);
+            }
+            else
+            {
+                Debug.Log("OnTriggerEnter2D: Hurtbox on:" + this.transform.parent.name + ":" + this.myParentScript.ownerConnectionId.ToString() + " collided with punchbox from " + collision.transform.parent.name + ":" + punchingGoblin.ownerConnectionId.ToString() + " BEFORE nextPunchTime");
+            }
+            
         }
         //Can't collided with these due to layer physics stuff
         /*

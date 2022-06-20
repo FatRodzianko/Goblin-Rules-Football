@@ -46,18 +46,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  is1v1: 0
   LocalGamePlayer: {fileID: 0}
   LocalGamePlayerScript: {fileID: 0}
   gameplayCanvas: {fileID: 0}
   coinTossCanvas: {fileID: 0}
   gamePhase: 
+  firstHalfCompleted: 0
+  firstHalfKickingTeam: 
   kickingPlayer: {fileID: 0}
   receivingPlayer: {fileID: 0}
+  kickingTeam: {fileID: 0}
+  receivingTeam: {fileID: 0}
   TouchDownPanel: {fileID: 0}
   touchDownText: {fileID: 0}
   touchDownTeamText: {fileID: 0}
   scoringPlayer: {fileID: 0}
   blockingPlayer: {fileID: 0}
+  scoringTeam: {fileID: 0}
+  blockingTeam: {fileID: 0}
   yPositionOfKickAfter: 0
   scoringGoblinNetId: 0
   KickAfterPositionControlsPanel: {fileID: 0}
@@ -71,6 +78,7 @@ MonoBehaviour:
   KickWasNotGoodText: {fileID: 0}
   KickWasBlockedText: {fileID: 0}
   isXtraTime: 0
+  lengthOfHalves: 0
   timerText: {fileID: 0}
   timeLeftInGame: 0
   isGameTimerRunning: 0
@@ -85,6 +93,23 @@ MonoBehaviour:
   greenTeamScoreText: {fileID: 0}
   greyTeamScoreText: {fileID: 0}
   teamWinnerText: {fileID: 0}
+  GameOverScrollPanelObject: {fileID: 0}
+  PossessionFootballGreen: {fileID: 0}
+  PossessionFootballGrey: {fileID: 0}
+  PossessionBarGreen: {fileID: 0}
+  PossessionBarGrey: {fileID: 0}
+  MoveLeftText: {fileID: 0}
+  MoveRightText: {fileID: 0}
+  EnterToSubmitText: {fileID: 0}
+  maxY: 0
+  minY: 0
+  maxX: 0
+  minX: 0
+  eventSystem: {fileID: 0}
+  inputSystem: {fileID: 0}
+  aiPlayerPrefab: {fileID: 746005145141606358, guid: 99ad0a2136d863b43b69c51e64ec3a12, type: 3}
+  aiGamePlayerScript: {fileID: 0}
+  aiPlayerScript: {fileID: 0}
 --- !u!114 &8456977640809881299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100,5 +125,5 @@ MonoBehaviour:
   sceneId: 0
   serverOnly: 0
   visible: 0
-  m_AssetId: 
+  m_AssetId: dcc63033471145348880d77a042ceb7d
   hasSpawned: 0

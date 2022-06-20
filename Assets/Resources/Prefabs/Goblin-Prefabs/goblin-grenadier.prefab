@@ -184,6 +184,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 037184e649e03b44ba79da4e656bc0e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lastPunchBox: {fileID: 0}
+  nextPunchTime: 0
 --- !u!1 &2813347414334592412
 GameObject:
   m_ObjectHideFlags: 0
@@ -457,6 +459,8 @@ MonoBehaviour:
   isKickAfterPositionSet: 0
   angleOfKickAttempt: 0
   kickAfterAccuracyDifficulty: 0
+  repositioningButtonHeldDown: 0
+  repositioningToLeft: 0
   kickAfterFinalPosition: {x: 0, y: 0}
   hasGoblinBeenRepositionedForKickAfter: 0
   kickAfterAccuracyBar: {fileID: 1814285302364287800}
@@ -492,9 +496,9 @@ MonoBehaviour:
   mySoundManager: {fileID: 2708079450929287685}
   state: 0
   punchRange: 2.5
-  punchRate: 1.75
+  punchRate: 1
   nextPunchTime: 0
-  slideRange: 3.5
+  slideRange: 2.75
   slideRate: 4
   nextSlideTime: 0
   minDistanceFromTarget: 1.75
@@ -513,6 +517,18 @@ MonoBehaviour:
   adjacentGoblinTime: 0
   diveRate: 2.5
   nextDiveTime: 0
+  myGoblinAIPathFindingScript: {fileID: 0}
+  didGoblinCompleteSprint: 0
+  willGoblinSprintToFatigue: 0
+  canGoblinSprint: 1
+  minStaminaToSprintTo: 1
+  isStuck: 0
+  stuckCheckTime: 0
+  stuckCheckRate: 0.75
+  lastCheckedPosition: {x: 100, y: 100, z: 0}
+  stuckDirectionChange: {x: 0, y: 0}
+  teammateCollision: 0
+  teammateCollisionDirectionModifer: {x: 0, y: 0}
 --- !u!95 &2813347414334592408
 Animator:
   serializedVersion: 3
@@ -692,6 +708,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 037184e649e03b44ba79da4e656bc0e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lastPunchBox: {fileID: 0}
+  nextPunchTime: 0
 --- !u!61 &7831233898718376710
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1052,6 +1070,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8439461319134223422}
   - component: {fileID: 7777596504333843401}
+  - component: {fileID: 3627114544715884067}
   m_Layer: 7
   m_Name: PunchBox
   m_TagString: punchbox
@@ -1099,6 +1118,20 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.0001, y: 0.0001}
   m_EdgeRadius: 0
+--- !u!114 &3627114544715884067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7844710513641514242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2fd4a5f364881c4c8c586c04039afdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextPunchTime: 0
+  nextPunchRate: 0.25
 --- !u!1001 &174814671012373966
 PrefabInstance:
   m_ObjectHideFlags: 0

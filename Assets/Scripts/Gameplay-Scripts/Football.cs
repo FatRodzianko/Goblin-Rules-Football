@@ -76,8 +76,8 @@ public class Football : NetworkBehaviour
     [SerializeField] float ThrownMinX; // -44. 5f // -59. 5f
     [SerializeField] float GroundedMaxY; // 5. 6f // 7. 1f
     [SerializeField] float GroundedMinY; // -6. 5f // -11. 0f
-    [SerializeField] Vector3 GoalPostForGrey; // GoalPostForGrey; // -50.3, -1.5
-    [SerializeField] Vector3 GoalPostForGreen; // GoalPostForGreen; // 50.3 , -1.5
+    [SerializeField] public Vector3 GoalPostForGrey; // GoalPostForGrey; // -50.3, -1.5
+    [SerializeField] public Vector3 GoalPostForGreen; // GoalPostForGreen; // 50.3 , -1.5
     [SerializeField] float KickFootballMaxY; // 5. 2f // 6. 7f
     [SerializeField] float KickFootballMinY; // -6. 0f // -10. 5f
 
@@ -602,6 +602,18 @@ public class Football : NetworkBehaviour
                 TeamManager.instance.greenTeam.UpdatePlayerPossessionTracker(false);
                 TeamManager.instance.greyTeam.UpdatePlayerPossessionTracker(false);
             }
+            if (newValue)
+            {
+                // If the ball is held, make sure that animation states aren't "stuck" in old state?
+                if (animator.GetBool("isThrown"))
+                    animator.SetBool("isThrown", false);
+                if(animator.GetBool("isSideways"))
+                    animator.SetBool("isSideways", false);
+                if (animator.GetBool("isFalling"))
+                    animator.SetBool("isFalling", false);
+                if (animator.GetBool("isFumbled"))
+                    animator.SetBool("isFumbled", false);
+            }
         }            
         if (isClient)
         {
@@ -622,7 +634,7 @@ public class Football : NetworkBehaviour
         if (!goblinToThrowToScript.canGoblinReceivePass)
             return;
 
-        if (throwingGoblinScript.doesCharacterHaveBall && !goblinToThrowToScript.doesCharacterHaveBall && !throwingGoblinScript.isKicking && !throwingGoblinScript.isDiving)
+        if (throwingGoblinScript.doesCharacterHaveBall && !goblinToThrowToScript.doesCharacterHaveBall && !throwingGoblinScript.isKicking && !throwingGoblinScript.isDiving && !throwingGoblinScript.isGoblinKnockedOut)
         {
             throwingGoblinScript.HandleHasBall(throwingGoblinScript.doesCharacterHaveBall, false);
             this.HandleIsHeld(isHeld, false);
@@ -1092,6 +1104,14 @@ public class Football : NetworkBehaviour
                 }
                 if (footballShadowObject.activeInHierarchy)
                     footballShadowObject.SetActive(false);
+            }
+            else if (newValue)
+            {
+                if (GameplayManager.instance.gamePhase == "kick-after-attempt")
+                {
+                    GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
+                    localPlayer.FollowSelectedGoblin(footballShadowObject.transform);
+                }
             }
         }
     }

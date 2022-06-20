@@ -221,6 +221,7 @@ MonoBehaviour:
   isBlueShell: 0
   remainingUses: 1
   multipleUses: 0
+  aiPowerUpType: defense
   PowerUpImageObject: {fileID: 6338328384912614004}
   PowerUpBorderObject: {fileID: 6338328385406385039}
   bounceSpeed: 0.25

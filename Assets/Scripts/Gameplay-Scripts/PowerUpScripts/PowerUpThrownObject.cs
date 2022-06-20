@@ -32,12 +32,18 @@ public class PowerUpThrownObject : NetworkBehaviour
 
     [Header("SFX Stuff")]
     [SerializeField] public string sfxClipName;
+    [SerializeField] public string sfxThrowDropClip;
     [SerializeField] bool playSoundOnDestroy;
 
     // Start is called before the first frame update
     void Start()
     {
 
+    }
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        this.PlayThrowDropClip();
     }
 
     // Update is called once per frame
@@ -282,19 +288,27 @@ public class PowerUpThrownObject : NetworkBehaviour
         return onscreen;
     }
     [ClientCallback]
-    void PlaySFXClip()
+    void PlaySFXClip(string clipName)
     {
         Debug.Log("PowerUpThrownObject: RpcPlaySFXClip for " + this.name);
-        if (this.IsOnScreen() && !string.IsNullOrWhiteSpace(sfxClipName))
+        if (this.IsOnScreen() && !string.IsNullOrWhiteSpace(clipName))
         {
-            SoundManager.instance.PlaySound(sfxClipName, 0.75f);
+            SoundManager.instance.PlaySound(clipName, 0.75f);
         }
     }
     private void OnDestroy()
     {
         if (isClient && playSoundOnDestroy)
         {
-            this.PlaySFXClip();
+            this.PlaySFXClip(sfxClipName);
         }
+    }
+    void PlayThrowDropClip()
+    {
+        this.PlaySFXClip(sfxThrowDropClip);
+    }
+    void PlayHitClip()
+    {
+        this.PlaySFXClip(sfxClipName);
     }
 }

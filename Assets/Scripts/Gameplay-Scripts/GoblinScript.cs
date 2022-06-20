@@ -12,6 +12,8 @@ public class GoblinScript : NetworkBehaviour
         ChaseBallCarrier,
         TeamHasBall,
         AttackNearbyGoblin,
+        RunTowardEndzone,
+        BlockKick,
     }
 
     public float pressedTime = 0f;
@@ -109,7 +111,7 @@ public class GoblinScript : NetworkBehaviour
 
     [Header("Dive Info")]
     [SyncVar(hook = nameof(HandleIsDiving))] public bool isDiving = false;
-    public bool DivingRoutineRunning = false;
+    [SyncVar] public bool DivingRoutineRunning = false;
     IEnumerator DivingRoutine;
 
     [Header("Is Goblin Throwing Stuff")]
@@ -145,8 +147,8 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar(hook =nameof(HandleKickAfterAccuracyDifficultyUpdate))] public float kickAfterAccuracyDifficulty = 0f;
     //[SyncVar] public float kickAfterAccuracyBar1 = 0f;
     //[SyncVar] public float kickAfterAccuracyBar2 = 0f;
-    bool repositioningButtonHeldDown = false;
-    bool repositioningToLeft = false;
+    public bool repositioningButtonHeldDown = false;
+    public bool repositioningToLeft = false;
     Vector2 greenGoalPost = new Vector2(50.3f, -1.5f);
     Vector2 greyGoalPost = new Vector2(-50.3f, -1.5f);
     [SyncVar] public Vector2 kickAfterFinalPosition = Vector2.zero;
@@ -234,15 +236,35 @@ public class GoblinScript : NetworkBehaviour
     public float adjacentGoblinTime = 0f;
     public float diveRate = 2.5f;
     public float nextDiveTime = 0f;
-    GoblinAIPathFinding myGoblinAIPathFindingScript;
+    public GoblinAIPathFinding myGoblinAIPathFindingScript;
 
-    
+    [Header("AI Sprinting Parameters")]
+    public bool didGoblinCompleteSprint = false;
+    public bool willGoblinSprintToFatigue = false;
+    public bool canGoblinSprint = true;
+    public float minStaminaToSprintTo = 1.0f;
+
+    [Header("AI Stuck Stuff")]
+    public bool isStuck = false;
+    public float stuckCheckTime = 0f;
+    public float stuckCheckRate = 0.5f;
+    public Vector3 lastCheckedPosition;
+    public Vector2 stuckDirectionChange = Vector2.zero;
+
+    [Header("AI Teammate Collision")]
+    public bool teammateCollision = false;
+    public Vector2 teammateCollisionDirectionModifer = Vector2.zero;
+
+    [Header("Dive Over Obstacle Checks")]
+    public float diveCheckTime = 0f;
+    public float diveCheckRate = 0.25f;
+
 
     public override void OnStartAuthority()
     {
         base.OnStartAuthority();
         GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
-        if (localPlayer)
+        if (localPlayer && !localPlayer.isSinglePlayer)
         {
             myGamePlayer = localPlayer;
             myGamePlayer.AddToGoblinTeam(this);
@@ -252,16 +274,53 @@ public class GoblinScript : NetworkBehaviour
                     CmdMakeGoblinGrey();
             }
             else
-            { 
-                if(myGamePlayer.isTeamGrey)
+            {
+                if (myGamePlayer.isTeamGrey)
                     CmdMakeGoblinGrey();
             }
-            
+
 
             //GoblinStartingPosition(myGamePlayer.IsGameLeader);
             if (transform.position.x > 0f)
                 CmdFlipRenderer(true);
         }
+        else if (localPlayer && localPlayer.isSinglePlayer)
+        {
+            GamePlayer aiPlayer = null;
+            try
+            {
+                aiPlayer = GameObject.FindGameObjectWithTag("GamePlayer").GetComponent<GamePlayer>();
+            }
+            catch (Exception e)
+            {
+                Debug.Log("OnStartAuthority for " + this.name + " could not find AIPlayer object. " + e);
+            }
+            if (this.ownerNetId == localPlayer.GetComponent<NetworkIdentity>().netId)
+            {
+                myGamePlayer = localPlayer;
+                myGamePlayer.AddToGoblinTeam(this);
+            }
+            else
+            {
+                myGamePlayer = aiPlayer;
+                myGamePlayer.AddToGoblinTeam(this);
+            }
+            if (myGamePlayer.isTeamGrey)
+                CmdMakeGoblinGrey();
+            if (transform.position.x > 0f)
+                CmdFlipRenderer(true);
+        }
+
+        myGoblinAIPathFindingScript = this.GetComponent<GoblinAIPathFinding>();
+
+        if (this.myGamePlayer.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
+        {
+            this.AIResetSprintingParameters();
+            //youMarkerObject.SetActive(false);
+            return;
+        }
+            
+
         InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
         InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
 
@@ -269,7 +328,7 @@ public class GoblinScript : NetworkBehaviour
         InputManager.Controls.Player.Sprint.canceled += _ => IsPlayerSprinting(false);
         EnableGoblinMovement(false);
 
-        myGoblinAIPathFindingScript = this.GetComponent<GoblinAIPathFinding>();
+        
     }
     public override void OnStartServer()
     {
@@ -339,12 +398,31 @@ public class GoblinScript : NetworkBehaviour
 
         if (hasAuthority)
         {
-            ballMarkerObject = Instantiate(ballMarkerPrefab);
-            youMarkerObject = Instantiate(youMarkerPrefab);
-            
-        }   
+            if (!GameplayManager.instance.isSinglePlayer)
+            {
+                ballMarkerObject = Instantiate(ballMarkerPrefab);
+                youMarkerObject = Instantiate(youMarkerPrefab);
+            }
+            else
+            {
+                if (this.ownerConnectionId != -1)
+                {
+                    ballMarkerObject = Instantiate(ballMarkerPrefab);
+                    youMarkerObject = Instantiate(youMarkerPrefab);
+                }
+                else
+                {
+                    youMarkerObject = new GameObject("empty-you-marker");
+                    ballMarkerObject = Instantiate(ballMarkerOpponentPrefab);
+                }
+            }
+        }
         else
+        {
             ballMarkerObject = Instantiate(ballMarkerOpponentPrefab);
+        }
+            
+
         ballMarkerObject.transform.SetParent(this.transform);
         Vector3 markerPosition = myStatusBars.transform.localPosition;
         markerPosition.y += 0.75f;
@@ -409,8 +487,27 @@ public class GoblinScript : NetworkBehaviour
                 if (newValue)
                 {
                     //rb.bodyType = RigidbodyType2D.Dynamic;
-                    Debug.Log("HandleCharacterSelected: Following new selected character");
-                    myGamePlayer.FollowSelectedGoblin(this.transform);
+                    Debug.Log("HandleCharacterSelected: Following new selected character " + this.name + " is this goblin grey? " + this.isGoblinGrey.ToString());
+                    if (GameplayManager.instance.isSinglePlayer)
+                    { 
+                        if(myGamePlayer.isLocalPlayer)
+                            myGamePlayer.FollowSelectedGoblin(this.transform);
+                    }
+                    else
+                        myGamePlayer.FollowSelectedGoblin(this.transform);
+                    try
+                    {
+                        if (this.myGamePlayer.is1v1 || this.myGamePlayer.isSinglePlayer)
+                        {
+                            this.isSprinting = false;
+                            this.AIResetSprintingParameters();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log("HandleCharacterSelected: could not access myGamePlayer. Error: " + e);
+                    }
+                    
                 }
                 else
                 {
@@ -421,8 +518,9 @@ public class GoblinScript : NetworkBehaviour
                         animator.SetBool("isRunning", isRunning);
                     }
                 }
-                if(!this.doesCharacterHaveBall && youMarkerObject != null)
+                if(!this.doesCharacterHaveBall && youMarkerObject != null && this.myGamePlayer.isLocalPlayer)
                     youMarkerObject.SetActive(newValue);
+
             }
         }
     }
@@ -431,7 +529,7 @@ public class GoblinScript : NetworkBehaviour
         Debug.Log("SetQGoblin " + isQ.ToString());
         if (hasAuthority)
         {
-            if(GameplayManager.instance.is1v1)
+            if(GameplayManager.instance.is1v1 || GameplayManager.instance.isSinglePlayer)
                 CmdSetQGoblin(isQ);
             else
                 SetQGoblinLocally3v3(isQ);
@@ -443,7 +541,7 @@ public class GoblinScript : NetworkBehaviour
     [Command]
     void CmdSetQGoblin(bool isQ)
     {
-        Debug.Log("CmdSetQGoblin " + isQ.ToString() + " "  + this.name);
+        Debug.Log("CmdSetQGoblin " + isQ.ToString() + " "  + this.name + " is grey? " + this.isGoblinGrey.ToString());
         HandleIsQGoblin(isQGoblin, isQ);
     }
     public void HandleIsQGoblin(bool oldValue, bool newValue)
@@ -456,6 +554,11 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (hasAuthority)
                 {
+                    if (GameplayManager.instance.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
+                    {
+                        qMarker.SetActive(false);
+                        return;
+                    }
                     qMarker.SetActive(newValue);
                 }
             }
@@ -481,7 +584,7 @@ public class GoblinScript : NetworkBehaviour
         Debug.Log("SetEGoblin " + isE.ToString() + " " + this.name);
         if (hasAuthority)
         {
-            if (GameplayManager.instance.is1v1)
+            if (GameplayManager.instance.is1v1 || GameplayManager.instance.isSinglePlayer)
                 CmdSetEGoblin(isE);
             else
                 SetEGoblinLocally3v3(isE);
@@ -493,7 +596,7 @@ public class GoblinScript : NetworkBehaviour
     [Command]
     void CmdSetEGoblin(bool isE)
     {
-        Debug.Log("CmdSetEGoblin " + isE.ToString());
+        Debug.Log("CmdSetEGoblin " + isE.ToString() + " is grey? " + this.isGoblinGrey.ToString());
         HandleIsEGoblin(isEGoblin, isE);
     }
 
@@ -505,6 +608,11 @@ public class GoblinScript : NetworkBehaviour
         {
             if (hasAuthority)
             {
+                if (GameplayManager.instance.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
+                {
+                    eMarker.SetActive(false);
+                    return;
+                }
                 eMarker.SetActive(newValue);
             }
         }
@@ -692,7 +800,7 @@ public class GoblinScript : NetworkBehaviour
                 CmdRecoverHealth();*/
         }
         //if (hasAuthority && isCharacterSelected && canGoblinMove && !isGoblinPunching && !isGoblinKnockedOut && !isSliding && !isDiving)
-        if (hasAuthority && isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving)
+        if (hasAuthority && isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && !(GameplayManager.instance.isSinglePlayer && !this.myGamePlayer.isLocalPlayer) && GameplayManager.instance.gamePhase != "kickoff")
         {
             CmdIsPlayerSprinting(isSprinting);
             isRunning = false;
@@ -745,7 +853,7 @@ public class GoblinScript : NetworkBehaviour
             // This will be what the goblin does when they are not selected. AI code will go here?
             // Check if there is a nearby goblin. If so, target them?
             //bool isOpposingGoblinNearBy = FindNearByGoblinToTarget();
-            
+
             if (myGamePlayer.doesTeamHaveBall)
             {
                 // AI behaviour when your team has the ball - stay near the player but "behind" them to receive a pass
@@ -761,7 +869,7 @@ public class GoblinScript : NetworkBehaviour
                     //animator.SetBool("isRunning", false);
                     //MoveTowrdBallCarrier();
                     // Check to see if a new target is needed. If not keep current target
-                    bool newTargetNeeded = false;
+                    /*bool newTargetNeeded = false;
                     if (goblinTarget != null)
                     {
                         if (goblinTarget.isGoblinKnockedOut)
@@ -778,6 +886,23 @@ public class GoblinScript : NetworkBehaviour
                     {
                         goblinTarget = null;
                         //Prioritize chasing goblin with ball instead of random goblin
+                        bool targetBallCarrier = AIShouldGoblinTargetBallCarrier();
+                        if (targetBallCarrier)
+                        {
+                            state = State.ChaseBallCarrier;
+                        }
+                        else
+                        {
+                            bool isOpposingGoblinNearBy = FindNearByGoblinToTarget();
+                            if (isOpposingGoblinNearBy)
+                            {
+                                state = State.AttackNearbyGoblin;
+                            }
+                            else
+                            {
+                                state = State.ChaseBallCarrier;
+                            }
+                        }
                         if (UnityEngine.Random.Range(0f, 1f) < 0.6f)
                         {
                             state = State.ChaseBallCarrier;
@@ -794,8 +919,9 @@ public class GoblinScript : NetworkBehaviour
                                 state = State.ChaseBallCarrier;
                                 //goblinTarget = null;
                             }
-                        }                        
-                    }
+                        }
+                    }*/
+                    AIGetGoblinTarget();
                 }
                 else
                 {
@@ -820,6 +946,39 @@ public class GoblinScript : NetworkBehaviour
                     //MoveTowardGoblinTarget();
                     break;
             }
+        }
+        // Check for the AI character for what to do with their goblin that they have selected?
+        else if (hasAuthority && this.isCharacterSelected && !this.myGamePlayer.isLocalPlayer && this.myGamePlayer.isSinglePlayer && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+        {
+            if (this.doesCharacterHaveBall)
+                state = State.RunTowardEndzone;
+            else if (gameFootball.isHeld && !this.doesCharacterHaveBall)
+            {
+                AIGetGoblinTarget();
+            }   
+            else
+                state = State.ChaseFootball;
+
+            switch (state)
+            {
+                default:
+                case State.ChaseFootball:
+                    //MoveTowardFootball();
+                    break;
+                case State.ChaseBallCarrier:
+                    //MoveTowrdBallCarrier();
+                    break;
+                case State.TeamHasBall:
+                    //GetOpenForPass();
+                    break;
+                case State.AttackNearbyGoblin:
+                    //MoveTowardGoblinTarget();
+                    break;
+                case State.RunTowardEndzone:
+                    //myGamePlayer.myAiPlayer.RunTowardEndZone();
+                    break;
+            }
+
         }
 
     }
@@ -928,8 +1087,24 @@ public class GoblinScript : NetworkBehaviour
                 CmdSetBallCarrySpeedModifier();
                 if(newValue && youMarkerObject != null)
                     youMarkerObject.SetActive(false);
-                else if(!newValue && this.isCharacterSelected && youMarkerObject != null)
+                else if(!newValue && this.isCharacterSelected && youMarkerObject != null && myGamePlayer.isLocalPlayer)
                     youMarkerObject.SetActive(true);
+                try
+                {
+                    if (this.myGamePlayer.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
+                    {
+                        if (!newValue)
+                        {
+                            this.isSprinting = false;
+                            this.AIResetSprintingParameters();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("HandleHasBall: Could not get myGamePlayer variable. Error: " + e);
+                }
+
             }
             if (newValue)
             {
@@ -1034,7 +1209,7 @@ public class GoblinScript : NetworkBehaviour
     {
         Debug.Log("ThrowBall: Throwing the ball to: " + goblinToThrowTo.gameObject.name);
         Football footballScript = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
-        if (!isKicking && !isDiving)
+        if (!isKicking && !isDiving && !this.isGoblinKnockedOut && this.doesCharacterHaveBall)
         {
             if (hasAuthority)
             {
@@ -1123,8 +1298,11 @@ public class GoblinScript : NetworkBehaviour
             if (isBlocking)
                 isPlayerSprinting = false;
                 
-            Debug.Log("IsPlayerSprinting: " + isPlayerSprinting.ToString());
-            isSprinting = isPlayerSprinting;
+            Debug.Log("IsPlayerSprinting: " + isPlayerSprinting.ToString() + " for goblin: " + this.name + " owned by player " + this.ownerName + ":" + this.ownerConnectionId.ToString());
+            if (this.isCharacterSelected)
+                isSprinting = isPlayerSprinting;
+            else
+                isSprinting = false;
         }
             
     }
@@ -1211,6 +1389,18 @@ public class GoblinScript : NetworkBehaviour
             FatigueIndicators(newValue);
             if (hasAuthority)
             {
+                if (this.myGamePlayer.isSinglePlayer && !myGamePlayer.isLocalPlayer)
+                {
+                    if (newValue)
+                    {
+                        this.canGoblinSprint = false;
+                    }
+                    else
+                    {
+                        //this.canGoblinSprint = true;
+                        this.AIResetSprintingParameters();
+                    }
+                }
                 if (newValue)
                 {
                     
@@ -1436,7 +1626,7 @@ public class GoblinScript : NetworkBehaviour
                 TeamManager.instance.FumbleBall(this.serverGamePlayer.isTeamGrey);
         }
         //Code here for ending kick-after-attempt?
-        if (GameplayManager.instance.gamePhase == "kick-after-attempt" && this.isKickAfterGoblin)
+        if (GameplayManager.instance.gamePhase == "kick-after-attempt" && this.isKickAfterGoblin && !gameFootball.isKicked)
         {
             GameplayManager.instance.KickAfterAttemptWasBlocked();
             RpcKickBlockedStopKickAfterAttempt(this.connectionToClient);
@@ -1459,7 +1649,7 @@ public class GoblinScript : NetworkBehaviour
     public IEnumerator KnockedOutTimer()
     {
         isHealthRecoveryRoutineRunning = true;
-        yield return new WaitForSeconds(4.0f);
+        yield return new WaitForSeconds(3.5f);
         isHealthRecoveryRoutineRunning = false;
         this.health = (MaxHealth * 0.66f);
         //isGoblinKnockedOut = false;
@@ -1590,6 +1780,21 @@ public class GoblinScript : NetworkBehaviour
             float newStamina = newValue;
             if (newStamina < 0f)
                 newStamina = 0f;
+            try
+            {
+                if (hasAuthority)
+                {
+                    if (this.myGamePlayer.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
+                    {
+                        if (newValue >= this.MaxStamina)
+                            this.AIResetSprintingParameters();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log("UpdateGoblinStamina: Could not get myGamePlayer variable. Error: " + e);
+            }
 
             myStatusBars.StaminaBarUpdate(newStamina / MaxStamina);
 
@@ -1652,6 +1857,7 @@ public class GoblinScript : NetworkBehaviour
         isSliding = true;
         yield return new WaitForSeconds(0.25f);
         speed = MaxSpeed * 1.2f;
+        Debug.Log("SlideGoblinRoutine: Set speed to 1.2x for goblin " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
         //yield return new WaitForSeconds(0.5f);
         yield return new WaitForSeconds(0.25f);
         isSliding = false;
@@ -1701,7 +1907,7 @@ public class GoblinScript : NetworkBehaviour
     public IEnumerator TripGoblinTimer()
     {
         isTrippedTimerRunning = true;
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(1.25f);
         isTrippedTimerRunning = false;
 
         HandleIsGoblinKnockedOut(isGoblinKnockedOut, false);
@@ -1727,15 +1933,26 @@ public class GoblinScript : NetworkBehaviour
             }
         }
     }
+    public void DiveAIGoblinTowardEndzone(Vector3 diveDirection)
+    {
+        if (!isGoblinKnockedOut && !isSliding && !isDiving && hasAuthority && !isPunching)
+        {
+            CmdStartDiving(diveDirection);
+            if (isBlocking)
+                CmdSetBlocking(false);
+        }
+    }
     [Command]
     void CmdStartDiving(Vector2 directionToDive)
     {
-        if (isRunningOnServer && directionToDive != Vector2.zero && !isSliding && !isFatigued && !isDiving && !DivingRoutineRunning && !isSlidingRoutineRunning && !isPunching)
+        Debug.Log("CmdStartDiving: isRunningOnServer: " + this.isRunningOnServer.ToString() + " Direction to move: " + directionToDive.ToString());
+        if (isRunningOnServer && directionToDive != Vector2.zero && !isSliding && !isFatigued && !isDiving && !DivingRoutineRunning && !isSlidingRoutineRunning && !isPunching && !this.isKicking)
         {
             Debug.Log("CmdStartDiving: Goblin will slide in direction of: " + directionToDive.ToString());
             slideDirection = directionToDive;
             HandleIsDiving(isDiving, true);
             speed = MaxSpeed * 1.2f;
+            Debug.Log("CmdStartDiving: Set speed to 1.2x for goblin " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
         }
             
     }
@@ -1757,6 +1974,8 @@ public class GoblinScript : NetworkBehaviour
                 {
                     animator.Play(goblinType + "-dive");
                 }
+                IEnumerator divingResetSanityCheckRoutine = DivingResetSanityCheckRoutine();
+                StartCoroutine(divingResetSanityCheckRoutine);
             }
             if (hasAuthority && !newValue)
             {
@@ -1764,6 +1983,13 @@ public class GoblinScript : NetworkBehaviour
                     golbinBodyCollider.gameObject.SetActive(true);
             }
         }
+    }
+    IEnumerator DivingResetSanityCheckRoutine()
+    {
+        yield return new WaitForSeconds(1.25f);
+        if (this.isDiving)
+            this.StopDiving();
+
     }
     public void StopDiving()
     {
@@ -1927,8 +2153,6 @@ public class GoblinScript : NetworkBehaviour
             HandleIsKicking(this.isKicking, true);
             GoblinKickPower = kickPower;
             GoblinKickoffAngle = kickAngle;
-            
-
         }
     }
     public void HandleIsKicking(bool oldValue, bool newValue)
@@ -2068,14 +2292,23 @@ public class GoblinScript : NetworkBehaviour
     }
     void FlipKickoffAimArrow()
     {
+        Debug.Log("FlipKickoffAimArrow: for goblin: " + this.name + " is that goblin grey? " + this.isGoblinGrey.ToString());
         Vector3 newPosition = KickoffAimArrow.transform.localPosition;
-        newPosition.x *= -1;
-        KickoffAimArrow.transform.localPosition = newPosition;
-        KickoffAimArrow.GetComponent<SpriteRenderer>().flipX = true;
+        if (newPosition.x > 0f)
+        {
+            newPosition.x *= -1;
+            KickoffAimArrow.transform.localPosition = newPosition;
+            KickoffAimArrow.GetComponent<SpriteRenderer>().flipX = true;
+        }   
     }
     public void EnableKickoffAimArrow(bool activate)
     {
-        KickoffAimArrow.SetActive(activate);
+        if(!GameplayManager.instance.isSinglePlayer)
+            KickoffAimArrow.SetActive(activate);
+        else if (this.myGamePlayer.isLocalPlayer && GameplayManager.instance.isSinglePlayer)
+            KickoffAimArrow.SetActive(activate);
+        else if(!this.myGamePlayer.isLocalPlayer && GameplayManager.instance.isSinglePlayer)
+            KickoffAimArrow.SetActive(false);
     }
     public void StartAimArrowDirection(bool aimUp)
     {
@@ -2122,6 +2355,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void ActivateKickAfterAccuracyBar(bool activate)
     {
+
         kickAfterAccuracyBar.SetActive(activate);
         kickAfterGuageLine.SetActive(false);
     }
@@ -2242,26 +2476,71 @@ public class GoblinScript : NetworkBehaviour
         ResetPowerBar();
 
     }
-    [ServerCallback]
+    //[ServerCallback]
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (GameplayManager.instance.gamePhase == "kick-after-attempt")
+        if (isServer)
         {
-            if (collision.collider.tag == "Goblin")
+            if (GameplayManager.instance.gamePhase == "kick-after-attempt")
             {
-                GoblinScript collidingGoblin = collision.collider.GetComponent<GoblinScript>();
-                if (collidingGoblin.isKickAfterGoblin && collidingGoblin.isGoblinGrey != this.isGoblinGrey && collidingGoblin.isKickAfterPositionSet)
+                if (collision.collider.tag == "Goblin")
                 {
-                    Debug.Log("GoblinScript: OnCollisionEnter2D: The colliding goblin is the kick after goblin! Goblin: " + collidingGoblin.name);
-                    collidingGoblin.KickAfterGoblinWasRunInto();
+                    GoblinScript collidingGoblin = collision.collider.GetComponent<GoblinScript>();
+                    if (collidingGoblin.isKickAfterGoblin && collidingGoblin.isGoblinGrey != this.isGoblinGrey && collidingGoblin.isKickAfterPositionSet && collidingGoblin.doesCharacterHaveBall)
+                    {
+                        Debug.Log("GoblinScript: OnCollisionEnter2D: The colliding goblin is the kick after goblin! Goblin: " + collidingGoblin.name);
+                        collidingGoblin.KickAfterGoblinWasRunInto();
+                    }
+                    /*if (this.isKickAfterGoblin)
+                    {
+                        Debug.Log("GoblinScript: OnCollisionEnter2D: THIS GOBLIN is the kick after goblin! And another goblin ran into it! This goblin: " + this.name + " colliding Goblin: " + collidingGoblin.name);
+                        KickAfterGoblinWasRunInto();
+                    }*/
                 }
-                /*if (this.isKickAfterGoblin)
-                {
-                    Debug.Log("GoblinScript: OnCollisionEnter2D: THIS GOBLIN is the kick after goblin! And another goblin ran into it! This goblin: " + this.name + " colliding Goblin: " + collidingGoblin.name);
-                    KickAfterGoblinWasRunInto();
-                }*/
             }
         }
+        if(isClient)
+        {
+            if ((GameplayManager.instance.is1v1 || GameplayManager.instance.isSinglePlayer) && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+            {
+                if (collision.collider.tag == "Goblin")
+                {
+                    GoblinScript collidingGoblin = collision.collider.GetComponent<GoblinScript>();
+                    if (collidingGoblin.isGoblinGrey == this.isGoblinGrey)
+                    {
+                        Debug.Log("GoblinScript: OnCollisionEnter2D: Teammates collided. This goblin: " + this.name + ":" + this.ownerConnectionId.ToString() + " collided with teammate goblin:" + collidingGoblin.name + ":" + collidingGoblin.ownerConnectionId.ToString());
+                        if (!teammateCollision)
+                        {
+                            // Get the perpindicular direction of the teammate collision
+                            Vector2 directionOfTeammate = (collidingGoblin.transform.position - this.transform.position).normalized;
+                            Debug.Log("GoblinScript: OnCollisionEnter2D: Teammates collided. Grey team?: " + this.isGoblinGrey.ToString() + " Direction of teammate " + collidingGoblin.name + " is: " + directionOfTeammate.ToString() + " and the Perpendicular is: " + Vector2.Perpendicular(directionOfTeammate).normalized.ToString());
+                            teammateCollisionDirectionModifer.x = directionOfTeammate.x * -1f;
+                            directionOfTeammate = Vector2.Perpendicular(directionOfTeammate).normalized;
+                            teammateCollisionDirectionModifer.y = directionOfTeammate.y;
+
+                            if (UnityEngine.Random.Range(0f, 1.0f) > 0.5f)
+                            {
+                                teammateCollisionDirectionModifer.y = teammateCollisionDirectionModifer.y * -1f;
+                            }
+
+                            // Don't have the ball character change their direction
+                            /*if (this.doesCharacterHaveBall)
+                                return;*/
+                            IEnumerator teammateCollisionCooldownRoutine = TeammateCollisionCooldownRoutine();
+                            StartCoroutine(teammateCollisionCooldownRoutine);
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+    }
+    IEnumerator TeammateCollisionCooldownRoutine()
+    {
+        teammateCollision = true;
+        yield return new WaitForSeconds(0.25f);
+        teammateCollision = false;
     }
     [Server]
     void KickAfterGoblinWasRunInto()
@@ -2404,6 +2683,7 @@ public class GoblinScript : NetworkBehaviour
     {
         // Reset the ai script for targetting goblin
         myGoblinAIPathFindingScript.goblinTarget = null;
+        this.goblinTarget = null;
         myGoblinAIPathFindingScript.isTargetingAGoblin = false;
 
         float distToFootball = Vector3.Distance(this.transform.position, gameFootball.transform.position);
@@ -2423,7 +2703,11 @@ public class GoblinScript : NetworkBehaviour
             positionOfFootball = gameFootball.transform.position;
             directionToFootball = (positionOfFootball - this.transform.position).normalized;
         }
-
+        // If goblin is far away from the ball, try to sprint toward it?
+        if (distToFootball > 10f)
+        {
+            this.WillAIGoblinSprint(true);
+        }
         if (distToFootball > 0.2f)
         {
             AIMoveTowardDirection(directionToFootball, positionOfFootball);
@@ -2489,10 +2773,17 @@ public class GoblinScript : NetworkBehaviour
             }
             // Move goblin toward their target
             Vector3 diretionToBallCarrier = (targetPosition - myPosition).normalized;
+            
             if (distanceToTarget > minDistanceFromTarget)
             {
                 // Get the goblin with the football to target them with the AI script
-                goblinTarget = NetworkIdentity.spawned[gameFootball.goblinWithBallNetId].GetComponent<GoblinScript>();
+                this.goblinTarget = NetworkIdentity.spawned[gameFootball.goblinWithBallNetId].GetComponent<GoblinScript>();
+                
+                //Check to see if the goblin should be sprinting to the ball carrier
+                if (distanceToTarget > 3f || goblinTarget.isSprintingOnServer)
+                {
+                    this.WillAIGoblinSprint(false);
+                }
                 myGoblinAIPathFindingScript.goblinTarget = goblinTarget;
                 myGoblinAIPathFindingScript.isTargetingAGoblin = true;
                 AIMoveTowardDirection(diretionToBallCarrier, targetPosition);
@@ -2501,6 +2792,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 isRunning = false;
                 animator.SetBool("isRunning", isRunning);
+                //this.AIResetSprintingParameters();
             }
         }
 
@@ -2556,7 +2848,7 @@ public class GoblinScript : NetworkBehaviour
         }*/
                    
     }
-    void AIMoveTowardDirection(Vector3 directionToMoveTo, Vector3 targetPosition)
+    public void AIMoveTowardDirection(Vector3 directionToMoveTo, Vector3 targetPosition)
     {
         //Vector2 direction = Vector2.ClampMagnitude(directionToMoveTo, 1);
         Vector2 direction = this.GetComponent<GoblinAIPathFinding>().AIMoveTowardDirection(Vector2.ClampMagnitude(directionToMoveTo, 1), targetPosition);
@@ -2568,7 +2860,18 @@ public class GoblinScript : NetworkBehaviour
         isRunning = false;
         if (direction.x != 0 || direction.y != 0)
             isRunning = true;
+        // Set the goblin's "Running On Server" value so that can be tracked by the server?
         CmdSetIsRunningOnServer(isRunning);
+
+        //Set the "isSprinting" on the server and make sure that all the speed modifiers get set correctly?
+        CmdIsPlayerSprinting(isSprinting);
+
+        // If the goblin is sprinting, make sure to drain their stamina
+        if (isSprinting && !isFatigued)
+        {
+            CmdDrainStamina();
+        }
+
         // Check if a goblin has had an "adjacent" goblin for more than 0.4 seconds and needs to dive to get unstuck?
         /*bool doesGoblinNeedtoDive = IsThereAnAdjacentGoblin();
         if (doesGoblinNeedtoDive && Time.time > nextDiveTime)
@@ -2582,6 +2885,26 @@ public class GoblinScript : NetworkBehaviour
             // Move the goblin toward the football
             rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
         }*/
+
+        // Check to see if the goblin has been "stuck" for the last set amount of time. If they are stuck, make the goblin move either up or down
+        if (teammateCollision)
+        {
+            direction += teammateCollisionDirectionModifer;
+            //direction = direction.normalized;
+            //direction = teammateCollisionDirectionModifer;
+            direction = Vector2.ClampMagnitude(direction, 1);
+        }
+        if (CheckIfAIGoblinIsStuck())
+        {
+            direction += (stuckDirectionChange * 2);
+            direction = Vector2.ClampMagnitude(direction, 1);
+            DiveAIGoblinTowardEndzone(direction);
+        }
+        else if (DiveOverObstacles(direction))
+        {
+            DiveAIGoblinTowardEndzone(direction);
+        }
+
         rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
 
         // check the direction the goblin is moving. If they are moving left, make sprite face left. If right, sprite face right
@@ -2599,6 +2922,9 @@ public class GoblinScript : NetworkBehaviour
     }
     void GetOpenForPass()
     {
+        // Reset any sprinting for the AI?
+        if (this.isSprinting)
+            this.AIResetSprintingParameters();
         // Should not have a goblin target, so resetting that on the AI script
         myGoblinAIPathFindingScript.goblinTarget = null;
         myGoblinAIPathFindingScript.isTargetingAGoblin = false;
@@ -2667,7 +2993,7 @@ public class GoblinScript : NetworkBehaviour
                     // There is a goblin between this goblin and the ball carrier. Find a new position entirely
                     //Debug.Log("GetOpenForPass: Goblin found between " + this.name + " and ball carrier");
                     //Debug.Log("GetOpenForPass: Getting new position for " + this.name + " Was there a goblin between them? " + goblinBetween.ToString());
-                    ballCarrierPosition.x += (UnityEngine.Random.Range(2.5f, 7f) * directionModifier);
+                    ballCarrierPosition.x += (UnityEngine.Random.Range(1.5f, 7.5f) * directionModifier);
                     if (ballCarrierPosition.x > fieldMaxX)
                         ballCarrierPosition.x = (fieldMaxX - UnityEngine.Random.Range(0f, 4.0f));
                     else if (ballCarrierPosition.x < fieldMinX)
@@ -2690,7 +3016,7 @@ public class GoblinScript : NetworkBehaviour
                     }
                     else
                     {
-                        ballCarrierPosition.x += (UnityEngine.Random.Range(2.5f, 7f) * directionModifier);
+                        ballCarrierPosition.x += (UnityEngine.Random.Range(1.5f, 7.5f) * directionModifier);
                         if (ballCarrierPosition.x > fieldMaxX)
                             ballCarrierPosition.x = (fieldMaxX - UnityEngine.Random.Range(0f, 4.0f));
                         else if (ballCarrierPosition.x < fieldMinX)
@@ -2706,7 +3032,7 @@ public class GoblinScript : NetworkBehaviour
                 // There is a goblin between this goblin and the ball carrier. Find a new position entirely
                 //Debug.Log("GetOpenForPass: Goblin found between " + this.name + " and ball carrier");
                 //Debug.Log("GetOpenForPass: Getting new position for " + this.name + " Was there a goblin between them? " + goblinBetween.ToString());
-                ballCarrierPosition.x += (UnityEngine.Random.Range(2.5f, 7f) * directionModifier);
+                ballCarrierPosition.x += (UnityEngine.Random.Range(1.5f, 7.5f) * directionModifier);
                 if (ballCarrierPosition.x > fieldMaxX)
                     ballCarrierPosition.x = (fieldMaxX - UnityEngine.Random.Range(0f, 4.0f));
                 else if (ballCarrierPosition.x < fieldMinX)
@@ -2723,7 +3049,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 // NO goblin was found between. Just change the x position of the goblin to move forward. Y position can remain the same.
                 Debug.Log("GetOpenForPass: !!!NO!!! Goblin found between " + this.name + " and ball carrier");
-                ballCarrierPosition.x += (UnityEngine.Random.Range(2.5f, 7f) * directionModifier);
+                ballCarrierPosition.x += (UnityEngine.Random.Range(1.5f, 7.5f) * directionModifier);
                 if (ballCarrierPosition.x > fieldMaxX)
                     ballCarrierPosition.x = (fieldMaxX - UnityEngine.Random.Range(0f, 4.0f));
                 else if (ballCarrierPosition.x < fieldMinX)
@@ -2770,6 +3096,21 @@ public class GoblinScript : NetworkBehaviour
             if (!this.doesCharacterHaveBall)
                 animator.SetBool("withFootball", false);
             this.CmdResetFootstepModifers();
+            if (this.isSprinting)
+                this.IsPlayerSprinting(false);
+            try
+            {
+                if (this.myGamePlayer.isSinglePlayer || this.myGamePlayer.is1v1)
+                {
+                    this.AIResetSprintingParameters();
+                    if (this.goblinTarget != null)
+                        this.goblinTarget = null;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log("RpcResetGoblinStatuses: Could not get goblin player owner object. Error: " + e);
+            }
         }        
     }
     [Command]
@@ -2778,6 +3119,7 @@ public class GoblinScript : NetworkBehaviour
         this.onGlueSlowDown = false;
         this.onWaterSlowDown = false;
         this.onBrushSlowDown = false;
+        this.slowDownObstacleModifier = 1.0f;
     }
     bool FindNearByGoblinToTarget()
     {
@@ -2854,6 +3196,11 @@ public class GoblinScript : NetworkBehaviour
                 {
                     // Provide the AI script with the goblin target info
                     myGoblinAIPathFindingScript.goblinTarget = goblinTarget;
+                    //Check to see if the goblin should be sprinting to the ball carrier
+                    if (distanceToTarget > 10f)
+                    {
+                        this.WillAIGoblinSprint(false);
+                    }
                     myGoblinAIPathFindingScript.isTargetingAGoblin = true;
                     AIMoveTowardDirection(diretionToBallCarrier, targetPosition);
                 }                    
@@ -3135,5 +3482,335 @@ public class GoblinScript : NetworkBehaviour
     {
         if (this.isGoblinOnScreen())
             SoundManager.instance.PlaySound("kicked-ball", 1.0f);
+    }
+    public void CollisionWithObstacleObject(bool knockOut)
+    {
+        if (hasAuthority)
+        {
+            this.CmdCollisionWithObstacleObject(knockOut);
+        }
+    }
+    [Command]
+    void CmdCollisionWithObstacleObject(bool knockOut)
+    {
+        if (!this.isGoblinKnockedOut && this.canCollide)
+        {
+            this.KnockOutGoblin(knockOut);
+        }
+    }
+    public void AISubmitKickAfterKickingAccuracy(float accuracyValue, float powerValue)
+    {
+        Debug.Log("AISubmitKickAfterKickingAccuracy: Accuracy value: " + accuracyValue.ToString() + " power value: " + powerValue.ToString());
+        //isAccuracySubmittedYet = true;
+        IEnumerator delayForKickAfterAttempt = DelayForKickAfterAttempt(accuracyValue, powerValue);
+        StartCoroutine(delayForKickAfterAttempt);
+    }
+    IEnumerator DelayForKickAfterAttempt(float accuracyValue, float powerValue)
+    {
+        CmdSubmitKickAfterAccuracyValue(accuracyValue);
+        yield return new WaitForSeconds(0.1f);
+        CmdKickFootball(powerValue, 0f);
+    }
+    // If a goblin is going to start to sprint, set paramaters for that sprinting "session" to abide by?
+    // Will the goblin sprint until they are fatigued?
+    // What percentage of their max stamina will the goblin sprint to?
+    public void AIGetSprintingParameters()
+    {
+        Debug.Log("AIGetSprintingParameters: for goblin: " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
+        // Determine if the goblin will sprint to the point of fatigue
+        float fatigueChance = UnityEngine.Random.Range(0f, 1.0f);
+        if (fatigueChance > 0.9f)
+            this.willGoblinSprintToFatigue = true;
+        else
+            this.willGoblinSprintToFatigue = false;
+        Debug.Log("AIGetSprintingParameters: for goblin: " + this.name + " owned by player: " + this.ownerConnectionId.ToString() + " will sprint to fatigue? " + willGoblinSprintToFatigue.ToString());
+        // If the goblin won't sprint to fatigue, set a minimum % of MaxStamina to sprint to?
+        // If they will sprint to fatigue, set to 0f
+        if (willGoblinSprintToFatigue)
+            minStaminaToSprintTo = 0f;
+        else
+        {
+            minStaminaToSprintTo = UnityEngine.Random.Range(0.05f, 0.15f);
+        }
+    }
+    public void AIResetSprintingParameters()
+    {
+        Debug.Log("AIResetSprintingParameters: for goblin: " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
+        this.didGoblinCompleteSprint = false;
+        this.willGoblinSprintToFatigue = false;
+        this.minStaminaToSprintTo = 1.0f;
+
+        IEnumerator aiCanSprintAgainDelay = AICanSprintAgainDelay();
+        StartCoroutine(aiCanSprintAgainDelay);
+    }
+    IEnumerator AICanSprintAgainDelay()
+    {
+        yield return new WaitForSeconds(0.15f);
+        this.canGoblinSprint = true;
+    }
+    // Determine if the goblin should keep sprinting based on the Sprint Parameters that were set earlier?
+    public bool AIWillGoblinKeepSprinting()
+    {
+        Debug.Log("AIWillGoblinKeepSprinting: for goblin: " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
+        bool keepSprinting = false;
+        if (!this.canGoblinSprint)
+        {
+            keepSprinting = false;
+            return keepSprinting;
+        }
+
+        if (this.willGoblinSprintToFatigue && !this.isFatigued)
+        {
+            keepSprinting = true;
+            return keepSprinting;
+        }
+        else if (!this.willGoblinSprintToFatigue && !this.isFatigued)
+        {
+            if ((this.stamina / this.MaxStamina) > minStaminaToSprintTo)
+            {
+                keepSprinting = true;
+                return keepSprinting;
+            }
+            else
+            {
+                keepSprinting = false;
+                this.canGoblinSprint = false;
+                return keepSprinting;
+            }
+        }
+        //Debug.Log("AIWillGoblinKeepSprinting: returning keepSprinting as: " + keepSprinting.ToString());
+        return keepSprinting;
+    }
+    // Check to see how many other AI goblins are targeting the ball carrier to see if this goblin should also target the ball carrier
+    // Idea is that at least 2 goblins will target the ball carrier and one other will target a random goblin that is "getting open for a pass"
+    // For 1v1, it is assumed the player goblin is targeting the ball carrier, so only 1 more AI goblin needs to target the ball carrier
+    bool AIShouldGoblinTargetBallCarrier()
+    {
+        // testing always targeting the ball carrier
+        return true;
+        bool targetBallCarrier = false;
+
+        int minToTargetBallCarrier = 1;
+        // For single player games. The AI will need to have at least 2 goblins targeting the ball carrier. The playter controlled teams only need 1 AI to target the ball carrier, and the player will (hopefully) target the ball carrier themselves
+        if (myGamePlayer.isSinglePlayer && !myGamePlayer.isLocalPlayer)
+        {
+            minToTargetBallCarrier = 2;
+        }
+
+        // The skirmisher should almost always be targetting the ball carrier. 90% chance they will and return as true?
+        if (this.soundType == "skirmisher")
+        {
+            if (UnityEngine.Random.Range(0f, 1.0f) > 0.9f)
+            {
+                targetBallCarrier = true;
+                return targetBallCarrier;
+            }
+        }
+
+        // Get the ball carrier goblin
+        GoblinScript ballCarrier = NetworkIdentity.spawned[gameFootball.goblinWithBallNetId].GetComponent<GoblinScript>();
+
+        // Go through each goblin in the player's goblinTeam and check who they are targetting (if any) and track how many are targetting the ball carrier
+        int numberTargetingBallCarrier = 0;
+        foreach (GoblinScript goblin in myGamePlayer.goblinTeam)
+        {
+            // don't count this goblin in this count
+            if (goblin == this)
+                continue;
+            // don't count the goblin that is controlled by a player character. Their "goblinTarget" value won't be set correctly?
+            // The isLocalPlayer check is to make sure they are a player controlled goblin and not an AI controlled goblin in single player
+            if (goblin.isCharacterSelected && goblin.myGamePlayer.isLocalPlayer)
+                continue;
+            if (goblin.goblinTarget == ballCarrier)
+                numberTargetingBallCarrier++;
+        }
+
+        // if minimum number of goblins are targeting the ball carrier, return false. Else, return true
+        if (numberTargetingBallCarrier >= minToTargetBallCarrier)
+            targetBallCarrier = false;
+        else
+            targetBallCarrier = true;
+
+        return targetBallCarrier;
+    }
+    // Checks to see if the AI should target the ball carrier or a random other goblin. Sets goblin state to either ChaseBallCarrier or AttackNearbyGoblin
+    void AIGetGoblinTarget()
+    {
+        bool newTargetNeeded = false;
+        if (goblinTarget != null)
+        {
+            if (goblinTarget.isGoblinKnockedOut)
+                newTargetNeeded = true;
+            if (Vector3.Distance(this.transform.position, goblinTarget.transform.position) > 10f)
+                newTargetNeeded = true;
+        }
+        else
+        {
+            newTargetNeeded = true;
+        }
+        // If a new target is needed, check to see if any goblins are nearby (<10f units away). If none are, then target the ball carrier
+        if (newTargetNeeded)
+        {
+            goblinTarget = null;
+            //Prioritize chasing goblin with ball instead of random goblin
+            bool targetBallCarrier = AIShouldGoblinTargetBallCarrier();
+            if (targetBallCarrier)
+            {
+                state = State.ChaseBallCarrier;
+            }
+            else
+            {
+                bool isOpposingGoblinNearBy = FindNearByGoblinToTarget();
+                if (isOpposingGoblinNearBy)
+                {
+                    state = State.AttackNearbyGoblin;
+                }
+                else
+                {
+                    state = State.ChaseBallCarrier;
+                }
+            }
+        }
+    }
+    public void WillAIGoblinSprint(bool chasingBall)
+    {
+        if (this.goblinTarget != null || chasingBall)
+        {
+            if (!this.isSprinting && this.canGoblinSprint)
+            {
+                this.AIGetSprintingParameters();
+                this.isSprinting = true;
+            }
+            else if (this.isSprinting && this.canGoblinSprint)
+            {
+                this.isSprinting = this.AIWillGoblinKeepSprinting();
+            }
+            else if (!this.canGoblinSprint)
+            {
+                this.isSprinting = false;
+            }
+        }
+        else
+        {
+            this.isSprinting = false;
+            this.canGoblinSprint = false;
+            this.AIResetSprintingParameters();
+        }
+    }
+    // Check to see if an AI goblin is stuck or not based on how far they have moved for the last set amount of time?
+    bool CheckIfAIGoblinIsStuck()
+    {
+        bool isGoblinStuck = false;
+        if (Time.time <= (stuckCheckTime + stuckCheckRate))
+            return isGoblinStuck;
+        else
+            stuckCheckTime = Time.time;
+        if (this.DivingRoutineRunning)
+            return isGoblinStuck;
+        if (this.isGoblinKnockedOut || this.isDiving || this.isSliding || this.isPunching || this.isKicking)
+        {
+            // Reset the "last checked position?
+            if(this.isGoblinKnockedOut)
+                this.lastCheckedPosition = new Vector3(100f, 100f, 0f);
+            return isGoblinStuck;
+        }   
+        try
+        {
+            if ((this.state == State.ChaseBallCarrier || this.state == State.AttackNearbyGoblin))
+            {
+                if (this.goblinTarget != null)
+                {
+                    float distToTarget = Vector2.Distance(this.transform.position, this.goblinTarget.transform.position);
+                    if (distToTarget <= this.slideRange || distToTarget <= this.punchRange)
+                        return isGoblinStuck;
+                }
+            }
+            else if (this.state == State.ChaseFootball)
+            {
+                Vector3 footballPosition = Vector3.zero;
+                if (gameFootball.isKicked)
+                {
+                    GameObject footBallLandingSpot = GameObject.FindGameObjectWithTag("footballLandingTarget");
+                    footballPosition = footBallLandingSpot.transform.position;
+                }
+                else
+                {
+                    footballPosition = gameFootball.transform.position;
+                }
+                float distToFootball = Vector2.Distance(this.transform.position, footballPosition);
+                if (distToFootball <= 3.0f)
+                    return isGoblinStuck;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log("CheckIfAIGoblinIsStuck: Unable to check state/get distance to targeT? Error: " + e);
+        }
+        if (Vector2.Distance(this.transform.position, this.lastCheckedPosition) > 0.5f)
+        {
+            this.lastCheckedPosition = this.transform.position;
+            return isGoblinStuck;
+        }   
+        else
+        {
+            Debug.Log("Goblin: " + this.name + ":" + this.ownerConnectionId.ToString() + " is stuck. Making them dive in a random direction to get free???");
+            isGoblinStuck = true;
+            // If the goblin appears to be stuck
+            if (UnityEngine.Random.Range(0f, 1.0f) > 0.5f)
+            {
+                stuckDirectionChange = new Vector2(0f, 1f);
+            }
+            else
+            {
+                stuckDirectionChange = new Vector2(0f, -1f);
+            }
+            /*float xDirection = 1f;
+            if (this.myRenderer.flipX)
+                xDirection = -1f;
+            Vector2 newDirection = new Vector2(xDirection, UnityEngine.Random.Range(-1f, 1.0f));
+            stuckDirectionChange = newDirection.normalized;*/
+            // reset the last checked position to something off the field to make sure that goblins aren't going to pass the check by randomly walking by the last checked position they dove from again?
+            this.lastCheckedPosition = new Vector3(100f, 100f, 0f);
+        }
+        return isGoblinStuck;
+    }
+    bool DiveOverObstacles(Vector3 direction)
+    {
+        bool willDive = false;
+
+        if (Time.time <= (diveCheckTime + diveCheckRate))
+            return willDive;
+        else
+            diveCheckTime = Time.time;
+        Debug.Log("DiveOverObstacles: running trip obstacle checks for this Goblin: " + this.name + ":" + this.ownerConnectionId.ToString());
+
+        // make sure that the diving routine/cool down isn't running? It is a syncvar so clients should know as well?
+        if (this.DivingRoutineRunning)
+            return willDive;
+
+        if (this.isGoblinKnockedOut || this.isDiving || this.isSliding || this.isPunching || this.isKicking)
+            return willDive;
+
+        // Only want to dive over obstacles if the goblin has the ball or if they are chasing the ball carrier?
+        if (!this.doesCharacterHaveBall || this.state != State.ChaseBallCarrier)
+            return willDive;
+
+        // cast out in the left/right direction the goblin is moving. If a trip obstacle is hit, dive?
+        // cast from the "worldCenterOfMass" since that is the goblin's feet, and the footbox collider/whatever is what collides with a trip object and causes a trip
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(this.rb.worldCenterOfMass, 0.25f, direction, 1.5f);
+        if (hits.Length > 0)
+        {
+            for (int i = 0; i < hits.Length; i++)
+            {
+                if (hits[i].collider.gameObject.tag == "tripObject")
+                {
+
+                    Debug.Log("DiveOverObstacles: trip obstacle hit! Goblin: " + this.name + ":" + this.ownerConnectionId.ToString() + " will dive over obstacle: " + hits[i].collider.name);
+                    willDive = true;
+                    break;
+                }
+            }
+        }
+        return willDive;
     }
 }

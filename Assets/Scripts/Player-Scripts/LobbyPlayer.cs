@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 public class LobbyPlayer : NetworkBehaviour
 {
@@ -17,6 +18,7 @@ public class LobbyPlayer : NetworkBehaviour
 
     [Header("1v1 or 3v3 stuff")]
     [SyncVar] public bool is1v1 = false;
+    [SyncVar] public bool isSinglePlayer = false;
     [SyncVar(hook = nameof(HandleGoblinType))] public string goblinType;
     [SyncVar(hook = nameof(HandleIsTeamGrey))] public bool isTeamGrey;
     [SyncVar(hook = nameof(HandleIsGoblinSelected))] public bool isGoblinSelected = false;
@@ -281,13 +283,19 @@ public class LobbyPlayer : NetworkBehaviour
     {
         if (isServer)
         {
-            this.isTeamGrey = newValue;
-            UpdateTeamListsOnLobbyManager();
-            UpdateAllPlayersOnAvailableGoblins(newValue);
+            if (!this.isSinglePlayer)
+            {
+                this.isTeamGrey = newValue;
+                UpdateTeamListsOnLobbyManager();
+                UpdateAllPlayersOnAvailableGoblins(newValue);
+            }
         }   
         if (isClient)
         {
-            LobbyManager.instance.UpdateUI();
+            if (!this.isSinglePlayer)
+            {
+                LobbyManager.instance.UpdateUI();
+            }
         }
     }
     public override void OnStartClient()
@@ -313,7 +321,7 @@ public class LobbyPlayer : NetworkBehaviour
     {
         if (isServer)
             this.isPlayerReady = newValue;
-        if (isClient)
+        if (isClient && ! this.isSinglePlayer)
             LobbyManager.instance.UpdateUI();
     }
     public void CanLobbyStartGame()
@@ -324,6 +332,7 @@ public class LobbyPlayer : NetworkBehaviour
     [Command]
     void CmdCanLobbyStartGame()
     {
+        Debug.Log("CmdCanLobbyStartGame");
         Game.StartGame();
     }
     public void UnselectGoblin()
@@ -437,7 +446,15 @@ public class LobbyPlayer : NetworkBehaviour
             if (hasAuthority)
             {
                 LobbyManager.instance.ActivateChangeGoblinButton();
-                myPlayerListItem.ActivateGoblinDropdown();
+                try
+                {
+                    myPlayerListItem.ActivateGoblinDropdown();
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("LobbyPlayer.cs: HandleIsGoblinSelected: Could not access myPlayerListItem.ActivateGoblinDropdown(); Error: " + e);
+                }
+                
                 if (!newValue && this.isPlayerReady)
                     CmdChangePlayerReadyStatus();
             }
@@ -453,7 +470,15 @@ public class LobbyPlayer : NetworkBehaviour
             if (hasAuthority)
             {
                 LobbyManager.instance.ActivateChangeGoblinButton();
-                myPlayerListItem.ActivateGoblinDropdown();
+                try
+                {
+                    myPlayerListItem.ActivateGoblinDropdown();
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("LobbyPlayer.cs: HandleGoblinType: Could not access myPlayerListItem.ActivateGoblinDropdown(); Error: " + e);
+                }
+                
             }
             LobbyManager.instance.UpdateGoblinSelectedTextOnPlayerListItems(this);
         }

@@ -67,9 +67,21 @@ public class StreakerEvent : NetworkBehaviour
                 uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
 
                 GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
-                if (goblinScript.canCollide)
+                if (goblinScript.canCollide && !goblinScript.isGoblinKnockedOut)
                     goblinScript.KnockOutGoblin(false);
 
+            }
+        }
+        if (isClient)
+        {
+            if (collision.tag == "Goblin")
+            {
+                //this.PlaySFXClip();
+                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+
+                GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
+                if (goblinScript.canCollide)
+                    goblinScript.CollisionWithObstacleObject(false);
             }
         }
     }

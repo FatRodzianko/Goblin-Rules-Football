@@ -135,8 +135,15 @@ MonoBehaviour:
   syncInterval: 0.1
   mySprite: {fileID: 21300000, guid: 05484a0fd7fcbd84fac97fcc9104eda6, type: 3}
   powerUpAbility: defenseNormal
+  isBlueShell: 0
+  remainingUses: 1
+  multipleUses: 0
+  aiPowerUpType: defense
   PowerUpImageObject: {fileID: 6338328384912614004}
   PowerUpBorderObject: {fileID: 6338328385406385039}
+  bounceSpeed: 0.25
+  powerUpAnimationPrefab: {fileID: 0}
+  thrownObjectPrefab: {fileID: 0}
   myPlayerOwner: {fileID: 0}
   localPlayerOwner: {fileID: 0}
 --- !u!61 &6338328385301744604

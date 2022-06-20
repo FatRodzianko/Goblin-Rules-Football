@@ -161,6 +161,7 @@ MonoBehaviour:
   isWater: 0
   isBrush: 0
   sfxClipName: trip-banana
+  sfxThrowDropClip: banana-drop
   playSoundOnDestroy: 1
 --- !u!114 &-1690484788134790645
 MonoBehaviour:

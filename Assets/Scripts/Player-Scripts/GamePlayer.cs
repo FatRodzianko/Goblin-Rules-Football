@@ -23,6 +23,7 @@ public class GamePlayer : NetworkBehaviour
 
     [Header("1v1 or 3v3 stuff")]
     [SyncVar] public bool is1v1 = false;
+    [SyncVar] public bool isSinglePlayer = false;
     [SyncVar] public string goblinType;
 
     [Header("Coin Toss Info")]
@@ -103,6 +104,9 @@ public class GamePlayer : NetworkBehaviour
     IEnumerator NoPossessionCooldownRoutine;
     [SyncVar(hook = nameof(HandlePossessionBonus))] public float possessionBonus = 1.0f;
 
+    [Header("AIPlayer Stuff")]
+    public AIPlayer myAiPlayer;
+
     [Header("Goblin Starting Positions")]
     [SerializeField] Vector3 GreenGrenadierStartingPosition; //(-9f, 4.45f, 0f)
     [SerializeField] Vector3 GreenBerserkerStartingPosition; //(-9f, 0f, 0f)
@@ -143,8 +147,21 @@ public class GamePlayer : NetworkBehaviour
     {
         Debug.Log("OnStartAuthority for " + this.PlayerName);
         base.OnStartAuthority();
-        gameObject.name = "LocalGamePlayer";
-        gameObject.tag = "LocalGamePlayer";
+        if (!this.isSinglePlayer)
+        {
+            gameObject.name = "LocalGamePlayer";
+            gameObject.tag = "LocalGamePlayer";
+        }
+        else
+        {
+            if (this.name.Contains("AI"))
+                return;
+            else
+            {
+                gameObject.name = "LocalGamePlayer";
+                gameObject.tag = "LocalGamePlayer";
+            }
+        }
 
 
         //Have these enabled when the "Gameplay" phase starts?
@@ -270,6 +287,8 @@ public class GamePlayer : NetworkBehaviour
             CameraMarker myCameraMarker = Camera.main.GetComponent<CameraMarker>();
             if (!myCameraMarker.myPlayer)
                 myCameraMarker.myPlayer = this;
+            // Initialize camera's boundary thing?
+            //myCamera.GetComponent<CinemachineConfiner>().InvalidatePathCache();
             Debug.Log("InitializeLocalGamePlayer: try to get team name, spawn football, and spawn goblin team for connection id: " + ConnectionId.ToString() + this.PlayerName);
             //CmdSpawnPlayerCharacters();
             CmdGetTeamName();
@@ -295,6 +314,16 @@ public class GamePlayer : NetworkBehaviour
 
             GameplayManager.instance.SetTimerText(GameplayManager.instance.timeLeftInGame);
         }
+    }
+    public void InitializeAIPlayer()
+    {
+        CmdGetTeamName();
+        CmdDoesPlayerChooseCoin();
+        CmdSpawnPlayerCharacters();
+        football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
+        if (football)
+            football.localPlayer = this;
+        CmdPlayerFinishedLoading();
     }
     [Command]
     void CmdPlayerFinishedLoading()
@@ -340,6 +369,8 @@ public class GamePlayer : NetworkBehaviour
                 {
                     if (this.goblinType == "Grenadier")
                         team.captain = this;
+                    else if (this.isSinglePlayer)
+                        team.captain = this;
                     if (this.isTeamGrey)
                         teamName = "Grey";
                     else
@@ -368,7 +399,7 @@ public class GamePlayer : NetworkBehaviour
                 {
                     newGrenadier.transform.position = GreenGrenadierStartingPosition;
                     //teamOnServer = TeamManager.instance.greenTeam;
-                }   
+                }
                 else
                 {
                     newGrenadier.transform.position = GreyGrenadierStartingPosition;
@@ -438,6 +469,91 @@ public class GamePlayer : NetworkBehaviour
                 newSkirmisherScript.defenseModifier = 1.0f;
                 newSkirmisherScript.goblinType = "skirmisher";
                 if (!IsGameLeader)
+                    newSkirmisherScript.goblinType += "-grey";
+                goblinTeamOnServer.Add(newSkirmisherScript);
+
+                newSkirmisherScript.serverGamePlayer = this;
+
+                areCharactersSpawnedYet = true;
+            }
+            else if (this.isSinglePlayer)
+            {
+                Debug.Log("Executing SpawnPlayerCharacters on the server for player " + this.PlayerName + this.ConnectionId.ToString() + " in a SINGLEPLAYER game");
+                GameObject newGrenadier = Instantiate(grenadierPrefab);
+                if (!this.isTeamGrey)
+                {
+                    newGrenadier.transform.position = GreenGrenadierStartingPosition;
+                    //teamOnServer = TeamManager.instance.greenTeam;
+                }
+                else
+                {
+                    newGrenadier.transform.position = GreyGrenadierStartingPosition;
+                    //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
+                    //teamOnServer = TeamManager.instance.greyTeam;
+                }
+                NetworkServer.Spawn(newGrenadier, connectionToClient);
+                goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkIdentity>().netId);
+                GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
+                newGrenadierScript.ownerConnectionId = this.ConnectionId;
+                newGrenadierScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newGrenadierScript.health = newGrenadierScript.MaxHealth;
+                newGrenadierScript.stamina = newGrenadierScript.MaxStamina;
+                newGrenadierScript.speed = newGrenadierScript.MaxSpeed;
+                newGrenadierScript.damage = newGrenadierScript.MaxDamage;
+                newGrenadierScript.defenseModifier = 1.0f;
+                newGrenadierScript.goblinType = "grenadier";
+                if (this.isTeamGrey)
+                    newGrenadierScript.goblinType += "-grey";
+                newGrenadierScript.serverGamePlayer = this;
+                goblinTeamOnServer.Add(newGrenadierScript);
+                //teamOnServer.add
+
+
+                GameObject newBerserker = Instantiate(berserkerPrefab, transform.position, Quaternion.identity);
+                if (!this.isTeamGrey)
+                    newBerserker.transform.position = GreenBerserkerStartingPosition;
+                else
+                {
+                    newBerserker.transform.position = GreyBerserkerStartingPosition;
+                    //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
+                }
+                NetworkServer.Spawn(newBerserker, connectionToClient);
+                goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkIdentity>().netId);
+                GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
+                newBerserkerScript.ownerConnectionId = this.ConnectionId;
+                newBerserkerScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newBerserkerScript.health = newBerserkerScript.MaxHealth;
+                newBerserkerScript.stamina = newBerserkerScript.MaxStamina;
+                newBerserkerScript.speed = newBerserkerScript.MaxSpeed;
+                Debug.Log("CmdSpawnPlayerCharacters: Setting the speed of the berserker to " + newBerserkerScript.speed.ToString() + " based in max speed of : " + newBerserkerScript.MaxSpeed.ToString());
+                newBerserkerScript.damage = newBerserkerScript.MaxDamage;
+                newBerserkerScript.defenseModifier = 1.0f;
+                newBerserkerScript.goblinType = "berserker";
+                if (this.isTeamGrey)
+                    newBerserkerScript.goblinType += "-grey";
+                newBerserkerScript.serverGamePlayer = this;
+                goblinTeamOnServer.Add(newBerserkerScript);
+
+                GameObject newSkirmisher = Instantiate(skrimisherPrefab, transform.position, Quaternion.identity);
+                if (!this.isTeamGrey)
+                    newSkirmisher.transform.position = GreenSkirmisherStartingPosition;
+                else
+                {
+                    newSkirmisher.transform.position = GreySkirmisherStartingPosition;
+                    //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
+                }
+                NetworkServer.Spawn(newSkirmisher, connectionToClient);
+                goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkIdentity>().netId);
+                GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
+                newSkirmisherScript.ownerConnectionId = this.ConnectionId;
+                newSkirmisherScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newSkirmisherScript.health = newSkirmisherScript.MaxHealth;
+                newSkirmisherScript.stamina = newSkirmisherScript.MaxStamina;
+                newSkirmisherScript.speed = newSkirmisherScript.MaxSpeed;
+                newSkirmisherScript.damage = newSkirmisherScript.MaxDamage;
+                newSkirmisherScript.defenseModifier = 1.0f;
+                newSkirmisherScript.goblinType = "skirmisher";
+                if (this.isTeamGrey)
                     newSkirmisherScript.goblinType += "-grey";
                 goblinTeamOnServer.Add(newSkirmisherScript);
 
@@ -537,7 +653,7 @@ public class GamePlayer : NetworkBehaviour
     {
         if (!goblinTeam.Contains(GoblinToAdd))
             goblinTeam.Add(GoblinToAdd);
-        if (this.is1v1)
+        if (this.is1v1 || this.isSinglePlayer)
         {
             if (GoblinToAdd.gameObject.name.ToLower().Contains("grenadier"))
             {
@@ -675,7 +791,7 @@ public class GamePlayer : NetworkBehaviour
             return;
         else
             qeTime = startTimeSubmitted;
-        if (this.is1v1)
+        if (this.is1v1 || this.isSinglePlayer)
         {
             if ((canSwitchGoblin && !selectGoblin.isKicking && !selectGoblin.isDiving) || qGoblin.doesCharacterHaveBall)
             {
@@ -710,7 +826,10 @@ public class GamePlayer : NetworkBehaviour
                 }
                 else
                 {
-                    FollowSelectedGoblin(selectGoblin.transform);
+                    if(!this.isSinglePlayer)
+                        FollowSelectedGoblin(selectGoblin.transform);
+                    else if (this.isSinglePlayer && this.isLocalPlayer)
+                        FollowSelectedGoblin(selectGoblin.transform);
                 }
                 Debug.Log("SwitchToQGoblin switching to goblin: " + selectGoblin.name);
                 CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
@@ -738,7 +857,7 @@ public class GamePlayer : NetworkBehaviour
             return;
         else
             qeTime = startTimeSubmitted;
-        if (this.is1v1)
+        if (this.is1v1 || this.isSinglePlayer)
         {
             if ((canSwitchGoblin && !selectGoblin.isKicking && !selectGoblin.isDiving) || eGoblin.doesCharacterHaveBall)
             {
@@ -778,7 +897,10 @@ public class GamePlayer : NetworkBehaviour
                 else
                 {
                     Debug.Log("SwitchToEGoblin: Throwing: set the GOBLIN to follow");
-                    FollowSelectedGoblin(selectGoblin.transform);
+                    if (!this.isSinglePlayer)
+                        FollowSelectedGoblin(selectGoblin.transform);
+                    else if (this.isSinglePlayer && this.isLocalPlayer)
+                        FollowSelectedGoblin(selectGoblin.transform);
                 }
                 Debug.Log("SwitchToEGoblin switching to goblin: " + selectGoblin.name);
                 CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
@@ -891,14 +1013,34 @@ public class GamePlayer : NetworkBehaviour
     }
     public void FollowSelectedGoblin(Transform goblinToFollow)
     {
-        if(GameplayManager.instance.gamePhase != "cointoss")
+        // For single player mode, make sure that the AI gameplayer object doesn't try to modify what the camera is following or whatever
+        if (this.isSinglePlayer && !this.isLocalPlayer)
+            return;
+        if (GameplayManager.instance.gamePhase != "cointoss")
+        {
+            if (GameplayManager.instance.gamePhase == "kickoff")
+            {
+                myCamera.PreviousStateIsValid = false;
+            }
             myCamera.Follow = goblinToFollow.transform;
+        }
+            
     }
     public void ResetCameraPositionForKickOff()
     {
-        Vector3 newPosition = myCamera.transform.position;
+        Debug.Log("ResetCameraPositionForKickOff");
+        /*Vector3 newPosition = myCamera.transform.position;
+        if (myCamera.Follow)
+            myCamera.Follow = null;
+        newPosition.x = 0;
         newPosition.y = 0f;
-        myCamera.transform.position = newPosition;
+        myCamera.transform.position = newPosition;*/
+        if (this.isSinglePlayer && !this.isLocalPlayer)
+            return;
+        float xDamping = myCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping;
+        myCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0f;
+        myCamera.Follow = GameObject.Find("CameraFollowObject").transform;
+        myCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = xDamping;
     }
     void KickFootball()
     {
@@ -1003,6 +1145,17 @@ public class GamePlayer : NetworkBehaviour
             else
                 HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, false);
         }
+        else if (this.isSinglePlayer)
+        {
+            if (this.isTeamGrey)
+            {
+                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, true);
+            }
+            else
+            {
+                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, false);
+            }
+        }
         else
         {
             if (this.isTeamGrey && this.goblinType == "Grenadier")
@@ -1022,6 +1175,13 @@ public class GamePlayer : NetworkBehaviour
         {
             if (hasAuthority)
             {
+                Debug.Log("HandleDoesPlayerChooseCoin: " + newValue.ToString() + " for player: " + this.name);
+                if (this.isSinglePlayer && !this.isLocalPlayer)
+                {
+                    if(newValue)
+                        GameplayManager.instance.AIChoosesCoinToss();
+                    return;
+                }
                 CoinTossControlls(newValue);
                 CoinTossManager.instance.ActivateSelectStuffToShowtoCoinSelecter(newValue);
                 CoinTossManager.instance.SetInitialSelectionText(newValue);
@@ -1103,7 +1263,7 @@ public class GamePlayer : NetworkBehaviour
             }
         }
     }
-    void SubmitCoinSelection()
+    public void SubmitCoinSelection()
     {
         Debug.Log("SubmitCoinSelection: " + headsOrTailsPlayer);
         if (!String.IsNullOrWhiteSpace(headsOrTailsPlayer) && hasAuthority)
@@ -1142,8 +1302,15 @@ public class GamePlayer : NetworkBehaviour
             if (hasAuthority)
             {
                 //if(newValue)
-                   // CoinTossControlls(!newValue);
-                //KickOrReceiveControls(newValue);                
+                // CoinTossControlls(!newValue);
+                //KickOrReceiveControls(newValue);
+                Debug.Log("HandleDoesPlayerChooseKickOrReceive: " + newValue.ToString() + " for player: " + this.name);
+                if (this.isSinglePlayer && !this.isLocalPlayer)
+                {
+                    /*if (newValue)
+                        GameplayManager.instance.AIChoosesKickOrReceive();*/
+                    return;
+                }
                 CoinTossManager.instance.ActivateSelectStuffToShowtoReceiveOrKickSelecter(newValue);
                 CoinTossManager.instance.SetInitialSelectionText(newValue);
             }
@@ -1165,7 +1332,7 @@ public class GamePlayer : NetworkBehaviour
             kickOrReceivePlayer = kickOrReceive;
         }
     }
-    void SubmitKickOrReceiveSelection()
+    public void SubmitKickOrReceiveSelection()
     {
         Debug.Log("SubmitKickOrReceiveSelection: " + kickOrReceivePlayer);
         if (!String.IsNullOrWhiteSpace(kickOrReceivePlayer) && hasAuthority)
@@ -1189,7 +1356,15 @@ public class GamePlayer : NetworkBehaviour
     {
         if (hasAuthority)
         {
-            Debug.Log("RpcCoinTossAndKickOrReceiveControllerActivation: " + activateCoinTossControlls.ToString() + " " + activateKickOrReceiveControlls.ToString());
+            Debug.Log("RpcCoinTossAndKickOrReceiveControllerActivation: " + activateCoinTossControlls.ToString() + " " + activateKickOrReceiveControlls.ToString() + " for player: " + this.name);
+            if (this.isSinglePlayer && !this.isLocalPlayer)
+            {
+                if (activateKickOrReceiveControlls)
+                {
+                    GameplayManager.instance.AIChoosesKickOrReceive();
+                }
+                return;
+            }
             CoinTossControlls(activateCoinTossControlls);
             KickOrReceiveControls(activateKickOrReceiveControlls);
         }        
@@ -1221,9 +1396,17 @@ public class GamePlayer : NetworkBehaviour
         Debug.Log("PositionTeamForKickOff: for player " + this.PlayerName + ". Is the player kicking? " + isKicking.ToString());
         if (hasAuthority)
         {
-            EnableKickingControls(isKicking);
-            EnableKickoffAimArrowControls(isKicking);
-            EnableQESwitchingControls(!isKicking);
+            EnableGameplayActions(false);
+            EnableGoblinMovement(false);
+            EnablePowerUpControls(false);
+
+            if (this.is1v1 || (this.isSinglePlayer && this.isLocalPlayer))
+            {
+                EnableKickingControls(isKicking);
+                EnableKickoffAimArrowControls(isKicking);
+                EnableQESwitchingControls(!isKicking);
+                
+            }
             if (isKicking)
             {
                 if (teamName == "Grey")
@@ -1270,6 +1453,11 @@ public class GamePlayer : NetworkBehaviour
                         // Make sure green goblins are facing to the right
                         goblin.FlipRenderer(false);
                     }
+                }
+                // Start process for AI to kick ball if they are the kicking team
+                if (this.isSinglePlayer && !this.isLocalPlayer)
+                {
+                    GameplayManager.instance.AIPlayerKickOff();
                 }
             }
             else
@@ -1322,6 +1510,10 @@ public class GamePlayer : NetworkBehaviour
                 }
             }
         }
+        if (this.isLocalPlayer)
+        {
+            this.FollowSelectedGoblin(this.selectGoblin.transform);
+        }
         
     }
     [TargetRpc]
@@ -1333,6 +1525,9 @@ public class GamePlayer : NetworkBehaviour
             EnableKickingControls(isKickingPlayer);
             EnableKickoffAimArrowControls(isKickingPlayer);
             EnableQESwitchingControls(!isTeamKicking);
+            EnableGameplayActions(false);
+            EnableGoblinMovement(false);
+            EnablePowerUpControls(false);
             if (isTeamKicking)
             {
                 if (this.goblinType == "Grenadier")
@@ -1422,6 +1617,10 @@ public class GamePlayer : NetworkBehaviour
                     }
                 }
             }
+        }
+        if (this.isLocalPlayer)
+        {
+            this.FollowSelectedGoblin(this.selectGoblin.transform);
         }
     }
     [Command]
@@ -1607,7 +1806,15 @@ public class GamePlayer : NetworkBehaviour
 
                         CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkIdentity>().netId);
 
-                        goblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
+                        if (!this.isSinglePlayer)
+                        {
+                            goblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
+                        }
+                        else if (this.isSinglePlayer && this.isLocalPlayer)
+                        {
+                            goblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
+                        }
+                        
                         goblin.UpdateHasGoblinRepositionedForKickAfter();
                         continue;
                     }                        
@@ -1669,6 +1876,12 @@ public class GamePlayer : NetworkBehaviour
                 }
             }
             // Enable positioning controls if the player is the kicking player
+            if (this.isSinglePlayer && !this.isLocalPlayer)
+            {
+                areGoblinsRepositionedForKickAfter = true;
+                //GameplayManager.instance.AIStartKickAfterPositioning();
+                return;
+            }
             EnableKickAfterPositioning(isKickingPlayer);
             GameplayManager.instance.ActivateKickAfterPositionControlsPanel(isKickingPlayer);
             areGoblinsRepositionedForKickAfter = true;
@@ -1869,6 +2082,12 @@ public class GamePlayer : NetworkBehaviour
             Debug.Log("RpcPowerUpPickedUp: " + this.PlayerName + " to pick up power up with this network id: " + powerUpNetId.ToString());
             PowerUp powerUptoAdd = NetworkIdentity.spawned[powerUpNetId].GetComponent<PowerUp>();
             myPowerUps.Add(powerUptoAdd);
+            // Make sure not to add powerups picked up by the AI to the player's PowerUp UI
+            if (this.isSinglePlayer && !this.isLocalPlayer)
+            {
+                PowerUpManager.instance.AIUpdateAIPowerUpUIImages(myPowerUps);
+                return;
+            }
             PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
             SoundManager.instance.PlaySound("pickup-powerup", 0.75f);
         }        
@@ -1939,13 +2158,32 @@ public class GamePlayer : NetworkBehaviour
                     myPowerUps.Remove(powerUp);
                 }
             }*/
-        }        
+        }
+        if (this.isSinglePlayer && !this.isLocalPlayer)
+        {
+            PowerUpManager.instance.AIUpdateAIPowerUpUIImages(myPowerUps);
+            return;
+        }
         PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
     }
     public void RemoveUsedPowerUps()
     {
         if (hasAuthority)
         {
+            // Make sure to remove "null" powerups? This appears to be an issue sometimes where the server destroys the powerup but it isn't removed from the player's list of powerups? Causing it to still be displayed in the UI
+            try
+            {
+                myPowerUps = myPowerUps.Where(item => item != null).ToList();
+            }
+            catch (Exception e)
+            {
+                Debug.Log("RemoveUsedPowerUps: Failed to find and remove NULL powerups from myPowerUps list. Error: " + e);
+            }
+            if (this.isSinglePlayer && !this.isLocalPlayer)
+            {
+                PowerUpManager.instance.AIUpdateAIPowerUpUIImages(myPowerUps);
+                return;
+            }
             PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
             /*if (powerUpSelectedIndexNumber >= myPowerUps.Count)
             {
@@ -2350,7 +2588,14 @@ public class GamePlayer : NetworkBehaviour
     }
     public void UpdatePowerUpRemainingUses()
     {
-        if(hasAuthority)
+        if (hasAuthority)
+        {
+            if (this.isSinglePlayer && !this.isLocalPlayer)
+            {
+                PowerUpManager.instance.AIUpdateAIPowerUpUIImages(myPowerUps);
+                return;
+            }
             PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
+        }   
     }
 }

@@ -158,7 +158,11 @@ MonoBehaviour:
   throwSpeed: 0
   dropTime: 0
   isGlue: 1
+  isWater: 0
+  isBrush: 0
   sfxClipName: 
+  sfxThrowDropClip: glue-squirt
+  playSoundOnDestroy: 0
 --- !u!114 &-1690484788134790645
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -24,6 +24,7 @@ public class NetworkManagerGRF : NetworkManager
 
     [Header("Game Info")]
     public bool is1v1 = false;
+    public bool isSinglePlayer = false;
 
 
     public List<GamePlayer> GamePlayers { get; } = new List<GamePlayer>();
@@ -92,6 +93,7 @@ public class NetworkManagerGRF : NetworkManager
             lobbyPlayerInstance.playerNumber = LobbyPlayers.Count + 1;
             //lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.current_lobbyID, LobbyPlayers.Count);
             lobbyPlayerInstance.is1v1 = this.is1v1;
+            lobbyPlayerInstance.isSinglePlayer = this.isSinglePlayer;
 
             NetworkServer.AddPlayerForConnection(conn, lobbyPlayerInstance.gameObject);
             Debug.Log("Player added. Player name: " + lobbyPlayerInstance.PlayerName + ". Player connection id: " + lobbyPlayerInstance.ConnectionId.ToString());
@@ -123,6 +125,7 @@ public class NetworkManagerGRF : NetworkManager
     }
     private bool CanStartGame()
     {
+        Debug.Log("NetworkManager: CanStartGame");
         if (numPlayers < minPlayers)
         {
             Debug.Log("CanStartGame: Not enough players to start the game. total players: " + numPlayers.ToString() + " need this many players: " + minPlayers.ToString());
@@ -154,10 +157,15 @@ public class NetworkManagerGRF : NetworkManager
                 gamePlayerInstance.IsGameLeader = LobbyPlayers[i].IsGameLeader;
                 //gamePlayerInstance.playerSteamId = LobbyPlayers[i].playerSteamId;
                 gamePlayerInstance.is1v1 = LobbyPlayers[i].is1v1;
-                if (!this.is1v1)
+                gamePlayerInstance.isSinglePlayer = LobbyPlayers[i].isSinglePlayer;
+                if (!this.is1v1 && !this.isSinglePlayer)
                 {
                     gamePlayerInstance.isTeamGrey = LobbyPlayers[i].isTeamGrey;
                     gamePlayerInstance.goblinType = LobbyPlayers[i].goblinType;
+                }
+                else if (this.isSinglePlayer)
+                {
+                    gamePlayerInstance.isTeamGrey = LobbyPlayers[i].isTeamGrey;
                 }
                 
 
@@ -303,12 +311,14 @@ public class NetworkManagerGRF : NetworkManager
         }
 
         // Check if each player has loaded all three goblins
-        if (numberOfGoblinsLoaded.Count != GamePlayers.Count)
+        if (numberOfGoblinsLoaded.Count != GamePlayers.Count  && !this.isSinglePlayer)
             return;
         else
         {
             foreach (GamePlayer player in GamePlayers)
             {
+                if (this.isSinglePlayer && player.playerNumber == 2)
+                    continue;
                 if (!numberOfGoblinsLoaded.ContainsKey(player.playerNumber))
                 {
                     areAllGoblinsLoaded = false;

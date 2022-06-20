@@ -24,6 +24,7 @@ TagManager:
   - teamObject
   - cowboy
   - mainMenuButton
+  - footballShadow
   layers:
   - Default
   - TransparentFX
@@ -46,7 +47,7 @@ TagManager:
   - thrownObjects
   - pathFindingObstacles
   - obstacleBlocker
-  - 
+  - cameraConfiner
   - 
   - 
   - 

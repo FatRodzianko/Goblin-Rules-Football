@@ -225,7 +225,12 @@ MonoBehaviour:
   throwCount: 0
   throwSpeed: 0
   dropTime: 0
+  isGlue: 0
+  isWater: 0
+  isBrush: 0
   sfxClipName: bottle-break
+  sfxThrowDropClip: bottle-throw
+  playSoundOnDestroy: 0
 --- !u!61 &1164805296021302863
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -239,7 +244,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.00033541024, y: 0.029675618}
+  m_Offset: {x: 0.00033541024, y: -0.029511273}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -250,5 +255,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.49878633, y: 0.43552563}
+  m_Size: {x: 0.49878633, y: 1.0643862}
   m_EdgeRadius: 0

@@ -47,7 +47,7 @@ public class ObstacleObject : NetworkBehaviour
                     uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
 
                     GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
-                    if (goblinScript.canCollide)
+                    if (goblinScript.canCollide && !goblinScript.isGoblinKnockedOut)
                         goblinScript.KnockOutGoblin(false);
 
                     //collision.transform.gameObject.GetComponent<GoblinScript>().KnockOutGoblin(false);
@@ -65,6 +65,11 @@ public class ObstacleObject : NetworkBehaviour
                 if (isTripObject)
                 {
                     this.PlaySFXClip();
+                    uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+
+                    GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
+                    if (goblinScript.canCollide)
+                        goblinScript.CollisionWithObstacleObject(false);
                 }
             }
         }

@@ -393,6 +393,7 @@ public class CoinTossManager : NetworkBehaviour
     }
     public void PlayerSelectedKickOrReceive(string kickOrReceive, string teamName)
     {
+        Debug.Log("PlayerSelectedKickOrReceive: " + kickOrReceive);
         ActivateSelectStuffToShowtoReceiveOrKickSelecter(false);
         KickOrReceiveSelectionArrow(kickOrReceive);
         SelectionBoardText.text = teamName.ToUpper() + " has selected to " + kickOrReceive + " the ball";

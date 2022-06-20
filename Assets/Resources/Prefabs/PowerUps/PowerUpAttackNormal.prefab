@@ -136,6 +136,9 @@ MonoBehaviour:
   mySprite: {fileID: 21300000, guid: e6c83834a13cc7845b7869fcf7db5c75, type: 3}
   powerUpAbility: attackNormal
   isBlueShell: 0
+  remainingUses: 1
+  multipleUses: 0
+  aiPowerUpType: attack
   PowerUpImageObject: {fileID: 6338328384912614004}
   PowerUpBorderObject: {fileID: 6338328385406385039}
   bounceSpeed: 0.25

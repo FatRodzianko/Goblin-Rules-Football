@@ -53,18 +53,23 @@ public class SplitGroundEvent : NetworkBehaviour
                 uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
 
                 GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
-                if (goblinScript.canCollide)
+                if (goblinScript.canCollide && !goblinScript.isGoblinKnockedOut)
                     goblinScript.KnockOutGoblin(true);
 
             }
         }
-        /*if (isClient)
+        if (isClient)
         {
             if (collision.tag == "Goblin")
             {
-                this.PlaySFXClip();
+                //this.PlaySFXClip();
+                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+
+                GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
+                if (goblinScript.canCollide)
+                    goblinScript.CollisionWithObstacleObject(true);
             }
-        }*/
+        }
 
     }
     [ClientCallback]

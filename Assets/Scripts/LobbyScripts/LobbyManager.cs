@@ -5,11 +5,14 @@ using UnityEngine.UI;
 using Mirror;
 using System.Linq;
 using TMPro;
+using UnityEngine.EventSystems;
+using System;
 
 public class LobbyManager : MonoBehaviour
 {
 
     public static LobbyManager instance;
+    [SerializeField] EventSystem eventSystem;
 
     [Header("Lobby UI Elements")]
     [SerializeField] private GameObject FindLobbiesPanel;
@@ -27,6 +30,7 @@ public class LobbyManager : MonoBehaviour
 
     [Header("1v1 or 3v3")]
     public bool is1v1 = false;
+    public bool isSinglePlayer;
 
 
     [Header("1v1 UI")]
@@ -48,6 +52,17 @@ public class LobbyManager : MonoBehaviour
     public List<string> GreyGoblinsSelected = new List<string>();
     public List<LobbyPlayer> GreenTeamMembers = new List<LobbyPlayer>();
     public List<LobbyPlayer> GreyTeamMembers = new List<LobbyPlayer>();
+
+    [Header("Single Player UI")]
+    [SerializeField] GameObject selectGreenButton;
+    [SerializeField] GameObject singlePlayerPanel;
+    [SerializeField] Image greenGoblinImage;
+    [SerializeField] Image greyGoblinImage;
+    [SerializeField] Sprite greenGoblinNotSelected;
+    [SerializeField] Sprite greyGoblinNotSelected;
+    [SerializeField] Sprite greenGoblinSelected;
+    [SerializeField] Sprite greyGoblinSelected;
+    public bool isTeamSelectedYet = false;
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -91,6 +106,7 @@ public class LobbyManager : MonoBehaviour
         localLobbyPlayerObject = GameObject.Find("LocalLobbyPlayer");
         localLobbyPlayerScript = localLobbyPlayerObject.GetComponent<LobbyPlayer>();
         this.is1v1 = localLobbyPlayerScript.is1v1;
+        this.isSinglePlayer = localLobbyPlayerScript.isSinglePlayer;
         ReadyUpButton.gameObject.SetActive(this.is1v1);
         Activate1v1or3v3Panels();
         /*if (!this.is1v1)
@@ -98,15 +114,27 @@ public class LobbyManager : MonoBehaviour
     }
     void Activate1v1or3v3Panels()
     {
-        if (is1v1)
+        if (is1v1 && !isSinglePlayer)
         {
             panel1v1.SetActive(true);
             panel3v3.SetActive(false);
+            singlePlayerPanel.SetActive(false);
+        }
+        else if (isSinglePlayer && !is1v1)
+        {
+            panel1v1.SetActive(false);
+            panel3v3.SetActive(false);
+            ReadyUpButton.gameObject.SetActive(false);
+            StartGameButton.gameObject.SetActive(false);
+            InitializeSinglePlayerImages();
+            singlePlayerPanel.SetActive(true);
+            eventSystem.SetSelectedGameObject(selectGreenButton, new BaseEventData(eventSystem));
         }
         else
         {
             panel1v1.SetActive(false);
             panel3v3.SetActive(true);
+            singlePlayerPanel.SetActive(false);
             ActivateChangeGoblinButton();
         }
             
@@ -485,11 +513,19 @@ public class LobbyManager : MonoBehaviour
         if (areAllPlayersReady && Game.LobbyPlayers.Count >= Game.minPlayers)
         {
             Debug.Log("CheckIfAllPlayersAreReady: All players are ready!");
-            if (localLobbyPlayerScript.IsGameLeader)
+            try
             {
-                Debug.Log("CheckIfAllPlayersAreReady: Local player is the game leader. They can start the game now.");
-                StartGameButton.gameObject.SetActive(true);
+                if (localLobbyPlayerScript.IsGameLeader)
+                {
+                    Debug.Log("CheckIfAllPlayersAreReady: Local player is the game leader. They can start the game now.");
+                    StartGameButton.gameObject.SetActive(true);
+                }
             }
+            catch (Exception e)
+            {
+                Debug.Log("CheckIfAllPlayersAreReady: error accessing localLobbyPlayerScript. Error: " + e);
+            }
+            
         }
         else
         {
@@ -509,39 +545,47 @@ public class LobbyManager : MonoBehaviour
     }
     public void ActivateChangeGoblinButton()
     {
-        Debug.Log("ActivateChangeGoblinButton. Is local lobby player grey? " + localLobbyPlayerScript.isTeamGrey.ToString());
-        if (localLobbyPlayerScript.isGoblinSelected)
+        try
         {
-            ReadyUpButton.gameObject.SetActive(true);
-            if (localLobbyPlayerScript.isTeamGrey)
+            Debug.Log("ActivateChangeGoblinButton. Is local lobby player grey? " + localLobbyPlayerScript.isTeamGrey.ToString());
+            if (localLobbyPlayerScript.isGoblinSelected)
             {
-                GreyChangeGoblinButton.SetActive(true);
-                GreyChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Change Goblin";
-                GreenChangeGoblinButton.SetActive(false);
+                ReadyUpButton.gameObject.SetActive(true);
+                if (localLobbyPlayerScript.isTeamGrey)
+                {
+                    GreyChangeGoblinButton.SetActive(true);
+                    GreyChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Change Goblin";
+                    GreenChangeGoblinButton.SetActive(false);
+                }
+                else
+                {
+                    GreyChangeGoblinButton.SetActive(false);
+                    GreenChangeGoblinButton.SetActive(true);
+                    GreenChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Change Goblin";
+                }
             }
             else
             {
-                GreyChangeGoblinButton.SetActive(false);
-                GreenChangeGoblinButton.SetActive(true);
-                GreenChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Change Goblin";
+                ReadyUpButton.gameObject.SetActive(false);
+                if (localLobbyPlayerScript.isTeamGrey)
+                {
+                    GreyChangeGoblinButton.SetActive(true);
+                    GreyChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Select Goblin";
+                    GreenChangeGoblinButton.SetActive(false);
+                }
+                else
+                {
+                    GreyChangeGoblinButton.SetActive(false);
+                    GreenChangeGoblinButton.SetActive(true);
+                    GreenChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Select Goblin";
+                }
             }
         }
-        else
+        catch (Exception e)
         {
-            ReadyUpButton.gameObject.SetActive(false);
-            if (localLobbyPlayerScript.isTeamGrey)
-            {
-                GreyChangeGoblinButton.SetActive(true);
-                GreyChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Select Goblin";
-                GreenChangeGoblinButton.SetActive(false);
-            }
-            else
-            {
-                GreyChangeGoblinButton.SetActive(false);
-                GreenChangeGoblinButton.SetActive(true);
-                GreenChangeGoblinButton.GetComponentInChildren<TextMeshProUGUI>().text = "Select Goblin";
-            }
+            Debug.Log("ActivateChangeGoblinButton: error accessing localLobbyPlayerScript. Error: " + e);
         }
+        
     }
     public void SelectGoblinButtonPressed()
     {
@@ -596,5 +640,29 @@ public class LobbyManager : MonoBehaviour
     {
         localLobbyPlayerScript.UnselectGoblin();
         localLobbyPlayerScript.QuitLobby();
+    }
+    void InitializeSinglePlayerImages()
+    {
+        greenGoblinImage.sprite = greenGoblinNotSelected;
+        greyGoblinImage.sprite = greyGoblinNotSelected;
+        isTeamSelectedYet = false;
+    }
+    public void SinglePlayerSelectGreen()
+    {
+        greenGoblinImage.sprite = greenGoblinSelected;
+        greyGoblinImage.sprite = greyGoblinNotSelected;
+        localLobbyPlayerScript.isTeamGrey = false;
+        localLobbyPlayerScript.isPlayerReady = true;
+        isTeamSelectedYet = true;
+        StartGameButton.gameObject.SetActive(true);
+    }
+    public void SinglePlayerSelectGrey()
+    {
+        greenGoblinImage.sprite = greenGoblinNotSelected;
+        greyGoblinImage.sprite = greyGoblinSelected;
+        localLobbyPlayerScript.isTeamGrey = true;
+        localLobbyPlayerScript.isPlayerReady = true;
+        isTeamSelectedYet = true;
+        StartGameButton.gameObject.SetActive(true);
     }
 }

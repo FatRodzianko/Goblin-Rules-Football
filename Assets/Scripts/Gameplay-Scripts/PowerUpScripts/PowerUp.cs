@@ -16,6 +16,7 @@ public class PowerUp : NetworkBehaviour
     [SerializeField] public bool isBlueShell = false;
     [SerializeField] [SyncVar(hook = nameof(HandleRemainingUses))] public int remainingUses = 1;
     [SerializeField] public bool multipleUses = false;
+    [SerializeField] public string aiPowerUpType;
 
     [Header("Power Up Objects")]
     [SerializeField] GameObject PowerUpImageObject;
@@ -616,7 +617,7 @@ public class PowerUp : NetworkBehaviour
         }
         else if (GameplayManager.instance.greyScore == GameplayManager.instance.greenScore)
         {
-            canPickUp = false;
+            canPickUp = true;
         }
 
         return canPickUp;

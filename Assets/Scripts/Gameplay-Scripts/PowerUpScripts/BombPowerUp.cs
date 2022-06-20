@@ -38,7 +38,7 @@ public class BombPowerUp : NetworkBehaviour
     {
         isCountdownRunning = true;
         RpcStartTimerSound();
-        yield return new WaitForSeconds(3.0f);
+        yield return new WaitForSeconds(0.5f);
         myAnimator.SetBool("explode", true);
     }
     [ServerCallback]

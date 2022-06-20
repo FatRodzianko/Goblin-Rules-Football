@@ -16,6 +16,7 @@ public class GameplayManager : NetworkBehaviour
 
     [Header("Game Info")]
     [SyncVar] public bool is1v1 = false;
+    [SyncVar] public bool isSinglePlayer = false;
 
     [Header("Local GamePlayers")]
     [SerializeField] private GameObject LocalGamePlayer;
@@ -112,6 +113,12 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] EventSystem eventSystem;
     [SerializeField] InputSystemUIInputModule inputSystem;
 
+    [Header("AIPlayer Stuff")]
+    [SerializeField] GameObject aiPlayerPrefab;
+    public GameObject aiPlayerObject;
+    public GamePlayer aiGamePlayerScript;
+    public AIPlayer aiPlayerScript;
+
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -145,11 +152,17 @@ public class GameplayManager : NetworkBehaviour
             GetLocalGamePlayer();
             UpdateKickAfterControlsUIForGamepad(GamepadUIManager.instance.gamepadUI);
         }
+        // Spawn the AIPlayer if this is a singleplayer game
+        if (isServer && this.isSinglePlayer && !this.is1v1)
+        {
+            SpawnAIPlayer();
+        }
     }
     public override void OnStartServer()
     {
         base.OnStartServer();
         this.is1v1 = Game.is1v1;
+        this.isSinglePlayer = Game.isSinglePlayer;
         Debug.Log("GameplayManager: is 1v1 is set to: " + this.is1v1);
         //gamePhase = "cointoss";
         HandleGamePhase(gamePhase, "cointoss");
@@ -182,6 +195,20 @@ public class GameplayManager : NetworkBehaviour
         {
             LocalGamePlayerScript.InitializeLocalGamePlayer();
         }
+        
+    }
+    void SpawnAIPlayer()
+    {
+        aiPlayerObject = Instantiate(aiPlayerPrefab);
+        NetworkServer.Spawn(aiPlayerObject,LocalGamePlayerScript.connectionToClient);
+        aiGamePlayerScript = aiPlayerObject.GetComponent<GamePlayer>();
+        aiGamePlayerScript.isSinglePlayer = LocalGamePlayerScript.isSinglePlayer;
+        aiGamePlayerScript.isTeamGrey = !LocalGamePlayerScript.isTeamGrey;
+        aiGamePlayerScript.SetPlayerName("AIPlayer");
+        aiGamePlayerScript.SetConnectionId(-1);
+        aiGamePlayerScript.SetPlayerNumber(2);
+        aiGamePlayerScript.InitializeAIPlayer();
+        aiPlayerScript = aiPlayerObject.GetComponent<AIPlayer>();
     }
     public void ActivateCoinTossUI(bool activate)
     {
@@ -216,6 +243,7 @@ public class GameplayManager : NetworkBehaviour
             if (newValue == "gameplay")
             {
                 ActivateGameplayControls(true);
+                RpcKickOffWhistle();
                 PowerUpManager.instance.StartGeneratingPowerUps(true);
                 RandomEventManager.instance.StartGeneratingRandomEvents(true);
                 ObstacleManager.instance.DisableCollidersOnObjects(true);
@@ -273,6 +301,7 @@ public class GameplayManager : NetworkBehaviour
             {
                 Debug.Log("GameplayManager on Server: It's game over!");
                 DetermineWinnerOfGame();
+                ResetAllGoblinStatuses();
                 ActivateGameplayControls(false);
                 ActivateMenuNavigationControls(true);
             }
@@ -301,16 +330,23 @@ public class GameplayManager : NetworkBehaviour
                     gameplayCanvas.SetActive(true);
                 Debug.Log("Starting the Kickoff Phase");
                 //LocalGamePlayerScript.EnableGoblinMovement(true);
-                LocalGamePlayerScript.ResetCameraPositionForKickOff();
+                //LocalGamePlayerScript.ResetCameraPositionForKickOff();
                 LocalGamePlayerScript.FollowSelectedGoblin(LocalGamePlayerScript.selectGoblin.transform);
                 LocalGamePlayerScript.CoinTossControlls(false);
                 LocalGamePlayerScript.KickOrReceiveControls(false);
-                if(!this.is1v1)
+                if(!this.is1v1 && !this.isSinglePlayer)
                     LocalGamePlayerScript.GetGoblinTeammatesFor3v3();
             }
             if (newValue == "kick-after-attempt")
             {
                 HideTouchDownText();
+
+                // Have the AI start their kick after attempt if they are the scoring player
+                if (this.isSinglePlayer && !this.is1v1)
+                {
+                    if (scoringPlayer == aiGamePlayerScript)
+                        AIKickAfterKickingPlayer();
+                }
             }
             if (oldValue == "kick-after-attempt")
             {
@@ -334,7 +370,8 @@ public class GameplayManager : NetworkBehaviour
     void RepositionTeamsForKickOff()
     {
         Debug.Log("RepositionTeamsForKickOff in gamemanager");
-        if (this.is1v1)
+        ResetAllGoblinStatuses();
+        if (this.is1v1 || this.isSinglePlayer)
         {
             receivingPlayer.RpcRepositionTeamForKickOff(false);
             kickingPlayer.RpcRepositionTeamForKickOff(true);
@@ -443,6 +480,17 @@ public class GameplayManager : NetworkBehaviour
             Debug.Log("ActivateGameTimer: " + activate.ToString());
             isGameTimerRunning = false;
             StopCoroutine(gameTimeRoutine);
+        }
+        if (this.isSinglePlayer && this.aiPlayerScript != null)
+        {
+            try
+            {
+                aiPlayerScript.ActivateAIPowerUpRoutine(activate);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("ActivateGameTimer: Unable to access the AIPlayer script to start their powerup routine. Error: " + e);
+            }
         }
     }
     [Server]
@@ -559,6 +607,24 @@ public class GameplayManager : NetworkBehaviour
                 }
             }
         }
+        else if (this.isSinglePlayer && !this.is1v1)
+        {
+            foreach (GamePlayer player in Game.GamePlayers)
+            {
+                if (scoringGoblinScript.ownerConnectionId == player.ConnectionId)
+                {
+                    scoringPlayer = player;
+                    kickingPlayer = player;
+                    player.RpcRepositionForKickAfter(player.connectionToClient, true, scoringGoblin, yPositionOfKickAfter);
+                }
+                else
+                {
+                    blockingPlayer = player;
+                    receivingPlayer = player;
+                    player.RpcRepositionForKickAfter(player.connectionToClient, false, scoringGoblin, yPositionOfKickAfter);
+                }
+            }
+        }
         else
         {
             if (scoringGoblinScript.isGoblinGrey)
@@ -639,6 +705,14 @@ public class GameplayManager : NetworkBehaviour
             scoringPlayer.RpcStartKickAfterTimer(scoringPlayer.connectionToClient, true);
             blockingPlayer.RpcStartKickAfterTimer(blockingPlayer.connectionToClient, false);
         }
+        else if (this.isSinglePlayer && !this.is1v1)
+        { 
+            // Only have the player be sent the RpcStartKickAfterTimer stuff, not the AI. So, check if the player is the scoring player or blocking player and send approriate message
+            if(scoringPlayer == LocalGamePlayerScript)
+                scoringPlayer.RpcStartKickAfterTimer(scoringPlayer.connectionToClient, true);
+            else if (blockingPlayer == LocalGamePlayerScript)
+                blockingPlayer.RpcStartKickAfterTimer(blockingPlayer.connectionToClient, false);
+        }
         else
         {
             foreach (GamePlayer player in scoringTeam.teamPlayers)
@@ -693,6 +767,30 @@ public class GameplayManager : NetworkBehaviour
             scoringPlayer.RpcKickAfterUpdateInsctructionsText(scoringPlayer.connectionToClient, true);
             blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.connectionToClient, false);
         }
+        else if (this.isSinglePlayer && !this.is1v1)
+        {
+            // Only have the player be sent the RpcStartKickAfterTimer stuff, not the AI. So, check if the player is the scoring player or blocking player and send approriate message
+            if (scoringPlayer == LocalGamePlayerScript)
+            {
+                scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, true);
+                scoringPlayer.RpcActivateKickAfterBlockingControls(scoringPlayer.connectionToClient, false);
+                scoringPlayer.RpcKickAfterUpdateInsctructionsText(scoringPlayer.connectionToClient, true);
+            }
+            else if (blockingPlayer == LocalGamePlayerScript)
+            {
+                blockingPlayer.RpcActivateKickAfterKickingControls(blockingPlayer.connectionToClient, false);
+                blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, true);
+                blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.connectionToClient, false);
+            }
+            if (blockingPlayer == aiGamePlayerScript)
+            {
+                AIBlockingPlayer();
+            }
+            else if (scoringPlayer == aiGamePlayerScript)
+            {
+                AIKickAfterAttempt();
+            }
+        }
         else
         {
             foreach (GamePlayer player in scoringTeam.teamPlayers)
@@ -706,7 +804,7 @@ public class GameplayManager : NetworkBehaviour
                 player.RpcKickAfterUpdateInsctructionsText(player.connectionToClient, true);
             }
             foreach (GamePlayer player in blockingTeam.teamPlayers)
-            { 
+            {
                 player.RpcActivateKickAfterKickingControls(player.connectionToClient, false);
                 player.RpcActivateKickAfterBlockingControls(player.connectionToClient, true);
                 player.RpcKickAfterUpdateInsctructionsText(player.connectionToClient, false);
@@ -771,6 +869,10 @@ public class GameplayManager : NetworkBehaviour
         }
         RpcKickAfterWasKickGoodOrBad(isKickGood, isScoringPlayerGrey);
         TeamManager.instance.KickAfterAttempts(scoringPlayer.isTeamGrey, isKickGood);
+        if (this.isSinglePlayer && !this.is1v1)
+        {
+            AIStopBlockingKickAfter();
+        }
     }
     [ClientRpc]
     void RpcKickAfterWasKickGoodOrBad(bool isKickGood, bool isScoringPlayerGrey)
@@ -827,6 +929,13 @@ public class GameplayManager : NetworkBehaviour
                 scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, false);
                 blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, false);
             }
+            else if (this.isSinglePlayer && !this.is1v1)
+            { 
+                if(scoringPlayer == LocalGamePlayerScript)
+                    scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, false);
+                else if (blockingPlayer == LocalGamePlayerScript)
+                    blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, false);
+            }
             else
             {
                 foreach (GamePlayer player in scoringTeam.teamPlayers)
@@ -880,6 +989,8 @@ public class GameplayManager : NetworkBehaviour
     void ResetKickAfterPositionBoolValue()
     {
         LocalGamePlayerScript.areGoblinsRepositionedForKickAfter = false;
+        if (this.isSinglePlayer)
+            aiGamePlayerScript.areGoblinsRepositionedForKickAfter = false;
     }
     [Server]
     public void KickAfterAttemptWasBlocked()
@@ -892,6 +1003,12 @@ public class GameplayManager : NetworkBehaviour
         {
             TeamManager.instance.BlockedKick(blockingPlayer.isTeamGrey);
             TeamManager.instance.KickAfterAttempts(scoringPlayer.isTeamGrey, false);
+        }
+        else if (this.isSinglePlayer && !this.is1v1)
+        {
+            TeamManager.instance.BlockedKick(blockingPlayer.isTeamGrey);
+            TeamManager.instance.KickAfterAttempts(scoringPlayer.isTeamGrey, false);
+            AIStopBlockingKickAfter();
         }
         else
         {
@@ -1014,6 +1131,10 @@ public class GameplayManager : NetworkBehaviour
             Football football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
             football.MoveFootballToKickoffGoblin(scoringGoblinNetId);
         }
+        if (this.isSinglePlayer && !this.is1v1)
+        {
+            AIStartKickAfterPositioning();
+        }
     }
     [Client]
     public void UpdatePossessionOfFootballtoTeam(bool doesGreyTeamHaveBall)
@@ -1093,6 +1214,7 @@ public class GameplayManager : NetworkBehaviour
     void TransitionToSecondHalf()
     {
         GetSecondHalfKickingTeam();
+        ResetAllGoblinStatuses();
         IEnumerator transitionToSecondHalfRoutine = TransitionToSecondHalfRoutine();
         StartCoroutine(transitionToSecondHalfRoutine);
     }
@@ -1202,5 +1324,104 @@ public class GameplayManager : NetworkBehaviour
     public void ExitToDesktopButton()
     {
         Application.Quit();
+    }
+    public void AIChoosesCoinToss()
+    {
+        if (this.isSinglePlayer)
+        {
+            Debug.Log("AIChoosesCoinToss: The AI will choose the coin toss, not the player");
+            IEnumerator aiWaitToChooseCoin = AIWaitToChooseCoin();
+            StartCoroutine(aiWaitToChooseCoin);
+        }
+    }
+    IEnumerator AIWaitToChooseCoin()
+    {
+        yield return new WaitForSeconds(2.0f);
+        string[] headsTails = new[]
+        { "heads","tails"};
+        var rng = new System.Random();
+        //aiGamePlayerScript.headsOrTailsPlayer = headsTails[rng.Next(headsTails.Length)];
+        aiGamePlayerScript.headsOrTailsPlayer = "tails";
+        aiGamePlayerScript.SubmitCoinSelection();
+    }
+    public void AIChoosesKickOrReceive()
+    {
+        if (this.isSinglePlayer)
+        {
+            Debug.Log("AIChoosesKickOrReceive: The AI will choose to kick or receive, not the player");
+            IEnumerator aiWaitToChooseKickOrReceive = AIWaitToChooseKickOrReceive();
+            StartCoroutine(aiWaitToChooseKickOrReceive);
+        }
+    }
+    IEnumerator AIWaitToChooseKickOrReceive()
+    {
+        yield return new WaitForSeconds(5.0f);
+        string[] headsTails = new[]
+        { "kick","receive"};
+        var rng = new System.Random();
+        aiGamePlayerScript.kickOrReceivePlayer = headsTails[rng.Next(headsTails.Length)];
+        //aiGamePlayerScript.kickOrReceivePlayer = "kick";
+        aiGamePlayerScript.SubmitKickOrReceiveSelection();
+    }
+    public void AIPlayerKickOff()
+    {
+        Debug.Log("AIPlayerKickOff");
+        IEnumerator aiKickOffSequence = AIKickOffSequence();
+        StartCoroutine(aiKickOffSequence);
+    }
+    IEnumerator AIKickOffSequence()
+    {
+        yield return new WaitForSeconds(3.0f);
+        aiPlayerScript.KickOffSequence();
+    }
+    public void AIStartKickAfterPositioning()
+    {
+        Debug.Log("AIStartKickAfterPositioning");
+        if (scoringPlayer == aiGamePlayerScript)
+        {
+            Debug.Log("AIStartKickAfterPositioning: The AI will be doing the kick after attempt. Starting on choosing position for kick");
+        }
+    }
+    void AIBlockingPlayer()
+    {
+        Debug.Log("AIBlockingPlayer");
+        IEnumerator aiBlockKickDelay = AIBlockKickDelay();
+        StartCoroutine(aiBlockKickDelay);
+    }
+    IEnumerator AIBlockKickDelay()
+    {
+        yield return new WaitForSeconds(0.25f);
+        aiPlayerScript.blockKick = true;
+    }
+    void AIStopBlockingKickAfter()
+    {
+        aiPlayerScript.blockKick = false;
+        aiPlayerScript.StopBlockingGoblinFromRunning();
+    }
+    void AIKickAfterKickingPlayer()
+    {
+        Debug.Log("AIKickAfterKickingPlayer");
+        IEnumerator aiKickAfterKickingPlayerDelay = AIKickAfterKickingPlayerDelay();
+        StartCoroutine(aiKickAfterKickingPlayerDelay);
+    }
+    IEnumerator AIKickAfterKickingPlayerDelay()
+    {
+        aiPlayerScript.kickAfterGoblin = NetworkIdentity.spawned[scoringGoblinNetId].GetComponent<GoblinScript>();
+        yield return new WaitForSeconds(1.0f);
+        Debug.Log("AIKickAfterKickingPlayerDelay");
+        aiPlayerScript.finalPositionReached = false;
+        aiPlayerScript.kickKickAfter = true;
+        
+        
+    }
+    void AIKickAfterAttempt()
+    {
+        Debug.Log("AIKickAfterAttempt");
+        aiPlayerScript.KickAfterAttempt();
+    }
+    [ClientRpc]
+    void RpcKickOffWhistle()
+    {
+        SoundManager.instance.PlaySound("ref-whistle", 1.0f);
     }
 }

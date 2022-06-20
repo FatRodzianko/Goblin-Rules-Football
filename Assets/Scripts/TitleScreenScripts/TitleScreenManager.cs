@@ -127,12 +127,14 @@ public class TitleScreenManager : MonoBehaviour
         if (toggle3v3.isOn)
         {
             networkManager.is1v1 = false;
+            networkManager.isSinglePlayer = false;
             networkManager.maxConnections = 6;
             networkManager.minPlayers = 6;
         }
         else
         {
             networkManager.is1v1 = true;
+            networkManager.isSinglePlayer = false;
             networkManager.maxConnections = 2;
             networkManager.minPlayers = 2;
         }
@@ -156,6 +158,17 @@ public class TitleScreenManager : MonoBehaviour
             networkManager.StartClient();
         }
         EnterIPAddressPanel.SetActive(false);
+        returnToMainMenu.gameObject.SetActive(false);
+    }
+    public void SinglePlayerGame()
+    {
+        Debug.Log("TitleScreenManager: Player has chosen a single player game");
+        networkManager.is1v1 = false;
+        networkManager.isSinglePlayer = true;
+        networkManager.maxConnections = 1;
+        networkManager.minPlayers = 1;
+        networkManager.StartHost();
+        CreateGameInfoPanel.SetActive(false);
         returnToMainMenu.gameObject.SetActive(false);
     }
     public void ExitGame()
