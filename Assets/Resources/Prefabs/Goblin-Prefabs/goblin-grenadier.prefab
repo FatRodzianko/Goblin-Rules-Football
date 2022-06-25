@@ -529,6 +529,8 @@ MonoBehaviour:
   stuckDirectionChange: {x: 0, y: 0}
   teammateCollision: 0
   teammateCollisionDirectionModifer: {x: 0, y: 0}
+  diveCheckTime: 0
+  diveCheckRate: 0.25
 --- !u!95 &2813347414334592408
 Animator:
   serializedVersion: 3
@@ -1132,6 +1134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextPunchTime: 0
   nextPunchRate: 0.25
+  lastHurBox: {fileID: 0}
 --- !u!1001 &174814671012373966
 PrefabInstance:
   m_ObjectHideFlags: 0

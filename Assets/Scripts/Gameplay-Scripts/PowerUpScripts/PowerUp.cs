@@ -229,6 +229,11 @@ public class PowerUp : NetworkBehaviour
             wasPowerUpUsed = StaminaNormal();
             return wasPowerUpUsed;
         }
+        else if (this.powerUpAbility == "bottleBlueShell")
+        {
+            wasPowerUpUsed = BottleBlueShell();
+            return wasPowerUpUsed;
+        }
         return wasPowerUpUsed;
     }
     [ServerCallback]
@@ -583,6 +588,58 @@ public class PowerUp : NetworkBehaviour
         else
             return false;
     }
+    [ServerCallback]
+    bool BottleBlueShell()
+    {
+        if (myPlayerOwner != null)
+        {
+            if (myPlayerOwner.serverSelectGoblin.isGoblinKnockedOut)
+                return false;
+
+            GameObject bottleObject = Instantiate(thrownObjectPrefab);
+            NetworkServer.Spawn(bottleObject);
+
+            BottleBlueShellSpawner bottleObjectScript = bottleObject.GetComponent<BottleBlueShellSpawner>();
+            bottleObjectScript.myPlayerOwner = this.myPlayerOwner;
+            bottleObjectScript.StartSpawningBottleRockets(this.myPlayerOwner);
+
+            /*Team teamToTarget;
+            if (myPlayerOwner.isTeamGrey)
+                teamToTarget = TeamManager.instance.greenTeam;
+            else
+                teamToTarget = TeamManager.instance.greyTeam;*/
+
+            /*foreach (GoblinScript goblin in teamToTarget.goblins)
+            {
+                GameObject bottleObject = Instantiate(thrownObjectPrefab);
+                //bottleObject.transform.position = myPlayerOwner.serverSelectGoblin.transform.position;            
+                int directionModifier = 1;
+                if (myPlayerOwner.serverSelectGoblin.GetComponent<SpriteRenderer>().flipX)
+                    directionModifier *= -1;
+
+                Vector3 startingPosition = myPlayerOwner.serverSelectGoblin.transform.position;
+                startingPosition.x += (1.25f * directionModifier);
+                startingPosition.y += 0.5f;
+
+                bottleObject.transform.localRotation = Quaternion.Euler(0, 0f, (90f * directionModifier));
+
+                bottleObject.transform.position = startingPosition;
+                NetworkServer.Spawn(bottleObject);
+
+                BottleBlueShellScript bottleObjectScript = bottleObject.GetComponent<BottleBlueShellScript>();
+                bottleObjectScript.myTarget = goblin.gameObject;
+                bottleObjectScript.myTargetNetId = goblin.GetComponent<NetworkIdentity>().netId;
+
+            }*/
+            //IEnumerator bottleBlueShellRoutine = BottleBlueShellRoutine(teamToTarget);
+            //StartCoroutine(bottleBlueShellRoutine);
+
+            return true;
+        }
+        else
+            return false;
+    }
+    
     public void HandleRemainingUses(int oldValue, int newValue)
     { 
         if(isServer)

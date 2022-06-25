@@ -290,7 +290,7 @@ public class PowerUpManager : NetworkBehaviour
             float yPosition = Random.Range(minY, maxY);
             float xPosition = Random.Range(2.5f, 5f);
             float negOrPos = Random.Range(0, 2) * 2 - 1;
-            xPosition *= negOrPos;
+            //xPosition *= negOrPos;
             /*if (gameFootball.isHeld && gameFootball.goblinWithBall != null)
             {
                 if (gameFootball.goblinWithBall.isGoblinGrey)
@@ -305,13 +305,26 @@ public class PowerUpManager : NetworkBehaviour
             }*/
 
             //Vector3 positionOfBlueShell = playerDownBad.selectGoblin.transform.position;
+            
+            xPosition = playerDownBad.serverSelectGoblin.transform.position.x + (xPosition * negOrPos);
+
             if (xPosition > maxX)
                 xPosition = maxX;
             else if (xPosition < minX)
                 xPosition = minX;
 
+            /*Vector3 newPostion = playerDownBad.serverSelectGoblin.transform.position;
+            newPostion.x += xPosition;
+            newPostion.y = yPosition;
+            if (newPostion.x > maxX)
+                newPostion.x = maxX;
+            else if (newPostion.x < minX)
+                newPostion.x = minX;*/
+
             GameObject powerUp = Instantiate(powerUptoSpawn);
-            powerUp.transform.position = new Vector3((playerDownBad.serverSelectGoblin.transform.position.x + xPosition), yPosition, 0f);
+            //powerUp.transform.position = new Vector3((playerDownBad.serverSelectGoblin.transform.position.x + xPosition), yPosition, 0f);
+            powerUp.transform.position = new Vector3(xPosition, yPosition, 0f);
+            //powerUp.transform.position = newPostion;
             //powerUp.transform.position = positionOfBlueShell;
 
             Collider2D[] colliders = Physics2D.OverlapCircleAll(powerUp.transform.position, 1.5f, powerUpLayer);

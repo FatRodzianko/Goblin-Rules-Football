@@ -11,6 +11,19 @@
 - - - - - - https://www.youtube.com/watch?v=Fg8KsCSE5k4
 - croquet?
 - - - like Kirby's Dream Course
+- Bowling
+- - - Championship Bowling for NES: https://www.youtube.com/watch?v=txV21zS2PBA
+- Basketball:
+- - - Tecmo Basketball: https://www.youtube.com/watch?v=EZYcTUBTpsg
+- - - obviously nba jam
+- - - barklet shut up and jam https://www.youtube.com/watch?v=tlUjvlYLjIA
+- - - - - - when players go for big jams they can have miny fights/kicks/punches and stuff?
+- Dodgeball
+- - - Super Dodgeball https://www.youtube.com/watch?v=736nU3J_j9s https://www.youtube.com/watch?v=gFb8GaCoEyQ
+- - - SNES version? https://www.youtube.com/watch?v=Np7-xrlYhLg https://www.youtube.com/watch?v=VzlBeHzSISU
+- - - these are kind of like fighting games but with dodgeball???
+- Soccer:
+- - - Nintendo world cup https://www.youtube.com/watch?v=mPKoHVO5g3o
 
 ### Remaining tasks
 (x) Punch animations while goblins are running
@@ -874,19 +887,43 @@ x For kick after, have camera follow football shadow toward the goal post?
 x On kick off st up, have camera move to 0,0, then reset to follow the selected goblin
 - - x this is to make sure that the player can see midfield/where the kick is occuring at kickoff
 - - x the fix was setting the camera's "PreviousStateIsValid" to false when the gamephase is kickoff
-- Blue shell idea: rocket propelled bottles that home in on enemy goblins?
-- have the regular grass tiles be more random
-- - - define specific "grass tiles", randomly choose them
-- - - just trying to make sure that the field doesn't look quite as bland/patterned?
-- - - use 2d tilemap extras and the random brush?
-- - - - - - https://docs.unity3d.com/Packages/com.unity.2d.tilemap.extras@1.6/manual/RandomBrush.html
+x Blue shell idea: rocket propelled bottles that home in on enemy goblins?
+x have the regular grass tiles be more random
+- - x define specific "grass tiles", randomly choose them
+- - x just trying to make sure that the field doesn't look quite as bland/patterned?
+- - x use 2d tilemap extras and the random brush?
+- - - - - x https://docs.unity3d.com/Packages/com.unity.2d.tilemap.extras@1.6/manual/RandomBrush.html
+- - x should probably add some "random" tiles for the hash lines and stuff so that appears more random?
+- - - - - x maybe 2-4 variations for each "type" of line tile?
 - animate the crowds?
-- - - just have them move up/down left/right with a random offset so it isn't too patterned?
-- - - not a huge deal
-- - - 2d tilemap extras has an "animated tile" function that potentially be used for this?
-- - - - - - https://docs.unity3d.com/Packages/com.unity.2d.tilemap.extras@1.6/manual/AnimatedTile.html
-- - - - - - https://medium.com/nerd-for-tech/animated-tiles-unity-a9fa47103296
-- Indicator for when you can't dive?
-- - - after a dive or slide goblins can't dive again. Maybe reuse the sweat drop to show the player when they can/can't dive?
+- - x just have them move up/down left/right with a random offset so it isn't too patterned?
+- - x not a huge deal
+- - x 2d tilemap extras has an "animated tile" function that potentially be used for this?
+- - - - - x https://docs.unity3d.com/Packages/com.unity.2d.tilemap.extras@1.6/manual/AnimatedTile.html
+- - - - - x https://medium.com/nerd-for-tech/animated-tiles-unity-a9fa47103296
+- - x Bottom half of the stands looked really bad animated so I got rid of that and only did the top half?
+x Indicator for when you can't dive?
+- - x after a dive or slide goblins can't dive again. Maybe reuse the sweat drop to show the player when they can/can't dive?
+- Escape menu:
+- - - allow for player to press esc/start to bring up a menu
+- - - - - - quit game
+- - - - - - settings menu (when that is created...)
+- - - ability for host to "pause" the game?
+- - - - - - stop game timer
+- - - - - - prevent everyone from moving
+- - - - - - pause menu tutorial? https://www.youtube.com/watch?v=JivuXdrIHK0
+- - - - - - pause without setting timescale to 0 https://www.youtube.com/watch?v=KPaEnLpu57s
+- Add "timeouts" to things outside of the gameplay phases
+- - - kickoff
+- - - - - - just kick straight ahead at half power after 30 seconds?
+- - - cointoss
+- - - - - - select heads/kick automatically if no player input is received?
+- - - kick after
+- - - - - - if kick has not been made after 30 seconds, automaticly block the kick?
+- - - 30 second countdown or whatever to prevent the game from "hanging" because someone isn't playing?
+- Migrate the host to another player if the host leaves?
+- - - not sure if that will be possible with mirror...
+- Update TitleScreen scene's UI so it isn't so bad?
+- - - look more like the Stalks UI? at least that's something more presentable
 
 

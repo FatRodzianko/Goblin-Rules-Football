@@ -219,10 +219,14 @@ MonoBehaviour:
   mySprite: {fileID: 21300000, guid: 330cc8b43e96a3046aba14a81bd13b55, type: 3}
   powerUpAbility: lightningBlueShell
   isBlueShell: 1
+  remainingUses: 1
+  multipleUses: 0
+  aiPowerUpType: blueShellEnemy
   PowerUpImageObject: {fileID: 6338328384912614004}
   PowerUpBorderObject: {fileID: 6338328385406385039}
   bounceSpeed: 0.25
   powerUpAnimationPrefab: {fileID: 3034892886349171904, guid: a40d30f9c028f8f45a217c06096d997c, type: 3}
+  thrownObjectPrefab: {fileID: 0}
   myPlayerOwner: {fileID: 0}
   localPlayerOwner: {fileID: 0}
 --- !u!61 &6338328385301744604

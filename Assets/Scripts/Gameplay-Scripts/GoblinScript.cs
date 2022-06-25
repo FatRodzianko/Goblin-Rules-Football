@@ -105,13 +105,13 @@ public class GoblinScript : NetworkBehaviour
     [Header("Slide Info")]
     [SyncVar(hook = nameof(HandleIsSliding))] public bool isSliding = false;
     [SyncVar] public Vector2 slideDirection = Vector2.zero;
-    public bool isSlidingRoutineRunning = false;
+    [SyncVar(hook = nameof(HandleIsSlidingRoutineRunning))] public bool isSlidingRoutineRunning = false;
     IEnumerator isSlidingRoutine;
     public float slideSpeedModifer = 1.0f;
 
     [Header("Dive Info")]
     [SyncVar(hook = nameof(HandleIsDiving))] public bool isDiving = false;
-    [SyncVar] public bool DivingRoutineRunning = false;
+    [SyncVar(hook = nameof(HandleIsDivingRoutineRunning))] public bool DivingRoutineRunning = false;
     IEnumerator DivingRoutine;
 
     [Header("Is Goblin Throwing Stuff")]
@@ -1744,7 +1744,8 @@ public class GoblinScript : NetworkBehaviour
         slideSpeedModifer = 1.0f;
         slideDirection = Vector2.zero;
         StopCoroutine(isSlidingRoutine);
-        isSlidingRoutineRunning = false;
+        //isSlidingRoutineRunning = false;
+        this.HandleIsSlidingRoutineRunning(this.isSlidingRoutineRunning, false);
     }
     public void GoblinPickUpFootball()
     {
@@ -1853,7 +1854,8 @@ public class GoblinScript : NetworkBehaviour
     [Server]
     public IEnumerator SlideGoblinRoutine()
     {
-        isSlidingRoutineRunning = true;
+        //isSlidingRoutineRunning = true;
+        this.HandleIsSlidingRoutineRunning(this.isSlidingRoutineRunning, true);
         isSliding = true;
         yield return new WaitForSeconds(0.25f);
         speed = MaxSpeed * 1.2f;
@@ -1867,7 +1869,8 @@ public class GoblinScript : NetworkBehaviour
         slideSpeedModifer = 1.0f;
         yield return new WaitForSeconds(0.75f);
         slideDirection = Vector2.zero;
-        isSlidingRoutineRunning = false;
+        //isSlidingRoutineRunning = false;
+        this.HandleIsSlidingRoutineRunning(this.isSlidingRoutineRunning, false);
     }
     public void SlideBoxCollision(GoblinScript slidingGoblin)
     {
@@ -2019,13 +2022,15 @@ public class GoblinScript : NetworkBehaviour
     [Server]
     public IEnumerator DiveGoblinRoutine()
     {
-        DivingRoutineRunning = true;
+        //DivingRoutineRunning = true;
+        this.HandleIsDivingRoutineRunning(this.DivingRoutineRunning, true);
         slideSpeedModifer = 0.7f;
         yield return new WaitForSeconds(1.25f);
         slideSpeedModifer = 1.0f;
         yield return new WaitForSeconds(0.75f);
         slideDirection = Vector2.zero;
-        DivingRoutineRunning = false;
+        //DivingRoutineRunning = false;
+        this.HandleIsDivingRoutineRunning(this.DivingRoutineRunning, false);
     }
     public void StartBlocking()
     {
@@ -3350,11 +3355,23 @@ public class GoblinScript : NetworkBehaviour
     public void FatigueIndicators(bool enable)
     {
         Debug.Log("FatigueIndicators: for goblin " + this.name + " " + enable.ToString());
-        if (enable)
+        if (enable && this.isFatigued)
         {  
             spriteFlash.Flash(Color.yellow);
         }
-        fatigueSweatDrop.SetActive(enable);
+        if (enable)
+        {
+            fatigueSweatDrop.SetActive(enable);
+        }
+        else if (this.isFatigued || this.isSlidingRoutineRunning || this.DivingRoutineRunning)
+        {
+            fatigueSweatDrop.SetActive(true);
+        }
+        else
+        {
+            fatigueSweatDrop.SetActive(false);
+        }
+        
     }
     public void FlipFatigueSweatIndicator()
     {
@@ -3812,5 +3829,23 @@ public class GoblinScript : NetworkBehaviour
             }
         }
         return willDive;
+    }
+    public void HandleIsDivingRoutineRunning(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            this.DivingRoutineRunning = newValue;
+        if (isClient)
+        {
+            this.FatigueIndicators(newValue);
+        }
+    }
+    public void HandleIsSlidingRoutineRunning(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            this.isSlidingRoutineRunning = newValue;
+        if (isClient)
+        {
+            this.FatigueIndicators(newValue);
+        }
     }
 }
