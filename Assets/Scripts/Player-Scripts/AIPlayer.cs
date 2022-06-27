@@ -81,10 +81,10 @@ public class AIPlayer : NetworkBehaviour
     public int staminaPowerUpIndex = 0;
     public bool hasHealthPowerUp = false;
     public int healthPowerUpIndex = 0;
-    public bool hasBlueShellLightning = false;
-    public int blueShellLightningIndex = 0;
-    public bool hasBlueShellInvinciblity = false;
-    public int blueShellInvinciblityIndex = 0;
+    public bool hasBlueShellEnemy = false;
+    public int blueShellEnemyIndex = 0;
+    public bool hasBlueShellSelf = false;
+    public int blueShellSelfIndex = 0;
     public bool hasBottlePowerUp = false;
     public int bottlePowerUpIndex = 0;
 
@@ -434,7 +434,7 @@ public class AIPlayer : NetworkBehaviour
 
 
         // If the goblin is invinvible, do not kick!
-        if (myPlayerScript.selectGoblin.invinvibilityBlueShell || this.hasBlueShellInvinciblity)
+        if (myPlayerScript.selectGoblin.invinvibilityBlueShell || this.hasBlueShellSelf)
             return false;
         // If the game is in xtra-time or near the end of the game, check if AI team is winning. If they are winning, kick the ball to end the game. If they are not winning, do not kick ball. If tied, ignore and continue with regular checks
         if (GameplayManager.instance.gamePhase == "xtra-time" || GameplayManager.instance.timeLeftInGame < 2)
@@ -555,7 +555,7 @@ public class AIPlayer : NetworkBehaviour
             passCheckLastTime = Time.time;
 
         // If the goblin is invinvible, do not pass!
-        if (myPlayerScript.selectGoblin.invinvibilityBlueShell || this.hasBlueShellInvinciblity)
+        if (myPlayerScript.selectGoblin.invinvibilityBlueShell || this.hasBlueShellSelf)
             return false;
 
         // if there were no close teammates, return false
@@ -852,13 +852,13 @@ public class AIPlayer : NetworkBehaviour
                 if (myPlayerScript.selectGoblin.doesCharacterHaveBall)
                 {
                     // BlueShell Lightning should be applicable in almost all scenarios? just use it if available
-                    if (hasBlueShellLightning && areEnemyGoblinsNearby && !isPowerUpCoolDownRoutineRunning)
+                    if (hasBlueShellEnemy && areEnemyGoblinsNearby && !isPowerUpCoolDownRoutineRunning)
                     {
-                        UsePowerUp(blueShellLightningIndex);
+                        UsePowerUp(blueShellEnemyIndex);
                     }
                     // Check for blue shell invincibility
-                    else if (hasBlueShellInvinciblity && areEnemyGoblinsNearby && !isPowerUpCoolDownRoutineRunning)
-                        UsePowerUp(blueShellInvinciblityIndex);
+                    else if (hasBlueShellSelf && areEnemyGoblinsNearby && !isPowerUpCoolDownRoutineRunning)
+                        UsePowerUp(blueShellSelfIndex);
                     // Prioritize the speed powerup first
                     else if (hasSpeedPowerUp && !isPowerUpCoolDownRoutineRunning)
                         UsePowerUp(speedPowerUpIndex);
@@ -874,9 +874,9 @@ public class AIPlayer : NetworkBehaviour
                 else if (!myPlayerScript.selectGoblin.doesCharacterHaveBall && gameFootball.isHeld)
                 {
                     // Check if opponent goblins are nearby. If yes, use attack powerup?
-                    if (hasBlueShellLightning && !isPowerUpCoolDownRoutineRunning)
+                    if (hasBlueShellEnemy && !isPowerUpCoolDownRoutineRunning)
                     {
-                        UsePowerUp(blueShellLightningIndex);
+                        UsePowerUp(blueShellEnemyIndex);
                     }
                     else if (hasSpeedPowerUp && !isPowerUpCoolDownRoutineRunning)
                         UsePowerUp(speedPowerUpIndex);
@@ -899,9 +899,9 @@ public class AIPlayer : NetworkBehaviour
                     // Make checks like: Is average health/stamina of goblins below 50%?
 
                     // Check health first:
-                    if (hasBlueShellLightning && !isPowerUpCoolDownRoutineRunning)
+                    if (hasBlueShellEnemy && !isPowerUpCoolDownRoutineRunning)
                     {
-                        UsePowerUp(blueShellLightningIndex);
+                        UsePowerUp(blueShellEnemyIndex);
                     }
                     else if (hasHealthPowerUp && !isPowerUpCoolDownRoutineRunning)
                         ShouldHealthPowerUpBeUsed();
@@ -926,10 +926,10 @@ public class AIPlayer : NetworkBehaviour
         staminaPowerUpIndex = 0;
         hasHealthPowerUp = false;
         healthPowerUpIndex = 0;
-        hasBlueShellLightning = false;
-        blueShellLightningIndex = 0;
-        hasBlueShellInvinciblity = false;
-        blueShellInvinciblityIndex = 0;
+        hasBlueShellEnemy = false;
+        blueShellEnemyIndex = 0;
+        hasBlueShellSelf = false;
+        blueShellSelfIndex = 0;
         hasBottlePowerUp = false;
         bottlePowerUpIndex = 0;
 
@@ -962,15 +962,15 @@ public class AIPlayer : NetworkBehaviour
                 hasHealthPowerUp = true;
                 healthPowerUpIndex = index;
             }
-            else if (powerup.powerUpAbility == "invincibilityBlueShell")
+            else if (powerup.aiPowerUpType == "blueShellSelf")
             {
-                hasBlueShellInvinciblity = true;
-                blueShellInvinciblityIndex = index;
+                hasBlueShellSelf = true;
+                blueShellSelfIndex = index;
             }
-            else if (powerup.powerUpAbility == "lightningBlueShell")
+            else if (powerup.aiPowerUpType == "blueShellEnemy")
             {
-                hasBlueShellLightning = true;
-                blueShellLightningIndex = index;
+                hasBlueShellEnemy = true;
+                blueShellEnemyIndex = index;
             }
             else if (powerup.powerUpAbility == "bottleNormal")
             {

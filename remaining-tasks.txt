@@ -913,6 +913,8 @@ x Indicator for when you can't dive?
 - - - - - - prevent everyone from moving
 - - - - - - pause menu tutorial? https://www.youtube.com/watch?v=JivuXdrIHK0
 - - - - - - pause without setting timescale to 0 https://www.youtube.com/watch?v=KPaEnLpu57s
+- - - - - - pause menu for multiplayer using PUN? https://www.youtube.com/watch?v=gaipT1NeyAM
+- - - - - - someone trying and failing to make a pause menu? https://forum.unity.com/threads/unity-mirror-simple-pause-menu-ui-not-working-in-multiplayer.1082147/
 - Add "timeouts" to things outside of the gameplay phases
 - - - kickoff
 - - - - - - just kick straight ahead at half power after 30 seconds?
