@@ -119,6 +119,29 @@ public class GameplayManager : NetworkBehaviour
     public GamePlayer aiGamePlayerScript;
     public AIPlayer aiPlayerScript;
 
+    [Header("Pause/Resume Game")]
+    [SerializeField] GameObject GamePausedTextObject;
+    [SyncVar (hook = nameof(HandleIsGamePaused))] public bool isGamePaused = false;
+    public GamePlayer playerWhoPaused;
+    [SyncVar] public uint playerWhoPausedNetId;
+    [SyncVar] public float lastPauseTimeStamp;
+    bool isGamePausedTimeoutRoutineRunning = false;
+    IEnumerator GamePausedTimeout;
+
+    [Header("Timeouts: UI Stuff")]
+    [SerializeField] GameObject TimeoutTimerHolder;
+    [SerializeField] TextMeshProUGUI timeoutTimerText;
+
+    [Header("Timeouts: Kick-after")]
+    public bool isKickAfterTimerCountDownRunning = false;
+    public bool isKickAfterTimerRunning = false;
+    IEnumerator timeoutKickAfter;
+    [SyncVar (hook = nameof(HandleKickAfterTimerTimeLeft))] int kickAfterTimerTimeLeft = 30;
+
+    [Header("Timeouts: Kick Off")]
+    public bool isKickOffTimerCountDownRunning = false;
+    IEnumerator timeoutKickOff;
+    [SyncVar(hook = nameof(HandleKickOffTimerTimeLeft))] int kickOffTimerTimeLeft = 30;
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -137,6 +160,7 @@ public class GameplayManager : NetworkBehaviour
         MakeInstance();
         gameplayCanvas.SetActive(false);
         coinTossCanvas.SetActive(false);
+        TimeoutTimerHolder.SetActive(false);
     }
     void MakeInstance()
     {
@@ -219,11 +243,13 @@ public class GameplayManager : NetworkBehaviour
     {
         Debug.Log("EnableGoblinMovement");
         LocalGamePlayerScript.EnableGoblinMovement(true);
+        LocalGamePlayerScript.EnableGoblinMovementControlsServerValues(true);
     }
     public void DisableGoblinMovement()
     {
         Debug.Log("EnableGoblinMovement");
         LocalGamePlayerScript.EnableGoblinMovement(false);
+        LocalGamePlayerScript.EnableGoblinMovementControlsServerValues(false);
     }
     public void HandleGamePhase(string oldValue, string newValue)
     {
@@ -334,6 +360,7 @@ public class GameplayManager : NetworkBehaviour
                 LocalGamePlayerScript.FollowSelectedGoblin(LocalGamePlayerScript.selectGoblin.transform);
                 LocalGamePlayerScript.CoinTossControlls(false);
                 LocalGamePlayerScript.KickOrReceiveControls(false);
+                LocalGamePlayerScript.DisableKickOrReceiveControls();
                 if(!this.is1v1 && !this.isSinglePlayer)
                     LocalGamePlayerScript.GetGoblinTeammatesFor3v3();
             }
@@ -374,7 +401,20 @@ public class GameplayManager : NetworkBehaviour
         if (this.is1v1 || this.isSinglePlayer)
         {
             receivingPlayer.RpcRepositionTeamForKickOff(false);
+            receivingPlayer.gameplayActionControlsOnServer = false;
+            receivingPlayer.goblinMovementControlsOnServer = false;
+            receivingPlayer.powerupsControlsOnServer = false;
+            receivingPlayer.kickingControlsOnServer = false;
+            receivingPlayer.kickOffAimArrowControlsOnServer = false;            
+            receivingPlayer.qeSwitchingControlsOnServer = true;
+
             kickingPlayer.RpcRepositionTeamForKickOff(true);
+            kickingPlayer.gameplayActionControlsOnServer = false;
+            kickingPlayer.goblinMovementControlsOnServer = false;
+            kickingPlayer.powerupsControlsOnServer = false;
+            kickingPlayer.kickingControlsOnServer = true;
+            kickingPlayer.kickOffAimArrowControlsOnServer = true;
+            kickingPlayer.qeSwitchingControlsOnServer = false;
         }
         else
         {
@@ -384,12 +424,41 @@ public class GameplayManager : NetworkBehaviour
                 if (player == kickingPlayer)
                     isThisTheKickingPlayer = true;
                 player.RpcRepositionTeamForKickOff3v3(player.connectionToClient, true, isThisTheKickingPlayer);
+                player.gameplayActionControlsOnServer = false;
+                player.goblinMovementControlsOnServer = false;
+                player.powerupsControlsOnServer = false;
+                player.kickingControlsOnServer = isThisTheKickingPlayer;
+                player.kickOffAimArrowControlsOnServer = isThisTheKickingPlayer;
+                player.qeSwitchingControlsOnServer = false;
             }
             foreach (GamePlayer player in receivingTeam.teamPlayers)
             {
 
                 player.RpcRepositionTeamForKickOff3v3(player.connectionToClient, false, false);
+                player.gameplayActionControlsOnServer = false;
+                player.goblinMovementControlsOnServer = false;
+                player.powerupsControlsOnServer = false;
+                player.kickingControlsOnServer = false;
+                player.kickOffAimArrowControlsOnServer = false;
+                player.qeSwitchingControlsOnServer = true;
             }
+        }
+        if (!this.isSinglePlayer)
+        {
+            if (isKickOffTimerCountDownRunning)
+            {
+                try
+                {
+                    isKickOffTimerCountDownRunning = false;
+                    StopCoroutine(timeoutKickOff);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("RepositionTeamsForKickOff: Tried and failed to stop Kick Off Timer coroutine. Error: " + e);
+                }
+            }
+            timeoutKickOff = TimeoutKickOffRoutine();
+            StartCoroutine(timeoutKickOff);
         }
         
     }
@@ -399,6 +468,12 @@ public class GameplayManager : NetworkBehaviour
         foreach (GamePlayer player in Game.GamePlayers)
         {
             player.RpcActivateGameplayControls(activate);
+            player.kickOffAimArrowControlsOnServer = false;
+            player.qeSwitchingControlsOnServer = activate;
+            player.kickingControlsOnServer = activate;
+            player.goblinMovementControlsOnServer = activate;
+            player.gameplayActionControlsOnServer = activate;
+            player.powerupsControlsOnServer = activate;
         }
     }
     [Server]
@@ -500,6 +575,10 @@ public class GameplayManager : NetworkBehaviour
         float timeLeftTracker;
         while (isGameTimerRunning)
         {
+            // Don't count down the time if the game is paused?
+            if (this.isGamePaused)
+                continue;
+
             yield return new WaitForSeconds(1.0f);
             timeLeftTracker = timeLeftInGame - 1;
             
@@ -749,6 +828,7 @@ public class GameplayManager : NetworkBehaviour
     IEnumerator KickAfterTimerCountDown()
     {
         Debug.Log("KickAfterTimerCountDown: started");
+        isKickAfterTimerCountDownRunning = true;
         KickAfterTimer = 3;
         yield return new WaitForSeconds(1.0f);
         KickAfterTimer = 2;
@@ -756,6 +836,7 @@ public class GameplayManager : NetworkBehaviour
         KickAfterTimer = 1;
         yield return new WaitForSeconds(1.0f);
         RpcDisableKickAfterTimerUI();
+        isKickAfterTimerCountDownRunning = false;
         if (this.is1v1)
         {
             scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, true);
@@ -810,6 +891,7 @@ public class GameplayManager : NetworkBehaviour
                 player.RpcKickAfterUpdateInsctructionsText(player.connectionToClient, false);
             }
         }
+        
         Debug.Log("KickAfterTimerCountDown: ended");
     }
     void HandleKickAfterTimerUpdate(int oldValue, int newValue)
@@ -1015,7 +1097,10 @@ public class GameplayManager : NetworkBehaviour
             TeamManager.instance.BlockedKick(blockingTeam.isGrey);
             TeamManager.instance.KickAfterAttempts(scoringTeam.isGrey, false);
         }
-        
+        if (!this.isSinglePlayer)
+        {
+            this.StopTimeoutKickAfterRoutine();
+        }
 
     }
     [ClientRpc]
@@ -1134,6 +1219,11 @@ public class GameplayManager : NetworkBehaviour
         if (this.isSinglePlayer && !this.is1v1)
         {
             AIStartKickAfterPositioning();
+        }
+        if (!this.isSinglePlayer)
+        {
+            timeoutKickAfter = TimeoutKickAfterRoutine();
+            StartCoroutine(timeoutKickAfter);
         }
     }
     [Client]
@@ -1423,5 +1513,232 @@ public class GameplayManager : NetworkBehaviour
     void RpcKickOffWhistle()
     {
         SoundManager.instance.PlaySound("ref-whistle", 1.0f);
+    }
+    [ServerCallback]
+    public void PauseGameOnServer(GamePlayer pausingPlayer, uint pausingPlayerNetId)
+    {
+        if (this.isGamePaused)
+            return;
+        Debug.Log("PauseGameOnServer: Player with a netid of: " + pausingPlayerNetId.ToString() + " wants to PAUSE the game.");
+        playerWhoPaused = pausingPlayer;
+        playerWhoPausedNetId = pausingPlayerNetId;
+        PauseGameForAllPlayers(true);
+        this.HandleIsGamePaused(this.isGamePaused, true);
+        if (!this.isSinglePlayer)
+        {
+            GamePausedTimeout = PauseGameTimeoutRoutine();
+            StartCoroutine(GamePausedTimeout);
+        }
+        //Time.timeScale = 0f;
+    }
+    [ServerCallback]
+    public void ResumeGameOnServer(GamePlayer pausingPlayer, uint pausingPlayerNetId)
+    {
+        if (!this.isGamePaused)
+            return;
+        Debug.Log("ResumeGameOnServer: Player with a netid of: " + pausingPlayerNetId.ToString() + " wants to RESUME the game.");
+        if (pausingPlayerNetId == this.playerWhoPausedNetId)
+        {
+            Debug.Log("ResumeGameOnServer: Player with a netid of: " + pausingPlayerNetId.ToString() + " matches netid of player who paused: " + this.playerWhoPausedNetId.ToString() + " will resume game.");
+            playerWhoPaused = null;
+            playerWhoPausedNetId = 0;
+            PauseGameForAllPlayers(false);
+            this.HandleIsGamePaused(this.isGamePaused, false);
+            if (isGamePausedTimeoutRoutineRunning)
+            {
+                StopCoroutine(GamePausedTimeout);
+                isGamePausedTimeoutRoutineRunning = false;
+            } 
+            //Time.timeScale = 1.0f;
+        }
+    }
+    public void HandleIsGamePaused(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            isGamePaused = newValue;
+        if (isClient)
+        {
+            //GamePausedTextObject.SetActive(newValue);
+            /*if (newValue)
+            {
+                Debug.Log("HandleIsGamePaused: time scale on client set to 0");
+                Time.timeScale = 0f;
+            }
+            else
+            {
+                Debug.Log("HandleIsGamePaused: time scale on client set to 1");
+                Time.timeScale = 1f;
+            }*/   
+        }
+    }
+    [ServerCallback]
+    void PauseGameForAllPlayers(bool pauseGame)
+    {
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            player.RpcGamePausedByServer(player.connectionToClient, pauseGame);
+        }
+    }
+    public void ActivateGamePausedText(bool activate)
+    {
+        GamePausedTextObject.SetActive(activate);
+    }
+    [Server]
+    IEnumerator PauseGameTimeoutRoutine()
+    {
+        isGamePausedTimeoutRoutineRunning = true;
+        yield return new WaitForSecondsRealtime(60f);
+        if (this.isGamePaused)
+        {
+            Debug.Log("PauseGameTimeoutRoutine: Reached paused game timeout");
+            playerWhoPaused = null;
+            playerWhoPausedNetId = 0;
+            PauseGameForAllPlayers(false);
+            this.HandleIsGamePaused(this.isGamePaused, false);
+            isGamePausedTimeoutRoutineRunning = false;
+        }
+    }
+    IEnumerator TimeoutKickAfterRoutine()
+    {
+        isKickAfterTimerRunning = true;
+        
+        this.HandleKickAfterTimerTimeLeft(this.kickAfterTimerTimeLeft, 30);
+        RpcActivateTheTimeoutTimer(true);
+        int timeLeftTracker;
+        while (isKickAfterTimerRunning)
+        {
+            // Don't count down the time if the game is paused?
+            if (this.isGamePaused)
+                continue;
+            if (this.gamePhase != "kick-after-attempt")
+            {
+                isKickAfterTimerRunning = false;
+                break;
+            }
+            yield return new WaitForSeconds(1.0f);
+            if (isKickAfterTimerCountDownRunning)
+                continue;
+            timeLeftTracker = kickAfterTimerTimeLeft - 1;
+
+            HandleKickAfterTimerTimeLeft(this.kickAfterTimerTimeLeft, timeLeftTracker);
+            if (timeLeftTracker <= 0)
+            {
+                HandleKickAfterTimerTimeLeft(this.kickAfterTimerTimeLeft, 0);
+                isKickAfterTimerRunning = false;
+                // code to block kick automatically?
+                try
+                {
+                    GoblinScript goblin = NetworkIdentity.spawned[scoringGoblinNetId].GetComponent<GoblinScript>();
+                    goblin.KnockOutGoblin(false);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("TimeoutKickAfterRoutine: could not access the scoringGoblinNetId. Error: " + e);
+                }
+                
+                //this.KickAfterAttemptWasBlocked();
+                RpcActivateTheTimeoutTimer(false);
+            }
+        }
+        RpcActivateTheTimeoutTimer(false);
+        yield break;
+    }
+    void HandleKickAfterTimerTimeLeft(int oldValue, int newValue)
+    {
+        if (isServer)
+            kickAfterTimerTimeLeft = newValue;
+        if (isClient)
+        {
+            timeoutTimerText.text = ":" + newValue.ToString();
+        }
+    }
+    [ClientRpc]
+    void RpcActivateTheTimeoutTimer(bool activate)
+    {
+        TimeoutTimerHolder.SetActive(activate);
+    }
+    [ServerCallback]
+    public void StopTimeoutKickAfterRoutine()
+    {
+        if (isKickAfterTimerRunning)
+            isKickAfterTimerRunning = false;
+        try
+        {
+            StopCoroutine(timeoutKickAfter);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("StopTimeoutKickAfterRoutine: Could not stop coroutine. Error: " + e);
+        }
+        
+        RpcActivateTheTimeoutTimer(false);
+    }
+    IEnumerator TimeoutKickOffRoutine()
+    {
+        isKickOffTimerCountDownRunning = true;
+
+        this.HandleKickOffTimerTimeLeft(this.kickOffTimerTimeLeft, 30);
+        RpcActivateTheTimeoutTimer(true);
+        int timeLeftTracker;
+        while (isKickOffTimerCountDownRunning)
+        {
+            if (this.gamePhase != "kickoff")
+            {
+                isKickOffTimerCountDownRunning = false;
+                break;
+            }
+            yield return new WaitForSeconds(1.0f);
+            // Don't count down the time if the game is paused?
+            if (this.isGamePaused)
+                continue;
+
+            timeLeftTracker = kickOffTimerTimeLeft - 1;
+
+            HandleKickOffTimerTimeLeft(this.kickOffTimerTimeLeft, timeLeftTracker);
+            if (timeLeftTracker <= 0)
+            {
+                HandleKickOffTimerTimeLeft(this.kickOffTimerTimeLeft, 0);
+                isKickOffTimerCountDownRunning = false;
+                // code to block kick automatically?
+                try
+                {
+                    kickingPlayer.serverSelectGoblin.RpcKickOffTimeoutForceKick(kickingPlayer.serverSelectGoblin.connectionToClient);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("TimeoutKickAfterRoutine: could not access the scoringGoblinNetId. Error: " + e);
+                }
+
+                //this.KickAfterAttemptWasBlocked();
+                RpcActivateTheTimeoutTimer(false);
+            }
+        }
+        RpcActivateTheTimeoutTimer(false);
+        yield break;
+    }
+    void HandleKickOffTimerTimeLeft(int oldValue, int newValue)
+    {
+        if (isServer)
+            kickOffTimerTimeLeft = newValue;
+        if (isClient)
+        {
+            timeoutTimerText.text = ":" + newValue.ToString();
+        }
+    }
+    [ServerCallback]
+    public void StopTimeoutKickOffRoutine()
+    {
+        if (isKickOffTimerCountDownRunning)
+            isKickOffTimerCountDownRunning = false;
+        try
+        {
+            StopCoroutine(timeoutKickOff);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("StopTimeoutKickOffRoutine: Could not stop coroutine. Error: " + e);
+        }
+
+        RpcActivateTheTimeoutTimer(false);
     }
 }

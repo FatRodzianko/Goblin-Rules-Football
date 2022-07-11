@@ -26,6 +26,12 @@ public class NetworkManagerGRF : NetworkManager
     public bool is1v1 = false;
     public bool isSinglePlayer = false;
 
+    [Header("Pause/Resume Game")]
+    public bool isGamePaused = false;
+    public GamePlayer playerWhoPaused;
+    public uint playerWhoPausedNetId;
+    public float lastPauseTimeStamp;
+
 
     public List<GamePlayer> GamePlayers { get; } = new List<GamePlayer>();
     public List<LobbyPlayer> LobbyPlayers { get; } = new List<LobbyPlayer>();
@@ -350,6 +356,13 @@ public class NetworkManagerGRF : NetworkManager
             Debug.Log("Could not destroy WaitingForPlayersCanvas");
         }
     }
-
+    public void PauseGame()
+    {
+        Time.timeScale = 0f;
+    }
+    public void ResumeGame()
+    {
+        Time.timeScale = 1.0f;
+    }
 
 }

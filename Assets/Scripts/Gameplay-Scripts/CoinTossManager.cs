@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using TMPro;
+using System;
 
 public class CoinTossManager : NetworkBehaviour
 {
@@ -53,6 +54,15 @@ public class CoinTossManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI EnterToSubmitText;
     [SerializeField] private TextMeshProUGUI SelectReceiveText;
     [SerializeField] private TextMeshProUGUI SelectKickText;
+
+    [Header("Timeout UI Objects")]
+    [SerializeField] GameObject TimeoutTimerHolder;
+    [SerializeField] TextMeshProUGUI timeoutTimerText;
+
+    [Header("Timeouts: Cointoss")]
+    public bool isCoinTossTimerRunning = false;
+    IEnumerator timeOutCoinToss;
+    [SyncVar(hook = nameof(HandleCointossTimerTimeLeft))] int cointossTimerTimeLeft = 30;
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -222,11 +232,15 @@ public class CoinTossManager : NetworkBehaviour
                     {
                         player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, true);
                         player.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
+                        player.coinTossControlsOnServer = false;
+                        player.kickOrReceiveControlsOnServer = true;
                     }
                     else
                     {
                         player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, false);
                         player.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                        player.coinTossControlsOnServer = false;
+                        player.kickOrReceiveControlsOnServer = false;
                     }
                 }
             }
@@ -242,11 +256,15 @@ public class CoinTossManager : NetworkBehaviour
                             {
                                 teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, true);
                                 teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
+                                teamPlayer.coinTossControlsOnServer = false;
+                                teamPlayer.kickOrReceiveControlsOnServer = true;
                             }
                             else
                             {
                                 teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
                                 teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                                teamPlayer.coinTossControlsOnServer = false;
+                                teamPlayer.kickOrReceiveControlsOnServer = false;
                             }
                         }
                     }
@@ -256,6 +274,8 @@ public class CoinTossManager : NetworkBehaviour
                         {
                             teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
                             teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                            teamPlayer.coinTossControlsOnServer = false;
+                            teamPlayer.kickOrReceiveControlsOnServer = false;
                         }
                     }
 
@@ -276,11 +296,15 @@ public class CoinTossManager : NetworkBehaviour
                     {
                         player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, false);
                         player.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                        player.coinTossControlsOnServer = false;
+                        player.kickOrReceiveControlsOnServer = false;
                     }
                     else
                     {
                         player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, true);
                         player.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
+                        player.coinTossControlsOnServer = false;
+                        player.kickOrReceiveControlsOnServer = true;
                     }
                 }
             }
@@ -296,11 +320,15 @@ public class CoinTossManager : NetworkBehaviour
                             {
                                 teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, true);
                                 teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
+                                teamPlayer.coinTossControlsOnServer = false;
+                                teamPlayer.kickOrReceiveControlsOnServer = true;
                             }
                             else
                             {
                                 teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
                                 teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                                teamPlayer.coinTossControlsOnServer = false;
+                                teamPlayer.kickOrReceiveControlsOnServer = false;
                             }
                         }
                     }
@@ -310,6 +338,8 @@ public class CoinTossManager : NetworkBehaviour
                         {
                             teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
                             teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
+                            teamPlayer.coinTossControlsOnServer = false;
+                            teamPlayer.kickOrReceiveControlsOnServer = false;
                         }
                     }
 
@@ -518,6 +548,118 @@ public class CoinTossManager : NetworkBehaviour
             EnterToSubmitText.text = "\"Enter\" to Submit";
             SelectReceiveText.text = "A to Select";
             SelectKickText.text = "D to Select";
+        }
+    }
+    public void HandleCointossTimerTimeLeft(int oldValue, int newValue)
+    {
+        if (isServer)
+            cointossTimerTimeLeft = newValue;
+        if (isClient)
+        {
+            timeoutTimerText.text = ":" + newValue.ToString();
+        }
+    }
+    IEnumerator TimeoutCoinTossRoutine()
+    {
+        isCoinTossTimerRunning = true;
+
+        this.HandleCointossTimerTimeLeft(this.cointossTimerTimeLeft, 30);
+        RpcActivateTheTimeoutTimer(true);
+        yield return new WaitForSeconds(1.0f);
+        int timeLeftTracker;
+        while (isCoinTossTimerRunning)
+        {
+            if (GameplayManager.instance.gamePhase != "cointoss")
+            {
+                isCoinTossTimerRunning = false;
+                break;
+            }
+            yield return new WaitForSeconds(1.0f);
+
+            timeLeftTracker = cointossTimerTimeLeft - 1;
+
+            HandleCointossTimerTimeLeft(this.cointossTimerTimeLeft, timeLeftTracker);
+            if (timeLeftTracker <= 0)
+            {
+                HandleCointossTimerTimeLeft(this.cointossTimerTimeLeft, 0);
+                isCoinTossTimerRunning = false;
+                // code to block kick automatically?
+                try
+                {
+                    if (!didPlayerSelectCoin)
+                    {
+                        foreach (GamePlayer player in Game.GamePlayers)
+                        {
+                            if (player.doesPlayerChooseCoin)
+                            {
+                                player.RpcForceSelectCoin(player.connectionToClient);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (GamePlayer player in Game.GamePlayers)
+                        {
+                            if (player.doesPlayerChooseKickOrReceive)
+                            {
+                                player.RpcForceSelectKickOrReceive(player.connectionToClient);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("TimeoutCoinTossRoutine: could not access the scoringGoblinNetId. Error: " + e);
+                }
+
+                //this.KickAfterAttemptWasBlocked();
+                RpcActivateTheTimeoutTimer(false);
+            }
+        }
+        RpcActivateTheTimeoutTimer(false);
+        yield break;
+    }
+    [ClientRpc]
+    void RpcActivateTheTimeoutTimer(bool activate)
+    {
+        TimeoutTimerHolder.SetActive(activate);
+    }
+    [ServerCallback]
+    public void StopTimeoutCointossRoutine()
+    {
+        if (GameplayManager.instance.isSinglePlayer)
+            return;
+        if (isCoinTossTimerRunning)
+            isCoinTossTimerRunning = false;
+        try
+        {
+            StopCoroutine(timeOutCoinToss);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("StopTimeoutKickOffRoutine: Could not stop coroutine. Error: " + e);
+        }
+
+        RpcActivateTheTimeoutTimer(false);
+    }
+    public void StartCoinTossTimeOutTimer()
+    {
+        if (!GameplayManager.instance.isSinglePlayer)
+        {
+            if (isCoinTossTimerRunning)
+            {
+                try
+                {
+                    isCoinTossTimerRunning = false;
+                    StopCoroutine(timeOutCoinToss);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("StartCoinTossTimeOutTimer: Could not access the coroutine. Error: " + e);
+                }
+            }
+            timeOutCoinToss = TimeoutCoinTossRoutine();
+            StartCoroutine(timeOutCoinToss);
         }
     }
 }

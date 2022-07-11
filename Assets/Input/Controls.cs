@@ -1284,6 +1284,44 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""EscMenu"",
+            ""id"": ""7aebb4f9-579a-49e7-be17-a6dde758d7b5"",
+            ""actions"": [
+                {
+                    ""name"": ""EscMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""b9b4d256-886b-4e95-bcc3-1df99573a111"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""9aab5453-42f8-4ce6-896e-f50e36497a71"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""EscMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a3ffaec2-8876-421d-ae16-0db597d9906d"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""GamePad"",
+                    ""action"": ""EscMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1367,6 +1405,9 @@ public class @Controls : IInputActionCollection, IDisposable
         m_UI_MiddleClick = m_UI.FindAction("MiddleClick", throwIfNotFound: true);
         m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
         m_UI_Submit = m_UI.FindAction("Submit", throwIfNotFound: true);
+        // EscMenu
+        m_EscMenu = asset.FindActionMap("EscMenu", throwIfNotFound: true);
+        m_EscMenu_EscMenu = m_EscMenu.FindAction("EscMenu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1901,6 +1942,39 @@ public class @Controls : IInputActionCollection, IDisposable
         }
     }
     public UIActions @UI => new UIActions(this);
+
+    // EscMenu
+    private readonly InputActionMap m_EscMenu;
+    private IEscMenuActions m_EscMenuActionsCallbackInterface;
+    private readonly InputAction m_EscMenu_EscMenu;
+    public struct EscMenuActions
+    {
+        private @Controls m_Wrapper;
+        public EscMenuActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @EscMenu => m_Wrapper.m_EscMenu_EscMenu;
+        public InputActionMap Get() { return m_Wrapper.m_EscMenu; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(EscMenuActions set) { return set.Get(); }
+        public void SetCallbacks(IEscMenuActions instance)
+        {
+            if (m_Wrapper.m_EscMenuActionsCallbackInterface != null)
+            {
+                @EscMenu.started -= m_Wrapper.m_EscMenuActionsCallbackInterface.OnEscMenu;
+                @EscMenu.performed -= m_Wrapper.m_EscMenuActionsCallbackInterface.OnEscMenu;
+                @EscMenu.canceled -= m_Wrapper.m_EscMenuActionsCallbackInterface.OnEscMenu;
+            }
+            m_Wrapper.m_EscMenuActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @EscMenu.started += instance.OnEscMenu;
+                @EscMenu.performed += instance.OnEscMenu;
+                @EscMenu.canceled += instance.OnEscMenu;
+            }
+        }
+    }
+    public EscMenuActions @EscMenu => new EscMenuActions(this);
     private int m_KeyboardandMouseSchemeIndex = -1;
     public InputControlScheme KeyboardandMouseScheme
     {
@@ -1978,5 +2052,9 @@ public class @Controls : IInputActionCollection, IDisposable
         void OnMiddleClick(InputAction.CallbackContext context);
         void OnRightClick(InputAction.CallbackContext context);
         void OnSubmit(InputAction.CallbackContext context);
+    }
+    public interface IEscMenuActions
+    {
+        void OnEscMenu(InputAction.CallbackContext context);
     }
 }

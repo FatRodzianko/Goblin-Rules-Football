@@ -2140,6 +2140,15 @@ public class GoblinScript : NetworkBehaviour
             }
         }
     }
+    [TargetRpc]
+    public void RpcKickOffTimeoutForceKick(NetworkConnection target)
+    {
+        if (hasAuthority)
+        {
+            //this.KickFootballGoblin(0.5f, 0f);
+            this.StopKickPower();
+        }
+    }
     public void KickFootballGoblin(float kickPower, float kickAngle)
     {
         if (hasAuthority && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
@@ -2154,7 +2163,14 @@ public class GoblinScript : NetworkBehaviour
         if (!isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing && kickPower <= 1f && kickPower >= 0f)
         {
             if (GameplayManager.instance.gamePhase == "kick-after-attempt")
+            {
                 powerValueSubmitted = kickPower;
+                GameplayManager.instance.StopTimeoutKickAfterRoutine();
+            }
+            if (GameplayManager.instance.gamePhase == "kickoff")
+            {
+                GameplayManager.instance.StopTimeoutKickOffRoutine();
+            }
             HandleIsKicking(this.isKicking, true);
             GoblinKickPower = kickPower;
             GoblinKickoffAngle = kickAngle;

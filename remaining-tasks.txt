@@ -905,24 +905,28 @@ x have the regular grass tiles be more random
 x Indicator for when you can't dive?
 - - x after a dive or slide goblins can't dive again. Maybe reuse the sweat drop to show the player when they can/can't dive?
 - Escape menu:
-- - - allow for player to press esc/start to bring up a menu
-- - - - - - quit game
+- - x allow for player to press esc/start to bring up a menu
+- - - - - x quit game
 - - - - - - settings menu (when that is created...)
-- - - ability for host to "pause" the game?
-- - - - - - stop game timer
-- - - - - - prevent everyone from moving
-- - - - - - pause menu tutorial? https://www.youtube.com/watch?v=JivuXdrIHK0
-- - - - - - pause without setting timescale to 0 https://www.youtube.com/watch?v=KPaEnLpu57s
-- - - - - - pause menu for multiplayer using PUN? https://www.youtube.com/watch?v=gaipT1NeyAM
-- - - - - - someone trying and failing to make a pause menu? https://forum.unity.com/threads/unity-mirror-simple-pause-menu-ui-not-working-in-multiplayer.1082147/
+- - x ability for host to "pause" the game?
+- - - - - x stop game timer
+- - - - - x prevent everyone from moving
+- - - - - x pause menu tutorial? https://www.youtube.com/watch?v=JivuXdrIHK0
+- - - - - x pause without setting timescale to 0 https://www.youtube.com/watch?v=KPaEnLpu57s
+- - - - - x pause menu for multiplayer using PUN? https://www.youtube.com/watch?v=gaipT1NeyAM
+- - - - - x someone trying and failing to make a pause menu? https://forum.unity.com/threads/unity-mirror-simple-pause-menu-ui-not-working-in-multiplayer.1082147/
+- - x Will need to "save" the current player's controls that are enable (QEswitching, goblin movement, kick off aiming, coin toss controlls, etc.)
+- - - - - x will also need to save changes to controls? If the esc menu is open during a gamephase change and the player's controls change, save those changes to be restored later?
+- - - - - x in the "Enable Controls" functions, such as EnableGameplayActions, have it call the EscMenuManager to save the new control update?
+- - - - - - or just have the game close the esc menu from the "Enable Controls" functions. If there are any controls changes, the EscMenu closes automatically without restoring old controls?
 - Add "timeouts" to things outside of the gameplay phases
-- - - kickoff
+- - x kickoff
 - - - - - - just kick straight ahead at half power after 30 seconds?
-- - - cointoss
+- - x cointoss
 - - - - - - select heads/kick automatically if no player input is received?
-- - - kick after
-- - - - - - if kick has not been made after 30 seconds, automaticly block the kick?
-- - - 30 second countdown or whatever to prevent the game from "hanging" because someone isn't playing?
+- - x kick after
+- - - - - x if kick has not been made after 30 seconds, automaticly block the kick?
+- - x 30 second countdown or whatever to prevent the game from "hanging" because someone isn't playing?
 - Migrate the host to another player if the host leaves?
 - - - not sure if that will be possible with mirror...
 - Update TitleScreen scene's UI so it isn't so bad?

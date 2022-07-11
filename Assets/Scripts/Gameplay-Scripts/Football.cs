@@ -502,11 +502,11 @@ public class Football : NetworkBehaviour
             if (!goblinToCheckScript.isGoblinKnockedOut && !goblinToCheckScript.isSliding && !goblinToCheckScript.isDiving && !goblinToCheckScript.isBlocking && !goblinToCheckScript.isPunching && !goblinToCheckScript.isKicking)
             {
                 float distanceToBall = Vector3.Distance(goblinToCheck.transform.position, this.transform.position);
-                if (GameplayManager.instance.gamePhase == "kickoff" && goblinToCheckScript.isGoblinGrey && goblinToCheckScript.name.Contains("grenadier"))
+                /*if (GameplayManager.instance.gamePhase == "kickoff" && goblinToCheckScript.isGoblinGrey && goblinToCheckScript.name.Contains("grenadier"))
                 {
                     Debug.Log("PlayerPickUpFootball: Grey team kicking football?");
                     distanceToBall = 0f;
-                }
+                }*/
                 if (GameplayManager.instance.gamePhase == "kickoff" && goblinToCheckScript.ownerConnectionId == GameplayManager.instance.kickingPlayer.ConnectionId && goblinToCheckScript.name.Contains("grenadier"))
                 {
                     Debug.Log("PlayerPickUpFootball: kicking team is kicking football?");
@@ -517,10 +517,10 @@ public class Football : NetworkBehaviour
                     Debug.Log("PlayerPickUpFootball: Need to return football to scoring goblin for kick after?");
                     distanceToBall = 0f;
                 }
-                Debug.Log("CmdPlayerPickUpFootball: distance to ball is: " + distanceToBall.ToString() + " from goblin with netid of " + goblinNetId.ToString());
+                Debug.Log("PlayerPickUpFootball: distance to ball is: " + distanceToBall.ToString() + " from goblin with netid of " + goblinNetId.ToString());
                 if (distanceToBall < 4.1f)
                 {
-                    Debug.Log("CmdPlayerPickUpFootball: Goblin is close enough to pick up the ball");
+                    Debug.Log("PlayerPickUpFootball: Goblin is close enough to pick up the ball");
                     //GoblinScript goblinToCheckScript = goblinToCheck.GetComponent<GoblinScript>();
 
                     goblinToCheckScript.HandleHasBall(goblinToCheckScript.doesCharacterHaveBall, true);

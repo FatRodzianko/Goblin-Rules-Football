@@ -22,15 +22,18 @@ public class PowerUpButtonScript : MonoBehaviour, IDeselectHandler, ISelectHandl
     }
     public void OnSelect(BaseEventData eventData)
     {
+        Debug.Log("PowerUpButtonScript OnSelect for power up: " + myIndexNumber.ToString());
         selectedObject.SetActive(true);
         myLocalPlayer.powerUpSelectedIndexNumber = myIndexNumber;
     }
     public void OnDeselect(BaseEventData data)
     {
+        Debug.Log("PowerUpButtonScript OnDeselect for power up: " + myIndexNumber.ToString());
         selectedObject.SetActive(false);
     }
     public void OnSubmit(BaseEventData eventData)
     {
+        Debug.Log("PowerUpButtonScript OnSubmit for power up: " + myIndexNumber.ToString());
         myLocalPlayer.UsePowerUp(myIndexNumber);
     }
 

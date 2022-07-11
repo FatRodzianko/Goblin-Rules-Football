@@ -1271,6 +1271,44 @@
                     "isPartOfComposite": true
                 }
             ]
+        },
+        {
+            "name": "EscMenu",
+            "id": "7aebb4f9-579a-49e7-be17-a6dde758d7b5",
+            "actions": [
+                {
+                    "name": "EscMenu",
+                    "type": "Button",
+                    "id": "b9b4d256-886b-4e95-bcc3-1df99573a111",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "9aab5453-42f8-4ce6-896e-f50e36497a71",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "EscMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a3ffaec2-8876-421d-ae16-0db597d9906d",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "GamePad",
+                    "action": "EscMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

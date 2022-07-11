@@ -20,6 +20,7 @@ public class GamePlayer : NetworkBehaviour
     [SerializeField] InputActionReference moveReference;
     [SerializeField] InputActionReference submitReference;
     [SerializeField] InputActionAsset defaultInputActions;
+    public bool isGamePaused = false;
 
     [Header("1v1 or 3v3 stuff")]
     [SyncVar] public bool is1v1 = false;
@@ -91,6 +92,18 @@ public class GamePlayer : NetworkBehaviour
     public bool kickAfterKickingEnabled = false;
     public bool powerUpsEnabled = false;
     public bool menuNavigationEnabled = false;
+    
+    [Header("Controls From Server")]
+    [SyncVar] public bool coinTossControlsOnServer = false;
+    [SyncVar] public bool kickOrReceiveControlsOnServer = false;
+    [SyncVar] public bool qeSwitchingControlsOnServer = false;
+    [SyncVar] public bool kickingControlsOnServer = false;
+    [SyncVar] public bool kickOffAimArrowControlsOnServer = false;
+    [SyncVar] public bool goblinMovementControlsOnServer = false;
+    [SyncVar] public bool gameplayActionControlsOnServer = false;
+    [SyncVar] public bool kickAfterPositioningControlsOnServer = false;
+    [SyncVar] public bool kickAfterKickingControlsOnServer = false;
+    [SyncVar] public bool powerupsControlsOnServer = false;
 
     [Header("Possession Tracker")]
     [SyncVar(hook = nameof(HandlePossessionPoints))] public float possessionPoints = 0f;
@@ -1116,6 +1129,15 @@ public class GamePlayer : NetworkBehaviour
         {
             if (enableOrDisable)
             {
+                try
+                {
+                    if (EscMenuManager.instance.isEscMenuOpen)
+                        return;
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("Could not access EscMenuManager instance. Error: " + e);
+                }
                 if (!goblinMovementEnabled)
                 {
                     foreach (GoblinScript goblin in goblinTeam)
@@ -1134,6 +1156,16 @@ public class GamePlayer : NetworkBehaviour
                 goblinMovementEnabled = false;
             }
         }
+    }
+    public void EnableGoblinMovementControlsServerValues(bool activate)
+    {
+        if (hasAuthority)
+            CmdEnableGoblinMovementControlsServerValues(activate);
+    }
+    [Command]
+    void CmdEnableGoblinMovementControlsServerValues(bool activate)
+    {
+        this.goblinMovementControlsOnServer = activate;
     }
     [Command]
     void CmdDoesPlayerChooseCoin()
@@ -1170,7 +1202,15 @@ public class GamePlayer : NetworkBehaviour
     public void HandleDoesPlayerChooseCoin(bool oldValue, bool newValue)
     {
         if (isServer)
+        {
             doesPlayerChooseCoin = newValue;
+            coinTossControlsOnServer = newValue;
+            /*if (newValue)
+            {
+                CoinTossManager.instance.StartCoinTossTimeOutTimer();
+            }*/
+            CoinTossManager.instance.StartCoinTossTimeOutTimer();
+        }   
         if (isClient)
         {
             if (hasAuthority)
@@ -1193,6 +1233,15 @@ public class GamePlayer : NetworkBehaviour
     {
         if (activate)
         {
+            try
+            {
+                if (EscMenuManager.instance.isEscMenuOpen)
+                    return;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Could not access EscMenuManager instance. Error: " + e);
+            }
             if (doesPlayerChooseCoin)
             {
                 if (!coinTossControllsEnabled)
@@ -1214,8 +1263,18 @@ public class GamePlayer : NetworkBehaviour
     }
     public void KickOrReceiveControls(bool activate)
     {
+        Debug.Log("KickOrReceiveControls: " + activate.ToString());
         if (activate)
         {
+            try
+            {
+                if (EscMenuManager.instance.isEscMenuOpen)
+                    return;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Could not access EscMenuManager instance. Error: " + e);
+            }
             Debug.Log("KickOrReceiveControls: doesPlayerChooseKickOrReceive " + doesPlayerChooseKickOrReceive.ToString());
             if (doesPlayerChooseKickOrReceive)
             {
@@ -1236,6 +1295,16 @@ public class GamePlayer : NetworkBehaviour
             InputManager.Controls.CoinTossKickReceive.Disable();
             kickOrReceiveControlsEnabled = false;
         }
+    }
+    public void DisableKickOrReceiveControls()
+    {
+        if (hasAuthority)
+            CmdDisableKickOrReceiveControls();
+    }
+    [Command]
+    void CmdDisableKickOrReceiveControls()
+    {
+        this.kickOrReceiveControlsOnServer = false;
     }
     void SelectCoin(string headsOrTails)
     {
@@ -1277,12 +1346,30 @@ public class GamePlayer : NetworkBehaviour
         //didPlayerChooseCoinYet = true;
         if (!didPlayerChooseCoinYet)
         {
-            CoinTossManager.instance.playerSelectedCoin = headsOrTailsPlayer;
+            if (!String.IsNullOrWhiteSpace(headsOrTailsPlayer))
+                CoinTossManager.instance.playerSelectedCoin = headsOrTailsPlayer;
+            else
+                CoinTossManager.instance.playerSelectedCoin = "heads";
             CoinTossManager.instance.ServerPlayerSelectedTheirCoin();
             CoinTossManager.instance.FlipCoin();
             HandleDidPlayerChooseCoinYet(didPlayerChooseCoinYet, true);
+            CoinTossManager.instance.StopTimeoutCointossRoutine();
         }
         
+    }
+    [TargetRpc]
+    public void RpcForceSelectCoin(NetworkConnection target)
+    {
+        if (GameplayManager.instance.isSinglePlayer)
+            return;
+        if (hasAuthority)
+        {
+            if (String.IsNullOrWhiteSpace(headsOrTailsPlayer))
+            {
+                CmdSelectCoin("heads");
+            }
+            CmdSubmitCoinSelection();
+        }
     }
     void HandleDidPlayerChooseCoinYet(bool oldValue, bool newValue)
     {
@@ -1296,7 +1383,13 @@ public class GamePlayer : NetworkBehaviour
     public void HandleDoesPlayerChooseKickOrReceive(bool oldValue, bool newValue)
     {
         if (isServer)
+        {
             doesPlayerChooseKickOrReceive = newValue;
+            if (newValue)
+            {
+                CoinTossManager.instance.StartCoinTossTimeOutTimer();
+            }
+        }   
         if (isClient)
         {
             if (hasAuthority)
@@ -1346,9 +1439,27 @@ public class GamePlayer : NetworkBehaviour
         //didPlayerChooseCoinYet = true;
         if (!didPlayerChooseKickOrReceiveYet)
         {
-            CoinTossManager.instance.playerKickOrReceive = kickOrReceivePlayer;
+            if (!String.IsNullOrWhiteSpace(kickOrReceivePlayer))
+                CoinTossManager.instance.playerKickOrReceive = kickOrReceivePlayer;
+            else
+                CoinTossManager.instance.playerKickOrReceive = "kick";
             CoinTossManager.instance.ServerPlayerSelectedKickOrReceive();
             HandleDidPlayerChooseKickOrReceiveYet(didPlayerChooseKickOrReceiveYet, true);
+            CoinTossManager.instance.StopTimeoutCointossRoutine();
+        }
+    }
+    [TargetRpc]
+    public void RpcForceSelectKickOrReceive(NetworkConnection target)
+    {
+        if (GameplayManager.instance.isSinglePlayer)
+            return;
+        if (hasAuthority)
+        {
+            if (String.IsNullOrWhiteSpace(kickOrReceivePlayer))
+            {
+                CmdSelectKickOrReceive("receive");
+            }
+            CmdSubmitKickOrReceiveSelection();
         }
     }
     [ClientRpc]
@@ -1638,6 +1749,15 @@ public class GamePlayer : NetworkBehaviour
         Debug.Log("EnableQESwitchingControls: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
+            try
+            {
+                if (EscMenuManager.instance.isEscMenuOpen)
+                    return;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Could not access EscMenuManager instance. Error: " + e);
+            }
             if (!qeSwitchingEnabled)
             {
                 Debug.Log("EnableQESwitchingControls: enabling the controls.");
@@ -1664,6 +1784,15 @@ public class GamePlayer : NetworkBehaviour
         Debug.Log("EnableKickingControls: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
+            try
+            {
+                if (EscMenuManager.instance.isEscMenuOpen)
+                    return;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Could not access EscMenuManager instance. Error: " + e);
+            }
             if (!kickingControlsEnabled)
             {
                 InputManager.Controls.Player.KickFootball.Enable();
@@ -1683,6 +1812,15 @@ public class GamePlayer : NetworkBehaviour
         Debug.Log("EnableKickoffAimArrowControls: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
+            try
+            {
+                if (EscMenuManager.instance.isEscMenuOpen)
+                    return;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Could not access EscMenuManager instance. Error: " + e);
+            }
             if (!kickoffAimArrowControlsEnabled)
             {
                 //InputManager.Controls.Player.KickFootball.Enable();
@@ -1737,11 +1875,20 @@ public class GamePlayer : NetworkBehaviour
             EnableMenuNavigationControls(activate);
         }
     }
-    void EnableGameplayActions(bool activate)
+    public void EnableGameplayActions(bool activate)
     {
         Debug.Log("EnableGameplayActions: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
+            try
+            {
+                if (EscMenuManager.instance.isEscMenuOpen)
+                    return;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Could not access EscMenuManager instance. Error: " + e);
+            }
             if (!gameplayActionsEnabled)
             {
                 Debug.Log("EnableGameplayActions: controls enabled for player " + this.PlayerName);
@@ -1883,6 +2030,7 @@ public class GamePlayer : NetworkBehaviour
                 return;
             }
             EnableKickAfterPositioning(isKickingPlayer);
+            CmdKickAfterPositioningControlsOnServerValues(isKickingPlayer);
             GameplayManager.instance.ActivateKickAfterPositionControlsPanel(isKickingPlayer);
             areGoblinsRepositionedForKickAfter = true;
         }
@@ -1962,15 +2110,29 @@ public class GamePlayer : NetworkBehaviour
             }
 
             EnableKickAfterPositioning(isKickingPlayer);
+            CmdKickAfterPositioningControlsOnServerValues(isKickingPlayer);
             GameplayManager.instance.ActivateKickAfterPositionControlsPanel(isKickingPlayer);
             areGoblinsRepositionedForKickAfter = true;
         }
+    }
+    void CmdKickAfterPositioningControlsOnServerValues(bool activate)
+    {
+        this.kickAfterPositioningControlsOnServer = activate;
     }
     public void EnableKickAfterPositioning(bool activate)
     {
         Debug.Log("EnableKickAfterPositioning: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
+            try
+            {
+                if (EscMenuManager.instance.isEscMenuOpen)
+                    return;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Could not access EscMenuManager instance. Error: " + e);
+            }
             if (!kickAfterPositioningEnabled)
             {
                 InputManager.Controls.KickAfterPositioning.Enable();
@@ -1993,8 +2155,12 @@ public class GamePlayer : NetworkBehaviour
     [TargetRpc]
     public void RpcDisableKickAfterPositioningControls(NetworkConnection target)
     {
-        if(hasAuthority)
+        if (hasAuthority)
+        {
             EnableKickAfterPositioning(false);
+            this.CmdKickAfterPositioningControlsOnServerValues(false);
+        }
+            
     }
     void KickAfterPositioningMove(bool moveLeft)
     {
@@ -2030,9 +2196,14 @@ public class GamePlayer : NetworkBehaviour
         {
             Debug.Log("RpcActivateKickAfterKickingControls: for player: " + this.PlayerName + " " + activate.ToString());
             EnableKickAfterKicking(activate);
+            CmdKickAfterKickingControlsOnServerValues(activate);
             if (activate)
                 selectGoblin.StartKickAfterKickAttempt();
         }
+    }
+    void CmdKickAfterKickingControlsOnServerValues(bool activate)
+    {
+        this.kickAfterKickingControlsOnServer = activate;
     }
     [TargetRpc]
     public void RpcActivateKickAfterBlockingControls(NetworkConnection target, bool activate)
@@ -2043,13 +2214,30 @@ public class GamePlayer : NetworkBehaviour
             EnableGoblinMovement(activate);
             EnableGameplayActions(activate);
             EnableQESwitchingControls(activate);
+            CmdEnableGameplayControlsForServerValues(activate);
         }
+    }
+    [Command]
+    void CmdEnableGameplayControlsForServerValues(bool activate)
+    {
+        this.goblinMovementControlsOnServer = activate;
+        this.gameplayActionControlsOnServer = activate;
+        this.qeSwitchingControlsOnServer = activate;
     }
     public void EnableKickAfterKicking(bool activate)
     {
         Debug.Log("EnableKickAfterKicking: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
+            try
+            {
+                if (EscMenuManager.instance.isEscMenuOpen)
+                    return;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Could not access EscMenuManager instance. Error: " + e);
+            }
             if (!kickAfterKickingEnabled)
             {
                 InputManager.Controls.KickAfterKicking.Enable();
@@ -2118,8 +2306,27 @@ public class GamePlayer : NetworkBehaviour
         Debug.Log("EnablePowerUpControls: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
+            try
+            {
+                if (EscMenuManager.instance.isEscMenuOpen)
+                    return;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Could not access EscMenuManager instance. Error: " + e);
+            }
+            
             if (!powerUpsEnabled)
             {
+                var uiModule = (InputSystemUIInputModule)EventSystem.current.currentInputModule;
+                //uiModule.move = moveReference;
+                //uiModule.submit = submitReference;
+                uiModule.move = InputActionReference.Create(InputManager.Controls.SelectPowerUps.SelectLeftOrRightComposite);
+                uiModule.submit = InputActionReference.Create(InputManager.Controls.SelectPowerUps.SubmitSelection);
+                uiModule.enabled = true;
+                var eventSystem = EventSystem.current;
+                eventSystem.enabled = true;
+
                 InputManager.Controls.PowerUps.Enable();
                 InputManager.Controls.SelectPowerUps.Enable();
                 powerUpsEnabled = true;
@@ -2597,5 +2804,53 @@ public class GamePlayer : NetworkBehaviour
             }
             PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
         }   
+    }
+    [ClientCallback]
+    public void PauseGamePlayer()
+    {
+        if (hasAuthority && this.isLocalPlayer)
+            CmdPauseGamePlayer();
+    }
+    [Command]
+    void CmdPauseGamePlayer()
+    {
+        GameplayManager.instance.PauseGameOnServer(this, this.GetComponent<NetworkIdentity>().netId);
+    }
+    [ClientCallback]
+    public void ResumeGamePlayer()
+    {
+        if (hasAuthority && this.isLocalPlayer)
+            CmdResumeGamePlayer();
+    }
+    [Command]
+    void CmdResumeGamePlayer()
+    {
+        GameplayManager.instance.ResumeGameOnServer(this, this.GetComponent<NetworkIdentity>().netId);
+    }
+    [TargetRpc]
+    public void RpcGamePausedByServer(NetworkConnection target, bool wasPaused)
+    {
+        Debug.Log("RpcGamePausedByServer: for player: " + this.PlayerName + ":" + this.ConnectionId.ToString() + ". Will pause game? " + wasPaused.ToString());
+        if (hasAuthority && this.isLocalPlayer)
+        {
+            if (wasPaused)
+                Time.timeScale = 0f;
+            else
+                Time.timeScale = 1.0f;
+            this.isGamePaused = wasPaused;
+            GameplayManager.instance.ActivateGamePausedText(wasPaused);
+            if (!GameplayManager.instance.isSinglePlayer)
+            {
+                try
+                {
+                    EscMenuManager.instance.UpdatePauseGameButtonText(wasPaused);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("RpcGamePausedByServer: could not access the EscMenuManager. Error: " + e);
+                }
+            }
+            
+        }
     }
 }
