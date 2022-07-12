@@ -127,6 +127,8 @@ public class GameplayManager : NetworkBehaviour
     [SyncVar] public float lastPauseTimeStamp;
     bool isGamePausedTimeoutRoutineRunning = false;
     IEnumerator GamePausedTimeout;
+    public float greenPauseTimeStamp = -30f;
+    public float greyPauseTimeStamp = -30f;
 
     [Header("Timeouts: UI Stuff")]
     [SerializeField] GameObject TimeoutTimerHolder;
@@ -142,6 +144,12 @@ public class GameplayManager : NetworkBehaviour
     public bool isKickOffTimerCountDownRunning = false;
     IEnumerator timeoutKickOff;
     [SyncVar(hook = nameof(HandleKickOffTimerTimeLeft))] int kickOffTimerTimeLeft = 30;
+
+    [Header("Error Messages Display")]
+    [SerializeField] GameObject errorCanvas;
+    [SerializeField] TextMeshProUGUI errorCanvasText;
+    public bool isErrorMessageDisplayed;
+    IEnumerator displayErrorMessageFromServer;
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -1520,6 +1528,43 @@ public class GameplayManager : NetworkBehaviour
         if (this.isGamePaused)
             return;
         Debug.Log("PauseGameOnServer: Player with a netid of: " + pausingPlayerNetId.ToString() + " wants to PAUSE the game.");
+
+        // prevent pause spamming by making it so a team can only pause once every 30 seconds of game time. Ignore for singleplayer.
+        if (!this.isSinglePlayer)
+        {
+            bool canPlayerPause = false;
+            if (pausingPlayer.isTeamGrey)
+            {
+                if (Time.time > greyPauseTimeStamp + 30f)
+                {
+                    canPlayerPause = true;
+                    greyPauseTimeStamp = Time.time;
+                }
+                else
+                {
+                    Debug.Log("PauseGameOnServer: GREY Player/team has tried to pause too recently after they already paused. Current time: " + Time.time.ToString() + " and last pause time: " + greyPauseTimeStamp.ToString());
+                }
+            }
+            else
+            {
+                if (Time.time > greenPauseTimeStamp + 30f)
+                {
+                    canPlayerPause = true;
+                    greenPauseTimeStamp = Time.time;
+                }
+                else
+                {
+                    Debug.Log("PauseGameOnServer: GREEN Player/team has tried to pause too recently after they already paused. Current time: " + Time.time.ToString() + " and last pause time: " + greenPauseTimeStamp.ToString());
+                }
+            }
+            if (!canPlayerPause)
+            {
+                //SendErrorMessageToTeam(pausingPlayer.isTeamGrey, "Team must wait 30 seconds of game time to pause again.");
+                pausingPlayer.RpcErrorMessageToDisplayFromServer(pausingPlayer.connectionToClient, "Your team must wait 30 seconds of game time to pause again.");
+                return;
+            }
+        }
+
         playerWhoPaused = pausingPlayer;
         playerWhoPausedNetId = pausingPlayerNetId;
         PauseGameForAllPlayers(true);
@@ -1548,8 +1593,13 @@ public class GameplayManager : NetworkBehaviour
             {
                 StopCoroutine(GamePausedTimeout);
                 isGamePausedTimeoutRoutineRunning = false;
-            } 
+            }
             //Time.timeScale = 1.0f;
+        }
+        else
+        {
+            if (!this.isSinglePlayer)
+                pausingPlayer.RpcErrorMessageToDisplayFromServer(pausingPlayer.connectionToClient, "Only the player who paused the game can resume the game.");
         }
     }
     public void HandleIsGamePaused(bool oldValue, bool newValue)
@@ -1740,5 +1790,54 @@ public class GameplayManager : NetworkBehaviour
         }
 
         RpcActivateTheTimeoutTimer(false);
+    }
+    [ServerCallback]
+    void SendErrorMessageToTeam(bool isTeamGrey, string message)
+    {
+        if (isTeamGrey)
+        {
+            foreach (GamePlayer player in TeamManager.instance.greyTeam.teamPlayers)
+            {
+                player.RpcErrorMessageToDisplayFromServer(player.connectionToClient, message);
+            }
+        }
+        else
+        {
+            foreach (GamePlayer player in TeamManager.instance.greenTeam.teamPlayers)
+            {
+                player.RpcErrorMessageToDisplayFromServer(player.connectionToClient, message);
+            }
+        }
+    }
+    [ClientCallback]
+    public void DisplayErrorMessage(string message)
+    {
+        if (isErrorMessageDisplayed)
+        {
+            try
+            {
+                StopCoroutine(displayErrorMessageFromServer);
+                errorCanvas.SetActive(false);
+                errorCanvasText.text = "";
+            }
+            catch (Exception e)
+            {
+                Debug.Log("DisplayErrorMessage: could not stop coroutine and/or access the messageCanvas. Error: " + e);
+            }
+        }
+        displayErrorMessageFromServer = DisplayErrorMessageFromServer(message);
+        StartCoroutine(displayErrorMessageFromServer);
+    }
+    [ClientCallback]
+    IEnumerator DisplayErrorMessageFromServer(string message)
+    {
+        Debug.Log("DisplayErrorMessageFromServer");
+        errorCanvasText.text = message;
+        errorCanvas.SetActive(true);
+        isErrorMessageDisplayed = true;
+        yield return new WaitForSecondsRealtime(5f);
+        errorCanvas.SetActive(false);
+        errorCanvasText.text = "";
+        isErrorMessageDisplayed = false;
     }
 }

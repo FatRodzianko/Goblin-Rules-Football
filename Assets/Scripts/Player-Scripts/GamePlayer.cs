@@ -8,6 +8,7 @@ using Cinemachine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class GamePlayer : NetworkBehaviour
 {
@@ -116,6 +117,10 @@ public class GamePlayer : NetworkBehaviour
     public bool didNoPossessionCooldownRoutineComplete = false;
     IEnumerator NoPossessionCooldownRoutine;
     [SyncVar(hook = nameof(HandlePossessionBonus))] public float possessionBonus = 1.0f;
+
+    [Header("Error Message Stuff")]
+    public bool isErrorMessageDisplayed = false;
+    IEnumerator displayErrorMessageFromServer;
 
     [Header("AIPlayer Stuff")]
     public AIPlayer myAiPlayer;
@@ -2853,4 +2858,13 @@ public class GamePlayer : NetworkBehaviour
             
         }
     }
+    [TargetRpc]
+    public void RpcErrorMessageToDisplayFromServer(NetworkConnection target, string message)
+    {
+        if (hasAuthority && this.isLocalPlayer)
+        {
+            GameplayManager.instance.DisplayErrorMessage(message);
+        }
+    }
+    
 }

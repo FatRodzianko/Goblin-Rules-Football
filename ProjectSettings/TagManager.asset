@@ -25,6 +25,8 @@ TagManager:
   - cowboy
   - mainMenuButton
   - footballShadow
+  - errorCanvas
+  - errorCanvasText
   layers:
   - Default
   - TransparentFX

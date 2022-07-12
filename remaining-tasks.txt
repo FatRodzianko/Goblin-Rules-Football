@@ -919,6 +919,7 @@ x Indicator for when you can't dive?
 - - - - - x will also need to save changes to controls? If the esc menu is open during a gamephase change and the player's controls change, save those changes to be restored later?
 - - - - - x in the "Enable Controls" functions, such as EnableGameplayActions, have it call the EscMenuManager to save the new control update?
 - - - - - - or just have the game close the esc menu from the "Enable Controls" functions. If there are any controls changes, the EscMenu closes automatically without restoring old controls?
+- - x make it so a team can only pause the game every 30seconds or whatever
 - Add "timeouts" to things outside of the gameplay phases
 - - x kickoff
 - - - - - - just kick straight ahead at half power after 30 seconds?
@@ -931,5 +932,8 @@ x Indicator for when you can't dive?
 - - - not sure if that will be possible with mirror...
 - Update TitleScreen scene's UI so it isn't so bad?
 - - - look more like the Stalks UI? at least that's something more presentable
+
+### Trailer timestamps?
+- 2 - 0:53 - juke for touchdown?
 
 
