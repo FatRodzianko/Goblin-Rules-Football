@@ -17,6 +17,12 @@ public class GameplayManager : NetworkBehaviour
     [Header("Game Info")]
     [SyncVar] public bool is1v1 = false;
     [SyncVar] public bool isSinglePlayer = false;
+    [SyncVar] public int secondsPerHalf;
+    [SyncVar] public bool powerUpsEnabled;
+    [SyncVar] public bool randomEventsEnabled;
+    [SyncVar] public bool spawnObstaclesEnabled;
+    [SyncVar] public bool mercyRuleEnabled;
+    [SyncVar] public int mercyRulePointDifferential;
 
     [Header("Local GamePlayers")]
     [SerializeField] private GameObject LocalGamePlayer;
@@ -121,6 +127,7 @@ public class GameplayManager : NetworkBehaviour
 
     [Header("Pause/Resume Game")]
     [SerializeField] GameObject GamePausedTextObject;
+    [SerializeField] TextMeshProUGUI GamePausedSecondsLeftText;
     [SyncVar (hook = nameof(HandleIsGamePaused))] public bool isGamePaused = false;
     public GamePlayer playerWhoPaused;
     [SyncVar] public uint playerWhoPausedNetId;
@@ -195,12 +202,19 @@ public class GameplayManager : NetworkBehaviour
         base.OnStartServer();
         this.is1v1 = Game.is1v1;
         this.isSinglePlayer = Game.isSinglePlayer;
+        this.secondsPerHalf = Game.secondsPerHalf;
+        this.powerUpsEnabled = Game.powerUpsEnabled;
+        this.randomEventsEnabled = Game.randomEventsEnabled;
+        this.spawnObstaclesEnabled = Game.spawnObstaclesEnabled;
+        this.mercyRuleEnabled = Game.mercyRuleEnabled;
+        this.mercyRulePointDifferential = Game.mercyRulePointDifferential;
+
         Debug.Log("GameplayManager: is 1v1 is set to: " + this.is1v1);
         //gamePhase = "cointoss";
         HandleGamePhase(gamePhase, "cointoss");
         //timeLeftInGame = 300f;
         //timeLeftInGame = 30f;
-        HandleGameTimerUpdate(0f, lengthOfHalves);
+        HandleGameTimerUpdate(0f, secondsPerHalf);
         greenScore = 0;
         greyScore = 0;
     }
@@ -521,6 +535,16 @@ public class GameplayManager : NetworkBehaviour
                 return;
             }            
         }
+        // If mercy rule is enabled, check if the new score is greater than mercy rule differential
+        if (this.mercyRuleEnabled)
+        {
+            if (CheckForMercyRule())
+            {
+                HandleGamePhase(this.gamePhase, "gameover");
+                return;
+            }
+        }
+
         RpcTouchDownScored(wasGrey, goblinNetId);
         IEnumerator touchdownToKickAfterTransition = GameplayToKickAfterTransition();
         StartCoroutine(touchdownToKickAfterTransition);
@@ -629,7 +653,10 @@ public class GameplayManager : NetworkBehaviour
     void HandleGreenScoreUpdate(int oldValue, int newValue)
     {
         if (isServer)
+        {
             greenScore = newValue;
+            //CheckForMercyRule();
+        }   
         if (isClient)
         {
             ScoreGreenText.text = newValue.ToString("00");
@@ -639,7 +666,10 @@ public class GameplayManager : NetworkBehaviour
     void HandleGreyScoreUpdate(int oldValue, int newValue)
     {
         if (isServer)
+        {
             greyScore = newValue;
+            //CheckForMercyRule();
+        }   
         if (isClient)
         {
             ScoreGreyText.text = newValue.ToString("00");
@@ -1049,7 +1079,11 @@ public class GameplayManager : NetworkBehaviour
         kickAfterRoutineRunning = true;
         yield return new WaitForSeconds(3.0f);        
         RpcDisableKickAfterWasKickGoodOrBadUI();
-        if (isXtraTime && firstHalfCompleted)
+        if (this.mercyRuleEnabled && CheckForMercyRule())
+        {
+            HandleGamePhase(this.gamePhase, "gameover");
+        }
+        else if (isXtraTime && firstHalfCompleted)
         {
             GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
         }
@@ -1357,7 +1391,7 @@ public class GameplayManager : NetworkBehaviour
         this.firstHalfCompleted = true;
         ResetAllGoblinStatuses();
         this.HandleGamePhase(this.gamePhase, "kickoff");
-        this.HandleGameTimerUpdate(this.timeLeftInGame, lengthOfHalves);
+        this.HandleGameTimerUpdate(this.timeLeftInGame, secondsPerHalf);
     }
     [ClientRpc]
     void RpcHalfTimeTransition(bool enable, string kickingTeam)
@@ -1632,12 +1666,32 @@ public class GameplayManager : NetworkBehaviour
     public void ActivateGamePausedText(bool activate)
     {
         GamePausedTextObject.SetActive(activate);
+        if (!this.isSinglePlayer)
+        {
+            if (activate)
+            {
+                GamePausedSecondsLeftText.text = "Resuming in 90 seconds...";
+            }
+            GamePausedSecondsLeftText.gameObject.SetActive(activate);
+        }
+        else
+        {
+            GamePausedSecondsLeftText.gameObject.SetActive(false);
+        }
     }
     [Server]
     IEnumerator PauseGameTimeoutRoutine()
     {
         isGamePausedTimeoutRoutineRunning = true;
-        yield return new WaitForSecondsRealtime(60f);
+        //yield return new WaitForSecondsRealtime(90f);
+        int secondsRemainingForPause = 90;
+        RpcUpdateGamePausedSecondsLeftText(secondsRemainingForPause);
+        while (secondsRemainingForPause > 0)
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            secondsRemainingForPause--;
+            RpcUpdateGamePausedSecondsLeftText(secondsRemainingForPause);
+        }
         if (this.isGamePaused)
         {
             Debug.Log("PauseGameTimeoutRoutine: Reached paused game timeout");
@@ -1646,6 +1700,15 @@ public class GameplayManager : NetworkBehaviour
             PauseGameForAllPlayers(false);
             this.HandleIsGamePaused(this.isGamePaused, false);
             isGamePausedTimeoutRoutineRunning = false;
+        }
+        yield break;
+    }
+    [ClientRpc]
+    public void RpcUpdateGamePausedSecondsLeftText(int secondsLeft)
+    {
+        if (!this.isSinglePlayer)
+        {
+            GamePausedSecondsLeftText.text = "Resuming in " + secondsLeft.ToString() + " seconds...";
         }
     }
     IEnumerator TimeoutKickAfterRoutine()
@@ -1839,5 +1902,29 @@ public class GameplayManager : NetworkBehaviour
         errorCanvas.SetActive(false);
         errorCanvasText.text = "";
         isErrorMessageDisplayed = false;
+    }
+    [ServerCallback]
+    bool CheckForMercyRule()
+    {
+        bool beMerciful = false;
+        
+        if (!this.mercyRuleEnabled)
+            return beMerciful;
+
+        if (this.mercyRulePointDifferential < 21)
+            return beMerciful;
+
+        int pointDiff = Mathf.Abs(greenScore - greyScore);
+        if (pointDiff >= mercyRulePointDifferential)
+        {
+            //this.HandleGamePhase(this.gamePhase, "gameover");
+            Debug.Log("CheckForMercyRule: Point differential is: " + pointDiff.ToString() + " ending game due to mercy rule...");
+            this.SendErrorMessageToTeam(true, "Game ended due to mercy rule.");
+            this.SendErrorMessageToTeam(false, "Game ended due to mercy rule.");
+            beMerciful = true;
+        }
+        else
+            beMerciful = false;
+        return beMerciful;
     }
 }

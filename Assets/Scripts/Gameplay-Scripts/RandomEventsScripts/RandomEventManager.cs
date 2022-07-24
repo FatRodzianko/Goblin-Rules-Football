@@ -69,6 +69,9 @@ public class RandomEventManager : NetworkBehaviour
     public void StartGeneratingRandomEvents(bool generate)
     {
         Debug.Log("StartGeneratingRandomEvents: " + generate.ToString());
+        if (!GameplayManager.instance.randomEventsEnabled)
+            return;
+
         if ((GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time") && generate && !isRandomEventGeneratorRunning)
         {
             Debug.Log("StartGeneratingRandomEvents: starting GenerateRandomEventsRoutine");

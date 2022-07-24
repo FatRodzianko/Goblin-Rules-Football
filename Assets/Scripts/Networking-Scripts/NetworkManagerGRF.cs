@@ -25,6 +25,13 @@ public class NetworkManagerGRF : NetworkManager
     [Header("Game Info")]
     public bool is1v1 = false;
     public bool isSinglePlayer = false;
+    public string lobbyName;
+    public int secondsPerHalf;
+    public bool powerUpsEnabled;
+    public bool randomEventsEnabled;
+    public bool spawnObstaclesEnabled;
+    public bool mercyRuleEnabled;
+    public int mercyRulePointDifferential;
 
     [Header("Pause/Resume Game")]
     public bool isGamePaused = false;
@@ -196,6 +203,7 @@ public class NetworkManagerGRF : NetworkManager
     {
         LobbyPlayers.Clear();
         GamePlayers.Clear();
+        //Debug.Log("Game Over: OnStopServer");
     }
     public void HostShutDownServer()
     {
@@ -204,7 +212,7 @@ public class NetworkManagerGRF : NetworkManager
         Destroy(NetworkManagerObject);
         Shutdown();
         SceneManager.LoadScene("TitleScreen");
-
+        //Debug.Log("Game Over: HostShutDownServer");
         Start();
 
     }

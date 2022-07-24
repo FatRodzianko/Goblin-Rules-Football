@@ -113,6 +113,10 @@ public class PowerUpManager : NetworkBehaviour
     public void StartGeneratingPowerUps(bool generate)
     {
         Debug.Log("StartGeneratingPowerUps: " + generate.ToString());
+
+        if (!GameplayManager.instance.powerUpsEnabled)
+            return;
+
         if (GameplayManager.instance.gamePhase == "gameplay" && generate && !isPowerUpGeneratorRunning)
         {
             Debug.Log("StartGeneratingPowerUps: starting GeneratePowerUpsRoutine");

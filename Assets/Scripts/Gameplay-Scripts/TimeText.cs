@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class TimeText : MonoBehaviour
 {
@@ -30,9 +31,18 @@ public class TimeText : MonoBehaviour
     }
     public void EndXtraTime()
     {
-        StopCoroutine(xtraTimeRoutine);
-        isXtraTimeRoutineRunning = false;
-        timeText.text = "GAME\nOVER";
+        try
+        {
+            StopCoroutine(xtraTimeRoutine);
+            isXtraTimeRoutineRunning = false;
+            timeText.text = "GAME\nOVER";
+        }
+        catch (Exception e)
+        {
+            Debug.Log("EndXtraTime: Could not stop coroutine. Error: " + e);
+        }
+        
+        
     }
     IEnumerator XtraTimeRoutine()
     {

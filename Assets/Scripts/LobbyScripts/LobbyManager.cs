@@ -638,7 +638,15 @@ public class LobbyManager : MonoBehaviour
     }
     public void PlayerQuitLobby()
     {
-        localLobbyPlayerScript.UnselectGoblin();
+        try
+        {
+            localLobbyPlayerScript.UnselectGoblin();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("PlayerQuitLobby: failed to run localLobbyPlayerScript.UnselectGoblin(). Error: " + e);
+        }
+        
         localLobbyPlayerScript.QuitLobby();
     }
     void InitializeSinglePlayerImages()

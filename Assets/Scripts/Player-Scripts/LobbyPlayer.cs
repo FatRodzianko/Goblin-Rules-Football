@@ -549,8 +549,16 @@ public class LobbyPlayer : NetworkBehaviour
     {
         if (hasAuthority)
         {
-            LobbyManager.instance.DestroyPlayerListItems();
-            //SteamMatchmaking.LeaveLobby((CSteamID)LobbyManager.instance.currentLobbyId);
+            try
+            {
+                LobbyManager.instance.DestroyPlayerListItems();
+                //SteamMatchmaking.LeaveLobby((CSteamID)LobbyManager.instance.currentLobbyId);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("LobbyPlayer.cs OnDestroy: Could not access LobbyManager.instance.DestroyPlayerListItems(). Error: " + e);
+            }
+            
         }
         if (isServer)
         { 

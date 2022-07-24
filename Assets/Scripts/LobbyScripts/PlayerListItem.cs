@@ -116,12 +116,28 @@ public class PlayerListItem : MonoBehaviour
     public void SetGoblinSelectedText(string selectedGoblinText)
     {
         Debug.Log("SetGoblinSelectedText: for playerlistitem for player: " + this.PlayerName + " set the goblin text to: " + selectedGoblinText);
-        goblinSelected.text = selectedGoblinText;
+        try
+        {
+            goblinSelected.text = selectedGoblinText;
+        }
+        catch (Exception e)
+        {
+            Debug.Log("SetGoblinSelectedText: Error: " + e);
+        }
+        
     }
     public void ActivateGoblinSelectedText(bool enable)
     {
         Debug.Log("ActivateGoblinSelectedText: for player: " + this.PlayerName + " enable goblin selected text? " + enable.ToString());
-        goblinSelected.gameObject.SetActive(enable);
+        try
+        {
+            goblinSelected.gameObject.SetActive(enable);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("ActivateGoblinSelectedText: Error: " + e);
+        }
+        
     }
     public void UpdateGoblinsAvailable(List<string> goblinsAvailable)
     {

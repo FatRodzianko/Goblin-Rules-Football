@@ -53,6 +53,8 @@ public class ObstacleManager : NetworkBehaviour
     public void GenerateObstacles()
     {
         Debug.Log("GenerateObstacles executed on server");
+        if (!GameplayManager.instance.spawnObstaclesEnabled)
+            return;
         var rng = new System.Random();
         //int numberToSpawn = rng.Next(4, 8);
         int numberToSpawn = rng.Next(7, 15);

@@ -2765,6 +2765,8 @@ public class GamePlayer : NetworkBehaviour
                 Game.StopClient();
                 //Game.HostShutDownServer();
             }
+            /*if (Time.timeScale != 1f)
+                Time.timeScale = 1f;*/
         }
     }
     public void EnableMenuNavigationControls(bool activate)
@@ -2841,7 +2843,14 @@ public class GamePlayer : NetworkBehaviour
             if (wasPaused)
                 Time.timeScale = 0f;
             else
+            {
                 Time.timeScale = 1.0f;
+                if (!this.isSinglePlayer)
+                {
+                    SoundManager.instance.PlaySound("ref-whistle", 1.0f);
+                }
+            }
+                
             this.isGamePaused = wasPaused;
             GameplayManager.instance.ActivateGamePausedText(wasPaused);
             if (!GameplayManager.instance.isSinglePlayer)
