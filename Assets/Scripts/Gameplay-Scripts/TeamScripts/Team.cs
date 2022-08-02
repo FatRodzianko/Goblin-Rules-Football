@@ -11,7 +11,8 @@ public class Team : NetworkBehaviour
     public GamePlayer captain;
     public List<GoblinScript> goblins = new List<GoblinScript>();
     public SyncList<uint> goblinNetIds = new SyncList<uint>();
-    
+    public SyncList<uint> teammateNetIds = new SyncList<uint>();
+
 
     [Header("Team Stats")]
     [SyncVar] public int punchesThrown; //
@@ -61,6 +62,7 @@ public class Team : NetworkBehaviour
         if (player != null && !teamPlayers.Contains(player))
         {
             teamPlayers.Add(player);
+            teammateNetIds.Add(player.GetComponent<NetworkIdentity>().netId);
         }
     }
     [ServerCallback]

@@ -962,8 +962,14 @@ x mercy rule? max point differential
 
 ### Things to add/update before release?
 - Fix running animations so 2 feet aren't on the ground
-- - - regular running
-
+- - x regular running
+- - x running with ball
+- - x running punch
+- - x running block
+- - x running block with ball
+- x x grenadier
+- x x berserker
+- - x skirmisher
 - Make it so the defense powerup prevents slide tackle trips?
 - - - goblins take damage still, but aren't tripped
 - will need to remember to "flip" the diving hurtbox when the goblin changes direction?
@@ -973,3 +979,24 @@ x mercy rule? max point differential
 - - - when the goblin picks up the ball, change the shadow to:
 - - - - - - your goblin: white and less transparent
 - - - - - - opposing goblin: yellow and less transparent
+- - x maybe make it so all goblins have a regular shadow that doesn't change, and then have a circle under their feet that is activated only when they pick up the ball?
+- - x make the shadow's "order in layer" be 0? The "has ball circle" 1?
+- - x remove the shadows from every sprite sheet for every goblin...
+- - - - - x make the new shadows slightly bigger for all goblins and also make them better centered?
+- - - - - x right now the shadows all seem to be shifted to the right, at least for the skirmisher/berserkers
+- - - - - - - - x may need to just "flip" them like the hitboxes...
+- - - - - - - - - or just undo everything and have the shadows drawn on the sprites... would just need to add them back to the running sprites...
+- - x To have the circle render behind its goblin but in front of others:
+- - - - - x make the sprite bigger/taller and have the pivot point be just below where the goblins would be?
+- - - - - - - - x Take the goblin sprite, place the circle where you want it on the goblin's feet, delete the goblin, export/save
+- - - - - - - - x in unity's sprite editor, set the pivot point up "high" on the circle, but make it so the pivot would be one pixel below the goblin's center?
+- - - - - - - - x then set the circle's "sprite sort point" from center to pivot?
+- - - - - - - - x none of the above works because the sprite needs to be "below" on the y-axis to render in front. Can't accomplish this so the sprite is "below" a goblin in front of me but also being "above" my own goblin while my own goblin is rendered behind the goblin in front of me
+- have a sprint indicator?
+- - x try to get the particle effect thing to work again?
+- - x have the particle trigger when the rear foot is extended back and front foot raised
+- - - - - x particles would be moving back when front foot hits ground and rear foot is up in new running anims
+- - - - - x changed it so the particle is played when rear foot is lifted. Looks better?
+- - - anime speed lines instead (or in combination with) the smoke effect?
+- - - - - - https://www.youtube.com/watch?v=UWjpkhShB28
+- Settings menu in game

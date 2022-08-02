@@ -64,6 +64,7 @@ public class GoblinScript : NetworkBehaviour
     public bool canGoblinMove = true;
     public bool isGoblinPunching = false;
     [SyncVar(hook = nameof(HandleIsPunching))] public bool isPunching = false;
+    bool hasGoblinGottenBallBefore = false;
     
     
     [SerializeField] private GameObject eMarkerPrefab;
@@ -87,6 +88,9 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] private StatusBarScript myStatusBars;
     [SerializeField] private GameObject touchdownHitbox;
     [SerializeField] private GameObject divingHitbox;
+    [SerializeField] private SpriteRenderer myShadow;
+    [SerializeField] private SpriteRenderer mySelectedCircle;
+    [SerializeField] private ParticleSystem sprintParticleSystem;
 
 
     [Header("Character Game State Stuff")]
@@ -402,6 +406,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 ballMarkerObject = Instantiate(ballMarkerPrefab);
                 youMarkerObject = Instantiate(youMarkerPrefab);
+                mySelectedCircle.color = Color.white;
             }
             else
             {
@@ -409,17 +414,20 @@ public class GoblinScript : NetworkBehaviour
                 {
                     ballMarkerObject = Instantiate(ballMarkerPrefab);
                     youMarkerObject = Instantiate(youMarkerPrefab);
+                    mySelectedCircle.color = Color.white;
                 }
                 else
                 {
                     youMarkerObject = new GameObject("empty-you-marker");
                     ballMarkerObject = Instantiate(ballMarkerOpponentPrefab);
+                    mySelectedCircle.color = Color.yellow;
                 }
             }
         }
         else
         {
             ballMarkerObject = Instantiate(ballMarkerOpponentPrefab);
+            mySelectedCircle.color = Color.yellow;
         }
             
 
@@ -934,16 +942,16 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    MoveTowrdBallCarrier();
+                    //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    GetOpenForPass();
+                    //GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    MoveTowardGoblinTarget();
+                    //MoveTowardGoblinTarget();
                     break;
             }
         }
@@ -963,19 +971,19 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    MoveTowrdBallCarrier();
+                    //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    GetOpenForPass();
+                    //GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    MoveTowardGoblinTarget();
+                    //MoveTowardGoblinTarget();
                     break;
                 case State.RunTowardEndzone:
-                    myGamePlayer.myAiPlayer.RunTowardEndZone();
+                    //myGamePlayer.myAiPlayer.RunTowardEndZone();
                     break;
             }
 
@@ -1008,6 +1016,11 @@ public class GoblinScript : NetworkBehaviour
 
         if (myRenderer.flipX != flip)
             myRenderer.flipX = flip;
+        if (myShadow.flipX != flip)
+            myShadow.flipX = flip;
+        if (mySelectedCircle.flipX != flip)
+            mySelectedCircle.flipX = flip;
+
         //Flip colliders for hurt/hitboxes so they match the flipped sprite
         Vector3 newLocalScale = punchBoxCollider.transform.localScale;
         newLocalScale.x = newScaleX;
@@ -1038,6 +1051,15 @@ public class GoblinScript : NetworkBehaviour
         /*Vector3 newPosition = fatigueSweatDrop.transform.localPosition;
         newPosition.x *= -1;
         fatigueSweatDrop.transform.localPosition = newPosition;*/
+
+        try
+        {
+            sprintParticleSystem.transform.localScale = new Vector3(newScaleX, 1f, 1f);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("PlaySprintDust: Could not play particle effect. Error: " + e);
+        }
 
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -1126,7 +1148,45 @@ public class GoblinScript : NetworkBehaviour
                         }
                     }
                 }
-                
+                if (!hasGoblinGottenBallBefore)
+                {
+                    if (GameplayManager.instance.is1v1 || GameplayManager.instance.isSinglePlayer)
+                        hasGoblinGottenBallBefore = true;
+                    else if (hasAuthority)
+                        hasGoblinGottenBallBefore = true;
+                    else
+                    {
+                        // If you're here, it is a 3v3 game and this is a goblin not controlled by the local player. Check if this goblin is on the same team as the local player. If yes, set ball marker stuff to white. If not, markers should already be yellow
+                        // remove this if it's too confusing?
+                        try
+                        {
+                            GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
+                            if (localPlayer.isTeamGrey == this.isGoblinGrey)
+                            {
+                                Debug.Log("HandleHasBall: hasGoblinGottenBallBefore is false and goblin is on same team as local player. Goblin: " + this.name + ":" + this.ownerConnectionId.ToString() + " local player number: " + localPlayer.playerNumber.ToString());
+                                if (ballMarkerObject)
+                                {
+                                    GameObject oldMarker = ballMarkerObject;
+                                    Destroy(oldMarker);
+                                    ballMarkerObject = null;
+                                }
+                                ballMarkerObject = Instantiate(ballMarkerPrefab);
+                                ballMarkerObject.transform.SetParent(this.transform);
+                                Vector3 markerPosition = myStatusBars.transform.localPosition;
+                                markerPosition.y += 0.75f;
+                                ballMarkerObject.transform.localPosition = markerPosition;
+                                ballMarkerObject.SetActive(false);
+                                mySelectedCircle.color = Color.white;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.Log("HandleHasBall: failed to get if goblin is on same team as local player for 3v3 game. Error: " + e);
+                        }
+                        hasGoblinGottenBallBefore = true;
+                    }
+                }
+
             }
             else
             {
@@ -1142,7 +1202,9 @@ public class GoblinScript : NetworkBehaviour
                 if (isQGoblinLocally3v3)
                     SetQGoblinLocally3v3(!newValue);
             }
+            
             ballMarkerObject.SetActive(newValue);
+            mySelectedCircle.gameObject.SetActive(newValue);
         }
     }
     [Command]
@@ -3490,6 +3552,18 @@ public class GoblinScript : NetworkBehaviour
         string footstepType = GetFootstepSFXType(firstFootStep);
 
         SoundManager.instance.PlaySound(footstepType, volume);
+
+        try
+        {
+            if (this.isSprintingOnServer && !this.isFatigued)
+                sprintParticleSystem.Play();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("PlaySprintDust: Could not play particle effect. Error: " + e);
+        }
+
+
     }
     public string GetFootstepSFXType(bool step1)
     {
@@ -3865,3 +3939,4 @@ public class GoblinScript : NetworkBehaviour
         }
     }
 }
+
