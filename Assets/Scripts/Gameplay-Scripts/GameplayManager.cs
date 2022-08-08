@@ -1561,6 +1561,8 @@ public class GameplayManager : NetworkBehaviour
     {
         if (this.isGamePaused)
             return;
+        if (this.gamePhase == "gameover")
+            return;
         Debug.Log("PauseGameOnServer: Player with a netid of: " + pausingPlayerNetId.ToString() + " wants to PAUSE the game.");
 
         // prevent pause spamming by making it so a team can only pause once every 30 seconds of game time. Ignore for singleplayer.

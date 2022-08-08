@@ -27,6 +27,7 @@ TagManager:
   - footballShadow
   - errorCanvas
   - errorCanvasText
+  - SettingsManager
   layers:
   - Default
   - TransparentFX

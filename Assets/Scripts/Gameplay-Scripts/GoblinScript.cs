@@ -3938,5 +3938,6 @@ public class GoblinScript : NetworkBehaviour
             this.FatigueIndicators(newValue);
         }
     }
+    
 }
 

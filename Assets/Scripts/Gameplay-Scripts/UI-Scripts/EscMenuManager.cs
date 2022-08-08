@@ -17,6 +17,7 @@ public class EscMenuManager : MonoBehaviour
     [SerializeField] private GameObject EscMenuPanelButtonHolder;
     [SerializeField] private EscMenuAnimationScript escMenuAnimationScript;
     [SerializeField] private Button PauseGameButton;
+    [SerializeField] private GameObject backToGameButton;
 
     [Header("Escape Menu Options")]
     public bool isEscMenuOpen = false;
@@ -25,6 +26,8 @@ public class EscMenuManager : MonoBehaviour
     [Header("Other UI Stuff?")]
     [SerializeField] private GameObject CoinTossCanvas;
     [SerializeField] private GameObject PowerUpSelectionObject;
+    [SerializeField] private GameObject settingsMenuPanel;
+
 
     [Header("Player Controls to Restore")]
     bool coinToss = false;
@@ -210,5 +213,16 @@ public class EscMenuManager : MonoBehaviour
             PauseGameButton.GetComponentInChildren<TextMeshProUGUI>().text = "Resume Game";
         else
             PauseGameButton.GetComponentInChildren<TextMeshProUGUI>().text = "Pause Game";
+    }
+    public void OpenSettingsMenu()
+    {   
+        settingsMenuPanel.GetComponent<ImageAnimation>().UnScrollHalfTime();
+    }
+    public void BackToEscMenu()
+    {
+        settingsMenuPanel.GetComponent<ImageAnimation>().ReRollScroll();
+        var eventSystem = EventSystem.current;
+        eventSystem.SetSelectedGameObject(backToGameButton, new BaseEventData(eventSystem));
+        eventSystem.firstSelectedGameObject = backToGameButton;
     }
 }

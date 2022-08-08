@@ -16,6 +16,7 @@ public class ImageAnimation : MonoBehaviour
 	public bool reroll = false;
 	public bool halfTime = false;
 	public bool endOfGame = false;
+	public float lastFrameTime = 0f;
 
 	public int index = 0;
 	[SerializeField] private Image image;
@@ -28,14 +29,64 @@ public class ImageAnimation : MonoBehaviour
 	[SerializeField] GameObject HalfTimeObjects;
 	[SerializeField] GameObject ParentPanel;
 	[SerializeField] GameObject TeamWinnerText;
+	[SerializeField] GameObject FirstButton;
 	bool activateWinningText = false;
+	[SerializeField] bool activateFirstButton = false;
 
 	void Awake()
 	{
 		image = GetComponent<Image>();
 	}
+    private void Update()
+    {
+		if (Time.unscaledTime < (lastFrameTime + 0.02f))
+			return;
+		else
+			lastFrameTime = Time.unscaledTime;
 
-	void FixedUpdate()
+		if (!loop && index == sprites.Length) return;
+		if (unroll)
+		{
+			frame++;
+			if (frame < spritePerFrameUnroll) return;
+			image.sprite = sprites[index];
+
+			frame = 0;
+			index++;
+			if (index >= sprites.Length)
+			{
+				if (loop) index = 0;
+				if (destroyOnEnd) Destroy(gameObject);
+				ActivateTextEndOfGame(halfTime);
+				unroll = false;
+			}
+		}
+		else if (reroll)
+		{
+			frame++;
+			if (frame < spritePerFrameReroll) return;
+			frame = 0;
+			index--;
+			try
+			{
+				image.sprite = sprites[index];
+			}
+			catch (Exception e)
+			{
+				Debug.Log("ImageAnimation: " + e);
+			}
+
+			if (index <= 0)
+			{
+				if (loop) index = 0;
+				if (destroyOnEnd) Destroy(gameObject);
+				reroll = false;
+				this.gameObject.SetActive(false);
+				ParentPanel.SetActive(false);
+			}
+		}
+	}
+    /*void FixedUpdate()
 	{
 		if (!loop && index == sprites.Length) return;
 		if (unroll)
@@ -79,8 +130,8 @@ public class ImageAnimation : MonoBehaviour
 			}
 		}
 		
-	}
-	public void UnScrollHalfTime()
+	}*/
+    public void UnScrollHalfTime()
 	{	
 		if (!unroll)
 		{
@@ -140,6 +191,13 @@ public class ImageAnimation : MonoBehaviour
 			TextObjects.SetActive(true);
 			//foreach (GameObject gameObject in HalfTimeTextObjects)
 			//gameObject.SetActive(true);
+			var eventSystem = EventSystem.current;
+			if (activateFirstButton)
+			{
+				eventSystem.SetSelectedGameObject(FirstButton, new BaseEventData(eventSystem));
+				eventSystem.firstSelectedGameObject = FirstButton;
+				Debug.Log("ActivateTextEndOfGame: The current selected object in the eventsystem is: " + eventSystem.currentSelectedGameObject.name.ToString());
+			}
 		}
 		else
 		{
@@ -154,7 +212,6 @@ public class ImageAnimation : MonoBehaviour
 			eventSystem.SetSelectedGameObject(mainMenuButton, new BaseEventData(eventSystem));
 			eventSystem.firstSelectedGameObject = mainMenuButton;
 			Debug.Log("ActivateTextEndOfGame: The current selected object in the eventsystem is: " + eventSystem.currentSelectedGameObject.name.ToString());
-
 		}
 	}
 	void DeActivateTextEndOfGame(bool halfTime)

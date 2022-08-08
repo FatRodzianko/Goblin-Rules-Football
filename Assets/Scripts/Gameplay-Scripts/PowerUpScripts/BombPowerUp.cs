@@ -38,7 +38,7 @@ public class BombPowerUp : NetworkBehaviour
     {
         isCountdownRunning = true;
         RpcStartTimerSound();
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.6f);
         myAnimator.SetBool("explode", true);
     }
     [ServerCallback]
@@ -53,7 +53,9 @@ public class BombPowerUp : NetworkBehaviour
                 if (hitCollider.tag == "Goblin")
                 {
                     Debug.Log("ExplosionKnockOutGoblins: Will knock out goblin: " + hitCollider.gameObject.name);
-                    hitCollider.GetComponent<GoblinScript>().KnockOutGoblin(true);
+                    GoblinScript hitGoblin = hitCollider.GetComponent<GoblinScript>();
+                    if(!hitGoblin.isDiving)
+                        hitGoblin.KnockOutGoblin(true);
                 }
             }
         }

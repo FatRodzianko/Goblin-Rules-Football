@@ -970,15 +970,16 @@ x mercy rule? max point differential
 - x x grenadier
 - x x berserker
 - - x skirmisher
-- Make it so the defense powerup prevents slide tackle trips?
-- - - goblins take damage still, but aren't tripped
+x Make it so the defense powerup prevents slide tackle trips?
+- - x goblins take damage still, but aren't tripped
 - will need to remember to "flip" the diving hurtbox when the goblin changes direction?
 - - - This is already done to other colliders in the RpcFlipRenderer function. Just add the diving hurtbox to that?
 - - - this may have already been done?
-- make it so shadows are now a object on each goblin that's just a circle/oval that is normally grey and transparent
-- - - when the goblin picks up the ball, change the shadow to:
-- - - - - - your goblin: white and less transparent
-- - - - - - opposing goblin: yellow and less transparent
+x make it so shadows are now a object on each goblin that's just a circle/oval that is normally grey and transparent
+- - x when the goblin picks up the ball, change the shadow to:
+- - - - - x your goblin: white and less transparent
+- - - - - x opposing goblin: yellow and less transparent
+- - - - - - - x did a different thing instead for the above two. New oval shaped indicator for who has ball. Kill myself.
 - - x maybe make it so all goblins have a regular shadow that doesn't change, and then have a circle under their feet that is activated only when they pick up the ball?
 - - x make the shadow's "order in layer" be 0? The "has ball circle" 1?
 - - x remove the shadows from every sprite sheet for every goblin...
@@ -992,11 +993,54 @@ x mercy rule? max point differential
 - - - - - - - - x in unity's sprite editor, set the pivot point up "high" on the circle, but make it so the pivot would be one pixel below the goblin's center?
 - - - - - - - - x then set the circle's "sprite sort point" from center to pivot?
 - - - - - - - - x none of the above works because the sprite needs to be "below" on the y-axis to render in front. Can't accomplish this so the sprite is "below" a goblin in front of me but also being "above" my own goblin while my own goblin is rendered behind the goblin in front of me
-- have a sprint indicator?
+x have a sprint indicator?
 - - x try to get the particle effect thing to work again?
 - - x have the particle trigger when the rear foot is extended back and front foot raised
 - - - - - x particles would be moving back when front foot hits ground and rear foot is up in new running anims
 - - - - - x changed it so the particle is played when rear foot is lifted. Looks better?
-- - - anime speed lines instead (or in combination with) the smoke effect?
-- - - - - - https://www.youtube.com/watch?v=UWjpkhShB28
-- Settings menu in game
+- - x anime speed lines instead (or in combination with) the smoke effect?
+- - - - - x https://www.youtube.com/watch?v=UWjpkhShB28
+- - - - - x stupid bullshit don't ever do
+x Settings menu in game
+x potential issue to trouble shoot/test:
+- - x can players open esc menu during halftime or end of game?
+- - x can players pause during halftime/end of game?
+- - x this is fine as far as I can tell? Players can open the escape menu and pause, but the game seems to resume normally?
+- - x when a player pauses during halftime/end of game, the "resuming in XX seconds..." message is hidden by the score/end of game/stats menu
+- - - - - x lowered the "resuming in" text so it is below the half-time scroll
+- - - - - x made it so you can't pause during gameover by adding a "if gameover, return" statement in PauseGameOnServer
+x Issue: Multiplayer lobby broken at resolution of 1600x900?
+- - x only tested on single player right now. The UI doesn't scale for some reason and looks huge?
+- - x swaped out the "CanvasScaler" script for "CanvasScalerTitleScreen" on the Lobby UI canvas
+- Issue: Goblin cowboy randomly started walking "too high" and above the stands. Not sure what caused it. Happened in a singleplayer game when I was pausing a bunch?
+x diving "dodges" a bomb?
+x create initial trailer
+x crop out the "gifs.com" watermark from all gifs on the store page...
+- - x open gif in gimp, resize canvas, export as new gif
+- - - - - x resize to 560 width?
+- - - - - x make sure to check "as animation" in the "Export Image as GIF" options
+- - x slide tackle
+- - x touchdown
+- - x kick downfield
+- - x powerups
+- - x dodge rowdy crowd
+- menu/UI navigation with the escape menu and the PowerUps is still all messed up?
+- - x issue is that the buttons in the escape menu have an "automatic" navigation set
+- - - - - x so, if you go up from "back to game" you will select the powerup UI icons
+- - x have explicit navigation for the top/bottom buttons
+- - - - - x make the rest "vertical" navigation only
+- - x make checks on the "Back to Game" and "Settings" buttons to check if the game is single player or not (no pause button in single player)
+- - - - - x if single player, replace back to game's "Select on Down" from the pausegamebutton to the settings button?
+- make sure that menu/UI navigation works when switching between esc menu and the settings menu?
+- - x when the settings menu is loaded, no buttons are "selected" and you can't navigate with arrow keys or the gamepad
+- - x make it so the OpenSettingsMenu and BackToEscMenu functions of the EscMenManager script set the selected buttons explicitly?
+- - - - - x unsure if this will work for the settings menu since the button won't be activated until after the "unscroll" animation?
+- For the settings menu, instead of querying the system for available resolutions, explicitly state the follow resolutions:
+- - - 1280x720
+- - - 1600x900
+- - - 1920x1080
+- - - 2560x1440
+- - - - - - make sure that the system's monitor/whatever supports the higher resolutions? Try to get a min/max supported resolution?
+- Add "show Gamepad UI controls" or whatever it's called to the titlescreen settings and in-game settings
+- Make sure that the title screen UI is navigable by the game pad?
+- - - yikes
