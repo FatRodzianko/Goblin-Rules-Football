@@ -229,4 +229,14 @@ public class ImageAnimation : MonoBehaviour
 				gameObject.SetActive(false);*/
 		}
 	}
+	public void ResetMenu()
+	{
+		index = 0;
+		DeActivateTextEndOfGame(halfTime);
+		unroll = false;
+		reroll = false;
+		image.sprite = sprites[0];
+		this.gameObject.SetActive(false);
+		ParentPanel.SetActive(false);
+	}
 }

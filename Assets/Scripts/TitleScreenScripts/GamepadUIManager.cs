@@ -17,6 +17,8 @@ public class GamepadUIManager : MonoBehaviour
         Debug.Log("GamepadUIManager MakeInstance.");
         if (instance == null)
             instance = this;
+        else
+            Destroy(gameObject);
     }
     // Update is called once per frame
     void Update()

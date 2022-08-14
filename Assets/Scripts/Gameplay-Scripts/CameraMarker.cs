@@ -28,6 +28,8 @@ public class CameraMarker : MonoBehaviour
     [SerializeField] Sprite qMarkerRightCanPass;
     [SerializeField] Sprite qMarkerRightCannotPass;
 
+    [Header("Game Pad Sprites")]
+
     [SerializeField] Sprite rbMarkerLeftCanPass;
     [SerializeField] Sprite rbMarkerLeftCannotPass;
     [SerializeField] Sprite rbMarkerRightCanPass;
@@ -37,6 +39,16 @@ public class CameraMarker : MonoBehaviour
     [SerializeField] Sprite lbMarkerLeftCannotPass;
     [SerializeField] Sprite lbMarkerRightCanPass;
     [SerializeField] Sprite lbMarkerRightCannotPass;
+
+    [Header("Keyboard Sprites")]
+    [SerializeField] Sprite eMarkerLeftCanPassSprite;
+    [SerializeField] Sprite eMarkerLeftCannotPassSprite;
+    [SerializeField] Sprite eMarkerRightCanPassSprite;
+    [SerializeField] Sprite eMarkerRightCannotPassSprite;
+    [SerializeField] Sprite qMarkerLeftCanPassSprite;
+    [SerializeField] Sprite qMarkerLeftCannotPassSprite;
+    [SerializeField] Sprite qMarkerRightCanPassSprite;
+    [SerializeField] Sprite qMarkerRightCannotPassSprite;
 
 
     Vector3 newPosition = Vector3.zero;
@@ -54,7 +66,10 @@ public class CameraMarker : MonoBehaviour
         qMarkerLeft.SetActive(false);
         qMarkerRight.SetActive(false);
 
-        if (GamepadUIManager.instance.gamepadUI)
+
+        SetGamepadUIStuff(GamepadUIManager.instance.gamepadUI);
+
+        /*if (GamepadUIManager.instance.gamepadUI)
         {
             eMarkerLeftCanPass = rbMarkerLeftCanPass;
             eMarkerLeftCannotPass = rbMarkerLeftCannotPass;
@@ -66,7 +81,7 @@ public class CameraMarker : MonoBehaviour
             qMarkerRightCanPass = lbMarkerRightCanPass;
             qMarkerRightCannotPass = lbMarkerRightCannotPass;
 
-        }
+        }*/
     }
 
     // Update is called once per frame
@@ -77,8 +92,6 @@ public class CameraMarker : MonoBehaviour
 
     public void ActivateGoblinMarker(bool isLeft, bool isQ, float yValue, bool canPass)
     {
-        
-
         if (isLeft)
         {
             if (isQ)
@@ -185,5 +198,32 @@ public class CameraMarker : MonoBehaviour
     {
         ballMarkerLeft.SetActive(false);
         ballMarkerRight.SetActive(false);
+    }
+    public void SetGamepadUIStuff(bool enableGamepadUI)
+    {
+        if (enableGamepadUI)
+        {
+            eMarkerLeftCanPass = rbMarkerLeftCanPass;
+            eMarkerLeftCannotPass = rbMarkerLeftCannotPass;
+            eMarkerRightCanPass = rbMarkerRightCanPass;
+            eMarkerRightCannotPass = rbMarkerRightCannotPass;
+
+            qMarkerLeftCanPass = lbMarkerLeftCanPass;
+            qMarkerLeftCannotPass = lbMarkerLeftCannotPass;
+            qMarkerRightCanPass = lbMarkerRightCanPass;
+            qMarkerRightCannotPass = lbMarkerRightCannotPass;
+        }
+        else
+        {
+            eMarkerLeftCanPass = eMarkerLeftCanPassSprite;
+            eMarkerLeftCannotPass = eMarkerLeftCannotPassSprite;
+            eMarkerRightCanPass = eMarkerRightCanPassSprite;
+            eMarkerRightCannotPass = eMarkerRightCannotPassSprite;
+
+            qMarkerLeftCanPass = qMarkerLeftCanPassSprite;
+            qMarkerLeftCannotPass = qMarkerLeftCannotPassSprite;
+            qMarkerRightCanPass = qMarkerRightCanPassSprite;
+            qMarkerRightCannotPass = qMarkerRightCannotPassSprite;
+        }
     }
 }

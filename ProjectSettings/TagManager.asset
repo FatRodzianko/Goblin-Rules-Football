@@ -28,6 +28,7 @@ TagManager:
   - errorCanvas
   - errorCanvasText
   - SettingsManager
+  - QuitButtonTitleScreen
   layers:
   - Default
   - TransparentFX

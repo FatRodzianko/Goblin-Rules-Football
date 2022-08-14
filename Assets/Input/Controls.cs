@@ -1322,6 +1322,110 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""TitleScreenUINavigation"",
+            ""id"": ""46cabeae-f191-41cd-aef4-73fb266ae107"",
+            ""actions"": [
+                {
+                    ""name"": ""UINav"",
+                    ""type"": ""Button"",
+                    ""id"": ""6d648d77-780c-49e0-9b6f-7fd941999d8c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""7f6ef67e-86c5-4427-a1ae-e803f46db9c4"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""UINav"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""afb525cf-966e-459e-882b-a4e7b1a70494"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""UINav"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a7bb6846-4f31-4b96-9346-014ab19becbb"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""UINav"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f774ff73-ce2a-4b90-90a3-4c8dffb1f4bd"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""UINav"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f2ba4ac5-6581-4c4c-91ed-04e204974079"",
+                    ""path"": ""<Gamepad>/dpad/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""GamePad"",
+                    ""action"": ""UINav"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e0a46e5c-efac-4935-8bb0-48d5438c9708"",
+                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""GamePad"",
+                    ""action"": ""UINav"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""65c14f9c-4262-4ebb-9b9c-71c2d716090d"",
+                    ""path"": ""<Gamepad>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""GamePad"",
+                    ""action"": ""UINav"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""be641c12-5b38-44a4-bd04-26e0c341947f"",
+                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""GamePad"",
+                    ""action"": ""UINav"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1408,6 +1512,9 @@ public class @Controls : IInputActionCollection, IDisposable
         // EscMenu
         m_EscMenu = asset.FindActionMap("EscMenu", throwIfNotFound: true);
         m_EscMenu_EscMenu = m_EscMenu.FindAction("EscMenu", throwIfNotFound: true);
+        // TitleScreenUINavigation
+        m_TitleScreenUINavigation = asset.FindActionMap("TitleScreenUINavigation", throwIfNotFound: true);
+        m_TitleScreenUINavigation_UINav = m_TitleScreenUINavigation.FindAction("UINav", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1975,6 +2082,39 @@ public class @Controls : IInputActionCollection, IDisposable
         }
     }
     public EscMenuActions @EscMenu => new EscMenuActions(this);
+
+    // TitleScreenUINavigation
+    private readonly InputActionMap m_TitleScreenUINavigation;
+    private ITitleScreenUINavigationActions m_TitleScreenUINavigationActionsCallbackInterface;
+    private readonly InputAction m_TitleScreenUINavigation_UINav;
+    public struct TitleScreenUINavigationActions
+    {
+        private @Controls m_Wrapper;
+        public TitleScreenUINavigationActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @UINav => m_Wrapper.m_TitleScreenUINavigation_UINav;
+        public InputActionMap Get() { return m_Wrapper.m_TitleScreenUINavigation; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(TitleScreenUINavigationActions set) { return set.Get(); }
+        public void SetCallbacks(ITitleScreenUINavigationActions instance)
+        {
+            if (m_Wrapper.m_TitleScreenUINavigationActionsCallbackInterface != null)
+            {
+                @UINav.started -= m_Wrapper.m_TitleScreenUINavigationActionsCallbackInterface.OnUINav;
+                @UINav.performed -= m_Wrapper.m_TitleScreenUINavigationActionsCallbackInterface.OnUINav;
+                @UINav.canceled -= m_Wrapper.m_TitleScreenUINavigationActionsCallbackInterface.OnUINav;
+            }
+            m_Wrapper.m_TitleScreenUINavigationActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @UINav.started += instance.OnUINav;
+                @UINav.performed += instance.OnUINav;
+                @UINav.canceled += instance.OnUINav;
+            }
+        }
+    }
+    public TitleScreenUINavigationActions @TitleScreenUINavigation => new TitleScreenUINavigationActions(this);
     private int m_KeyboardandMouseSchemeIndex = -1;
     public InputControlScheme KeyboardandMouseScheme
     {
@@ -2056,5 +2196,9 @@ public class @Controls : IInputActionCollection, IDisposable
     public interface IEscMenuActions
     {
         void OnEscMenu(InputAction.CallbackContext context);
+    }
+    public interface ITitleScreenUINavigationActions
+    {
+        void OnUINav(InputAction.CallbackContext context);
     }
 }

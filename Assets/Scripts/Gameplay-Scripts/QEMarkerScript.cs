@@ -93,4 +93,19 @@ public class QEMarkerScript : MonoBehaviour
     {
         myCameraMarker.DeactivateGoblinMarker(isQ);
     }
+    public void UpdateForGamepadUI(bool enableGamepadUI)
+    {
+        Debug.Log("UpdateForGamepadUI: " + enableGamepadUI.ToString());
+        if (enableGamepadUI)
+        {
+            canPass = gamePadCanPass;
+            cannotPass = gamePadCannotPass;
+        }
+        else
+        {
+            canPass = keyBoardCanPass;
+            cannotPass = keyBoardCannotPass;
+        }
+        this.UpdateSpriteForPassing(canPassToThisGoblin);
+    }
 }

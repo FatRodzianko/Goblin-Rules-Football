@@ -1035,12 +1035,40 @@ x crop out the "gifs.com" watermark from all gifs on the store page...
 - - x when the settings menu is loaded, no buttons are "selected" and you can't navigate with arrow keys or the gamepad
 - - x make it so the OpenSettingsMenu and BackToEscMenu functions of the EscMenManager script set the selected buttons explicitly?
 - - - - - x unsure if this will work for the settings menu since the button won't be activated until after the "unscroll" animation?
-- For the settings menu, instead of querying the system for available resolutions, explicitly state the follow resolutions:
-- - - 1280x720
-- - - 1600x900
-- - - 1920x1080
-- - - 2560x1440
-- - - - - - make sure that the system's monitor/whatever supports the higher resolutions? Try to get a min/max supported resolution?
+x For the settings menu, instead of querying the system for available resolutions, explicitly state the follow resolutions:
+- - x 1280x720
+- - x 1600x900
+- - x 1920x1080
+- - x 2560x1440
+- - - - - x make sure that the system's monitor/whatever supports the higher resolutions? Try to get a min/max supported resolution?
 - Add "show Gamepad UI controls" or whatever it's called to the titlescreen settings and in-game settings
-- Make sure that the title screen UI is navigable by the game pad?
-- - - yikes
+- - x add to titlescreen UI
+- - - For in-game change to gamepad UI, the following needs to be updated:
+- - - - - x camera markers
+- - - - - - - - x need to add new variables to CameraMarker.cs to save the q/e marker sprites. Right now, if gamepadUI is set to true, qMarkerLeftCanPass/etc. gets overwritten with the gamepad sprites. The original sprites are essentially lost. Need to save those sprites somewhere. basically copy every eMarkerLeftCanPass/etc. and make them eMarkerLeftCanPassSprite/etc.
+- - - - - x markers above all goblins
+- - - - - - - - x still need to test in a 3v3 game
+- - - - - - - - x in 3v3 had weird issue where the camera markers could become unsynced from the gamepadUI setting if a different window "saved" the settings. I think this is due to the different windows using the same playerpref values in the registry? idk. Issue was when another goblin that the player didnt control had the ball. The window of the goblin with the ball then changed their gamepad UI setting and saved (thus saving for everyone). Then, when the goblin with the ball got rid of the ball, their camera marker was stuck on the old gamepad UI setting until it was toggled again (but not saved)
+- - - - - x I think GameplayManager.cs already dynamically sets the instruction texts based on if gamepadUI is true/false? As in, it makes the if(gamepadUI) check every time instructions text is used?
+- - - - - - - - x probably should have EnableGamepadUIFromSettingsMenu check what gamephase it is. If it is something like coin toss/kick after/whatever, make calls to the functions that set the instruction text for those phases?
+- - - - - x power up images (the "1/2/3/4" and d-pad images) need to be updated
+x Make sure that the title screen UI is navigable by the game pad?
+- - x yikes
+- - x top bar navigates only left to right. Only can navigate down when their "panel" below is activated?
+- - x going to far to the left or right, or up, goes to the quit game button
+- - - - - x quit game button can go left/right to the top bar. Up/Down just go to the first item in the top bar?
+- - - - - x maybe have the quit button's "up" dynamically change to the panel items if they are active?
+x add a esc menu and settings menu to the lobby scene?
+- - - this seems more annoying than anything and also doesn't help at all?
+x AI goblins still keep doing the "running" animation after a touchdown is scored
+- - x should just have to reset goblin statuses or whatever is done at the beginning of kick after attempts and kick offs?
+- punches thrown stats are wrong?
+- - - played a single player game and my team had 0 punches thrown?
+x When you escape the esc menu with the settings menu still open, then reopen the esc menu, the settings menu remains open
+- - x when closing the esc menu with the esc key, have EscMenManager check if settings menu is open and if so, unroll the settings menu and hide it?
+x navigate out of input fields with gamepad. May need to have GetOutOfInputField.cs using the  InputControls and detect any move inputs?
+- Add a "was punched" indicator. Maybe just an "X" symbol that appears on their head, or a bandaid
+- - - should appear near where the fatigue indicator is?
+
+- "How to get a variable from another script in Unity (the right way)" connecting scripts/objects without singletons?
+https://gamedevbeginner.com/how-to-get-a-variable-from-another-script-in-unity-the-right-way/#scriptable_objects

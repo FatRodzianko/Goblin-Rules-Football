@@ -80,6 +80,7 @@ public class GamePlayer : NetworkBehaviour
 
     [Header("Kick After")]
     public bool areGoblinsRepositionedForKickAfter = false;
+    public bool localIsKickingPlayer = false;
 
     [Header("Input Manager Controls")]
     public bool coinTossControllsEnabled = false;
@@ -2192,7 +2193,11 @@ public class GamePlayer : NetworkBehaviour
     public void RpcKickAfterUpdateInsctructionsText(NetworkConnection target, bool isKickingPlayer)
     {
         if (hasAuthority)
+        {
+            localIsKickingPlayer = isKickingPlayer;
             GameplayManager.instance.KickAfterUpdateInsctructionsText(isKickingPlayer);
+        }
+            
     }
     [TargetRpc]
     public void RpcActivateKickAfterKickingControls(NetworkConnection target, bool activate)

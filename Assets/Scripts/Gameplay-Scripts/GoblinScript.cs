@@ -69,8 +69,8 @@ public class GoblinScript : NetworkBehaviour
     
     [SerializeField] private GameObject eMarkerPrefab;
     [SerializeField] private GameObject qMarkerPrefab;
-    private GameObject eMarker;
-    private GameObject qMarker;
+    [SerializeField] private GameObject eMarker;
+    [SerializeField] private GameObject qMarker;
     [SerializeField] private GameObject ballMarkerPrefab;
     [SerializeField] private GameObject ballMarkerOpponentPrefab;
     private GameObject ballMarkerObject;
@@ -174,7 +174,7 @@ public class GoblinScript : NetworkBehaviour
     public float AccuracyBarSpeed = 0f;
 
     [Header("wasPunchedSpeedModifier Info")]
-    public bool isWasPunchedRoutineRunning = false;
+    [SyncVar(hook = nameof(HandleWasPunchedRoutineRunning))] public bool isWasPunchedRoutineRunning = false;
     IEnumerator isWasPunched;
     public float wasPunchedSpeedModifier = 1.0f;
 
@@ -208,6 +208,7 @@ public class GoblinScript : NetworkBehaviour
     [Header("Sprite Effects?")]
     [SerializeField] private SpriteFlash spriteFlash;
     [SerializeField] private GameObject fatigueSweatDrop;
+    [SerializeField] private GameObject wasPunchedBandAid;
 
     [Header("SFX Stuff")]
     [SyncVar] public bool onWaterSlowDown;
@@ -1805,8 +1806,8 @@ public class GoblinScript : NetworkBehaviour
         isSliding = false;
         slideSpeedModifer = 1.0f;
         slideDirection = Vector2.zero;
-        StopCoroutine(isSlidingRoutine);
-        //isSlidingRoutineRunning = false;
+        if(isSlidingRoutineRunning)
+            StopCoroutine(isSlidingRoutine);
         this.HandleIsSlidingRoutineRunning(this.isSlidingRoutineRunning, false);
     }
     public void GoblinPickUpFootball()
@@ -1916,22 +1917,18 @@ public class GoblinScript : NetworkBehaviour
     [Server]
     public IEnumerator SlideGoblinRoutine()
     {
-        //isSlidingRoutineRunning = true;
         this.HandleIsSlidingRoutineRunning(this.isSlidingRoutineRunning, true);
         isSliding = true;
         yield return new WaitForSeconds(0.25f);
         speed = MaxSpeed * 1.2f;
         Debug.Log("SlideGoblinRoutine: Set speed to 1.2x for goblin " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
-        //yield return new WaitForSeconds(0.5f);
         yield return new WaitForSeconds(0.25f);
         isSliding = false;
         slideSpeedModifer = 0.7f;
-        //yield return new WaitForSeconds(1.25f);
         yield return new WaitForSeconds(2.25f);
         slideSpeedModifer = 1.0f;
         yield return new WaitForSeconds(0.75f);
         slideDirection = Vector2.zero;
-        //isSlidingRoutineRunning = false;
         this.HandleIsSlidingRoutineRunning(this.isSlidingRoutineRunning, false);
     }
     public void SlideBoxCollision(GoblinScript slidingGoblin)
@@ -2362,11 +2359,13 @@ public class GoblinScript : NetworkBehaviour
     [Server]
     public IEnumerator WasPunchedRoutine()
     {
-        isWasPunchedRoutineRunning = true;
+        //isWasPunchedRoutineRunning = true;
+        this.HandleWasPunchedRoutineRunning(this.isWasPunchedRoutineRunning, true);
         wasPunchedSpeedModifier = 0.8f;
         yield return new WaitForSeconds(3.0f);
         wasPunchedSpeedModifier = 1.0f;
-        isWasPunchedRoutineRunning = false;
+        //isWasPunchedRoutineRunning = false;
+        this.HandleWasPunchedRoutineRunning(this.isWasPunchedRoutineRunning, false);
     }
     public void ToggleGoblinBodyCollider()
     {
@@ -3162,16 +3161,19 @@ public class GoblinScript : NetworkBehaviour
                 CmdStopThrowing();
             if (isSliding)
             {
-                isSliding = false;
+                /*isSliding = false;
                 slideSpeedModifer = 1.0f;
                 slideDirection = Vector2.zero;
                 isSlidingRoutineRunning = false;
-                StopCoroutine(isSlidingRoutine);
+                StopCoroutine(isSlidingRoutine);*/
+                CmdStopSliding();
             }
             if (isBlocking)
                 CmdSetBlocking(false);
             if (isKicking)
                 CmdStopKicking();
+            if (isWasPunchedRoutineRunning)
+                this.CmdStopWasPunchedCoroutine();
 
             animator.SetBool("isRunning", false);
             animator.SetBool("isSliding", false);
@@ -3194,8 +3196,24 @@ public class GoblinScript : NetworkBehaviour
             {
                 Debug.Log("RpcResetGoblinStatuses: Could not get goblin player owner object. Error: " + e);
             }
+
+            // Reset speed for the goblin?
+            CmdIsPlayerSprinting(this.isSprinting);
         }        
     }
+    // If the isWasPunchedRoutineRunning coroutine is running on the server, this command will stop it and reset the goblins wasPunchedSpeedModifier.
+    [Command]
+    void CmdStopWasPunchedCoroutine()
+    {
+        if (isWasPunchedRoutineRunning)
+        {
+            StopCoroutine(isWasPunched);
+            wasPunchedSpeedModifier = 1.0f;
+            //isWasPunchedRoutineRunning = false;
+            this.HandleWasPunchedRoutineRunning(this.isWasPunchedRoutineRunning, false);
+        }
+    }
+    // Resets the footstep modifers on the server. This controls the footstep sound that is played, as well as any slowDownObstacleModifier effects that are affecting the goblin.
     [Command]
     void CmdResetFootstepModifers()
     {
@@ -3455,6 +3473,7 @@ public class GoblinScript : NetworkBehaviour
     {
         bool flipSweat = false;
         Vector3 newPosition = fatigueSweatDrop.transform.localPosition;
+        Vector3 bandAidPosition = wasPunchedBandAid.transform.localPosition;
         if (myRenderer.flipX && newPosition.x < 0)
         {
             flipSweat = true;
@@ -3466,7 +3485,9 @@ public class GoblinScript : NetworkBehaviour
         if (flipSweat)
         {
             newPosition.x *= -1;
+            bandAidPosition.x *= -1;
             fatigueSweatDrop.transform.localPosition = newPosition;
+            wasPunchedBandAid.transform.localPosition = bandAidPosition;
         }
     }
     [ClientCallback]
@@ -3938,6 +3959,22 @@ public class GoblinScript : NetworkBehaviour
             this.FatigueIndicators(newValue);
         }
     }
-    
+    public void UpdateGamePadUIMarkersForGoblins(bool enableGamePadUI)
+    {
+        Debug.Log("UpdateGamePadUIMarkersForGoblins: to: " + enableGamePadUI.ToString() + " for goblin: " + this.name + " owned by: " + this.ownerNetId.ToString());
+        qMarker.GetComponent<QEMarkerScript>().UpdateForGamepadUI(enableGamePadUI);
+        eMarker.GetComponent<QEMarkerScript>().UpdateForGamepadUI(enableGamePadUI);
+        //qMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(this.canGoblinReceivePass);
+        //eMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(this.canGoblinReceivePass);
+    }
+    public void HandleWasPunchedRoutineRunning(bool oldVale, bool newValue)
+    {
+        if (isServer)
+            isWasPunchedRoutineRunning = newValue;
+        if (isClient)
+        {
+            wasPunchedBandAid.SetActive(newValue);
+        }
+    }
 }
 

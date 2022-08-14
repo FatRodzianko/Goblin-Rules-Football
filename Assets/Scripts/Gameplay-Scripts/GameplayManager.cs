@@ -549,6 +549,9 @@ public class GameplayManager : NetworkBehaviour
         IEnumerator touchdownToKickAfterTransition = GameplayToKickAfterTransition();
         StartCoroutine(touchdownToKickAfterTransition);
         StopPossessionRoutinesForPlayers();
+
+        // Stop Goblins from running?
+        ResetAllGoblinStatuses();
     }
     [ClientRpc]
     void RpcTouchDownScored(bool wasGrey, uint goblinId)
@@ -1928,5 +1931,64 @@ public class GameplayManager : NetworkBehaviour
         else
             beMerciful = false;
         return beMerciful;
+    }
+    public void EnableGamepadUIFromSettingsMenu(bool enableGamepadUI)
+    {
+        Debug.Log("EnableGamepadUIFromSettingsMenu: Enable gamepad UI elements? " + enableGamepadUI.ToString());
+        GamepadUIManager.instance.gamepadUI = enableGamepadUI;
+
+        // Update Camera marker UI
+        Camera.main.GetComponent<CameraMarker>().SetGamepadUIStuff(enableGamepadUI);
+
+        // Update markers on goblins
+        try
+        {
+            if (this.is1v1 || this.isSinglePlayer)
+            {
+                foreach (GoblinScript goblin in LocalGamePlayerScript.goblinTeam)
+                {
+                    goblin.UpdateGamePadUIMarkersForGoblins(enableGamepadUI);
+                }
+            }
+            else
+            {
+                Team teamToIterate;
+                if (LocalGamePlayerScript.isTeamGrey)
+                    teamToIterate = TeamManager.instance.greyTeam;
+                else
+                    teamToIterate = TeamManager.instance.greenTeam;
+
+                if (teamToIterate != null)
+                {
+                    foreach (uint goblinNetId in teamToIterate.goblinNetIds)
+                    {
+                        NetworkIdentity.spawned[goblinNetId].GetComponent<GoblinScript>().UpdateGamePadUIMarkersForGoblins(enableGamepadUI);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log("EnableGamepadUIFromSettingsMenu: Failed to access local player script or something like that. Error: " + e);
+        }
+
+        // Reset the power up images
+        PowerUpManager.instance.UpdatePowerUpBoardUIForGamepad(enableGamepadUI);
+
+        // Update UI text:
+        this.UpdateKickAfterControlsUIForGamepad(enableGamepadUI);
+        CoinTossManager.instance.UpdateUIForGamepad(enableGamepadUI);
+        if (this.gamePhase == "kick-after-attempt")
+        {
+            try
+            {
+                this.KickAfterUpdateInsctructionsText(LocalGamePlayerScript.localIsKickingPlayer);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("EnableGamepadUIFromSettingsMenu: Could not access local player script for whatever reason. Error: " + e);
+            }
+            
+        }
     }
 }

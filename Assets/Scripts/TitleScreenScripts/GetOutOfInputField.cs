@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class GetOutOfInputField : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class GetOutOfInputField : MonoBehaviour
     void Start()
     {
         tmpInputField = this.GetComponent<TMP_InputField>();
+        //InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
+        //InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
+        InputManager.Controls.TitleScreenUINavigation.UINav.performed += _ => EscapeTextInputField();
     }
 
     // Update is called once per frame
@@ -21,7 +25,32 @@ public class GetOutOfInputField : MonoBehaviour
         if (Input.GetButtonUp("Submit") || Input.GetButtonUp("Cancel"))
         {
             //_inputField.DeactivateInputField();
-            tmpInputField.DeactivateInputField();
+            try
+            {
+                tmpInputField.DeactivateInputField();
+            }
+            catch (Exception e)
+            {
+                Debug.Log("GetOutOfInputField.cs: could not access the tmpInputField object. Error: " + e);
+            }
         }
     }
+    private void FixedUpdate()
+    {
+
+    }
+    void EscapeTextInputField()
+    {
+        Debug.Log("GetOutOfInputField.cs: EscapeTextInputField");
+        try
+        {
+            tmpInputField.DeactivateInputField();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("GetOutOfInputField.cs: could not access the tmpInputField object. Error: " + e);
+        }
+        
+    }
+    
 }

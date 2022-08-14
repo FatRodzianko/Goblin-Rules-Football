@@ -531,7 +531,7 @@ public class CoinTossManager : NetworkBehaviour
         GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "kickoff");
     }
     [Client]
-    void UpdateUIForGamepad(bool usingGamepad)
+    public void UpdateUIForGamepad(bool usingGamepad)
     {
         if (usingGamepad)
         {

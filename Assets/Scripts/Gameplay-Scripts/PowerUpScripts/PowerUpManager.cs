@@ -540,7 +540,7 @@ public class PowerUpManager : NetworkBehaviour
         }        
     }
     [Client]
-    void UpdatePowerUpBoardUIForGamepad(bool usingGamepad)
+    public void UpdatePowerUpBoardUIForGamepad(bool usingGamepad)
     {
         if (usingGamepad)
         {

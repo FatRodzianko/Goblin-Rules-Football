@@ -111,6 +111,10 @@ public class EscMenuManager : MonoBehaviour
             CoinTossCanvas.SetActive(true);
         if (GameplayManager.instance.isSinglePlayer)
             ResumeGameEscapeMenu();
+        if (settingsMenuPanel.activeInHierarchy)
+        {
+            ResetSettingsMenu();
+        }
     }
     // Saves what control schemes are active for the gameplayer so they can be restored when the esc menu is later closed?
     public void GameplayerActiveControls(bool enable)
@@ -224,5 +228,9 @@ public class EscMenuManager : MonoBehaviour
         var eventSystem = EventSystem.current;
         eventSystem.SetSelectedGameObject(backToGameButton, new BaseEventData(eventSystem));
         eventSystem.firstSelectedGameObject = backToGameButton;
+    }
+    void ResetSettingsMenu()
+    {
+        settingsMenuPanel.GetComponent<ImageAnimation>().ResetMenu();
     }
 }

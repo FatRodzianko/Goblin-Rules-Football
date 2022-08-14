@@ -12,11 +12,13 @@ public class SettingsManager : MonoBehaviour
     private const string resolutionHeightPlayerPrefKey = "ResolutionHeight";
     private const string volumePlayerPrefKey = "VolumePreference";
     private const string fullScreenPlayerPrefKey = "FullScreen";
+    private const string gamepadUIPlayerPrefKey = "GamepadUI";
 
     public AudioMixer audioMixer;
     public Dropdown resolutionDropdown;
     public Slider volumeSlider;
     public Toggle fillScreenToggle;
+    public Toggle gamepadUIToggle;
     int currentScreenWidth;
     int currentScreenHeight;
     float currentVolume;
@@ -51,6 +53,8 @@ public class SettingsManager : MonoBehaviour
     {
         Debug.Log("SetFullscreen: " + isFullScreen.ToString());
         fillScreenToggle.isOn = isFullScreen;
+        //Screen.fullScreenMode = FullScreenMode.Windowed;
+        //Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
         Screen.fullScreen = isFullScreen;
         //string test = Screen.fullScreenMode
         //ullScreenMode fullScreen = Screen.FullScreenMode;
@@ -59,8 +63,12 @@ public class SettingsManager : MonoBehaviour
     void GetResolutions()
     {
         //resolutions = Screen.resolutions;
+        //Debug.Log("GetResolutions: Current screen resolution is: " + Screen.currentResolution.ToString());
         List<Resolution> resolutionList = new List<Resolution>();
         double aspectRatio = ((double)16 / (double)9);
+
+        double maxHeight = 0;
+
         foreach (Resolution resolution in Screen.resolutions)
         {
             double resolutionAspectRation = (double)resolution.width / (double)resolution.height;
@@ -68,9 +76,13 @@ public class SettingsManager : MonoBehaviour
             {
                 resolutionList.Add(resolution);
             }
+            //Debug.Log("GetResolutions: Found resolution of " + resolution.ToString());
+            if (resolution.height > maxHeight)
+                maxHeight = resolution.height;
 
         }
-        if (resolutionList.Count > 0)
+        Debug.Log("GetResolutions: The max screen resolution height is: " + maxHeight.ToString());
+        /*if (resolutionList.Count > 0)
         {
             resolutions = resolutionList.ToArray();
         }
@@ -94,12 +106,90 @@ public class SettingsManager : MonoBehaviour
             resolutionDropdown.AddOptions(options);
             resolutionDropdown.value = currentResolutionIndex;
             ResolutionDropDown(currentResolutionIndex);
+        }*/
+        resolutionList.Clear();
+        resolutionDropdown.ClearOptions();
+        List<string> options = new List<string>();
+        string option = "";
+        int index = 0;
+        int currentResolutionIndex = 0;
+        Resolution newRes = new Resolution();
+        if (maxHeight >= 720)
+        {
+            option = "1280x720";
+            options.Add(option);
+            
+            newRes.width = 1280;
+            newRes.height = 720;
+            newRes.refreshRate = Screen.currentResolution.refreshRate;
+            resolutionList.Add(newRes);
+
+            if (Screen.width == 1280 && Screen.height == 720)
+            {
+                currentResolutionIndex = index;
+            }
+            index++;
         }
+        if (maxHeight >= 900)
+        {
+            option = "1600x900";
+            options.Add(option);
+
+            newRes.width = 1600;
+            newRes.height = 900;
+            newRes.refreshRate = Screen.currentResolution.refreshRate;
+            resolutionList.Add(newRes);
+
+            if (Screen.width == 1600 && Screen.height == 900)
+            {
+                currentResolutionIndex = index;
+            }
+            index++;
+        }
+        if (maxHeight >= 1080)
+        {
+            option = "1920x1080";
+            options.Add(option);
+
+            newRes.width = 1920;
+            newRes.height = 1080;
+            newRes.refreshRate = Screen.currentResolution.refreshRate;
+            resolutionList.Add(newRes);
+
+            if (Screen.width == 1920 && Screen.height == 1080)
+            {
+                currentResolutionIndex = index;
+            }
+            index++;
+        }
+        if (maxHeight >= 1440)
+        {
+            option = "2560x1440";
+            options.Add(option);
+
+            newRes.width = 2560;
+            newRes.height = 1440;
+            newRes.refreshRate = Screen.currentResolution.refreshRate;
+            resolutionList.Add(newRes);
+
+            if (Screen.width == 2560 && Screen.height == 1440)
+            {
+                currentResolutionIndex = index;
+            }
+            index++;
+        }
+        if (resolutionList.Count > 0)
+        {
+            resolutions = resolutionList.ToArray();
+        }
+        resolutionDropdown.AddOptions(options);
+        resolutionDropdown.value = currentResolutionIndex;
+        ResolutionDropDown(currentResolutionIndex);
+
         //LoadSettings();        
     }
     public void ResolutionDropDown(int index)
     {
-
         currentScreenWidth = resolutions[index].width;
         currentScreenHeight = resolutions[index].height;
 
@@ -109,7 +199,12 @@ public class SettingsManager : MonoBehaviour
     {
         Debug.Log("SetResolution: " + width.ToString() + "x" + height.ToString() + " " + fullScreen.ToString());
         if (width > 0 && height > 0 && (width / height) == (1920 / 1080))
-            Screen.SetResolution(width, height, fullScreen);
+        {
+            if(fullScreen)
+                Screen.SetResolution(width, height, FullScreenMode.FullScreenWindow);
+            else
+                Screen.SetResolution(width, height, false);
+        }   
         else
             Screen.SetResolution(1920, 1080, false);
     }
@@ -122,6 +217,11 @@ public class SettingsManager : MonoBehaviour
             PlayerPrefs.SetInt(fullScreenPlayerPrefKey, fullScreenBool);
         else
             PlayerPrefs.SetInt(fullScreenPlayerPrefKey, 0);
+        int gamepadUIBool = Convert.ToInt32(gamepadUIToggle.isOn);
+        if (gamepadUIBool == 1 || gamepadUIBool == 0)
+            PlayerPrefs.SetInt(gamepadUIPlayerPrefKey, gamepadUIBool);
+        else
+            PlayerPrefs.SetInt(gamepadUIPlayerPrefKey, 0);
         if (currentScreenHeight > 0 && currentScreenWidth > 0 && (currentScreenWidth / currentScreenHeight) == (1920 / 1080))
         {
             PlayerPrefs.SetInt(resolutionWidthPlayerPrefKey, currentScreenWidth);
@@ -188,6 +288,26 @@ public class SettingsManager : MonoBehaviour
         else
         {
             SetResolution(1920, 1080, false);
+        }
+        if (PlayerPrefs.HasKey(gamepadUIPlayerPrefKey))
+        {
+            int gamepadUIBool = PlayerPrefs.GetInt(gamepadUIPlayerPrefKey);
+            if (gamepadUIBool == 1 || gamepadUIBool == 0)
+            {
+                GamepadUIManager.instance.gamepadUI = Convert.ToBoolean(PlayerPrefs.GetInt(gamepadUIPlayerPrefKey));
+                gamepadUIToggle.isOn = Convert.ToBoolean(gamepadUIBool);
+            }
+            else
+            {
+                GamepadUIManager.instance.gamepadUI = false;
+                gamepadUIToggle.isOn = false;
+            }
+                
+        }
+        else
+        {
+            GamepadUIManager.instance.gamepadUI = false;
+            gamepadUIToggle.isOn = false;
         }
     }
 }
