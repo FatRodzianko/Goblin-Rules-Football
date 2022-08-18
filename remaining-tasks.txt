@@ -1062,13 +1062,35 @@ x add a esc menu and settings menu to the lobby scene?
 - - - this seems more annoying than anything and also doesn't help at all?
 x AI goblins still keep doing the "running" animation after a touchdown is scored
 - - x should just have to reset goblin statuses or whatever is done at the beginning of kick after attempts and kick offs?
-- punches thrown stats are wrong?
-- - - played a single player game and my team had 0 punches thrown?
+x punches thrown stats are wrong?
+- - x played a single player game and my team had 0 punches thrown?
+- - x I think what is happening is that only punches "thrown" by a goblin selected by the player are counted in this stat? maybe make it so all punches are counted?
+- - x removed checks for "isCharacterSelected" and fixed.
 x When you escape the esc menu with the settings menu still open, then reopen the esc menu, the settings menu remains open
 - - x when closing the esc menu with the esc key, have EscMenManager check if settings menu is open and if so, unroll the settings menu and hide it?
 x navigate out of input fields with gamepad. May need to have GetOutOfInputField.cs using the  InputControls and detect any move inputs?
-- Add a "was punched" indicator. Maybe just an "X" symbol that appears on their head, or a bandaid
-- - - should appear near where the fatigue indicator is?
+x Add a "was punched" indicator. Maybe just an "X" symbol that appears on their head, or a bandaid
+- - x should appear near where the fatigue indicator is?
+x make it so if a goblin is blocking, they don't take the "was punched" slow down?
+- - x also made it so the defense power up prevents the slow down as well
+- transitions between scenes?
+- - - may be helpful, especially for singleplayer, for there to be a real transition between titlescreen/lobby and the gameplay scene
+- - - brackey's scene transition tutorial: https://www.youtube.com/watch?v=CE9VOZivb3I
+- - - loading bar? https://www.youtube.com/results?search_query=unity+loading+screen
+- "How To Play" page of the title screen?
+- - - hopefully it can just be text and images that the player scrolls through?
+- - - tutorials on in-game tutorialis: https://www.youtube.com/watch?v=Deuf1H5Wu1E https://www.youtube.com/watch?v=be0C8FXGPrA
+- maybe add some "screen" effects
+- - - corners of the screen change color based on some event
+- - - - - - red when your goblin is punched, white when your team picks up the ball, yellow when they lose the ball?
+- - - - - - the change of possession stuff can reuse the cheer/boo sound triggers for when possession changes?
 
 - "How to get a variable from another script in Unity (the right way)" connecting scripts/objects without singletons?
-https://gamedevbeginner.com/how-to-get-a-variable-from-another-script-in-unity-the-right-way/#scriptable_objects
+- - - https://gamedevbeginner.com/how-to-get-a-variable-from-another-script-in-unity-the-right-way/#scriptable_objects
+- Scripting tutorial for events in unity?
+- - - https://www.youtube.com/watch?v=k4JlFxPcqlg
+- - - https://www.youtube.com/watch?v=OuZrhykVytg
+- Game Architecture "tips"
+- - - https://www.youtube.com/watch?v=pRjTM3pzqDw
+- unity "job" system?
+- - - https://www.youtube.com/watch?v=C56bbgtPr_w

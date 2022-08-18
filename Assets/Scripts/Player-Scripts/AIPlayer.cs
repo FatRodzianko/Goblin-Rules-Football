@@ -880,10 +880,11 @@ public class AIPlayer : NetworkBehaviour
                     }
                     else if (hasSpeedPowerUp && !isPowerUpCoolDownRoutineRunning)
                         UsePowerUp(speedPowerUpIndex);
-                    else if (hasAttackPowerUp && !isPowerUpCoolDownRoutineRunning)
+                    else if (hasAttackPowerUp && !isPowerUpCoolDownRoutineRunning && CheckForNearbyGoblinsToAttack())
                     {
-                        if (CheckForNearbyGoblinsToAttack() && !isPowerUpCoolDownRoutineRunning)
-                            UsePowerUp(attackPowerUpIndex);
+                        /*if (CheckForNearbyGoblinsToAttack() && !isPowerUpCoolDownRoutineRunning)
+                            UsePowerUp(attackPowerUpIndex);*/
+                        UsePowerUp(attackPowerUpIndex);
                     }
                     // Check if an enemy goblin is directly in front of any goblins. If yes, use bottle powerup
                     else if (hasBottlePowerUp && !isPowerUpCoolDownRoutineRunning)

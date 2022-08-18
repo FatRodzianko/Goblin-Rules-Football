@@ -1601,17 +1601,22 @@ public class GoblinScript : NetworkBehaviour
                     regainHealthRoutine = RegainHealth();
                     StartCoroutine(regainHealthRoutine);
 
-                    // Slow down goblin after they are punched
-                    if (isWasPunchedRoutineRunning)
-                        StopCoroutine(isWasPunched);
-                    isWasPunched = WasPunchedRoutine();
-                    StartCoroutine(isWasPunched);
+                    // Slow down goblin after they are punched, ONLY IF they are NOT blocking?
+                    if (!this.isBlocking && !this.defenseNormal)
+                    {
+                        if (isWasPunchedRoutineRunning)
+                            StopCoroutine(isWasPunched);
+                        isWasPunched = WasPunchedRoutine();
+                        StartCoroutine(isWasPunched);
+                    }
+                    
                 }
             }
-            if (goblinGivingDamage.isCharacterSelected)
+            /*if (goblinGivingDamage.isCharacterSelected)
             {
                 TeamManager.instance.PunchHit(goblinGivingDamage.serverGamePlayer);
-            }
+            }*/
+            TeamManager.instance.PunchHit(goblinGivingDamage);
             goblinReceivingDamage.RpcPunchedFlashSprite();
         }
     }
@@ -1887,7 +1892,7 @@ public class GoblinScript : NetworkBehaviour
                 isSlidingRoutine = SlideGoblinRoutine();
                 StartCoroutine(isSlidingRoutine);
                 if (this.isCharacterSelected)
-                    TeamManager.instance.SlideTackle(this.serverGamePlayer, false);
+                    TeamManager.instance.SlideTackle(this, false);
             }
             
         }
@@ -1943,7 +1948,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 slidingGoblin.TripGoblin();
                 if (this.isCharacterSelected)
-                    TeamManager.instance.SlideTackle(this.serverGamePlayer, true);
+                    TeamManager.instance.SlideTackle(this, true);
             }   
         }
     }
@@ -2179,8 +2184,9 @@ public class GoblinScript : NetworkBehaviour
     {
         //isPunching = punching;
         HandleIsPunching(isPunching, punching);
-        if (this.isCharacterSelected && punching)
-            TeamManager.instance.ThrownPunch(this.serverGamePlayer);
+        /*if (this.isCharacterSelected && punching)
+            TeamManager.instance.ThrownPunch(this.serverGamePlayer);*/
+        TeamManager.instance.ThrownPunch(this);
     }
     public void HandleIsPunching(bool oldValue, bool newValue)
     {
@@ -2284,7 +2290,7 @@ public class GoblinScript : NetworkBehaviour
             footballScript.KickAfterAttemptKick(isGoblinGrey, powerValueSubmitted, angleOfKickAttempt, GoblinMaxKickDistance, GoblinMinKickDistance, kickAfterAccuracyDifficulty, accuracyValueSubmitted, kickAfterFinalPosition);
             return;
         }
-        if (this.isCharacterSelected && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+        if (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time")
             TeamManager.instance.KickDownfield(this.serverGamePlayer);
         footballScript.KickFootballDownField(isGoblinGrey, GoblinKickPower, GoblinKickoffAngle, GoblinMaxKickDistance, GoblinMinKickDistance);        
     }

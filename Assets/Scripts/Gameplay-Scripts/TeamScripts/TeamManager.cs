@@ -55,9 +55,9 @@ public class TeamManager : NetworkBehaviour
     {
         
     }
-    public void ThrownPunch(GamePlayer player)
+    public void ThrownPunch(GoblinScript goblin)
     {
-        if (player != null)
+        /*if (player != null)
         {
             foreach (Team team in teams)
             {
@@ -66,11 +66,22 @@ public class TeamManager : NetworkBehaviour
                     team.punchesThrown += 1;
                 }
             }
+        }*/
+        if (goblin != null)
+        {
+            foreach (Team team in teams)
+            {
+                if (team.isGrey == goblin.isGoblinGrey && team.goblins.Contains(goblin))
+                {
+                    team.punchesThrown += 1;
+                }
+            }
         }
+
     }
-    public void PunchHit(GamePlayer player)
+    public void PunchHit(GoblinScript goblin)
     {
-        if (player != null)
+        /*if (player != null)
         {
             foreach (Team team in teams)
             {
@@ -79,15 +90,25 @@ public class TeamManager : NetworkBehaviour
                     team.punchesHit += 1;
                 }
             }
-        }
-    }
-    public void SlideTackle(GamePlayer player, bool slideHit)
-    {
-        if (player != null)
+        }*/
+        if (goblin != null)
         {
             foreach (Team team in teams)
             {
-                if (team.isGrey == player.isTeamGrey && team.teamPlayers.Contains(player))
+                if (team.isGrey == goblin.isGoblinGrey && team.goblins.Contains(goblin))
+                {
+                    team.punchesHit += 1;
+                }
+            }
+        }
+    }
+    public void SlideTackle(GoblinScript goblin, bool slideHit)
+    {
+        if (goblin != null)
+        {
+            foreach (Team team in teams)
+            {
+                if (team.isGrey == goblin.isGoblinGrey && team.goblins.Contains(goblin))
                 {
                     if (slideHit)
                         team.slideTacklesHit += 1;

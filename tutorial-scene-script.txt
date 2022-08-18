@@ -1,0 +1,53 @@
+references:
+https://www.youtube.com/watch?v=a1RFxtuTVsk
+
+
+tutorial scene. Hopefully less than 5 minutes?
+- spawn Grenadier goblin on empty field
+- "Use arrow keys or the left analog stick to move"
+- - - shadowed area with arrow above it to indicate where to move?
+- - - or check for movement and "pass" the player
+- "hold down shift/left trigger while moving to sprint"
+- "stamina will drain as you sprint. Use all stamina and become fatigued.
+- - - "When you are fatigued you move slower, and you cannot sprint or dive until you have fully recovered your stamina"
+- spawn two goblins on the player's team
+- - - "Q/E or Rb/Lb to switch between goblins"
+- spawn football near player/one of the goblins
+- - - "Walk over to the ball to pick it up"
+- "Q/E or Rb/Lb will pass the ball. You can only pass backwards."
+- - - after a pass is made, freeze movement/pass?
+- spawn opposing team
+- "The opposing team will try to punch you to get possession of the ball."
+- - - opponent goblin will punch the player once to reduce their health
+- "When surrounded by opponents, kicking the ball downfield may be a good strategy. Use "TAB" or Right trigger to kick. Hold down the button to get your kick power, and release to kick."
+- - - ball is kicked downfield. opponent recovers it?
+- "Use 'A' on keyboard or X on gamepad to punch opponent until their health is depleted and they are knocked out."
+- - - opponent fumbles and recovers
+- - - secondary message about how you cannot punch/slide tackle when your goblin has the ball?
+- "While moving, use 'S' on keyboard or "A" on gamepad to slide tackle. This will trip opposing goblins and cause fumbles.
+- - - slide tackle into opposining goblin to cause another fumble
+- "Pick up the ball and run toward the endzone to score a touchdown"
+- - - as the player is running, point toward the possession meter
+- - - "The longer you posses the ball, the greater 'possession bonus' you receive. Possession bonus increase speed and attack damage. Reduces damage taken from opponents."
+- Spawn power up in front of goblin
+- - - "Run over a power up to pick it up."
+- - - power up will be something simple like the defense power up?
+- - - "Use the 1/2/3/4 keys, the dpad, or right analog stick to use power ups"
+- As player is running, point out "trip obstacles" and "slow down obstacles" that are in their way?
+- When the player is near the endzone, "To score, touch the ball down with a dive by pressing the 'W' key or 'Y' on the gamepad"
+- player scores
+- "After a touchdown is the kick after attempt. The kick after attempt must be down directly back from where the ball was touched down in the endzone. The closer to the center of the endzone the ball was touched down, the easier the kick after attempt will be.
+- "Choose where the kick after attempt will be from. It must be behind the 10 yard line, but can be as far back as your goblin can kick."
+- - - "As you move away from the goal posts, the yellow bars get further apart. This means that the accuracy difficulty of the kick will be easier because the angle of the kick is closer to perpendicular to the goal posts."
+- - - "After you submit the kick after attempt position by pressing "Tab" or "A", a countdown will start and the attempt will begin"
+- "To kick the ball, first submit your kick accuracy with "TAB" or "A". You want the moving red bar to be between the yellow bars."
+- "After submitting the kick accuracy, you will submit the kick power. The further back the attempt, the more power you will need."
+- - - "While you are doing this, the opposing team can run from the endzone and try and block the kick. If an opposing goblin runs into the kicker, or if the kicker runs into a trip object while positioning for the kick, the kick after attempt will be blocked."
+- "After accuracy and power have been submitted, the kick will be made. The kick will be 'good' only if you submitted an accurate kick that has enough power to pass through the goal posts."
+- "After the kick after attempt is the kick off. Choose the direction of your kick off with the Up/Down direction keys. Use TAB/Right trigger for your kick power, and release."
+- "After the kick off, the game resumes and you start the gameplay loop again."
+
+- Activate controls as they are needed for the tutorial
+- May need to create a bunch of offline "prefabs" for things like the goblins, football, and power ups specific for the tutorial scene
+- - - will allow for these objects to be stripped way down for the tutorial. Replace their normal scripts with tutorial specific scripts
+- - - may be a lot of work...but less work than trying to get the gameplay stuff to work in a non-game situation?
