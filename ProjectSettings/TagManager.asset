@@ -29,6 +29,8 @@ TagManager:
   - errorCanvasText
   - SettingsManager
   - QuitButtonTitleScreen
+  - TutorialPlayer
+  - secondTutorialPlayer
   layers:
   - Default
   - TransparentFX

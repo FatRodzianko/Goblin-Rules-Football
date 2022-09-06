@@ -25,6 +25,7 @@ public class NetworkManagerGRF : NetworkManager
     [Header("Game Info")]
     public bool is1v1 = false;
     public bool isSinglePlayer = false;
+    public bool isTutorial = false;
     public string lobbyName;
     public int secondsPerHalf;
     public bool powerUpsEnabled;

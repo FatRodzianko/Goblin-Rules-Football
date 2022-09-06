@@ -3,6 +3,8 @@
 - - - Look to recreate something like Golf Story / Mario Golf for GBA
 - - - "OGgolf" looks like basically what I am trying to make...
 - - - - - - https://store.steampowered.com/app/1608820/OGgolf/
+- - - "Cursed To Golf" may be a better model for this. Basically a 2d side scroller with golf mechanics. Adds more of a platforming element. Also seems easier. Also, seems like it would be better suited for a multiplayer arcade thing where you can hit power ups with your ball and attack other players or whatever
+- - - - - - putting might be challenging. No "slopes", but maybe just have a flat platform with <<< or >>> to indicate if it slopes there or something?
 - Baseball
 - - - Something like "Baseball Stars 2"
 - - - Super Baseball 2020
@@ -940,6 +942,11 @@ x Implement the "mercy rule" feature
 - - x if point differential is equal to or greater than mercy rule amount, end the game?
 x When game is paused, during the PauseGameTimeoutRoutine have it send the pause time left to each client
 - - x client will then update a text object to show seconds left for the pause
+- Add an "outline" to characters when they have the ball as yet another visual indicator?
+- - - https://www.youtube.com/watch?v=84rZ-rCRsZk - "shader graph" to add outline?
+- - - https://www.youtube.com/watch?v=FvQFhkS90nI - same as above but shows on an animated sprite?
+- - - https://www.youtube.com/watch?v=MqpyXhBIRSw - see comment about "texel size" and "tilling and offset node" to make the outline consistently 1 pixel thick?
+- - - https://www.youtube.com/watch?v=vqDOirux0Es - again with shaders. By dapper dino so that's good?
 
 ### Custom Settings per game?
 x Time per half
@@ -1077,13 +1084,16 @@ x make it so if a goblin is blocking, they don't take the "was punched" slow dow
 - - - may be helpful, especially for singleplayer, for there to be a real transition between titlescreen/lobby and the gameplay scene
 - - - brackey's scene transition tutorial: https://www.youtube.com/watch?v=CE9VOZivb3I
 - - - loading bar? https://www.youtube.com/results?search_query=unity+loading+screen
-- "How To Play" page of the title screen?
-- - - hopefully it can just be text and images that the player scrolls through?
-- - - tutorials on in-game tutorialis: https://www.youtube.com/watch?v=Deuf1H5Wu1E https://www.youtube.com/watch?v=be0C8FXGPrA
+x "How To Play" page of the title screen?
+- - x hopefully it can just be text and images that the player scrolls through?
+- - x tutorials on in-game tutorialis: https://www.youtube.com/watch?v=Deuf1H5Wu1E https://www.youtube.com/watch?v=be0C8FXGPrA
 - maybe add some "screen" effects
 - - - corners of the screen change color based on some event
 - - - - - - red when your goblin is punched, white when your team picks up the ball, yellow when they lose the ball?
 - - - - - - the change of possession stuff can reuse the cheer/boo sound triggers for when possession changes?
+- add a delay/limit how often you can block
+- - - right now you can spam blocking while running. Doesn't seem like it affects speed much. Unsure if it gives you the blocking defense bonus
+- - - when blocking is released, save timestamp. Don't allow for another block until after a certain time. Probably only needs to be like 0.5 seconds
 
 - "How to get a variable from another script in Unity (the right way)" connecting scripts/objects without singletons?
 - - - https://gamedevbeginner.com/how-to-get-a-variable-from-another-script-in-unity-the-right-way/#scriptable_objects
@@ -1093,4 +1103,4 @@ x make it so if a goblin is blocking, they don't take the "was punched" slow dow
 - Game Architecture "tips"
 - - - https://www.youtube.com/watch?v=pRjTM3pzqDw
 - unity "job" system?
-- - - https://www.youtube.com/watch?v=C56bbgtPr_w
+- - - https://www.youtube.com/watch?v=C56bbgtPr_w 

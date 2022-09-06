@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -164,10 +165,21 @@ public class CameraMarker : MonoBehaviour
     }
     public void ActivateFootballMarker(bool isLeft, bool isHeld, float yValue)
     {
-        if (yValue > GameplayManager.instance.maxY)
-            yValue = GameplayManager.instance.maxY;
-        else if (yValue < GameplayManager.instance.minY)
-            yValue = GameplayManager.instance.minY;
+        try
+        {
+            if (yValue > GameplayManager.instance.maxY)
+                yValue = GameplayManager.instance.maxY;
+            else if (yValue < GameplayManager.instance.minY)
+                yValue = GameplayManager.instance.minY;
+        }
+        catch (Exception e)
+        {
+            if (yValue > 7.1f)
+                yValue = 7.1f;
+            else if (yValue < -11f)
+                yValue = -11f;
+        }
+        
 
         if (isLeft)
         {

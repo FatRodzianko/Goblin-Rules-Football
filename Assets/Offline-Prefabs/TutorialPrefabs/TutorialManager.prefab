@@ -1,0 +1,106 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5695608621318469281
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8421584485540348601}
+  - component: {fileID: 4859128927231544625}
+  m_Layer: 0
+  m_Name: TutorialManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8421584485540348601
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5695608621318469281}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 22.258692, y: 11.304009, z: -2.3082905}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4859128927231544625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5695608621318469281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6de66f7d326d2864fa3e6a3a9e1ce43d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tutorialPlayer: {fileID: 0}
+  grenadierPrefb: {fileID: 2813347414334592412, guid: 99103c3582b1912469beddd3b2b53c80, type: 3}
+  skirmisherPrefb: {fileID: 6877901074420270458, guid: e17b8c28ea7d9584d9fb80245c5346c3, type: 3}
+  berserkerPrefb: {fileID: 6607051740916151457, guid: f50da633388e42843b12055605bd51d5, type: 3}
+  greenGrenadierObject: {fileID: 0}
+  greenGrenadierScript: {fileID: 0}
+  greenSkirmisherObject: {fileID: 0}
+  greenSkirmisherScript: {fileID: 0}
+  greenBerserkerObject: {fileID: 0}
+  greenBerserkerScript: {fileID: 0}
+  greyGrenadierObject: {fileID: 0}
+  greyGrenadierScript: {fileID: 0}
+  greySkirmisherObject: {fileID: 0}
+  greySkirmisherScript: {fileID: 0}
+  greyBerserkerObject: {fileID: 0}
+  greyBerserkerScript: {fileID: 0}
+  greenGoblins: []
+  greyGoblins: []
+  tutIndex: 0
+  messageBoardTop: {fileID: 0}
+  messageBoardTopText: {fileID: 0}
+  firstGoblinPosition: {x: -40, y: -0.5, z: 0}
+  greenBerserkerPosition: {x: -48, y: -6, z: 0}
+  greenskirmisherPosition: {x: -48, y: 5, z: 0}
+  footballPrefab: {fileID: 7510187484870184805, guid: a2a64be0a9692684d89705c976ec2b99, type: 3}
+  footballScript: {fileID: 0}
+  footballSpawnPosition: {x: -25, y: -1.5, z: 0}
+  moveToCicle: {fileID: 7955268059874832154, guid: 79a7038aac631504ba893d8e3341e5b0, type: 3}
+  moveToCicleSpawnPosition: {x: -47.5, y: -1.5, z: 0}
+  greyGrenadierSpawnLocation: {x: 0, y: 0, z: 0}
+  greySkirmisherSpawnLocation: {x: 0, y: 0, z: 0}
+  greyBerserkerSpawnLocation: {x: 0, y: 0, z: 0}
+  greenGrenadierNewLocation: {x: -35, y: -0.5, z: 0}
+  greenSkirmisherNewLocation: {x: -45, y: 2.4, z: 0}
+  greenBerserkerNewLocation: {x: -45, y: -3.6, z: 0}
+  goblinLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 524288
+  maxY: 7.1
+  minY: -11
+  maxX: 59.44
+  minX: -59.5
+  index0Tracker: 0
+  index1Tracker: 0
+  index2Tracker: 0
+  index3Tracker: 0
+  index4Tracker: 0
+  index5Tracker: 0
+  index6Tracker: 0
+  index7Tracker: 0
+  index8Tracker: 0
+  index9Tracker: 0
+  index10Tracker: 0
+  index11Tracker: 0
+  doneSprinting: 0
+  usedQE: 0
+  playerPickedUpBall: 0
+  firstThrownPass: 0

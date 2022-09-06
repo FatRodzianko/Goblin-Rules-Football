@@ -373,6 +373,14 @@ public class TitleScreenManager : MonoBehaviour
             }
         }
     }
+    public void StartTutorial()
+    {
+        networkManager.is1v1 = false;
+        networkManager.isSinglePlayer = false;
+        networkManager.maxConnections = 1;
+        networkManager.minPlayers = 1;
+        SceneManager.LoadScene("Tutorial");
+    }
     public void ExitGame()
     {
         Application.Quit();
