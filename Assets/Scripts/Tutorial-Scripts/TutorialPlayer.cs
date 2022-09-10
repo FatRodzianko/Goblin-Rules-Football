@@ -83,7 +83,10 @@ public class TutorialPlayer : MonoBehaviour
 	void Start()
     {
         myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
-    }
+		/*if(this.gameObject.tag == "TutorialPlayer")
+			EnablePowerUpControls();*/
+
+	}
 
     // Update is called once per frame
     void Update()
@@ -590,7 +593,47 @@ public class TutorialPlayer : MonoBehaviour
 		InputManager.Controls.PowerUps.PowerUp2.performed += _ => UsePowerUp(1);
 		InputManager.Controls.PowerUps.PowerUp3.performed += _ => UsePowerUp(2);
 		InputManager.Controls.PowerUps.PowerUp4.performed += _ => UsePowerUp(3);
-		powerUpsEnabled = true;
+		//InputManager.Controls.SelectPowerUps.SelectLeftOrRightComposite.performed += ctx => PowerUpAnalogReader(ctx.ReadValue<Vector2>());
+		InputManager.Controls.SelectPowerUps.RightAnalogStickDirection.performed += ctx => PowerUpAnalogReader(ctx.ReadValue<Vector2>());
+		InputManager.Controls.SelectPowerUps.RightAnalogStickDirection.canceled += ctx => CancelRightAnalogStickDirection();
+		//powerUpsEnabled = true;
+		powerupsControlsOnServer = true;
+		ActivatePowerUpControls(true);
+	}
+	void PowerUpAnalogReader(Vector2 direction)
+	{
+		Debug.Log("PowerUpAnalogReader: Direction of right stick: " + direction.ToString() + " wasRightStickUsedToSelect: " + wasRightStickUsedToSelect.ToString());
+		if (wasRightStickUsedToSelect)
+			return;
+		if (direction.x <= -0.75f)
+		{
+			Debug.Log("PowerUpAnalogReader: setting power up value to 0");
+			UsePowerUp(0);
+			wasRightStickUsedToSelect = true;
+		}
+		else if (direction.y >= 0.75f)
+		{
+			Debug.Log("PowerUpAnalogReader: setting power up value to 1");
+			UsePowerUp(1);
+			wasRightStickUsedToSelect = true;
+		}
+		else if (direction.x >= 0.75f)
+		{
+			Debug.Log("PowerUpAnalogReader: setting power up value to 2");
+			UsePowerUp(2);
+			wasRightStickUsedToSelect = true;
+		}
+		else if (direction.y <= -0.75f)
+		{
+			Debug.Log("PowerUpAnalogReader: setting power up value to 3");
+			UsePowerUp(3);
+			wasRightStickUsedToSelect = true;
+		}
+	}
+	void CancelRightAnalogStickDirection()
+	{
+		Debug.Log("CancelRightAnalogStickDirection: wasRightStickUsedToSelect: " + wasRightStickUsedToSelect.ToString());
+		wasRightStickUsedToSelect = false;
 	}
 	public void ActivatePowerUpControls(bool activate)
 	{
@@ -612,14 +655,16 @@ public class TutorialPlayer : MonoBehaviour
 				var uiModule = (InputSystemUIInputModule)EventSystem.current.currentInputModule;
 				//uiModule.move = moveReference;
 				//uiModule.submit = submitReference;
-				uiModule.move = InputActionReference.Create(InputManager.Controls.SelectPowerUps.SelectLeftOrRightComposite);
-				uiModule.submit = InputActionReference.Create(InputManager.Controls.SelectPowerUps.SubmitSelection);
+				//uiModule.move = InputActionReference.Create(InputManager.Controls.SelectPowerUps.SelectLeftOrRightComposite);
+				
+				//uiModule.submit = InputActionReference.Create(InputManager.Controls.SelectPowerUps.SubmitSelection);
 				uiModule.enabled = true;
 				var eventSystem = EventSystem.current;
 				eventSystem.enabled = true;
 
 				InputManager.Controls.PowerUps.Enable();
 				InputManager.Controls.SelectPowerUps.Enable();
+				InputManager.Controls.SelectPowerUps.RightAnalogStickDirection.Enable();
 				powerUpsEnabled = true;
 			}
 		}
@@ -627,6 +672,7 @@ public class TutorialPlayer : MonoBehaviour
 		{
 			InputManager.Controls.PowerUps.Disable();
 			InputManager.Controls.SelectPowerUps.Disable();
+			InputManager.Controls.SelectPowerUps.RightAnalogStickDirection.Disable();
 			powerUpsEnabled = false;
 		}
 	}

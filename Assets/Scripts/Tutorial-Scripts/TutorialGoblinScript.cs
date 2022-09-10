@@ -1011,8 +1011,8 @@ public class TutorialGoblinScript : MonoBehaviour
 
         if (isOwnedByTutorialPlayer)
         {
-            qMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(newValue);
-            eMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(newValue);
+            qMarker.GetComponent<TutorialQEMarkerScript>().UpdateSpriteForPassing(newValue);
+            eMarker.GetComponent<TutorialQEMarkerScript>().UpdateSpriteForPassing(newValue);
         }
     }
     public void GetSpawnedFootball()
@@ -2124,5 +2124,11 @@ public class TutorialGoblinScript : MonoBehaviour
     {
         Debug.Log("CmdSubmitKickAfterAccuracyValue: " + accuracyValue);
         accuracyValueSubmitted = accuracyValue;
+    }
+    public void UpdateGamePadUIMarkersForGoblins(bool enableGamePadUI)
+    {
+        Debug.Log("UpdateGamePadUIMarkersForGoblins: to: " + enableGamePadUI.ToString() + " for goblin: " + this.name);
+        qMarker.GetComponent<TutorialQEMarkerScript>().UpdateForGamepadUI(enableGamePadUI);
+        eMarker.GetComponent<TutorialQEMarkerScript>().UpdateForGamepadUI(enableGamePadUI);
     }
 }

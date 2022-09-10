@@ -839,6 +839,14 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": ""StickDeadzone(min=0.5,max=0.925)"",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""RightAnalogStickDirection"",
+                    ""type"": ""Value"",
+                    ""id"": ""9a837fd3-b08f-44b3-9da5-9b3b53e93d8d"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": ""StickDeadzone(min=0.5,max=0.925)"",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -938,6 +946,61 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""processors"": """",
                     ""groups"": ""GamePad"",
                     ""action"": ""SelectLeftOrRightComposite"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""ed6c6bc9-49d8-4f05-8407-94bb0ffdebe5"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": ""StickDeadzone(min=0.125,max=0.925)"",
+                    ""groups"": """",
+                    ""action"": ""RightAnalogStickDirection"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""1a79ca0e-d0ae-4e06-a28e-651cdd6c49e7"",
+                    ""path"": ""<XInputController>/rightStick/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""GamePad"",
+                    ""action"": ""RightAnalogStickDirection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""ecefe708-85f9-4f0e-b69a-ec4ff0f1dfab"",
+                    ""path"": ""<XInputController>/rightStick/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""GamePad"",
+                    ""action"": ""RightAnalogStickDirection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""629da4a2-0021-4a00-a246-d5d04217c3b3"",
+                    ""path"": ""<XInputController>/rightStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""GamePad"",
+                    ""action"": ""RightAnalogStickDirection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""795421dd-6b13-4648-9a64-62a3d8ba00c8"",
+                    ""path"": ""<XInputController>/rightStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""GamePad"",
+                    ""action"": ""RightAnalogStickDirection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 }
@@ -1501,6 +1564,7 @@ public class @Controls : IInputActionCollection, IDisposable
         m_SelectPowerUps_SelectRight = m_SelectPowerUps.FindAction("SelectRight", throwIfNotFound: true);
         m_SelectPowerUps_SelectLeftOrRight = m_SelectPowerUps.FindAction("SelectLeftOrRight", throwIfNotFound: true);
         m_SelectPowerUps_SelectLeftOrRightComposite = m_SelectPowerUps.FindAction("SelectLeftOrRightComposite", throwIfNotFound: true);
+        m_SelectPowerUps_RightAnalogStickDirection = m_SelectPowerUps.FindAction("RightAnalogStickDirection", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1920,6 +1984,7 @@ public class @Controls : IInputActionCollection, IDisposable
     private readonly InputAction m_SelectPowerUps_SelectRight;
     private readonly InputAction m_SelectPowerUps_SelectLeftOrRight;
     private readonly InputAction m_SelectPowerUps_SelectLeftOrRightComposite;
+    private readonly InputAction m_SelectPowerUps_RightAnalogStickDirection;
     public struct SelectPowerUpsActions
     {
         private @Controls m_Wrapper;
@@ -1929,6 +1994,7 @@ public class @Controls : IInputActionCollection, IDisposable
         public InputAction @SelectRight => m_Wrapper.m_SelectPowerUps_SelectRight;
         public InputAction @SelectLeftOrRight => m_Wrapper.m_SelectPowerUps_SelectLeftOrRight;
         public InputAction @SelectLeftOrRightComposite => m_Wrapper.m_SelectPowerUps_SelectLeftOrRightComposite;
+        public InputAction @RightAnalogStickDirection => m_Wrapper.m_SelectPowerUps_RightAnalogStickDirection;
         public InputActionMap Get() { return m_Wrapper.m_SelectPowerUps; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1953,6 +2019,9 @@ public class @Controls : IInputActionCollection, IDisposable
                 @SelectLeftOrRightComposite.started -= m_Wrapper.m_SelectPowerUpsActionsCallbackInterface.OnSelectLeftOrRightComposite;
                 @SelectLeftOrRightComposite.performed -= m_Wrapper.m_SelectPowerUpsActionsCallbackInterface.OnSelectLeftOrRightComposite;
                 @SelectLeftOrRightComposite.canceled -= m_Wrapper.m_SelectPowerUpsActionsCallbackInterface.OnSelectLeftOrRightComposite;
+                @RightAnalogStickDirection.started -= m_Wrapper.m_SelectPowerUpsActionsCallbackInterface.OnRightAnalogStickDirection;
+                @RightAnalogStickDirection.performed -= m_Wrapper.m_SelectPowerUpsActionsCallbackInterface.OnRightAnalogStickDirection;
+                @RightAnalogStickDirection.canceled -= m_Wrapper.m_SelectPowerUpsActionsCallbackInterface.OnRightAnalogStickDirection;
             }
             m_Wrapper.m_SelectPowerUpsActionsCallbackInterface = instance;
             if (instance != null)
@@ -1972,6 +2041,9 @@ public class @Controls : IInputActionCollection, IDisposable
                 @SelectLeftOrRightComposite.started += instance.OnSelectLeftOrRightComposite;
                 @SelectLeftOrRightComposite.performed += instance.OnSelectLeftOrRightComposite;
                 @SelectLeftOrRightComposite.canceled += instance.OnSelectLeftOrRightComposite;
+                @RightAnalogStickDirection.started += instance.OnRightAnalogStickDirection;
+                @RightAnalogStickDirection.performed += instance.OnRightAnalogStickDirection;
+                @RightAnalogStickDirection.canceled += instance.OnRightAnalogStickDirection;
             }
         }
     }
@@ -2183,6 +2255,7 @@ public class @Controls : IInputActionCollection, IDisposable
         void OnSelectRight(InputAction.CallbackContext context);
         void OnSelectLeftOrRight(InputAction.CallbackContext context);
         void OnSelectLeftOrRightComposite(InputAction.CallbackContext context);
+        void OnRightAnalogStickDirection(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

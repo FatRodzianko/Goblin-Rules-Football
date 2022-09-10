@@ -68,7 +68,7 @@ public class TutorialCameraMarker : MonoBehaviour
         qMarkerRight.SetActive(false);
 
 
-        SetGamepadUIStuff(GamepadUIManager.instance.gamepadUI);
+        SetGamepadUIStuff(TutorialManager.instance.gamepadUI);
 
         /*if (GamepadUIManager.instance.gamepadUI)
         {
@@ -214,6 +214,7 @@ public class TutorialCameraMarker : MonoBehaviour
     }
     public void SetGamepadUIStuff(bool enableGamepadUI)
     {
+        Debug.Log("TutorialCameraMarker: SetGamepadUIStuff");
         if (enableGamepadUI)
         {
             eMarkerLeftCanPass = rbMarkerLeftCanPass;

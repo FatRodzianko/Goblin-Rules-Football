@@ -10,6 +10,7 @@ public class TutorialManager : MonoBehaviour
 {
     public static TutorialManager instance;
     public string gamePhase;
+    public bool gamepadUI = false;
 
     [Header("Player Object")]
     [SerializeField] TutorialPlayer tutorialPlayer;
@@ -120,6 +121,11 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] GameObject PossessionBarMarker;
     [SerializeField] TextMeshProUGUI ScoreGreenText;
 
+    [Header("Touchdown")]
+    [SerializeField] GameObject TouchDownPanel;
+    [SerializeField] TextMeshProUGUI touchDownText;
+    [SerializeField] TextMeshProUGUI touchDownTeamText;
+
     [Header("Kick After Attempt")]
     public float yPositionOfKickAfter;
     [SerializeField] GameObject KickAfterPositionControlsPanel;
@@ -223,6 +229,7 @@ public class TutorialManager : MonoBehaviour
 
     private void Awake()
     {
+        this.gamepadUI = GamepadUIManager.instance.gamepadUI;
         MakeInstance();
     }
     void MakeInstance()
@@ -574,6 +581,7 @@ public class TutorialManager : MonoBehaviour
             greenGrenadierScript.SetEGoblin(false);
             greenGrenadierScript.SetQGoblin(false);
             greenGrenadierScript.goblinType = "grenadier";
+            //greenGrenadierScript.UpdateGamePadUIMarkersForGoblins(this.gamepadUI);
             tutorialPlayer.selectGoblin = greenGrenadierScript;
             greenGoblins.Add(greenGrenadierScript);
             tutorialPlayer.goblinTeam.Add(greenGrenadierScript);
@@ -675,6 +683,7 @@ public class TutorialManager : MonoBehaviour
             greenBerserkerScript.SetEGoblin(true);
             greenBerserkerScript.SetQGoblin(false);
             greenBerserkerScript.goblinType = "berserker";
+            //greenBerserkerScript.UpdateGamePadUIMarkersForGoblins(this.gamepadUI);
             tutorialPlayer.eGoblin = greenBerserkerScript;
             greenGoblins.Add(greenBerserkerScript);
             tutorialPlayer.goblinTeam.Add(greenBerserkerScript);
@@ -695,6 +704,7 @@ public class TutorialManager : MonoBehaviour
             greenSkirmisherScript.SetEGoblin(false);
             greenSkirmisherScript.SetQGoblin(true);
             greenSkirmisherScript.goblinType = "skirmisher";
+            //greenSkirmisherScript.UpdateGamePadUIMarkersForGoblins(this.gamepadUI);
             tutorialPlayer.qGoblin = greenSkirmisherScript;
             greenGoblins.Add(greenSkirmisherScript);
             tutorialPlayer.goblinTeam.Add(greenSkirmisherScript);
@@ -924,7 +934,7 @@ public class TutorialManager : MonoBehaviour
         if (index14Tracker)
             return;
         Debug.Log("KickBallDownFieldInstructions started. The tutorial index is: " + tutIndex.ToString());
-        messageBoardTopText.text = "When surrounded by opponents, kicking the ball downfield may be a good strategy.";
+        messageBoardTopText.text = "When surrounded by opponents, kicking the ball downfield may be a good strategy. Use \"TAB\" or Right trigger to kick. Hold down the button to get your kick power, and release to submit power and start the kick.";
         donePunchingPlayerGoblin = false;
         greyGrenadierScript.PunchPlayerGoblin(greenGrenadierScript, 1);
         index14Tracker = true;
@@ -934,7 +944,7 @@ public class TutorialManager : MonoBehaviour
         if (index15Tracker)
             return;
         Debug.Log("KickBallDownFieldEnableControls started. The tutorial index is: " + tutIndex.ToString());
-        messageBoardTopText.text = "Use \"TAB\" or Right trigger to kick. Hold down the button to get your kick power, and release to submit power and start the kick.";
+        messageBoardTopText.text = "When surrounded by opponents, kicking the ball downfield may be a good strategy. Use \"TAB\" or Right trigger to kick. Hold down the button to get your kick power, and release to submit power and start the kick.";
         // Enable kicking controls for the player
         tutorialPlayer.EnableKickingControlsFirstTime();
         index15Tracker = true;
@@ -1011,7 +1021,7 @@ public class TutorialManager : MonoBehaviour
         messageBoardTopText.text = "While moving, use 'S' on keyboard or 'A' on gamepad to slide tackle. This will trip opposing goblins and cause fumbles.";
         tutorialPlayer.EnableGoblinMovement(true);
         tutorialPlayer.goblinMovementControlsOnServer = true;
-        tutorialPlayer.ActivateAttackControls(true);
+        tutorialPlayer.ActivateAttackControls(false);
         tutorialPlayer.EnableSlideControls();
         index19Tracker = true;
     }
@@ -1324,6 +1334,7 @@ public class TutorialManager : MonoBehaviour
         tutorialPlayer.EnableGoblinMovement(false);
         tutorialPlayer.goblinMovementControlsOnServer = false;
         tutorialPlayer.ActivatePowerUpControls(false);
+        tutorialPlayer.powerupsControlsOnServer = false;
         StartCoroutine(TutorialDelay(5f, true));
         index33Tracker = true;
     }
@@ -1337,6 +1348,7 @@ public class TutorialManager : MonoBehaviour
         tutorialPlayer.EnableGoblinMovement(false);
         tutorialPlayer.goblinMovementControlsOnServer = false;
         tutorialPlayer.ActivatePowerUpControls(false);
+        tutorialPlayer.powerupsControlsOnServer = false;
         StartCoroutine(TutorialDelay(5f, true));
         index34Tracker = true;
     }
@@ -1516,6 +1528,8 @@ public class TutorialManager : MonoBehaviour
         HandleGreenScoreUpdate(greenScore, (greenScore + 5));
 
         playerScoredTouchdown = true;
+
+        StartCoroutine(TouchdownScoredUI());
     }
     void HandleGreenScoreUpdate(int oldValue, int newValue)
     {
@@ -1758,5 +1772,58 @@ public class TutorialManager : MonoBehaviour
     public void ExitToDesktopButton()
     {
         Application.Quit();
+    }
+    IEnumerator TouchdownScoredUI()
+    {
+        TouchDownPanel.SetActive(true);
+        touchDownText.GetComponent<TouchDownTextGradient>().ActivateGradient();
+        SoundManager.instance.PlaySound("touchdown-cheer", 0.75f);
+        SoundManager.instance.PlaySound("touchdown-touchdown", 1.0f);
+        yield return new WaitForSeconds(3.0f);
+        TouchDownPanel.SetActive(false);
+    }
+    public void EnableGamepadUIFromSettingsMenu(bool enableGamepadUI)
+    {
+        Debug.Log("EnableGamepadUIFromSettingsMenu: Enable gamepad UI elements? " + enableGamepadUI.ToString());
+        this.gamepadUI = enableGamepadUI;
+
+        // Update Camera marker UI
+        Camera.main.GetComponent<TutorialCameraMarker>().SetGamepadUIStuff(enableGamepadUI);
+
+        
+        // update goblin markers
+        if (greenGrenadierScript)
+        {
+            try
+            {
+                greenGrenadierScript.UpdateGamePadUIMarkersForGoblins(enableGamepadUI);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("EnableGamepadUIFromSettingsMenu: could not update goblin marker. Error: " + e);
+            }
+        }
+        if(greenBerserkerScript)
+        {
+            try
+            {
+                greenBerserkerScript.UpdateGamePadUIMarkersForGoblins(enableGamepadUI);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("EnableGamepadUIFromSettingsMenu: could not update goblin marker. Error: " + e);
+            }
+        }
+        if (greenSkirmisherScript)
+        {
+            try
+            {
+                greenSkirmisherScript.UpdateGamePadUIMarkersForGoblins(enableGamepadUI);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("EnableGamepadUIFromSettingsMenu: could not update goblin marker. Error: " + e);
+            }
+        }
     }
 }

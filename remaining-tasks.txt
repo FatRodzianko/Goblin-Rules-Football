@@ -1094,6 +1094,28 @@ x "How To Play" page of the title screen?
 - add a delay/limit how often you can block
 - - - right now you can spam blocking while running. Doesn't seem like it affects speed much. Unsure if it gives you the blocking defense bonus
 - - - when blocking is released, save timestamp. Don't allow for another block until after a certain time. Probably only needs to be like 0.5 seconds
+- Make it so you can use powerups by just move the right stick in a specific direction
+- - - Look at SelectPowerUps -> SelectLeftOrRightComposite for reference
+- - - - - - change it so there is an up/down/left/right bound to the right stick movement directions
+- - - - - - have values read into a Vector2 and a function reads it
+- - - - - - if value in any direction is >0.71f, set appropriate direction
+- - - - - - - - - (-1.0,0.0) = left = 0
+- - - - - - - - - (0.0,1.0) = up = 1
+- - - - - - - - - (1.0,0.0) = right = 2
+- - - - - - - - - (0.0,-1.0) = down = 3
+- - - - - - have timer cooldown between reading the analog stick and submitting to UsePowerUp?
+- - - - - - - - - or use boolean value wasRightStickUsedToSelect. Set to true when action is performed. Set back to false when action is cancelled?
+- - - - - - - - - see how the goblin movement works when reading values?
+- - - - - - - - - - - - InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
+- - - - - - - - - - - - InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
+- - - - - - the above seems to work in the tutorial game. Add to regular gameplay???
+- if player pauses/opens esc menu during end of game, make sure that when they close the esc menu the "main menu" button is selected again for gamepad UI navigation?
+- - - only confirmed this is an issue in singleplayer so far?
+- re-mapping controls D:
+- - - https://www.youtube.com/watch?v=dUCcZrPhwSo
+- - - https://www.youtube.com/watch?v=DBBbpbIRoIc - persistent key binding?
+
+
 
 - "How to get a variable from another script in Unity (the right way)" connecting scripts/objects without singletons?
 - - - https://gamedevbeginner.com/how-to-get-a-variable-from-another-script-in-unity-the-right-way/#scriptable_objects
@@ -1103,4 +1125,6 @@ x "How To Play" page of the title screen?
 - Game Architecture "tips"
 - - - https://www.youtube.com/watch?v=pRjTM3pzqDw
 - unity "job" system?
-- - - https://www.youtube.com/watch?v=C56bbgtPr_w 
+- - - https://www.youtube.com/watch?v=C56bbgtPr_w
+- make combat fun?
+- - - https://www.youtube.com/watch?v=6BrZryMz-ac

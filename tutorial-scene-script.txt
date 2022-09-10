@@ -64,6 +64,7 @@ x escape menu manager needs to be recreated for tutorial...
 x calculate the kick after accuracy/angle and set the yellow bars correctly when the kick after attempt first starts>?
 - - x right now it shows the yellow bars out at their max position
 x go through and make sure the controlsEnabled variables are set each time a control scheme is set?
-- using powerups with the right analog stick still doesn't work. Need to activate that control scheme specifically?
-- gamepad UI doesn't change on things like goblin markers or whatever
-- make it so the touchdown scored panel still shows up when you score a touchdown
+x using powerups with the right analog stick still doesn't work. Need to activate that control scheme specifically?
+x gamepad UI doesn't change on things like goblin markers or whatever
+x make it so the touchdown scored panel still shows up when you score a touchdown
+- update the powerup numbers/dpad icons when gamepadUI is set to true/false

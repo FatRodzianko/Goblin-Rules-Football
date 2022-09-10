@@ -1019,8 +1019,9 @@ public class GoblinScript : NetworkBehaviour
             myRenderer.flipX = flip;
         if (myShadow.flipX != flip)
             myShadow.flipX = flip;
-        if (mySelectedCircle.flipX != flip)
-            mySelectedCircle.flipX = flip;
+        // Remove quotes if removing the animated selection circle?
+        /*if (mySelectedCircle.flipX != flip)
+            mySelectedCircle.flipX = flip;*/
 
         //Flip colliders for hurt/hitboxes so they match the flipped sprite
         Vector3 newLocalScale = punchBoxCollider.transform.localScale;

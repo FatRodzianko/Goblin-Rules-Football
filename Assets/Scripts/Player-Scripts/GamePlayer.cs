@@ -241,6 +241,8 @@ public class GamePlayer : NetworkBehaviour
         InputManager.Controls.PowerUps.PowerUp2.performed += _ => UsePowerUp(1);
         InputManager.Controls.PowerUps.PowerUp3.performed += _ => UsePowerUp(2);
         InputManager.Controls.PowerUps.PowerUp4.performed += _ => UsePowerUp(3);
+        InputManager.Controls.SelectPowerUps.RightAnalogStickDirection.performed += ctx => PowerUpAnalogReader(ctx.ReadValue<Vector2>());
+        InputManager.Controls.SelectPowerUps.RightAnalogStickDirection.canceled += ctx => CancelRightAnalogStickDirection();
         // Power Up selection with right analog stick - Gamepads only?
         //InputManager.Controls.SelectPowerUps.SelectLeft.performed += _ => GamepadPowerUpSelectLeftRight(true);
         //InputManager.Controls.SelectPowerUps.SelectRight.performed += _ => GamepadPowerUpSelectLeftRight(false);
@@ -2311,6 +2313,41 @@ public class GamePlayer : NetworkBehaviour
             }
         }
     }
+    void PowerUpAnalogReader(Vector2 direction)
+    {
+        Debug.Log("PowerUpAnalogReader: Direction of right stick: " + direction.ToString() + " wasRightStickUsedToSelect: " + wasRightStickUsedToSelect.ToString());
+        if (wasRightStickUsedToSelect)
+            return;
+        if (direction.x <= -0.75f)
+        {
+            Debug.Log("PowerUpAnalogReader: setting power up value to 0");
+            UsePowerUp(0);
+            wasRightStickUsedToSelect = true;
+        }
+        else if (direction.y >= 0.75f)
+        {
+            Debug.Log("PowerUpAnalogReader: setting power up value to 1");
+            UsePowerUp(1);
+            wasRightStickUsedToSelect = true;
+        }
+        else if (direction.x >= 0.75f)
+        {
+            Debug.Log("PowerUpAnalogReader: setting power up value to 2");
+            UsePowerUp(2);
+            wasRightStickUsedToSelect = true;
+        }
+        else if (direction.y <= -0.75f)
+        {
+            Debug.Log("PowerUpAnalogReader: setting power up value to 3");
+            UsePowerUp(3);
+            wasRightStickUsedToSelect = true;
+        }
+    }
+    void CancelRightAnalogStickDirection()
+    {
+        Debug.Log("CancelRightAnalogStickDirection: wasRightStickUsedToSelect: " + wasRightStickUsedToSelect.ToString());
+        wasRightStickUsedToSelect = false;
+    }
     public void EnablePowerUpControls(bool activate)
     {
         Debug.Log("EnablePowerUpControls: for player " + this.PlayerName + " " + activate.ToString());
@@ -2331,14 +2368,15 @@ public class GamePlayer : NetworkBehaviour
                 var uiModule = (InputSystemUIInputModule)EventSystem.current.currentInputModule;
                 //uiModule.move = moveReference;
                 //uiModule.submit = submitReference;
-                uiModule.move = InputActionReference.Create(InputManager.Controls.SelectPowerUps.SelectLeftOrRightComposite);
-                uiModule.submit = InputActionReference.Create(InputManager.Controls.SelectPowerUps.SubmitSelection);
+                //uiModule.move = InputActionReference.Create(InputManager.Controls.SelectPowerUps.SelectLeftOrRightComposite);
+                //uiModule.submit = InputActionReference.Create(InputManager.Controls.SelectPowerUps.SubmitSelection);
                 uiModule.enabled = true;
                 var eventSystem = EventSystem.current;
                 eventSystem.enabled = true;
 
                 InputManager.Controls.PowerUps.Enable();
                 InputManager.Controls.SelectPowerUps.Enable();
+                InputManager.Controls.SelectPowerUps.RightAnalogStickDirection.Enable();
                 powerUpsEnabled = true;
             }
         }
@@ -2346,6 +2384,7 @@ public class GamePlayer : NetworkBehaviour
         {
             InputManager.Controls.PowerUps.Disable();
             InputManager.Controls.SelectPowerUps.Disable();
+            InputManager.Controls.SelectPowerUps.RightAnalogStickDirection.Disable();
             powerUpsEnabled = false;
         }
     }
