@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour
 {
     // Dictionary to keep track of action map names and if they are disable or not
     // if an action map name has a value greater than 0, it is disabled
     private static readonly IDictionary<string, int> mapStates = new Dictionary<string, int>();
+    public InputActionAsset actions;
 
     private static Controls controls;
     public static Controls Controls
@@ -22,12 +24,20 @@ public class InputManager : MonoBehaviour
         if (controls != null)
             return;
         controls = new Controls();
-
+        
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        var rebinds = PlayerPrefs.GetString("rebinds");
+        if (!string.IsNullOrEmpty(rebinds))
+        {
+            //actions.LoadFromJson(rebinds);
+            //actions.LoadBindingOverridesFromJson(rebinds);
+            controls.asset.LoadBindingOverridesFromJson(rebinds);
+            Debug.Log("RebindSaveLoad: LoadBindings: loaded from json string!");
+        }
         
     }
 

@@ -858,7 +858,7 @@ TextureImporter:
       213: -8499570005695774153
     second: ground-tile-set-4_284
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -879,6 +879,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -917,6 +918,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -932,6 +934,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -6940,6 +6954,292 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      ground-tile-set-4_84: -6711402492743065645
+      ground-tile-set-4_233: -3432906029224036688
+      ground-tile-set-4_248: 6667666240395826135
+      ground-tile-set-4_26: -1502074144594129885
+      ground-tile-set-4_4: -2627756030810591714
+      ground-tile-set-4_56: 4419298570213756132
+      ground-tile-set-4_184: 54256624188107126
+      ground-tile-set-4_42: -8195799285706265493
+      ground-tile-set-4_0: 4355990765428391538
+      ground-tile-set-4_22: 455946565707383468
+      ground-tile-set-4_126: -352091786787884418
+      ground-tile-set-4_160: 2460028652986438153
+      ground-tile-set-4_190: 2109603820069371971
+      ground-tile-set-4_223: 3464879142951522499
+      ground-tile-set-4_266: 1499971422520222387
+      ground-tile-set-4_180: 4061361256313860435
+      ground-tile-set-4_192: -5759285149157745284
+      ground-tile-set-4_28: 2106254187901349378
+      ground-tile-set-4_63: 4997066597496812936
+      ground-tile-set-4_229: -5260257862499089685
+      ground-tile-set-4_263: -4041924026009216510
+      ground-tile-set-4_261: 8635928116360496888
+      ground-tile-set-4_268: -2554886758311179485
+      ground-tile-set-4_10: 9141915886966625671
+      ground-tile-set-4_85: -4162688910252577333
+      ground-tile-set-4_273: -7446284445414351877
+      ground-tile-set-4_8: -3766772521036630595
+      ground-tile-set-4_18: -6009004779217279957
+      ground-tile-set-4_119: 3385587728117515369
+      ground-tile-set-4_204: 6126652626669796649
+      ground-tile-set-4_282: -4884787615531395422
+      ground-tile-set-4_82: 3294643824291948329
+      ground-tile-set-4_2: -7629799760927026499
+      ground-tile-set-4_242: -5258066755447847131
+      ground-tile-set-4_16: -2279482422484169643
+      ground-tile-set-4_213: 983379111596364442
+      ground-tile-set-4_179: 5135787823683902560
+      ground-tile-set-4_270: 8475676567824077636
+      ground-tile-set-4_141: -4283721323996241597
+      ground-tile-set-4_127: -2172648272873977476
+      ground-tile-set-4_43: 1846709240528079877
+      ground-tile-set-4_120: 9203736302798202172
+      ground-tile-set-4_208: -5673670539844024905
+      ground-tile-set-4_176: 350596860377643646
+      ground-tile-set-4_271: 6814053962589771371
+      ground-tile-set-4_136: -5109481366670541636
+      ground-tile-set-4_131: -4498054500688896801
+      ground-tile-set-4_205: -1759146851202348469
+      ground-tile-set-4_101: 2108238515596033324
+      ground-tile-set-4_145: 5476557899208941167
+      ground-tile-set-4_150: -8973600138912204656
+      ground-tile-set-4_6: -2862871203644918437
+      ground-tile-set-4_13: 488047782050001687
+      ground-tile-set-4_87: -6180877143961267030
+      ground-tile-set-4_122: 5824534649251137535
+      ground-tile-set-4_193: -3191831663765731767
+      ground-tile-set-4_258: 7252754942962523824
+      ground-tile-set-4_41: 3968220909208742621
+      ground-tile-set-4_240: -5132141468399057507
+      ground-tile-set-4_153: -1803595650495755386
+      ground-tile-set-4_256: 2523351564225765160
+      ground-tile-set-4_51: 1579694782395560381
+      ground-tile-set-4_206: 3558917276396587699
+      ground-tile-set-4_231: 2422630373970135385
+      ground-tile-set-4_44: 6864469093103011846
+      ground-tile-set-4_225: -4510177113594327072
+      ground-tile-set-4_34: -8138262709762210454
+      ground-tile-set-4_226: 5250280421054472314
+      ground-tile-set-4_112: -4567036139217885964
+      ground-tile-set-4_254: -4346969849040839732
+      ground-tile-set-4_45: -2452937652278518846
+      ground-tile-set-4_118: -4175506601240424911
+      ground-tile-set-4_175: 1918798130592627202
+      ground-tile-set-4_115: 4518917830805864143
+      ground-tile-set-4_187: 5711863302829732966
+      ground-tile-set-4_207: 6079082613918508563
+      ground-tile-set-4_251: -6801360258389958108
+      ground-tile-set-4_35: -6242622116679311904
+      ground-tile-set-4_276: -2053035702363352683
+      ground-tile-set-4_279: -7864028961041998113
+      ground-tile-set-4_165: 8206915480061158481
+      ground-tile-set-4_54: 7586054729673147053
+      ground-tile-set-4_86: -5928399023877309066
+      ground-tile-set-4_53: -3000991987556312263
+      ground-tile-set-4_65: 3441441744404162841
+      ground-tile-set-4_121: 2845242628049806999
+      ground-tile-set-4_125: -8196252992976299545
+      ground-tile-set-4_105: -445973271132257924
+      ground-tile-set-4_200: 2419221406167926071
+      ground-tile-set-4_202: -5561708153503198897
+      ground-tile-set-4_97: -1273737856296198296
+      ground-tile-set-4_154: 3956232219285898164
+      ground-tile-set-4_140: 8494673310456742798
+      ground-tile-set-4_214: -2792515110488894828
+      ground-tile-set-4_92: 6581616629629229540
+      ground-tile-set-4_138: 7884741796562947928
+      ground-tile-set-4_235: 6498700514067043251
+      ground-tile-set-4_181: 893957063436935567
+      ground-tile-set-4_81: -7651709916525695672
+      ground-tile-set-4_9: 4653973292878368791
+      ground-tile-set-4_57: 6736278130265668689
+      ground-tile-set-4_1: 3438200745870730821
+      ground-tile-set-4_23: -679840921513866504
+      ground-tile-set-4_227: -2264196433256191138
+      ground-tile-set-4_91: -2694370751081327103
+      ground-tile-set-4_245: -1495369430122952013
+      ground-tile-set-4_11: 3286079336653749650
+      ground-tile-set-4_243: 8927821747120776852
+      ground-tile-set-4_222: 8582704645961709413
+      ground-tile-set-4_50: -2360537170791632451
+      ground-tile-set-4_259: -7086634865573080159
+      ground-tile-set-4_31: -770433760189222581
+      ground-tile-set-4_68: 1107343760176277226
+      ground-tile-set-4_73: 4748972868574088981
+      ground-tile-set-4_76: -5693480845081572691
+      ground-tile-set-4_7: -6213060589393483443
+      ground-tile-set-4_71: -6550638644101293775
+      ground-tile-set-4_183: -3594963789048799913
+      ground-tile-set-4_265: -6411153011963896506
+      ground-tile-set-4_144: 6599095924083686466
+      ground-tile-set-4_197: 348205598868998433
+      ground-tile-set-4_220: 1969317097308111387
+      ground-tile-set-4_201: 5353066936586941103
+      ground-tile-set-4_17: 1632009149580845379
+      ground-tile-set-4_78: 749655236190598049
+      ground-tile-set-4_52: 8225874900509058744
+      ground-tile-set-4_167: 3752333845065450727
+      ground-tile-set-4_46: 7638298444404067508
+      ground-tile-set-4_130: -4843459439085893774
+      ground-tile-set-4_210: 4509634839427111294
+      ground-tile-set-4_275: 51683214261630719
+      ground-tile-set-4_88: 3678421095277184558
+      ground-tile-set-4_151: 5716546006984969642
+      ground-tile-set-4_93: 4308618106691153161
+      ground-tile-set-4_15: 3008105354836180349
+      ground-tile-set-4_135: -3313110614384346777
+      ground-tile-set-4_212: -1659367823993525870
+      ground-tile-set-4_146: 7714748075489736482
+      ground-tile-set-4_143: 8998638614368076722
+      ground-tile-set-4_232: -4459659600309179890
+      ground-tile-set-4_38: 7572926894816508562
+      ground-tile-set-4_244: -5786957084109652592
+      ground-tile-set-4_132: -7280732393979166071
+      ground-tile-set-4_158: 3124169359890927799
+      ground-tile-set-4_58: -4130157171070779949
+      ground-tile-set-4_133: 2590760364934067161
+      ground-tile-set-4_224: -827992082856426798
+      ground-tile-set-4_178: 4237840603594427117
+      ground-tile-set-4_164: -2126883070356326054
+      ground-tile-set-4_228: 2869662525258602864
+      ground-tile-set-4_272: -7904008800964716886
+      ground-tile-set-4_21: 569646109762107128
+      ground-tile-set-4_74: -6498909800864229295
+      ground-tile-set-4_185: -4722281228409688386
+      ground-tile-set-4_49: -2310474273652935137
+      ground-tile-set-4_19: -6766563773464104199
+      ground-tile-set-4_162: 16322412860057870
+      ground-tile-set-4_191: 8919895767895743622
+      ground-tile-set-4_249: 1114230017202316659
+      ground-tile-set-4_189: 2467182415777045121
+      ground-tile-set-4_217: 8719143647420768052
+      ground-tile-set-4_106: -1266350034560125830
+      ground-tile-set-4_238: -7565054456596902754
+      ground-tile-set-4_59: -9072686598371049610
+      ground-tile-set-4_109: -7132789741689760260
+      ground-tile-set-4_148: -5015856562211348736
+      ground-tile-set-4_107: 1836986773263092599
+      ground-tile-set-4_37: 8367921428899701423
+      ground-tile-set-4_104: 6315654700964454796
+      ground-tile-set-4_32: 8784308320880065444
+      ground-tile-set-4_67: 3086468591417156672
+      ground-tile-set-4_72: 8754618862034830460
+      ground-tile-set-4_61: 2513020525469168340
+      ground-tile-set-4_96: 5062496616992767835
+      ground-tile-set-4_215: 5590747925255407729
+      ground-tile-set-4_247: 8173634537120582779
+      ground-tile-set-4_234: 1800254354873209573
+      ground-tile-set-4_14: 7891741206731537448
+      ground-tile-set-4_111: -2650308924780298558
+      ground-tile-set-4_177: -7227818006314521003
+      ground-tile-set-4_281: 3175002260398690963
+      ground-tile-set-4_142: -6372088443219029558
+      ground-tile-set-4_83: 3558684114339466390
+      ground-tile-set-4_39: 7309989801990689346
+      ground-tile-set-4_152: 7637898981728999485
+      ground-tile-set-4_60: -8963493372770078683
+      ground-tile-set-4_89: 9074499515302600255
+      ground-tile-set-4_262: 1004600628939982208
+      ground-tile-set-4_264: -277466163939802343
+      ground-tile-set-4_113: -4022817390713710823
+      ground-tile-set-4_134: -7595236217736779634
+      ground-tile-set-4_274: -3910495133641775068
+      ground-tile-set-4_116: 9006187604102059477
+      ground-tile-set-4_170: 244992976517952619
+      ground-tile-set-4_246: 7824757881337681564
+      ground-tile-set-4_94: -6683928200618479923
+      ground-tile-set-4_147: 4451475203738164731
+      ground-tile-set-4_157: 8479038927424661584
+      ground-tile-set-4_219: -1057205190248001335
+      ground-tile-set-4_20: 6652372607333273798
+      ground-tile-set-4_33: 5517918913333058534
+      ground-tile-set-4_55: 7943647389351326428
+      ground-tile-set-4_100: 941264378292124901
+      ground-tile-set-4_62: 707191733249883797
+      ground-tile-set-4_277: 4123123656004542218
+      ground-tile-set-4_30: 6104175228966487761
+      ground-tile-set-4_129: 5388024300760575583
+      ground-tile-set-4_166: -6571309046674706286
+      ground-tile-set-4_269: -6819570279468881623
+      ground-tile-set-4_260: 6486652414594700288
+      ground-tile-set-4_156: -1325891572020463478
+      ground-tile-set-4_90: 3711907814797161114
+      ground-tile-set-4_218: -3906255798804223217
+      ground-tile-set-4_236: 7817570338239034311
+      ground-tile-set-4_79: -4789900127494823256
+      ground-tile-set-4_98: -1197720586552088005
+      ground-tile-set-4_77: -6182975146553308792
+      ground-tile-set-4_12: -766742790892736677
+      ground-tile-set-4_195: 542108328273029797
+      ground-tile-set-4_25: -5327330055820270857
+      ground-tile-set-4_182: -797296729222943711
+      ground-tile-set-4_80: 8628015388192415617
+      ground-tile-set-4_99: 774782506314831482
+      ground-tile-set-4_174: 749177394161487065
+      ground-tile-set-4_194: 3829739159246091922
+      ground-tile-set-4_5: -2630461967038950350
+      ground-tile-set-4_278: -1569846578217261920
+      ground-tile-set-4_24: -730805621375308882
+      ground-tile-set-4_36: 9025952334349135720
+      ground-tile-set-4_110: -5642734018327891603
+      ground-tile-set-4_70: 2922437052751754166
+      ground-tile-set-4_203: 4629923116769854304
+      ground-tile-set-4_171: -4389803864094178988
+      ground-tile-set-4_267: 2891556968125425377
+      ground-tile-set-4_149: 5152279198290956760
+      ground-tile-set-4_123: -43236564067588232
+      ground-tile-set-4_253: 6959128906029585251
+      ground-tile-set-4_128: -206384060452864330
+      ground-tile-set-4_283: 6225397915667303490
+      ground-tile-set-4_252: 4326013072403612977
+      ground-tile-set-4_139: 6191677260656953870
+      ground-tile-set-4_108: -2977817321980641210
+      ground-tile-set-4_173: 2078027211967001460
+      ground-tile-set-4_163: 7297013032665420534
+      ground-tile-set-4_69: 8422433484434186380
+      ground-tile-set-4_188: -4501398677878430774
+      ground-tile-set-4_198: 4643584938763978622
+      ground-tile-set-4_169: 4975918338057961959
+      ground-tile-set-4_209: -7242256354745102651
+      ground-tile-set-4_159: 2718179752108911571
+      ground-tile-set-4_230: -1713068897957018344
+      ground-tile-set-4_239: -8312199873729202504
+      ground-tile-set-4_161: -6332180463014074300
+      ground-tile-set-4_168: 3236203725564099000
+      ground-tile-set-4_29: 5037768739958475604
+      ground-tile-set-4_102: 3312985296919236488
+      ground-tile-set-4_3: -7769343702244295739
+      ground-tile-set-4_137: 3748573967133757515
+      ground-tile-set-4_257: -2840040689742381077
+      ground-tile-set-4_237: 8010123971067580338
+      ground-tile-set-4_155: -6701160284300518573
+      ground-tile-set-4_114: -6019675459805522310
+      ground-tile-set-4_75: 5204549545278340335
+      ground-tile-set-4_172: 6373667956858539018
+      ground-tile-set-4_196: -3726629553642749529
+      ground-tile-set-4_124: 6795942815297359041
+      ground-tile-set-4_186: -3784243285376335929
+      ground-tile-set-4_255: 7965940820704990054
+      ground-tile-set-4_241: 5727322772033423346
+      ground-tile-set-4_95: 25146657284714379
+      ground-tile-set-4_250: -7933260380488834705
+      ground-tile-set-4_199: -8459262150725851530
+      ground-tile-set-4_284: -8499570005695774153
+      ground-tile-set-4_48: 3287347677175143053
+      ground-tile-set-4_27: 4710029546025749228
+      ground-tile-set-4_66: -4860451027599744746
+      ground-tile-set-4_117: -1626678129443523176
+      ground-tile-set-4_216: 4384845072784580866
+      ground-tile-set-4_40: 104479715704857564
+      ground-tile-set-4_103: -4753360716160935399
+      ground-tile-set-4_47: 1537412572708895549
+      ground-tile-set-4_221: -286382673005976426
+      ground-tile-set-4_280: 6764790816856154063
+      ground-tile-set-4_64: 6746811576385034604
+      ground-tile-set-4_211: 1377273572591385104
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

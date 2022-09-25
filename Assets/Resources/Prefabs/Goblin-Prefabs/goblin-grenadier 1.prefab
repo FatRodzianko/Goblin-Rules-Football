@@ -142,7 +142,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2, y: 3}
+  m_Size: {x: 0.32, y: 0.48}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -187,7 +187,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5625, y: 0.5}
     oldSize: {x: 2, y: 3}
-    newSize: {x: 2, y: 3}
+    newSize: {x: 0.32, y: 0.48}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -242,6 +242,7 @@ MonoBehaviour:
   MaxSpeed: 10
   MaxDamage: 0
   canCollide: 1
+  soundType: 
   health: 0
   stamina: 0
   speed: 0
@@ -262,6 +263,8 @@ MonoBehaviour:
   isPunching: 0
   eMarkerPrefab: {fileID: 3718499330716654528, guid: 764a42fe423f10f4e80ab9e989af2463, type: 3}
   qMarkerPrefab: {fileID: 7215489222767727815, guid: f42ce2cbcc7b04f4db61749caeea4077, type: 3}
+  eMarker: {fileID: 0}
+  qMarker: {fileID: 0}
   ballMarkerPrefab: {fileID: 0}
   ballMarkerOpponentPrefab: {fileID: 0}
   youMarkerPrefab: {fileID: 0}
@@ -275,6 +278,9 @@ MonoBehaviour:
   myStatusBars: {fileID: 0}
   touchdownHitbox: {fileID: 0}
   divingHitbox: {fileID: 0}
+  myShadow: {fileID: 0}
+  mySelectedCircle: {fileID: 0}
+  sprintParticleSystem: {fileID: 0}
   isGoblinGrey: 0
   doesCharacterHaveBall: 0
   isThrowing: 0
@@ -313,6 +319,8 @@ MonoBehaviour:
   isKickAfterPositionSet: 0
   angleOfKickAttempt: 0
   kickAfterAccuracyDifficulty: 0
+  repositioningButtonHeldDown: 0
+  repositioningToLeft: 0
   kickAfterFinalPosition: {x: 0, y: 0}
   hasGoblinBeenRepositionedForKickAfter: 0
   kickAfterAccuracyBar: {fileID: 0}
@@ -338,6 +346,15 @@ MonoBehaviour:
   attackNormal: 0
   defenseNormal: 0
   speedNormal: 0
+  invinvibilityBlueShell: 0
+  spriteFlash: {fileID: 0}
+  fatigueSweatDrop: {fileID: 0}
+  wasPunchedBandAid: {fileID: 0}
+  onWaterSlowDown: 0
+  onBrushSlowDown: 0
+  onGlueSlowDown: 0
+  firstFootStep: 0
+  mySoundManager: {fileID: 0}
   state: 0
   punchRange: 2.5
   punchRate: 1
@@ -361,6 +378,20 @@ MonoBehaviour:
   adjacentGoblinTime: 0
   diveRate: 2.5
   nextDiveTime: 0
+  myGoblinAIPathFindingScript: {fileID: 0}
+  didGoblinCompleteSprint: 0
+  willGoblinSprintToFatigue: 0
+  canGoblinSprint: 1
+  minStaminaToSprintTo: 1
+  isStuck: 0
+  stuckCheckTime: 0
+  stuckCheckRate: 0.5
+  lastCheckedPosition: {x: 0, y: 0, z: 0}
+  stuckDirectionChange: {x: 0, y: 0}
+  teammateCollision: 0
+  teammateCollisionDirectionModifer: {x: 0, y: 0}
+  diveCheckTime: 0
+  diveCheckRate: 0.25
 --- !u!95 &2813347414334592408
 Animator:
   serializedVersion: 3

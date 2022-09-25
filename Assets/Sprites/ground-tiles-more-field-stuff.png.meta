@@ -384,7 +384,7 @@ TextureImporter:
       213: 4434032324190791610
     second: ground-tiles-more-field-stuff_126
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -405,6 +405,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -443,6 +444,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -458,6 +460,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -3148,6 +3162,134 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      ground-tiles-more-field-stuff_69: -2898685729107776642
+      ground-tiles-more-field-stuff_61: 6493825374151260738
+      ground-tiles-more-field-stuff_87: -8132686204792581475
+      ground-tiles-more-field-stuff_71: 6654066443928414269
+      ground-tiles-more-field-stuff_13: -4337342347469634801
+      ground-tiles-more-field-stuff_82: 6194410971058413585
+      ground-tiles-more-field-stuff_104: 36217289233568796
+      ground-tiles-more-field-stuff_126: 4434032324190791610
+      ground-tiles-more-field-stuff_40: 1721274786150050396
+      ground-tiles-more-field-stuff_39: 4111910937175921973
+      ground-tiles-more-field-stuff_48: 698332641567916091
+      ground-tiles-more-field-stuff_122: 5850472632730872352
+      ground-tiles-more-field-stuff_46: -5147863699732321772
+      ground-tiles-more-field-stuff_42: -1641797874788982647
+      ground-tiles-more-field-stuff_111: -5811699755029962255
+      ground-tiles-more-field-stuff_97: -3100112255856919456
+      ground-tiles-more-field-stuff_15: -2506616596558515871
+      ground-tiles-more-field-stuff_89: -6268548188399815071
+      ground-tiles-more-field-stuff_98: -4345415309254184810
+      ground-tiles-more-field-stuff_125: -7837763514858484818
+      ground-tiles-more-field-stuff_74: 8957529540257171715
+      ground-tiles-more-field-stuff_44: 7436059775677228378
+      ground-tiles-more-field-stuff_3: 3248800709076772472
+      ground-tiles-more-field-stuff_57: 3739304137259317765
+      ground-tiles-more-field-stuff_35: 6426701527119540125
+      ground-tiles-more-field-stuff_20: 4922386983705440877
+      ground-tiles-more-field-stuff_66: 2453401194690451568
+      ground-tiles-more-field-stuff_115: -8610734026918085904
+      ground-tiles-more-field-stuff_60: -3165755543027923516
+      ground-tiles-more-field-stuff_81: -4131315330125282700
+      ground-tiles-more-field-stuff_77: 2049484960537888534
+      ground-tiles-more-field-stuff_91: 6552010783916162759
+      ground-tiles-more-field-stuff_78: 5711785875533623198
+      ground-tiles-more-field-stuff_116: -1172390742591737321
+      ground-tiles-more-field-stuff_29: -3232371614698590859
+      ground-tiles-more-field-stuff_49: -2206112416679996597
+      ground-tiles-more-field-stuff_56: 6072870726321881009
+      ground-tiles-more-field-stuff_86: -2908546255808485827
+      ground-tiles-more-field-stuff_90: 3964935773389777158
+      ground-tiles-more-field-stuff_31: -6843688536940341979
+      ground-tiles-more-field-stuff_17: 2103984975704187390
+      ground-tiles-more-field-stuff_84: -8399769083611942893
+      ground-tiles-more-field-stuff_109: 6907052259180669720
+      ground-tiles-more-field-stuff_121: -4464138310527632395
+      ground-tiles-more-field-stuff_55: -6270167077090895621
+      ground-tiles-more-field-stuff_113: 1608974356493566822
+      ground-tiles-more-field-stuff_103: 2165227035395831395
+      ground-tiles-more-field-stuff_36: -815953382402274239
+      ground-tiles-more-field-stuff_110: -8620705660227543793
+      ground-tiles-more-field-stuff_23: 2344796426289625338
+      ground-tiles-more-field-stuff_30: -6350326525011839315
+      ground-tiles-more-field-stuff_70: 4985284077625159901
+      ground-tiles-more-field-stuff_50: 8697140461540412336
+      ground-tiles-more-field-stuff_32: -6920354204021106206
+      ground-tiles-more-field-stuff_124: 6449606351497972104
+      ground-tiles-more-field-stuff_65: -7999457192944781148
+      ground-tiles-more-field-stuff_33: 7572148497729530680
+      ground-tiles-more-field-stuff_18: 7694086569299645309
+      ground-tiles-more-field-stuff_22: 3171040443230938129
+      ground-tiles-more-field-stuff_52: -6529997466948326230
+      ground-tiles-more-field-stuff_9: 8794342390272125362
+      ground-tiles-more-field-stuff_5: 7119528270056631143
+      ground-tiles-more-field-stuff_100: 9079902359105800674
+      ground-tiles-more-field-stuff_38: -3064182045823089953
+      ground-tiles-more-field-stuff_120: 4632020477744156119
+      ground-tiles-more-field-stuff_45: -6188533256607833814
+      ground-tiles-more-field-stuff_47: 9074690589373276078
+      ground-tiles-more-field-stuff_73: -4856212238723779738
+      ground-tiles-more-field-stuff_105: 7319157164234000405
+      ground-tiles-more-field-stuff_34: -4749990417656329980
+      ground-tiles-more-field-stuff_19: 7313634929935515135
+      ground-tiles-more-field-stuff_99: -5004612613132120655
+      ground-tiles-more-field-stuff_62: -304384823342118659
+      ground-tiles-more-field-stuff_67: 3544080238222180036
+      ground-tiles-more-field-stuff_58: 5501667565079627448
+      ground-tiles-more-field-stuff_1: 5297534581011160082
+      ground-tiles-more-field-stuff_6: 4956861677790331818
+      ground-tiles-more-field-stuff_107: 1820942582803816413
+      ground-tiles-more-field-stuff_123: 6688313443894565755
+      ground-tiles-more-field-stuff_79: -2216430412227587481
+      ground-tiles-more-field-stuff_96: 8463589809524133300
+      ground-tiles-more-field-stuff_92: -568229017479790359
+      ground-tiles-more-field-stuff_119: 6311561756924370437
+      ground-tiles-more-field-stuff_80: -2242884480437953749
+      ground-tiles-more-field-stuff_7: -2941818078482480627
+      ground-tiles-more-field-stuff_21: 8026308242938061202
+      ground-tiles-more-field-stuff_8: 5131706793325932890
+      ground-tiles-more-field-stuff_72: 4121144227747690400
+      ground-tiles-more-field-stuff_68: -5329228632181216437
+      ground-tiles-more-field-stuff_26: 1910849350288040272
+      ground-tiles-more-field-stuff_0: 4901302200483004811
+      ground-tiles-more-field-stuff_59: 5121182283347035941
+      ground-tiles-more-field-stuff_117: 382834835524833209
+      ground-tiles-more-field-stuff_93: 3935295961009931824
+      ground-tiles-more-field-stuff_25: -8810900644047077777
+      ground-tiles-more-field-stuff_28: -8657755558373415084
+      ground-tiles-more-field-stuff_11: 7519261394079909926
+      ground-tiles-more-field-stuff_4: -2852365729796991979
+      ground-tiles-more-field-stuff_106: 2402074969922207867
+      ground-tiles-more-field-stuff_75: -8564174487443574423
+      ground-tiles-more-field-stuff_101: 3334573029204913684
+      ground-tiles-more-field-stuff_16: 8617650368306817466
+      ground-tiles-more-field-stuff_102: 8825212243988878070
+      ground-tiles-more-field-stuff_63: -4083593464425551725
+      ground-tiles-more-field-stuff_76: -2656668223910513853
+      ground-tiles-more-field-stuff_108: -7327735821361825800
+      ground-tiles-more-field-stuff_114: -6335885401642410146
+      ground-tiles-more-field-stuff_54: -4548594681817827589
+      ground-tiles-more-field-stuff_95: 5651086637523615131
+      ground-tiles-more-field-stuff_12: 5294328874804934869
+      ground-tiles-more-field-stuff_118: -4425363314930531743
+      ground-tiles-more-field-stuff_64: 8173477357893727791
+      ground-tiles-more-field-stuff_2: -7908657488218549225
+      ground-tiles-more-field-stuff_94: -6073080294804922213
+      ground-tiles-more-field-stuff_43: 3394779845608048666
+      ground-tiles-more-field-stuff_53: 3971248557553794924
+      ground-tiles-more-field-stuff_88: -4393832129763297406
+      ground-tiles-more-field-stuff_14: -8867482900357728661
+      ground-tiles-more-field-stuff_85: -440877556834125241
+      ground-tiles-more-field-stuff_51: 4498845728718011914
+      ground-tiles-more-field-stuff_83: -5995051355074837304
+      ground-tiles-more-field-stuff_112: -1762933048203065431
+      ground-tiles-more-field-stuff_27: 4747379690298815040
+      ground-tiles-more-field-stuff_24: -7207863665719036453
+      ground-tiles-more-field-stuff_10: -4284759612036556684
+      ground-tiles-more-field-stuff_41: -2850361542187397866
+      ground-tiles-more-field-stuff_37: -8840146763699740169
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

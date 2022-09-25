@@ -91,6 +91,10 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] private SpriteRenderer myShadow;
     [SerializeField] private SpriteRenderer mySelectedCircle;
     [SerializeField] private ParticleSystem sprintParticleSystem;
+    [SerializeField] private Material spriteDefault;
+    [SerializeField] private Material spriteOutlineWhite;
+    [SerializeField] private Material spriteOutlineYellow;
+    Material spriteOutline;
 
 
     [Header("Character Game State Stuff")]
@@ -408,6 +412,7 @@ public class GoblinScript : NetworkBehaviour
                 ballMarkerObject = Instantiate(ballMarkerPrefab);
                 youMarkerObject = Instantiate(youMarkerPrefab);
                 mySelectedCircle.color = Color.white;
+                spriteOutline = spriteOutlineWhite;
             }
             else
             {
@@ -416,12 +421,14 @@ public class GoblinScript : NetworkBehaviour
                     ballMarkerObject = Instantiate(ballMarkerPrefab);
                     youMarkerObject = Instantiate(youMarkerPrefab);
                     mySelectedCircle.color = Color.white;
+                    spriteOutline = spriteOutlineWhite;
                 }
                 else
                 {
                     youMarkerObject = new GameObject("empty-you-marker");
                     ballMarkerObject = Instantiate(ballMarkerOpponentPrefab);
                     mySelectedCircle.color = Color.yellow;
+                    spriteOutline = spriteOutlineYellow;
                 }
             }
         }
@@ -429,6 +436,7 @@ public class GoblinScript : NetworkBehaviour
         {
             ballMarkerObject = Instantiate(ballMarkerOpponentPrefab);
             mySelectedCircle.color = Color.yellow;
+            spriteOutline = spriteOutlineYellow;
         }
             
 
@@ -460,6 +468,7 @@ public class GoblinScript : NetworkBehaviour
         //eMarker.transform.localPosition = new Vector3(0f, 2f, 0f);
         eMarker.transform.localPosition = markerPosition;
         eMarker.SetActive(false);
+        myRenderer.material = spriteDefault;
     }
     public void SelectThisCharacter()
     {
@@ -943,16 +952,16 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    MoveTowrdBallCarrier();
+                    //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    GetOpenForPass();
+                    //GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    MoveTowardGoblinTarget();
+                    //MoveTowardGoblinTarget();
                     break;
             }
         }
@@ -972,19 +981,19 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    MoveTowrdBallCarrier();
+                    //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    GetOpenForPass();
+                    //GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    MoveTowardGoblinTarget();
+                    //MoveTowardGoblinTarget();
                     break;
                 case State.RunTowardEndzone:
-                    myGamePlayer.myAiPlayer.RunTowardEndZone();
+                    //myGamePlayer.myAiPlayer.RunTowardEndZone();
                     break;
             }
 
@@ -1179,6 +1188,7 @@ public class GoblinScript : NetworkBehaviour
                                 ballMarkerObject.transform.localPosition = markerPosition;
                                 ballMarkerObject.SetActive(false);
                                 mySelectedCircle.color = Color.white;
+                                spriteOutline = spriteOutlineWhite;
                             }
                         }
                         catch (Exception e)
@@ -1188,7 +1198,8 @@ public class GoblinScript : NetworkBehaviour
                         hasGoblinGottenBallBefore = true;
                     }
                 }
-
+                // Set the sprite outline material
+                myRenderer.material = spriteOutline;
             }
             else
             {
@@ -1196,6 +1207,8 @@ public class GoblinScript : NetworkBehaviour
                 football.transform.parent = null;
                 if (hasAuthority && powerBarActive)
                     ResetPowerBar();
+                // Set the sprite outline material
+                myRenderer.material = spriteDefault;
             }
             if (!GameplayManager.instance.is1v1)
             {
@@ -1207,6 +1220,30 @@ public class GoblinScript : NetworkBehaviour
             
             ballMarkerObject.SetActive(newValue);
             mySelectedCircle.gameObject.SetActive(newValue);
+            // Checks for setting the sprite outline material
+            /*if (newValue)
+            {
+                if (hasAuthority)
+                {
+                    if (myGamePlayer.isSinglePlayer)
+                    { 
+                        if(myGamePlayer.isLocalPlayer)
+                            myRenderer.material = spriteOutlineWhite;
+                        else
+                            myRenderer.material = spriteOutlineYellow;
+                    }
+                    else
+                        myRenderer.material = spriteOutlineWhite;
+                }
+                else
+                {
+                    myRenderer.material = spriteOutlineYellow;
+                }
+            }
+            else
+            {
+                myRenderer.material = spriteDefault;
+            }*/
         }
     }
     [Command]

@@ -30,7 +30,7 @@ TextureImporter:
       213: -4562910992817883439
     second: goblin-3-punch-animation-grey_8
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -51,6 +51,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -89,6 +90,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -104,6 +106,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -316,6 +330,16 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      goblin-3-punch-animation-grey_5: 5470195462564964727
+      goblin-3-punch-animation-grey_7: -1746266162625246066
+      goblin-3-punch-animation-grey_0: 2617269400292540638
+      goblin-3-punch-animation-grey_1: -4247665589377004735
+      goblin-3-punch-animation-grey_8: -4562910992817883439
+      goblin-3-punch-animation-grey_2: -4799983467184640039
+      goblin-3-punch-animation-grey_6: 1834759746276202063
+      goblin-3-punch-animation-grey_3: -2063378014857837699
+      goblin-3-punch-animation-grey_4: 4083419147484666278
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

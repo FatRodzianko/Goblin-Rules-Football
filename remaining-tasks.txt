@@ -942,11 +942,11 @@ x Implement the "mercy rule" feature
 - - x if point differential is equal to or greater than mercy rule amount, end the game?
 x When game is paused, during the PauseGameTimeoutRoutine have it send the pause time left to each client
 - - x client will then update a text object to show seconds left for the pause
-- Add an "outline" to characters when they have the ball as yet another visual indicator?
-- - - https://www.youtube.com/watch?v=84rZ-rCRsZk - "shader graph" to add outline?
-- - - https://www.youtube.com/watch?v=FvQFhkS90nI - same as above but shows on an animated sprite?
-- - - https://www.youtube.com/watch?v=MqpyXhBIRSw - see comment about "texel size" and "tilling and offset node" to make the outline consistently 1 pixel thick?
-- - - https://www.youtube.com/watch?v=vqDOirux0Es - again with shaders. By dapper dino so that's good?
+x Add an "outline" to characters when they have the ball as yet another visual indicator?
+- - x https://www.youtube.com/watch?v=84rZ-rCRsZk - "shader graph" to add outline?
+x Since switching to universal render pipeline, the "blur" material/shader for the esc menu doesn't work and is just grey?
+- - x fix? https://www.youtube.com/watch?v=QhasSbe7Xes
+- - x what I used: https://www.youtube.com/watch?v=cjfNgra1uWk
 
 ### Custom Settings per game?
 x Time per half
@@ -1094,26 +1094,53 @@ x "How To Play" page of the title screen?
 - add a delay/limit how often you can block
 - - - right now you can spam blocking while running. Doesn't seem like it affects speed much. Unsure if it gives you the blocking defense bonus
 - - - when blocking is released, save timestamp. Don't allow for another block until after a certain time. Probably only needs to be like 0.5 seconds
-- Make it so you can use powerups by just move the right stick in a specific direction
-- - - Look at SelectPowerUps -> SelectLeftOrRightComposite for reference
-- - - - - - change it so there is an up/down/left/right bound to the right stick movement directions
-- - - - - - have values read into a Vector2 and a function reads it
-- - - - - - if value in any direction is >0.71f, set appropriate direction
+x Make it so you can use powerups by just move the right stick in a specific direction
+- - x Look at SelectPowerUps -> SelectLeftOrRightComposite for reference
+- - - - - x change it so there is an up/down/left/right bound to the right stick movement directions
+- - - - - x have values read into a Vector2 and a function reads it
+- - - - - x if value in any direction is >0.71f, set appropriate direction
 - - - - - - - - - (-1.0,0.0) = left = 0
 - - - - - - - - - (0.0,1.0) = up = 1
 - - - - - - - - - (1.0,0.0) = right = 2
 - - - - - - - - - (0.0,-1.0) = down = 3
-- - - - - - have timer cooldown between reading the analog stick and submitting to UsePowerUp?
-- - - - - - - - - or use boolean value wasRightStickUsedToSelect. Set to true when action is performed. Set back to false when action is cancelled?
-- - - - - - - - - see how the goblin movement works when reading values?
-- - - - - - - - - - - - InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
-- - - - - - - - - - - - InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
-- - - - - - the above seems to work in the tutorial game. Add to regular gameplay???
+- - - - - x have timer cooldown between reading the analog stick and submitting to UsePowerUp?
+- - - - - - - - x or use boolean value wasRightStickUsedToSelect. Set to true when action is performed. Set back to false when action is cancelled?
+- - - - - - - - x see how the goblin movement works when reading values?
+- - - - - - - - - - - x InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
+- - - - - - - - - - - x InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
+- - - - - x the above seems to work in the tutorial game. Add to regular gameplay???
 - if player pauses/opens esc menu during end of game, make sure that when they close the esc menu the "main menu" button is selected again for gamepad UI navigation?
 - - - only confirmed this is an issue in singleplayer so far?
 - re-mapping controls D:
 - - - https://www.youtube.com/watch?v=dUCcZrPhwSo
 - - - https://www.youtube.com/watch?v=DBBbpbIRoIc - persistent key binding?
+- - - better one to use: https://www.youtube.com/watch?v=csqVa2Vimao
+- - - - - x when check for duplicates, create a serialized field that is an array of all action maps
+- - - - - - - - x not actually all, but the important "gameplay" ones like switch goblins and player actions?
+- - - - - - - - x check through each action map and see if the new binding key exists in an action map
+- - - - - - - - x not sure what to do for gamepad because there won't be any "available" keys since everything is mapped already?
+- - - - - x When saving, change it so the save function is a public func that is called by pressing a button, instead of just "onDisable"?
+- - - - - - - - x or just leave it as onDisable so player's don't need to worry about forgetting to save it?
+- - - recreate the "multiple With Cancelling Through" stuff by doing something similar to CheckDuplicateBindings in the onComplete section of PerformInteractiveRebind
+- - - - - - how some people did it: https://forum.unity.com/threads/withcancelingthrough-keyboard-escape-also-cancels-with-keyboard-e.1233400/
+- - - - - - basically, check for input, if it is esc/start/select, then removeBindingOverride and cleanup(), then return?
+- - - - - - how to check the submitted binding though???
+- - x make it so the "reset" button for an individual binding also checks for duplicates
+- - - - - x want to make sure that when you reset a binding to default, another binding isn't using its default path. If it is, switch the duplicate binding to something else
+- - x for gamepad, make sure that not is ever set to a path with the left stick and right stick?
+- - x make it so the duplicate checks are for more than just the current action map (like Controls.Player). It should also check other action maps
+- - - - - x Player, QESwitchGoblins, PowerUps
+- turn off the game audio listener or whatever its called when the game is paused
+- - - if you don't you can get stuck listening to sounds that are looped
+
+- New title screen UI tabs:
+- - - tutorial
+- - - controls
+- - - - - - two sub tabs:
+- - - - - - Keyboard/Mouse
+- - - - - - Gamepad
+- - - - - - copy from multiplayer for how to have the two sub tabs?
+- Switch all gamepad controls from "Xbox Controller" to generic "Gamepad"?
 
 
 

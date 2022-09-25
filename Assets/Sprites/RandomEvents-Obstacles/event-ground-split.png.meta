@@ -78,7 +78,7 @@ TextureImporter:
       213: 1846555051664896650
     second: event-ground-split_24
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -99,6 +99,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -137,6 +138,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -152,6 +154,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -700,6 +714,32 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      event-ground-split_12: 6607792209837099557
+      event-ground-split_11: -6564158502176258504
+      event-ground-split_0: -2673348339105487656
+      event-ground-split_7: -5975101211768410043
+      event-ground-split_9: -1146210939635232676
+      event-ground-split_14: -3323829065300756700
+      event-ground-split_5: -5020773028438496882
+      event-ground-split_15: 8026932824585684220
+      event-ground-split_19: 1642365590147106008
+      event-ground-split_8: 8957850084399956345
+      event-ground-split_24: 1846555051664896650
+      event-ground-split_20: 6257677763896750458
+      event-ground-split_10: -7147484904092458327
+      event-ground-split_17: -7780510923149858322
+      event-ground-split_21: -5383617421850977245
+      event-ground-split_22: -5795110572684000185
+      event-ground-split_1: 8220743869267581275
+      event-ground-split_13: 2826402827757935850
+      event-ground-split_16: -8373294818783881618
+      event-ground-split_23: 8114873250531584444
+      event-ground-split_3: -6250717238153009490
+      event-ground-split_4: -697233384408086512
+      event-ground-split_18: 8340861610494002073
+      event-ground-split_2: -4019867683276181912
+      event-ground-split_6: 5393412880553700967
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
