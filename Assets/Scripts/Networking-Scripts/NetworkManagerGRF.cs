@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using Steamworks;
 
 public class NetworkManagerGRF : NetworkManager
 {
@@ -105,7 +106,7 @@ public class NetworkManagerGRF : NetworkManager
             lobbyPlayerInstance.IsGameLeader = isGameLeader;
             lobbyPlayerInstance.ConnectionId = conn.connectionId;
             lobbyPlayerInstance.playerNumber = LobbyPlayers.Count + 1;
-            //lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.current_lobbyID, LobbyPlayers.Count);
+            lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.current_lobbyID, LobbyPlayers.Count);
             lobbyPlayerInstance.is1v1 = this.is1v1;
             lobbyPlayerInstance.isSinglePlayer = this.isSinglePlayer;
 
@@ -169,7 +170,7 @@ public class NetworkManagerGRF : NetworkManager
                 gamePlayerInstance.SetConnectionId(LobbyPlayers[i].ConnectionId);
                 gamePlayerInstance.SetPlayerNumber(LobbyPlayers[i].playerNumber);
                 gamePlayerInstance.IsGameLeader = LobbyPlayers[i].IsGameLeader;
-                //gamePlayerInstance.playerSteamId = LobbyPlayers[i].playerSteamId;
+                gamePlayerInstance.playerSteamId = LobbyPlayers[i].playerSteamId;
                 gamePlayerInstance.is1v1 = LobbyPlayers[i].is1v1;
                 gamePlayerInstance.isSinglePlayer = LobbyPlayers[i].isSinglePlayer;
                 if (!this.is1v1 && !this.isSinglePlayer)
@@ -202,6 +203,7 @@ public class NetworkManagerGRF : NetworkManager
 
     public override void OnStopServer()
     {
+        Debug.Log("Stopping the server with OnStopServer");
         LobbyPlayers.Clear();
         GamePlayers.Clear();
         //Debug.Log("Game Over: OnStopServer");
@@ -281,11 +283,26 @@ public class NetworkManagerGRF : NetworkManager
             Debug.Log("CheckIfAllGameplayStuffIsLoaded: true");
             foreach (GamePlayer player in GamePlayers)
                 player.DoneLoadingGameplayStuff();
+            ResetWaitingForPlayersToLoadStuff();
         }
         else
         {
             Debug.Log("CheckIfAllGameplayStuffIsLoaded: false");
         }
+    }
+    public void ResetWaitingForPlayersToLoadStuff()
+    {
+        playersFinishedLoading.Clear();
+        areAllGoblinsLoaded = false;
+        areAllPlayersLoaded = false;
+        numberOfGoblinsLoaded.Clear();
+        playersWithFootballSpawned.Clear();
+        areFootballsSpawned = false;
+    }
+    public void ClearLobbyAndGamePlayerList()
+    {
+        LobbyPlayers.Clear();
+        GamePlayers.Clear();
     }
     [Server]
     public void ReportFootballSpawnedForPlayer(int playerNumber)

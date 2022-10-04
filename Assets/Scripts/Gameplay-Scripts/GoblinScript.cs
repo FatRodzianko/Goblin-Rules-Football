@@ -29,6 +29,8 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public uint ownerNetId;
     public GamePlayer myGamePlayer;
     public GamePlayer serverGamePlayer;
+    float touchdownScoredtime = 0f;
+    float blockedKickTime = 0f;
     
 
     [Header("Goblin Base Stats")]
@@ -952,16 +954,16 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    //MoveTowardFootball();
+                    MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    //MoveTowrdBallCarrier();
+                    MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    //GetOpenForPass();
+                    GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    //MoveTowardGoblinTarget();
+                    MoveTowardGoblinTarget();
                     break;
             }
         }
@@ -981,19 +983,19 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    //MoveTowardFootball();
+                    MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    //MoveTowrdBallCarrier();
+                    MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    //GetOpenForPass();
+                    GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    //MoveTowardGoblinTarget();
+                    MoveTowardGoblinTarget();
                     break;
                 case State.RunTowardEndzone:
-                    //myGamePlayer.myAiPlayer.RunTowardEndZone();
+                    myGamePlayer.myAiPlayer.RunTowardEndZone();
                     break;
             }
 
@@ -1987,6 +1989,15 @@ public class GoblinScript : NetworkBehaviour
                 slidingGoblin.TripGoblin();
                 if (this.isCharacterSelected)
                     TeamManager.instance.SlideTackle(this, true);
+                //GoblinScript collidingGoblin = collision.collider.GetComponent<GoblinScript>();
+                Debug.Log("SlideBoxCollision: Is the sliding goblin " + slidingGoblin.name + " the kickafter goblin? " + slidingGoblin.isKickAfterGoblin + " has ball? " + slidingGoblin.doesCharacterHaveBall);
+                if (GameplayManager.instance.gamePhase == "kick-after-attempt" && slidingGoblin.isKickAfterGoblin && slidingGoblin.isGoblinGrey != this.isGoblinGrey && slidingGoblin.isKickAfterPositionSet && !gameFootball.isKicked)
+                {   
+                    if (this.serverGamePlayer)
+                    {
+                        serverGamePlayer.RpcBlockedKickAchievement(serverGamePlayer.connectionToClient);
+                    }
+                }
             }   
         }
     }
@@ -2167,7 +2178,10 @@ public class GoblinScript : NetworkBehaviour
             if (isGoblinBlocking)
                 blockingSpeedModifier = 0.8f;
             else
+            {
                 blockingSpeedModifier = 1.0f;
+            }
+
             HandleIsBlocking(this.isBlocking, isGoblinBlocking);
         }
         else
@@ -2175,8 +2189,6 @@ public class GoblinScript : NetworkBehaviour
             blockingSpeedModifier = 1.0f;
             HandleIsBlocking(this.isBlocking, false);
         }
-            
-
     }
     public void HandleIsBlocking(bool oldValue, bool newValue)
     {
@@ -2616,6 +2628,10 @@ public class GoblinScript : NetworkBehaviour
                     {
                         Debug.Log("GoblinScript: OnCollisionEnter2D: The colliding goblin is the kick after goblin! Goblin: " + collidingGoblin.name);
                         collidingGoblin.KickAfterGoblinWasRunInto();
+                        if (this.serverGamePlayer)
+                        {
+                            serverGamePlayer.RpcBlockedKickAchievement(serverGamePlayer.connectionToClient);
+                        }
                     }
                     /*if (this.isKickAfterGoblin)
                     {
@@ -4018,6 +4034,56 @@ public class GoblinScript : NetworkBehaviour
         if (isClient)
         {
             wasPunchedBandAid.SetActive(newValue);
+        }
+    }
+    public void CheckForStubbedToeAchievement()
+    {
+        Debug.Log("CheckForStubbedToeAchievement: for goblin: " + this.name + " is grey? " + this.isGoblinGrey.ToString());
+        if (hasAuthority)
+        {
+            // Don't give the achievement for a goblin that the player isn't controlling
+            if (!this.isCharacterSelected)
+                return;
+            // IF it is singleplayer, make sure that the goblin is the AI's goblin
+            if (GameplayManager.instance.isSinglePlayer)
+            {
+                if (!myGamePlayer.isLocalPlayer)
+                    return;
+            }
+
+            SteamAchievementManager.instance.StubbedToe();
+        }
+    }
+    public void TouchdownScoredAchievement()
+    {
+        Debug.Log("TouchdownScoredAchievement");
+        if (serverGamePlayer)
+        {
+            if (GameplayManager.instance.isSinglePlayer)
+            {
+                if (serverGamePlayer.PlayerName == "AIPlayer")
+                    return;
+            }
+            RpcTouchdownScoredAchievement(serverGamePlayer.connectionToClient);
+        }
+    }
+    [TargetRpc]
+    void RpcTouchdownScoredAchievement(NetworkConnection target)
+    {
+        Debug.Log("RpcTouchdownScoredAchievement: goblin scored touchdown: " + this.name);
+        if (hasAuthority)
+        {
+            if (GameplayManager.instance.isSinglePlayer)
+            {
+                if (!myGamePlayer.isLocalPlayer)
+                    return;
+            }
+            if (Time.time >= (touchdownScoredtime + 1f))
+            {
+                SteamAchievementManager.instance.TouchdownScored();
+                touchdownScoredtime = Time.time;
+            }
+            
         }
     }
 }

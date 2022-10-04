@@ -266,9 +266,16 @@ public class TutorialManager : MonoBehaviour
         //
         touchDownTrigger.SetActive(false);
         GameObject networkManager = GameObject.Find("NetworkManager");
-        Destroy(networkManager);
+        //Destroy(networkManager);
+        //StartCoroutine(ToggleEscMenu());
+        TutorialEscMenuManager.instance.CloseEscMenu();
     }
-
+    IEnumerator ToggleEscMenu()
+    {
+        TutorialEscMenuManager.instance.UpdateEscapeMenu();
+        yield return new WaitForSeconds(0.1f);
+        TutorialEscMenuManager.instance.UpdateEscapeMenu();
+    }
     // Update is called once per frame
     void Update()
     {
@@ -598,6 +605,7 @@ public class TutorialManager : MonoBehaviour
         Debug.Log("MovementInstructions started. The tutorial index is: " + tutIndex.ToString());
         messageBoardTopText.text = "Use the arrow keys or the right analog stick on a game pad to move";
         greenGrenadierScript.EnableMovementControls();
+        tutorialPlayer.EnableGoblinMovement(true);
         tutorialPlayer.FollowSelectedGoblin(greenGrenadierObject.transform);
         //greenGrenadierScript.isCharacterSelected = true;
         index2Tracker = true;
@@ -1731,6 +1739,7 @@ public class TutorialManager : MonoBehaviour
         if (index54Tracker)
             return;
         messageBoardTopText.text = "That's it for the tutorial. I hope you learned something. Good luck out there!";
+        SteamAchievementManager.instance.TutorialCompleted();
 
         StartCoroutine(TutorialDelay(5.0f, true));
         index54Tracker = true;

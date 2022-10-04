@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
+using Steamworks;
 
 public class TitleScreenManager : MonoBehaviour
 {
@@ -73,6 +74,33 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] GameObject connectToIPButton;
     [SerializeField] GameObject createLobbyButton;
 
+    [Header("Lobby List UI")]
+    [SerializeField] private GameObject LobbyListCanvas;
+    [SerializeField] private GameObject LobbyListItemPrefab;
+    [SerializeField] private GameObject ContentPanel;
+    [SerializeField] private GameObject LobbyListScrollRect;
+    [SerializeField] private TMP_InputField searchBox;
+    public bool didPlayerSearchForLobbies = false;
+    [Header("Create Lobby UI")]
+    [SerializeField] private GameObject CreateLobbyCanvas;
+    [SerializeField] private TMP_InputField lobbyNameInputField;
+    [SerializeField] private Toggle friendsOnlyToggle;
+    public bool didPlayerNameTheLobby = false;
+    public List<GameObject> listOfLobbyListItems = new List<GameObject>();
+
+    private NetworkManagerGRF game;
+    private NetworkManagerGRF Game
+    {
+        get
+        {
+            if (game != null)
+            {
+                return game;
+            }
+            return game = NetworkManagerGRF.singleton as NetworkManagerGRF;
+        }
+    }
+
     private void Awake()
     {
         MakeInstance();
@@ -82,6 +110,8 @@ public class TitleScreenManager : MonoBehaviour
     {
         if (instance == null)
             instance = this;
+        else if (instance != this)
+            Destroy(gameObject);
     }
     // Start is called before the first frame update
     void Start()
@@ -148,7 +178,7 @@ public class TitleScreenManager : MonoBehaviour
     public void HostGame()
     {
         Debug.Log("Hosting a game...");
-        /*networkManager.StartHost();
+        /*Game.StartHost();
         HostOrJoinPanel.SetActive(false);
         returnToMainMenu.gameObject.SetActive(false);*/
         HostOrJoinPanel.SetActive(false);
@@ -160,20 +190,20 @@ public class TitleScreenManager : MonoBehaviour
         //if (toggle3v3.isOn)
         if (multiplayer3v3Toggle.isOn)
         {
-            networkManager.is1v1 = false;
-            networkManager.isSinglePlayer = false;
-            networkManager.maxConnections = 6;
-            networkManager.minPlayers = 6;
+            Game.is1v1 = false;
+            Game.isSinglePlayer = false;
+            Game.maxConnections = 6;
+            Game.minPlayers = 6;
         }
         else
         {
-            networkManager.is1v1 = true;
-            networkManager.isSinglePlayer = false;
-            networkManager.maxConnections = 2;
-            networkManager.minPlayers = 2;
+            Game.is1v1 = true;
+            Game.isSinglePlayer = false;
+            Game.maxConnections = 2;
+            Game.minPlayers = 2;
         }
         SetGameSettings(false);
-        networkManager.StartHost();
+        Game.StartHost();
         CreateGameInfoPanel.SetActive(false);
         returnToMainMenu.gameObject.SetActive(false);
     }
@@ -189,8 +219,8 @@ public class TitleScreenManager : MonoBehaviour
         if (!string.IsNullOrEmpty(IpAddressField.text))
         {
             Debug.Log("Client will connect to: " + IpAddressField.text);
-            networkManager.networkAddress = IpAddressField.text;
-            networkManager.StartClient();
+            Game.networkAddress = IpAddressField.text;
+            Game.StartClient();
         }
         EnterIPAddressPanel.SetActive(false);
         returnToMainMenu.gameObject.SetActive(false);
@@ -198,10 +228,15 @@ public class TitleScreenManager : MonoBehaviour
     public void SinglePlayerGame()
     {
         Debug.Log("TitleScreenManager: Player has chosen a single player game");
-        networkManager.is1v1 = false;
-        networkManager.isSinglePlayer = true;
-        networkManager.maxConnections = 1;
-        networkManager.minPlayers = 1;
+        ResetGameServerSettings();
+        /*Game.is1v1 = false;
+        Game.isSinglePlayer = true;
+        Game.maxConnections = 1;
+        Game.minPlayers = 1;*/
+        Game.is1v1 = false;
+        Game.isSinglePlayer = true;
+        Game.maxConnections = 1;
+        Game.minPlayers = 1;
 
         try
         {
@@ -212,7 +247,8 @@ public class TitleScreenManager : MonoBehaviour
             Debug.Log("SinglePlayerGame: Failed to set new game values. Error: " + e);
         }
 
-        networkManager.StartHost();
+        //Game.StartHost();
+        Game.StartHost();
         CreateGameInfoPanel.SetActive(false);
         returnToMainMenu.gameObject.SetActive(false);
     }
@@ -228,7 +264,8 @@ public class TitleScreenManager : MonoBehaviour
                 {
                     if (String.IsNullOrWhiteSpace(singlePlayerSecondsPerHalfInputField.text))
                     {
-                        networkManager.secondsPerHalf = 60;
+                        //Game.secondsPerHalf = 60;
+                        Game.secondsPerHalf = 60;
                     }
                     else
                     {
@@ -237,46 +274,54 @@ public class TitleScreenManager : MonoBehaviour
                             secondsPerHalf = 30;
                         else if (secondsPerHalf > 300)
                             secondsPerHalf = 300;
-                        networkManager.secondsPerHalf = secondsPerHalf;
+                        //Game.secondsPerHalf = secondsPerHalf;
+                        Game.secondsPerHalf = secondsPerHalf;
                     }
                 }
                 catch (Exception e)
                 {
                     Debug.Log("SetGameSettings: failed to get text from seconds per half input field. Error: " + e);
-                    networkManager.secondsPerHalf = 60;
+                    Game.secondsPerHalf = 60;
                 }
 
                 // set power ups bool
-                networkManager.powerUpsEnabled = singlePlayerPowerUpsToggle.isOn;
+                //Game.powerUpsEnabled = singlePlayerPowerUpsToggle.isOn;
+                Game.powerUpsEnabled = singlePlayerPowerUpsToggle.isOn;
 
                 // set the random events enabled bool
-                networkManager.randomEventsEnabled = singlePlayerRandomEventsToggle.isOn;
+                //Game.randomEventsEnabled = singlePlayerRandomEventsToggle.isOn;
+                Game.randomEventsEnabled = singlePlayerRandomEventsToggle.isOn;
 
                 // set spawn obstacles bool
-                networkManager.spawnObstaclesEnabled = singlePlayerSpawnObstacles.isOn;
+                //Game.spawnObstaclesEnabled = singlePlayerSpawnObstacles.isOn;
+                Game.spawnObstaclesEnabled = singlePlayerSpawnObstacles.isOn;
 
                 // set Mercy rule bool
-                networkManager.mercyRuleEnabled = singlePlayerMercyRuleToggle.isOn;
+                //Game.mercyRuleEnabled = singlePlayerMercyRuleToggle.isOn;
+                Game.mercyRuleEnabled = singlePlayerMercyRuleToggle.isOn;
 
                 // Set mercy rule point differential
                 try
                 {
                     if (String.IsNullOrWhiteSpace(singlePlayerMercyRuleInputField.text))
                     {
-                        networkManager.mercyRulePointDifferential = 21;
+                        //Game.mercyRulePointDifferential = 21;
+                        Game.mercyRulePointDifferential = 21;
                     }
                     else
                     {
                         int.TryParse(singlePlayerMercyRuleInputField.text, out mercyRulePointDifferential);
                         if (mercyRulePointDifferential < 21)
                             mercyRulePointDifferential = 21;
-                        networkManager.mercyRulePointDifferential = mercyRulePointDifferential;
+                        //Game.mercyRulePointDifferential = mercyRulePointDifferential;
+                        Game.mercyRulePointDifferential = mercyRulePointDifferential;
                     }
                 }
                 catch (Exception e)
                 {
                     Debug.Log("SetGameSettings: failed to get text from mercy rule point differential input field. Error: " + e);
-                    networkManager.mercyRulePointDifferential = 21;
+                    //Game.mercyRulePointDifferential = 21;
+                    Game.mercyRulePointDifferential = 21;
                 }
             }
             catch (Exception e)
@@ -293,20 +338,21 @@ public class TitleScreenManager : MonoBehaviour
                 {
                     if (String.IsNullOrWhiteSpace(multiplayerLobbyNameInputField.text))
                     {
-                        networkManager.lobbyName = "Player's Lobby";
+                        //Game.lobbyName = "Player's Lobby";
+                        Game.lobbyName = "Player's Lobby";
                     }
                     else
                     {
                         if (multiplayerLobbyNameInputField.text.Length > 15)
-                            networkManager.lobbyName = multiplayerLobbyNameInputField.text.Substring(0, 15);
+                            Game.lobbyName = multiplayerLobbyNameInputField.text.Substring(0, 15);
                         else
-                            networkManager.lobbyName = multiplayerLobbyNameInputField.text;
+                            Game.lobbyName = multiplayerLobbyNameInputField.text;
                     }
                 }
                 catch (Exception e)
                 {
                     Debug.Log("SetGameSettings: failed to get text from lobby name input field. Error: " + e);
-                    networkManager.lobbyName = "Player's Lobby";
+                    Game.lobbyName = "Player's Lobby";
                 }
 
                 // set seconds per game
@@ -315,7 +361,8 @@ public class TitleScreenManager : MonoBehaviour
                 {
                     if (String.IsNullOrWhiteSpace(multiplayerSecondsPerHalfInputField.text))
                     {
-                        networkManager.secondsPerHalf = 60;
+                        //Game.secondsPerHalf = 60;
+                        Game.secondsPerHalf = 60;
                     }
                     else
                     {
@@ -324,46 +371,47 @@ public class TitleScreenManager : MonoBehaviour
                             secondsPerHalf = 30;
                         else if (secondsPerHalf > 300)
                             secondsPerHalf = 300;
-                        networkManager.secondsPerHalf = secondsPerHalf;
+                        //Game.secondsPerHalf = secondsPerHalf;
+                        Game.secondsPerHalf = secondsPerHalf;
                     }
                 }
                 catch (Exception e)
                 {
                     Debug.Log("SetGameSettings: failed to get text from seconds per half input field. Error: " + e);
-                    networkManager.secondsPerHalf = 60;
+                    Game.secondsPerHalf = 60;
                 }
 
                 // set power ups bool
-                networkManager.powerUpsEnabled = multiplayerPowerUpsToggle.isOn;
+                Game.powerUpsEnabled = multiplayerPowerUpsToggle.isOn;
 
                 // set the random events enabled bool
-                networkManager.randomEventsEnabled = multiplayerRandomEventsToggle.isOn;
+                Game.randomEventsEnabled = multiplayerRandomEventsToggle.isOn;
 
                 // set spawn obstacles bool
-                networkManager.spawnObstaclesEnabled = multiplayerSpawnObstacles.isOn;
+                Game.spawnObstaclesEnabled = multiplayerSpawnObstacles.isOn;
 
                 // set Mercy rule bool
-                networkManager.mercyRuleEnabled = multiplayerMercyRuleToggle.isOn;
+                Game.mercyRuleEnabled = multiplayerMercyRuleToggle.isOn;
 
                 // Set mercy rule point differential
                 try
                 {
                     if (String.IsNullOrWhiteSpace(multiplayerMercyRuleInputField.text))
                     {
-                        networkManager.mercyRulePointDifferential = 21;
+                        Game.mercyRulePointDifferential = 21;
                     }
                     else
                     {
                         int.TryParse(multiplayerMercyRuleInputField.text, out mercyRulePointDifferential);
                         if (mercyRulePointDifferential < 21)
                             mercyRulePointDifferential = 21;
-                        networkManager.mercyRulePointDifferential = mercyRulePointDifferential;
+                        Game.mercyRulePointDifferential = mercyRulePointDifferential;
                     }
                 }
                 catch (Exception e)
                 {
                     Debug.Log("SetGameSettings: failed to get text from mercy rule point differential input field. Error: " + e);
-                    networkManager.mercyRulePointDifferential = 21;
+                    Game.mercyRulePointDifferential = 21;
                 }
                 
             }
@@ -375,14 +423,154 @@ public class TitleScreenManager : MonoBehaviour
     }
     public void StartTutorial()
     {
-        networkManager.is1v1 = false;
-        networkManager.isSinglePlayer = false;
-        networkManager.maxConnections = 1;
-        networkManager.minPlayers = 1;
+        Game.is1v1 = false;
+        Game.isSinglePlayer = false;
+        Game.maxConnections = 1;
+        Game.minPlayers = 1;
         SceneManager.LoadScene("Tutorial");
     }
     public void ExitGame()
     {
         Application.Quit();
     }
+    public void GetListOfLobbies()
+    {
+        Debug.Log("Trying to get list of available lobbies ...");
+        //buttons.SetActive(false);
+        //LobbyListCanvas.SetActive(true);
+        //eventSystem.SetSelectedGameObject(searchButton, new BaseEventData(eventSystem));
+        SteamLobby.instance.GetListOfLobbies();
+        GamepadUIManager.instance.gamepadUI = GamepadToggle.isOn;
+    }
+    public void DisplayLobbies(List<CSteamID> lobbyIDS, LobbyDataUpdate_t result)
+    {
+        Debug.Log("DisplayLobbies: Count of lobby ids: " + lobbyIDS.Count.ToString());
+        for (int i = 0; i < lobbyIDS.Count; i++)
+        {
+            if (lobbyIDS[i].m_SteamID == result.m_ulSteamIDLobby)
+            {
+                Debug.Log("Lobby " + i + " :: " + SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "name") + " number of players: " + SteamMatchmaking.GetNumLobbyMembers((CSteamID)lobbyIDS[i].m_SteamID).ToString() + " max players: " + SteamMatchmaking.GetLobbyMemberLimit((CSteamID)lobbyIDS[i].m_SteamID).ToString());
+
+                //if(true)
+                if (SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "GameName").Equals("GRF"))
+                {
+                    if (didPlayerSearchForLobbies)
+                    {
+                        Debug.Log("OnGetLobbyInfo: Player searched for lobbies");
+                        if (SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "name").ToLower().Contains(searchBox.text.ToLower()))
+                        {
+                            GameObject newLobbyListItem = Instantiate(LobbyListItemPrefab) as GameObject;
+                            LobbyListItem newLobbyListItemScript = newLobbyListItem.GetComponent<LobbyListItem>();
+
+                            newLobbyListItemScript.lobbySteamId = (CSteamID)lobbyIDS[i].m_SteamID;
+                            newLobbyListItemScript.lobbyName = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "name");
+                            newLobbyListItemScript.numberOfPlayers = SteamMatchmaking.GetNumLobbyMembers((CSteamID)lobbyIDS[i].m_SteamID);
+                            newLobbyListItemScript.maxNumberOfPlayers = SteamMatchmaking.GetLobbyMemberLimit((CSteamID)lobbyIDS[i].m_SteamID);
+                            newLobbyListItemScript.SetLobbyItemValues();
+
+
+                            newLobbyListItem.transform.SetParent(ContentPanel.transform);
+                            newLobbyListItem.transform.localScale = Vector3.one;
+
+                            listOfLobbyListItems.Add(newLobbyListItem);
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("OnGetLobbyInfo: Player DID NOT search for lobbies");
+                        GameObject newLobbyListItem = Instantiate(LobbyListItemPrefab) as GameObject;
+                        LobbyListItem newLobbyListItemScript = newLobbyListItem.GetComponent<LobbyListItem>();
+
+                        newLobbyListItemScript.lobbySteamId = (CSteamID)lobbyIDS[i].m_SteamID;
+                        newLobbyListItemScript.lobbyName = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "name");
+                        newLobbyListItemScript.numberOfPlayers = SteamMatchmaking.GetNumLobbyMembers((CSteamID)lobbyIDS[i].m_SteamID);
+                        newLobbyListItemScript.maxNumberOfPlayers = SteamMatchmaking.GetLobbyMemberLimit((CSteamID)lobbyIDS[i].m_SteamID);
+                        newLobbyListItemScript.SetLobbyItemValues();
+
+
+                        newLobbyListItem.transform.SetParent(ContentPanel.transform);
+                        newLobbyListItem.transform.localScale = Vector3.one;
+
+                        listOfLobbyListItems.Add(newLobbyListItem);
+                    }
+                }
+
+                return;
+            }
+        }
+        if (didPlayerSearchForLobbies)
+            didPlayerSearchForLobbies = false;
+    }
+    
+    public void DestroyOldLobbyListItems()
+    {
+        Debug.Log("DestroyOldLobbyListItems");
+        foreach (GameObject lobbyListItem in listOfLobbyListItems)
+        {
+            GameObject lobbyListItemToDestroy = lobbyListItem;
+            Destroy(lobbyListItemToDestroy);
+            lobbyListItemToDestroy = null;
+        }
+        listOfLobbyListItems.Clear();
+    }
+    public void SearchForLobby()
+    {
+        if (!string.IsNullOrEmpty(searchBox.text))
+        {
+            didPlayerSearchForLobbies = true;
+        }
+        else
+            didPlayerSearchForLobbies = false;
+        SteamLobby.instance.GetListOfLobbies();
+    }
+    public void RefreshLobbyList()
+    {
+        Debug.Log("RefreshLobbyList");
+        SteamLobby.instance.GetListOfLobbies();
+    }
+    public void CreateNewLobby()
+    {
+        ResetGameServerSettings();
+        ELobbyType newLobbyType;
+        if (friendsOnlyToggle.isOn)
+        {
+            Debug.Log("CreateNewLobby: friendsOnlyToggle is on. Making lobby friends only.");
+            newLobbyType = ELobbyType.k_ELobbyTypeFriendsOnly;
+        }
+        else
+        {
+            Debug.Log("CreateNewLobby: friendsOnlyToggle is OFF. Making lobby public.");
+            newLobbyType = ELobbyType.k_ELobbyTypePublic;
+        }
+
+        if (!string.IsNullOrEmpty(lobbyNameInputField.text))
+        {
+            Debug.Log("CreateNewLobby: player created a lobby name of: " + lobbyNameInputField.text);
+            didPlayerNameTheLobby = true;
+            lobbyName = lobbyNameInputField.text;
+        }
+
+        if (multiplayer3v3Toggle.isOn)
+        {
+            Game.is1v1 = false;
+            Game.isSinglePlayer = false;
+            Game.maxConnections = 6;
+            Game.minPlayers = 6;
+        }
+        else
+        {
+            Game.is1v1 = true;
+            Game.isSinglePlayer = false;
+            Game.maxConnections = 2;
+            Game.minPlayers = 2;
+        }
+        SetGameSettings(false);
+        SteamLobby.instance.CreateNewLobby(newLobbyType);
+    }
+    public void ResetGameServerSettings()
+    {
+        Game.ResetWaitingForPlayersToLoadStuff();
+        Game.ClearLobbyAndGamePlayerList();
+    }
+
 }

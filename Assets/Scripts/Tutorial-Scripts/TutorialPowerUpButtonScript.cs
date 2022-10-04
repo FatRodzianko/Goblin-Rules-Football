@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System;
 
 public class TutorialPowerUpButtonScript : MonoBehaviour, IDeselectHandler, ISelectHandler, ISubmitHandler
 {
@@ -24,7 +25,15 @@ public class TutorialPowerUpButtonScript : MonoBehaviour, IDeselectHandler, ISel
     {
         Debug.Log("PowerUpButtonScript OnSelect for power up: " + myIndexNumber.ToString());
         selectedObject.SetActive(true);
-        myLocalPlayer.powerUpSelectedIndexNumber = myIndexNumber;
+        try
+        {
+            myLocalPlayer.powerUpSelectedIndexNumber = myIndexNumber;
+        }
+        catch (Exception e)
+        {
+            Debug.Log("TutorialPowerUpButtonScript: OnSelect: Error : " + e);
+        }
+
     }
     public void OnDeselect(BaseEventData data)
     {

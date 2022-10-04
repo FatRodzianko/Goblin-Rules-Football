@@ -360,8 +360,12 @@ public class TutorialGoblinScript : MonoBehaviour
         InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
         InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
     }
-    
-    private void SetMovement(Vector2 movement) => previousInput = movement;
+
+    private void SetMovement(Vector2 movement)
+    {
+        previousInput = movement;
+        //Debug.Log("SetMovement: " + movement.ToString());
+    }
 
     private void ResetMovement() => previousInput = Vector2.zero;
     public void EnableSprintControls()
@@ -1090,6 +1094,7 @@ public class TutorialGoblinScript : MonoBehaviour
     }
     public void EnableGoblinMovement(bool allowMovement)
     {
+        Debug.Log("EnableGoblinMovement for " + this.name + " allowMovement: " + allowMovement.ToString());
         if (allowMovement)
         {
             InputManager.Controls.Player.Move.Enable();

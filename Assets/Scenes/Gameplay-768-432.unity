@@ -89199,10 +89199,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
+    x: 0.21523438
     y: 0
-    width: 1
-    height: 1
+    width: 0.3590278
+    height: 0.35902777
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 90
@@ -90774,7 +90774,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7777778, y: 1}
+    m_SensorSize: {x: 1.7777779, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -116642,6 +116642,10 @@ PrefabInstance:
       propertyPath: settingsMenuPanel
       value: 
       objectReference: {fileID: 1881841403}
+    - target: {fileID: 7130295645808481016, guid: 8b03980ffe60b9640bb68aa1b1f27f94, type: 3}
+      propertyPath: GameOverMainMenuButton
+      value: 
+      objectReference: {fileID: 2070743110}
     - target: {fileID: 7130295645808481016, guid: 8b03980ffe60b9640bb68aa1b1f27f94, type: 3}
       propertyPath: PowerUpSelectionObject
       value: 

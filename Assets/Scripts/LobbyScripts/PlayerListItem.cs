@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Mirror;
 using TMPro;
 using System;
+using Steamworks;
 
 public class PlayerListItem : MonoBehaviour
 {
@@ -12,8 +13,8 @@ public class PlayerListItem : MonoBehaviour
     public string PlayerName;
     public int ConnectionId;
     public bool isPlayerReady;
-    //public ulong playerSteamId;
-    //private bool avatarRetrieved;
+    public ulong playerSteamId;
+    private bool avatarRetrieved;
     public bool isTeamGrey;
 
     [SerializeField] private TextMeshProUGUI PlayerNameText;
@@ -24,12 +25,20 @@ public class PlayerListItem : MonoBehaviour
     [SerializeField] private GameObject GoblinTypeDropdown;
     [SerializeField] private TextMeshProUGUI goblinSelected;
 
+    [Header("DLC Image Stuff")]
+    [SerializeField] private Image dlcImage;
+    private bool dlcImageRetrieved;
+    [SerializeField] Sprite dlc99;
+    [SerializeField] Sprite dlc199;
+    [SerializeField] Sprite dlcBoth;
+    [SerializeField] Sprite noDLC;
+
     public GameObject localLobbyPlayerObject;
     public LobbyPlayer localLobbyPlayerScript;
 
     private bool isLocalPlayerFoundYet = false;
 
-    //protected Callback<AvatarImageLoaded_t> avatarImageLoaded;
+    protected Callback<AvatarImageLoaded_t> avatarImageLoaded;
     // Start is called before the first frame update
     void Start()
     {
@@ -46,8 +55,9 @@ public class PlayerListItem : MonoBehaviour
     {
         PlayerNameText.text = PlayerName;
         UpdatePlayerItemReadyStatus();
-        /*if (!avatarRetrieved)
-            GetPlayerAvatar();*/
+        if (!avatarRetrieved)
+            GetPlayerAvatar();
+        GetDLCImageInfoFromLobbyPlayer();
     }
     public void UpdatePlayerItemReadyStatus()
     {
@@ -145,7 +155,7 @@ public class PlayerListItem : MonoBehaviour
         GoblinTypeDropdown.GetComponent<TMP_Dropdown>().ClearOptions();
         GoblinTypeDropdown.GetComponent<TMP_Dropdown>().AddOptions(goblinsAvailable);
     }
-    /*void GetPlayerAvatar()
+    void GetPlayerAvatar()
     {
         int imageId = SteamFriends.GetLargeFriendAvatar((CSteamID)playerSteamId);
 
@@ -192,7 +202,7 @@ public class PlayerListItem : MonoBehaviour
         {
             return;
         }
-    }*/
+    }
     public void SetPlayerTeam(bool isGrey)
     {
         Debug.Log("SetPlayerTeam: To Grey? " + isGrey.ToString() + " for player: " + this.PlayerName + " " + this.ConnectionId);
@@ -215,6 +225,55 @@ public class PlayerListItem : MonoBehaviour
                 catch (Exception e)
                 {
                     Debug.Log("SetPlayerTeam: " + e);
+                }
+            }
+        }
+    }
+    public void UpdateDLCImages(string whatDLCsAreInstalled)
+    {
+        Debug.Log("UpdateDLCImages: for player with Steam Id of : " + this.playerSteamId.ToString() + " what dlcs are installed: " + whatDLCsAreInstalled);
+        try
+        {
+            if (string.IsNullOrWhiteSpace(whatDLCsAreInstalled))
+            {
+                dlcImage.sprite = noDLC;
+            }
+            if (whatDLCsAreInstalled == "none")
+            {
+                dlcImage.sprite = noDLC;
+            }
+            if (whatDLCsAreInstalled == "99")
+            {
+                dlcImage.sprite = dlc99;
+            }
+            if (whatDLCsAreInstalled == "1_99")
+            {
+                dlcImage.sprite = dlc199;
+            }
+            if (whatDLCsAreInstalled == "both")
+            {
+                dlcImage.sprite = dlcBoth;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log("UpdateDLCImages: Could not set the dlcImage sprite. Error: " + e);
+        }
+    }
+    public void GetDLCImageInfoFromLobbyPlayer()
+    {
+        GameObject[] LobbyPlayers = GameObject.FindGameObjectsWithTag("LobbyPlayer");
+        if (LobbyPlayers.Length > 0)
+        {
+            Debug.Log("GetDLCImageInfoFromLobbyPlayer: Length of lobby players: " + LobbyPlayers.Length.ToString());
+            for (int i = 0; i < LobbyPlayers.Length; i++)
+            {
+                LobbyPlayer lobbyPlayerScript = LobbyPlayers[i].GetComponent<LobbyPlayer>();
+                if (this.playerSteamId == lobbyPlayerScript.playerSteamId)
+                {
+                    Debug.Log("GetDLCImageInfoFromLobbyPlayer: Matching steam id found. Lobby Player Steam id: " + lobbyPlayerScript.playerSteamId.ToString() + " this player list item steam id: " + this.playerSteamId);
+                    this.UpdateDLCImages(lobbyPlayerScript.whatDLCsAreInstalled);
+                    break;
                 }
             }
         }

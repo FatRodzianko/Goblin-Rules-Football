@@ -236,6 +236,7 @@ public class TeamManager : NetworkBehaviour
                     team.SendYeehawsToTeammates();
                 }
             }
+            player.RpcYeehawAchievement(player.connectionToClient);
         }
     }
 }

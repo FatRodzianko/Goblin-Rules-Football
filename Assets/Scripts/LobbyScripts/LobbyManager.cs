@@ -7,6 +7,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine.EventSystems;
 using System;
+using Steamworks;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -63,6 +64,8 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] Sprite greenGoblinSelected;
     [SerializeField] Sprite greyGoblinSelected;
     public bool isTeamSelectedYet = false;
+
+    public ulong currentLobbyId;
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -141,14 +144,14 @@ public class LobbyManager : MonoBehaviour
     }
     public void UpdateLobbyName()
     {
-       /* Debug.Log("UpdateLobbyName");
+        Debug.Log("UpdateLobbyName");
         currentLobbyId = Game.GetComponent<SteamLobby>().current_lobbyID;
         string lobbyName = SteamMatchmaking.GetLobbyData((CSteamID)currentLobbyId, "name");
         Debug.Log("UpdateLobbyName: new lobby name will be: " + lobbyName);
         //LobbyNameText.SetText(lobbyName);
         //LobbyNameText.transform.GetChild(0).GetComponent<TextMeshPro>().SetText(lobbyName);
         //LobbyNameText.GetComponent<TextMeshPro>().text = lobbyName;
-        LobbyNameText.SetText(lobbyName);*/
+        LobbyNameText.SetText(lobbyName);
     }
     public void UpdateUI()
     {
@@ -176,7 +179,7 @@ public class LobbyManager : MonoBehaviour
                 newPlayerListItemScript.PlayerName = player.PlayerName;
                 newPlayerListItemScript.ConnectionId = player.ConnectionId;
                 newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
-                //newPlayerListItemScript.playerSteamId = player.playerSteamId;
+                newPlayerListItemScript.playerSteamId = player.playerSteamId;
                 newPlayerListItemScript.SetPlayerListItemValues();
 
 
@@ -194,7 +197,7 @@ public class LobbyManager : MonoBehaviour
                 newPlayerListItemScript.PlayerName = player.PlayerName;
                 newPlayerListItemScript.ConnectionId = player.ConnectionId;
                 newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
-                //newPlayerListItemScript.playerSteamId = player.playerSteamId;
+                newPlayerListItemScript.playerSteamId = player.playerSteamId;
                 newPlayerListItemScript.SetPlayerListItemValues();
                 /*if (player.isGoblinSelected && !string.IsNullOrWhiteSpace(player.goblinType))
                 {
@@ -290,7 +293,7 @@ public class LobbyManager : MonoBehaviour
                     newPlayerListItemScript.PlayerName = player.PlayerName;
                     newPlayerListItemScript.ConnectionId = player.ConnectionId;
                     newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
-                    //newPlayerListItemScript.playerSteamId = player.playerSteamId;
+                    newPlayerListItemScript.playerSteamId = player.playerSteamId;
                     newPlayerListItemScript.SetPlayerListItemValues();
 
 
@@ -308,7 +311,7 @@ public class LobbyManager : MonoBehaviour
                     newPlayerListItemScript.PlayerName = player.PlayerName;
                     newPlayerListItemScript.ConnectionId = player.ConnectionId;
                     newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
-                    //newPlayerListItemScript.playerSteamId = player.playerSteamId;
+                    newPlayerListItemScript.playerSteamId = player.playerSteamId;
                     newPlayerListItemScript.SetPlayerListItemValues();
                     playerListItems.Add(newPlayerListItemScript);
                     /*if (player.isTeamGrey)

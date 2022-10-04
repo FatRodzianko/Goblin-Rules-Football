@@ -18,6 +18,7 @@ public class TutorialEscMenuManager : MonoBehaviour
     [SerializeField] private TutorialEscMenAnimationScript escMenuAnimationScript;
     [SerializeField] private Button PauseGameButton;
     [SerializeField] private GameObject backToGameButton;
+    [SerializeField] GameObject FirstButton;
 
     [Header("Escape Menu Options")]
     public bool isEscMenuOpen = false;
@@ -56,6 +57,16 @@ public class TutorialEscMenuManager : MonoBehaviour
         EscMenuPanel.SetActive(false);
         EscMenuPanelButtonHolder.SetActive(false);
         InputManager.Controls.EscMenu.EscMenu.performed += _ => UpdateEscapeMenu();
+        //
+       /* Debug.Log("TutorialEscMenuManager: setting the event system stuff? Selecting \"first button\"");
+        var eventSystem = EventSystem.current;
+        eventSystem.SetSelectedGameObject(FirstButton, new BaseEventData(eventSystem));
+        eventSystem.firstSelectedGameObject = FirstButton;
+
+        Debug.Log("TutorialEscMenuManager: setting the event system stuff? Selecting \"PowerUpSelectionObject\"");
+        //var eventSystem = EventSystem.current;
+        eventSystem.SetSelectedGameObject(PowerUpSelectionObject, new BaseEventData(eventSystem));
+        eventSystem.firstSelectedGameObject = PowerUpSelectionObject;*/
     }
 
     // Update is called once per frame
@@ -63,7 +74,7 @@ public class TutorialEscMenuManager : MonoBehaviour
     {
 
     }
-    void UpdateEscapeMenu()
+    public void UpdateEscapeMenu()
     {
         Debug.Log("UpdateEscapeMenu. isEscMenuOpen: " + isEscMenuOpen.ToString());
         isEscMenuOpen = !isEscMenuOpen;

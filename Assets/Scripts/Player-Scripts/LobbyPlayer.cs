@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using System;
+using Steamworks;
 
 public class LobbyPlayer : NetworkBehaviour
 {
@@ -10,6 +11,7 @@ public class LobbyPlayer : NetworkBehaviour
     [SyncVar(hook = nameof(HandlePlayerNameUpdate))] public string PlayerName;
     [SyncVar] public int ConnectionId;
     [SyncVar] public int playerNumber;
+    [SyncVar] public ulong playerSteamId;
 
     [Header("Game Info")]
     [SyncVar] public bool IsGameLeader = false;
@@ -23,6 +25,9 @@ public class LobbyPlayer : NetworkBehaviour
     [SyncVar(hook = nameof(HandleIsTeamGrey))] public bool isTeamGrey;
     [SyncVar(hook = nameof(HandleIsGoblinSelected))] public bool isGoblinSelected = false;
     [SyncVar(hook = nameof(HandleWantsToSwitchTeams))] public bool wantsToSwitchTeams = false;
+
+    [Header("DLC Installed SyncVars")]
+    [SyncVar(hook = nameof(HandleWhatDLCsAreInstalled))] public string whatDLCsAreInstalled;
 
     private const string PlayerPrefsNameKey = "PlayerName";
 
@@ -42,7 +47,7 @@ public class LobbyPlayer : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -52,12 +57,13 @@ public class LobbyPlayer : NetworkBehaviour
     }
     public override void OnStartAuthority()
     {
-        //CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
-        CmdSetPlayerName(PlayerPrefs.GetString(PlayerPrefsNameKey));
+        CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
+        //CmdSetPlayerName(PlayerPrefs.GetString(PlayerPrefsNameKey));
         gameObject.name = "LocalLobbyPlayer";
         LobbyManager.instance.FindLocalLobbyPlayer();
         LobbyManager.instance.UpdateLobbyName();
         CmdSetPlayerInitialTeam();
+        CheckIfDLCsAreInstalled();
     }
     public override void OnStartServer()
     {
@@ -304,6 +310,7 @@ public class LobbyPlayer : NetworkBehaviour
         LobbyManager.instance.UpdateLobbyName();
         LobbyManager.instance.UpdateUI();
         StartUpdateTeamListsOnLobbyManager();
+        
     }
     public void ChangeReadyStatus()
     {
@@ -552,7 +559,7 @@ public class LobbyPlayer : NetworkBehaviour
             try
             {
                 LobbyManager.instance.DestroyPlayerListItems();
-                //SteamMatchmaking.LeaveLobby((CSteamID)LobbyManager.instance.currentLobbyId);
+                SteamMatchmaking.LeaveLobby((CSteamID)LobbyManager.instance.currentLobbyId);
             }
             catch (Exception e)
             {
@@ -586,5 +593,81 @@ public class LobbyPlayer : NetworkBehaviour
             }
         }
     }
-
+    [ClientCallback]
+    void CheckIfDLCsAreInstalled()
+    {
+        if (hasAuthority)
+        {
+            Steamworks.AppId_t dlc_99 = new Steamworks.AppId_t(2174640);
+            bool dlc99Installed = SteamApps.BIsDlcInstalled(dlc_99);
+            Steamworks.AppId_t dlc_1_99 = new Steamworks.AppId_t(2174641);
+            bool dlc199Installed = SteamApps.BIsDlcInstalled(dlc_1_99);
+            Debug.Log("CheckIfDLCsAreInstalled: for player with Steam Id of : " + this.playerSteamId.ToString() + " dlc_99 " + dlc99Installed.ToString() + " dlc_1_99 " + dlc199Installed.ToString());
+            CmdTellServerWhatDLCsAreInstalled(dlc99Installed, dlc199Installed);
+        }
+    }
+    [Command]
+    void CmdTellServerWhatDLCsAreInstalled(bool dlc_99, bool dlc_1_99)
+    {
+        Debug.Log("CmdTellServerWhatDLCsAreInstalled: for player with Steam Id of : " + this.playerSteamId.ToString() + " dlc_99 " + dlc_99.ToString() + " dlc_1_99 " + dlc_1_99.ToString());
+        //RpcUpdateDLCImages(dlc_99, dlc_1_99);
+        if (!dlc_99 && !dlc_1_99)
+        {
+            this.HandleWhatDLCsAreInstalled(this.whatDLCsAreInstalled, "none");
+        }
+        if (dlc_99 && !dlc_1_99)
+        {
+            this.HandleWhatDLCsAreInstalled(this.whatDLCsAreInstalled, "99");
+        }
+        if (!dlc_99 && dlc_1_99)
+        {
+            this.HandleWhatDLCsAreInstalled(this.whatDLCsAreInstalled, "1_99");
+        }
+        if (dlc_99 && dlc_1_99)
+        {
+            this.HandleWhatDLCsAreInstalled(this.whatDLCsAreInstalled, "both");
+        }
+    }
+    [ClientRpc]
+    void RpcUpdateDLCImages(bool dlc_99, bool dlc_1_99)
+    {
+        Debug.Log("RpcUpdateDLCImages: for player with Steam Id of : " + this.playerSteamId.ToString() + " dlc_99 " + dlc_99.ToString() + " dlc_1_99 " + dlc_1_99.ToString());
+        GameObject[] playerListItems = GameObject.FindGameObjectsWithTag("PlayerListItem");
+        if (playerListItems.Length > 0)
+        {
+            for (int i = 0; i < playerListItems.Length; i++)
+            {
+                PlayerListItem playerListItem = playerListItems[i].GetComponent<PlayerListItem>();
+                if (playerListItem.playerSteamId == this.playerSteamId)
+                {
+                    //playerListItem.UpdateDLCImages(dlc_99, dlc_1_99);
+                }
+            }
+        }
+    }
+    public void HandleWhatDLCsAreInstalled(string oldValue, string newValue)
+    {
+        if (isServer)
+            whatDLCsAreInstalled = newValue;
+        if (isClient)
+        {
+            Debug.Log("HandleWhatDLCsAreInstalled. For player: " + this.PlayerName + " newValue: " + newValue);
+            GameObject[] playerListItems = GameObject.FindGameObjectsWithTag("PlayerListItem");
+            Debug.Log("HandleWhatDLCsAreInstalled: Number of player list items found: " + playerListItems.Length.ToString());
+            if (playerListItems.Length > 0)
+            {
+                Debug.Log("HandleWhatDLCsAreInstalled: Checking through " + playerListItems.Length.ToString() + " number of playerListItems");
+                for (int i = 0; i < playerListItems.Length; i++)
+                {
+                    PlayerListItem playerListItem = playerListItems[i].GetComponent<PlayerListItem>();
+                    if (playerListItem.playerSteamId == this.playerSteamId)
+                    {
+                        Debug.Log("HandleWhatDLCsAreInstalled: Matching player list item found for this player. This player's steamid: " + this.playerSteamId.ToString() + " playerListItem steam id: " + playerListItem.playerSteamId);
+                        playerListItem.UpdateDLCImages(newValue);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }

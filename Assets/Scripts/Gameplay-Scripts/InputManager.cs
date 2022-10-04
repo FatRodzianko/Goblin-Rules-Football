@@ -30,13 +30,19 @@ public class InputManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("InputManager: Start");
         var rebinds = PlayerPrefs.GetString("rebinds");
         if (!string.IsNullOrEmpty(rebinds))
         {
             //actions.LoadFromJson(rebinds);
             //actions.LoadBindingOverridesFromJson(rebinds);
             controls.asset.LoadBindingOverridesFromJson(rebinds);
-            Debug.Log("RebindSaveLoad: LoadBindings: loaded from json string!");
+            Debug.Log("InputManager: LoadBindings: loaded from json string!");
+        }
+        else
+        {
+            Debug.Log("InputManager: RemoveAllBindingOverrides!");
+            controls.asset.RemoveAllBindingOverrides();
         }
         
     }

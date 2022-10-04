@@ -70,6 +70,7 @@ public class ObstacleObject : NetworkBehaviour
                     GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
                     if (goblinScript.canCollide)
                         goblinScript.CollisionWithObstacleObject(false);
+                    goblinScript.CheckForStubbedToeAchievement();
                 }
             }
         }

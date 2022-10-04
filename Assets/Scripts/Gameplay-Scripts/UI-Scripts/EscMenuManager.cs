@@ -27,6 +27,7 @@ public class EscMenuManager : MonoBehaviour
     [SerializeField] private GameObject CoinTossCanvas;
     [SerializeField] private GameObject PowerUpSelectionObject;
     [SerializeField] private GameObject settingsMenuPanel;
+    [SerializeField] private GameObject GameOverMainMenuButton;
 
 
     [Header("Player Controls to Restore")]
@@ -66,7 +67,6 @@ public class EscMenuManager : MonoBehaviour
             Debug.Log("EscMenuManager.cs: could not find local game playeR? Error: " + e);
         }
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -99,6 +99,7 @@ public class EscMenuManager : MonoBehaviour
         escMenuAnimationScript.reroll = false;
         if (GameplayManager.instance.isSinglePlayer)
             PauseGameEscapeMenu();
+
     }
     public void CloseEscMenu()
     {
@@ -114,6 +115,12 @@ public class EscMenuManager : MonoBehaviour
         if (settingsMenuPanel.activeInHierarchy)
         {
             ResetSettingsMenu();
+        }
+        if (GameplayManager.instance.gamePhase == "gameover")
+        {
+            var eventSystem = EventSystem.current;
+            eventSystem.SetSelectedGameObject(GameOverMainMenuButton, new BaseEventData(eventSystem));
+            eventSystem.firstSelectedGameObject = GameOverMainMenuButton;
         }
     }
     // Saves what control schemes are active for the gameplayer so they can be restored when the esc menu is later closed?
@@ -169,14 +176,15 @@ public class EscMenuManager : MonoBehaviour
                 localGamePlayer.EnablePowerUpControls(enable);
         }
 
-        localGamePlayer.EnableMenuNavigationControls(!enable);
+        if(GameplayManager.instance.gamePhase != "gameover")
+            localGamePlayer.EnableMenuNavigationControls(!enable);
         if (enable)
         {
             if (localGamePlayer.powerupsControlsOnServer)
                 localGamePlayer.EnablePowerUpControls(enable);
-            var eventSystem = EventSystem.current;
-            eventSystem.SetSelectedGameObject(PowerUpSelectionObject, new BaseEventData(eventSystem));
-            eventSystem.firstSelectedGameObject = PowerUpSelectionObject;
+            //var eventSystem = EventSystem.current;
+            //eventSystem.SetSelectedGameObject(PowerUpSelectionObject, new BaseEventData(eventSystem));
+            //eventSystem.firstSelectedGameObject = PowerUpSelectionObject;
         }
     }
     public void PauseOrResumeGame()

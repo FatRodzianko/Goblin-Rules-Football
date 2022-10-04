@@ -1091,9 +1091,10 @@ x "How To Play" page of the title screen?
 - - - corners of the screen change color based on some event
 - - - - - - red when your goblin is punched, white when your team picks up the ball, yellow when they lose the ball?
 - - - - - - the change of possession stuff can reuse the cheer/boo sound triggers for when possession changes?
-- add a delay/limit how often you can block
-- - - right now you can spam blocking while running. Doesn't seem like it affects speed much. Unsure if it gives you the blocking defense bonus
-- - - when blocking is released, save timestamp. Don't allow for another block until after a certain time. Probably only needs to be like 0.5 seconds
+x add a delay/limit how often you can block
+- - x right now you can spam blocking while running. Doesn't seem like it affects speed much. Unsure if it gives you the blocking defense bonus
+- - x when blocking is released, save timestamp. Don't allow for another block until after a certain time. Probably only needs to be like 0.5 seconds
+- - x I don't think spamming was every really an issue because when you spam the block command, even when you are the host, the isBlocking value doesn't get set until you've held it for like a quarter second so mashing the key for block basically means you aren't really blocking ever?
 x Make it so you can use powerups by just move the right stick in a specific direction
 - - x Look at SelectPowerUps -> SelectLeftOrRightComposite for reference
 - - - - - x change it so there is an up/down/left/right bound to the right stick movement directions
@@ -1109,12 +1110,12 @@ x Make it so you can use powerups by just move the right stick in a specific dir
 - - - - - - - - - - - x InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
 - - - - - - - - - - - x InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
 - - - - - x the above seems to work in the tutorial game. Add to regular gameplay???
-- if player pauses/opens esc menu during end of game, make sure that when they close the esc menu the "main menu" button is selected again for gamepad UI navigation?
-- - - only confirmed this is an issue in singleplayer so far?
-- re-mapping controls D:
-- - - https://www.youtube.com/watch?v=dUCcZrPhwSo
-- - - https://www.youtube.com/watch?v=DBBbpbIRoIc - persistent key binding?
-- - - better one to use: https://www.youtube.com/watch?v=csqVa2Vimao
+x if player pauses/opens esc menu during end of game, make sure that when they close the esc menu the "main menu" button is selected again for gamepad UI navigation?
+- - x only confirmed this is an issue in singleplayer so far?
+x re-mapping controls D:
+- - x https://www.youtube.com/watch?v=dUCcZrPhwSo
+- - x https://www.youtube.com/watch?v=DBBbpbIRoIc - persistent key binding?
+- - x better one to use: https://www.youtube.com/watch?v=csqVa2Vimao
 - - - - - x when check for duplicates, create a serialized field that is an array of all action maps
 - - - - - - - - x not actually all, but the important "gameplay" ones like switch goblins and player actions?
 - - - - - - - - x check through each action map and see if the new binding key exists in an action map
@@ -1130,8 +1131,23 @@ x Make it so you can use powerups by just move the right stick in a specific dir
 - - x for gamepad, make sure that not is ever set to a path with the left stick and right stick?
 - - x make it so the duplicate checks are for more than just the current action map (like Controls.Player). It should also check other action maps
 - - - - - x Player, QESwitchGoblins, PowerUps
-- turn off the game audio listener or whatever its called when the game is paused
-- - - if you don't you can get stuck listening to sounds that are looped
+x turn off the game audio listener or whatever its called when the game is paused
+- - x if you don't you can get stuck listening to sounds that are looped
+- - x seemed more annoying than anything so I decided not to do this???
+- - - maybe make it instead so the audio listener is only turned off if the game is paused? That's different than the escape menu open...
+- Create at least 10 achievements
+- - x Complete Tutorial (learning how to lose)
+- - x Win singleplayer game
+- - x lose singleplayer
+- - x Play a 1v1 game
+- - - punches thrown? slide tackles? fumbles?
+- - x cowboys yeehawed, obviously
+- - x blocked kick?
+- Create the 2 DLC builds. One for 0.99 and the other for 1.99
+- - x Create three images: one little crown and one big create. One with both?
+- - - - - - display images in the "playerListItem" objects in lobbies based on DLC's bought? - waiting for dlcs to be approved before I can test?
+x keyboard controls not working in tutorial?
+- - - "fixed" by calling CloseMenu from the escmanager. No idea what is causing the issue
 
 - New title screen UI tabs:
 - - - tutorial

@@ -95960,10 +95960,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
+    x: 0.21523438
     y: 0
-    width: 1
-    height: 1
+    width: 0.3590278
+    height: 0.35902777
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 90
@@ -96636,6 +96636,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EscMenuManager-tutorial
       objectReference: {fileID: 0}
+    - target: {fileID: 8196121129516229347, guid: 9545bd882cfb7494bb7073606bb0addd, type: 3}
+      propertyPath: FirstButton
+      value: 
+      objectReference: {fileID: 709308553}
     - target: {fileID: 8196121129516229347, guid: 9545bd882cfb7494bb7073606bb0addd, type: 3}
       propertyPath: EscMenuPanel
       value: 
@@ -98875,7 +98879,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7777778, y: 1}
+    m_SensorSize: {x: 1.7777779, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -141902,6 +141906,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7093659731155696368, guid: bde6be0e2afedad4e81ffce8675a7735, type: 3}
+      propertyPath: actions
+      value: 
+      objectReference: {fileID: -944628639613478452, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
     - target: {fileID: 7093659731155696369, guid: bde6be0e2afedad4e81ffce8675a7735, type: 3}
       propertyPath: m_Name
       value: InputManager

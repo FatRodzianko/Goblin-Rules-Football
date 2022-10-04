@@ -17,11 +17,16 @@ public class GamePlayer : NetworkBehaviour
     [SyncVar] public int ConnectionId;
     [SyncVar] public int playerNumber;
     [SyncVar] public bool IsGameLeader;
+    [SyncVar] public ulong playerSteamId;
     [SerializeField] InputSystemUIInputModule inputSystemUIInputModule;
     [SerializeField] InputActionReference moveReference;
     [SerializeField] InputActionReference submitReference;
     [SerializeField] InputActionAsset defaultInputActions;
     public bool isGamePaused = false;
+    public float lastBlockTime = 0f;
+    float kickAfterAttemptTime = 0f;
+    float yeehawGivenTime = 0f;
+    float blockedKickTime = 0f;
 
     [Header("1v1 or 3v3 stuff")]
     [SyncVar] public bool is1v1 = false;
@@ -61,7 +66,7 @@ public class GamePlayer : NetworkBehaviour
     [Header("Team Info")]
     [SyncVar] public string teamName;
     [SyncVar] public bool doesTeamHaveBall;
-    [SyncVar] public bool isTeamGrey;
+    [SyncVar(hook = nameof(HandleIsTeamGrey))] public bool isTeamGrey;
 
     [Header("Power Ups")]
     public List<PowerUp> myPowerUps = new List<PowerUp>();
@@ -334,6 +339,14 @@ public class GamePlayer : NetworkBehaviour
             EnableMenuNavigationControls(false);
 
             GameplayManager.instance.SetTimerText(GameplayManager.instance.timeLeftInGame);
+            if (GameplayManager.instance.is1v1 && !GameplayManager.instance.isSinglePlayer)
+            {
+                SteamAchievementManager.instance.Play1v1();
+            }
+            else if (!GameplayManager.instance.is1v1 && !GameplayManager.instance.isSinglePlayer)
+            {
+                SteamAchievementManager.instance.Play3v3();
+            }
         }
     }
     public void InitializeAIPlayer()
@@ -402,8 +415,7 @@ public class GamePlayer : NetworkBehaviour
                     team.captain = this;
                 }
             }   
-        }
-            
+        }   
     }
     [Command]
     void CmdSpawnPlayerCharacters()
@@ -672,6 +684,7 @@ public class GamePlayer : NetworkBehaviour
     }
     public void AddToGoblinTeam(GoblinScript GoblinToAdd)
     {
+        Debug.Log("AddToGoblinTeam: for player: " + this.PlayerName + " is their team grey? " + this.isTeamGrey.ToString());
         if (!goblinTeam.Contains(GoblinToAdd))
             goblinTeam.Add(GoblinToAdd);
         if (this.is1v1 || this.isSinglePlayer)
@@ -994,6 +1007,10 @@ public class GamePlayer : NetworkBehaviour
         Debug.Log("StartBlockGoblin");
         if (selectGoblin)
         {
+            if (Time.time < (lastBlockTime + 0.33f))
+                return;
+            else
+                lastBlockTime = Time.time;
             if (!selectGoblin.isSliding && !selectGoblin.isDiving && !selectGoblin.isGoblinKnockedOut && !selectGoblin.isPunching)
             {
                 selectGoblin.StartBlocking();
@@ -2919,5 +2936,117 @@ public class GamePlayer : NetworkBehaviour
             GameplayManager.instance.DisplayErrorMessage(message);
         }
     }
-    
+    [ClientCallback]
+    public void WinnerOfGameSteamAchievementChecks(string winnerName)
+    {
+        Debug.Log("Gameplayer.cs: WinnerOfGameSteamAchievementChecks: " + winnerName);
+        if (winnerName == "draw")
+            return;
+        if (hasAuthority)
+        {
+            if (winnerName == "green")
+            {
+                if (this.isTeamGrey)
+                {
+                    SteamAchievementManager.instance.LosingPlayer();
+                    if (this.isSinglePlayer)
+                        SteamAchievementManager.instance.LoseSinglePlayer();
+                }
+                else
+                {
+                    SteamAchievementManager.instance.WinningPlayer();
+                    if (this.isSinglePlayer)
+                        SteamAchievementManager.instance.WinSinglePlayer();
+                }
+            }
+            else if (winnerName == "grey")
+            {
+                if (this.isTeamGrey)
+                {
+                    SteamAchievementManager.instance.WinningPlayer();
+                    if (this.isSinglePlayer)
+                        SteamAchievementManager.instance.WinSinglePlayer();
+                }
+                else
+                {
+                    SteamAchievementManager.instance.LosingPlayer();
+                    if (this.isSinglePlayer)
+                        SteamAchievementManager.instance.LoseSinglePlayer();
+                }
+            }
+        }
+    }
+    [TargetRpc]
+    public void RpcKickAfterAttemptAchievement(NetworkConnection target)
+    {
+        Debug.Log("RpcKickAfterAttemptAchievement: Player made their kick after attempt: " + this.PlayerName);
+        if (hasAuthority)
+        {
+            if (GameplayManager.instance.isSinglePlayer)
+            {
+                if (!this.isLocalPlayer)
+                    return;
+            }
+            if (Time.time >= (kickAfterAttemptTime + 1f))
+            {
+                SteamAchievementManager.instance.KickAfterAttemptMade();
+                kickAfterAttemptTime = Time.time;
+            }
+
+        }
+    }
+    [TargetRpc]
+    public void RpcYeehawAchievement(NetworkConnection target)
+    {
+        Debug.Log("RpcYeehawAchievement: Player sent a YEEHAW to their team: " + this.PlayerName);
+        if (hasAuthority)
+        {
+            if (GameplayManager.instance.isSinglePlayer)
+            {
+                if (!this.isLocalPlayer)
+                    return;
+            }
+            if (Time.time >= (yeehawGivenTime + 1f))
+            {
+                SteamAchievementManager.instance.YeehawGiven();
+                yeehawGivenTime = Time.time;
+            }
+
+        }
+    }
+    [TargetRpc]
+    public void RpcBlockedKickAchievement(NetworkConnection target)
+    {
+        Debug.Log("RpcBlockedKickAchievement: Player blocked kick: " + this.name);
+        if (hasAuthority)
+        {
+            if (GameplayManager.instance.isSinglePlayer)
+            {
+                if (!this.isLocalPlayer)
+                    return;
+            }
+            if (Time.time >= (blockedKickTime + 1f))
+            {
+                SteamAchievementManager.instance.BlockedKick();
+                blockedKickTime = Time.time;
+            }
+
+        }
+    }
+    public void HandleIsTeamGrey(bool oldValue, bool newValue)
+    {
+        if (isServer)
+            this.isTeamGrey = newValue;
+        if (isClient)
+        {
+            if (newValue)
+            {
+                myTeam = TeamManager.instance.greyTeam;
+            }
+            else
+            {
+                myTeam = TeamManager.instance.greenTeam;
+            }
+        }
+    }
 }

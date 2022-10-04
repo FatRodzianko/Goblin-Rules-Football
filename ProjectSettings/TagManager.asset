@@ -31,6 +31,7 @@ TagManager:
   - QuitButtonTitleScreen
   - TutorialPlayer
   - secondTutorialPlayer
+  - PlayerListItem
   layers:
   - Default
   - TransparentFX

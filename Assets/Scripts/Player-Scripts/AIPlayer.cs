@@ -777,6 +777,7 @@ public class AIPlayer : NetworkBehaviour
         yield return new WaitForSeconds(delayAmount);
         float accuracyValue = UnityEngine.Random.Range(0f, 1.0f);
         float powerValue = KickAfterPower();
+        
         kickAfterGoblin.AISubmitKickAfterKickingAccuracy(accuracyValue, powerValue);
         this.kickKickAfter = false;
         this.gotMaxAcceptableDistance = false;

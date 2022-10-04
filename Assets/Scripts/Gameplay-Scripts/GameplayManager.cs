@@ -97,6 +97,8 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] TextMeshProUGUI greyTeamScoreText;
     [SerializeField] TextMeshProUGUI teamWinnerText;
     [SerializeField] GameObject GameOverScrollPanelObject;
+    public bool gameWinnersNotified = false;
+    public bool mercyRuleResultsSent = false;
 
     [Header("UI Stuff")]
     [SerializeField] GameObject PossessionFootballGreen;
@@ -541,6 +543,24 @@ public class GameplayManager : NetworkBehaviour
             if (CheckForMercyRule())
             {
                 HandleGamePhase(this.gamePhase, "gameover");
+                if (greenScore > greyScore)
+                {
+                    if (!mercyRuleResultsSent)
+                    {
+                        TeamManager.instance.greenTeam.TellTeamMembersMercyRuleEndedGame(true);
+                        TeamManager.instance.greyTeam.TellTeamMembersMercyRuleEndedGame(false);
+                        mercyRuleResultsSent = true;
+                    }
+                }
+                else if (greyScore > greenScore)
+                {
+                    if (!mercyRuleResultsSent)
+                    {
+                        TeamManager.instance.greenTeam.TellTeamMembersMercyRuleEndedGame(false);
+                        TeamManager.instance.greyTeam.TellTeamMembersMercyRuleEndedGame(true);
+                        mercyRuleResultsSent = true;
+                    }
+                }
                 return;
             }
         }
@@ -549,6 +569,17 @@ public class GameplayManager : NetworkBehaviour
         IEnumerator touchdownToKickAfterTransition = GameplayToKickAfterTransition();
         StartCoroutine(touchdownToKickAfterTransition);
         StopPossessionRoutinesForPlayers();
+
+        try
+        {
+            GoblinScript scoringGoblinScript = NetworkIdentity.spawned[goblinNetId].GetComponent<GoblinScript>();
+            scoringGoblinScript.TouchdownScoredAchievement();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("TouchDownScored: Could not get goblinscript from goblinNetId. Error: " + e);
+        }
+        
 
         // Stop Goblins from running?
         ResetAllGoblinStatuses();
@@ -989,6 +1020,11 @@ public class GameplayManager : NetworkBehaviour
             {
                 greenScore += 2;
             }
+            // Kick after attempt achievement checks
+            if (scoringPlayer)
+            {
+                scoringPlayer.RpcKickAfterAttemptAchievement(scoringPlayer.connectionToClient);
+            }
         }
         RpcKickAfterWasKickGoodOrBad(isKickGood, isScoringPlayerGrey);
         TeamManager.instance.KickAfterAttempts(scoringPlayer.isTeamGrey, isKickGood);
@@ -1165,20 +1201,35 @@ public class GameplayManager : NetworkBehaviour
         if (greenScore > greyScore)
         {
             winningTeam = "green";
+            /*if (!gameWinnersNotified)
+            {
+                TeamManager.instance.greenTeam.TellTeamMembersIfTheyWonOrLost(true);
+                TeamManager.instance.greyTeam.TellTeamMembersIfTheyWonOrLost(false);
+            }
+            gameWinnersNotified = true;*/
+            
         }
         else if (greenScore < greyScore)
         {
             winningTeam = "grey";
+            /*if (!gameWinnersNotified)
+            {
+                TeamManager.instance.greenTeam.TellTeamMembersIfTheyWonOrLost(false);
+                TeamManager.instance.greyTeam.TellTeamMembersIfTheyWonOrLost(true);
+            }
+            gameWinnersNotified = true;*/
         }
         else
         {
             winningTeam = "draw";
+            //gameWinnersNotified = true;
         }
         RpcWinnerOfGameDetermined(winningTeam);
     }
     [ClientRpc]
     void RpcWinnerOfGameDetermined(string winnerOfGame)
     {
+        Debug.Log("RpcWinnerOfGameDetermined: " + winnerOfGame);
         theFinalScoreText.text = "THE FINAL SCORE";
         greenTeamScoreText.text = greenScore.ToString();
         greyTeamScoreText.text = greyScore.ToString();
@@ -1188,19 +1239,29 @@ public class GameplayManager : NetworkBehaviour
         {
             teamWinnerText.text = "GREEN WINS!!!";
             //teamWinnerText.GetComponent<TouchDownTextGradient>().ActivateGradient();
+            if (!gameWinnersNotified)
+            {
+                LocalGamePlayerScript.WinnerOfGameSteamAchievementChecks(winnerOfGame);
+                gameWinnersNotified = true;
+            } 
         }
         else if (winnerOfGame == "grey")
         {
             teamWinnerText.text = "GREY WINS!!!";
             //teamWinnerText.GetComponent<TouchDownTextGradient>().ActivateGradient();
+            if (!gameWinnersNotified)
+            {
+                LocalGamePlayerScript.WinnerOfGameSteamAchievementChecks(winnerOfGame);
+                gameWinnersNotified = true;
+            }
         }
         else if (winnerOfGame == "draw")
         {
             teamWinnerText.text = "IT'S A DRAW...";
             teamWinnerText.GetComponent<TouchDownTextGradient>().SetGreenOrGreyColor(true);
+            gameWinnersNotified = true;
         }
         GameOverScrollPanelObject.GetComponent<ImageAnimation>().UnScrollEndOfGame(winnerOfGame);
-
     }
     [Server]
     public void DidWinningGoblinDiveInXtraTimeToEndGame(bool isGoblinGrey)
@@ -1475,8 +1536,8 @@ public class GameplayManager : NetworkBehaviour
         string[] headsTails = new[]
         { "heads","tails"};
         var rng = new System.Random();
-        //aiGamePlayerScript.headsOrTailsPlayer = headsTails[rng.Next(headsTails.Length)];
-        aiGamePlayerScript.headsOrTailsPlayer = "tails";
+        aiGamePlayerScript.headsOrTailsPlayer = headsTails[rng.Next(headsTails.Length)];
+        //aiGamePlayerScript.headsOrTailsPlayer = "tails";
         aiGamePlayerScript.SubmitCoinSelection();
     }
     public void AIChoosesKickOrReceive()

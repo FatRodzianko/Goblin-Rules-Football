@@ -450,7 +450,10 @@ public class Football : NetworkBehaviour
             if (!isThrown && !isKicked && !isHeld && !isFumbled && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
             {
                 Debug.Log("Football.cs: Football collided with a trip object: " + collision.gameObject.name);
-                FumbleFootball();
+                if (isBouncing)
+                    numberOfBounces--;
+                else
+                    FumbleFootball();
             }
         }
     }
@@ -1168,7 +1171,7 @@ public class Football : NetworkBehaviour
         }
 
         bool anotherBounce = false;
-        if (numberOfBounces == 0)
+        if (numberOfBounces <= 0)
             anotherBounce = true;
         else
         {

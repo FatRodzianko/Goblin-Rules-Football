@@ -12,6 +12,10 @@ GameObject:
   - component: {fileID: 7248241285292473032}
   - component: {fileID: 7248241285292473033}
   - component: {fileID: 7248241285292473038}
+  - component: {fileID: 1142487431}
+  - component: {fileID: 4566586564409145088}
+  - component: {fileID: 1142487433}
+  - component: {fileID: 1142487432}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -29,6 +33,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -46,13 +51,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 1
-  PersistNetworkManagerToOfflineScene: 0
+  PersistNetworkManagerToOfflineScene: 1
   runInBackground: 1
   autoStartServerBuild: 1
   serverTickRate: 100
-  offlineScene: 
-  onlineScene: 
-  transport: {fileID: 7248241285292473033}
+  offlineScene: Assets/Scenes/TitleScreen.unity
+  onlineScene: Assets/Scenes/LobbyScene.unity
+  transport: {fileID: 1142487432}
   networkAddress: 127.0.0.1
   maxConnections: 100
   disconnectInactiveConnections: 0
@@ -62,7 +67,30 @@ MonoBehaviour:
   autoCreatePlayer: 1
   playerSpawnMethod: 0
   spawnPrefabs: []
+  minPlayers: 2
+  lobbyPlayerPrefab: {fileID: 9114685772438749880, guid: db9cd257207cc0548a0ed4cba8b158a5, type: 3}
   gamePlayerPrefab: {fileID: 554441546451090241, guid: 28687f36ab3be4e45a8cf649939dcbe1, type: 3}
+  WaitingForPlayersCanvas: {fileID: 2342166639519145750, guid: f0686eca83607064299e7e8ce9ee42ce, type: 3}
+  waitingForPlayersObject: {fileID: 0}
+  playersFinishedLoading: 
+  areAllPlayersLoaded: 0
+  areAllGoblinsLoaded: 0
+  playersWithFootballSpawned: 
+  areFootballsSpawned: 0
+  is1v1: 0
+  isSinglePlayer: 0
+  isTutorial: 0
+  lobbyName: 
+  secondsPerHalf: 0
+  powerUpsEnabled: 0
+  randomEventsEnabled: 0
+  spawnObstaclesEnabled: 0
+  mercyRuleEnabled: 0
+  mercyRulePointDifferential: 0
+  isGamePaused: 0
+  playerWhoPaused: {fileID: 0}
+  playerWhoPausedNetId: 0
+  lastPauseTimeStamp: 0
 --- !u!114 &7248241285292473033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98,6 +126,62 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showGUI: 1
+  showGUI: 0
   offsetX: 0
   offsetY: 200
+--- !u!114 &1142487431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7248241285292473039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8aea0e7e97cb8345883cb2051d27fc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4566586564409145088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7248241285292473039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c1ce63880171e045a469bceddb2e4dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  current_lobbyID: 0
+  lobbyIDS: []
+--- !u!114 &1142487433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7248241285292473039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef4bffeda13d7a748973ff9204401c07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1142487432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7248241285292473039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea368fb6f27ec2f40a40e20977992b9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Channels: 0200000001000000
+  Timeout: 25
+  SteamAppID: 2071510
+  AllowSteamRelay: 1
+  UseNextGenSteamNetworking: 1
+  SteamUserID: 0

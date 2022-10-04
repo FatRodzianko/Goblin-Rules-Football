@@ -12,6 +12,8 @@ public class Team : NetworkBehaviour
     public List<GoblinScript> goblins = new List<GoblinScript>();
     public SyncList<uint> goblinNetIds = new SyncList<uint>();
     public SyncList<uint> teammateNetIds = new SyncList<uint>();
+    public bool sentMercyRuleToTeamServer = false;
+    public bool sentMercyRuleToTeamClient = false;
 
 
     [Header("Team Stats")]
@@ -326,5 +328,38 @@ public class Team : NetworkBehaviour
         {
             goblin.possessionSpeedBonus = possessionSpeedBonus;
         }
+    }
+    [ServerCallback]
+    public void TellTeamMembersMercyRuleEndedGame(bool wonGame)
+    {
+        Debug.Log("TellTeamMembersMercyRuleEndedGame: for team: " + this.name + " did team win the mercy rule? " + wonGame);
+        if (sentMercyRuleToTeamServer)
+            return;
+        foreach (GamePlayer player in teamPlayers)
+        {
+            if (GameplayManager.instance.isSinglePlayer)
+            {
+                if (player.PlayerName == "AIPlayer")
+                    continue;
+            }
+            RpcMercyRuleAchievement(player.connectionToClient, wonGame);
+        }
+        sentMercyRuleToTeamServer = true;
+    }
+    [TargetRpc]
+    void RpcMercyRuleAchievement(NetworkConnection target, bool wonGame)
+    {
+        Debug.Log("RpcMercyRuleAchievement: did player win by mercy rule? " + wonGame.ToString());
+        if (sentMercyRuleToTeamClient)
+            return;
+        if (wonGame)
+        {
+            SteamAchievementManager.instance.MercyRuleWin();
+        }
+        else
+        {
+            SteamAchievementManager.instance.MercyRuleLose();
+        }
+        sentMercyRuleToTeamClient = true;
     }
 }
