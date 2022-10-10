@@ -1148,6 +1148,10 @@ x turn off the game audio listener or whatever its called when the game is pause
 - - - - - - display images in the "playerListItem" objects in lobbies based on DLC's bought? - waiting for dlcs to be approved before I can test?
 x keyboard controls not working in tutorial?
 - - - "fixed" by calling CloseMenu from the escmanager. No idea what is causing the issue
+- slow down effect issue where the slow down "material" or whatever like the glue disappeared and the player still stayed at the slower speed
+- - - had to run into another slow down area and leave to reset speed
+- - - maybe have it so when a slow down effect is set, start a ~3 second timer
+- - - - - - check if the player is still in the slow down area. If not, remove the effect?
 
 - New title screen UI tabs:
 - - - tutorial
