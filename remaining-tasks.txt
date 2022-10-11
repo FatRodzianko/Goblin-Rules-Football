@@ -1135,7 +1135,7 @@ x turn off the game audio listener or whatever its called when the game is pause
 - - x if you don't you can get stuck listening to sounds that are looped
 - - x seemed more annoying than anything so I decided not to do this???
 - - - maybe make it instead so the audio listener is only turned off if the game is paused? That's different than the escape menu open...
-- Create at least 10 achievements
+x Create at least 10 achievements
 - - x Complete Tutorial (learning how to lose)
 - - x Win singleplayer game
 - - x lose singleplayer
@@ -1145,22 +1145,27 @@ x turn off the game audio listener or whatever its called when the game is pause
 - - x blocked kick?
 - Create the 2 DLC builds. One for 0.99 and the other for 1.99
 - - x Create three images: one little crown and one big create. One with both?
-- - - - - - display images in the "playerListItem" objects in lobbies based on DLC's bought? - waiting for dlcs to be approved before I can test?
+- - - - - x display images in the "playerListItem" objects in lobbies based on DLC's bought? - waiting for dlcs to be approved before I can test?
 x keyboard controls not working in tutorial?
 - - - "fixed" by calling CloseMenu from the escmanager. No idea what is causing the issue
 - slow down effect issue where the slow down "material" or whatever like the glue disappeared and the player still stayed at the slower speed
 - - - had to run into another slow down area and leave to reset speed
 - - - maybe have it so when a slow down effect is set, start a ~3 second timer
 - - - - - - check if the player is still in the slow down area. If not, remove the effect?
+- try and create a "CRT"/"REtro TV" effect using shader graph?
+- - - Acerola video on doing it with shaders (doesn't work with new render pipeline) https://www.youtube.com/watch?v=aWdySZ0BtJs
+- - - write up on doing it with shader graph? https://cyangamedev.wordpress.com/2020/09/10/retro-crt-shader-breakdown/ 
+- - - - - - https://github.com/Cyanilux/URP_RetroCRTShader
+- - - shader graph for full screen effects? https://www.youtube.com/watch?v=mCpRxFP2J1c
 
-- New title screen UI tabs:
-- - - tutorial
-- - - controls
-- - - - - - two sub tabs:
-- - - - - - Keyboard/Mouse
-- - - - - - Gamepad
-- - - - - - copy from multiplayer for how to have the two sub tabs?
-- Switch all gamepad controls from "Xbox Controller" to generic "Gamepad"?
+x New title screen UI tabs:
+- - x tutorial
+- - x controls
+- - - - - x two sub tabs:
+- - - - - x Keyboard/Mouse
+- - - - - x Gamepad
+- - - - - x copy from multiplayer for how to have the two sub tabs?
+x Switch all gamepad controls from "Xbox Controller" to generic "Gamepad"?
 
 
 

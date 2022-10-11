@@ -13,6 +13,7 @@ public class SettingsManager : MonoBehaviour
     private const string volumePlayerPrefKey = "VolumePreference";
     private const string fullScreenPlayerPrefKey = "FullScreen";
     private const string gamepadUIPlayerPrefKey = "GamepadUI";
+    private const string crtScreenEffectPrefKey = "CRT";
 
     public AudioMixer audioMixer;
     public Dropdown resolutionDropdown;
@@ -23,6 +24,7 @@ public class SettingsManager : MonoBehaviour
     int currentScreenHeight;
     float currentVolume;
     Resolution[] resolutions;
+    public Toggle crtScreenEffectToggle;
 
     private void Start()
     {
@@ -208,6 +210,21 @@ public class SettingsManager : MonoBehaviour
         else
             Screen.SetResolution(1920, 1080, false);
     }
+    public void SetCRTScreenEffect(bool isCRTEffectOn)
+    {
+        Debug.Log("SetCRTScreenEffect: " + isCRTEffectOn.ToString());
+        crtScreenEffectToggle.isOn = isCRTEffectOn;
+
+        try
+        {
+            RenderFeaturesManager.instance.EnableRetroCRT(isCRTEffectOn);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("SetCRTScreenEffect: Could not access RenderFeaturesManager. Error: " + e);
+        }
+
+    }
     public void SaveSettings()
     {
         Debug.Log("Saving Settings");
@@ -232,6 +249,12 @@ public class SettingsManager : MonoBehaviour
             PlayerPrefs.SetInt(resolutionWidthPlayerPrefKey, 1920);
             PlayerPrefs.SetInt(resolutionHeightPlayerPrefKey, 1080);
         }
+
+        int crtBool = Convert.ToInt32(crtScreenEffectToggle.isOn);
+        if (crtBool == 1 || crtBool == 0)
+            PlayerPrefs.SetInt(crtScreenEffectPrefKey, crtBool);
+        else
+            PlayerPrefs.SetInt(crtScreenEffectPrefKey, 0);
 
         LoadSettings();
     }
@@ -308,6 +331,18 @@ public class SettingsManager : MonoBehaviour
         {
             GamepadUIManager.instance.gamepadUI = false;
             gamepadUIToggle.isOn = false;
+        }
+        if (PlayerPrefs.HasKey(crtScreenEffectPrefKey))
+        {
+            int crtBool = PlayerPrefs.GetInt(crtScreenEffectPrefKey);
+            if (crtBool == 1 || crtBool == 0)
+                SetCRTScreenEffect(Convert.ToBoolean(PlayerPrefs.GetInt(crtScreenEffectPrefKey)));
+            else
+                SetCRTScreenEffect(false);
+        }
+        else
+        {
+            SetCRTScreenEffect(false);
         }
     }
 }
