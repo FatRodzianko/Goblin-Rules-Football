@@ -292,7 +292,7 @@ GameObject:
   - component: {fileID: 7590740301646765950}
   - component: {fileID: 8176173775456769324}
   - component: {fileID: 2057881179304844266}
-  m_Layer: 11
+  m_Layer: 22
   m_Name: goblin-grenadier
   m_TagString: Goblin
   m_Icon: {fileID: 0}
@@ -522,6 +522,8 @@ MonoBehaviour:
   spriteDefault: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   spriteOutlineWhite: {fileID: 2100000, guid: ec8c350c617971440b515c1e1e70e02b, type: 2}
   spriteOutlineYellow: {fileID: 2100000, guid: 3a0b3ff54a504b1428ce061f13590bb3, type: 2}
+  greenGoblinLayer: greenGoblin
+  greyGoblinLayer: greyGoblin
   isGoblinGrey: 0
   doesCharacterHaveBall: 0
   isThrowing: 0
@@ -706,7 +708,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goblinLayerMask:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 12584960
   obstacleLayerMask:
     serializedVersion: 2
     m_Bits: 524288

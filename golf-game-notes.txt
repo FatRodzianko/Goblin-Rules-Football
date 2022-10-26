@@ -1,0 +1,13 @@
+### Golf game notes/stuff to do
+
+- Try and create two quick prototypes for just hitting a ball
+- - - one based on Golf Story. top down 2d golfing
+- - - - - - most of the ball movement isn't "seen" by the player. Really just ball moving in straight line based on where they aim
+- - - - - - calculate "fake" arc of ball: height based on angle and so on
+- - - - - - - - - for prototype, try to simply adjust the look of the ball based on its height. Smallest when on ground. Sprite gets bigger as it gets higher
+- - - - - - - - - - - - have the ball script check its height value in update, change sprite as needed based on height hitting whatever threshholds
+- - - other based on Cursed to Golf. Side view, 2d golf platforming
+- - - - - - this will likely be easier?
+- - - - - - can only hit the ball either right or left
+- - - - - - calculate arc of ball based on power and angle
+- - - - - - ball bounces off the ground? loses momentum with each bounce?

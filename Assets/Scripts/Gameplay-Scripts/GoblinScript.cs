@@ -97,6 +97,8 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] private Material spriteOutlineWhite;
     [SerializeField] private Material spriteOutlineYellow;
     Material spriteOutline;
+    [SerializeField] string greenGoblinLayer;
+    [SerializeField] string greyGoblinLayer;
 
 
     [Header("Character Game State Stuff")]
@@ -1376,11 +1378,32 @@ public class GoblinScript : NetworkBehaviour
     public void HandleIsGoblinGrey(bool oldValue, bool newValue)
     {
         if (isServer)
+        {
             isGoblinGrey = newValue;
+            //Debug.Log("HandleIsGoblinGrey: current goblin layeR: " + this.gameObject.layer);
+            /*if (newValue)
+                this.gameObject.layer = greyGoblinLayer.value;
+            else
+                this.gameObject.layer = greenGoblinLayer.value;*/
+            //Debug.Log("HandleIsGoblinGrey: current goblin layeR: " + this.gameObject.layer + " green layer: " + greenGoblinLayer.value + " grey layeR: " + greyGoblinLayer.value);
+        }   
         if (isClient)
         {
+            Debug.Log("HandleIsGoblinGrey: current goblin layeR: " + this.gameObject.layer);
             if (newValue)
+            {
                 animator.SetBool("isGrey", newValue);
+                int layerInt = LayerMask.NameToLayer(greyGoblinLayer);
+                Debug.Log("HandleIsGoblinGrey: changing goblin layer to: " + layerInt);
+                this.gameObject.layer = layerInt;
+            }
+            else
+            {
+                int layerInt = LayerMask.NameToLayer(greenGoblinLayer);
+
+                this.gameObject.layer = layerInt;
+            }
+            Debug.Log("HandleIsGoblinGrey: current goblin layeR: " + this.gameObject.layer + " green layer: " + greenGoblinLayer.ToString() + " grey layeR: " + greyGoblinLayer.ToString());
             if (newValue && hasAuthority)
             {
                 FlipKickoffAimArrow();

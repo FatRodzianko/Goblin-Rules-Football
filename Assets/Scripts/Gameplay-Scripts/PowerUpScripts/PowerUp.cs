@@ -9,6 +9,7 @@ public class PowerUp : NetworkBehaviour
 {
     int lifeTimeCount = 0;
     IEnumerator lifeTimeCounterRoutine;
+    public Vector3 borderOffset = new Vector3(0f, -0.062f, 0f);
 
     [Header("Power Up Stats")]
     [SerializeField] public Sprite mySprite;
@@ -77,7 +78,7 @@ public class PowerUp : NetworkBehaviour
                 directionToMoveUpAndDown = 1;
             }
             PowerUpImageObject.transform.localPosition = newPosition;
-            PowerUpBorderObject.transform.localPosition = newPosition;
+            PowerUpBorderObject.transform.localPosition = (newPosition + borderOffset);
 
         }
     }

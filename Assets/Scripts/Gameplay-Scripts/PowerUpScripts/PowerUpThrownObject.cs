@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 public class PowerUpThrownObject : NetworkBehaviour
 {
@@ -34,6 +35,9 @@ public class PowerUpThrownObject : NetworkBehaviour
     [SerializeField] public string sfxClipName;
     [SerializeField] public string sfxThrowDropClip;
     [SerializeField] bool playSoundOnDestroy;
+
+    [Header("Goblin That Stepped In IT info?")]
+    public List<GoblinScript> goblinsWhoSteppedInIt = new List<GoblinScript>();
 
     // Start is called before the first frame update
     void Start()
@@ -132,6 +136,10 @@ public class PowerUpThrownObject : NetworkBehaviour
                 collision.transform.gameObject.GetComponent<GoblinScript>().onGlueSlowDown = this.isGlue;
                 collision.transform.gameObject.GetComponent<GoblinScript>().onWaterSlowDown = this.isWater;
                 collision.transform.gameObject.GetComponent<GoblinScript>().onBrushSlowDown = this.isBrush;
+                if (!goblinsWhoSteppedInIt.Contains(collision.transform.gameObject.GetComponent<GoblinScript>()))
+                {
+                    goblinsWhoSteppedInIt.Add(collision.transform.gameObject.GetComponent<GoblinScript>());
+                }
             }
         }
     }
@@ -150,6 +158,10 @@ public class PowerUpThrownObject : NetworkBehaviour
                 collision.transform.gameObject.GetComponent<GoblinScript>().onGlueSlowDown = false;
                 collision.transform.gameObject.GetComponent<GoblinScript>().onWaterSlowDown = false;
                 collision.transform.gameObject.GetComponent<GoblinScript>().onBrushSlowDown = false;
+                if (goblinsWhoSteppedInIt.Contains(collision.transform.gameObject.GetComponent<GoblinScript>()))
+                {
+                    goblinsWhoSteppedInIt.Remove(collision.transform.gameObject.GetComponent<GoblinScript>());
+                }
                 NetworkServer.Destroy(this.gameObject);
             }
         }
@@ -301,6 +313,26 @@ public class PowerUpThrownObject : NetworkBehaviour
         if (isClient && playSoundOnDestroy)
         {
             this.PlaySFXClip(sfxClipName);
+        }
+        if (isServer)
+        {
+            if (slowObject && goblinsWhoSteppedInIt.Count > 0)
+            {
+                try
+                {
+                    foreach (GoblinScript goblin in goblinsWhoSteppedInIt)
+                    {
+                        goblin.SlowDownObstacleEffect(false);
+                        goblin.onGlueSlowDown = false;
+                        goblin.onWaterSlowDown = false;
+                        goblin.onBrushSlowDown = false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("PowerupThrownObject: OnDestroy: Couldn't get goblinsWhoSteppedInIt. Error: " + e);
+                }
+            }
         }
     }
     void PlayThrowDropClip()

@@ -29,6 +29,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -51,10 +52,13 @@ MonoBehaviour:
   ConnectionId: 0
   playerNumber: 0
   IsGameLeader: 0
+  playerSteamId: 0
   inputSystemUIInputModule: {fileID: 0}
   moveReference: {fileID: 2739214424016785584, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
   submitReference: {fileID: 8772204883310439263, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
   defaultInputActions: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  isGamePaused: 0
+  lastBlockTime: 0
   is1v1: 0
   isSinglePlayer: 0
   goblinType: 
@@ -92,6 +96,7 @@ MonoBehaviour:
   myCamera: {fileID: 0}
   football: {fileID: 0}
   areGoblinsRepositionedForKickAfter: 0
+  localIsKickingPlayer: 0
   coinTossControllsEnabled: 0
   kickOrReceiveControlsEnabled: 0
   qeSwitchingEnabled: 0
@@ -103,6 +108,16 @@ MonoBehaviour:
   kickAfterKickingEnabled: 0
   powerUpsEnabled: 0
   menuNavigationEnabled: 0
+  coinTossControlsOnServer: 0
+  kickOrReceiveControlsOnServer: 0
+  qeSwitchingControlsOnServer: 0
+  kickingControlsOnServer: 0
+  kickOffAimArrowControlsOnServer: 0
+  goblinMovementControlsOnServer: 0
+  gameplayActionControlsOnServer: 0
+  kickAfterPositioningControlsOnServer: 0
+  kickAfterKickingControlsOnServer: 0
+  powerupsControlsOnServer: 0
   possessionPoints: 0
   gainPossessionPointsRate: 2.5
   isGainingPossesionPointsRoutineRunning: 0
@@ -110,6 +125,7 @@ MonoBehaviour:
   isNoPossessionCooldownRoutineRunning: 0
   didNoPossessionCooldownRoutineComplete: 0
   possessionBonus: 1
+  isErrorMessageDisplayed: 0
   myAiPlayer: {fileID: 8925233755424393115}
   GreenGrenadierStartingPosition: {x: -9, y: 2.45, z: 0}
   GreenBerserkerStartingPosition: {x: -9, y: -2, z: 0}
@@ -175,7 +191,7 @@ MonoBehaviour:
   positionToRunToward: {x: 0, y: 0, z: 0}
   goblinPlayerLayerMask:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 12584960
   goblinBodyLayerMask:
     serializedVersion: 2
     m_Bits: 512
@@ -219,6 +235,9 @@ MonoBehaviour:
   minKickAfterDistance: 15
   maxAcceptableDistance: 0
   finalPositionReached: 0
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
   isPowerUpRoutineRunning: 0
   isPowerUpCoolDownRoutineRunning: 0
   hasDefensePowerUp: 0
@@ -231,9 +250,9 @@ MonoBehaviour:
   staminaPowerUpIndex: 0
   hasHealthPowerUp: 0
   healthPowerUpIndex: 0
-  hasBlueShellLightning: 0
-  blueShellLightningIndex: 0
-  hasBlueShellInvinciblity: 0
-  blueShellInvinciblityIndex: 0
+  hasBlueShellEnemy: 0
+  blueShellEnemyIndex: 0
+  hasBlueShellSelf: 0
+  blueShellSelfIndex: 0
   hasBottlePowerUp: 0
   bottlePowerUpIndex: 0

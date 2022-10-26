@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,7 @@ public class GoblinAIPathFinding : MonoBehaviour
     public float avoidObjectsScanDistance = 2f;
     Vector2 currentDirection;
 
+    public GoblinScript myParent;
     public GoblinScript goblinTarget;
     public bool isTargetingAGoblin = false;
 
@@ -29,7 +31,7 @@ public class GoblinAIPathFinding : MonoBehaviour
     {
         //seeker = GetComponent<Seeker>();
         myRigidBody = this.transform.GetComponent<Rigidbody2D>();
-
+        myParent = this.transform.GetComponent<GoblinScript>();
         //seeker.StartPath(myRigidBody.position, target.position, OnPathComplete);
         //InvokeRepeating("UpdatePath", 0f, 0.5f);
 
@@ -152,6 +154,18 @@ public class GoblinAIPathFinding : MonoBehaviour
                     if (collidersScript == goblinTarget)
                         continue;
                 }
+                // check if goblins are on same team. If they are, no reason to avoid each other as same team goblins can't run into each other
+                try
+                {
+                    GoblinScript goblinCollider = colliders[i].GetComponent<GoblinScript>();
+                    if (goblinCollider.isGoblinGrey == myParent.isGoblinGrey)
+                        continue;
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("GetAvoidDirection: Error getting goblin script. Error: " + e);
+                }
+
                 float distance = Vector2.Distance(colliderPosition, positionOfColliderThatWasHit);
                 if (distance <= avoidRadius)
                 {

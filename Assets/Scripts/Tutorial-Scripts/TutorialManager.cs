@@ -1295,11 +1295,11 @@ public class TutorialManager : MonoBehaviour
         if (index30Tracker)
             return;
         Debug.Log("PowerUpInstructionsPart4 started. The tutorial index is: " + tutIndex.ToString());
-        messageBoardTopText.text = "To use a power up, press the number key (1,2,3,4) or d-pad key (<,^,>,v) displayed below the power up in your inventory bar.";
+        messageBoardTopText.text = "To use a power up, press the number key (1,2,3,4) or d-pad key (<,^,>,v) displayed below the power up in your inventory bar. You can also move the right stick in the <,^,>,v directions to use a powerup";
         powerUpMarker.SetActive(true);
         tutorialPlayer.EnableGoblinMovement(false);
         tutorialPlayer.goblinMovementControlsOnServer = false;
-        StartCoroutine(TutorialDelay(4.0f, true));
+        StartCoroutine(TutorialDelay(8.0f, true));
         index30Tracker = true;
     }
     void PowerUpInstructionsPart5()

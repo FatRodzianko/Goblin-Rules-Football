@@ -30,6 +30,8 @@ public class AIPlayer : NetworkBehaviour
     [Header("Goblin Direction Stuff?")]
     [SerializeField] LayerMask goblinPlayerLayerMask;
     [SerializeField] LayerMask goblinBodyLayerMask;
+    //[SerializeField] LayerMask greenGoblinLayerMask;
+    //[SerializeField] LayerMask greyGoblinLayerMask;
     [SerializeField] float fieldYMax;
     [SerializeField] float fieldYMin;
 

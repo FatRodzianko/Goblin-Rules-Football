@@ -925,7 +925,7 @@ x Indicator for when you can't dive?
 - - - - - x in the "Enable Controls" functions, such as EnableGameplayActions, have it call the EscMenuManager to save the new control update?
 - - - - - - or just have the game close the esc menu from the "Enable Controls" functions. If there are any controls changes, the EscMenu closes automatically without restoring old controls?
 - - x make it so a team can only pause the game every 30seconds or whatever
-- Add "timeouts" to things outside of the gameplay phases
+x Add "timeouts" to things outside of the gameplay phases
 - - x kickoff
 - - - - - - just kick straight ahead at half power after 30 seconds?
 - - x cointoss
@@ -1143,20 +1143,23 @@ x Create at least 10 achievements
 - - - punches thrown? slide tackles? fumbles?
 - - x cowboys yeehawed, obviously
 - - x blocked kick?
-- Create the 2 DLC builds. One for 0.99 and the other for 1.99
+x Create the 2 DLC builds. One for 0.99 and the other for 1.99
 - - x Create three images: one little crown and one big create. One with both?
 - - - - - x display images in the "playerListItem" objects in lobbies based on DLC's bought? - waiting for dlcs to be approved before I can test?
 x keyboard controls not working in tutorial?
 - - - "fixed" by calling CloseMenu from the escmanager. No idea what is causing the issue
 - slow down effect issue where the slow down "material" or whatever like the glue disappeared and the player still stayed at the slower speed
-- - - had to run into another slow down area and leave to reset speed
-- - - maybe have it so when a slow down effect is set, start a ~3 second timer
-- - - - - - check if the player is still in the slow down area. If not, remove the effect?
-- try and create a "CRT"/"REtro TV" effect using shader graph?
-- - - Acerola video on doing it with shaders (doesn't work with new render pipeline) https://www.youtube.com/watch?v=aWdySZ0BtJs
-- - - write up on doing it with shader graph? https://cyangamedev.wordpress.com/2020/09/10/retro-crt-shader-breakdown/ 
-- - - - - - https://github.com/Cyanilux/URP_RetroCRTShader
-- - - shader graph for full screen effects? https://www.youtube.com/watch?v=mCpRxFP2J1c
+- - x had to run into another slow down area and leave to reset speed
+- - x maybe have it so when a slow down effect is set, start a ~3 second timer
+- - - - - x check if the player is still in the slow down area. If not, remove the effect?
+- - - - - x stored a list of all goblins who come in contact with the slowdown powerup object. When the object is destroyed, the server goes through a loop of all those goblins who stepped in it and resets their slowdown modifier value
+x try and create a "CRT"/"REtro TV" effect using shader graph?
+- - x Acerola video on doing it with shaders (doesn't work with new render pipeline) https://www.youtube.com/watch?v=aWdySZ0BtJs
+- - x write up on doing it with shader graph? https://cyangamedev.wordpress.com/2020/09/10/retro-crt-shader-breakdown/ 
+- - - - - x https://github.com/Cyanilux/URP_RetroCRTShader
+- - - - - x https://cyangamedev.wordpress.com/2020/09/10/retro-crt-shader-breakdown/
+- - - - - x blit: https://github.com/Cyanilux/URP_BlitRenderFeature
+- - x shader graph for full screen effects? https://www.youtube.com/watch?v=mCpRxFP2J1c
 
 x New title screen UI tabs:
 - - x tutorial
@@ -1166,6 +1169,17 @@ x New title screen UI tabs:
 - - - - - x Gamepad
 - - - - - x copy from multiplayer for how to have the two sub tabs?
 x Switch all gamepad controls from "Xbox Controller" to generic "Gamepad"?
+
+### Post Release stuff to change?
+- make it so goblin teammates cannot run into each other?
+- - x have two different layers for goblins: green-goblin and grey-goblin
+- - x default is green, when the isGoblinGrey syncvar changes, update to gre-goblin if it is true
+- - x make it so that the green/grey layers interact with each other, but not themselves. Grey/green: yes. Grey/Grey: no. Green/Green: no
+- - x need to update AIPlayer.cs and GoblinAIPathFinding.cs so they update their goblinPlayerLayer masks with the correct grey/greenGoblin masks
+- - x maybe instead create a new "footbox" for each goblin and set its layer to grey/greenGoblin. Turn it off when diving? Keep the default collider as "goblinPlayer" and have it so the default footbox doesn't interact with itself, grey/greenGoblin only interact with each other and nothing else?
+- - - - - - everything seems to work actually with just setting the layermask values for the scripts to include goblinPlayers,greenGoblin,and greyGoblin???
+- slide tackle stats for CPU goblins not correct? Looks to only add to stat counts when they land a slide tackle. Missed slide tackles are not tracked?
+
 
 
 
