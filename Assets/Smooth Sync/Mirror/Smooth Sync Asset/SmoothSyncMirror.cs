@@ -839,6 +839,7 @@ namespace Smooth
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
             if (!NetworkServer.active) registerClientHandlers();
+            clearBuffer();
         }
 
 
@@ -1748,7 +1749,7 @@ namespace Smooth
             dontEaseScale = true;
         }
 
-        /// <summary> Clear the state buffer. Must be called on all non-owned objects if it's ownership has changed. </summary>
+        /// <summary> Clear the state buffer. Must be called on all non-owned objects if its ownership has changed and isSmoothingAuthorityChanges is not true.. </summary>
         public void clearBuffer()
         {
             stateCount = 0;
@@ -1944,7 +1945,6 @@ namespace Smooth
         /// <summary>Is automatically called on authority change on server.</summary>
         public void AssignAuthorityCallback(NetworkConnection conn, NetworkIdentity theNetID, bool authorityState)
         {
-            //var target = NetworkServer.spawned[theNetID.netId];
             var target = NetworkIdentity.spawned[theNetID.netId];
             if (target == null)
             {

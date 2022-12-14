@@ -32,6 +32,12 @@ TagManager:
   - TutorialPlayer
   - secondTutorialPlayer
   - PlayerListItem
+  - groundRough
+  - groundGreen
+  - groundFairway
+  - golfHole
+  - golfBall
+  - GolfClub
   layers:
   - Default
   - TransparentFX
@@ -57,10 +63,10 @@ TagManager:
   - cameraConfiner
   - greenGoblin
   - greyGoblin
-  - 
-  - 
-  - 
-  - 
+  - golfGround
+  - spinIcon
+  - golfHole
+  - golfEnvironmentObstacles
   - 
   - 
   - 
@@ -68,6 +74,9 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: weather
+    uniqueID: 126962435
     locked: 0
   - name: ui-markers
     uniqueID: 747716661

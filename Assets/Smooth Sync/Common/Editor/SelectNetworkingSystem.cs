@@ -8,7 +8,7 @@ namespace Smooth
 {
     public class SelectNetworkingSystem : EditorWindow
     {
-        enum NetworkingSystem { UNET, MIRROR, MLAPI, PUN, PUN2, NONE }
+        enum NetworkingSystem { UNET, MIRROR, MLAPI, NETCODE_FOR_GAMEOBJECTS, PUN, PUN2, NONE }
         string[] networkingSystemStrings = { "UNet", "Mirror", "MLAPI", "Netcode for GameObjects", "PUN", "PUN2", "None" };
         string[] packageStrings = { "UNet", "Mirror", "MLAPI", "NetcodeForGameObjects", "PUN", "PUN2", "None" };
         string[] inconsistentlyNamedExampleScenes = { "SmoothSyncExample", "SmoothSyncMirrorExample", "SmoothSyncMLAPIExample", "SmoothSyncNetcodeExample", "SmoothSyncExamplePUN", "SmoothSyncExampleScenePUN2" };

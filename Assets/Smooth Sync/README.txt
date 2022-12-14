@@ -1,4 +1,4 @@
-Plugin Version: 3.39
+Plugin Version: 3.40
 
 # Smooth Sync
 Performs interpolation and extrapolation in order to make your objects smooth and more accurate over the network.
@@ -54,8 +54,7 @@ SmoothSync.teleport() - Used to teleport your objects for situations like respaw
 SmoothSync.forceStateSendNextFixedUpdate() - Useful if you have a low send rate but you want to manually send a transform
 in between the send rate. 
 SmoothSync.clearBuffer() - You will need to manually call this on all of the object's instances if you change the object's network owner.
-Alternatively, check Smooth Authority Changes (UNet only) to use an extra byte and handle it automatically and smoothly.
-*When using Mirror you must call AssignAuthorityCallback() on the server after changing authority.*
+Alternatively, check Smooth Authority Changes to use an extra byte and handle it automatically and smoothly.
 SmoothSync.validateStateMethod - You may set up a validation method to check incoming States to see if cheating may be happening. 
 
 

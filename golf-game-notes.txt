@@ -3,11 +3,67 @@
 - Try and create two quick prototypes for just hitting a ball
 - - - one based on Golf Story. top down 2d golfing
 - - - - - - most of the ball movement isn't "seen" by the player. Really just ball moving in straight line based on where they aim
-- - - - - - calculate "fake" arc of ball: height based on angle and so on
+- - - - - x calculate "fake" arc of ball: height based on angle and so on
 - - - - - - - - - for prototype, try to simply adjust the look of the ball based on its height. Smallest when on ground. Sprite gets bigger as it gets higher
 - - - - - - - - - - - - have the ball script check its height value in update, change sprite as needed based on height hitting whatever threshholds
+- - - - - x probably can't use the 2d physics engine, so you'd have to basically recreate it for the top down view?
+- - - - - - - - - calculate trajectories manually. Detect collisions and then calculate the bounce/ricochet direction? Manually calculate bounces, etc.
+- - - - - - - - - - - x more similar to how the football bounces are calculated in GRF? or something along those lines?
+- - - - - - the "2d top-down hieght illusion" video maybe useful? https://www.youtube.com/watch?v=6iS0qbSbKuw and https://www.youtube.com/watch?v=aEMTc3rU2L8
+- - - - - x use the z-axis as a psuedo height value that can be used to compare where objects are - as ball moves up, it's z value increases. As it moves down, it decreases. When it collides with something, compare Z values. If ball z value is lower than collision object's z value, there is a collision?
+- - - - - - - - - doesn't seem like high z values affect whether the camera will render it in 2d? Only if Z gets too low. Otherwise, it is the Y value and order in layer that matters for things being rendered on top of each other or not
+- - - - - x make it so you can putt into a hole
+- - - - - x trail behind ball as it travels. Based on speed maybe?
+- - - - - - - - x unfortunately the particles wigggle a lot...
+- - - - - - - - x maybe switch to the trail renderer that turns on an offf? Adjust its width dynamically based on speed?
+- - - - - x change spin to a Vector2 value so their is side spin as well as top/back spin?
+- - - - - - - - x also need to have spin change trajectory somewhat. Top spin, lower angle and height but further distance? Back spin, higher angle and height and shorter distance?
+- - - - - x controls to change the hit direction with left/right?
+- - - - - x the power/accuracy bar thing and game for the hit power
+- - - - - - - - x hit meter icon ranges: start at +8.5x end at -11.5x
+- - - - - x scale ball size up by 1? The ground ball should be 4x4 not just 2x2? Basically, shift the ball size down and create one more "highester" ball
+- - - - - - - - x can also change the "max height" / difference between ball sprite and shadow. Make it so the ball sprite can get higher than it currently can? The max difference now is like 5.25f
+- - x Create objects in the game like trees that have specific "heights"
+- - - - - x make a collider that is a Trigger at the base of the object - detect when balls shadow collides with the object when the ball is moving
+- - - - - x if the balls zvalue is higher than the object's height, clear the object. If not, hit the object and bounce back
+- - - Similar to the above but for the hole flag as well
+- - - - - - depending on how high the ball is off the ground (it's z value) will determine if the ball bounces off the flag and into the hole?
+- - - - - - - - - should also check fall direction of the ball. If falling down, possible to bounce in. If still going up, have the ball bounce off the flag away from the hole
+- - - When making the game, instead of copying the trees over and over with their own colliders, maybe make the collection of sprites, and then create one big collider that covers the whole area the trees are on?
+- - - - - - would need to have the ball constantly check if it is "hitting" a tree/obstacle during its flight instead of just "OnTriggerEnter." CircleCast at each update/fixed update and check if it is over an obstacle and check height?
+- - - - - - - - - needed because the balls height will change as it travels through its flight arc, getting higher/lower with each frame
+- - - - - - - - - would likely need to do this anyway because the balls height will always change as it "goes over" a tree/obstacle. Could be especially important for bounces?
+- - x when a rolling ball collides with the hole, check the ball's speed. If too fast, bounce past the hole. If slow enough, ball falls into the hole?
+- - - have the camera focus/follow on the end of the hit trajectory
+- - - - - x first should have the trajectory determine if the player will hit an object mid flight. If so, cut the trajectory short?
+- - - - - x create a circle thing that shows the landing spot
+- - - - - - exception for putting. When using the putter, player will want to see the "whole green" or whatever to determine hills/whatever to account for in their putts. Make sure the player can see the whole trajectory and not just the end
+- - - - - x make it so the number of "line segments" for the trajectory is based on the distance traveled for the hit?
+- - - - - - - - x longer shots have more points on the line to calculate, shorter shots have fewer
+- - - - - - - - x maybe make it so there is a minimum of 10 points (or whatever) and a max of 100?
+- - - - - x dashed line shader tutorial: https://www.youtube.com/watch?v=yEMM0sYCWoI
+- - x wind: should shift the end target a certain amount based on a Vector2 direction and float for window power?
+- - - - - x the drawn trajectory should NOT take wind into account
+- - - - - - x draw a wind direction sprite
+- - - other weather effects? Maybe have rain/snow? Lightning and stuff?
+- - - - - x rain will reduce hitting power, dampen bounces off the ground, and slow down rolling faster? Rain could be something that slows down rolls, reduces bounces on the ground, and "dampens" your hit by lowering the actual max height it will achieve (relative to a "no rain" hit)
+- - - - - - Lightning can maybe strike a player? Idk, some sort of mechanism to "take cover" which is a stroke penalty but you have a random chance to get struck by lightning that knocks you out for the hole so you get the max stroke penalty
+- - - - - - Maybe have a tornado event where players have to do something to either avoid the tornado or make it less attracted to them? If you get hit by the tornado you lose a stroke and the ball gets launched in a random direction
+- - - - - - - - - have be like some weird "wind god" ritual. Could be a rythym thing or some other little mini game and the player that does the worst (or random if they all do it perfectly) attracts the torndao toward them. The tornado moves greateer distances after each iteration of the wind god routine so bigger penalty for messing up later in the hole (or maybe make it a game long thing that transfers from hole to hole???)
+- - - - - - - - - Reset the tornado after it hits a player so it can happen multiple times
+- - - Events and delegates tutorial for wind power/direction changes: https://www.youtube.com/watch?v=6NRqwL3N5Go
+
+
 - - - other based on Cursed to Golf. Side view, 2d golf platforming
 - - - - - - this will likely be easier?
 - - - - - - can only hit the ball either right or left
 - - - - - - calculate arc of ball based on power and angle
 - - - - - - ball bounces off the ground? loses momentum with each bounce?
+- - - - - - use unity physics engine for all the ball movement?
+- - - - - - draw trajectory line: https://www.youtube.com/watch?v=13KrnisMf14 or https://www.youtube.com/watch?v=p8e4Kpl9b28
+- - - - - - - - - 2d trajectory line: https://www.youtube.com/watch?v=RpeRnlLgmv8
+
+### Golf average numbers for different clubs for: distance, launch angle, height, etc.
+https://www.globalgolf.com/articles/pro-tip-61/
+
+ 
