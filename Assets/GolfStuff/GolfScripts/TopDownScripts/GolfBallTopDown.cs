@@ -102,6 +102,7 @@ public class GolfBallTopDown : MonoBehaviour
         else if (isRolling)
         {
             movementDirection = GetRollDirection(movementDirection, groundSlopeDirection);
+            movementDirection = CalculateWindShiftForPutts(movementDirection);
             RollBall(speedMetersPerSecond, movementDirection);
 
             if (!trail.enabled)
@@ -789,6 +790,7 @@ public class GolfBallTopDown : MonoBehaviour
         if (distanceToPutt > 20f)
             distanceToPutt = 20f;
         movementDirection = directionToPutt.normalized;
+        //movementDirection = CalculateWindShiftForPutts(movementDirection);
         launchDistance = distanceToPutt;
         if (RainManager.instance.IsRaining)
         {
@@ -1120,6 +1122,17 @@ public class GolfBallTopDown : MonoBehaviour
     Vector2 GetBounceDirection(Vector2 movementDirection, Vector3 collisionPoint, Vector3 ballPos)
     { 
         return Vector2.Reflect(movementDirection.normalized, (ballPos - collisionPoint).normalized);
+    }
+    Vector2 CalculateWindShiftForPutts(Vector2 oldDir)
+    {
+        if (WindManager.instance.WindDirection == Vector2.zero || WindManager.instance.WindPower == 0)
+            return oldDir;
+        Vector2 newDir = oldDir;
+
+        Vector2 windDirModifier = WindManager.instance.WindDirection * WindManager.instance.WindPower * slopeSpeedModifier * Time.fixedDeltaTime * 0.05f;
+        newDir = (newDir + windDirModifier).normalized;
+
+        return newDir;
     }
 }
 

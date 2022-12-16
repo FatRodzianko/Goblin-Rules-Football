@@ -26,8 +26,9 @@
 - - x Create objects in the game like trees that have specific "heights"
 - - - - - x make a collider that is a Trigger at the base of the object - detect when balls shadow collides with the object when the ball is moving
 - - - - - x if the balls zvalue is higher than the object's height, clear the object. If not, hit the object and bounce back
-- - - Similar to the above but for the hole flag as well
-- - - - - - depending on how high the ball is off the ground (it's z value) will determine if the ball bounces off the flag and into the hole?
+- - x Similar to the above but for the hole flag as well
+- - - - - x depending on how high the ball is off the ground (it's z value) will determine if the ball bounces off the flag and into the hole?
+- - - - - - - - - decided to just use the normal bounce-off-obstacle function and if the ball bounces into the hole, it counts. So special bounce scenario just for hole flags?
 - - - - - - - - - should also check fall direction of the ball. If falling down, possible to bounce in. If still going up, have the ball bounce off the flag away from the hole
 - - - When making the game, instead of copying the trees over and over with their own colliders, maybe make the collection of sprites, and then create one big collider that covers the whole area the trees are on?
 - - - - - - would need to have the ball constantly check if it is "hitting" a tree/obstacle during its flight instead of just "OnTriggerEnter." CircleCast at each update/fixed update and check if it is over an obstacle and check height?

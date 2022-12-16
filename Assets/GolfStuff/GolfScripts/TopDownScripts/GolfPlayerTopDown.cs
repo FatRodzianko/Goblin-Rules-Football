@@ -82,7 +82,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     public float MaxBackSpinFromClub;
     public float MaxSideSpinFromClub;
     [SerializeField] public float RoughTerrainDistModifer = 0.75f;
-    [SerializeField] public float TrapTerrainDistModifer = 0.5f;
+    //[SerializeField] public float TrapTerrainDistModifer = 0.5f;
 
     [Header("Club Info")]
     [SerializeField] ClubTopDown[] _myClubs;
@@ -518,8 +518,8 @@ public class GolfPlayerTopDown : MonoBehaviour
             }
             else
             {
-                //myBall.HitBall(HitPowerSubmitted, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
-                myBall.HitBall(100, hitAngle, hitTopSpin, new Vector2(1f,0f), hitLeftOrRightspin);
+                myBall.HitBall(HitPowerSubmitted, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
+                //myBall.HitBall(100, hitAngle, hitTopSpin, new Vector2(1f,0f), hitLeftOrRightspin);
             }
         }
         else
@@ -666,11 +666,11 @@ public class GolfPlayerTopDown : MonoBehaviour
         // code here to adjust hit distance if it is in rough terrain or a trap
         if (myBall.bounceContactGroundMaterial == "rough")
         {
-            dist *= RoughTerrainDistModifer;
+            dist *= club.RoughTerrainDistModifer;
         }
         else if (myBall.bounceContactGroundMaterial.Contains("trap") && club.ClubType != "wedge")
         { 
-            dist *= TrapTerrainDistModifer;
+            dist *= club.TrapTerrainDistModifer;
         }
 
         return dist;

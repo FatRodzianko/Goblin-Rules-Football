@@ -54,3 +54,5 @@ MonoBehaviour:
   MaxSideSpin: 5
   ClubTextSprite: {fileID: 21300000, guid: 3169c436c67fa684992a8057a6a3eb15, type: 3}
   ClubImageSprite: {fileID: 21300000, guid: 81d663e0579b9d748831674c0416447d, type: 3}
+  RoughTerrainDistModifer: 0.85
+  TrapTerrainDistModifer: 0.25

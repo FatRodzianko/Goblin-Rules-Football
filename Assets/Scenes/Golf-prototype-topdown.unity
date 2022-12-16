@@ -5413,6 +5413,87 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1001 &809772305
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7856488600319485310, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: groundType
+      value: trap
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637442, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_Color.b
+      value: 0.0747597
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637442, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_Color.g
+      value: 0.74338436
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637442, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_Color.r
+      value: 0.754717
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637443, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_Name
+      value: GroundFairWay (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_RootOrder
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8587717766256637453, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 10380a10f9c30ba4fa0a36c94e7f73d0, type: 3}
 --- !u!1001 &877237664
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10535,8 +10616,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b348900f84e65614ca10a520bcb07931, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WindDirection: {x: 0, y: 0}
-  WindPower: 0
+  WindDirection: {x: 0, y: 1}
+  WindPower: 5
   _windPower: 0
 --- !u!4 &1583700940
 Transform:
