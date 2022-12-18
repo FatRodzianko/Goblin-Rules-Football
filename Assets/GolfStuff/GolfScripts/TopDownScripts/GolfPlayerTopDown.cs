@@ -93,6 +93,9 @@ public class GolfPlayerTopDown : MonoBehaviour
     [SerializeField] GameObject _clubSelectionHolder;
     [SerializeField] SpriteRenderer _selectedClubTextImage;
     [SerializeField] SpriteRenderer _selectedClubImage;
+    [SerializeField] SpriteRenderer _puttDistanceTextImage;
+    [SerializeField] Sprite _shortPuttTextImage;
+    [SerializeField] Sprite _longPuttTextImage;
 
     [Header("Wind UI")]
     [SerializeField] GameObject _windUIHolder;
@@ -154,7 +157,10 @@ public class GolfPlayerTopDown : MonoBehaviour
                     ChangeCurrentClub();
                 }
             }
-
+            if (!_moveHitMeterIcon && IsPlayersTurn && CurrentClub.ClubType == "putter" && Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                SetPutterDistance(CurrentClub, true);
+            }
             if (_moveHitMeterIcon)
             {
                 if (_powerSubmitted && _accuracySubmitted)
@@ -210,9 +216,9 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     public void EnableOrDisableLineObjects(bool enable)
     {
-        trajectoryLineObject.enabled = true;
-        trajectoryShadowLineObject.enabled = true;
-        _landingTargetSprite.enabled = true;
+        trajectoryLineObject.enabled = enable;
+        trajectoryShadowLineObject.enabled = enable;
+        _landingTargetSprite.enabled = enable;
     }
     public void ResetPreviousHitValues()
     {
@@ -257,9 +263,11 @@ public class GolfPlayerTopDown : MonoBehaviour
         UpdateBallGroundMaterial();
         GetNewClubAttributes(CurrentClub);
         GetHitStatsFromClub();
+        SetPutterDistance(CurrentClub, false);
         EnableOrDisableLineObjects(true);
         //_hitMeterObject.SetActive(true);
         ActivateHitUIObjects(true);
+        SetInitialDirection(myBall.transform.position);
         DidPlayerAdjustDistance = false;
         ResethitTopSpinForNewTurn();
     }
@@ -637,7 +645,7 @@ public class GolfPlayerTopDown : MonoBehaviour
 
         // Update the Club UI stuff
         SetSelectedClubUI(CurrentClub);
-
+        SetPutterDistance(CurrentClub, false);
         // Update spin values to adjust for new clubs
         if (hitTopSpin > 0)
             UpdateTopSpin(hitTopSpin / _myClubs[oldIndex].MaxTopSpin);
@@ -821,6 +829,69 @@ public class GolfPlayerTopDown : MonoBehaviour
         {
             this.transform.parent = null;
             this.transform.localPosition = Vector3.zero;
+        }
+    }
+    void SetPutterDistance(ClubTopDown club, bool fromShift)
+    {
+        if (club.ClubType != "putter")
+        {
+            _puttDistanceTextImage.enabled = false;
+            return;
+        }
+
+        if (!fromShift)
+        {
+            _puttDistanceTextImage.sprite = _longPuttTextImage;
+        }
+        else
+        {
+            if (_puttDistanceTextImage.sprite == _longPuttTextImage)
+            {
+                _puttDistanceTextImage.sprite = _shortPuttTextImage;
+                MaxDistanceFromClub = GetDistanceFromClub(club) / 4f;
+                hitDistance = MaxDistanceFromClub;
+                UpdatePositionOfAdjustedDistanceIcon(hitDistance);
+                MinDistance = GetMinDistance(hitDistance);
+                
+            }
+            else
+            {
+                _puttDistanceTextImage.sprite = _longPuttTextImage;
+                GetNewClubAttributes(club);
+                hitDistance = MaxDistanceFromClub;
+                UpdatePositionOfAdjustedDistanceIcon(hitDistance);
+                MinDistance = GetMinDistance(hitDistance);
+            }
+        }
+        _puttDistanceTextImage.enabled = true;
+    }
+    void SetInitialDirection(Vector3 ballPos)
+    {
+        // Find the flag hole objects
+        GameObject[] flagHoles = GameObject.FindGameObjectsWithTag("golfHole");
+
+        if (flagHoles.Length > 0)
+        {
+            int closestHoleIndex = 0;
+            float closestDist = 0f;
+            for (int i = 0; i < flagHoles.Length; i++)
+            {
+                float holeDist = Vector2.Distance(flagHoles[i].transform.position, ballPos);
+                if (i == 0)
+                {
+                    closestDist = holeDist;
+                    closestHoleIndex = i;
+                    continue;
+                }
+                if (holeDist < closestDist)
+                {
+                    closestDist = holeDist;
+                    closestHoleIndex = i;
+                }
+            }
+
+            Vector2 newDir = (flagHoles[closestHoleIndex].transform.position - ballPos).normalized;
+            hitDirection = newDir;
         }
     }
 }

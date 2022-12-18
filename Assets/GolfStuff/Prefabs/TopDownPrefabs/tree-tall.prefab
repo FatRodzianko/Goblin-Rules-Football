@@ -125,3 +125,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HeightInUnityUnits: 7.9375
+  _isHoleFlag: 0
+  SoftBounce: 1
+  _minHeightForSoftBounce: 1
+  _bounceModifier: 1
+  _gradualBounceModifier: 0
+  _immediateBounceModifier: 1
+  _minHeightForImmediateBounceModifier: 1
+  _minBounceModifier: 0.35
+  _maxBounceModifier: 1

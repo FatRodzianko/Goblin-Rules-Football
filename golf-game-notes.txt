@@ -28,8 +28,8 @@
 - - - - - x if the balls zvalue is higher than the object's height, clear the object. If not, hit the object and bounce back
 - - x Similar to the above but for the hole flag as well
 - - - - - x depending on how high the ball is off the ground (it's z value) will determine if the ball bounces off the flag and into the hole?
-- - - - - - - - - decided to just use the normal bounce-off-obstacle function and if the ball bounces into the hole, it counts. So special bounce scenario just for hole flags?
-- - - - - - - - - should also check fall direction of the ball. If falling down, possible to bounce in. If still going up, have the ball bounce off the flag away from the hole
+- - - - - - - - x decided to just use the normal bounce-off-obstacle function and if the ball bounces into the hole, it counts. So special bounce scenario just for hole flags?
+- - - - - - - - x should also check fall direction of the ball. If falling down, possible to bounce in. If still going up, have the ball bounce off the flag away from the hole
 - - - When making the game, instead of copying the trees over and over with their own colliders, maybe make the collection of sprites, and then create one big collider that covers the whole area the trees are on?
 - - - - - - would need to have the ball constantly check if it is "hitting" a tree/obstacle during its flight instead of just "OnTriggerEnter." CircleCast at each update/fixed update and check if it is over an obstacle and check height?
 - - - - - - - - - needed because the balls height will change as it travels through its flight arc, getting higher/lower with each frame
@@ -53,6 +53,8 @@
 - - - - - - - - - have be like some weird "wind god" ritual. Could be a rythym thing or some other little mini game and the player that does the worst (or random if they all do it perfectly) attracts the torndao toward them. The tornado moves greateer distances after each iteration of the wind god routine so bigger penalty for messing up later in the hole (or maybe make it a game long thing that transfers from hole to hole???)
 - - - - - - - - - Reset the tornado after it hits a player so it can happen multiple times
 - - - Events and delegates tutorial for wind power/direction changes: https://www.youtube.com/watch?v=6NRqwL3N5Go
+- - x "Precision Mode" for the putter. Basically, have a long/short putt option. The short putt lowers the max distance so that the player has more control and can make shorter putts
+- - - - - - maybe also have a "tap in" option if the ball is close enough to the hole. Player doesn't actually have to make the shot? Or maybe a very easy shot that has like a 1% chance of failing if the player really messes up their shot thing
 
 
 - - - other based on Cursed to Golf. Side view, 2d golf platforming

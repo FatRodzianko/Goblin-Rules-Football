@@ -949,12 +949,12 @@ public class GolfBallTopDown : MonoBehaviour
         this.HitBall(speedMetersPerSecond / 2, 50f, 0f, movementDirection, 0f);
     }
     //public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector3 collisionPoint, Vector3 centerOfObstacle, Vector3 extentOfObstacle)
-    public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector2 collisionPoint, Vector2 ballPos, GameObject collisionObject)
+    public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector2 collisionPoint, Vector2 ballPos, bool softBounce = false, float bounceModifier = 1.0f)
     {
         //if (ballUnityUnits < obstalceUnityUnits)
         if(DoesBallHitObject(obstalceUnityUnits,ballUnityUnits))
         {
-            Debug.Log("HitEnvironmentObstacle: ball is not high enough to clear environmnet obstalce. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString());
+            Debug.Log("HitEnvironmentObstacle: ball is not high enough to clear environmnet obstalce. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString() + " bounce modifier: " + bounceModifier.ToString());
             /*if (isHoleFlag)
             {
                 Debug.Log("HitEnvironmentObstacle: the obstacle was a hole flag. Checking if the ball meets conditions to 'bounce' off the flag and into the hole.");
@@ -971,11 +971,13 @@ public class GolfBallTopDown : MonoBehaviour
             if (isRolling)
             {
                 //BounceOffTheObstacleRolling(collisionPoint, centerOfObstacle, extentOfObstacle);
-                BounceOffTheObstacleRolling(collisionPoint, ballPos);
+                //BounceOffTheObstacleRolling(collisionPoint, ballPos, softBounce);
+                BounceOffTheObstacleRolling(collisionPoint, ballPos, softBounce, bounceModifier);
             }
             else
             {
-                BounceOffTheObstacle();
+                //BounceOffTheObstacle(softBounce);
+                BounceOffTheObstacle(softBounce, bounceModifier);
             }
             
             //hitBallPonts = CalculateHitTrajectory(10f, launchAngle, launchTopSpin, launchLeftOrRightSpin, -movementDirection, Vector2.zero, 0f);
@@ -1001,7 +1003,7 @@ public class GolfBallTopDown : MonoBehaviour
         }
         return doesBallHitObject;
     }
-    void BounceOffTheObstacle()
+    void BounceOffTheObstacle(bool softBounce, float bounceModifier = 1.0f)
     {
         if (hitBallCount < 0.5f)
         {
@@ -1013,9 +1015,13 @@ public class GolfBallTopDown : MonoBehaviour
             Debug.Log("BounceOffTheObstacle: ball is flying downward now");
         }
 
+        float softBounceModifier = GetSoftBounceModifier(softBounce);
+
         float currentHeight = this.transform.position.z;
-        float midPointHeight = GetObstacleBounceHeight(currentHeight, hitBallCount);
-        float obstacleBounceDistance = GetObstacleBounceDistance(launchDistance, hitBallCount);
+        //float midPointHeight = GetObstacleBounceHeight(currentHeight, hitBallCount, softBounceModifier);
+        float midPointHeight = GetObstacleBounceHeight(currentHeight, hitBallCount, bounceModifier);
+        //float obstacleBounceDistance = GetObstacleBounceDistance(launchDistance, hitBallCount, softBounceModifier);
+        float obstacleBounceDistance = GetObstacleBounceDistance(launchDistance, hitBallCount, bounceModifier);
 
         // reset before hitting the ball again?
         hitBallCount = 0f;
@@ -1031,7 +1037,7 @@ public class GolfBallTopDown : MonoBehaviour
         //HitBall(obstacleBounceDistance, launchAngle, launchTopSpin, movementDirection, launchLeftOrRightSpin, true, midPointHeight);
 
     }
-    float GetObstacleBounceHeight(float ballHeight, float hitCount)
+    float GetObstacleBounceHeight(float ballHeight, float hitCount, float softBounceModifier = 1.0f)
     {
         float newHeight = 0f;
 
@@ -1045,20 +1051,20 @@ public class GolfBallTopDown : MonoBehaviour
         else
         {
             //newHeight = ballHeight
-            newHeight = ballHeight + ((ballHeight * distFromMid) / 2);
+            newHeight = ballHeight + (((ballHeight * distFromMid) / 2) * softBounceModifier);
         }
 
         return newHeight;
     }
-    float GetObstacleBounceDistance(float oldDist, float hitCount)
+    float GetObstacleBounceDistance(float oldDist, float hitCount, float softBounceModifier = 1.0f)
     {
-        float newDist = oldDist / 4f;
+        float newDist = oldDist / 4f * softBounceModifier;
         newDist *= (1f - hitCount);
         Debug.Log("GetObstacleBounceDistance: new hitDistance is: " + newDist.ToString() + " based on previous distance of: " + oldDist.ToString() + " after traveling " + hitCount.ToString() + " of its path");
         return newDist;
     }
     //void BounceOffTheObstacleRolling(Vector3 ballPos, Vector3 centerOfObstacle, Vector3 extentOfObstacle)
-    void BounceOffTheObstacleRolling(Vector2 collisionPoint, Vector2 ballPos)
+    void BounceOffTheObstacleRolling(Vector2 collisionPoint, Vector2 ballPos, bool softBounce, float bounceModifier = 1.0f)
     {
         Debug.Log("BounceOffTheObstacleRolling: ballPos: " + ballPos.x.ToString() + "," + ballPos.y.ToString() + " and a collision point of: " + collisionPoint.x.ToString() + "," + collisionPoint.y.ToString());
         Vector2 oldDir = movementDirection;
@@ -1106,7 +1112,9 @@ public class GolfBallTopDown : MonoBehaviour
             }
         }
         */
-        speedMetersPerSecond *= 0.8f;
+        float softBounceModifier = GetSoftBounceModifier(softBounce);
+        //speedMetersPerSecond *= (0.8f * softBounceModifier);
+        speedMetersPerSecond *= (0.8f * bounceModifier);
 
         // Instead of all this, do the following?
         // Get the direction of the collision point to the center of the collider. That will be the perpendicular angle of the ball to the collider
@@ -1133,6 +1141,13 @@ public class GolfBallTopDown : MonoBehaviour
         newDir = (newDir + windDirModifier).normalized;
 
         return newDir;
+    }
+    float GetSoftBounceModifier(bool softBounce)
+    {
+        if (softBounce)
+            return 0.4f;
+        else
+            return 1.0f;
     }
 }
 

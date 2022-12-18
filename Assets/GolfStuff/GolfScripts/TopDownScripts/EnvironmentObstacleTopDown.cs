@@ -7,6 +7,17 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     [SerializeField] public float HeightInUnityUnits; // get the number of pixels high the sprite is, then divide by 16 (or just multiple by the pixel unit, 0.0625f)
     [SerializeField] bool _isHoleFlag = false;
     // have a unity for "hardness" of the object? Balls bounce far from hard objects, don't bounce as much off soft objects? Pass that value to golfBallScript.HitEnvironmentObstacle to determine how far to bounce off the object???
+    [SerializeField] public bool SoftBounce = false;
+    [SerializeField] float _minHeightForSoftBounce = 0f; // for things like trees. Make it a hard bounce if the ball hits low (as in, the ball hit the tree trunk) and make it a soft bounce if the ball hits high (hits the tree leaves)
+
+    [Header("Bounce Modifier Stuff")]
+    [SerializeField] float _bounceModifier = 1.0f;
+    [SerializeField] bool _gradualBounceModifier = false;
+    [SerializeField] bool _immediateBounceModifier = false;
+    [SerializeField] float _minHeightForImmediateBounceModifier = 0f;
+    [SerializeField] float _minBounceModifier = 1.0f;
+    [SerializeField] float _maxBounceModifier = 1.0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -40,6 +51,16 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
                 Debug.Log("EnvironmentObstacleTopDown: Ball ABOVE height of object. Ball should continue flight.");
             }*/
 
+            bool isSoftBounce = SoftBounce;
+            if (SoftBounce && _minHeightForSoftBounce > 0f)
+            {
+                if (ballHeightInUnityUnits < _minHeightForSoftBounce)
+                    isSoftBounce = false;
+                else
+                    isSoftBounce = true;
+            }
+            float newBounceModifier = GetBounceModifier(ballHeightInUnityUnits);
+            Debug.Log("EnvironmentObstacleTopDown: new bounce modifier: " + newBounceModifier);
             // Make a call to the ball here. Give it the height of the ball in Unity Units and the height of the obstalce in Unity Units. The ball will then decide if it should continue flying, or bounce back
             if (golfBallScript.isRolling)
             {
@@ -52,12 +73,12 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
                 Debug.Log("EnvironmentObstacleTopDown: ball is rolling. Ball position: " + ballPos.ToString("0.00000") + " centerOfCollider: " + centerOfCollider.ToString() + " and the collision point: " + collisionPoint.ToString() + " closest point from collider: " + closestPoint.ToString("0.00000")); ;
                 //golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, collisionPoint, centerOfCollider, this.GetComponent<Collider2D>().bounds.extents);
                 //golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, centerOfCollider, this.GetComponent<Collider2D>().bounds.extents);
-                golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, ballPos, this.gameObject);
+                golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, ballPos, isSoftBounce, newBounceModifier);
             }
             else
             {
                 Debug.Log("EnvironmentObstacleTopDown: ball is NOT rolling."); ;
-                golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, Vector2.zero, Vector2.zero, this.gameObject) ;
+                golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, Vector2.zero, Vector2.zero, isSoftBounce, newBounceModifier) ;
             }
 
             /*Vector3 ballPos = golfBallScript.transform.position;
@@ -66,5 +87,33 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             Debug.Log("EnvironmentObstacleTopDown: ball is rolling. Ball position: " + ballPos.ToString("0.00000") + " closest point from collider: " + closestPoint.ToString("0.00000"));*/
             //Debug.Break();
         }
+    }
+    float GetBounceModifier(float ballHeightInUnityUnits)
+    {
+        if (!_gradualBounceModifier && !_immediateBounceModifier)
+            return _bounceModifier;
+
+        if (ballHeightInUnityUnits > HeightInUnityUnits)
+            return _bounceModifier;
+
+        float newModifier = _bounceModifier;
+
+        if (_immediateBounceModifier)
+        {
+            if (ballHeightInUnityUnits > _minHeightForImmediateBounceModifier)
+                return _minBounceModifier;
+            else
+                return _maxBounceModifier;
+        }
+        if (_gradualBounceModifier)
+        {
+            float modifierRange = _maxBounceModifier - _minBounceModifier;
+            float heightPercentrage = ballHeightInUnityUnits / HeightInUnityUnits;
+            float heightPercentageModifier = (modifierRange * heightPercentrage) + _minBounceModifier;
+            Debug.Log("GetBounceModifier: Gradual bounce modifier. Ball height: " + ballHeightInUnityUnits.ToString() + " modifier range: " + modifierRange.ToString() + " height percentage ball was on the obstacle: " + heightPercentrage.ToString() + " height percentage modifier: " + heightPercentageModifier.ToString() + " and new bounce modifier: " + newModifier.ToString());
+            return heightPercentageModifier;
+        }
+
+        return newModifier;
     }
 }
