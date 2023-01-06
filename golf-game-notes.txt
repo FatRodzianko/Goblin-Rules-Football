@@ -55,6 +55,12 @@
 - - - Events and delegates tutorial for wind power/direction changes: https://www.youtube.com/watch?v=6NRqwL3N5Go
 - - x "Precision Mode" for the putter. Basically, have a long/short putt option. The short putt lowers the max distance so that the player has more control and can make shorter putts
 - - - - - - maybe also have a "tap in" option if the ball is close enough to the hole. Player doesn't actually have to make the shot? Or maybe a very easy shot that has like a 1% chance of failing if the player really messes up their shot thing
+- - - tilemap tutorial to use scriptable objects to store data at a per tile level? https://www.youtube.com/watch?v=XIqtZnqutGg
+- - - - - - unique data in each tile: https://www.youtube.com/watch?v=nRFZDmThbdE
+- - - - - - another tutorial on storing data in individual tiles: https://medium.com/@allencoded/unity-tilemaps-and-storing-individual-tile-data-8b95d87e9f32
+- - - - - - scriptbale tiles https://www.youtube.com/watch?v=2FL0Jac5TAo
+- - x when selecting the first club at the beginning of the player's turn, check which club has the max distance that is closest to the distance to the hole?
+- - - - - x also have it set the hit distance to be at the hole if the club's distance is past the hole?
 
 
 - - - other based on Cursed to Golf. Side view, 2d golf platforming
@@ -69,4 +75,4 @@
 ### Golf average numbers for different clubs for: distance, launch angle, height, etc.
 https://www.globalgolf.com/articles/pro-tip-61/
 
- 
+34, -1, 0

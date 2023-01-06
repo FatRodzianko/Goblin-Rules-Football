@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class GolfBallTopDown : MonoBehaviour
 
     [Header("Ball Sprite Info")]
     [SerializeField] SpriteRenderer ballObjectRenderer;
+    [SerializeField] BallSpriteCollision _ballSpriteCollision;
     [SerializeField] Sprite groundSprite;
     [SerializeField] Sprite medSprite;
     [SerializeField] Sprite highSprite;
@@ -74,14 +76,17 @@ public class GolfBallTopDown : MonoBehaviour
     [Header("Ground Material Info")]
     [SerializeField] public float greenRollSpeedModifier = 0.5f;
     [SerializeField] public float fairwayRollSpeedModifier = 1.0f;
-    [SerializeField] public float roughRollSpeedModifier = 15f;
+    [SerializeField] public float roughRollSpeedModifier = 10f;
+    [SerializeField] public float deepRoughRollSpeedModifier = 20f;
     public Vector2 groundSlopeDirection = Vector2.zero;
     public float slopeSpeedModifier = 0f;
     [SerializeField] LayerMask _golfHoleLayerMask;
+    [SerializeField] Vector3Int _currentTileCell;
 
     // Start is called before the first frame update
     void Start()
     {
+        isHit = false;
         MyColliderRadius = myCollider.radius;
     }
 
@@ -156,24 +161,44 @@ public class GolfBallTopDown : MonoBehaviour
     void UpdateBallSpriteForHeight()
     {
         float height = this.transform.position.z;
+        float radius = pixelUnit * 2f;
         if (height < 1.0f)
             ballObjectRenderer.sprite = groundSprite;
         else if (height < 5f)
+        {
             ballObjectRenderer.sprite = medSprite;
+            radius = pixelUnit * 3f;
+        }
         else if (height < 10f)
+        {
             ballObjectRenderer.sprite = highSprite;
+            radius = pixelUnit * 4f;
+        }
         else if (height < 18f)
+        {
             ballObjectRenderer.sprite = higherSprite;
+            radius = pixelUnit * 5f;
+        }
         else if (height < 27f)
+        {
             ballObjectRenderer.sprite = highestSprite;
+            radius = pixelUnit * 6f;
+        }
         else if (height < 36f)
+        {
             ballObjectRenderer.sprite = highesterSprite;
+            radius = pixelUnit * 7f;
+        }
         else
+        {
             ballObjectRenderer.sprite = highestererSprite;
-
+            radius = pixelUnit * 8f;
+        }
 
         UpdateShadowPosition(height);
         UpdateTrailLine(ballObjectRenderer.sprite);
+        // Update the sprite collider's radius for accurate sprite collision detection?
+        _ballSpriteCollision.UpdateColliderRadius(radius);
     }
     public void UpdateShadowPosition(float ballZValue)
     {
@@ -590,7 +615,8 @@ public class GolfBallTopDown : MonoBehaviour
     {
         string material = "";
 
-        RaycastHit2D[] ground = Physics2D.CircleCastAll(this.transform.position, this.GetComponent<CircleCollider2D>().radius / 2, Vector2.zero, 0f, groundMask);
+        //RaycastHit2D[] ground = Physics2D.CircleCastAll(this.transform.position, this.GetComponent<CircleCollider2D>().radius / 2, Vector2.zero, 0f, groundMask);
+        RaycastHit2D[] ground = Physics2D.CircleCastAll(this.transform.position, pixelUnit, Vector2.zero, 0f, groundMask);
         if (ground.Length > 0)
         {
             for (int i = 0; i < ground.Length; i++)
@@ -614,15 +640,20 @@ public class GolfBallTopDown : MonoBehaviour
                     else
                     {
                         material = groundMaterial;
-                        groundSlopeDirection = groundScript.slopeDirection;
-                        slopeSpeedModifier = groundScript.slopeSpeedIncrease;
+
+                        // Check to see if the ball has moved onto a new tile. If so, check if that new tile has any slope information
+                        GetTileSlopeInformation(groundScript);
+                        //groundSlopeDirection = groundScript.slopeDirection;
+                        //slopeSpeedModifier = groundScript.slopeSpeedIncrease;
                     }
                 }
                 else
                 {
                     material = groundMaterial;
-                    groundSlopeDirection = groundScript.slopeDirection;
-                    slopeSpeedModifier = groundScript.slopeSpeedIncrease;
+                    // Check to see if the ball has moved onto a new tile. If so, check if that new tile has any slope information
+                    GetTileSlopeInformation(groundScript);
+                    //groundSlopeDirection = groundScript.slopeDirection;
+                    //slopeSpeedModifier = groundScript.slopeSpeedIncrease;
                 }
             }
         }
@@ -660,7 +691,9 @@ public class GolfBallTopDown : MonoBehaviour
         if (groundMaterial.Equals("green"))
             bounceHeightModifier += 0.1f;
         else if (groundMaterial.Equals("rough"))
-            bounceHeightModifier -= 0.3f;
+            bounceHeightModifier -= 0.2f;
+        else if (groundMaterial.Equals("deep rough"))
+            bounceHeightModifier -= 0.5f;
 
         if (bounceHeightModifier < 0.1f)
             bounceHeightModifier = 0.1f;
@@ -682,7 +715,7 @@ public class GolfBallTopDown : MonoBehaviour
         if (groundMaterial.Contains("trap"))
             return bounceDistance = 0f;
 
-        float bounceHeightModifer = 0.5f * (bounceHeight / oldHeight);
+        float bounceHeightModifer = 0.6f * (bounceHeight / oldHeight);
         Debug.Log("GetBounceDistance: bounceHeightModifer is: " + bounceHeightModifer.ToString());
 
         bounceDistance = previousDistance * bounceHeightModifer;
@@ -782,6 +815,8 @@ public class GolfBallTopDown : MonoBehaviour
             groundRollSpeedModifier = fairwayRollSpeedModifier;
         else if (groundMaterial.Equals("rough"))
             groundRollSpeedModifier = roughRollSpeedModifier;
+        else if (groundMaterial.Equals("deep rough"))
+            groundRollSpeedModifier = deepRoughRollSpeedModifier;
 
         return groundRollSpeedModifier;
     }
@@ -1137,7 +1172,8 @@ public class GolfBallTopDown : MonoBehaviour
             return oldDir;
         Vector2 newDir = oldDir;
 
-        Vector2 windDirModifier = WindManager.instance.WindDirection * WindManager.instance.WindPower * slopeSpeedModifier * Time.fixedDeltaTime * 0.05f;
+        //Vector2 windDirModifier = WindManager.instance.WindDirection * WindManager.instance.WindPower * slopeSpeedModifier * Time.fixedDeltaTime * 0.05f;
+        Vector2 windDirModifier = WindManager.instance.WindDirection * WindManager.instance.WindPower * Time.fixedDeltaTime * 0.025f;
         newDir = (newDir + windDirModifier).normalized;
 
         return newDir;
@@ -1148,6 +1184,19 @@ public class GolfBallTopDown : MonoBehaviour
             return 0.4f;
         else
             return 1.0f;
+    }
+    void GetTileSlopeInformation(GroundTopDown groundScript)
+    {
+        // Get the current tile the ball is over. If the ball is now on a new tile, get new slope information
+        Vector3Int newTilePos = groundScript.GetTilePosition(this.transform.position);
+        if (newTilePos == _currentTileCell)
+            return;
+        Debug.Log("GetTileSlopeInformation: Ball on new tile. Old tile: " + _currentTileCell.ToString() + " new tile: " + newTilePos.ToString());
+        _currentTileCell = newTilePos;
+        Tuple<Vector2, float> newSlopeValues = groundScript.GetSlopeDirection(newTilePos);
+        groundSlopeDirection = newSlopeValues.Item1;
+        slopeSpeedModifier = newSlopeValues.Item2;
+        Debug.Log("GetTileSlopeInformation: New slope direction: " + groundSlopeDirection.ToString() + " new slope Speed Modifier: " + slopeSpeedModifier.ToString());
     }
 }
 

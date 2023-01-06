@@ -37,6 +37,7 @@ public class GolfPlayerTopDown : MonoBehaviour
 
     [Header("Player Turn")]
     public bool IsPlayersTurn = false;
+    public bool DirectionAndDistanceChosen = false;
 
     [Header("Hit Meter Objects")]
     [SerializeField] GameObject _hitMeterObject;
@@ -104,10 +105,14 @@ public class GolfPlayerTopDown : MonoBehaviour
     public Camera myCamera;
     public CameraFollowScript cameraFollowScript;
 
+    [Header("Player Sprite")]
+    [SerializeField] GolferAnimator _golfAnimator;
+
     // Start is called before the first frame update
     void Start()
     {
         myBall.myPlayer = this;
+        SetPlayerOnBall();
         myCamera = Camera.main;
         cameraFollowScript = GameObject.FindGameObjectWithTag("camera").GetComponent<CameraFollowScript>();
         //AttachUIToNewParent(myCamera.transform);
@@ -127,7 +132,12 @@ public class GolfPlayerTopDown : MonoBehaviour
                 //EnableOrDisableLineObjects(false);
                 if (!IsPlayersTurn && !_moveHitMeterIcon)
                     StartPlayerTurn();
-                else if (IsPlayersTurn && !_moveHitMeterIcon)
+                else if (IsPlayersTurn && !DirectionAndDistanceChosen && !_moveHitMeterIcon)
+                {
+                    PlayerChooseDirectionAndDistance(true);
+                    UpdateCameraFollowTarget(myBall.myBallObject);
+                }
+                else if (IsPlayersTurn && DirectionAndDistanceChosen && !_moveHitMeterIcon)
                     StartHitMeterSequence();
                 else if (_moveHitMeterIcon)
                 {
@@ -139,14 +149,22 @@ public class GolfPlayerTopDown : MonoBehaviour
                     {
                         SetHitAccuracyValue();
                         // Later SubmitHitToBall() will be called by the animation instead of right here:
-                        SubmitHitToBall();
+                        _golfAnimator.StartSwing();
+                        //SubmitHitToBall();
                     }
                 }
             }
-            if (Input.GetKeyDown(KeyCode.LeftControl) && !IsPlayersTurn)
+            //if (Input.GetKeyDown(KeyCode.LeftControl) && !IsPlayersTurn)
+            if (Input.GetKeyDown(KeyCode.LeftControl) && IsPlayersTurn)
             {
-                myBall.ResetPosition();
-                EnableOrDisableLineObjects(true);
+                //myBall.ResetPosition();
+                //EnableOrDisableLineObjects(true);
+                Debug.Log("LEft Control Pressed");
+                if (DirectionAndDistanceChosen && !_moveHitMeterIcon)
+                {
+                    PlayerChooseDirectionAndDistance(false);
+                    UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
+                }
             }
             if (Input.GetKeyDown(KeyCode.Tab))
             {
@@ -155,11 +173,21 @@ public class GolfPlayerTopDown : MonoBehaviour
                 if (IsPlayersTurn && !_moveHitMeterIcon)
                 {
                     ChangeCurrentClub();
+                    if (DirectionAndDistanceChosen)
+                    {
+                        PlayerChooseDirectionAndDistance(false);
+                        UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
+                    }
                 }
             }
             if (!_moveHitMeterIcon && IsPlayersTurn && CurrentClub.ClubType == "putter" && Input.GetKeyDown(KeyCode.LeftShift))
             {
                 SetPutterDistance(CurrentClub, true);
+                if (DirectionAndDistanceChosen)
+                {
+                    PlayerChooseDirectionAndDistance(false);
+                    UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
+                }
             }
             if (_moveHitMeterIcon)
             {
@@ -174,7 +202,7 @@ public class GolfPlayerTopDown : MonoBehaviour
                 }
                 
             }
-            else
+            else if (!DirectionAndDistanceChosen)
             {
                 aimLeftRight = Input.GetAxisRaw("Horizontal");
                 if (aimLeftRight != 0)
@@ -212,6 +240,9 @@ public class GolfPlayerTopDown : MonoBehaviour
             previousHitAngle = hitAngle;
             previousHitTopSpin = hitTopSpin;
             previousHitLeftOrRightSpin = hitLeftOrRightspin;
+
+            // Update the sprite direction
+            _golfAnimator.UpdateSpriteDirection(hitDirection.normalized);
         }
     }
     public void EnableOrDisableLineObjects(bool enable)
@@ -258,27 +289,53 @@ public class GolfPlayerTopDown : MonoBehaviour
         // IsPlayersTurn will be set by the game manager in a real game. This is just a place holder for now.
         this.IsPlayersTurn = true;
         SetCameraOnPlayer();
+        SetPlayerOnBall();
         AttachUIToNewParent(myCamera.transform);
         DeactivateIconsForNewTurn();
         UpdateBallGroundMaterial();
+
+        // Find the closest hole to the player
+        Vector3 ballPos = myBall.transform.position;
+        GameObject closestHole = FindClosestHole(ballPos);
+        // Get the distance to the hole
+        float distToHole = GetDistanceToHole(closestHole, ballPos);
+        // Find most appropriate club to start with based on distance to hole
+        _currentClubIndex = FindAppropriateClubToStart(closestHole, distToHole);
+        CurrentClub = _myClubs[_currentClubIndex];
+        // Update the Club UI stuff
+        SetSelectedClubUI(CurrentClub);
+        // update the club stats?
         GetNewClubAttributes(CurrentClub);
         GetHitStatsFromClub();
         SetPutterDistance(CurrentClub, false);
         EnableOrDisableLineObjects(true);
         //_hitMeterObject.SetActive(true);
         ActivateHitUIObjects(true);
-        SetInitialDirection(myBall.transform.position);
+        // Set the initial direction of the hit to be in the direction of the hole
+        hitDirection = SetInitialDirection(ballPos, closestHole);
+
+        // Check to see if the current club's max distance is greater than distance to the hole. If so, adjust the player's shot so that their initial hit distance is right at the hole
         DidPlayerAdjustDistance = false;
+        if (MaxDistanceFromClub > distToHole)
+        {
+            hitDistance = distToHole;
+            UpdatePositionOfAdjustedDistanceIcon(distToHole);
+        }
         ResethitTopSpinForNewTurn();
+        PlayerChooseDirectionAndDistance(false);
     }
     void SetCameraOnPlayer()
     {
         // Update player so they are at the same position of the camera
         UpdateCameraFollowTarget(myBall.myBallObject);
         //cameraFollowScript.followTarget = myBall.myBallObject;
-        Vector3 cameraPos = myCamera.transform.position;
-        this.transform.position = new Vector3(cameraPos.x, cameraPos.y, 0f);
+        //Vector3 cameraPos = myCamera.transform.position;
+        //this.transform.position = new Vector3(cameraPos.x, cameraPos.y, 0f);
         //AttachPlayerToCamera(true, myCamera.transform);
+    }
+    void SetPlayerOnBall()
+    {
+        this.transform.position = myBall.transform.position;
     }
     void DeactivateIconsForNewTurn()
     {
@@ -393,7 +450,8 @@ public class GolfPlayerTopDown : MonoBehaviour
             {
                 Debug.Log("MoveHitMeterIcon: Accuracy meter off the right edge without accuracy submitted by player. SHANKED!!!");
                 IsShanked = true;
-                SubmitHitToBall();
+                //SubmitHitToBall();
+                _golfAnimator.StartSwing();
             }
                 
         }
@@ -515,7 +573,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     {
         _hitMeterMovingIcon.SetActive(enable);
     }
-    void SubmitHitToBall()
+    public void SubmitHitToBall()
     {
         if (!IsShanked)
         {
@@ -676,6 +734,10 @@ public class GolfPlayerTopDown : MonoBehaviour
         {
             dist *= club.RoughTerrainDistModifer;
         }
+        if (myBall.bounceContactGroundMaterial == "deep rough")
+        {
+            dist *= club.DeepRoughTerrainDistModifer;
+        }
         else if (myBall.bounceContactGroundMaterial.Contains("trap") && club.ClubType != "wedge")
         { 
             dist *= club.TrapTerrainDistModifer;
@@ -714,7 +776,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     bool CanClubBeUsedOnCurrentGround(ClubTopDown club)
     {
-        if (myBall.bounceContactGroundMaterial == "rough")
+        if (myBall.bounceContactGroundMaterial.Contains("rough"))
         {
             if (club.ClubType == "putter")
                 return false;
@@ -865,10 +927,10 @@ public class GolfPlayerTopDown : MonoBehaviour
         }
         _puttDistanceTextImage.enabled = true;
     }
-    void SetInitialDirection(Vector3 ballPos)
+    Vector2 SetInitialDirection(Vector3 ballPos, GameObject closestHole)
     {
         // Find the flag hole objects
-        GameObject[] flagHoles = GameObject.FindGameObjectsWithTag("golfHole");
+        /*GameObject[] flagHoles = GameObject.FindGameObjectsWithTag("golfHole");
 
         if (flagHoles.Length > 0)
         {
@@ -892,6 +954,110 @@ public class GolfPlayerTopDown : MonoBehaviour
 
             Vector2 newDir = (flagHoles[closestHoleIndex].transform.position - ballPos).normalized;
             hitDirection = newDir;
+        }*/
+        Vector2 newDir = (closestHole.transform.position - ballPos).normalized;
+        return newDir;
+        
+    }
+    void PlayerChooseDirectionAndDistance(bool enable)
+    {
+        Debug.Log("PlayerChooseDirectionAndDistance: setting to: " + enable.ToString());
+        DirectionAndDistanceChosen = enable;
+    }
+    // Search through available clubs and select the one that has a max hit distance closest to the hole
+    int FindAppropriateClubToStart(GameObject closestHole, float distToHole)
+    {
+        // Get distance to the hole
+        //float distanceToHole = GetDistanceToHole();
+        UpdateBallGroundMaterial();
+        float bestDifferenceFromHoleDistance = 0f;
+        int bestClubIndex = 0;
+        bool firstCheckDone = false;        
+
+        for (int i = 0; i < _myClubs.Length; i++)
+        {
+            if (CanClubBeUsedOnCurrentGround(_myClubs[i]))
+            {
+                float clubDist = _myClubs[i].MaxHitDistance;
+                // Make checks based on how terrain modifies hit distance
+                if (myBall.bounceContactGroundMaterial == "rough")
+                {
+                    clubDist *= _myClubs[i].RoughTerrainDistModifer;
+                }
+                if (myBall.bounceContactGroundMaterial == "deep rough")
+                {
+                    clubDist *= _myClubs[i].DeepRoughTerrainDistModifer;
+                }
+                else if (myBall.bounceContactGroundMaterial.Contains("trap") && _myClubs[i].ClubType != "wedge")
+                {
+                    clubDist *= _myClubs[i].TrapTerrainDistModifer;
+                }
+
+                float distDifference = Mathf.Abs(clubDist - distToHole);
+
+                // only default to the putter if the player is on the green
+                if (myBall.bounceContactGroundMaterial != "green" && _myClubs[i].ClubType == "putter")
+                    continue;
+
+                if (!firstCheckDone)
+                {
+                    bestDifferenceFromHoleDistance = distDifference;
+                    bestClubIndex = i;
+                    firstCheckDone = true;
+                    continue;
+                }
+                
+                if (distDifference < bestDifferenceFromHoleDistance)
+                {
+                    bestDifferenceFromHoleDistance = distDifference;
+                    bestClubIndex = i;
+                }
+                else if (distDifference == bestDifferenceFromHoleDistance && clubDist > distToHole) // default to the club that has a distance greater than distance to hole if the difference in distances is the same?
+                {
+                    bestDifferenceFromHoleDistance = distDifference;
+                    bestClubIndex = i;
+                }
+            }
         }
+        Debug.Log("FindAppropriateClubToStart: Returning club index of: " + bestClubIndex.ToString() + " which maps to: " + _myClubs[bestClubIndex].ClubName);
+        return bestClubIndex;
+    }
+    // Get distance from the ball to the hole
+    float GetDistanceToHole(GameObject closestHole, Vector3 ballPos)
+    {
+        float dist = Vector2.Distance(closestHole.transform.position, ballPos);
+        return dist;
+    }
+    GameObject FindClosestHole(Vector3 ballPos)
+    {
+        // Find the flag hole objects
+        GameObject[] flagHoles = GameObject.FindGameObjectsWithTag("golfHole");
+        GameObject closestHole = null;
+        if (flagHoles.Length > 0)
+        {
+            int closestHoleIndex = 0;
+            float closestDist = 0f;
+            for (int i = 0; i < flagHoles.Length; i++)
+            {
+                float holeDist = Vector2.Distance(flagHoles[i].transform.position, ballPos);
+                if (i == 0)
+                {
+                    closestDist = holeDist;
+                    closestHoleIndex = i;
+                    closestHole = flagHoles[i];
+                    continue;
+                }
+                if (holeDist < closestDist)
+                {
+                    closestDist = holeDist;
+                    closestHoleIndex = i;
+                    closestHole = flagHoles[i];
+                }
+            }
+
+            //Vector2 newDir = (flagHoles[closestHoleIndex].transform.position - ballPos).normalized;
+            //hitDirection = newDir;
+        }
+        return closestHole;
     }
 }

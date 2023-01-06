@@ -38,6 +38,8 @@ TagManager:
   - golfHole
   - golfBall
   - GolfClub
+  - GolfBallSprite
+  - DirectionTiles
   layers:
   - Default
   - TransparentFX
@@ -67,7 +69,7 @@ TagManager:
   - spinIcon
   - golfHole
   - golfEnvironmentObstacles
-  - 
+  - spriteCollisions
   - 
   - 
   - 

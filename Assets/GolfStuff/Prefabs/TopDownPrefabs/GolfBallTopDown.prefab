@@ -13,9 +13,11 @@ GameObject:
   - component: {fileID: 4003736612596823783}
   - component: {fileID: 1474082947283139999}
   - component: {fileID: 885962383}
-  m_Layer: 0
+  - component: {fileID: 7168041866932580886}
+  - component: {fileID: 5862308198339419254}
+  m_Layer: 28
   m_Name: ball-sprite
-  m_TagString: Untagged
+  m_TagString: GolfBallSprite
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -85,8 +87,8 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_MaskInteraction: 2
+  m_SpriteSortPoint: 1
 --- !u!199 &4003736612596823783
 ParticleSystemRenderer:
   serializedVersion: 6
@@ -4965,6 +4967,40 @@ TrailRenderer:
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
   m_Emitting: 1
+--- !u!58 &7168041866932580886
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4374865640907677581}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.125
+--- !u!114 &5862308198339419254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4374865640907677581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e862a768881cb30409721b29d961e4c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _shadowObject: {fileID: 7447958787880024895}
+  _circleCollider2D: {fileID: 7168041866932580886}
+  _spriteRenderer: {fileID: 5132641245094547481}
+  _defaultOrderInLayer: 0
+  _golfBallTopDown: {fileID: 4414391001200824294}
+  _trailRenderer: {fileID: 885962383}
 --- !u!1 &7447958787880024895
 GameObject:
   m_ObjectHideFlags: 0
@@ -5152,8 +5188,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 578994876}
   myCollider: {fileID: 578994875}
+  MyColliderRadius: 0
   myPlayer: {fileID: 0}
   ballObjectRenderer: {fileID: 5132641245094547481}
+  _ballSpriteCollision: {fileID: 5862308198339419254}
   groundSprite: {fileID: 21300000, guid: 927daddc8a422a241a9a7e91618d7abc, type: 3}
   medSprite: {fileID: 21300000, guid: b43b09b1f928e2d439d25548c951c0da, type: 3}
   highSprite: {fileID: 21300000, guid: 645573667c0fa2d4a9b08fce5bfa00b7, type: 3}
@@ -5198,6 +5236,7 @@ MonoBehaviour:
   originalHitDirection: {x: 0, y: 0}
   twoBounceDistancesAgo: 0
   isRolling: 0
+  IsInHole: 0
   greenRollSpeedModifier: 0.5
   fairwayRollSpeedModifier: 1
   roughRollSpeedModifier: 15

@@ -17,7 +17,8 @@ public class ClubTopDown : MonoBehaviour
     [SerializeField] public Sprite ClubImageSprite;
 
     [Header("Ground Distance Modifiers")]
-    [SerializeField] public float RoughTerrainDistModifer = 0.75f;
+    [SerializeField] public float RoughTerrainDistModifer = 0.8f;
+    [SerializeField] public float DeepRoughTerrainDistModifer = 0.7f;
     [SerializeField] public float TrapTerrainDistModifer = 0.5f;
 
     // Start is called before the first frame update
