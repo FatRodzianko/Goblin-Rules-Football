@@ -580,12 +580,12 @@ public class GolfPlayerTopDown : MonoBehaviour
             if (CurrentClub.ClubType == "putter")
             {
                 myBall.PuttBall(ModifiedHitDirection, HitPowerSubmitted);
-                //myBall.PuttBall(new Vector2 (1f,0f), 20f);
+                //myBall.PuttBall(new Vector2 (1f,0f), 10f);                
             }
             else
             {
                 myBall.HitBall(HitPowerSubmitted, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
-                //myBall.HitBall(100, hitAngle, hitTopSpin, new Vector2(1f,0f), hitLeftOrRightspin);
+                //myBall.HitBall(20f, hitAngle, hitTopSpin, new Vector2(1f,0f), hitLeftOrRightspin);
             }
         }
         else

@@ -114,7 +114,7 @@ public class BallSpriteCollision : MonoBehaviour
                     _spriteRenderer.sortingOrder = collisionOrderInLayer + 2;
                     //_trailRenderer.sortingOrder = _spriteRenderer.sortingOrder -1;
                 }
-                Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Increasing BALL SPRITE sorting order to: " + _spriteRenderer.sortingOrder.ToString());
+                //Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Increasing BALL SPRITE sorting order to: " + _spriteRenderer.sortingOrder.ToString());
             }
             else if (collision.transform.position.y <= _shadowObject.transform.position.y  && collisionRenderer.sortingOrder <= _spriteRenderer.sortingOrder && !spriteCollision.MySpriteMask.enabled)
             {
@@ -124,7 +124,7 @@ public class BallSpriteCollision : MonoBehaviour
                 spriteCollision.UpdateSpriteOrderInLayer(_spriteRenderer.sortingOrder + 1);*/
                 //Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Ball Sprite should be BEHIND sprite collision. Setting sort order to sprite collision sort order of: " + collisionRenderer.sortingOrder.ToString());
                 //_spriteRenderer.sortingOrder = collisionRenderer.sortingOrder;
-                Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Ball Sprite should be BEHIND sprite collision. Setting sprite mask to true for: " + collision.gameObject.name);
+                //Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Ball Sprite should be BEHIND sprite collision. Setting sprite mask to true for: " + collision.gameObject.name);
                 spriteCollision.MySpriteMask.enabled = true;
 
             }

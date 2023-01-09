@@ -68,6 +68,7 @@ public class GolfBallTopDown : MonoBehaviour
 
     [Header("Rolling")]
     public bool isRolling = false;
+    public bool HitApexOfHill = false;
 
     [Header("Ball State")]
     public bool IsInHole = false;
@@ -76,8 +77,8 @@ public class GolfBallTopDown : MonoBehaviour
     [Header("Ground Material Info")]
     [SerializeField] public float greenRollSpeedModifier = 0.5f;
     [SerializeField] public float fairwayRollSpeedModifier = 1.0f;
-    [SerializeField] public float roughRollSpeedModifier = 10f;
-    [SerializeField] public float deepRoughRollSpeedModifier = 20f;
+    [SerializeField] public float roughRollSpeedModifier = 5f;
+    [SerializeField] public float deepRoughRollSpeedModifier = 15f;
     public Vector2 groundSlopeDirection = Vector2.zero;
     public float slopeSpeedModifier = 0f;
     [SerializeField] LayerMask _golfHoleLayerMask;
@@ -106,8 +107,11 @@ public class GolfBallTopDown : MonoBehaviour
         }
         else if (isRolling)
         {
+            //Debug.Log("IsRolling: Roll direction before slope: " + movementDirection.ToString());
             movementDirection = GetRollDirection(movementDirection, groundSlopeDirection);
-            movementDirection = CalculateWindShiftForPutts(movementDirection);
+            //Debug.Log("IsRolling: Roll direction AFTER slope: " + movementDirection.ToString());
+            //movementDirection = CalculateWindShiftForPutts(movementDirection);
+            //Debug.Log("IsRolling: Roll direction AFTER WIND: " + movementDirection.ToString());
             RollBall(speedMetersPerSecond, movementDirection);
 
             if (!trail.enabled)
@@ -261,7 +265,7 @@ public class GolfBallTopDown : MonoBehaviour
         // Get the distance travelled in last fixed update, then divid by fixed update to get meters/second?
         float dist = Vector2.Distance(start, end);
         currentSpeed = dist / Time.deltaTime;
-        //Debug.Log("CalculateCurrentSpeed: " + currentSpeed.ToString());
+        Debug.Log("CalculateCurrentSpeed: current speed: " + currentSpeed.ToString());
         return currentSpeed;
     }
     public void ResetBallInfo(bool checkForBounces)
@@ -556,10 +560,16 @@ public class GolfBallTopDown : MonoBehaviour
             }
 
             // Get the bounce distance based on previous distance and spin
-            float bounceDistance = GetBounceDistance(hitDistance, bounceTopSpin, bounceContactGroundMaterial, bounceHeight, hitHeight);
+            float bounceDistance = GetBounceDistance(hitDistance, bounceTopSpin, bounceContactGroundMaterial, bounceHeight, hitHeight, hitDirection);
 
             // Change direction of the bounce if the distance is negative / bouncing backwards
+            //Vector2 bounceDirection = (hitDirection + (Vector3)BounceOffSlope()).normalized;
+            //Vector2 bounceDirection = (hitDirection + (Vector3)BounceOffSlope());
             Vector2 bounceDirection = hitDirection;
+            // Adjust the distance of the bounce based on the slope of the ground the ball is bouncing off of
+            //bounceDistance = AdjustBounceDistanceFromSlope(bounceDistance, bounceHeight, hitDirection, groundSlopeDirection, slopeSpeedModifier);
+
+            //Debug.Log("GetBounces: hit direction was: " + hitDirection.ToString() + " and the new bounce direction after checking for ground slope will be: " + bounceDirection.ToString());
             if (bounceDistance <= 0)
             {   
                 bounceDistance = Mathf.Abs(bounceDistance);
@@ -568,13 +578,18 @@ public class GolfBallTopDown : MonoBehaviour
                     bounceDirection = -bounceDirection;
                 }
             }
+            Debug.Log("GetBounces: hit direction was: " + hitDirection.ToString() + " and the new bounce direction after checking for spin is: " + bounceDirection.ToString());
+            // Factor in the slope of ground for bounces???
+            bounceDirection += BounceOffSlope();
+            Debug.Log("GetBounces: hit direction was: " + hitDirection.ToString() + " and the new bounce direction after checking for ground slope will be: " + bounceDirection.ToString() + " Bounce direction using reflecion is: " + Vector3.Reflect(hitDirection,Vector3.forward).ToString());
+
 
             // Get the new hit angle based on the new bounce distance. If spin is increasing or decreasing the bounce distance, the angle needs to change?
             float bounceAngle = GetBounceAngle(bounceDistance, bounceHeight);
 
             // Calculate the trajectory of the bounce
             //CalculateHitTrajectory(bounceDistance, bounceAngle, bounceTopSpin, bounceDirection, Vector2.zero, 0f, true, bounceHeight);
-            hitBallPonts = CalculateHitTrajectory(bounceDistance, bounceAngle, bounceTopSpin, 0f, bounceDirection, WindManager.instance.WindDirection, WindManager.instance.WindPower, true, bounceHeight);
+            hitBallPonts = CalculateHitTrajectory(bounceDistance, bounceAngle, bounceTopSpin, 0f, bounceDirection , WindManager.instance.WindDirection, WindManager.instance.WindPower, true, bounceHeight);
             maxHeight = hitBallPonts[1].z / 2;
             initialVelocity = CalculateInitialVelocity(hitAngle, maxHeight);
             flightTime = CalculateFlightTime(initialVelocity, hitAngle);
@@ -622,12 +637,14 @@ public class GolfBallTopDown : MonoBehaviour
             for (int i = 0; i < ground.Length; i++)
             {
                 GroundTopDown groundScript = ground[i].collider.GetComponent<GroundTopDown>();
+                GetTileSlopeInformation(groundScript);
                 string groundMaterial = groundScript.groundType;
 
                 // Always have rough or trap override 
                 if (groundMaterial == "rough" || groundMaterial.Contains("trap"))
                 {
                     material = groundMaterial;
+                    //GetTileSlopeInformation(groundScript);
                     break;
                 }
                 // Check to see if the ball is overlapping any types of ground. If it is on the edge of a green ground and non-green ground, keep the non-green ground
@@ -642,7 +659,7 @@ public class GolfBallTopDown : MonoBehaviour
                         material = groundMaterial;
 
                         // Check to see if the ball has moved onto a new tile. If so, check if that new tile has any slope information
-                        GetTileSlopeInformation(groundScript);
+                        //GetTileSlopeInformation(groundScript);
                         //groundSlopeDirection = groundScript.slopeDirection;
                         //slopeSpeedModifier = groundScript.slopeSpeedIncrease;
                     }
@@ -651,7 +668,7 @@ public class GolfBallTopDown : MonoBehaviour
                 {
                     material = groundMaterial;
                     // Check to see if the ball has moved onto a new tile. If so, check if that new tile has any slope information
-                    GetTileSlopeInformation(groundScript);
+                    //GetTileSlopeInformation(groundScript);
                     //groundSlopeDirection = groundScript.slopeDirection;
                     //slopeSpeedModifier = groundScript.slopeSpeedIncrease;
                 }
@@ -708,7 +725,7 @@ public class GolfBallTopDown : MonoBehaviour
         return bounceHeight;
     }
 
-    float GetBounceDistance(float previousDistance, float spin, string groundMaterial, float bounceHeight, float oldHeight)
+    float GetBounceDistance(float previousDistance, float spin, string groundMaterial, float bounceHeight, float oldHeight, Vector2 ballDir)
     {
         float bounceDistance = 0f;
 
@@ -743,6 +760,22 @@ public class GolfBallTopDown : MonoBehaviour
         Debug.Log("GetBounceDistance: bounceDistanceModifier is: " + bounceHeightModifer.ToString());
 
         bounceDistance += bounceDistanceModifier;
+
+        if (groundSlopeDirection != Vector2.zero && slopeSpeedModifier != 0f)
+        {
+            
+            Vector2 bounceVector = ballDir * bounceDistance;
+            Vector2 slopeVector = groundSlopeDirection * slopeSpeedModifier * 7.5f * (Mathf.Abs(bounceDistance) + 0.1f); // adding 0.1 to prevent it from being zero?
+            Vector2 combinedVectors = bounceVector + slopeVector;
+            Debug.Log("GetBounceDistance: Checking for bounce distance modifier due to slope of ground. Bounce vector is: " + bounceVector.ToString() + " Current bounce distance: " + bounceDistance.ToString() + " magnitude of bounce vector is: " + bounceVector.magnitude.ToString() + " slope vector is: " + slopeVector.ToString() + " with a magnitude of: " + slopeVector.magnitude.ToString() + " magnitude of combined vectors is: " + combinedVectors.magnitude.ToString()); ;
+            int distNegOrPos = 1;
+            if (bounceDistance < 0)
+                distNegOrPos = -1;
+            bounceDistance = combinedVectors.magnitude * distNegOrPos;
+            Debug.Log("GetBounceDistance: Checking for bounce distance modifier due to slope of ground. New bounce distance is: " + bounceDistance.ToString()); ;
+
+
+        }
 
         Debug.Log("GetBounceDistance: bounce distance is: " + bounceDistance.ToString());
         return bounceDistance;
@@ -786,8 +819,9 @@ public class GolfBallTopDown : MonoBehaviour
         // Check what material is beneath the ball
         bounceContactGroundMaterial = GetGroundMaterial();
 
-        if (bounceContactGroundMaterial.Contains("trap") || bounceContactGroundMaterial.Contains("rough"))
+        if (bounceContactGroundMaterial.Contains("trap") || bounceContactGroundMaterial.Equals("deep rough"))
         {
+            Debug.Log("WillBallRoll: stopping due to ground material of: " + bounceContactGroundMaterial);
             willBallRoll = false;
             return willBallRoll;
         }
@@ -797,15 +831,76 @@ public class GolfBallTopDown : MonoBehaviour
         if (speedMetersPerSecond > 0.05f)
             willBallRoll = true;
         else
-            speedMetersPerSecond = 0f;
+        {
+            if (groundSlopeDirection == Vector2.zero)
+            {
+                Debug.Log("WillBallRoll: Ball is not on a hill. Stopping.");
+                speedMetersPerSecond = 0f;
+            }
+            else
+            {
+                if (!HitApexOfHill)
+                {
+                    Debug.Log("WillBallRoll: Ball IS on a hill. Start rolling back down?.");
+                    HitApexOfHill = true;
+                    willBallRoll = true;
+                    speedMetersPerSecond = 0.1f;
+                    movementDirection = groundSlopeDirection;
+                }
+                else
+                {
+                    Debug.Log("WillBallRoll: Ball IS on a hill, BUT already hit apex of hill. should stop now from friction?");
+                    willBallRoll = false;
+                    speedMetersPerSecond = 0f;
+                }
+                
+            }
+            
+        }
+            
+
+        // from when I was trying to use forces instead of my bullshit
+        /*if (Mathf.Abs(rb.velocity.magnitude) < 0.05f)
+        {
+            Debug.Log("WillBallRoll: setting velocity to 0");
+            willBallRoll = false;
+            //rb.velocity = Vector2.zero;
+        }*/
 
         return willBallRoll;
     }
     void RollBall(float rollSpeed, Vector2 rollDirection)
     {
-        this.rb.MovePosition(rb.position + rollDirection * rollSpeed * Time.deltaTime);
-        speedMetersPerSecond -= GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime;
+        //original method
+        /*this.rb.MovePosition(rb.position + rollDirection * rollSpeed * Time.deltaTime);
+        speedMetersPerSecond -= GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime;*/
+
+        /*
+        //float actualSpeed = CalculateCurrentSpeed(rb.position, (rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 10f)) * Time.deltaTime));
+        //Vector2 newPos = rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier)) * Time.deltaTime;
+        //speedMetersPerSecond = CalculateCurrentSpeed(rb.position, newPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime);
+        //this.rb.MovePosition(rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 10f)) * Time.deltaTime);
+        //this.rb.MovePosition(newPos);
+        */
+
+        //rb.AddForce(-rollDirection * GetGroundRollSpeedModifier(bounceContactGroundMaterial));
+
+        //Debug.Log("RollBall:  the new speed will be: " + speedMetersPerSecond.ToString() + " but the new speed should actually be: " + actualSpeed.ToString());
         //Debug.Log("Rolling: speedMetersPerSecond: " + speedMetersPerSecond.ToString());
+
+        Vector2 rollVector = rollDirection * rollSpeed;
+        Vector2 slopeVector = groundSlopeDirection * slopeSpeedModifier;
+        Vector3 currentPos = this.transform.position;
+        //Vector3 nextPos = rb.position + rollDirection * rollSpeed * Time.deltaTime;
+        Vector3 nextPos = rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 0.5f)) * Time.deltaTime;
+        Debug.Log("RollBall: current position is: " + currentPos.ToString("0.00000000") + " and the next position will be: " + nextPos.ToString("0.00000000"));
+        //this.rb.MovePosition(rb.position + rollDirection * rollSpeed * Time.deltaTime);
+        //this.rb.MovePosition(rb.position + rollVector + slopeVector);
+        //speedMetersPerSecond -= GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime;
+        float realSpeed = CalculateCurrentSpeed(currentPos, nextPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime);
+        Debug.Log("RollBall: current position is: " + currentPos.ToString("0.00000000") + " and the next position will be: " + nextPos.ToString("0.00000000") + " the speed per seconds WILL BE: " + realSpeed.ToString("0.00000000") + " and the speed previously WAS: " + speedMetersPerSecond.ToString("0.00000000"));
+        this.rb.MovePosition(nextPos);
+        speedMetersPerSecond = realSpeed;
     }
     float GetGroundRollSpeedModifier(string groundMaterial)
     {
@@ -832,11 +927,16 @@ public class GolfBallTopDown : MonoBehaviour
             distanceToPutt *= RainManager.instance.RainHitModifier;
         }
         speedMetersPerSecond = GetPuttSpeed(distanceToPutt);
+
+        // from when I was trying to figure out using forces instead of my bullshit
+        //rb.AddForce(movementDirection * speedMetersPerSecond, ForceMode2D.Impulse);
+
         isRolling = WillBallRoll();
         if (!isRolling)
         {
             ResetBallAndPlayerAfterBallStoppedRolling();
         }
+        
 
     }
     public float GetPuttSpeed(float distanceToPutt)
@@ -855,8 +955,10 @@ public class GolfBallTopDown : MonoBehaviour
     {
 
         Vector2 newDir = (rollDirection * speedMetersPerSecond * Time.fixedDeltaTime) + (slopeDirection * slopeSpeedModifier * Time.fixedDeltaTime);
-        //Debug.Log("GetRollDirection: initial roll direction: " + rollDirection.ToString() + " slope direction: " + slopeDirection.ToString() + " new direction: " + newDir.normalized.ToString());
+        //Vector2 newDir = (rollDirection * speedMetersPerSecond * Time.fixedDeltaTime) + (slopeDirection * slopeSpeedModifier);
+        Debug.Log("GetRollDirection: initial roll direction: " + rollDirection.ToString() + " slope direction: " + slopeDirection.ToString() + " new direction: " + newDir.ToString() + " new direction normalized: " + newDir.normalized.ToString());
         return newDir.normalized;
+        //return newDir;
     }
     public void BallRolledIntoHole(HoleTopDown holeRolledInto)
     {
@@ -1173,7 +1275,8 @@ public class GolfBallTopDown : MonoBehaviour
         Vector2 newDir = oldDir;
 
         //Vector2 windDirModifier = WindManager.instance.WindDirection * WindManager.instance.WindPower * slopeSpeedModifier * Time.fixedDeltaTime * 0.05f;
-        Vector2 windDirModifier = WindManager.instance.WindDirection * WindManager.instance.WindPower * Time.fixedDeltaTime * 0.025f;
+        //Vector2 windDirModifier = WindManager.instance.WindDirection * WindManager.instance.WindPower * Time.fixedDeltaTime * 0.025f;
+        Vector2 windDirModifier = WindManager.instance.WindDirection * WindManager.instance.WindPower * 0.025f;
         newDir = (newDir + windDirModifier).normalized;
 
         return newDir;
@@ -1185,18 +1288,32 @@ public class GolfBallTopDown : MonoBehaviour
         else
             return 1.0f;
     }
-    void GetTileSlopeInformation(GroundTopDown groundScript)
+    void GetTileSlopeInformation(GroundTopDown groundScript, bool forceTileLookup = false)
     {
         // Get the current tile the ball is over. If the ball is now on a new tile, get new slope information
         Vector3Int newTilePos = groundScript.GetTilePosition(this.transform.position);
-        if (newTilePos == _currentTileCell)
+        if (newTilePos == _currentTileCell && !forceTileLookup)
             return;
         Debug.Log("GetTileSlopeInformation: Ball on new tile. Old tile: " + _currentTileCell.ToString() + " new tile: " + newTilePos.ToString());
         _currentTileCell = newTilePos;
-        Tuple<Vector2, float> newSlopeValues = groundScript.GetSlopeDirection(newTilePos);
+        //Tuple<Vector2, float> newSlopeValues = groundScript.GetSlopeDirection(newTilePos);
+        Tuple<Vector2, float> newSlopeValues = DirectionTileManager.instance.GetSlopeDirection(newTilePos);
         groundSlopeDirection = newSlopeValues.Item1;
         slopeSpeedModifier = newSlopeValues.Item2;
         Debug.Log("GetTileSlopeInformation: New slope direction: " + groundSlopeDirection.ToString() + " new slope Speed Modifier: " + slopeSpeedModifier.ToString());
+    }
+    Vector2 BounceOffSlope()
+    {
+        Vector2 bounceOffSlope = Vector2.zero;
+
+        if (groundSlopeDirection == Vector2.zero || slopeSpeedModifier == 0f)
+            return bounceOffSlope;
+
+        bounceOffSlope = groundSlopeDirection * slopeSpeedModifier * 10f; // was originally multipied by 7.5f before I lowered the slope modifiers on the DirectionTileManager
+
+        Debug.Log("BounceOffSlope: new bounce direction modifier off a slope with the following modifier: " + bounceOffSlope.ToString() + " and normalized is: " + bounceOffSlope.normalized.ToString());
+
+        return bounceOffSlope;
     }
 }
 
