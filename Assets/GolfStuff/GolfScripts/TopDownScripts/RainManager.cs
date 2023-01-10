@@ -9,7 +9,8 @@ public class RainManager : MonoBehaviour
     [Header("Rain state")]
     public bool IsRaining = false;
     public string RainState; // "No Rain" "light rain" "Med Rain" "Heavy Rain"
-    public List<string> RainStates = new List<string> { "no rain", "light rain", "med rain", "heavy rain" };
+    public List<string> RainStates = new List<string> { "clear", "light rain", "med rain", "heavy rain" };
+    [SerializeField] private string _rainState;
 
     [Header("Rain Rates")]
     [SerializeField] int _rainGroundLow;
@@ -37,9 +38,13 @@ public class RainManager : MonoBehaviour
     [SerializeField] float _medRainHitModifier = 0.935f;
     [SerializeField] float _heavyRainHitModifier = 0.865f;
 
+    public delegate void WeatherEffectChange(string newEffect);
+    public event WeatherEffectChange WeatherChanged;
+
     private void Awake()
     {
         MakeInstance();
+        WeatherChanged = WeatherChangedFunction;
     }
     // Start is called before the first frame update
     void Start()
@@ -56,7 +61,12 @@ public class RainManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (RainState != _rainState && WeatherChanged != null)
+        {
+            Debug.Log("RainManager: rain states no longer match. RainState: " + RainState.ToString() + " _rainState: " + _rainState.ToString());
+            _rainState = RainState;
+            WeatherChanged(_rainState);
+        }
     }
     public void SetRainState(string newState)
     {
@@ -68,7 +78,7 @@ public class RainManager : MonoBehaviour
 
         if (!RainStates.Contains(newState))
             return;
-        if (newState == "no rain")
+        if (newState == "clear")
         {
             IsRaining = false;
             _rainGround.Stop();
@@ -130,7 +140,20 @@ public class RainManager : MonoBehaviour
             RainBounceModifier = _heavyRainBounceModifier;
             RainHitModifier = _heavyRainHitModifier;
         }
+        else
+        {
+            IsRaining = false;
+            _rainGround.Stop();
+            _rainBackgroundGround.Stop();
+            RainBounceModifier = _noRainBounceModifier;
+            RainHitModifier = _noRainHitModifier;
+        }
 
         RainState = newState;
+    }
+    void WeatherChangedFunction(string newEffect)
+    {
+        Debug.Log("WeatherChangedFunction: the new weather effect is: " + newEffect);
+        SetRainState(newEffect);
     }
 }
