@@ -61,6 +61,11 @@
 - - - - - - scriptbale tiles https://www.youtube.com/watch?v=2FL0Jac5TAo
 - - x when selecting the first club at the beginning of the player's turn, check which club has the max distance that is closest to the distance to the hole?
 - - - - - x also have it set the hit distance to be at the hole if the club's distance is past the hole?
+- - - Save a tilemap into a "level" or "hole" object so that it can be loaded by the game, then use that to build the saved tilemap for that hole?
+- - - - - x maybe use Scriptable Objects for this?
+- - - - - - - - x scriptable object would save things like: hole name, number, par amount, tile locations? Camera bounding box? out-of-bounds perimeter/bounds?
+- - - - - - - - x tutorial for this? https://www.youtube.com/watch?v=TeEWLC-QKjw and https://www.youtube.com/watch?v=rveUkizSGE8
+- - - - - - - - - - - - the first tutorial from tarodev mentions saving the "level" as a json object to then be read and rebuilt. Useful for players sharing maps. Should probably look into that more later when I want to have a "level editor" in the golf game?
 
 
 - - - other based on Cursed to Golf. Side view, 2d golf platforming
@@ -76,3 +81,8 @@
 https://www.globalgolf.com/articles/pro-tip-61/
 
 34, -1, 0
+
+
+
+
+GolfEnvironmentObstacles

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8166354678133470489}
   m_Layer: 27
   m_Name: tree-tall
-  m_TagString: Untagged
+  m_TagString: GolfEnvironmentObstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -125,6 +125,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5b10ad901f7fb4d992bb6c969ea6e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MyPrefab: {fileID: 4690552690983110126}
+  myScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   HeightInUnityUnits: 7.9375
   _isHoleFlag: 0
   SoftBounce: 1

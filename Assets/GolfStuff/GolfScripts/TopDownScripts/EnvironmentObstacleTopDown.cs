@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EnvironmentObstacleTopDown : MonoBehaviour
 {
+    [SerializeField] public ScriptableObstacle myScriptableObject; // scriptable object for the obstacle. Used to store the prefab of the obstacle for when the tilemapmanager needs to save/load new holes
     [SerializeField] public float HeightInUnityUnits; // get the number of pixels high the sprite is, then divide by 16 (or just multiple by the pixel unit, 0.0625f)
     [SerializeField] bool _isHoleFlag = false;
     // have a unity for "hardness" of the object? Balls bounce far from hard objects, don't bounce as much off soft objects? Pass that value to golfBallScript.HitEnvironmentObstacle to determine how far to bounce off the object???

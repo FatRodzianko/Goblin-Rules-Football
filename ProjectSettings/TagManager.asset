@@ -40,6 +40,9 @@ TagManager:
   - GolfClub
   - GolfBallSprite
   - DirectionTiles
+  - teeOffPosition
+  - GolfEnvironmentObstacle
+  - GolfTeeMarker
   layers:
   - Default
   - TransparentFX

@@ -269,8 +269,9 @@ public class DirectionTileManager : MonoBehaviour
         }
         return speed;
     }
-    void GetTilesWithSlopes()
+    public void GetTilesWithSlopes()
     {
+        Debug.Log("GetTilesWithSlopes:");
         foreach (var pos in _directionTiles.cellBounds.allPositionsWithin)
         {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
