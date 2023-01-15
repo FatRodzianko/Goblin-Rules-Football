@@ -43,6 +43,8 @@ TagManager:
   - teeOffPosition
   - GolfEnvironmentObstacle
   - GolfTeeMarker
+  - CameraBoundingBox
+  - EnvironmentObstacleHolder
   layers:
   - Default
   - TransparentFX

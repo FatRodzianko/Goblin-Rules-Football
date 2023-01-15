@@ -710,7 +710,7 @@ public class GolfBallTopDown : MonoBehaviour
         else if (groundMaterial.Equals("rough"))
             bounceHeightModifier -= 0.2f;
         else if (groundMaterial.Equals("deep rough"))
-            bounceHeightModifier -= 0.5f;
+            bounceHeightModifier -= 0.85f;
 
         if (bounceHeightModifier < 0.1f)
             bounceHeightModifier = 0.1f;

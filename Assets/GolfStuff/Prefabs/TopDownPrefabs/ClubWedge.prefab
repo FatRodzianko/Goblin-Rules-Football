@@ -50,10 +50,10 @@ MonoBehaviour:
   DefaultLaunchAngle: 50
   SpinDivider: 1
   MaxTopSpin: 2
-  MaxBackSpin: -7
+  MaxBackSpin: -6
   MaxSideSpin: 2
   ClubTextSprite: {fileID: 21300000, guid: 94226300cc2707d47bea376e3e17c6a3, type: 3}
   ClubImageSprite: {fileID: 21300000, guid: 14d52758a1da357439b9e1b7c1a01186, type: 3}
   RoughTerrainDistModifer: 1
-  DeepRoughTerrainDistModifer: 1
-  TrapTerrainDistModifer: 1
+  DeepRoughTerrainDistModifer: 0.95
+  TrapTerrainDistModifer: 0.9

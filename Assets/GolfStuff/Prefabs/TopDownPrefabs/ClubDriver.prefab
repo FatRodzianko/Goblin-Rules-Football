@@ -55,5 +55,5 @@ MonoBehaviour:
   ClubTextSprite: {fileID: 21300000, guid: 667624af8df45e343bce614a5d45d2e3, type: 3}
   ClubImageSprite: {fileID: 21300000, guid: 85bdb149145cf6149bf39dca4f32b002, type: 3}
   RoughTerrainDistModifer: 0.5
-  DeepRoughTerrainDistModifer: 0.35
-  TrapTerrainDistModifer: 0.15
+  DeepRoughTerrainDistModifer: 0.25
+  TrapTerrainDistModifer: 0.1

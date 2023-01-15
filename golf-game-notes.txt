@@ -66,6 +66,10 @@
 - - - - - - - - x scriptable object would save things like: hole name, number, par amount, tile locations? Camera bounding box? out-of-bounds perimeter/bounds?
 - - - - - - - - x tutorial for this? https://www.youtube.com/watch?v=TeEWLC-QKjw and https://www.youtube.com/watch?v=rveUkizSGE8
 - - - - - - - - - - - - the first tutorial from tarodev mentions saving the "level" as a json object to then be read and rebuilt. Useful for players sharing maps. Should probably look into that more later when I want to have a "level editor" in the golf game?
+- - - Dependency injection instead of singletons? https://medium.com/xrpractices/dependency-injection-in-unity-86afabf2cf8d and https://www.gamedeveloper.com/blogs/dependency-injection-on-unity-part-2-
+- - - - - - service locator? https://medium.com/medialesson/simple-service-locator-for-your-unity-project-40e317aad307 and https://gameprogrammingpatterns.com/service-locator.html
+- - - bounces bounce too far? Especially on fairways. Reduce bounce distance by like 40%? something like that?
+- - - make a second patch of small rough ground after the lake for a second bounce?
 
 
 - - - other based on Cursed to Golf. Side view, 2d golf platforming

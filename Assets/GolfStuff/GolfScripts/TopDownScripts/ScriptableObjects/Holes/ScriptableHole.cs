@@ -24,6 +24,10 @@ public class ScriptableHole : ScriptableObject
     public List<SavedTile> DirectionTiles;
     [Header("Saved Obstacles")]
     public List<SavedObstacle> SavedObstacles;
+    [Header("Camera Bounding Box")]
+    public Vector3 CameraBoundingBoxPos;
+    public Vector2[] PolygonPoints;
+
 }
 [Serializable]
 public class SavedTile 

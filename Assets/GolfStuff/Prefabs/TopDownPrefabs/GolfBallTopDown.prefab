@@ -5236,15 +5236,18 @@ MonoBehaviour:
   originalHitDirection: {x: 0, y: 0}
   twoBounceDistancesAgo: 0
   isRolling: 0
+  HitApexOfHill: 0
   IsInHole: 0
   greenRollSpeedModifier: 0.5
   fairwayRollSpeedModifier: 1
-  roughRollSpeedModifier: 15
+  roughRollSpeedModifier: 5
+  deepRoughRollSpeedModifier: 25
   groundSlopeDirection: {x: 0, y: 0}
   slopeSpeedModifier: 0
   _golfHoleLayerMask:
     serializedVersion: 2
     m_Bits: 67108864
+  _currentTileCell: {x: 0, y: 0, z: 0}
 --- !u!50 &578994876
 Rigidbody2D:
   serializedVersion: 4
@@ -5264,7 +5267,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!58 &578994875
 CircleCollider2D:

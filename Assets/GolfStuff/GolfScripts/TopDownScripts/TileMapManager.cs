@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEditor;
 using System;
+using Cinemachine;
 
 public class TileMapManager : MonoBehaviour
 {
@@ -16,6 +17,22 @@ public class TileMapManager : MonoBehaviour
     [Header("Prefabs for Objects like holes/tee ball things")]
     [SerializeField] GameObject _holePrefab;
     [SerializeField] GameObject _teeMarkerPrefab;
+    [SerializeField] GameObject _cameraBoundingBox;
+    [SerializeField] GameObject _environmentObstacleHolderPrefab;
+    [SerializeField] GameObject _environmentObstacleHolderObject;
+
+
+    [Header("Camera stuff?")]
+    [SerializeField] CinemachineVirtualCamera _myCamera;
+
+    private void Start()
+    {
+        if(!_myCamera)
+            _myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
+        if (!_environmentObstacleHolderObject)
+            _environmentObstacleHolderObject = GameObject.FindGameObjectWithTag("EnvironmentObstacleHolder");
+    }
+
     public void SaveMap()
     {
         // Create a new scriptable object. Set info inputed into the Editor such as hole number, course name, and name of the object that will be created
@@ -53,6 +70,18 @@ public class TileMapManager : MonoBehaviour
         // Find all Environment obstacles and save their locations
         GameObject[] obstacles = GameObject.FindGameObjectsWithTag("GolfEnvironmentObstacle");
         newHole.SavedObstacles = SaveAllObstacles(obstacles).ToList();
+
+        // Find the camera bounding box and save its object and position
+        //BoxCollider2D boundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<BoxCollider2D>();
+        GameObject boundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox");
+        PolygonCollider2D boundingBoxPolygonCollider = boundingBox.gameObject.GetComponent<PolygonCollider2D>();
+        Vector2[] polygonPoints = boundingBoxPolygonCollider.points;
+        newHole.PolygonPoints = polygonPoints;
+        //newHole.CameraBoundingBoxObject = boundingBox;
+        //newHole.CameraBoundingBoxOffset = boundingBox.offset;
+        //newHole.CameraBoundingBoxSize = boundingBox.size;
+        newHole.CameraBoundingBoxPos = boundingBox.transform.position;
+
 
         // Save the scriptable object to a file
         ScriptableObjectUtility.SaveHoleToFile(newHole);
@@ -130,7 +159,17 @@ public class TileMapManager : MonoBehaviour
         {
             Debug.Log("ClearMap: Could not find/delete objects. Error: " + e);
         }
-        
+        // Delete the camera bounding box
+        try
+        {
+            GameObject[] boundingBox = GameObject.FindGameObjectsWithTag("CameraBoundingBox");
+            DeleteObjects(boundingBox);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("ClearMap: Could not find/delete objects. Error: " + e);
+        }
+
     }
     public void LoadMap()
     {
@@ -166,11 +205,35 @@ public class TileMapManager : MonoBehaviour
         {
             Instantiate(_teeMarkerPrefab, pos, Quaternion.identity);
         }
-        // Spawn the obstacles
-        foreach (SavedObstacle savedObstacle in hole.SavedObstacles)
+        // Check to see if the EnvironmentObstacleHolder exists in the scene. If not, Instantiate it
+        if (!DoesObjectWithTagExist("EnvironmentObstacleHolder"))
         {
-            Instantiate(savedObstacle.ObstacleScriptableObject.ObstaclePrefab, savedObstacle.ObstaclePos, Quaternion.identity);
+            _environmentObstacleHolderObject = Instantiate(_environmentObstacleHolderPrefab);
         }
+        // If the object exists but the _environmentObstacleHolderObject is empty/null, find the object by its tag and set _environmentObstacleHolderObject to it
+        else if (!_environmentObstacleHolderObject)
+        {
+            _environmentObstacleHolderObject = GameObject.FindGameObjectWithTag("EnvironmentObstacleHolder");
+        }
+        // Spawn the obstacles and make them a child object of the EnvironmentObstacleHolder
+        foreach (SavedObstacle savedObstacle in hole.SavedObstacles)
+        {   
+            Instantiate(savedObstacle.ObstacleScriptableObject.ObstaclePrefab, savedObstacle.ObstaclePos, Quaternion.identity, _environmentObstacleHolderObject.transform);
+        }
+        // Spawn the camera bounding box and add it to the camera
+        GameObject boundingBox = Instantiate(_cameraBoundingBox, hole.CameraBoundingBoxPos, Quaternion.identity);
+        PolygonCollider2D polygonCollider = boundingBox.GetComponent<PolygonCollider2D>();
+        // Check if TileMapManager has a reference to the camera or not
+        if (!_myCamera)
+            _myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
+        // Set the points of the polygon collider to what was saved
+        polygonCollider.points = hole.PolygonPoints;
+        // Add the polygon collider to the camera
+        _myCamera.GetComponent<CinemachineConfiner2D>().m_BoundingShape2D = polygonCollider;
+        // invalidate the cache of the confiner2d so that it updates for the new confining collider
+        _myCamera.GetComponent<CinemachineConfiner2D>().InvalidateCache();
+        //PolygonCollider2D boundingBoxPolygonCollider = 
+        //CinemachineConfiner2D confiner = _myCamera.GetComponent<CinemachineConfiner2D>();
         // LATER save the tee off position to the GameManager
         // LATER save the hole PAR value to the GameManager
 
@@ -206,6 +269,24 @@ public class TileMapManager : MonoBehaviour
             GameObject toDelete = objects[i];
             DestroyImmediate(toDelete);
         }
+    }
+    bool DoesObjectWithTagExist(string tagName)
+    {
+        bool doesObjectExist = false;
+        try
+        {
+            GameObject objectToFind = GameObject.FindGameObjectWithTag(tagName);
+            if (objectToFind)
+                doesObjectExist = true;
+            else
+                doesObjectExist = false;
+        }
+        catch (Exception e)
+        {
+            Debug.Log("DoesObjectWithTagExist: Could not find object with tag: " + tagName + ". Error: " + e);
+            doesObjectExist = false;
+        }
+        return doesObjectExist;
     }
 }
 
