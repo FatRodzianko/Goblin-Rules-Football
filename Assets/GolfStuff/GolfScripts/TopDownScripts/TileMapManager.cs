@@ -1,9 +1,12 @@
+
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System;
 using Cinemachine;
 
@@ -84,7 +87,9 @@ public class TileMapManager : MonoBehaviour
 
 
         // Save the scriptable object to a file
+#if UNITY_EDITOR
         ScriptableObjectUtility.SaveHoleToFile(newHole);
+#endif
 
         // Local function to iterate through a tilemap, check if a tile exists at a location, and then save that tile's info + location
         IEnumerable<SavedTile> GetTilesFromMap(Tilemap map)
@@ -290,8 +295,8 @@ public class TileMapManager : MonoBehaviour
     }
 }
 
-#if UNITY_EDITOR
 
+#if UNITY_EDITOR
 public static class ScriptableObjectUtility
 {
     public static void SaveHoleToFile(ScriptableHole hole)

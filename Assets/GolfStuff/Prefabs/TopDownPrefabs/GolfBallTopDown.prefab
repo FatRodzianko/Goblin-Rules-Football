@@ -5231,8 +5231,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16777216
   minBounceHeight: 0.16
-  defaultBounceHeightModifier: 0.4
-  spinBounceDistanceModifier: 0.2
+  defaultBounceHeightModifier: 0.3
+  spinBounceDistanceModifier: 0.15
   originalHitDirection: {x: 0, y: 0}
   twoBounceDistancesAgo: 0
   isRolling: 0

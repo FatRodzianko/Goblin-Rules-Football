@@ -61,8 +61,8 @@ public class GolfBallTopDown : MonoBehaviour
     public string bounceContactGroundMaterial;
     [SerializeField] LayerMask groundMask;
     public float minBounceHeight = 0.16f;
-    public float defaultBounceHeightModifier = 0.4f;
-    public float spinBounceDistanceModifier = 0.2f;
+    public float defaultBounceHeightModifier = 0.3f;
+    public float spinBounceDistanceModifier = 0.15f;
     public Vector2 originalHitDirection = Vector2.zero;
     public float twoBounceDistancesAgo;
 
@@ -706,14 +706,14 @@ public class GolfBallTopDown : MonoBehaviour
         float bounceHeightModifier = defaultBounceHeightModifier;
 
         if (groundMaterial.Equals("green"))
-            bounceHeightModifier += 0.1f;
+            bounceHeightModifier += 0.05f;
         else if (groundMaterial.Equals("rough"))
-            bounceHeightModifier -= 0.2f;
+            bounceHeightModifier -= 0.15f;
         else if (groundMaterial.Equals("deep rough"))
-            bounceHeightModifier -= 0.85f;
+            bounceHeightModifier -= 0.25f;
 
-        if (bounceHeightModifier < 0.1f)
-            bounceHeightModifier = 0.1f;
+        if (bounceHeightModifier < 0.05f)
+            bounceHeightModifier = 0.05f;
 
         bounceHeight = previousHeight * bounceHeightModifier;
 
@@ -732,7 +732,7 @@ public class GolfBallTopDown : MonoBehaviour
         if (groundMaterial.Contains("trap"))
             return bounceDistance = 0f;
 
-        float bounceHeightModifer = 0.6f * (bounceHeight / oldHeight);
+        float bounceHeightModifer = 0.4f * (bounceHeight / oldHeight);
         Debug.Log("GetBounceDistance: bounceHeightModifer is: " + bounceHeightModifer.ToString());
 
         bounceDistance = previousDistance * bounceHeightModifer;
@@ -772,9 +772,7 @@ public class GolfBallTopDown : MonoBehaviour
             if (bounceDistance < 0)
                 distNegOrPos = -1;
             bounceDistance = combinedVectors.magnitude * distNegOrPos;
-            Debug.Log("GetBounceDistance: Checking for bounce distance modifier due to slope of ground. New bounce distance is: " + bounceDistance.ToString()); ;
-
-
+            Debug.Log("GetBounceDistance: Checking for bounce distance modifier due to slope of ground. New bounce distance is: " + bounceDistance.ToString());
         }
 
         Debug.Log("GetBounceDistance: bounce distance is: " + bounceDistance.ToString());

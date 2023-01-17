@@ -551,7 +551,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     Vector2 ModifyHitDirectionFromAccuracy(Vector2 direction, float accuracyDistance)
     {
-        return direction;
+        //return direction;
         Vector2 newDir = Vector2.zero;
 
         // If the hit is perfectly accurate, don't adjust the direction from where the player aimed
