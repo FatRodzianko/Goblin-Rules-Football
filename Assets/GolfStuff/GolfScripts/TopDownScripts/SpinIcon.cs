@@ -13,7 +13,7 @@ public class SpinIcon : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _maxDistanceFromCenter = _myCollider.radius - (_myPlayer.myBall.pixelUnit * 2f);
+        _maxDistanceFromCenter = _myCollider.radius - (_myPlayer.MyBall.pixelUnit * 2f);
     }
 
     // Update is called once per frame

@@ -31,7 +31,7 @@ public class TileMapManagerEditor : Editor
         }
         if (GUILayout.Button("Load Map"))
         {
-            script.LoadMap();
+            script.LoadMapFromEditor();
         }
     }
 }

@@ -10,7 +10,7 @@ public class GolfBallTopDown : MonoBehaviour
     public float MyColliderRadius;
 
     [Header("Player Info")]
-    public GolfPlayerTopDown myPlayer;
+    public GolfPlayerTopDown MyPlayer;
 
     [Header("Ball Sprite Info")]
     [SerializeField] SpriteRenderer ballObjectRenderer;
@@ -25,7 +25,7 @@ public class GolfBallTopDown : MonoBehaviour
 
     [Header("Shadow")]
     [SerializeField] GameObject myShadow;
-    [SerializeField] public GameObject myBallObject;
+    [SerializeField] public GameObject MyBallObject;
     public float pixelUnit = 0.0625f;
 
     [Header("Trail")]
@@ -207,7 +207,7 @@ public class GolfBallTopDown : MonoBehaviour
     public void UpdateShadowPosition(float ballZValue)
     {
         // Move the ball sprite up relative to the shadow object to give the illusion the ball is off the ground while still having the shadow sprite follow the trajectory path
-        Vector3 ballObjectPos = myBallObject.transform.localPosition;
+        Vector3 ballObjectPos = MyBallObject.transform.localPosition;
         /*float ballObjectY = 0f;
         if (ballZValue > pixelUnit)
         {
@@ -219,7 +219,7 @@ public class GolfBallTopDown : MonoBehaviour
         }
         ballObjectPos.y = ballObjectY;*/
         ballObjectPos.y = GetBallHeightYValue(ballZValue);
-        myBallObject.transform.localPosition = ballObjectPos;
+        MyBallObject.transform.localPosition = ballObjectPos;
         //ps.transform.localPosition = ballObjectPos;
     }
     public float GetBallHeightYValue(float ballZValue)
@@ -298,7 +298,7 @@ public class GolfBallTopDown : MonoBehaviour
         timeInAir = 0f;
         this.transform.position = new Vector3(0f, 0f, 0f);
         myShadow.GetComponent<SpriteRenderer>().enabled = true;
-        myBallObject.GetComponent<SpriteRenderer>().enabled = true;
+        MyBallObject.GetComponent<SpriteRenderer>().enabled = true;
     }
     public void HitBall(float hitDistance, float hitAngle, float hitTopSpin, Vector2 hitDirection, float hitLeftOrRightSpin = 0f, bool provideHeight = false, float hieghtProvided = 0f)
     {
@@ -531,7 +531,7 @@ public class GolfBallTopDown : MonoBehaviour
         if (leftOrRightSpin != 0)
         {
             // Get the rotation from the left or right spin
-            float rotationAngle = 45f * (leftOrRightSpin / myPlayer.TopSpinPositiveModifer);
+            float rotationAngle = 45f * (leftOrRightSpin / MyPlayer.TopSpinPositiveModifer);
             Quaternion rotation = Quaternion.AngleAxis(rotationAngle, Vector3.forward);
             Debug.Log("GetBounces: Left or right spin is not zero. Rotate the following degrees: " + rotationAngle.ToString());
             originalHitDirection = (rotation * originalHitDirection).normalized;
@@ -978,7 +978,7 @@ public class GolfBallTopDown : MonoBehaviour
     {
         Debug.Log("BallInHole: Wow!");
         myShadow.GetComponent<SpriteRenderer>().enabled = false;
-        myBallObject.GetComponent<SpriteRenderer>().enabled = false;
+        MyBallObject.GetComponent<SpriteRenderer>().enabled = false;
         this.IsInHole = true;
         ResetBallMovementBools();
         
@@ -1006,8 +1006,8 @@ public class GolfBallTopDown : MonoBehaviour
     }
     void ResetBallAndPlayerAfterBallStoppedRolling()
     {
-        //myPlayer.EnableOrDisableLineObjects(true);
-        myPlayer.ResetPreviousHitValues();
+        //MyPlayer.EnableOrDisableLineObjects(true);
+        MyPlayer.ResetPreviousHitValues();
     }
     Vector2 GetPerpendicular(Vector2 dir, float leftOrRight)
     {
@@ -1030,12 +1030,12 @@ public class GolfBallTopDown : MonoBehaviour
             return shift;
         // old way
         //Vector2 perp = GetPerpendicular(dir, spinValue);
-        //shift = midPoint + (perp * (heightValue) * (Mathf.Abs(spinValue) / myPlayer.TopSpinPositiveModifer));
+        //shift = midPoint + (perp * (heightValue) * (Mathf.Abs(spinValue) / MyPlayer.TopSpinPositiveModifer));
 
         // get the length of the adjacent side
         float lengthOfAdjacent = Vector2.Distance(midPoint, startPoint);
         // get the angle between adjacent side and hypo
-        float rotAngle = 45f * (spinValue / myPlayer.TopSpinPositiveModifer);
+        float rotAngle = 45f * (spinValue / MyPlayer.TopSpinPositiveModifer);
         // flip the angle because this is the curved trajectory??? something like that hard to explain sorry
         rotAngle *= -1f;
         // Get the direction of the hypo

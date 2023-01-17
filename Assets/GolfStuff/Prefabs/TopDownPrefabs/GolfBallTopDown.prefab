@@ -5189,7 +5189,7 @@ MonoBehaviour:
   rb: {fileID: 578994876}
   myCollider: {fileID: 578994875}
   MyColliderRadius: 0
-  myPlayer: {fileID: 0}
+  MyPlayer: {fileID: 0}
   ballObjectRenderer: {fileID: 5132641245094547481}
   _ballSpriteCollision: {fileID: 5862308198339419254}
   groundSprite: {fileID: 21300000, guid: 927daddc8a422a241a9a7e91618d7abc, type: 3}
@@ -5200,7 +5200,7 @@ MonoBehaviour:
   highesterSprite: {fileID: 21300000, guid: 66d1528125df5924e96521565e644819, type: 3}
   highestererSprite: {fileID: 21300000, guid: 12130979589c2234bb180fec1f24f25d, type: 3}
   myShadow: {fileID: 7447958787880024895}
-  myBallObject: {fileID: 4374865640907677581}
+  MyBallObject: {fileID: 4374865640907677581}
   pixelUnit: 0.0625
   trail: {fileID: 885962383}
   isHit: 0

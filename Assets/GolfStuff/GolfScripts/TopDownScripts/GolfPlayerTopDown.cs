@@ -4,7 +4,14 @@ using UnityEngine;
 
 public class GolfPlayerTopDown : MonoBehaviour
 {
-    [SerializeField] public GolfBallTopDown myBall;
+    [Header("Player Infor")]
+    public string PlayerName;
+    public GolfPlayerScore PlayerScore;
+
+    [Header("Golf Ball Stuff")]
+    [SerializeField] GameObject _golfBallPrefab;
+    [SerializeField] public GolfBallTopDown MyBall;
+
 
     [Header("Hit Values")]
     [SerializeField] public Vector2 hitDirection = Vector2.zero;
@@ -107,35 +114,44 @@ public class GolfPlayerTopDown : MonoBehaviour
 
     [Header("Player Sprite")]
     [SerializeField] GolferAnimator _golfAnimator;
+    private void Awake()
+    {
+        if (!MyBall)
+            SpawnPlayerBall();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        myBall.myPlayer = this;
-        SetPlayerOnBall();
+        //SetPlayerOnBall();
         myCamera = Camera.main;
         cameraFollowScript = GameObject.FindGameObjectWithTag("camera").GetComponent<CameraFollowScript>();
         //AttachUIToNewParent(myCamera.transform);
         StartGameWithDriver();
-        drawTrajectoryTopDown.SetLineWidth(myBall.pixelUnit * 2f);
+        drawTrajectoryTopDown.SetLineWidth(MyBall.pixelUnit * 2f);
     }
-
+    void SpawnPlayerBall()
+    {
+        GameObject newBall = Instantiate(_golfBallPrefab);
+        MyBall = newBall.GetComponent<GolfBallTopDown>();
+        MyBall.MyPlayer = this;
+    }
     // Update is called once per frame
     void Update()
     {
 
-        if (!myBall.isHit && !myBall.isBouncing && !myBall.isRolling)
+        if (!MyBall.isHit && !MyBall.isBouncing && !MyBall.isRolling)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                //myBall.HitBall(hitDistance, hitAngle, hitTopSpin, hitDirection);
+                //MyBall.HitBall(hitDistance, hitAngle, hitTopSpin, hitDirection);
                 //EnableOrDisableLineObjects(false);
                 if (!IsPlayersTurn && !_moveHitMeterIcon)
                     StartPlayerTurn();
                 else if (IsPlayersTurn && !DirectionAndDistanceChosen && !_moveHitMeterIcon)
                 {
                     PlayerChooseDirectionAndDistance(true);
-                    UpdateCameraFollowTarget(myBall.myBallObject);
+                    UpdateCameraFollowTarget(MyBall.MyBallObject);
                 }
                 else if (IsPlayersTurn && DirectionAndDistanceChosen && !_moveHitMeterIcon)
                     StartHitMeterSequence();
@@ -157,7 +173,7 @@ public class GolfPlayerTopDown : MonoBehaviour
             //if (Input.GetKeyDown(KeyCode.LeftControl) && !IsPlayersTurn)
             if (Input.GetKeyDown(KeyCode.LeftControl) && IsPlayersTurn)
             {
-                //myBall.ResetPosition();
+                //MyBall.ResetPosition();
                 //EnableOrDisableLineObjects(true);
                 Debug.Log("LEft Control Pressed");
                 if (DirectionAndDistanceChosen && !_moveHitMeterIcon)
@@ -168,7 +184,7 @@ public class GolfPlayerTopDown : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.Tab))
             {
-                //myBall.PuttBall(hitDirection, hitDistance);
+                //MyBall.PuttBall(hitDirection, hitDistance);
                 //EnableOrDisableLineObjects(false);
                 if (IsPlayersTurn && !_moveHitMeterIcon)
                 {
@@ -221,15 +237,15 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if ((hitDistance != previousHitDistance || hitAngle != previousHitAngle || hitTopSpin != previousHitTopSpin || hitDirection != previousHitDirection || hitLeftOrRightspin != previousHitLeftOrRightSpin) && (!myBall.isHit && !myBall.isBouncing && !myBall.isRolling && IsPlayersTurn))
+        if ((hitDistance != previousHitDistance || hitAngle != previousHitAngle || hitTopSpin != previousHitTopSpin || hitDirection != previousHitDirection || hitLeftOrRightspin != previousHitLeftOrRightSpin) && (!MyBall.isHit && !MyBall.isBouncing && !MyBall.isRolling && IsPlayersTurn))
         {
             // Get the trajaectory line
             if (CurrentClub.ClubType != "putter")
-                trajectoryPoints = myBall.CalculateHitTrajectory(hitDistance, hitAngle, hitTopSpin, hitLeftOrRightspin, hitDirection, Vector3.zero, 0f);
+                trajectoryPoints = MyBall.CalculateHitTrajectory(hitDistance, hitAngle, hitTopSpin, hitLeftOrRightspin, hitDirection, Vector3.zero, 0f);
             else
-                trajectoryPoints = myBall.CalculatePutterTrajectoryPoints(hitDistance, hitDirection);
+                trajectoryPoints = MyBall.CalculatePutterTrajectoryPoints(hitDistance, hitDirection);
             // Draw the trajectory
-            drawTrajectoryTopDown.UpdateTrajectory(trajectoryPoints, myBall,CurrentClub.ClubType, hitDistance);
+            drawTrajectoryTopDown.UpdateTrajectory(trajectoryPoints, MyBall,CurrentClub.ClubType, hitDistance);
             UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
 
 
@@ -295,7 +311,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         UpdateBallGroundMaterial();
 
         // Find the closest hole to the player
-        Vector3 ballPos = myBall.transform.position;
+        Vector3 ballPos = MyBall.transform.position;
         GameObject closestHole = FindClosestHole(ballPos);
         // Get the distance to the hole
         float distToHole = GetDistanceToHole(closestHole, ballPos);
@@ -327,15 +343,15 @@ public class GolfPlayerTopDown : MonoBehaviour
     void SetCameraOnPlayer()
     {
         // Update player so they are at the same position of the camera
-        UpdateCameraFollowTarget(myBall.myBallObject);
-        //cameraFollowScript.followTarget = myBall.myBallObject;
+        UpdateCameraFollowTarget(MyBall.MyBallObject);
+        //cameraFollowScript.followTarget = MyBall.MyBallObject;
         //Vector3 cameraPos = myCamera.transform.position;
         //this.transform.position = new Vector3(cameraPos.x, cameraPos.y, 0f);
         //AttachPlayerToCamera(true, myCamera.transform);
     }
     void SetPlayerOnBall()
     {
-        this.transform.position = myBall.transform.position;
+        this.transform.position = MyBall.transform.position;
     }
     void DeactivateIconsForNewTurn()
     {
@@ -361,7 +377,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     float GetMinDistance(float distance)
     {
-        float minDistPercentage = (_centerAccuracyPosition - (_furthestLeftAccuracyPosition - myBall.pixelUnit)) / _distancePositionLength;
+        float minDistPercentage = (_centerAccuracyPosition - (_furthestLeftAccuracyPosition - MyBall.pixelUnit)) / _distancePositionLength;
         float minDistance = distance * minDistPercentage;
 
 
@@ -399,7 +415,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     void StartHitMeterSequence()
     {
         // Placeholder until the actual hit meter stuff is added
-        //myBall.HitBall(hitDistance, hitAngle, hitTopSpin, hitDirection);
+        //MyBall.HitBall(hitDistance, hitAngle, hitTopSpin, hitDirection);
         ResetIconPositions();
         ResetSubmissionValues();
         BeginMovingHitMeter();
@@ -475,7 +491,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     float GetMovingIconXPosition()
     {
         float xPos = _hitMeterMovingIcon.transform.localPosition.x;
-        /*float minXToGetMaxHit = _maxDistancePosition + (myBall.pixelUnit * 2);
+        /*float minXToGetMaxHit = _maxDistancePosition + (MyBall.pixelUnit * 2);
         if (xPos <= minXToGetMaxHit)
         {
             Debug.Log("GetMovingIconXPosition: Got a max hit! Real x position: " + xPos.ToString()); 
@@ -527,7 +543,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         bool isCloseEnoughToTargetPosition = false;
 
         float diff = Mathf.Abs(targetPosition - submittedPosition);
-        if (diff <= (myBall.pixelUnit * 2))
+        if (diff <= (MyBall.pixelUnit * 2))
             isCloseEnoughToTargetPosition = true;
 
         Debug.Log("IsCloseEnoughToTargetPosition: returning: " + isCloseEnoughToTargetPosition.ToString() + " target position: " + targetPosition.ToString() + " submitted position: " + submittedPosition.ToString());
@@ -575,29 +591,33 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     public void SubmitHitToBall()
     {
+        if (this.PlayerScore.StrokesForCurrentHole == 0)
+            GameplayManagerTopDownGolf.instance.PlayerTeedOff();
+        this.PlayerScore.PlayerHitBall();
+
         if (!IsShanked)
         {
             if (CurrentClub.ClubType == "putter")
             {
-                myBall.PuttBall(ModifiedHitDirection, HitPowerSubmitted);
-                //myBall.PuttBall(new Vector2 (1f,0f), 10f);                
+                MyBall.PuttBall(ModifiedHitDirection, HitPowerSubmitted);
+                //MyBall.PuttBall(new Vector2 (1f,0f), 10f);                
             }
             else
             {
-                myBall.HitBall(HitPowerSubmitted, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
-                //myBall.HitBall(20f, hitAngle, hitTopSpin, new Vector2(1f,0f), hitLeftOrRightspin);
+                MyBall.HitBall(HitPowerSubmitted, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
+                //MyBall.HitBall(20f, hitAngle, hitTopSpin, new Vector2(1f,0f), hitLeftOrRightspin);
             }
         }
         else
         {
             Debug.Log("Was ball shanked? " + IsShanked.ToString());
             DoTheShank();
-            //myBall.HitBall(100, hitAngle, hitTopSpin, new Vector2(1f, 0f), hitLeftOrRightspin);
+            //MyBall.HitBall(100, hitAngle, hitTopSpin, new Vector2(1f, 0f), hitLeftOrRightspin);
         }
         ActivateHitUIObjects(false);
         AttachUIToNewParent(this.transform);
         //AttachPlayerToCamera(false, myCamera.transform);
-        UpdateCameraFollowTarget(myBall.myBallObject);
+        UpdateCameraFollowTarget(MyBall.MyBallObject);
         EnableOrDisableLineObjects(false);
     }
     public void UpdateHitSpinForPlayer(Vector2 newSpin)
@@ -730,15 +750,15 @@ public class GolfPlayerTopDown : MonoBehaviour
         float dist = club.MaxHitDistance;
 
         // code here to adjust hit distance if it is in rough terrain or a trap
-        if (myBall.bounceContactGroundMaterial == "rough")
+        if (MyBall.bounceContactGroundMaterial == "rough")
         {
             dist *= club.RoughTerrainDistModifer;
         }
-        if (myBall.bounceContactGroundMaterial == "deep rough")
+        if (MyBall.bounceContactGroundMaterial == "deep rough")
         {
             dist *= club.DeepRoughTerrainDistModifer;
         }
-        else if (myBall.bounceContactGroundMaterial.Contains("trap") && club.ClubType != "wedge")
+        else if (MyBall.bounceContactGroundMaterial.Contains("trap") && club.ClubType != "wedge")
         { 
             dist *= club.TrapTerrainDistModifer;
         }
@@ -772,16 +792,16 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     void UpdateBallGroundMaterial()
     {
-        myBall.UpdateGroundMaterial();
+        MyBall.UpdateGroundMaterial();
     }
     bool CanClubBeUsedOnCurrentGround(ClubTopDown club)
     {
-        if (myBall.bounceContactGroundMaterial.Contains("rough"))
+        if (MyBall.bounceContactGroundMaterial.Contains("rough"))
         {
             if (club.ClubType == "putter")
                 return false;
         }
-        if (myBall.bounceContactGroundMaterial.Contains("trap"))
+        if (MyBall.bounceContactGroundMaterial.Contains("trap"))
         {
             if (club.ClubType == "putter" || club.ClubType == "driver")
                 return false;
@@ -812,7 +832,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         if (CurrentClub.ClubType == "putter")
         {
             Debug.Log("DoTheShank: Putting with new direction of: " + ModifiedHitDirection.ToString() + " and new power of: " + HitPowerSubmitted.ToString());
-            myBall.PuttBall(ModifiedHitDirection, HitPowerSubmitted);
+            MyBall.PuttBall(ModifiedHitDirection, HitPowerSubmitted);
         }
         else
         {
@@ -820,7 +840,7 @@ public class GolfPlayerTopDown : MonoBehaviour
             float shankTopSpin = ShankTopSpin(MaxBackSpinFromClub,MaxTopSpinFromClub);
             float shankSideSpin = ShankSideSpin(-MaxSideSpinFromClub, MaxSideSpinFromClub);
             Debug.Log("DoTheShank: Hitting with new direction of: " + ModifiedHitDirection.ToString() + " and new power of: " + HitPowerSubmitted.ToString() + " and new launch angle of: " + shankAngle.ToString() + " and new top spin of: " + shankTopSpin.ToString() + " and new side spin of: " + shankSideSpin.ToString());
-            myBall.HitBall(HitPowerSubmitted, shankAngle, shankTopSpin, ModifiedHitDirection, shankSideSpin);
+            MyBall.HitBall(HitPowerSubmitted, shankAngle, shankTopSpin, ModifiedHitDirection, shankSideSpin);
         }
 
     }
@@ -980,15 +1000,15 @@ public class GolfPlayerTopDown : MonoBehaviour
             {
                 float clubDist = _myClubs[i].MaxHitDistance;
                 // Make checks based on how terrain modifies hit distance
-                if (myBall.bounceContactGroundMaterial == "rough")
+                if (MyBall.bounceContactGroundMaterial == "rough")
                 {
                     clubDist *= _myClubs[i].RoughTerrainDistModifer;
                 }
-                if (myBall.bounceContactGroundMaterial == "deep rough")
+                if (MyBall.bounceContactGroundMaterial == "deep rough")
                 {
                     clubDist *= _myClubs[i].DeepRoughTerrainDistModifer;
                 }
-                else if (myBall.bounceContactGroundMaterial.Contains("trap") && _myClubs[i].ClubType != "wedge")
+                else if (MyBall.bounceContactGroundMaterial.Contains("trap") && _myClubs[i].ClubType != "wedge")
                 {
                     clubDist *= _myClubs[i].TrapTerrainDistModifer;
                 }
@@ -996,7 +1016,7 @@ public class GolfPlayerTopDown : MonoBehaviour
                 float distDifference = Mathf.Abs(clubDist - distToHole);
 
                 // only default to the putter if the player is on the green
-                if (myBall.bounceContactGroundMaterial != "green" && _myClubs[i].ClubType == "putter")
+                if (MyBall.bounceContactGroundMaterial != "green" && _myClubs[i].ClubType == "putter")
                     continue;
 
                 if (!firstCheckDone)

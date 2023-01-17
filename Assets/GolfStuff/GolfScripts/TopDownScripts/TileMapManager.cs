@@ -176,7 +176,7 @@ public class TileMapManager : MonoBehaviour
         }
 
     }
-    public void LoadMap()
+    public void LoadMapFromEditor()
     {
         var hole = Resources.Load<ScriptableHole>($"Holes/{_courseName}_{_holeIndex}");
         if (hole == null)
@@ -184,6 +184,11 @@ public class TileMapManager : MonoBehaviour
             Debug.LogError($"{_courseName}_{_holeIndex} does not exist.");
             return;
         }
+        this.LoadMap(hole);
+    }
+    public void LoadMap(ScriptableHole hole)
+    {
+        Debug.Log("TileMapManager: LoadMap: Loading hole: " + hole.name);
         // Set the tiles
         SetTileOnTileMap(_greenMap, hole.GreenTiles);
         SetTileOnTileMap(_fairwayMap, hole.FairwayTiles);
@@ -222,7 +227,7 @@ public class TileMapManager : MonoBehaviour
         }
         // Spawn the obstacles and make them a child object of the EnvironmentObstacleHolder
         foreach (SavedObstacle savedObstacle in hole.SavedObstacles)
-        {   
+        {
             Instantiate(savedObstacle.ObstacleScriptableObject.ObstaclePrefab, savedObstacle.ObstaclePos, Quaternion.identity, _environmentObstacleHolderObject.transform);
         }
         // Spawn the camera bounding box and add it to the camera
@@ -237,10 +242,11 @@ public class TileMapManager : MonoBehaviour
         _myCamera.GetComponent<CinemachineConfiner2D>().m_BoundingShape2D = polygonCollider;
         // invalidate the cache of the confiner2d so that it updates for the new confining collider
         _myCamera.GetComponent<CinemachineConfiner2D>().InvalidateCache();
-        //PolygonCollider2D boundingBoxPolygonCollider = 
-        //CinemachineConfiner2D confiner = _myCamera.GetComponent<CinemachineConfiner2D>();
+
         // LATER save the tee off position to the GameManager
+        //GameplayManagerTopDownGolf.instance.UpdateTeeOffPositionForNewHole(hole.TeeOffLocation);
         // LATER save the hole PAR value to the GameManager
+        //GameplayManagerTopDownGolf.instance.UpdateParForNewHole(hole.HolePar);
 
     }
     public List<Vector3> GetObjectPositions(GameObject[] objects)

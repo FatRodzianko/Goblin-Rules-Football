@@ -525,6 +525,7 @@ GameObject:
   - component: {fileID: 8112661790293754950}
   - component: {fileID: 7513493645420276422}
   - component: {fileID: 3662651631311076367}
+  - component: {fileID: 2653947506407809911}
   m_Layer: 0
   m_Name: GolfPlayerTopDown
   m_TagString: Untagged
@@ -567,6 +568,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8684af7d05ee8b74c98caf984fe699df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerName: Player1
+  PlayerScore: {fileID: 2653947506407809911}
+  _golfBallPrefab: {fileID: 7504929942250748449, guid: 6721b70aef94bf54988229bfa7f71add, type: 3}
   myBall: {fileID: 0}
   hitDirection: {x: 0, y: 1}
   hitDistance: 200
@@ -666,6 +670,20 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 134217728
   _trajectoryLineMaterial: {fileID: 2100000, guid: e83adf9101039654083da63c04d158ec, type: 2}
+--- !u!114 &2653947506407809911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3144715486186738516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21600fc32e1272c449ab39c614214dfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StrokesForCurrentHole: 0
+  TotalStrokesForCourse: 0
 --- !u!1 &3549653242320339040
 GameObject:
   m_ObjectHideFlags: 0
