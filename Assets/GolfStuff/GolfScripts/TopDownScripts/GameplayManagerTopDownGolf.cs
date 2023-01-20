@@ -16,6 +16,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     public Vector3 TeeOffPosition;
     public string CurrentHoleName;
     public int CurrentHolePar;
+    public List<Vector3> HolePositions;
+    public Vector3 TeeOffAimPoint;
     
 
     [Header("Tilemap Manager References")]
@@ -25,6 +27,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] public List<GolfPlayerTopDown> GolfPlayers = new List<GolfPlayerTopDown>();
     public List<GolfPlayerTopDown> GolfPlayersInTeeOffOrder = new List<GolfPlayerTopDown>();
     [SerializeField] int _numberOfPlayersTeedOff = 0;
+    bool _haveAllPlayersTeedOff = false;
     public GolfPlayerTopDown CurrentPlayer;
 
     private void Awake()
@@ -50,14 +53,24 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         ResetNumberOfPlayersWhoHaveTeedOff();
         // Load a new hole
         LoadNewHole(0);
+        // Set the Hole Positions for the new hole
+        HolePositions = CurrentHoleInCourse.HolePositions;
+        // Set the Course aim points for players to use
+        TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
         // Set the new tee off location
         UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
         // update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
         // Sort the players by lowest score to start the hole
         OrderListOfPlayers();
+        // Set the current player
+        SetCurrentPlayer(GolfPlayersInTeeOffOrder[0]);
         // Move the first player to the tee off location
-        MovePlayerToTeeOffLocation(GolfPlayersInTeeOffOrder[0]);
+        MovePlayerToTeeOffLocation(CurrentPlayer);
+        // Set the camera on the current player
+        SetCameraOnPlayer(CurrentPlayer);
+        // Prompt player to start their turn
+        CurrentPlayer.EnablePlayerCanvas(true);
     }
 
     // Update is called once per frame
@@ -108,6 +121,13 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             GolfPlayersInTeeOffOrder = GolfPlayers.OrderByDescending(x => x.PlayerScore).ToList();
         }
     }
+    void SetCurrentPlayer(GolfPlayerTopDown player)
+    {
+        // this check probably isn't needed unless I have some sort of event tied to the current player changing and don't want to trigger it multiple times?
+        //if (CurrentPlayer == player)
+        //    return;
+        CurrentPlayer = player;
+    }
     void MovePlayerToTeeOffLocation(GolfPlayerTopDown player)
     {
         player.transform.position = TeeOffPosition;
@@ -116,5 +136,72 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     public void PlayerTeedOff()
     {
         _numberOfPlayersTeedOff++;
+    }
+    public void StartCurrentPlayersTurn(GolfPlayerTopDown requestingPlayer)
+    {
+        if (requestingPlayer != CurrentPlayer)
+            return;
+        CurrentPlayer.StartPlayerTurn();
+    }
+    void SetCameraOnPlayer(GolfPlayerTopDown player)
+    {
+        player.SetCameraOnPlayer();
+    }
+    public void StartNextPlayersTurn()
+    {
+        // Find the next player based on tee off position, or by furthest player from hole if all players teed off
+        CurrentPlayer = SelectNextPlayer();
+        // Prompt player to start their turn
+        CurrentPlayer.EnablePlayerCanvas(true);
+    }
+    GolfPlayerTopDown SelectNextPlayer()
+    {
+        if (!_haveAllPlayersTeedOff)
+        {
+            if (!HaveAllPlayersTeedOff())
+            {
+                return GolfPlayersInTeeOffOrder[_numberOfPlayersTeedOff];
+            }
+        }
+
+        return FindPlayerFurthestFromHole();
+    }
+    bool HaveAllPlayersTeedOff()
+    {
+        if (_numberOfPlayersTeedOff < GolfPlayersInTeeOffOrder.Count)
+            return false;
+        else
+        {
+            _haveAllPlayersTeedOff = true;
+            return true;
+        }
+    }
+    GolfPlayerTopDown FindPlayerFurthestFromHole()
+    {
+        float furthestDistance = 0f;
+        GolfPlayerTopDown currentClosestPlayer = CurrentPlayer;
+        foreach (GolfPlayerTopDown player in GolfPlayers)
+        {
+            float playerDistanceToHole = 0f;
+            Vector3 playerBallPosition = player.MyBall.transform.position;
+            // loop through all the different holes. Use the hole the player is closest to as their distance value
+            for (int i = 0; i < this.HolePositions.Count; i++)
+            {
+                if (i == 0)
+                {
+                    playerDistanceToHole = Vector2.Distance(playerBallPosition, this.HolePositions[i]);
+                }
+                else
+                { 
+                    float thisDistance = Vector2.Distance(playerBallPosition, this.HolePositions[i]);
+                    if (thisDistance < playerDistanceToHole)
+                        playerDistanceToHole = thisDistance;
+                }
+            }
+
+            if (playerDistanceToHole > furthestDistance)
+                currentClosestPlayer = player;
+        }
+        return currentClosestPlayer;
     }
 }

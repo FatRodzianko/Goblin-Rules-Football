@@ -32,7 +32,7 @@ public class GolferAnimator : MonoBehaviour
             AnimatorClipInfo[] animatorInfo = _animator.GetCurrentAnimatorClipInfo(0);
             if (animatorInfo[0].clip.name != _idle)
             {
-                Debug.Log("GolferAnimator : starting the idle animation");
+                //Debug.Log("GolferAnimator : starting the idle animation");
                 _animator.Play(_idle);
             }
             

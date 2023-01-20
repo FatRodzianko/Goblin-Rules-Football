@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5402649870086206319}
   - component: {fileID: 1546201323194637164}
+  - component: {fileID: 8111158602580040511}
   m_Layer: 0
   m_Name: CameraBoundingBox
   m_TagString: CameraBoundingBox
@@ -58,3 +59,15 @@ PolygonCollider2D:
   m_Points:
     m_Paths:
     - []
+--- !u!114 &8111158602580040511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5402649870086206317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7a3184ee36f5f740b0ccfeae25be7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

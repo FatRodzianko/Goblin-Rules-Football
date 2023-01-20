@@ -85,6 +85,9 @@ public class TileMapManager : MonoBehaviour
         //newHole.CameraBoundingBoxSize = boundingBox.size;
         newHole.CameraBoundingBoxPos = boundingBox.transform.position;
 
+        // Find the Tee Off Aim Point and save it
+        GameObject aimPoint = GameObject.FindGameObjectWithTag("GolfAimPoint");
+        newHole.TeeOffAimPoint = aimPoint.transform.position;
 
         // Save the scriptable object to a file
 #if UNITY_EDITOR

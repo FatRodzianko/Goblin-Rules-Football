@@ -27,6 +27,10 @@ public class ScriptableHole : ScriptableObject
     [Header("Camera Bounding Box")]
     public Vector3 CameraBoundingBoxPos;
     public Vector2[] PolygonPoints;
+    // Line camera should take in the "intro" video?
+    // "Hit points" for the player to aim at when their turn starts. Have a few of the "intended route"
+    [Header("Course Aim Points")]
+    public Vector3 TeeOffAimPoint;
 
 }
 [Serializable]

@@ -45,6 +45,8 @@ TagManager:
   - GolfTeeMarker
   - CameraBoundingBox
   - EnvironmentObstacleHolder
+  - GolfLandingTarget
+  - GolfAimPoint
   layers:
   - Default
   - TransparentFX

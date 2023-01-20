@@ -817,7 +817,15 @@ public class GolfBallTopDown : MonoBehaviour
         // Check what material is beneath the ball
         bounceContactGroundMaterial = GetGroundMaterial();
 
-        if (bounceContactGroundMaterial.Contains("trap") || bounceContactGroundMaterial.Equals("deep rough"))
+
+        if (bounceContactGroundMaterial.Contains("water"))
+        {
+            Debug.Log("WillBallRoll: stopping due to ground material of: " + bounceContactGroundMaterial);
+            willBallRoll = false;
+            FindPointOutOfWater();
+            return willBallRoll;
+        }
+        if (bounceContactGroundMaterial.Contains("trap"))
         {
             Debug.Log("WillBallRoll: stopping due to ground material of: " + bounceContactGroundMaterial);
             willBallRoll = false;
@@ -1008,6 +1016,7 @@ public class GolfBallTopDown : MonoBehaviour
     {
         //MyPlayer.EnableOrDisableLineObjects(true);
         MyPlayer.ResetPreviousHitValues();
+        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn();
     }
     Vector2 GetPerpendicular(Vector2 dir, float leftOrRight)
     {
@@ -1312,6 +1321,56 @@ public class GolfBallTopDown : MonoBehaviour
         Debug.Log("BounceOffSlope: new bounce direction modifier off a slope with the following modifier: " + bounceOffSlope.ToString() + " and normalized is: " + bounceOffSlope.normalized.ToString());
 
         return bounceOffSlope;
+    }
+    void FindPointOutOfWater()
+    {
+        Vector3 playerPos = MyPlayer.transform.position;
+        Vector3 ballPos = this.transform.position;
+        Vector2 directionToPlayer = (playerPos - ballPos).normalized;
+        float distanceToPlayer = Vector2.Distance(playerPos, ballPos);
+
+        // Loop through the hits. Check if the ground type is NOT water. If so, check the collision point. Use the closest collision point to the ball to replace the ball. Make sure to set the ball at a point + the ball's circle collider radius along the line
+        List<Vector3> contactPoints = new List<Vector3>();
+        RaycastHit2D[] hits = Physics2D.RaycastAll(ballPos, directionToPlayer, distanceToPlayer, groundMask);
+        if (hits.Length > 0)
+        {
+            for (int i = 0; i < hits.Length; i++)
+            {
+                RaycastHit2D hit = hits[i];
+                GroundTopDown ground = hit.transform.GetComponent<GroundTopDown>();
+                if (ground.groundType.Contains("water"))
+                    continue;
+                Debug.Log("FindPointOutOfWater: Raycast from ball hit collider of ground type: " + ground.groundType + " at position: " + hit.point.ToString());
+                contactPoints.Add(hit.point);
+            }
+        }
+        // Find the closest contact point based on distance to the ball
+        Vector3 closestContactPoint = Vector3.zero;
+        if (contactPoints.Count > 0)
+        {
+            float closestContactPointDist = 0f;
+            for (int i = 0; i < contactPoints.Count; i++)
+            {
+                float distToContactPoint = Vector2.Distance(contactPoints[i], ballPos);
+                if (i == 0)
+                {
+                    closestContactPointDist = distToContactPoint;
+                    closestContactPoint = contactPoints[i];
+                    continue;
+                }
+
+                if (distToContactPoint < closestContactPointDist)
+                {
+                    closestContactPointDist = distToContactPoint;
+                    closestContactPoint = contactPoints[i];
+                }
+            }
+        }
+        // Add the ball's circle collider radius along path to player to get point that is off the water?
+        Vector3 newBallPos = closestContactPoint + (Vector3)(directionToPlayer * (this.MyColliderRadius * 2));
+        Debug.Log("FindPointOutOfWater: Closest contact point was: " + closestContactPoint.ToString("0.00000") + " and after adding ball circle collider radius: " + newBallPos.ToString("0.00000"));
+
+        
     }
 }
 

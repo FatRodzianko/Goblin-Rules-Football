@@ -24,16 +24,16 @@ public class GroundTopDown : MonoBehaviour
     [SerializeField] List<Vector3Int> _tilePositionsWithSlopes = new List<Vector3Int>();
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         if (!MyTiles)
             MyTiles = this.GetComponent<Tilemap>();
 
 
-        if (TilesWithSlope.Length > 0)
+        /*if (TilesWithSlope.Length > 0)
         {
             SetDirectionalTiles();
-        }
+        }*/
             
     }
 
@@ -42,7 +42,7 @@ public class GroundTopDown : MonoBehaviour
     {
         
     }
-    void SetDirectionalTiles()
+    /*void SetDirectionalTiles()
     {
         for (int i = 0; i < TilesWithSlope.Length; i++)
         {
@@ -50,12 +50,12 @@ public class GroundTopDown : MonoBehaviour
             if(!_tilePositionsWithSlopes.Contains(TilesWithSlope[i].TilePosition))
                 _tilePositionsWithSlopes.Add(TilesWithSlope[i].TilePosition);
         }
-    }
+    }*/
     public Vector3Int GetTilePosition(Vector3 pos)
     { 
         return MyTiles.WorldToCell(pos);
     }
-    public Tuple<Vector2, float> GetSlopeDirection(Vector3Int tilePos)
+    /*public Tuple<Vector2, float> GetSlopeDirection(Vector3Int tilePos)
     {
         // Get the cell position that the ball is on
         //Vector3Int tileBallIsOn = MyTiles.WorldToCell(ballPos);
@@ -70,5 +70,5 @@ public class GroundTopDown : MonoBehaviour
         { 
             return new Tuple<Vector2, float>(Vector2.zero, 0f);
         }
-    }
+    }*/
 }

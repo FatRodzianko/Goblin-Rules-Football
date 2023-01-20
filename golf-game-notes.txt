@@ -70,6 +70,13 @@
 - - - - - - service locator? https://medium.com/medialesson/simple-service-locator-for-your-unity-project-40e317aad307 and https://gameprogrammingpatterns.com/service-locator.html
 - - - bounces bounce too far? Especially on fairways. Reduce bounce distance by like 40%? something like that?
 - - - make a second patch of small rough ground after the lake for a second bounce?
+- - - check when the landing target is out of bounds. When it is, either move it in closer (like when a player switches to a new club) or prevent the player from moving further out of the bounds ?
+- - - For the aim points:
+- - - - - - Get the distance to the hole. Then, check if any clubs that can hit on the current terrain have enough distance to reach the hole
+- - - - - x or for now just have one "first aim point" that the player aims towards. After that, aim for the hole? Player checks if they are within 20 yards of the tee off position. If they are, aim for "first point," else aim for the hole?
+- - - Add water logic:
+- - - - - - if a player hits a ball in water, the ball will need to be placed outside of the water and the player takes a 1 stroke penalty
+- - - - - - - - - cast ray from ball toward player, first point not in the water, set ball there?
 
 - GameplayManager requirements for top down golf
 - - - track what player's turn it is
