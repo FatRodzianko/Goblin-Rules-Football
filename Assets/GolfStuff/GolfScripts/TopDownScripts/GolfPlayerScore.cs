@@ -27,4 +27,9 @@ public class GolfPlayerScore : MonoBehaviour
         StrokesForCurrentHole++;
         TotalStrokesForCourse++;
     }
+    public void StrokePenalty(int penalty)
+    {
+        StrokesForCurrentHole += penalty;
+        TotalStrokesForCourse += penalty;
+    }
 }

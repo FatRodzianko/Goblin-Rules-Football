@@ -265,7 +265,7 @@ public class GolfBallTopDown : MonoBehaviour
         // Get the distance travelled in last fixed update, then divid by fixed update to get meters/second?
         float dist = Vector2.Distance(start, end);
         currentSpeed = dist / Time.deltaTime;
-        Debug.Log("CalculateCurrentSpeed: current speed: " + currentSpeed.ToString());
+        //Debug.Log("CalculateCurrentSpeed: current speed: " + currentSpeed.ToString());
         return currentSpeed;
     }
     public void ResetBallInfo(bool checkForBounces)
@@ -326,7 +326,7 @@ public class GolfBallTopDown : MonoBehaviour
     }
     public Vector3[] CalculateHitTrajectory(float hitDistance, float hitAngle, float hitTopSpin, float hitLeftOrRightSpin, Vector3 hitDirection, Vector2 windDirection, float windPower, bool isHeightIncluded = false, float heightToUse = 0f, bool calculateRainEffect = false)
     {
-        Debug.Log("CalculateHitTrajectory: hitDistance: " + hitDistance.ToString() + " hitAngle: " + hitAngle.ToString());
+        //Debug.Log("CalculateHitTrajectory: hitDistance: " + hitDistance.ToString() + " hitAngle: " + hitAngle.ToString());
         Vector3[] trajectoryPoints = new Vector3[3];
         //Debug.Log("CalculateHitTrajectory: hitAngle: " + hitAngle.ToString());
         // save the trajectory parameters
@@ -822,7 +822,7 @@ public class GolfBallTopDown : MonoBehaviour
         {
             Debug.Log("WillBallRoll: stopping due to ground material of: " + bounceContactGroundMaterial);
             willBallRoll = false;
-            FindPointOutOfWater();
+            //FindPointOutOfWater();
             return willBallRoll;
         }
         if (bounceContactGroundMaterial.Contains("trap"))
@@ -989,7 +989,7 @@ public class GolfBallTopDown : MonoBehaviour
         MyBallObject.GetComponent<SpriteRenderer>().enabled = false;
         this.IsInHole = true;
         ResetBallMovementBools();
-        
+        TellPlayerBallIsInHole();
     }
     float TimeBeforeSinkInHole(float movementSpeed, HoleTopDown holeRolledInto)
     {
@@ -1016,7 +1016,7 @@ public class GolfBallTopDown : MonoBehaviour
     {
         //MyPlayer.EnableOrDisableLineObjects(true);
         MyPlayer.ResetPreviousHitValues();
-        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn();
+        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
     Vector2 GetPerpendicular(Vector2 dir, float leftOrRight)
     {
@@ -1322,7 +1322,7 @@ public class GolfBallTopDown : MonoBehaviour
 
         return bounceOffSlope;
     }
-    void FindPointOutOfWater()
+    Vector3 FindPointOutOfWater()
     {
         Vector3 playerPos = MyPlayer.transform.position;
         Vector3 ballPos = this.transform.position;
@@ -1369,8 +1369,41 @@ public class GolfBallTopDown : MonoBehaviour
         // Add the ball's circle collider radius along path to player to get point that is off the water?
         Vector3 newBallPos = closestContactPoint + (Vector3)(directionToPlayer * (this.MyColliderRadius * 2));
         Debug.Log("FindPointOutOfWater: Closest contact point was: " + closestContactPoint.ToString("0.00000") + " and after adding ball circle collider radius: " + newBallPos.ToString("0.00000"));
-
-        
+        return newBallPos;
+    }
+    public void BallEndedInWater()
+    {
+        Debug.Log("BallEndedInWater: for player: " + MyPlayer.PlayerName);
+        MyPlayer.PlayerUIMessage("water");
+        MyPlayer.EnablePlayerCanvas(true);
+        MyPlayer.PlayerScore.StrokePenalty(1);
+        MoveBallOutOfWater();
+    }
+    void MoveBallOutOfWater()
+    {
+        Vector3 newBallPos = FindPointOutOfWater();
+        StartCoroutine(DelayForPenaltyMessage(newBallPos, 3f));
+    }
+    IEnumerator DelayForPenaltyMessage(Vector3 newBallPos, float delaySeconds)
+    {
+        yield return new WaitForSeconds(delaySeconds);
+        this.transform.position = newBallPos;
+        bounceContactGroundMaterial = GetGroundMaterial();
+        MyPlayer.EnablePlayerCanvas(false);
+        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+    }
+    void TellPlayerBallIsInHole()
+    {
+        Debug.Log("TellPlayerBallIsInHole");
+        MyPlayer.PlayerUIMessage("ball in hole");
+        MyPlayer.EnablePlayerCanvas(true);
+        StartCoroutine(DelayForBallInHole(4f));
+    }
+    IEnumerator DelayForBallInHole(float delaySeconds)
+    {
+        yield return new WaitForSeconds(delaySeconds);
+        MyPlayer.EnablePlayerCanvas(false);
+        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
 }
 

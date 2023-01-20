@@ -8,6 +8,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     public string PlayerName;
     public GolfPlayerScore PlayerScore;
     [SerializeField] Canvas _playerCanvas;
+    [SerializeField] PlayerUIMessage _playerUIMessage;
 
 
     [Header("Golf Ball Stuff")]
@@ -117,6 +118,9 @@ public class GolfPlayerTopDown : MonoBehaviour
 
     [Header("Player Sprite")]
     [SerializeField] GolferAnimator _golfAnimator;
+
+    
+
     private void Awake()
     {
         if (!MyBall)
@@ -299,7 +303,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         if (direction > 0)
             perpendicular *= -1f;
 
-        turnRate = 7.5f / (hitDistance + 0.1f);
+        turnRate = 5.5f / (hitDistance + 0.1f);
         hitDirection += perpendicular * Time.deltaTime * turnRate;
         
         hitDirection = hitDirection.normalized;
@@ -608,6 +612,9 @@ public class GolfPlayerTopDown : MonoBehaviour
         // Punish innaccurate putts more than regular hits?
         if (CurrentClub.ClubType == "putter")
             accuracyDistance *= 2.5f;
+        // Also punish driver hits?
+        if (CurrentClub.ClubType == "driver")
+            accuracyDistance *= 1.5f;
 		
 		// https://www.youtube.com/watch?v=HH6JzH5pTGo
         var rotation = Quaternion.AngleAxis(accuracyDistance, Vector3.forward);
@@ -624,6 +631,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         if (this.PlayerScore.StrokesForCurrentHole == 0)
             GameplayManagerTopDownGolf.instance.PlayerTeedOff();
         this.PlayerScore.PlayerHitBall();
+        GameplayManagerTopDownGolf.instance.ResetCurrentPlayer();
 
         if (!IsShanked)
         {
@@ -1117,5 +1125,9 @@ public class GolfPlayerTopDown : MonoBehaviour
     public void EnablePlayerCanvas(bool enable)
     {
         _playerCanvas.gameObject.SetActive(enable);
+    }
+    public void PlayerUIMessage(string message)
+    {
+        _playerUIMessage.UpdatePlayerMessageText(message);
     }
 }

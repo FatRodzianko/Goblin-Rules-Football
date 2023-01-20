@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using TMPro;
 
 public class GameplayManagerTopDownGolf : MonoBehaviour
 {
@@ -29,6 +30,10 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] int _numberOfPlayersTeedOff = 0;
     bool _haveAllPlayersTeedOff = false;
     public GolfPlayerTopDown CurrentPlayer;
+
+    [Header("Camera and UI Stuff?")]
+    [SerializeField] TextMeshProUGUI _holeNumberText;
+    [SerializeField] TextMeshProUGUI _parText;
 
     private void Awake()
     {
@@ -70,6 +75,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Set the camera on the current player
         SetCameraOnPlayer(CurrentPlayer);
         // Prompt player to start their turn
+        CurrentPlayer.PlayerUIMessage("start turn");
         CurrentPlayer.EnablePlayerCanvas(true);
     }
 
@@ -101,6 +107,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         CurrentHoleIndex = index;
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[CurrentHoleIndex];
         _tileMapManager.LoadMap(CurrentHoleInCourse);
+        _holeNumberText.text = CurrentHoleInCourse.CourseName + " #" + (CurrentHoleIndex + 1).ToString();
     }
     public void UpdateTeeOffPositionForNewHole(Vector3 newPosition)
     {
@@ -111,6 +118,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         Debug.Log("UpdateParForNewHole: " + newPar.ToString());
         CurrentHolePar = newPar;
+        _parText.text = "Par " + CurrentHolePar.ToString();
     }
     void OrderListOfPlayers()
     {
@@ -147,11 +155,25 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         player.SetCameraOnPlayer();
     }
-    public void StartNextPlayersTurn()
+    public void StartNextPlayersTurn(GolfBallTopDown ball)
     {
+        Debug.Log("GameplayManager: StartNextPlayersTurn: executing...");
+        if (ball.bounceContactGroundMaterial.Contains("water"))
+        {
+            Debug.Log("GameplayManager: StartNextPlayersTurn: ball landed in water");
+            ball.BallEndedInWater();
+            return;
+
+        }
+        if (ball.IsInHole)
+        {
+            Debug.Log("GameplayManager: StartNextPlayersTurn: the ball is in the hole! Congrats to player: " + ball.MyPlayer.PlayerName);
+            return;
+        }
         // Find the next player based on tee off position, or by furthest player from hole if all players teed off
         CurrentPlayer = SelectNextPlayer();
         // Prompt player to start their turn
+        CurrentPlayer.PlayerUIMessage("start turn");
         CurrentPlayer.EnablePlayerCanvas(true);
     }
     GolfPlayerTopDown SelectNextPlayer()
@@ -182,6 +204,9 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         GolfPlayerTopDown currentClosestPlayer = CurrentPlayer;
         foreach (GolfPlayerTopDown player in GolfPlayers)
         {
+            // skip players whose ball is in the hole
+            if (player.MyBall.IsInHole)
+                continue;
             float playerDistanceToHole = 0f;
             Vector3 playerBallPosition = player.MyBall.transform.position;
             // loop through all the different holes. Use the hole the player is closest to as their distance value
@@ -203,5 +228,9 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
                 currentClosestPlayer = player;
         }
         return currentClosestPlayer;
+    }
+    public void ResetCurrentPlayer()
+    {
+        CurrentPlayer = null;
     }
 }

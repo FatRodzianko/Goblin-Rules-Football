@@ -256,7 +256,7 @@ LineRenderer:
       m_NumAlphaKeys: 2
     numCornerVertices: 0
     numCapVertices: 0
-    alignment: 0
+    alignment: 1
     textureMode: 0
     shadowBias: 0.5
     generateLightingData: 0
@@ -280,7 +280,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &55897779891082081
 RectTransform:
   m_ObjectHideFlags: 0
@@ -673,6 +673,7 @@ MonoBehaviour:
   PlayerName: Player1
   PlayerScore: {fileID: 2653947506407809911}
   _playerCanvas: {fileID: 3381234889782742433}
+  _playerUIMessage: {fileID: 5631159995116756437}
   _golfBallPrefab: {fileID: 7504929942250748449, guid: 6721b70aef94bf54988229bfa7f71add, type: 3}
   MyBall: {fileID: 0}
   hitDirection: {x: 0, y: 1}
@@ -700,6 +701,7 @@ MonoBehaviour:
   _changeDistanceRate: 5
   IsPlayersTurn: 0
   DirectionAndDistanceChosen: 0
+  HasPlayerTeedOff: 0
   _hitMeterObject: {fileID: 7163028177395403728}
   _hitMeterMovingIcon: {fileID: 6270932585342972451}
   _hitMeterPowerSubmissionIcon: {fileID: 5009623720184125964}
@@ -1794,8 +1796,9 @@ GameObject:
   - component: {fileID: 5523184446937672254}
   - component: {fileID: 2912511933001683778}
   - component: {fileID: 8946823189081565864}
+  - component: {fileID: 5631159995116756437}
   m_Layer: 5
-  m_Name: SpaceToStartText
+  m_Name: UserMesageText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1918,6 +1921,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &5631159995116756437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8927251873727996672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44213b3bf1faa8543aa1191a7e5ce2da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _golfPlayerScore: {fileID: 2653947506407809911}
+  _playerMessageText: {fileID: 8946823189081565864}
 --- !u!1001 &102123190226600881
 PrefabInstance:
   m_ObjectHideFlags: 0

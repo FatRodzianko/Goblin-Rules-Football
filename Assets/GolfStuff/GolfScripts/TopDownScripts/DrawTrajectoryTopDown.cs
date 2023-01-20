@@ -39,8 +39,8 @@ public class DrawTrajectoryTopDown : MonoBehaviour
 
         if (trajectoryPoints.Length < 2)
             return;
-        if(clubType != "putter")
-            Debug.Log("UpdateTrajectory: Trajectory points: " + trajectoryPoints[0].ToString() + " : " + trajectoryPoints[1].ToString() + " : " + trajectoryPoints[2].ToString() + " club type is: " + clubType + " and hit distance is: " + hitDistance.ToString());
+        /*if(clubType != "putter")
+            Debug.Log("UpdateTrajectory: Trajectory points: " + trajectoryPoints[0].ToString() + " : " + trajectoryPoints[1].ToString() + " : " + trajectoryPoints[2].ToString() + " club type is: " + clubType + " and hit distance is: " + hitDistance.ToString());*/
         _linePoints.Clear();
         _lineShadowPoints.Clear();
 
@@ -59,7 +59,7 @@ public class DrawTrajectoryTopDown : MonoBehaviour
             // Get the number of points for the trajectory
             //int numberOfPoints = GetNumberOfPointsForLine(hitDistance);
             _lineSegmentCount = GetNumberOfPointsForLine(hitDistance);
-            Debug.Log("UpdateTrajectory: line segment count will be: " + _lineSegmentCount.ToString());
+            //Debug.Log("UpdateTrajectory: line segment count will be: " + _lineSegmentCount.ToString());
             //_lineSegmentCount = 100;
 
             stepCountModifier = 1f / _lineSegmentCount;
@@ -71,7 +71,7 @@ public class DrawTrajectoryTopDown : MonoBehaviour
 
             for (int i = 0; i < _lineSegmentCount + 1; i++)
             {
-                Debug.Log("UpdateTrajectory: loop number: " + i.ToString());
+                //Debug.Log("UpdateTrajectory: loop number: " + i.ToString());
                 stepCount = stepCountModifier * i;
 
                 Vector3 m1 = Vector3.Lerp(trajectoryPoints[0], trajectoryPoints[1], stepCount);
@@ -194,7 +194,7 @@ public class DrawTrajectoryTopDown : MonoBehaviour
                 
             }   
         }
-        Debug.Log("NearestCollisionPoint: returning: " + nearestCollisionPoint.ToString());
+        //Debug.Log("NearestCollisionPoint: returning: " + nearestCollisionPoint.ToString());
         return nearestCollisionPoint;
     }
     float HeightOfBallAtCollisionPoint(Vector3 prevPos, Vector3 newPos, Vector2 collisionPos)
@@ -231,7 +231,7 @@ public class DrawTrajectoryTopDown : MonoBehaviour
     }
     Vector3 GetNewLastPoint(List<Vector3> linePoints, float offset)
     {
-        Debug.Log("GetNewLastPoint: number of line points: " + linePoints.Count.ToString());
+        //Debug.Log("GetNewLastPoint: number of line points: " + linePoints.Count.ToString());
         Vector3 lastPoint = linePoints[linePoints.Count - 1];
 
         Vector3 dir = linePoints[_linePoints.Count - 2] - lastPoint;
