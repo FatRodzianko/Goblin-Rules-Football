@@ -10,7 +10,8 @@ public class PlayerUIMessage : MonoBehaviour
     [Header("Player UI Message Texts")]
     [SerializeField] const string _startTurn = "Press Space to Start Turn";
     [SerializeField] const string _water = "Water...\n+1 Stroke Penalty";
-    
+    [SerializeField] const string _outOfBounds = "Out of bounds...\n+1 Stroke Penalty";
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +32,10 @@ public class PlayerUIMessage : MonoBehaviour
         else if (message == "water")
         {
             _playerMessageText.text = _water;
+        }
+        else if (message == "out of bounds")
+        {
+            _playerMessageText.text = _outOfBounds;
         }
         else if (message == "ball in hole")
         {

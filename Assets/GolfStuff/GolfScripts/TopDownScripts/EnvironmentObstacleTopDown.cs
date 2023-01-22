@@ -10,6 +10,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     // have a unity for "hardness" of the object? Balls bounce far from hard objects, don't bounce as much off soft objects? Pass that value to golfBallScript.HitEnvironmentObstacle to determine how far to bounce off the object???
     [SerializeField] public bool SoftBounce = false;
     [SerializeField] float _minHeightForSoftBounce = 0f; // for things like trees. Make it a hard bounce if the ball hits low (as in, the ball hit the tree trunk) and make it a soft bounce if the ball hits high (hits the tree leaves)
+    [SerializeField] Collider2D _myCollider;
 
     [Header("Bounce Modifier Stuff")]
     [SerializeField] float _bounceModifier = 1.0f;
@@ -89,6 +90,38 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             //Debug.Break();
         }
     }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (_isHoleFlag)
+            return;
+        if (collision.tag == "golfBall")
+        {
+            GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
+            if (golfBallScript.IsInHole || golfBallScript.isRolling || golfBallScript.isHit || golfBallScript.isBouncing)
+                return;
+            Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: moving ball to prevent issues?");
+
+            Vector2 closestExitPoint = this._myCollider.ClosestPoint(collision.transform.position);
+            Vector2 directionToPlayer = ((Vector2)golfBallScript.MyPlayer.transform.position - closestExitPoint).normalized;
+
+            Vector2 newBallPoint = closestExitPoint + (directionToPlayer * (golfBallScript.MyColliderRadius * 4f));
+            Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: moving ball to new point of: " + newBallPoint.ToString());
+            collision.transform.position = newBallPoint;
+
+            //_myCollider.enabled = false;
+
+        }
+    }
+    /*private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (_isHoleFlag)
+            return;
+        if (collision.tag == "golfBall")
+        {
+            Debug.Log("EnvironmentObstacleTopDown: OnTriggerExit2D: ball is leaving collider. Re-enabling the collider?");
+
+        }
+    }*/
     float GetBounceModifier(float ballHeightInUnityUnits)
     {
         if (!_gradualBounceModifier && !_immediateBounceModifier)

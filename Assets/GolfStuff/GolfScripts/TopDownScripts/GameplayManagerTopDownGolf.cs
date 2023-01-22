@@ -32,6 +32,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     public GolfPlayerTopDown CurrentPlayer;
 
     [Header("Camera and UI Stuff?")]
+    [SerializeField] PolygonCollider2D _cameraBoundingBox;
     [SerializeField] TextMeshProUGUI _holeNumberText;
     [SerializeField] TextMeshProUGUI _parText;
 
@@ -158,6 +159,19 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     public void StartNextPlayersTurn(GolfBallTopDown ball)
     {
         Debug.Log("GameplayManager: StartNextPlayersTurn: executing...");
+
+        // Check if the ball is out-of-bounds. If so, move ball back in bounds before selecting next player
+        GetCameraBoundingBox();
+        if (_cameraBoundingBox)
+        {
+            if (!_cameraBoundingBox.OverlapPoint(ball.transform.position))
+            {
+                Debug.Log("GameplayManager: StartNextPlayersTurn: Ball is NOT in bounds. Moving the ball for the ball");
+                ball.OutOfBounds();
+                return;
+            }
+        }
+        // Check if the ball is in water. If so, move ball out of water before selecting next player
         if (ball.bounceContactGroundMaterial.Contains("water"))
         {
             Debug.Log("GameplayManager: StartNextPlayersTurn: ball landed in water");
@@ -168,7 +182,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         if (ball.IsInHole)
         {
             Debug.Log("GameplayManager: StartNextPlayersTurn: the ball is in the hole! Congrats to player: " + ball.MyPlayer.PlayerName);
-            return;
+            //return;
         }
         // Find the next player based on tee off position, or by furthest player from hole if all players teed off
         CurrentPlayer = SelectNextPlayer();
@@ -232,5 +246,10 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     public void ResetCurrentPlayer()
     {
         CurrentPlayer = null;
+    }
+    void GetCameraBoundingBox()
+    {
+        if (!_cameraBoundingBox)
+            _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
     }
 }

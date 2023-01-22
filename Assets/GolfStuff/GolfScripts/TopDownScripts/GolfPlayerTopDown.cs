@@ -27,6 +27,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     [Header("Trajectory Drawing Stuff")]
     [SerializeField] DrawTrajectoryTopDown drawTrajectoryTopDown;
     [SerializeField] SpriteRenderer _landingTargetSprite;
+    [SerializeField] Collider2D _landingTargetCollider;
     public Vector3[] trajectoryPoints = new Vector3[3];
     public Vector2 previousHitDirection;
     public float previousHitDistance;
@@ -115,6 +116,8 @@ public class GolfPlayerTopDown : MonoBehaviour
     [Header("Camera")]
     public Camera myCamera;
     public CameraFollowScript cameraFollowScript;
+    [SerializeField] PolygonCollider2D _cameraBoundingBox;
+    [SerializeField] LayerMask _cameraBoundingBoxMask;
 
     [Header("Player Sprite")]
     [SerializeField] GolferAnimator _golfAnimator;
@@ -140,6 +143,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         //AttachUIToNewParent(myCamera.transform);
         StartGameWithDriver();
         drawTrajectoryTopDown.SetLineWidth(MyBall.pixelUnit * 2f);
+        GetCameraBoundingBox();
     }
     void SpawnPlayerBall()
     {
@@ -304,20 +308,53 @@ public class GolfPlayerTopDown : MonoBehaviour
             perpendicular *= -1f;
 
         turnRate = 5.5f / (hitDistance + 0.1f);
-        hitDirection += perpendicular * Time.deltaTime * turnRate;
-        
-        hitDirection = hitDirection.normalized;
+        Vector2 newDir = hitDirection + perpendicular * Time.deltaTime * turnRate;
+        Vector3 newTargetPos = MyBall.transform.position + (Vector3)(newDir.normalized * hitDistance);
+
+        // check if the new target is within the bounds of the camera bounding box
+        GetCameraBoundingBox();
+        if (_cameraBoundingBox.OverlapPoint(newTargetPos))
+        {
+            Debug.Log("ChangeHitDirection: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
+            hitDirection = newDir.normalized;
+        }
+        else
+        {
+            Debug.Log("ChangeHitDirection: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000"));            
+        }
+
+        // old way?
+        //hitDirection += perpendicular * Time.deltaTime * turnRate;
+
+        //hitDirection = hitDirection.normalized;
 
         //turnRate = 0.5f / (hitDistance + 0.1f);
 
     }
     void ChangeHitDistance(float changeDirection)
     {
-        hitDistance += changeDirection * Time.deltaTime * _changeDistanceRate;
+        
+        float newDist = hitDistance + (changeDirection * Time.deltaTime * _changeDistanceRate);
+        // check if the new distance will be out of bounds
+        Vector3 newTargetPos = MyBall.transform.position + (Vector3)(hitDirection.normalized * newDist);
+
+        if (_cameraBoundingBox.OverlapPoint(newTargetPos))
+        {
+            Debug.Log("ChangeHitDistance: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
+            hitDistance = newDist;
+        }
+        else
+        {
+            Debug.Log("ChangeHitDistance: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
+            return;
+        }
+        // old way
+        /*hitDistance += changeDirection * Time.deltaTime * _changeDistanceRate;*/
         if (hitDistance > MaxDistanceFromClub)
             hitDistance = MaxDistanceFromClub;
         if (hitDistance <= MinDistance)
             hitDistance = MinDistance;
+
 
         // Adjust the location of the Adjusted Distance Icon
         UpdatePositionOfAdjustedDistanceIcon(hitDistance);
@@ -347,6 +384,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         // Get the distance to the hole
         float distToHole = GetDistanceToHole(closestHole, ballPos);
         float distToAimPoint = Vector2.Distance(aimTarget, ballPos);
+        hitDirection = SetInitialDirection(ballPos, aimTarget);
         // Find most appropriate club to start with based on distance to hole
         //_currentClubIndex = FindAppropriateClubToStart(distToHole);
         _currentClubIndex = FindAppropriateClubToStart(distToAimPoint);
@@ -355,6 +393,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         SetSelectedClubUI(CurrentClub);
         // update the club stats?
         GetNewClubAttributes(CurrentClub);
+
         GetHitStatsFromClub();
         SetPutterDistance(CurrentClub, false);
         EnableOrDisableLineObjects(true);
@@ -362,7 +401,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         ActivateHitUIObjects(true);
         // Set the initial direction of the hit to be in the direction of the hole
         //hitDirection = SetInitialDirection(ballPos, closestHole.transform.position);
-        hitDirection = SetInitialDirection(ballPos, aimTarget);
+        
 
         // Check to see if the current club's max distance is greater than distance to the hole. If so, adjust the player's shot so that their initial hit distance is right at the hole
         DidPlayerAdjustDistance = false;
@@ -402,7 +441,26 @@ public class GolfPlayerTopDown : MonoBehaviour
     void GetHitStatsFromClub()
     {
         // code to get the max distance from different club objects here. Right now just a place holder
-        hitDistance = MaxDistanceFromClub;
+        // old way
+        //hitDistance = MaxDistanceFromClub;
+
+        float newDist = MaxDistanceFromClub;
+        Vector3 ballPos = MyBall.transform.position;
+        Vector3 newTargetPos = ballPos + (Vector3)(hitDirection.normalized * newDist);
+        if (_cameraBoundingBox.OverlapPoint(newTargetPos))
+        {
+            Debug.Log("GetHitStatsFromClub: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000") + ". No change to hit distance.");
+            hitDistance = newDist;
+        }
+        else
+        {
+
+            //Vector3 inBoundsPos = GetNearestPointInBounds(ballPos, newTargetPos, hitDirection);
+            //hitDistance = Vector2.Distance(inBoundsPos, ballPos);
+            hitDistance = GetInBoundsDistance(newDist, hitDirection, ballPos);
+            Debug.Log("GetHitStatsFromClub: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000") + ". CHANGING hit distance to: " + hitDistance + " from original distance: " + newDist.ToString()) ;
+        }
+
         hitAngle = DefaultLaunchAngleFromClub;
         //SpinDividerFromClub = 1f; // get this from the actual club object later?
         UpdatePositionOfAdjustedDistanceIcon(hitDistance);
@@ -601,7 +659,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     Vector2 ModifyHitDirectionFromAccuracy(Vector2 direction, float accuracyDistance)
     {
-        //return direction;
+        return direction;
         Vector2 newDir = Vector2.zero;
 
         // If the hit is perfectly accurate, don't adjust the direction from where the player aimed
@@ -643,7 +701,7 @@ public class GolfPlayerTopDown : MonoBehaviour
             else
             {
                 MyBall.HitBall(HitPowerSubmitted, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
-                //MyBall.HitBall(20f, hitAngle, hitTopSpin, new Vector2(1f,0f), hitLeftOrRightspin);
+                //MyBall.HitBall(CurrentClub.MaxHitDistance, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
             }
         }
         else
@@ -714,11 +772,13 @@ public class GolfPlayerTopDown : MonoBehaviour
         }
         else if (spin > 0)
         {
-            hitAngle = DefaultLaunchAngleFromClub * (1f - ((spin * 2f) / 100f));
+            //hitAngle = DefaultLaunchAngleFromClub * (1f - ((spin * 2f) / 100f));
+            hitAngle = DefaultLaunchAngleFromClub * (1f - ((spin * 6f) / 100f));
         }
         else
         {
-            hitAngle = DefaultLaunchAngleFromClub * (1f + ((spin * -1f) / 100f));
+            //hitAngle = DefaultLaunchAngleFromClub * (1f + ((spin * -1f) / 100f));
+            hitAngle = DefaultLaunchAngleFromClub * (1f + ((spin * -3f) / 100f));
         }
             
     }
@@ -1129,5 +1189,43 @@ public class GolfPlayerTopDown : MonoBehaviour
     public void PlayerUIMessage(string message)
     {
         _playerUIMessage.UpdatePlayerMessageText(message);
+    }
+    void GetCameraBoundingBox()
+    {
+        if (!_cameraBoundingBox)
+            _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
+    }
+    public Vector3 GetNearestPointInBounds(Vector3 startPos, Vector3 endPos, Vector2 dir)
+    {
+        float distToPlayer = Vector2.Distance(endPos, startPos);
+        RaycastHit2D hit = Physics2D.Raycast(endPos, -dir, distToPlayer, _cameraBoundingBoxMask);
+        if (hit)
+        {
+            Vector3 newPos = hit.point;
+            newPos += (Vector3)(-dir * MyBall.MyColliderRadius * 2f);
+            return newPos;
+        }
+        else
+            return endPos;
+    }
+    float GetInBoundsDistance(float attemptedDist, Vector2 dir, Vector3 startPos)
+    {
+        float inBoundsDistance = 0f;
+
+        Vector3 newTargetPos = startPos + (Vector3)(dir.normalized * attemptedDist);
+        if (_cameraBoundingBox.OverlapPoint(newTargetPos))
+        {
+            Debug.Log("GetInBoundsDistance: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
+            return attemptedDist;
+        }
+        else
+        {
+            Debug.Log("GetInBoundsDistance: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000") + ". Calculating inbounds distance...");
+
+            Vector3 inboundsPos = GetNearestPointInBounds(startPos, newTargetPos, dir);
+            inBoundsDistance = Vector2.Distance(inboundsPos, startPos);
+
+            return inBoundsDistance;
+        }
     }
 }

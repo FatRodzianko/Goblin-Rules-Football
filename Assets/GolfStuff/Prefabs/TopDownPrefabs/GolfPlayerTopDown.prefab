@@ -125,7 +125,7 @@ LineRenderer:
       m_NumAlphaKeys: 2
     numCornerVertices: 0
     numCapVertices: 0
-    alignment: 0
+    alignment: 1
     textureMode: 0
     shadowBias: 0.5
     generateLightingData: 0
@@ -684,6 +684,7 @@ MonoBehaviour:
   IsShanked: 0
   drawTrajectoryTopDown: {fileID: 3662651631311076367}
   _landingTargetSprite: {fileID: 4478594324651228388}
+  _landingTargetCollider: {fileID: 169311651467970805}
   trajectoryPoints:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
@@ -750,6 +751,10 @@ MonoBehaviour:
   _windUIHolder: {fileID: 8772944465458510233}
   myCamera: {fileID: 0}
   cameraFollowScript: {fileID: 0}
+  _cameraBoundingBox: {fileID: 0}
+  _cameraBoundingBoxMask:
+    serializedVersion: 2
+    m_Bits: 2097152
   _golfAnimator: {fileID: 3891610743640057217}
 --- !u!114 &3662651631311076367
 MonoBehaviour:
@@ -974,7 +979,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.3125
+  m_Radius: 0.0625
 --- !u!50 &2059486975858603742
 Rigidbody2D:
   serializedVersion: 4

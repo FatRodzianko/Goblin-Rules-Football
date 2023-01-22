@@ -319,6 +319,10 @@ public class GolfBallTopDown : MonoBehaviour
             flightTime /= 2f;
         hitBallModifer = 1 / flightTime;
 
+        // Calculate the effect of the wind after calculating the flight time?
+        hitBallPonts[1] = CalculateWindShiftFromFlightTime(hitBallPonts[1], WindManager.instance.WindDirection, WindManager.instance.WindPower, flightTime, true);
+        hitBallPonts[2] = CalculateWindShiftFromFlightTime(hitBallPonts[2], WindManager.instance.WindDirection, WindManager.instance.WindPower, flightTime, false);
+
         movementDirection = hitDirection.normalized;
         launchAngle = hitAngle;
         isHit = true;
@@ -392,12 +396,12 @@ public class GolfBallTopDown : MonoBehaviour
         }
 
         // Wind?>??
-        if (windDirection != Vector2.zero && windPower > 0)
+        /*if (windDirection != Vector2.zero && windPower > 0)
         {
             Debug.Log("CalculateHitTrajectory: Wind dir/power is non-zero. Taking wind into accout. Wind dir: " + windDirection.ToString() + " wind power: " + windPower.ToString());
             trajectoryPoints[1] = CalculateWindShift(trajectoryPoints[1], windDirection, windPower, trajectoryPoints[1].z / 2f, true);
             trajectoryPoints[2] = CalculateWindShift(trajectoryPoints[2], windDirection, windPower, trajectoryPoints[1].z / 2f, false);
-        }
+        }*/
 
         return trajectoryPoints;
     }
@@ -415,12 +419,29 @@ public class GolfBallTopDown : MonoBehaviour
     {
         if (windDirection == Vector2.zero || windPower == 0)
             return trajectoryPoint;
-        Vector3 windShift = windDirection.normalized * windPower * (maxHeight / 25);
+        Vector3 windShift = windDirection.normalized * windPower * (maxHeight / 25) * 0.75f; // reduce the wind effect by 25% because it seemed too strong? maybe change back later?
         if (isMidPoint)
         {
             windShift /= 2f;
         }
         Debug.Log("CalculateWindShift: Original trajectory point: " + trajectoryPoint.ToString() + " wind shift amount: " + windShift.ToString() + " based on a wind direction of: " + windDirection.ToString() + " and wind power of: " + windPower.ToString() + " and a max height of: " + maxHeight.ToString());
+        windShift += trajectoryPoint;
+        return windShift;
+    }
+    Vector3 CalculateWindShiftFromFlightTime(Vector3 trajectoryPoint, Vector2 windDirection, float windPower, float timeInAir, bool isMidPoint, bool forBounce = false)
+    {
+        if (windDirection == Vector2.zero || windPower == 0)
+            return trajectoryPoint;
+        Vector3 windShift = windDirection.normalized * windPower * (timeInAir / 10f); 
+        if (isMidPoint)
+        {
+            windShift /= 2f;
+        }
+        if (forBounce)
+        {
+            windShift /= 4f;
+        }
+        Debug.Log("CalculateWindShiftFromFlightTime: Original trajectory point: " + trajectoryPoint.ToString() + " wind shift amount: " + windShift.ToString() + " based on a wind direction of: " + windDirection.ToString() + " and wind power of: " + windPower.ToString() + " and a flight time of: " + timeInAir.ToString());
         windShift += trajectoryPoint;
         return windShift;
     }
@@ -594,6 +615,12 @@ public class GolfBallTopDown : MonoBehaviour
             initialVelocity = CalculateInitialVelocity(hitAngle, maxHeight);
             flightTime = CalculateFlightTime(initialVelocity, hitAngle);
             hitBallModifer = 1 / flightTime;
+
+            // Calculate the effect of the wind after calculating the flight time?
+            //hitBallPonts[1] = CalculateWindShiftFromFlightTime(hitBallPonts[1], WindManager.instance.WindDirection, WindManager.instance.WindPower, flightTime, true);
+            //hitBallPonts[2] = CalculateWindShiftFromFlightTime(hitBallPonts[2], WindManager.instance.WindDirection, WindManager.instance.WindPower, flightTime, false);
+            hitBallPonts[1] = CalculateWindShift(hitBallPonts[1], WindManager.instance.WindDirection, WindManager.instance.WindPower, hitBallPonts[1].z / 2f, true);
+            hitBallPonts[2] = CalculateWindShift(hitBallPonts[2], WindManager.instance.WindDirection, WindManager.instance.WindPower, hitBallPonts[1].z / 2f, false);
 
             // Start bouncing???
             isBouncing = true;
@@ -1404,6 +1431,24 @@ public class GolfBallTopDown : MonoBehaviour
         yield return new WaitForSeconds(delaySeconds);
         MyPlayer.EnablePlayerCanvas(false);
         GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+    }
+    public void OutOfBounds()
+    {
+        Debug.Log("OutOfBounds: This ball is out of bounds: " + this.name + ":" + this.MyPlayer.PlayerName);
+        // Get the nearest inbounds point from the player object
+        Vector3 ballPos = this.transform.position;
+        Vector3 playerPos = MyPlayer.transform.position;
+        Vector2 dirToPlayer = (playerPos - ballPos).normalized;
+        Debug.Log("OutOfBounds: Ball position: " + ballPos.ToString() + " player position: " + playerPos.ToString() + " direction to the playeR: " + dirToPlayer.ToString());
+        Vector3 inBoundsPos = MyPlayer.GetNearestPointInBounds(playerPos, ballPos, -dirToPlayer);
+        inBoundsPos += (Vector3)(dirToPlayer * MyColliderRadius * 4f);
+        Debug.Log("OutOfBounds: Nearest inbounds position is: " + inBoundsPos.ToString("0.00000") +" for ball: "  + this.name + ":" + this.MyPlayer.PlayerName);
+
+        MyPlayer.PlayerUIMessage("out of bounds");
+        MyPlayer.EnablePlayerCanvas(true);
+        MyPlayer.PlayerScore.StrokePenalty(1);
+        StartCoroutine(DelayForPenaltyMessage(inBoundsPos, 3f));
+
     }
 }
 

@@ -125,7 +125,7 @@ public class DrawTrajectoryTopDown : MonoBehaviour
         // Save the last point in the line
         Vector3 lastPoint = _linePoints[_linePoints.Count - 1];
         // Set were to draw the landing target
-        _landingTargetObject.transform.position = lastPoint;
+        _landingTargetObject.transform.position = (Vector2)lastPoint; // casting as a vector2 so the landing point is always at a z value of zero?
         // Get the direction of the last two points
         //Vector3 dir = _linePoints[_linePoints.Count - 2] - lastPont;
         //Vector3 newLastPoint = lastPont + (dir.normalized * (ball.pixelUnit * 4));

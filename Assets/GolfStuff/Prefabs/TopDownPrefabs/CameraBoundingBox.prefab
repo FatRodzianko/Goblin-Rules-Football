@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5402649870086206319}
   - component: {fileID: 1546201323194637164}
   - component: {fileID: 8111158602580040511}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: CameraBoundingBox
   m_TagString: CameraBoundingBox
   m_Icon: {fileID: 0}
