@@ -73,8 +73,9 @@ public class WindManager : MonoBehaviour
 
         // Get how severe the wind will be
         WindSeverity = GetWindSeverity();
-        float newWind = GetInitialWindSpeedFromSeverity(WindSeverity);
-        WindPower = GetNewWindPower(newWind);
+        //float newWind = GetInitialWindSpeedFromSeverity(WindSeverity);
+        WindPower = GetInitialWindSpeedFromSeverity(WindSeverity);
+        //WindPower = GetNewWindPower(newWind);
     }
     public void SetInitialWindDirection()
     {
@@ -85,22 +86,33 @@ public class WindManager : MonoBehaviour
         negOrPos = UnityEngine.Random.Range(0, 2) * 2 - 1;
         // set the y value of the wind
         int y = (int)UnityEngine.Random.Range(0, 2) * negOrPos;
+        if (x == 0 && y == 0)
+        {
+            Debug.Log("SetInitialWindDirection: both x and y are 0. Randomly setting one to 1 or -1. " + x.ToString() +":" + y.ToString());
+            if (UnityEngine.Random.Range(0f, 1f) < 0.5f)
+                x = negOrPos;
+            else
+                y = negOrPos;
+            Debug.Log("SetInitialWindDirection: both x and y were 0. Randomly set one to 1 or -1. " + x.ToString() + ":" + y.ToString());
+        }
         Debug.Log("SetInitialWindDirection: setting new wind direction of " + x.ToString() + "," + y.ToString());
         WindDirection = new Vector2(x, y);
     }
     string GetWindSeverity()
     {
         float windSeverity = UnityEngine.Random.Range(0f, 1f);
+        Debug.Log("GetWindSeverity: The wind severity chance value is: " + windSeverity.ToString());
         if (windSeverity < 0.05)
             return "none";
-        else if (windSeverity < 0.4f)
+        else if (windSeverity < 0.6f)
             return "low";
-        else if (windSeverity < 0.7)
+        else if (windSeverity < 0.85f)
             return "med";
-        else if (windSeverity < 0.9)
+        else if (windSeverity < 0.95f)
             return "high";
         else
             return "highest";
+        
     }
     int GetInitialWindSpeedFromSeverity(string severity)
     {
@@ -132,8 +144,9 @@ public class WindManager : MonoBehaviour
     }
     public void UpdateWindDirectionForNewTurn()
     {
+        // For these update functions for wind/rain, will probably have a game setting for players that's something like "Can Wind/Rain Change? Yes/No" to either allow this or not
         Debug.Log("UpdateWindDirectionForNewTurn");
-        if (UnityEngine.Random.Range(0f, 1f) < 0.1f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.75f)
             return;
 
         Debug.Log("UpdateWindDirectionForNewTurn: Running!");

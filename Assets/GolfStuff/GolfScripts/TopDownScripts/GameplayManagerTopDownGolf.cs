@@ -37,6 +37,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] PolygonCollider2D _cameraBoundingBox;
     [SerializeField] TextMeshProUGUI _holeNumberText;
     [SerializeField] TextMeshProUGUI _parText;
+    [SerializeField] TextMeshProUGUI _playerNameText;
+    [SerializeField] TextMeshProUGUI _numberOfStrokesText;
 
     private void Awake()
     {
@@ -72,6 +74,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Set the Initial Wind for the hole
         WindManager.instance.SetInitialWindForNewHole();
         WindManager.instance.SetInitialWindDirection();
+        // Set initial weather for the hole
+        RainManager.instance.SetInitialWeatherForHole();
         // Sort the players by lowest score to start the hole
         OrderListOfPlayers();
         // Set the current player
@@ -83,6 +87,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Prompt player to start their turn
         CurrentPlayer.PlayerUIMessage("start turn");
         CurrentPlayer.EnablePlayerCanvas(true);
+        UpdateUIForCurrentPlayer(CurrentPlayer);
     }
 
     // Update is called once per frame
@@ -187,11 +192,15 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         if (ball.IsInHole)
         {
             Debug.Log("GameplayManager: StartNextPlayersTurn: the ball is in the hole! Congrats to player: " + ball.MyPlayer.PlayerName);
+            // This only needs to happen here for the single player right now, I think?
+            UpdateUIForCurrentPlayer(CurrentPlayer);
             //return;
         }
         // Set the new wind for the next turn
         WindManager.instance.UpdateWindForNewTurn();
         WindManager.instance.UpdateWindDirectionForNewTurn();
+        // Set new weather for the next turn
+        RainManager.instance.UpdateWeatherForNewTurn();
         // Check if any players still have to hit a ball
         if (_numberOfPlayersInHole >= GolfPlayers.Count)
         {
@@ -204,6 +213,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Prompt player to start their turn
         CurrentPlayer.PlayerUIMessage("start turn");
         CurrentPlayer.EnablePlayerCanvas(true);
+        UpdateUIForCurrentPlayer(CurrentPlayer);
     }
     GolfPlayerTopDown SelectNextPlayer()
     {
@@ -280,5 +290,12 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             return;
         _numberOfPlayersInHole++;
         _lastBallInHoleTime = Time.time;
+    }
+    void UpdateUIForCurrentPlayer(GolfPlayerTopDown player)
+    {
+        if (!player)
+            return;
+        _playerNameText.text = "Player: " + player.PlayerName;
+        _numberOfStrokesText.text = "Strokes: " + player.PlayerScore.StrokesForCurrentHole.ToString();
     }
 }

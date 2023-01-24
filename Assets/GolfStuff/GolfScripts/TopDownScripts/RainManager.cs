@@ -156,4 +156,81 @@ public class RainManager : MonoBehaviour
         Debug.Log("WeatherChangedFunction: the new weather effect is: " + newEffect);
         SetRainState(newEffect);
     }
+    public void SetInitialWeatherForHole()
+    {
+        // similar to wind stuff, this will probably be controlled by player settings in the full game. Right now, just randomly selecting it
+        float weatherChance = UnityEngine.Random.Range(0f, 1.0f);
+
+        if (weatherChance < 0.7f)
+            RainState = "clear";
+        else if (weatherChance < 0.85f)
+            RainState = "light rain";
+        else if (weatherChance < 0.95f)
+            RainState = "med rain";
+        else
+            RainState = "heavy rain";
+
+        Debug.Log("SetInitialWeatherForHole: Setting the rain state to: " + RainState + " from weather chance of: " + weatherChance.ToString());
+    }
+    public void UpdateWeatherForNewTurn()
+    {
+        // For these update functions for wind/rain, will probably have a game setting for players that's something like "Can Wind/Rain Change? Yes/No" to either allow this or not
+        if (_rainState == "clear")
+        {
+            if (UnityEngine.Random.Range(0f, 1f) < 0.9f)
+                return;
+        }
+        else
+        {
+            if (UnityEngine.Random.Range(0f, 1f) < 0.7f)
+                return;
+        }
+
+        // Generate a random value of either -1 or 1 to determine if weather should get better or worse
+        int negOrPos = UnityEngine.Random.Range(0, 2) * 2 - 1;
+        if (negOrPos > 0)
+        {
+            Debug.Log("UpdateWeatherForNewTurn: Weather will get BETTER based on value of: " + negOrPos.ToString());
+            if (_rainState == "clear") // can't get better if its already clear
+                return;
+            else if (_rainState == "light rain")
+            {
+                RainState = "clear";
+                return; // returning after changing the rainstate in case the Update function is somehow called part way through and changes _rainState to what RainState was updated to during the middle of this, cascading downward or something
+            }
+            else if (_rainState == "med rain")
+            {
+                RainState = "light rain";
+                return;
+            }
+            else if (_rainState == "heavy rain")
+            {
+                RainState = "med rain";
+                return;
+            }
+                
+        }
+        else
+        {
+            Debug.Log("UpdateWeatherForNewTurn: Weather will get WORSE based on value of: " + negOrPos.ToString());
+            if (_rainState == "heavy rain") // can't get worse if its heavy rain
+                return;
+            else if (_rainState == "light rain")
+            {
+                RainState = "med rain";
+                return; // returning after changing the rainstate in case the Update function is somehow called part way through and changes _rainState to what RainState was updated to during the middle of this, cascading downward or something
+            }
+            else if (_rainState == "med rain")
+            {
+                RainState = "heavy rain";
+                return;
+            }
+            else if (_rainState == "clear")
+            {
+                RainState = "light rain";
+                return;
+            }
+        }
+
+    }
 }
