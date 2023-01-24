@@ -28,6 +28,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] public List<GolfPlayerTopDown> GolfPlayers = new List<GolfPlayerTopDown>();
     public List<GolfPlayerTopDown> GolfPlayersInTeeOffOrder = new List<GolfPlayerTopDown>();
     [SerializeField] int _numberOfPlayersTeedOff = 0;
+    [SerializeField] int _numberOfPlayersInHole = 0;
+    [SerializeField] float _lastBallInHoleTime = 0f;
     bool _haveAllPlayersTeedOff = false;
     public GolfPlayerTopDown CurrentPlayer;
 
@@ -67,6 +69,9 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
         // update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
+        // Set the Initial Wind for the hole
+        WindManager.instance.SetInitialWindForNewHole();
+        WindManager.instance.SetInitialWindDirection();
         // Sort the players by lowest score to start the hole
         OrderListOfPlayers();
         // Set the current player
@@ -184,6 +189,16 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             Debug.Log("GameplayManager: StartNextPlayersTurn: the ball is in the hole! Congrats to player: " + ball.MyPlayer.PlayerName);
             //return;
         }
+        // Set the new wind for the next turn
+        WindManager.instance.UpdateWindForNewTurn();
+        WindManager.instance.UpdateWindDirectionForNewTurn();
+        // Check if any players still have to hit a ball
+        if (_numberOfPlayersInHole >= GolfPlayers.Count)
+        {
+            // should put transition to load next hole here. just returning for now
+            Debug.Log("GameplayManager: StartNextPlayersTurn: All players have made it into the hole. No more remaining players! Loading next hole?");
+            return;
+        }
         // Find the next player based on tee off position, or by furthest player from hole if all players teed off
         CurrentPlayer = SelectNextPlayer();
         // Prompt player to start their turn
@@ -251,5 +266,19 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         if (!_cameraBoundingBox)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
+    }
+    bool AllPlayersBallsInHole()
+    {
+        bool allPlayersBallsInHole = false;
+
+
+        return allPlayersBallsInHole;
+    }
+    public void PlayersBallInHole()
+    {
+        if (Time.time < (_lastBallInHoleTime + 0.5f))
+            return;
+        _numberOfPlayersInHole++;
+        _lastBallInHoleTime = Time.time;
     }
 }

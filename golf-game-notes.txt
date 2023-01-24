@@ -74,9 +74,9 @@
 - - - For the aim points:
 - - - - - - Get the distance to the hole. Then, check if any clubs that can hit on the current terrain have enough distance to reach the hole
 - - - - - x or for now just have one "first aim point" that the player aims towards. After that, aim for the hole? Player checks if they are within 20 yards of the tee off position. If they are, aim for "first point," else aim for the hole?
-- - - Add water logic:
-- - - - - - if a player hits a ball in water, the ball will need to be placed outside of the water and the player takes a 1 stroke penalty
-- - - - - - - - - cast ray from ball toward player, first point not in the water, set ball there?
+- - x Add water logic:
+- - - - - x if a player hits a ball in water, the ball will need to be placed outside of the water and the player takes a 1 stroke penalty
+- - - - - - - - x cast ray from ball toward player, first point not in the water, set ball there?
 
 - GameplayManager requirements for top down golf
 - - - track what player's turn it is

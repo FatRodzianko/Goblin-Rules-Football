@@ -999,7 +999,7 @@ public class GolfBallTopDown : MonoBehaviour
         {
             Debug.Log("BallRolledIntoHole: current speed of the ball: " + this.speedMetersPerSecond.ToString() + " which is slow enough to fall into hole");
             //BallInHole();
-            IsInHole = true;
+            //IsInHole = true;
             float timeDelay = TimeBeforeSinkInHole(speedMetersPerSecond, holeRolledInto);
             StartCoroutine(DelayBeforeFallInHole(timeDelay));
         }
@@ -1017,6 +1017,7 @@ public class GolfBallTopDown : MonoBehaviour
         this.IsInHole = true;
         ResetBallMovementBools();
         TellPlayerBallIsInHole();
+        GameplayManagerTopDownGolf.instance.PlayersBallInHole();
     }
     float TimeBeforeSinkInHole(float movementSpeed, HoleTopDown holeRolledInto)
     {
