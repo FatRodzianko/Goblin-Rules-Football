@@ -41,6 +41,10 @@ public class PlayerUIMessage : MonoBehaviour
         {
             _playerMessageText.text = BallInHoleMessage();
         }
+        else if (message.Contains("ground:"))
+        {
+            DisplayGroundType(message);
+        }
         else
         {
             _playerMessageText.text = "";
@@ -72,5 +76,30 @@ public class PlayerUIMessage : MonoBehaviour
             ballInHoleMessage += "ALBATROSS!";
 
         return ballInHoleMessage;
+    }
+    void DisplayGroundType(string groundType)
+    {
+        if (groundType.Contains("water"))
+            return;
+        if (groundType.Contains("green"))
+        {
+            _playerMessageText.text = "Green";
+        }
+        else if (groundType.Contains("fairway"))
+        {
+            _playerMessageText.text = "Fairway";
+        }
+        else if (groundType.Contains("deep rough"))
+        {
+            _playerMessageText.text = "DEEP rough...";
+        }
+        else if (groundType.Contains("rough"))
+        {
+            _playerMessageText.text = "rough...";
+        }
+        else if (groundType.Contains("trap"))
+        {
+            _playerMessageText.text = "...bunker...";
+        }
     }
 }

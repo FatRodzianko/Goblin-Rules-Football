@@ -1044,6 +1044,7 @@ public class GolfBallTopDown : MonoBehaviour
     {
         //MyPlayer.EnableOrDisableLineObjects(true);
         MyPlayer.ResetPreviousHitValues();
+        //TellPlayerGroundTypeTheyLandedOn();
         GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
     Vector2 GetPerpendicular(Vector2 dir, float leftOrRight)
@@ -1410,15 +1411,15 @@ public class GolfBallTopDown : MonoBehaviour
     void MoveBallOutOfWater()
     {
         Vector3 newBallPos = FindPointOutOfWater();
-        StartCoroutine(DelayForPenaltyMessage(newBallPos, 3f));
+        StartCoroutine(DelayForPenaltyMessage(newBallPos, 2f));
     }
     IEnumerator DelayForPenaltyMessage(Vector3 newBallPos, float delaySeconds)
     {
         yield return new WaitForSeconds(delaySeconds);
         this.transform.position = newBallPos;
         bounceContactGroundMaterial = GetGroundMaterial();
-        MyPlayer.EnablePlayerCanvas(false);
-        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+        //MyPlayer.EnablePlayerCanvas(false);
+        //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
     void TellPlayerBallIsInHole()
     {
@@ -1448,8 +1449,20 @@ public class GolfBallTopDown : MonoBehaviour
         MyPlayer.PlayerUIMessage("out of bounds");
         MyPlayer.EnablePlayerCanvas(true);
         MyPlayer.PlayerScore.StrokePenalty(1);
-        StartCoroutine(DelayForPenaltyMessage(inBoundsPos, 3f));
-
+        StartCoroutine(DelayForPenaltyMessage(inBoundsPos, 2f));
+    }
+    public void TellPlayerGroundTypeTheyLandedOn()
+    {
+        Debug.Log("TellPlayerGroundTheyLandedOn: on ball");
+        GetGroundMaterial();
+        if (this.bounceContactGroundMaterial.Contains("water"))
+        {
+            BallEndedInWater();
+            return;
+        }
+        MyPlayer.PlayerUIMessage("ground: " + this.bounceContactGroundMaterial);
+        MyPlayer.EnablePlayerCanvas(true);
+        //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
 }
 

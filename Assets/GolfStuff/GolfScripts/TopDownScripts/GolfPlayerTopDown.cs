@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class GolfPlayerTopDown : MonoBehaviour
@@ -728,7 +729,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     void UpdateTopSpin(float newTopSpin)
     {
         // Instead of using these TopSpinPositiveModifer and TopSpinNegativeModifer values, a range of possible values for top/back spin should be calculated based on the clubs Max top/back spin values
-        Debug.Log("UpdateTopSpin: newTopSpin:" + newTopSpin.ToString());
+        //Debug.Log("UpdateTopSpin: newTopSpin:" + newTopSpin.ToString());
         if (newTopSpin == 0f)
             hitTopSpin = 0f;
 
@@ -1190,6 +1191,43 @@ public class GolfPlayerTopDown : MonoBehaviour
     {
         _playerUIMessage.UpdatePlayerMessageText(message);
     }
+    public async Task TellPlayerGroundTheyLandedOn(float duration)
+    {
+        Debug.Log("TellPlayerGroundTheyLandedOn: on game player");
+        float end = Time.time + duration;
+        GetCameraBoundingBox();
+        bool isInBounds = true;
+        if (_cameraBoundingBox)
+        {
+            if (!_cameraBoundingBox.OverlapPoint(MyBall.transform.position))
+            {
+                Debug.Log("TellPlayerGroundTheyLandedOn: Ball is NOT in bounds. Moving the ball for the ball");
+                isInBounds = false;
+                MyBall.OutOfBounds();
+                //ball.OutOfBounds();
+                //await ball.MyPlayer.TellPlayerBallIsOutOfBounds(3);
+                //return;
+            }
+        }
+        if(isInBounds)
+            MyBall.TellPlayerGroundTypeTheyLandedOn();
+        while (Time.time < end)
+        {
+            await Task.Yield();
+        }
+        this.EnablePlayerCanvas(false);
+    }
+    public async Task TellPlayerBallIsOutOfBounds(float duration)
+    {
+        Debug.Log("TellPlayerBallIsOutOfBounds: on game player");
+        float end = Time.time + duration;
+        MyBall.OutOfBounds();
+        while (Time.time < end)
+        {
+            await Task.Yield();
+        }
+        this.EnablePlayerCanvas(false);
+    }
     void GetCameraBoundingBox()
     {
         if (!_cameraBoundingBox)
@@ -1227,5 +1265,10 @@ public class GolfPlayerTopDown : MonoBehaviour
 
             return inBoundsDistance;
         }
+    }
+    public string GetTerrainTypeFromBall()
+    {
+        UpdateBallGroundMaterial();
+        return MyBall.bounceContactGroundMaterial;
     }
 }

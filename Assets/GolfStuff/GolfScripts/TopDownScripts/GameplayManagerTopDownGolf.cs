@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using TMPro;
+using System.Globalization;
 
 public class GameplayManagerTopDownGolf : MonoBehaviour
 {
@@ -39,6 +40,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] TextMeshProUGUI _parText;
     [SerializeField] TextMeshProUGUI _playerNameText;
     [SerializeField] TextMeshProUGUI _numberOfStrokesText;
+    [SerializeField] TextMeshProUGUI _terrainTypeText;
+    TextInfo titleCase = new CultureInfo("en-US", false).TextInfo;
 
     private void Awake()
     {
@@ -166,36 +169,46 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         player.SetCameraOnPlayer();
     }
-    public void StartNextPlayersTurn(GolfBallTopDown ball)
+    public async void StartNextPlayersTurn(GolfBallTopDown ball)
     {
         Debug.Log("GameplayManager: StartNextPlayersTurn: executing...");
 
         // Check if the ball is out-of-bounds. If so, move ball back in bounds before selecting next player
-        GetCameraBoundingBox();
+        /*GetCameraBoundingBox();
         if (_cameraBoundingBox)
         {
             if (!_cameraBoundingBox.OverlapPoint(ball.transform.position))
             {
                 Debug.Log("GameplayManager: StartNextPlayersTurn: Ball is NOT in bounds. Moving the ball for the ball");
-                ball.OutOfBounds();
-                return;
+                //ball.OutOfBounds();
+                await ball.MyPlayer.TellPlayerBallIsOutOfBounds(3);
+                //return;
             }
-        }
+        }*/
         // Check if the ball is in water. If so, move ball out of water before selecting next player
-        if (ball.bounceContactGroundMaterial.Contains("water"))
+        /*if (ball.bounceContactGroundMaterial.Contains("water"))
         {
             Debug.Log("GameplayManager: StartNextPlayersTurn: ball landed in water");
             ball.BallEndedInWater();
             return;
 
-        }
+        }*/
         if (ball.IsInHole)
         {
             Debug.Log("GameplayManager: StartNextPlayersTurn: the ball is in the hole! Congrats to player: " + ball.MyPlayer.PlayerName);
             // This only needs to happen here for the single player right now, I think?
-            UpdateUIForCurrentPlayer(CurrentPlayer);
+            UpdateUIForCurrentPlayer(ball.MyPlayer);
             //return;
         }
+        
+        //TellPlayerGroundBallIsOn(ball);
+        if (!ball.IsInHole)
+        {  
+            Debug.Log("StartNextPlayersTurn: Calling TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
+            await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
+            Debug.Log("StartNextPlayersTurn: Returning from TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
+        }
+        
         // Set the new wind for the next turn
         WindManager.instance.UpdateWindForNewTurn();
         WindManager.instance.UpdateWindDirectionForNewTurn();
@@ -215,6 +228,10 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         CurrentPlayer.EnablePlayerCanvas(true);
         UpdateUIForCurrentPlayer(CurrentPlayer);
     }
+    /*async void TellPlayerGroundBallIsOn(GolfBallTopDown ball)
+    {
+        await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
+    }*/
     GolfPlayerTopDown SelectNextPlayer()
     {
         if (!_haveAllPlayersTeedOff)
@@ -297,5 +314,6 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             return;
         _playerNameText.text = "Player: " + player.PlayerName;
         _numberOfStrokesText.text = "Strokes: " + player.PlayerScore.StrokesForCurrentHole.ToString();
+        _terrainTypeText.text = titleCase.ToTitleCase(player.GetTerrainTypeFromBall());
     }
 }
