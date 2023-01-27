@@ -66,6 +66,9 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         ResetNumberOfPlayersWhoHaveTeedOff();
         // Load a new hole
         LoadNewHole(0);
+        // Get the CameraBoundBox and tell players to get it as well?
+        GetCameraBoundingBox();
+        TellPlayersToGetCameraBoundingBox();
         // Set the Hole Positions for the new hole
         HolePositions = CurrentHoleInCourse.HolePositions;
         // Set the Course aim points for players to use
@@ -293,6 +296,13 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         if (!_cameraBoundingBox)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
+    }
+    void TellPlayersToGetCameraBoundingBox()
+    {
+        foreach (GolfPlayerTopDown player in GolfPlayers)
+        {
+            player.GetCameraBoundingBox();
+        }
     }
     bool AllPlayersBallsInHole()
     {

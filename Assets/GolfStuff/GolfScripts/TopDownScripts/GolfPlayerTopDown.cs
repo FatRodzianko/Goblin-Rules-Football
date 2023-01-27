@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -144,7 +145,14 @@ public class GolfPlayerTopDown : MonoBehaviour
         //AttachUIToNewParent(myCamera.transform);
         StartGameWithDriver();
         drawTrajectoryTopDown.SetLineWidth(MyBall.pixelUnit * 2f);
-        GetCameraBoundingBox();
+        try
+        {
+            GetCameraBoundingBox();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("GolfPlayerTopDown.cs: could not get camera bounding box. Error: " + e);
+        }
     }
     void SpawnPlayerBall()
     {
@@ -448,6 +456,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         float newDist = MaxDistanceFromClub;
         Vector3 ballPos = MyBall.transform.position;
         Vector3 newTargetPos = ballPos + (Vector3)(hitDirection.normalized * newDist);
+        GetCameraBoundingBox();
         if (_cameraBoundingBox.OverlapPoint(newTargetPos))
         {
             Debug.Log("GetHitStatsFromClub: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000") + ". No change to hit distance.");
@@ -948,14 +957,14 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     float ShankDistance(float dist)
     {
-        return Random.Range((dist * 0.15f), dist);
+        return UnityEngine.Random.Range((dist * 0.15f), dist);
     }
     Vector2 ShankDirection(Vector2 dir)
     {
         Vector2 shankDir = dir;
 
         // Get the rotation from the hit direction to shank
-        float rotAngle = 90f * (Random.Range(0.1f, 0.9f));
+        float rotAngle = 90f * (UnityEngine.Random.Range(0.1f, 0.9f));
         // Multiple the rotation by 1 or -1 randomly
         int negOrPos = UnityEngine.Random.Range(0, 2) * 2 - 1;
         rotAngle *= negOrPos;
@@ -971,16 +980,16 @@ public class GolfPlayerTopDown : MonoBehaviour
     float ShankAngle(float angle)
     {
         float shankAngle = angle;
-        shankAngle *= (Random.Range(0.25f, 1.25f));
+        shankAngle *= (UnityEngine.Random.Range(0.25f, 1.25f));
         return shankAngle;
     }
     float ShankTopSpin(float maxBack, float maxTop)
     {
-        return Random.Range(maxBack, maxTop);
+        return UnityEngine.Random.Range(maxBack, maxTop);
     }
     float ShankSideSpin(float minSideSpin, float maxSideSpin)
     {
-        return Random.Range(minSideSpin, maxSideSpin);
+        return UnityEngine.Random.Range(minSideSpin, maxSideSpin);
     }
     void UpdateCameraFollowTarget(GameObject objectToFollow)
     {
@@ -1228,7 +1237,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         }
         this.EnablePlayerCanvas(false);
     }
-    void GetCameraBoundingBox()
+    public void GetCameraBoundingBox()
     {
         if (!_cameraBoundingBox)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();

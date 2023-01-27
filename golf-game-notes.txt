@@ -77,6 +77,14 @@
 - - x Add water logic:
 - - - - - x if a player hits a ball in water, the ball will need to be placed outside of the water and the player takes a 1 stroke penalty
 - - - - - - - - x cast ray from ball toward player, first point not in the water, set ball there?
+- - - Add ability to view the "map" - zoomed out view of the course?
+- - - - - - Will probably need disable the "Pixel Perfect Camera" and then on the virtual camera set the "ortho size" to something like 5x-8x the normal size
+- - - - - - add controls for the player to pan around the course
+- - - - - - - - - this will also require removing the "follow target" of the camera follow script so the camera isn't fixed
+- - - - - - make sure to disable any controls that allow the player to hit the ball
+- - - - - - - - - probably should start making some input manager controls for golf to be enabled/disabled like in GRF
+- - - - - - - - - maybe still allow player to adjust their aim when viewing the map? at least in terms of left/right aiming?
+- - - - - - reset everything after the player returns to game?
 
 - GameplayManager requirements for top down golf
 - - - track what player's turn it is
