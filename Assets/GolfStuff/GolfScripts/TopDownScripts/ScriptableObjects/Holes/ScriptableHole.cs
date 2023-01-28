@@ -24,9 +24,10 @@ public class ScriptableHole : ScriptableObject
     public List<SavedTile> DirectionTiles;
     [Header("Saved Obstacles")]
     public List<SavedObstacle> SavedObstacles;
-    [Header("Camera Bounding Box")]
+    [Header("Camera and Bounding Box")]
     public Vector3 CameraBoundingBoxPos;
     public Vector2[] PolygonPoints;
+    public Vector3 ZoomedOutPos;
     // Line camera should take in the "intro" video?
     // "Hit points" for the player to aim at when their turn starts. Have a few of the "intended route"
     [Header("Course Aim Points")]

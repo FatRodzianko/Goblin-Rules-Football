@@ -1469,7 +1469,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &563537458
 GameObject:
@@ -11783,6 +11783,37 @@ RectTransform:
   m_AnchoredPosition: {x: -62.5, y: -30}
   m_SizeDelta: {x: 125, y: 12}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1054490761
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1054490762}
+  m_Layer: 0
+  m_Name: ZoomedOutPosition
+  m_TagString: ZoomedOutPosition
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1054490762
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1054490761}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 175.5, y: -44.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1120248227
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12715,6 +12746,7 @@ GameObject:
   - component: {fileID: 1778082216}
   - component: {fileID: 1778082214}
   - component: {fileID: 1778082219}
+  - component: {fileID: 1778082220}
   m_Layer: 0
   m_Name: CM vcam1
   m_TagString: camera
@@ -12776,7 +12808,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7777779, y: 1}
+    m_SensorSize: {x: 1.7777778, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -12816,6 +12848,23 @@ MonoBehaviour:
   m_BoundingShape2D: {fileID: 0}
   m_Damping: 0
   m_MaxWindowSize: -1
+--- !u!114 &1778082220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778082213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 673060f22fbfc1648a26bac922bdd6c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _vCam: {fileID: 1778082217}
+  _pixelPerfect: {fileID: 1778082216}
+  _cameraFollowScript: {fileID: 1778082214}
+  IsCameraZoomedOut: 0
+  _zoomedOutPos: {x: 0, y: 0, z: 0}
 --- !u!1 &1787541132
 GameObject:
   m_ObjectHideFlags: 0
@@ -12955,9 +13004,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.055555556
-    width: 0.33333334
-    height: 0.3333333
+    y: 0
+    width: 1
+    height: 1
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 90
@@ -23153,7 +23202,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4837695825861965832, guid: da16777e960cd1a43a4451837f23806d, type: 3}
       propertyPath: m_RootOrder
-      value: 15
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 4837695825861965832, guid: da16777e960cd1a43a4451837f23806d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -23278,6 +23327,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8242093619301733080, guid: 6d18c956d7127c74b936e2e3930bcb6e, type: 3}
+      propertyPath: _cameraViewHole
+      value: 
+      objectReference: {fileID: 1778082220}
+    - target: {fileID: 8242093619301733080, guid: 6d18c956d7127c74b936e2e3930bcb6e, type: 3}
       propertyPath: _holeNumberText
       value: 
       objectReference: {fileID: 1477791185}
@@ -23311,7 +23364,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8242093619301733083, guid: 6d18c956d7127c74b936e2e3930bcb6e, type: 3}
       propertyPath: m_RootOrder
-      value: 14
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 8242093619301733083, guid: 6d18c956d7127c74b936e2e3930bcb6e, type: 3}
       propertyPath: m_LocalPosition.x

@@ -1,3 +1,4 @@
+using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -117,6 +118,8 @@ public class GolfPlayerTopDown : MonoBehaviour
 
     [Header("Camera")]
     public Camera myCamera;
+    [SerializeField] CinemachineVirtualCamera _vCam;
+    [SerializeField] CameraViewHole _cameraViewHole;
     public CameraFollowScript cameraFollowScript;
     [SerializeField] PolygonCollider2D _cameraBoundingBox;
     [SerializeField] LayerMask _cameraBoundingBoxMask;
@@ -132,8 +135,12 @@ public class GolfPlayerTopDown : MonoBehaviour
             SpawnPlayerBall();
         if(!myCamera)
             myCamera = Camera.main;
-        if(!cameraFollowScript)
-            cameraFollowScript = GameObject.FindGameObjectWithTag("camera").GetComponent<CameraFollowScript>();
+        if (!_vCam)
+            _vCam = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
+        if (!cameraFollowScript)
+            cameraFollowScript = _vCam.GetComponent<CameraFollowScript>();        
+        if (!_cameraViewHole)
+            _cameraViewHole = _vCam.GetComponent<CameraViewHole>();
     }
 
     // Start is called before the first frame update
@@ -184,6 +191,8 @@ public class GolfPlayerTopDown : MonoBehaviour
             if (!DirectionAndDistanceChosen && !_moveHitMeterIcon)
             {
                 PlayerChooseDirectionAndDistance(true);
+                if (_cameraViewHole.IsCameraZoomedOut)
+                    _cameraViewHole.ZoomOutCamera();
                 UpdateCameraFollowTarget(MyBall.MyBallObject);
             }
             else if (DirectionAndDistanceChosen && !_moveHitMeterIcon)
@@ -264,6 +273,11 @@ public class GolfPlayerTopDown : MonoBehaviour
                 ChangeHitDistance(distanceUpDown);
             }
         }
+        if (Input.GetKeyDown(KeyCode.BackQuote) && !_powerSubmitted && !_accuracySubmitted)
+        {
+            Debug.Log("GolfPlayer: BackQuote key pressed. _moveHitMeterIcon: " + _moveHitMeterIcon.ToString());
+            _cameraViewHole.ZoomOutCamera();
+        }
             
         
 
@@ -324,12 +338,12 @@ public class GolfPlayerTopDown : MonoBehaviour
         GetCameraBoundingBox();
         if (_cameraBoundingBox.OverlapPoint(newTargetPos))
         {
-            Debug.Log("ChangeHitDirection: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
+            //Debug.Log("ChangeHitDirection: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
             hitDirection = newDir.normalized;
         }
         else
         {
-            Debug.Log("ChangeHitDirection: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000"));            
+            //Debug.Log("ChangeHitDirection: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000"));            
         }
 
         // old way?
@@ -521,6 +535,10 @@ public class GolfPlayerTopDown : MonoBehaviour
         ResetIconPositions();
         ResetSubmissionValues();
         BeginMovingHitMeter();
+
+        // Make sure the camera isn't zoomed out?
+        if (_cameraViewHole.IsCameraZoomedOut)
+            _cameraViewHole.ZoomOutCamera();
 
         // IsPlayersTurn will be set by the game manager in a real game. This is just a place holder for now.
         //this.IsPlayersTurn = false;
@@ -734,6 +752,8 @@ public class GolfPlayerTopDown : MonoBehaviour
         //Debug.Log("UpdateHitSpinForPlayer: new spin submitted: " + newSpin.ToString() + " hitTopSpinSubmitted will then be: " + hitTopSpinSubmitted.ToString());
         UpdateTopSpin(hitTopSpinSubmitted.y);
         UpdateLeftRightSpin(hitTopSpinSubmitted.x);
+        if(DirectionAndDistanceChosen)
+            PlayerChooseDirectionAndDistance(false);
     }
     void UpdateTopSpin(float newTopSpin)
     {

@@ -35,6 +35,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     public GolfPlayerTopDown CurrentPlayer;
 
     [Header("Camera and UI Stuff?")]
+    [SerializeField] CameraViewHole _cameraViewHole;
     [SerializeField] PolygonCollider2D _cameraBoundingBox;
     [SerializeField] TextMeshProUGUI _holeNumberText;
     [SerializeField] TextMeshProUGUI _parText;
@@ -75,6 +76,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
         // Set the new tee off location
         UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
+        // Set the Camera Zoomed Out position
+        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos);
         // update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
         // Set the Initial Wind for the hole
@@ -325,5 +328,12 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         _playerNameText.text = "Player: " + player.PlayerName;
         _numberOfStrokesText.text = "Strokes: " + player.PlayerScore.StrokesForCurrentHole.ToString();
         _terrainTypeText.text = titleCase.ToTitleCase(player.GetTerrainTypeFromBall());
+    }
+    void UpdateZoomedOutPos(Vector3 newPos)
+    {
+        if (!_cameraViewHole)
+            _cameraViewHole = GameObject.FindGameObjectWithTag("camera").GetComponent<CameraViewHole>();
+        _cameraViewHole.SetZoomedOutPosition(newPos);
+
     }
 }

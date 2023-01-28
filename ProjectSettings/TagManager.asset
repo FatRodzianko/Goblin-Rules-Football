@@ -47,6 +47,7 @@ TagManager:
   - EnvironmentObstacleHolder
   - GolfLandingTarget
   - GolfAimPoint
+  - ZoomedOutPosition
   layers:
   - Default
   - TransparentFX

@@ -70,6 +70,9 @@ public class TileMapManager : MonoBehaviour
         if (teeMarkers.Length > 0)
             newHole.TeeMarkerPositions = GetObjectPositions(teeMarkers);
 
+        // Find the zoomed out position and save it for later use by the camera
+        newHole.ZoomedOutPos = GameObject.FindGameObjectWithTag("ZoomedOutPosition").transform.position;
+
         // Find all Environment obstacles and save their locations
         GameObject[] obstacles = GameObject.FindGameObjectsWithTag("GolfEnvironmentObstacle");
         newHole.SavedObstacles = SaveAllObstacles(obstacles).ToList();
