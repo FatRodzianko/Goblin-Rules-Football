@@ -390,6 +390,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         SetPlayerOnBall();
         AttachUIToNewParent(myCamera.transform);
         DeactivateIconsForNewTurn();
+        ResetSubmissionValues();
         UpdateBallGroundMaterial();
 
         // Find the closest hole to the player
@@ -1257,6 +1258,30 @@ public class GolfPlayerTopDown : MonoBehaviour
         }
         this.EnablePlayerCanvas(false);
     }
+    public async Task TellPlayerHoleEnded(float duration)
+    {
+        Debug.Log("TellPlayerHoleEnded: on game player: " + this.PlayerName);
+        float end = Time.time + duration;
+        this.PlayerUIMessage("hole ended");
+        this.EnablePlayerCanvas(true);
+        while (Time.time < end)
+        {
+            await Task.Yield();
+        }
+        this.EnablePlayerCanvas(false);
+    }
+    public async Task TellPlayerGameIsOver(float duration)
+    {
+        Debug.Log("TellPlayerGameIsOver: on game player: " + this.PlayerName);
+        float end = Time.time + duration;
+        this.PlayerUIMessage("game over");
+        this.EnablePlayerCanvas(true);
+        while (Time.time < end)
+        {
+            await Task.Yield();
+        }
+        this.EnablePlayerCanvas(false);
+    }
     public void GetCameraBoundingBox()
     {
         if (!_cameraBoundingBox)
@@ -1300,4 +1325,15 @@ public class GolfPlayerTopDown : MonoBehaviour
         UpdateBallGroundMaterial();
         return MyBall.bounceContactGroundMaterial;
     }
+    public void ResetForNewHole(int holeIndex)
+    {
+        // Reset player score for the current hole
+        PlayerScore.SaveScoreAtEndOfHole(holeIndex);
+        PlayerScore.ResetScoreForNewHole();
+        // Reset whether the player has teed off
+        this.HasPlayerTeedOff = false;
+        // reset the ball being in the hole
+        MyBall.IsInHole = false;
+    }
+
 }

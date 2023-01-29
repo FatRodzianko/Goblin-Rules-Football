@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using TMPro;
 using System.Globalization;
+using System.Threading.Tasks;
 
 public class GameplayManagerTopDownGolf : MonoBehaviour
 {
@@ -20,7 +21,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     public int CurrentHolePar;
     public List<Vector3> HolePositions;
     public Vector3 TeeOffAimPoint;
-    
+    [SerializeField] float _lastNewHoleTime = 0f;
+
 
     [Header("Tilemap Manager References")]
     [SerializeField] TileMapManager _tileMapManager;
@@ -160,6 +162,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         player.transform.position = TeeOffPosition;
         player.MyBall.transform.position = TeeOffPosition;
+        player.MyBall.ResetBallSpriteForNewHole();
+        
     }
     public void PlayerTeedOff()
     {
@@ -223,8 +227,20 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Check if any players still have to hit a ball
         if (_numberOfPlayersInHole >= GolfPlayers.Count)
         {
-            // should put transition to load next hole here. just returning for now
-            Debug.Log("GameplayManager: StartNextPlayersTurn: All players have made it into the hole. No more remaining players! Loading next hole?");
+
+            if ((CurrentHoleIndex + 1) < CurrentCourse.HolesInCourse.Length)
+            {
+                Debug.Log("GameplayManager: StartNextPlayersTurn: All players have made it into the hole. No more remaining players! Loading next hole?");
+                await ball.MyPlayer.TellPlayerHoleEnded(5);
+                NextHole();
+            }
+            else
+            {
+                Debug.Log("GameplayManager: StartNextPlayersTurn: All players have made it into the hole. No more remaining players! And this was the last hole! Ending the game...");
+                EndGame();
+            }
+                
+
             return;
         }
         // Find the next player based on tee off position, or by furthest player from hole if all players teed off
@@ -334,6 +350,71 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         if (!_cameraViewHole)
             _cameraViewHole = GameObject.FindGameObjectWithTag("camera").GetComponent<CameraViewHole>();
         _cameraViewHole.SetZoomedOutPosition(newPos);
+
+    }
+    void NextHole()
+    {
+        Debug.Log("Next hole: " + Time.time);
+        if (Time.time < _lastNewHoleTime + 0.25f)
+            return;
+        _lastNewHoleTime = Time.time;
+        CurrentHoleIndex++;
+        _numberOfPlayersInHole = 0;
+        // Save each player's score and reset their "current" score of the new hole
+        foreach (GolfPlayerTopDown player in GolfPlayers)
+        {
+            
+            player.ResetForNewHole(CurrentHoleIndex);
+        }
+        // Reset the number of players that have teed off
+        ResetNumberOfPlayersWhoHaveTeedOff();
+        // Load a new hole
+        LoadNewHole(CurrentHoleIndex);
+        // Get the CameraBoundBox and tell players to get it as well?
+        GetCameraBoundingBox();
+        TellPlayersToGetCameraBoundingBox();
+        // Set the Hole Positions for the new hole
+        HolePositions = CurrentHoleInCourse.HolePositions;
+        // Set the Course aim points for players to use
+        TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
+        // Set the new tee off location
+        UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
+        // Set the Camera Zoomed Out position
+        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos);
+        // update the par value for the hole
+        UpdateParForNewHole(CurrentHoleInCourse.HolePar);
+        // Set the new wind for the next turn
+        WindManager.instance.UpdateWindForNewTurn();
+        WindManager.instance.UpdateWindDirectionForNewTurn();
+        // Set new weather for the next turn
+        RainManager.instance.UpdateWeatherForNewTurn();
+        // Sort the players by lowest score to start the hole
+        OrderListOfPlayers();
+        // Set the current player
+        SetCurrentPlayer(GolfPlayersInTeeOffOrder[0]);
+        // Move the first player to the tee off location
+        MovePlayerToTeeOffLocation(CurrentPlayer);
+        // Set the camera on the current player
+        SetCameraOnPlayer(CurrentPlayer);
+        // Prompt player to start their turn
+        CurrentPlayer.PlayerUIMessage("start turn");
+        CurrentPlayer.EnablePlayerCanvas(true);
+        UpdateUIForCurrentPlayer(CurrentPlayer);
+    }
+    async void EndGame()
+    {
+        var tasks = new Task[GolfPlayers.Count];
+        Debug.Log("EndGame: Before calling TellPlayerGameIsOver time is: " + Time.time.ToString());
+        // Save each player's score and reset their "current" score of the new hole
+        for (int i = 0; i < GolfPlayers.Count; i++)
+        {
+            GolfPlayerTopDown player = GolfPlayers[i];
+            player.ResetForNewHole(CurrentHoleIndex + 1);
+            tasks[i] = player.TellPlayerGameIsOver(5);
+        }
+
+        await Task.WhenAll(tasks);
+        Debug.Log("EndGame: AFTER calling TellPlayerGameIsOver time is: " + Time.time.ToString());
 
     }
 }

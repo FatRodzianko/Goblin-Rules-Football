@@ -5,6 +5,7 @@ using TMPro;
 
 public class PlayerUIMessage : MonoBehaviour
 {
+    [SerializeField] GolfPlayerTopDown _myPlayer;
     [SerializeField] GolfPlayerScore _golfPlayerScore;
     [SerializeField] TextMeshProUGUI _playerMessageText;
     [Header("Player UI Message Texts")]
@@ -44,6 +45,14 @@ public class PlayerUIMessage : MonoBehaviour
         else if (message.Contains("ground:"))
         {
             DisplayGroundType(message);
+        }
+        else if (message == "hole ended")
+        {
+            HoleEnded();
+        }
+        else if (message == "game over")
+        {
+            GameOverMessage();
         }
         else
         {
@@ -101,5 +110,20 @@ public class PlayerUIMessage : MonoBehaviour
         {
             _playerMessageText.text = "...bunker...";
         }
+    }
+    void HoleEnded()
+    {
+        _playerMessageText.text = "Hole #" + (GameplayManagerTopDownGolf.instance.CurrentHoleIndex + 1).ToString() + " Ended. Moving onto the next hole...";
+    }
+    void GameOverMessage()
+    {
+        // get the par for the course
+        int parForCourse = 0;
+        for (int i = 0; i < GameplayManagerTopDownGolf.instance.CurrentCourse.HolesInCourse.Length; i++)
+        {
+            parForCourse += GameplayManagerTopDownGolf.instance.CurrentCourse.HolesInCourse[i].HolePar;
+        }
+        int overUnderPar = _golfPlayerScore.TotalStrokesForCourse - parForCourse;
+        _playerMessageText.text = _myPlayer.PlayerName + " score for course: " + _golfPlayerScore.TotalStrokesForCourse.ToString() + "\nPar for course: " + parForCourse.ToString() + "\nOver/Under Par: " + overUnderPar.ToString();
     }
 }

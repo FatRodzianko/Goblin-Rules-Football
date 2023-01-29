@@ -652,6 +652,8 @@ public class GolfBallTopDown : MonoBehaviour
         isBouncing = false;
         if (resetHasBouncedYet)
             hasBouncedYet = false;
+        if (HitApexOfHill)
+            HitApexOfHill = false;
     }
     string GetGroundMaterial()
     {
@@ -1463,6 +1465,11 @@ public class GolfBallTopDown : MonoBehaviour
         MyPlayer.PlayerUIMessage("ground: " + this.bounceContactGroundMaterial);
         MyPlayer.EnablePlayerCanvas(true);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+    }
+    public void ResetBallSpriteForNewHole()
+    {
+        myShadow.GetComponent<SpriteRenderer>().enabled = true;
+        MyBallObject.GetComponent<SpriteRenderer>().enabled = true;
     }
 }
 

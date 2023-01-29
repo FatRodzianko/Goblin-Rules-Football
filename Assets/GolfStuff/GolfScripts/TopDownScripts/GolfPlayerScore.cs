@@ -32,4 +32,13 @@ public class GolfPlayerScore : MonoBehaviour
         StrokesForCurrentHole += penalty;
         TotalStrokesForCourse += penalty;
     }
+    public void SaveScoreAtEndOfHole(int holeIndex)
+    {
+        HoleWithScores[holeIndex] = StrokesForCurrentHole;
+
+        foreach (KeyValuePair<int, int> entry in HoleWithScores)
+        {
+            Debug.Log(transform.GetComponent<GolfPlayerTopDown>().PlayerName + " Score for hole #" + entry.Key.ToString() + " is: " + entry.Value.ToString());
+        }
+    }
 }
