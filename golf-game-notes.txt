@@ -88,6 +88,9 @@
 - - - - - - - - - probably should start making some input manager controls for golf to be enabled/disabled like in GRF
 - - - - - - - - - maybe still allow player to adjust their aim when viewing the map? at least in terms of left/right aiming?
 - - - - - - reset everything after the player returns to game?
+- - - Use "object pooling" to speed up clearing and loading a new hole?
+- - - - - - https://learn.unity.com/tutorial/object-pooling#
+- - - - - - https://www.youtube.com/watch?v=7EZ2F-TzHYw
 
 - GameplayManager requirements for top down golf
 - - - track what player's turn it is

@@ -23,7 +23,8 @@ public class TileMapManagerEditor : Editor
         }
         if (GUILayout.Button("Clear Map"))
         {
-            script.ClearMap();
+            Debug.Log("TileMapManagerEditor: Clear map: " + Time.time.ToString());
+            script.ClearMapFromEditor();
         }
         if (GUILayout.Button("!!! WARNING CLEAR MAP ABOVE"))
         {

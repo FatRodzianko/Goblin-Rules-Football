@@ -884,7 +884,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         {
             dist *= club.RoughTerrainDistModifer;
         }
-        if (MyBall.bounceContactGroundMaterial == "deep rough")
+        if (MyBall.bounceContactGroundMaterial.Contains("deep rough"))
         {
             dist *= club.DeepRoughTerrainDistModifer;
         }
@@ -1136,7 +1136,7 @@ public class GolfPlayerTopDown : MonoBehaviour
                 {
                     clubDist *= _myClubs[i].RoughTerrainDistModifer;
                 }
-                if (MyBall.bounceContactGroundMaterial == "deep rough")
+                if (MyBall.bounceContactGroundMaterial.Contains("deep rough"))
                 {
                     clubDist *= _myClubs[i].DeepRoughTerrainDistModifer;
                 }
@@ -1323,7 +1323,10 @@ public class GolfPlayerTopDown : MonoBehaviour
     public string GetTerrainTypeFromBall()
     {
         UpdateBallGroundMaterial();
-        return MyBall.bounceContactGroundMaterial;
+        string ground = MyBall.bounceContactGroundMaterial;
+        if (ground.Contains("deep rough"))
+            ground = "deep rough";
+        return ground;
     }
     public void ResetForNewHole(int holeIndex)
     {

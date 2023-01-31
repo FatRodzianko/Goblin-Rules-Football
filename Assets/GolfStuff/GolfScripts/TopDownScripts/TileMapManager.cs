@@ -13,6 +13,8 @@ using Cinemachine;
 public class TileMapManager : MonoBehaviour
 {
     [SerializeField] private Tilemap _greenMap, _fairwayMap, _roughMap, _deepRoughMap, _sandTrapMap, _waterTrapMap, _edgesMap, _directionTilesMap;
+    [SerializeField] private List<Tilemap> _allMaps = new List<Tilemap>();
+    [SerializeField] private Tile _nullTile;
     [SerializeField] private int _holeIndex;
     [SerializeField] private string _courseName;
     [SerializeField] private int _holePar;
@@ -132,14 +134,43 @@ public class TileMapManager : MonoBehaviour
             }
         }
     }
-    public void ClearMap()
+    public void ClearMapFromEditor()
     {
+        var hole = Resources.Load<ScriptableHole>($"Holes/{_courseName}_{_holeIndex}");
+        if (hole == null)
+        {
+            Debug.LogError($"{_courseName}_{_holeIndex} does not exist.");
+            return;
+        }
+        this.ClearMap(hole);
+    }
+    public void ClearMap(ScriptableHole hole)
+    {
+        Debug.Log("ClearMap: start time: " + Time.time.ToString());
         // Clear all tilemaps
-        var maps = FindObjectsOfType<Tilemap>();
+        /*var maps = FindObjectsOfType<Tilemap>();
         foreach (var tilemap in maps)
         {
             tilemap.ClearAllTiles();
-        }
+        }*/
+
+        /*NullTileOnTileMap(_greenMap, hole.GreenTiles);
+        NullTileOnTileMap(_fairwayMap, hole.FairwayTiles);
+        NullTileOnTileMap(_roughMap, hole.RoughTiles);
+        NullTileOnTileMap(_deepRoughMap, hole.DeepRoughTiles);
+        NullTileOnTileMap(_sandTrapMap, hole.SandTrapTiles);
+        NullTileOnTileMap(_waterTrapMap, hole.WaterTrapTiles);
+        NullTileOnTileMap(_edgesMap, hole.EdgesTiles);
+        NullTileOnTileMap(_directionTilesMap, hole.DirectionTiles);*/
+        _greenMap.ClearAllTiles();
+        _fairwayMap.ClearAllTiles();
+        _roughMap.ClearAllTiles();
+        _deepRoughMap.ClearAllTiles();
+        _sandTrapMap.ClearAllTiles();
+        _waterTrapMap.ClearAllTiles();
+        _edgesMap.ClearAllTiles();
+        _directionTilesMap.ClearAllTiles();
+
         // Delete all hole objects
         try
         {
@@ -153,8 +184,14 @@ public class TileMapManager : MonoBehaviour
         // Delete all obstacle objects
         try
         {
-            GameObject[] obstacles = GameObject.FindGameObjectsWithTag("GolfEnvironmentObstacle");
-            DeleteObjects(obstacles);
+            //GameObject[] obstacles = GameObject.FindGameObjectsWithTag("GolfEnvironmentObstacle");
+            GameObject obstacleHolder = GameObject.FindGameObjectWithTag("EnvironmentObstacleHolder");
+            GameObject[] obstacleChildren = new GameObject[obstacleHolder.transform.childCount];
+            for (int i = 0; i < obstacleHolder.transform.childCount; i++)
+            {
+                obstacleChildren[i] = obstacleHolder.transform.GetChild(i).gameObject;
+            }
+            DeleteObjects(obstacleChildren);
         }
         catch (Exception e)
         {
@@ -195,6 +232,7 @@ public class TileMapManager : MonoBehaviour
     public void LoadMap(ScriptableHole hole)
     {
         Debug.Log("TileMapManager: LoadMap: Loading hole: " + hole.name);
+        Debug.Log("LoadMap: start time: " + Time.time.ToString());
         // Set the tiles
         SetTileOnTileMap(_greenMap, hole.GreenTiles);
         SetTileOnTileMap(_fairwayMap, hole.FairwayTiles);
@@ -253,6 +291,7 @@ public class TileMapManager : MonoBehaviour
         //GameplayManagerTopDownGolf.instance.UpdateTeeOffPositionForNewHole(hole.TeeOffLocation);
         // LATER save the hole PAR value to the GameManager
         //GameplayManagerTopDownGolf.instance.UpdateParForNewHole(hole.HolePar);
+        Debug.Log("LoadMap: end time: " + Time.time.ToString());
 
     }
     public List<Vector3> GetObjectPositions(GameObject[] objects)
@@ -277,6 +316,21 @@ public class TileMapManager : MonoBehaviour
             map.SetTile(savedTile.TilePos, savedTile.MyTile);
         }
     }
+    public void NullTileOnTileMap(Tilemap map, List<SavedTile> savedTiles)
+    {
+        Debug.Log("NullTileOnTileMap: " + Time.time);
+        if (savedTiles.Count <= 0)
+            return;
+        /*foreach (SavedTile savedTile in savedTiles)
+        {
+            map.SetTile(savedTile.TilePos, null);
+        }*/
+        for (int i = 0; i < savedTiles.Count; i++)
+        {
+            map.SetTile(savedTiles[i].TilePos, null);
+        }
+        
+    }
     public void DeleteObjects(GameObject[] objects)
     {
         if (objects.Length <= 0)
@@ -284,7 +338,13 @@ public class TileMapManager : MonoBehaviour
         for (int i = 0; i < objects.Length; i++)
         {
             GameObject toDelete = objects[i];
+#if UNITY_EDITOR
             DestroyImmediate(toDelete);
+#else
+            toDelete.SetActive(false);
+            Destroy(toDelete);
+#endif
+
         }
     }
     bool DoesObjectWithTagExist(string tagName)

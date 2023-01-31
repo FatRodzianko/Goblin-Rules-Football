@@ -668,9 +668,10 @@ public class GolfBallTopDown : MonoBehaviour
                 GroundTopDown groundScript = ground[i].collider.GetComponent<GroundTopDown>();
                 GetTileSlopeInformation(groundScript);
                 string groundMaterial = groundScript.groundType;
+                Debug.Log("GetGroundMaterial: material found: " + groundMaterial);
 
                 // Always have rough or trap override 
-                if (groundMaterial == "rough" || groundMaterial.Contains("trap"))
+                if (groundMaterial.Contains("trap"))
                 {
                     material = groundMaterial;
                     //GetTileSlopeInformation(groundScript);
@@ -679,7 +680,16 @@ public class GolfBallTopDown : MonoBehaviour
                 // Check to see if the ball is overlapping any types of ground. If it is on the edge of a green ground and non-green ground, keep the non-green ground
                 if (!string.IsNullOrWhiteSpace(material))
                 {
-                    if (groundMaterial == "green" && !material.Equals("green"))
+                    if (i == 0)
+                    {
+                        material = groundMaterial;
+                        continue;
+                    }
+                    if (groundMaterial == "green" && !material.Equals("green") && !material.Equals("deep rough background")) // if a material found in a prior loop is not green AND ALSO NOT deep rough background, skip this green detection
+                    {
+                        continue;
+                    }
+                    else if (groundMaterial == "deep rough background" && !material.Equals("deep rough background")) // override for deep rough because I have that fill in everything instead of having to reload it every time?
                     {
                         continue;
                     }
@@ -706,6 +716,8 @@ public class GolfBallTopDown : MonoBehaviour
         else
             material = "fairway"; // in case of failure, default to fairway?
 
+
+        Debug.Log("GetGroundMaterial: returning material as: " + material);
         return material;
     }
     bool KeepBouncing(float previousHeight, string groundMaterial)
@@ -738,7 +750,7 @@ public class GolfBallTopDown : MonoBehaviour
             bounceHeightModifier += 0.05f;
         else if (groundMaterial.Equals("rough"))
             bounceHeightModifier -= 0.15f;
-        else if (groundMaterial.Equals("deep rough"))
+        else if (groundMaterial.Contains("deep rough"))
             bounceHeightModifier -= 0.25f;
 
         if (bounceHeightModifier < 0.05f)
@@ -935,6 +947,8 @@ public class GolfBallTopDown : MonoBehaviour
         float realSpeed = CalculateCurrentSpeed(currentPos, nextPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime);
         //Debug.Log("RollBall: current position is: " + currentPos.ToString("0.00000000") + " and the next position will be: " + nextPos.ToString("0.00000000") + " the speed per seconds WILL BE: " + realSpeed.ToString("0.00000000") + " and the speed previously WAS: " + speedMetersPerSecond.ToString("0.00000000"));
         this.rb.MovePosition(nextPos);
+        if (groundSlopeDirection != Vector2.zero && rollDirection == groundSlopeDirection && realSpeed < 1)
+            realSpeed += 0.01f;
         speedMetersPerSecond = realSpeed;
     }
     float GetGroundRollSpeedModifier(string groundMaterial)
@@ -945,7 +959,7 @@ public class GolfBallTopDown : MonoBehaviour
             groundRollSpeedModifier = fairwayRollSpeedModifier;
         else if (groundMaterial.Equals("rough"))
             groundRollSpeedModifier = roughRollSpeedModifier;
-        else if (groundMaterial.Equals("deep rough"))
+        else if (groundMaterial.Contains("deep rough"))
             groundRollSpeedModifier = deepRoughRollSpeedModifier;
 
         return groundRollSpeedModifier;
@@ -991,7 +1005,7 @@ public class GolfBallTopDown : MonoBehaviour
 
         Vector2 newDir = (rollDirection * speedMetersPerSecond * Time.fixedDeltaTime) + (slopeDirection * slopeSpeedModifier * Time.fixedDeltaTime);
         //Vector2 newDir = (rollDirection * speedMetersPerSecond * Time.fixedDeltaTime) + (slopeDirection * slopeSpeedModifier);
-        Debug.Log("GetRollDirection: initial roll direction: " + rollDirection.ToString() + " slope direction: " + slopeDirection.ToString() + " new direction: " + newDir.ToString() + " new direction normalized: " + newDir.normalized.ToString());
+        //Debug.Log("GetRollDirection: initial roll direction: " + rollDirection.ToString() + " slope direction: " + slopeDirection.ToString() + " new direction: " + newDir.ToString() + " new direction normalized: " + newDir.normalized.ToString());
         return newDir.normalized;
         //return newDir;
     }
@@ -1369,7 +1383,7 @@ public class GolfBallTopDown : MonoBehaviour
             {
                 RaycastHit2D hit = hits[i];
                 GroundTopDown ground = hit.transform.GetComponent<GroundTopDown>();
-                if (ground.groundType.Contains("water"))
+                if (ground.groundType.Contains("water") || ground.groundType.Equals("deep rough background"))
                     continue;
                 Debug.Log("FindPointOutOfWater: Raycast from ball hit collider of ground type: " + ground.groundType + " at position: " + hit.point.ToString());
                 contactPoints.Add(hit.point);

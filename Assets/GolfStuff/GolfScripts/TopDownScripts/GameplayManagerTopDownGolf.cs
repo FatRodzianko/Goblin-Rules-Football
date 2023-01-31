@@ -98,7 +98,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Prompt player to start their turn
         CurrentPlayer.PlayerUIMessage("start turn");
         CurrentPlayer.EnablePlayerCanvas(true);
-        UpdateUIForCurrentPlayer(CurrentPlayer);
+        UpdateUIForCurrentPlayer(CurrentPlayer,true);
     }
 
     // Update is called once per frame
@@ -124,7 +124,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             return;
 
         // First, clear the tilemap of any pre-existing hole tiles
-        _tileMapManager.ClearMap();
+        Debug.Log("GameplayManagerTopDownGolf: ClearMap: start time: " + Time.time.ToString());
+        _tileMapManager.ClearMap(CurrentCourse.HolesInCourse[CurrentHoleIndex]);
         // load the next map in the course
         CurrentHoleIndex = index;
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[CurrentHoleIndex];
@@ -173,6 +174,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         if (requestingPlayer != CurrentPlayer)
             return;
+        UpdateUIForCurrentPlayer(requestingPlayer);
         CurrentPlayer.StartPlayerTurn();
     }
     void SetCameraOnPlayer(GolfPlayerTopDown player)
@@ -231,7 +233,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             if ((CurrentHoleIndex + 1) < CurrentCourse.HolesInCourse.Length)
             {
                 Debug.Log("GameplayManager: StartNextPlayersTurn: All players have made it into the hole. No more remaining players! Loading next hole?");
-                await ball.MyPlayer.TellPlayerHoleEnded(5);
+                await ball.MyPlayer.TellPlayerHoleEnded(3);
                 NextHole();
             }
             else
@@ -337,13 +339,16 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         _numberOfPlayersInHole++;
         _lastBallInHoleTime = Time.time;
     }
-    void UpdateUIForCurrentPlayer(GolfPlayerTopDown player)
+    void UpdateUIForCurrentPlayer(GolfPlayerTopDown player, bool forTeeOff = false)
     {
         if (!player)
             return;
         _playerNameText.text = "Player: " + player.PlayerName;
         _numberOfStrokesText.text = "Strokes: " + player.PlayerScore.StrokesForCurrentHole.ToString();
-        _terrainTypeText.text = titleCase.ToTitleCase(player.GetTerrainTypeFromBall());
+        if (forTeeOff)
+            _terrainTypeText.text = "";
+        else
+            _terrainTypeText.text = titleCase.ToTitleCase(player.GetTerrainTypeFromBall());
     }
     void UpdateZoomedOutPos(Vector3 newPos)
     {
@@ -362,8 +367,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         _numberOfPlayersInHole = 0;
         // Save each player's score and reset their "current" score of the new hole
         foreach (GolfPlayerTopDown player in GolfPlayers)
-        {
-            
+        {   
             player.ResetForNewHole(CurrentHoleIndex);
         }
         // Reset the number of players that have teed off
