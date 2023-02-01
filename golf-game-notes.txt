@@ -78,10 +78,10 @@
 - - - - - x if a player hits a ball in water, the ball will need to be placed outside of the water and the player takes a 1 stroke penalty
 - - - - - - - - x cast ray from ball toward player, first point not in the water, set ball there?
 - - - Add ability to view the "map" - zoomed out view of the course?
-- - - - - - Will probably need disable the "Pixel Perfect Camera" and then on the virtual camera set the "ortho size" to something like 5x-8x the normal size
-- - - - - - - - - Disable the "Cinemachine Pixel Perfect (Script)" component of the virtual camera
-- - - - - - - - - Disable the "Camera Follow Script" of the virtual camera
-- - - - - - - - - Set the "ortho size" to 9x it's current value
+- - - - - x Will probably need disable the "Pixel Perfect Camera" and then on the virtual camera set the "ortho size" to something like 5x-8x the normal size
+- - - - - - - - x Disable the "Cinemachine Pixel Perfect (Script)" component of the virtual camera
+- - - - - - - - x Disable the "Camera Follow Script" of the virtual camera
+- - - - - - - - x Set the "ortho size" to 9x it's current value
 - - - - - - add controls for the player to pan around the course
 - - - - - - - - - this will also require removing the "follow target" of the camera follow script so the camera isn't fixed
 - - - - - - make sure to disable any controls that allow the player to hit the ball

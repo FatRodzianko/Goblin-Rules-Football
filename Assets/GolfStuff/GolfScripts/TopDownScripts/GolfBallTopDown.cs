@@ -668,7 +668,7 @@ public class GolfBallTopDown : MonoBehaviour
                 GroundTopDown groundScript = ground[i].collider.GetComponent<GroundTopDown>();
                 GetTileSlopeInformation(groundScript);
                 string groundMaterial = groundScript.groundType;
-                Debug.Log("GetGroundMaterial: material found: " + groundMaterial);
+                //Debug.Log("GetGroundMaterial: material found: " + groundMaterial);
 
                 // Always have rough or trap override 
                 if (groundMaterial.Contains("trap"))
@@ -717,7 +717,7 @@ public class GolfBallTopDown : MonoBehaviour
             material = "fairway"; // in case of failure, default to fairway?
 
 
-        Debug.Log("GetGroundMaterial: returning material as: " + material);
+        //Debug.Log("GetGroundMaterial: returning material as: " + material);
         return material;
     }
     bool KeepBouncing(float previousHeight, string groundMaterial)
@@ -947,8 +947,8 @@ public class GolfBallTopDown : MonoBehaviour
         float realSpeed = CalculateCurrentSpeed(currentPos, nextPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime);
         //Debug.Log("RollBall: current position is: " + currentPos.ToString("0.00000000") + " and the next position will be: " + nextPos.ToString("0.00000000") + " the speed per seconds WILL BE: " + realSpeed.ToString("0.00000000") + " and the speed previously WAS: " + speedMetersPerSecond.ToString("0.00000000"));
         this.rb.MovePosition(nextPos);
-        if (groundSlopeDirection != Vector2.zero && rollDirection == groundSlopeDirection && realSpeed < 1)
-            realSpeed += 0.01f;
+        if (groundSlopeDirection != Vector2.zero && rollDirection == groundSlopeDirection && realSpeed < 0.5f && realSpeed > 0.05f)
+            realSpeed += 0.005f;
         speedMetersPerSecond = realSpeed;
     }
     float GetGroundRollSpeedModifier(string groundMaterial)

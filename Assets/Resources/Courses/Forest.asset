@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CourseName: Forest
   HolesInCourse:
-  - {fileID: 11400000, guid: a09893d0e2cffbf4f8f723c835f322c1, type: 2}
-  - {fileID: 11400000, guid: ab8bc480b53301049a332c23eb5a26c7, type: 2}
+  - {fileID: 11400000, guid: a87a1099d535fc8458827d42ca136c40, type: 2}
+  - {fileID: 11400000, guid: 223e824694cde4a45b88e5b99c8273e8, type: 2}

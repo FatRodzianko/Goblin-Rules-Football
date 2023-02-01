@@ -9,6 +9,7 @@ using UnityEditor;
 #endif
 using System;
 using Cinemachine;
+using System.Threading.Tasks;
 
 public class TileMapManager : MonoBehaviour
 {
@@ -142,9 +143,9 @@ public class TileMapManager : MonoBehaviour
             Debug.LogError($"{_courseName}_{_holeIndex} does not exist.");
             return;
         }
-        this.ClearMap(hole);
+        this.ClearMap();
     }
-    public void ClearMap(ScriptableHole hole)
+    public void ClearMap()
     {
         Debug.Log("ClearMap: start time: " + Time.time.ToString());
         // Clear all tilemaps
@@ -293,6 +294,12 @@ public class TileMapManager : MonoBehaviour
         //GameplayManagerTopDownGolf.instance.UpdateParForNewHole(hole.HolePar);
         Debug.Log("LoadMap: end time: " + Time.time.ToString());
 
+    }
+    public async Task LoadMapAsTask(ScriptableHole hole)
+    {
+        ClearMap();
+        LoadMap(hole);
+        await Task.Yield();
     }
     public List<Vector3> GetObjectPositions(GameObject[] objects)
     {

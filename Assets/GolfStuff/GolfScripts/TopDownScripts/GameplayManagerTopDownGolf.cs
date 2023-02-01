@@ -45,10 +45,13 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] TextMeshProUGUI _numberOfStrokesText;
     [SerializeField] TextMeshProUGUI _terrainTypeText;
     TextInfo titleCase = new CultureInfo("en-US", false).TextInfo;
+    [SerializeField] Canvas _loadingHoleCanvas;
+    [SerializeField] Canvas _holeInfoCanvas;
 
     private void Awake()
     {
         MakeInstance();
+        _loadingHoleCanvas.gameObject.SetActive(false);
         if (!_tileMapManager)
             _tileMapManager = GameObject.FindGameObjectWithTag("TileMapManager").GetComponent<TileMapManager>();
     }
@@ -117,7 +120,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         _numberOfPlayersTeedOff = 0;
     }
-    void LoadNewHole(int index)
+    async void LoadNewHole(int index)
     {
         // make sure there is a hole to load? Shouldn't happen unless game is over...
         if (index > CurrentCourse.HolesInCourse.Length)
@@ -125,11 +128,18 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
 
         // First, clear the tilemap of any pre-existing hole tiles
         Debug.Log("GameplayManagerTopDownGolf: ClearMap: start time: " + Time.time.ToString());
-        _tileMapManager.ClearMap(CurrentCourse.HolesInCourse[CurrentHoleIndex]);
+        //_tileMapManager.ClearMap(CurrentCourse.HolesInCourse[CurrentHoleIndex]);
         // load the next map in the course
         CurrentHoleIndex = index;
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[CurrentHoleIndex];
-        _tileMapManager.LoadMap(CurrentHoleInCourse);
+        //_tileMapManager.LoadMap(CurrentHoleInCourse);
+        Debug.Log("GameplayManagertopDownGolf: LoadNewHole: Starting task to load hole at index: " + CurrentHoleInCourse.ToString() + ". Time: " + Time.time);
+        _holeInfoCanvas.gameObject.SetActive(false);
+        _loadingHoleCanvas.gameObject.SetActive(true);
+        await _tileMapManager.LoadMapAsTask(CurrentHoleInCourse);
+        Debug.Log("GameplayManagertopDownGolf: LoadNewHole: Task to load hole at index: " + CurrentHoleInCourse.ToString() + " completed. Time: " + Time.time);
+        _loadingHoleCanvas.gameObject.SetActive(false);
+        _holeInfoCanvas.gameObject.SetActive(true);
         _holeNumberText.text = CurrentHoleInCourse.CourseName + " #" + (CurrentHoleIndex + 1).ToString();
     }
     public void UpdateTeeOffPositionForNewHole(Vector3 newPosition)
@@ -221,11 +231,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             Debug.Log("StartNextPlayersTurn: Returning from TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
         }
         
-        // Set the new wind for the next turn
-        WindManager.instance.UpdateWindForNewTurn();
-        WindManager.instance.UpdateWindDirectionForNewTurn();
-        // Set new weather for the next turn
-        RainManager.instance.UpdateWeatherForNewTurn();
+        
         // Check if any players still have to hit a ball
         if (_numberOfPlayersInHole >= GolfPlayers.Count)
         {
@@ -245,6 +251,11 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
 
             return;
         }
+        // Set the new wind for the next turn
+        WindManager.instance.UpdateWindForNewTurn();
+        WindManager.instance.UpdateWindDirectionForNewTurn();
+        // Set new weather for the next turn
+        RainManager.instance.UpdateWeatherForNewTurn();
         // Find the next player based on tee off position, or by furthest player from hole if all players teed off
         CurrentPlayer = SelectNextPlayer();
         // Prompt player to start their turn
@@ -317,6 +328,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         if (!_cameraBoundingBox)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
+        if (_cameraBoundingBox)
+            _cameraViewHole.GetLinePointsForOutOfBoundsBorder(_cameraBoundingBox);
     }
     void TellPlayersToGetCameraBoundingBox()
     {
