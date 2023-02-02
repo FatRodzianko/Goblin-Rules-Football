@@ -42,7 +42,7 @@ public class CameraViewHole : MonoBehaviour
             _vCam.m_Lens.OrthographicSize /= 9f;
             _pixelPerfect.enabled = true;
             _cameraFollowScript.enabled = true;
-            _outOfBoundsBorderLine.enabled = false;
+            //_outOfBoundsBorderLine.enabled = false;
             
         }
         else
@@ -73,5 +73,6 @@ public class CameraViewHole : MonoBehaviour
         positions[points.Length] = (Vector2)points[0];
         _outOfBoundsBorderLine.positionCount = points.Length + 1;
         _outOfBoundsBorderLine.SetPositions(positions);
+        _outOfBoundsBorderLine.enabled = true;
     }
 }

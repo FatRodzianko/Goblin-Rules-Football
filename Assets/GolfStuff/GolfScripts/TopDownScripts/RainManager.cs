@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class RainManager : MonoBehaviour
 {
@@ -37,6 +38,9 @@ public class RainManager : MonoBehaviour
     [SerializeField] float _lightRainHitModifier = 0.975f;
     [SerializeField] float _medRainHitModifier = 0.935f;
     [SerializeField] float _heavyRainHitModifier = 0.865f;
+
+    [Header("Lighting Related To Rain")]
+    [SerializeField] Light2D _globalLight;
 
     public delegate void WeatherEffectChange(string newEffect);
     public event WeatherEffectChange WeatherChanged;
@@ -85,6 +89,8 @@ public class RainManager : MonoBehaviour
             _rainBackgroundGround.Stop();
             RainBounceModifier = _noRainBounceModifier;
             RainHitModifier = _noRainHitModifier;
+
+            _globalLight.intensity = 1.0f;
         }
         else if (newState == "light rain")
         {
@@ -102,6 +108,8 @@ public class RainManager : MonoBehaviour
                 _rainBackgroundGround.Play();
             RainBounceModifier = _lightRainBounceModifier;
             RainHitModifier = _lightRainHitModifier;
+
+            _globalLight.intensity = 0.9f;
 
         }
         else if (newState == "med rain")
@@ -121,6 +129,8 @@ public class RainManager : MonoBehaviour
 
             RainBounceModifier = _medRainBounceModifier;
             RainHitModifier = _medRainHitModifier;
+
+            _globalLight.intensity = 0.8f;
         }
         else if (newState == "heavy rain")
         {
@@ -139,6 +149,8 @@ public class RainManager : MonoBehaviour
 
             RainBounceModifier = _heavyRainBounceModifier;
             RainHitModifier = _heavyRainHitModifier;
+            
+            _globalLight.intensity = 0.7f;
         }
         else
         {
@@ -147,6 +159,8 @@ public class RainManager : MonoBehaviour
             _rainBackgroundGround.Stop();
             RainBounceModifier = _noRainBounceModifier;
             RainHitModifier = _noRainHitModifier;
+
+            _globalLight.intensity = 1.0f;
         }
 
         RainState = newState;
