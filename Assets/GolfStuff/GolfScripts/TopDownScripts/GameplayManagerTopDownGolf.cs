@@ -36,6 +36,9 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     bool _haveAllPlayersTeedOff = false;
     public GolfPlayerTopDown CurrentPlayer;
 
+    [Header("Weather Effects")]
+    [SerializeField] LightningManager _lightningManager;
+
     [Header("Camera and UI Stuff?")]
     [SerializeField] CameraViewHole _cameraViewHole;
     [SerializeField] PolygonCollider2D _cameraBoundingBox;
@@ -47,6 +50,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     TextInfo titleCase = new CultureInfo("en-US", false).TextInfo;
     [SerializeField] Canvas _loadingHoleCanvas;
     [SerializeField] Canvas _holeInfoCanvas;
+
+    
 
     private void Awake()
     {
@@ -256,6 +261,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         WindManager.instance.UpdateWindDirectionForNewTurn();
         // Set new weather for the next turn
         RainManager.instance.UpdateWeatherForNewTurn();
+        _lightningManager.CheckIfLightningStartsThisTurn();
         // Find the next player based on tee off position, or by furthest player from hole if all players teed off
         CurrentPlayer = SelectNextPlayer();
         // Prompt player to start their turn
