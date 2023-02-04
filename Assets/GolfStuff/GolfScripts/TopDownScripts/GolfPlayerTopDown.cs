@@ -719,6 +719,7 @@ public class GolfPlayerTopDown : MonoBehaviour
             GameplayManagerTopDownGolf.instance.PlayerTeedOff();
         this.PlayerScore.PlayerHitBall();
         GameplayManagerTopDownGolf.instance.ResetCurrentPlayer();
+        //GameplayManagerTopDownGolf.instance.LightningAfterPlayerHit();
 
         if (!IsShanked)
         {

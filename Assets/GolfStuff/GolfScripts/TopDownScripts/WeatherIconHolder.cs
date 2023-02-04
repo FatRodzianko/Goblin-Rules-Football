@@ -34,7 +34,7 @@ public class WeatherIconHolder : MonoBehaviour
     }
     void UpdateWeatherIcons(string newWeatherEffect)
     {
-        Debug.Log("UpdateWeatherIcons: updating to new state: " + newWeatherEffect);
+        //Debug.Log("UpdateWeatherIcons: updating to new state: " + newWeatherEffect);
         if (string.IsNullOrWhiteSpace(newWeatherEffect))
             return;
 

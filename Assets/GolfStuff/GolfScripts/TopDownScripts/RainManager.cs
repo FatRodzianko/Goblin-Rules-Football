@@ -167,7 +167,7 @@ public class RainManager : MonoBehaviour
     }
     void WeatherChangedFunction(string newEffect)
     {
-        Debug.Log("WeatherChangedFunction: the new weather effect is: " + newEffect);
+        //Debug.Log("WeatherChangedFunction: the new weather effect is: " + newEffect);
         SetRainState(newEffect);
     }
     public void SetInitialWeatherForHole()

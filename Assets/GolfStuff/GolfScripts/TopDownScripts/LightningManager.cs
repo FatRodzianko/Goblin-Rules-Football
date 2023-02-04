@@ -34,7 +34,20 @@ public class LightningManager : MonoBehaviour
 
     [Header("Lightning/Storm Distance and stuff")]
     public float DistanceFromPlayer; // in miles? 5 second sound delay for thunder for each mile away from player
-    
+    [SerializeField] float _lightIntensity;
+    [SerializeField] float _maxDistanceFromPlayer = 1.5f;
+    [SerializeField] float _minLightIntensity = 0.25f;
+    [SerializeField] float _maxLightIntensity = 0.75f;
+
+    [Header("Movement Ranges")]
+    [SerializeField] float _minLightningMove;
+    [SerializeField] float _maxLightningMove;
+    [SerializeField] float _minLightRainLightningMove = 0.05f;
+    [SerializeField] float _maxLightRainLightningMove = 0.15f;
+    [SerializeField] float _minMedRainLightningMove = 0.1f;
+    [SerializeField] float _maxMedRainLightningMove = 0.2f;
+    [SerializeField] float _minHeavyRainLightningMove = 0.15f;
+    [SerializeField] float _maxHeavyRainLightningMove = 0.3f;
 
     // Start is called before the first frame update
     void Start()
@@ -57,6 +70,8 @@ public class LightningManager : MonoBehaviour
             _cooldownMax = _lightRainMax;
             _startLightningOdds = _lightRainOddsToStart;
             _stopLightningOdds = _lightRainOddsToStop;
+            _minLightningMove = _minLightRainLightningMove;
+            _maxLightningMove = _maxLightRainLightningMove;
         }
         else if (newWeather.Equals("med rain"))
         {
@@ -64,6 +79,9 @@ public class LightningManager : MonoBehaviour
             _cooldownMax = _medRainMax;
             _startLightningOdds = _medRainOddsToStart;
             _stopLightningOdds = _medRainOddsToStop;
+            _minLightningMove = _minMedRainLightningMove;
+            _maxLightningMove = _maxMedRainLightningMove;
+
         }
         else if (newWeather.Equals("heavy rain"))
         {
@@ -71,12 +89,16 @@ public class LightningManager : MonoBehaviour
             _cooldownMax = _heavyRainMax;
             _startLightningOdds = _heavyRainOddsToStart;
             _stopLightningOdds = _heavyRainOddsToStop;
+            _minLightningMove = _minHeavyRainLightningMove;
+            _maxLightningMove = _maxHeavyRainLightningMove;
         }
         else
         {
             isRain = false;
             _startLightningOdds = 1.0f;
             _stopLightningOdds = 0f;
+            _minLightningMove = 0f;
+            _maxLightningMove = 0f;
         }
             
 
@@ -105,9 +127,8 @@ public class LightningManager : MonoBehaviour
             else
             {
                 int numberOfFlashes = UnityEngine.Random.Range(2, 6);
-                UpdateLightningDistanceFromPlayer();
-                GetLightningBrightnessFromDistance();
-                GetThunderVolumeFromDistance();
+                
+                GetThunderVolumeFromDistance(DistanceFromPlayer);
                 StartCoroutine(LightningFlash(numberOfFlashes));
                 float lightningCooldown = UnityEngine.Random.Range(_cooldownMin, _cooldownMax);
                 Debug.Log("Delay before LightningFlash: " + lightningCooldown.ToString());
@@ -126,6 +147,7 @@ public class LightningManager : MonoBehaviour
         {
             // lightning flash
             float flashDelay = UnityEngine.Random.Range(0.15f, 0.25f);
+            _lightningLight.intensity = _lightIntensity;
             _lightningLight.enabled = true;
             yield return new WaitForSeconds(flashDelay);
             _lightningLight.enabled = false;
@@ -137,9 +159,12 @@ public class LightningManager : MonoBehaviour
         }
         _lightningFlashing = false;
     }
-    IEnumerator ThunderClap(float soundDelay, int numberOfFlashes)
+    IEnumerator ThunderClap(float dist, int numberOfFlashes)
     {
+        float soundDelay = Mathf.Abs(dist) * 5f;
+        Debug.Log("ThunderClap: delay will be: " + soundDelay.ToString() + " Time: " + Time.time);
         yield return new WaitForSeconds(soundDelay);
+        Debug.Log("ThunderClap: Thunder will play now. Time: " + Time.time);
         // Play thunder sound
     }
     public void CheckIfLightningStartsThisTurn()
@@ -151,11 +176,16 @@ public class LightningManager : MonoBehaviour
             {
                 Debug.Log("CheckIfLightningStartsThisTurn: Lightning will start this turn");
                 IsThereLightning = true;
-                GetInitialLightningDistanceFromPlayer();
-                GetLightningBrightnessFromDistance();
-                GetThunderVolumeFromDistance();
-                _lightningRoutine = StartLightning();
-                StartCoroutine(_lightningRoutine);
+                DistanceFromPlayer = GetInitialLightningDistanceFromPlayer();
+                _lightIntensity = GetLightningBrightnessFromDistance(DistanceFromPlayer);
+                if (_lightningRoutineRunning)
+                {
+                    StopCoroutine(_lightningRoutine);
+                    _lightningRoutineRunning = false;
+                }
+                //_lightningRoutine = StartLightning();
+                //StartCoroutine(_lightningRoutine);
+                StartLightningStrike();
             }
         }
         else
@@ -166,7 +196,23 @@ public class LightningManager : MonoBehaviour
                 IsThereLightning = false;
                 StopCoroutine(_lightningRoutine);
                 _lightningRoutineRunning = false;
+                return;
             }
+
+            // Update lightning distance for each turn
+            DistanceFromPlayer = UpdateLightningDistanceFromPlayer(DistanceFromPlayer);
+            // If the distance is far enough away, end the lightning
+            if (DistanceFromPlayer < -_maxDistanceFromPlayer)
+            {
+                Debug.Log("CheckIfLightningStartsThisTurn: Lightning far enough away to end. Distance: " + DistanceFromPlayer.ToString());
+                IsThereLightning = false;
+                StopCoroutine(_lightningRoutine);
+                _lightningRoutineRunning = false;
+                return;
+            }
+            _lightIntensity = GetLightningBrightnessFromDistance(DistanceFromPlayer);
+            // Start a lightning flash at the beginning of a player's turn so they know the distance of the lightning right away from the sound/brightness of the flash. Then, start a coroutine that runs during their turn. When the turn ends (or when the hit is made?) stop that routine to be resumed during the next turn?
+            StartLightningStrike();
         }
     }
     bool WillLightningStart()
@@ -185,20 +231,45 @@ public class LightningManager : MonoBehaviour
         else
             return false;
     }
-    void GetInitialLightningDistanceFromPlayer()
-    { 
+    float GetInitialLightningDistanceFromPlayer()
+    {
+        return UnityEngine.Random.Range(_startLightningOdds * _maxDistanceFromPlayer, _maxDistanceFromPlayer);
+    }
+    float UpdateLightningDistanceFromPlayer(float currentDist)
+    {
+        return currentDist - UnityEngine.Random.Range(_minLightningMove, _maxLightningMove);
+    }
+    float GetLightningBrightnessFromDistance(float dist)
+    {
+        float distPercent = (_maxDistanceFromPlayer - Mathf.Abs(DistanceFromPlayer)) / _maxDistanceFromPlayer;
+        float intensityRange = _maxLightIntensity - _minLightIntensity;
+        return _minLightIntensity + (intensityRange * distPercent);
+    }
+    void GetThunderVolumeFromDistance(float dist)
+    {
+        dist = Mathf.Abs(dist);
+    }
+    public void LightningForHit()
+    {
+        if (!IsThereLightning)
+            return;
+        //StartCoroutine(RandomWaitForLightningAfterHit());
+        StartLightningStrike();
 
     }
-    void UpdateLightningDistanceFromPlayer()
-    { 
-
+    IEnumerator RandomWaitForLightningAfterHit()
+    {
+        yield return new WaitForSeconds(UnityEngine.Random.Range(0.25f, 1.25f));
+        StartLightningStrike();
     }
-    void GetLightningBrightnessFromDistance()
-    { 
+    void StartLightningStrike()
+    {
+        if (!IsThereLightning)
+            return;
+        int numberOfFlashes = UnityEngine.Random.Range(2, 6);
 
-    }
-    void GetThunderVolumeFromDistance()
-    { 
-
+        GetThunderVolumeFromDistance(DistanceFromPlayer);
+        StartCoroutine(LightningFlash(numberOfFlashes));
+        StartCoroutine(ThunderClap(DistanceFromPlayer, numberOfFlashes));
     }
 }

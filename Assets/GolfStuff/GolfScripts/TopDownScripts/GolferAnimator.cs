@@ -58,4 +58,8 @@ public class GolferAnimator : MonoBehaviour
         else
             _spriteRenderer.flipX = false;
     }
+    public void LightningStrikeForHit()
+    {
+        GameplayManagerTopDownGolf.instance.LightningForPlayerHit();
+    }
 }

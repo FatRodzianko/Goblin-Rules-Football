@@ -440,4 +440,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         Debug.Log("EndGame: AFTER calling TellPlayerGameIsOver time is: " + Time.time.ToString());
 
     }
+    public void LightningForPlayerHit()
+    {
+        _lightningManager.LightningForHit();
+    }
 }
