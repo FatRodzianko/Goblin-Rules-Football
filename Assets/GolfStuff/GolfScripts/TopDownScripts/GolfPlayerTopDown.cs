@@ -53,6 +53,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     public bool IsPlayersTurn = false;
     public bool DirectionAndDistanceChosen = false;
     public bool HasPlayerTeedOff = false;
+    public bool PromptedForLightning = false;
 
     [Header("Hit Meter Objects")]
     [SerializeField] GameObject _hitMeterObject;
@@ -178,6 +179,13 @@ public class GolfPlayerTopDown : MonoBehaviour
             {
                 this.EnablePlayerCanvas(false);
                 GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
+            }
+            else if (PromptedForLightning && GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Backspace))
+            {
+                Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " is skipping their turn due to lightning.");
+                this.EnablePlayerCanvas(false);
+                PlayerScore.StrokePenalty(1);
+                GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(MyBall, true);
             }
             return;
         }
@@ -363,12 +371,12 @@ public class GolfPlayerTopDown : MonoBehaviour
 
         if (_cameraBoundingBox.OverlapPoint(newTargetPos))
         {
-            Debug.Log("ChangeHitDistance: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
+            //Debug.Log("ChangeHitDistance: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
             hitDistance = newDist;
         }
         else
         {
-            Debug.Log("ChangeHitDistance: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
+            //Debug.Log("ChangeHitDistance: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
             return;
         }
         // old way
@@ -1338,6 +1346,10 @@ public class GolfPlayerTopDown : MonoBehaviour
         this.HasPlayerTeedOff = false;
         // reset the ball being in the hole
         MyBall.IsInHole = false;
+    }
+    public void LightningOnTurn()
+    {
+        PromptedForLightning = true;
     }
 
 }

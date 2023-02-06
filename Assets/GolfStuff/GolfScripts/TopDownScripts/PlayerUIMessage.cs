@@ -12,6 +12,7 @@ public class PlayerUIMessage : MonoBehaviour
     [SerializeField] const string _startTurn = "Press Space to Start Turn";
     [SerializeField] const string _water = "Water...\n+1 Stroke Penalty";
     [SerializeField] const string _outOfBounds = "Out of bounds...\n+1 Stroke Penalty";
+    [SerializeField] const string _lightningOnTurn = "Lightning in area.\n\nPress Backspace to skip 1 turn with +1 penalty.\n\nPress Space to start turn now.";
 
     // Start is called before the first frame update
     void Start()
@@ -45,6 +46,10 @@ public class PlayerUIMessage : MonoBehaviour
         else if (message.Contains("ground:"))
         {
             DisplayGroundType(message);
+        }
+        else if (message == "lightning")
+        {
+            LightningOnTurn();
         }
         else if (message == "hole ended")
         {
@@ -125,5 +130,10 @@ public class PlayerUIMessage : MonoBehaviour
         }
         int overUnderPar = _golfPlayerScore.TotalStrokesForCourse - parForCourse;
         _playerMessageText.text = _myPlayer.PlayerName + " score for course: " + _golfPlayerScore.TotalStrokesForCourse.ToString() + "\nPar for course: " + parForCourse.ToString() + "\nOver/Under Par: " + overUnderPar.ToString();
+    }
+    void LightningOnTurn()
+    {
+        _playerMessageText.text = _lightningOnTurn;
+        _myPlayer.LightningOnTurn();
     }
 }

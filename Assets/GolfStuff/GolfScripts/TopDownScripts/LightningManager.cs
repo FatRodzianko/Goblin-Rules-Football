@@ -194,8 +194,11 @@ public class LightningManager : MonoBehaviour
             {
                 Debug.Log("CheckIfLightningStartsThisTurn: Lightning will STOP this turn");
                 IsThereLightning = false;
-                StopCoroutine(_lightningRoutine);
-                _lightningRoutineRunning = false;
+                if (_lightningRoutineRunning)
+                {
+                    StopCoroutine(_lightningRoutine);
+                    _lightningRoutineRunning = false;
+                }
                 return;
             }
 

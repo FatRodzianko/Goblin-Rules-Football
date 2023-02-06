@@ -31,9 +31,10 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] public List<GolfPlayerTopDown> GolfPlayers = new List<GolfPlayerTopDown>();
     public List<GolfPlayerTopDown> GolfPlayersInTeeOffOrder = new List<GolfPlayerTopDown>();
     [SerializeField] int _numberOfPlayersTeedOff = 0;
+    [SerializeField] int _teeOffOrder = 0;
     [SerializeField] int _numberOfPlayersInHole = 0;
     [SerializeField] float _lastBallInHoleTime = 0f;
-    bool _haveAllPlayersTeedOff = false;
+    [SerializeField] bool _haveAllPlayersTeedOff = false;
     public GolfPlayerTopDown CurrentPlayer;
 
     [Header("Weather Effects")]
@@ -124,6 +125,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     void ResetNumberOfPlayersWhoHaveTeedOff()
     {
         _numberOfPlayersTeedOff = 0;
+        _haveAllPlayersTeedOff = false;
     }
     async void LoadNewHole(int index)
     {
@@ -164,7 +166,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             GolfPlayersInTeeOffOrder = GolfPlayers;
         else
         {
-            GolfPlayersInTeeOffOrder = GolfPlayers.OrderByDescending(x => x.PlayerScore).ToList();
+            GolfPlayersInTeeOffOrder = GolfPlayers.OrderByDescending(x => x.PlayerScore.TotalStrokesForCourse).ToList();
         }
     }
     void SetCurrentPlayer(GolfPlayerTopDown player)
@@ -196,7 +198,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         player.SetCameraOnPlayer();
     }
-    public async void StartNextPlayersTurn(GolfBallTopDown ball)
+    public async void StartNextPlayersTurn(GolfBallTopDown ball, bool playerSkippingForLightning = false)
     {
         Debug.Log("GameplayManager: StartNextPlayersTurn: executing...");
 
@@ -252,22 +254,47 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
                 Debug.Log("GameplayManager: StartNextPlayersTurn: All players have made it into the hole. No more remaining players! And this was the last hole! Ending the game...");
                 EndGame();
             }
-                
-
             return;
         }
-        // Set the new wind for the next turn
-        WindManager.instance.UpdateWindForNewTurn();
-        WindManager.instance.UpdateWindDirectionForNewTurn();
-        // Set new weather for the next turn
-        RainManager.instance.UpdateWeatherForNewTurn();
-        _lightningManager.CheckIfLightningStartsThisTurn();
+        // Set the weather for the next turn
+        SetWeatherForNextTurn();
         // Find the next player based on tee off position, or by furthest player from hole if all players teed off
-        CurrentPlayer = SelectNextPlayer();
+        if (playerSkippingForLightning)
+        {
+            Debug.Log("GameplayManagerTopDownGolf: StartNextPlayersTurn: Player: " + ball.MyPlayer.PlayerName + " skipping for next turn due to lightning.");
+            // Skip the current player's turn. Find the next player up based on tee off order, or distance to hole. If no other players are left, then this player stays as current player
+            if (_numberOfPlayersInHole == GolfPlayers.Count - 1)
+            {
+                // If the only player who hasn't made it in the hole is this player, they stay as the current player
+                CurrentPlayer = ball.MyPlayer;
+            }
+            else
+            {
+                // If players still have not teed off, remove this player from GolfPlayersInTeeOffOrder, then add them back at the end of the list
+                if (!_haveAllPlayersTeedOff)
+                {
+                    if (!HaveAllPlayersTeedOff())
+                    {
+                        MovePlayerToBackOfTeeOffOrder(ball.MyPlayer);
+                        CurrentPlayer = GolfPlayersInTeeOffOrder[_numberOfPlayersTeedOff];
+                    }
+                }
+                else
+                { 
+                    // If all players have teed off, find the next furthest away player
+
+                    // Once a player has skipped a turn, create an ordered list of players by their distance to the hole. Add the player who just skipped to the end of the list. Everyone takes their turn based on that list until all players have had a turn to either hit or skip turn. Once all players either choose skip/hit and the list makes it back to the first player who skipped, then reset a "player has skipped turn" value and calculate next player normally based on just distance
+                    // all of the above is just to make sure that if a player skips their turn, and then the next player goes, it doesn't just go back to the player who skipped (who will still be the furthest away from the hole), penalizing them continuously for their turn taken place near a lightning storm
+                }
+
+            }
+        }
+        else
+        {
+            CurrentPlayer = SelectNextPlayer();
+        }
         // Prompt player to start their turn
-        CurrentPlayer.PlayerUIMessage("start turn");
-        CurrentPlayer.EnablePlayerCanvas(true);
-        UpdateUIForCurrentPlayer(CurrentPlayer);
+        PromptPlayerForNextTurn();
     }
     /*async void TellPlayerGroundBallIsOn(GolfBallTopDown ball)
     {
@@ -406,11 +433,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos);
         // update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
-        // Set the new wind for the next turn
-        WindManager.instance.UpdateWindForNewTurn();
-        WindManager.instance.UpdateWindDirectionForNewTurn();
-        // Set new weather for the next turn
-        RainManager.instance.UpdateWeatherForNewTurn();
+        // Set the weather for the next turn
+        SetWeatherForNextTurn();
         // Sort the players by lowest score to start the hole
         OrderListOfPlayers();
         // Set the current player
@@ -420,7 +444,27 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Set the camera on the current player
         SetCameraOnPlayer(CurrentPlayer);
         // Prompt player to start their turn
-        CurrentPlayer.PlayerUIMessage("start turn");
+        PromptPlayerForNextTurn();
+    }
+    void SetWeatherForNextTurn()
+    {
+        // Set the new wind for the next turn
+        WindManager.instance.UpdateWindForNewTurn();
+        WindManager.instance.UpdateWindDirectionForNewTurn();
+        // Set new weather for the next turn
+        RainManager.instance.UpdateWeatherForNewTurn();
+        _lightningManager.CheckIfLightningStartsThisTurn();
+    }
+    void PromptPlayerForNextTurn()
+    {
+        if (_lightningManager.IsThereLightning)
+        {
+            CurrentPlayer.PlayerUIMessage("lightning");
+        }
+        else
+        {
+            CurrentPlayer.PlayerUIMessage("start turn");
+        }
         CurrentPlayer.EnablePlayerCanvas(true);
         UpdateUIForCurrentPlayer(CurrentPlayer);
     }
@@ -443,5 +487,10 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     public void LightningForPlayerHit()
     {
         _lightningManager.LightningForHit();
+    }
+    public void MovePlayerToBackOfTeeOffOrder(GolfPlayerTopDown player)
+    {
+        GolfPlayersInTeeOffOrder.Remove(player);
+        GolfPlayersInTeeOffOrder.Add(player);
     }
 }
