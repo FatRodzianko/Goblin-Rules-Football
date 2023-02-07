@@ -18,7 +18,7 @@ public class GolferAnimator : MonoBehaviour
     [Header("Player Owner")]
     [SerializeField] GolfPlayerTopDown _myPlayer;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         _myPlayer = this.transform.parent.GetComponent<GolfPlayerTopDown>();
         _spriteRenderer = this.GetComponent<SpriteRenderer>();
@@ -61,5 +61,9 @@ public class GolferAnimator : MonoBehaviour
     public void LightningStrikeForHit()
     {
         GameplayManagerTopDownGolf.instance.LightningForPlayerHit();
+    }
+    public void EnablePlayerSprite(bool enable)
+    {
+        _spriteRenderer.enabled = enable;
     }
 }

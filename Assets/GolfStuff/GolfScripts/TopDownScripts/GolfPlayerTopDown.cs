@@ -181,9 +181,9 @@ public class GolfPlayerTopDown : MonoBehaviour
                 this.EnablePlayerCanvas(false);
                 GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
             }
-            else if (PromptedForLightning && GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Backspace))
+            else if (PromptedForLightning && GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Backspace) && Time.time >= (GameplayManagerTopDownGolf.instance.TimeSinceLastSkip + 0.15f))
             {
-                Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " is skipping their turn due to lightning.");
+                Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " is skipping their turn due to lightning. At time of: " + Time.time.ToString() + " and last skip was: " + GameplayManagerTopDownGolf.instance.TimeSinceLastSkip.ToString());
                 this.EnablePlayerCanvas(false);
                 PlayerScore.StrokePenalty(1);
                 GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(MyBall, true);
@@ -455,7 +455,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         //this.transform.position = new Vector3(cameraPos.x, cameraPos.y, 0f);
         //AttachPlayerToCamera(true, myCamera.transform);
     }
-    void SetPlayerOnBall()
+    public void SetPlayerOnBall()
     {
         this.transform.position = MyBall.transform.position;
     }
@@ -1229,10 +1229,15 @@ public class GolfPlayerTopDown : MonoBehaviour
     
     public void EnablePlayerCanvas(bool enable)
     {
+        Debug.Log("EnablePlayerCanvas: " + enable + " for player: " + this.PlayerName);
         _playerCanvas.gameObject.SetActive(enable);
     }
     public void PlayerUIMessage(string message)
     {
+        if (message == "lightning")
+            PromptedForLightning = true;
+        else if (message == "start turn")
+            PromptedForLightning = false;
         _playerUIMessage.UpdatePlayerMessageText(message);
     }
     public async Task TellPlayerGroundTheyLandedOn(float duration)
@@ -1361,5 +1366,9 @@ public class GolfPlayerTopDown : MonoBehaviour
         Vector3 ballPos = MyBall.transform.position; 
         GameObject closestHole = FindClosestHole(ballPos);
         DistanceToHole = GetDistanceToHole(closestHole, ballPos);
+    }
+    public void EnablePlayerSprite(bool enable)
+    {
+        _golfAnimator.EnablePlayerSprite(enable);
     }
 }

@@ -114,7 +114,7 @@ public class BallSpriteCollision : MonoBehaviour
                     _spriteRenderer.sortingOrder = collisionOrderInLayer + 2;
                     //_trailRenderer.sortingOrder = _spriteRenderer.sortingOrder -1;
                 }
-                //Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Increasing BALL SPRITE sorting order to: " + _spriteRenderer.sortingOrder.ToString());
+                //Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Increasing BALL SPRITE sorting order to: " + _spriteRenderer.sortingOrder.ToString()); 
             }
             else if (collision.transform.position.y <= _shadowObject.transform.position.y  && collisionRenderer.sortingOrder <= _spriteRenderer.sortingOrder && !spriteCollision.MySpriteMask.enabled)
             {

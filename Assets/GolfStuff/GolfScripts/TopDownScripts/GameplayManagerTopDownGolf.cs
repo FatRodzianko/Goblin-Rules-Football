@@ -56,6 +56,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] public bool PlayerHasSkippedTurn = false;
     [SerializeField] public List<GolfPlayerTopDown> TurnOrderForLightningSkips = new List<GolfPlayerTopDown>();
     [SerializeField] public int TurnsSinceSkip = 0;
+    public float TimeSinceLastSkip = 0f;
 
     private void Awake()
     {
@@ -105,6 +106,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         SetCurrentPlayer(GolfPlayersInTeeOffOrder[0]);
         // Move the first player to the tee off location
         MovePlayerToTeeOffLocation(CurrentPlayer);
+        // Diable sprite of players that are not the current player
+        EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
         // Set the camera on the current player
         SetCameraOnPlayer(CurrentPlayer);
         // Prompt player to start their turn
@@ -214,7 +217,17 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     }
     public async void StartNextPlayersTurn(GolfBallTopDown ball, bool playerSkippingForLightning = false)
     {
-        Debug.Log("GameplayManager: StartNextPlayersTurn: executing... playerSkippingForLightning: " + playerSkippingForLightning.ToString());
+        Debug.Log("GameplayManager: StartNextPlayersTurn: executing... from player: " + ball.MyPlayer.PlayerName + " playerSkippingForLightning: " + playerSkippingForLightning.ToString());
+        if (playerSkippingForLightning && Time.time < TimeSinceLastSkip + 0.15f)
+        {
+            Debug.Log("GameplayManager: StartNextPlayersTurn: playerSkippingForLightning: " + playerSkippingForLightning.ToString() + " current time is: " + Time.time + " and last skip was: " + TimeSinceLastSkip.ToString() + " SKIPPING this StartNextPlayersTurn call...");
+            return;
+        }
+        else if (playerSkippingForLightning && Time.time >= TimeSinceLastSkip + 0.15f)
+        {
+            Debug.Log("GameplayManager: StartNextPlayersTurn: playerSkippingForLightning: " + playerSkippingForLightning.ToString() + " current time is: " + Time.time + " and last skip was: " + TimeSinceLastSkip.ToString() + " will continue with this StartNextPlayersTurn call...");
+            TimeSinceLastSkip = Time.time;
+        }
 
         // Check if the ball is out-of-bounds. If so, move ball back in bounds before selecting next player
         /*GetCameraBoundingBox();
@@ -256,6 +269,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Check if any players still have to hit a ball
         if (_numberOfPlayersInHole >= GolfPlayers.Count)
         {
+            if(PlayerHasSkippedTurn)
+                ResetLightningSkipInfo();
 
             if ((CurrentHoleIndex + 1) < CurrentCourse.HolesInCourse.Length)
             {
@@ -304,22 +319,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
 
                 if (PlayerHasSkippedTurn)
                 {
-                    /*Debug.Log("StartNextPlayersTurn: Player: " + ball.MyPlayer.PlayerName + " has skipped for lightning. They are not the first to do so.");
-                    if (TurnOrderForLightningSkips.Contains(ball.MyPlayer))
-                        TurnOrderForLightningSkips.Remove(ball.MyPlayer);
-                    if (TurnOrderForLightningSkips.Count > 0)
-                    {
-                        CurrentPlayer = TurnOrderForLightningSkips[0];
-                        Debug.Log("StartNextPlayersTurn: " + TurnOrderForLightningSkips.Count.ToString() + " players remaining in TurnOrderForLightningSkips. Setting player: " + CurrentPlayer.PlayerName + " as the next player");
-                    }
-                    else
-                    {
-                        ResetLightningSkipInfo();
-                        CurrentPlayer = SelectNextPlayer();
-                        Debug.Log("StartNextPlayersTurn: TurnOrderForLightningSkips should be zero. It is: " + TurnOrderForLightningSkips.Count.ToString() + ". Resetting info and setting current player as normally would. Current Player is: " + CurrentPlayer.PlayerName);
-                    }*/
-                    GetNextPlayerFromLightningSkipList(ball.MyPlayer);
-
+                    GetNextPlayerFromLightningSkipList(ball.MyPlayer, playerSkippingForLightning);
                 }
                 else // For the first player skip for lightning, create the TurnOrderForLightningSkips list that will be used to track turn order after the skip
                 {
@@ -341,24 +341,30 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
                     // Make sure that the current user is at the end of the TurnOrderForLightningSkips list by removing them and then adding them back to the list
                     if (TurnOrderForLightningSkips.Contains(ball.MyPlayer))
                         TurnOrderForLightningSkips.Remove(ball.MyPlayer);
-                    TurnOrderForLightningSkips.Add(ball.MyPlayer);
+                    //TurnOrderForLightningSkips.Add(ball.MyPlayer);
 
                     CurrentPlayer = TurnOrderForLightningSkips[0];
                 }
             }
         }
-        else if (PlayerHasSkippedTurn)
+        else if (!playerSkippingForLightning && PlayerHasSkippedTurn)
         {
             Debug.Log("StartNextPlayersTurn: Player did not skip for lightning but PlayerHasSkippedTurn was true before their turn.");
-            GetNextPlayerFromLightningSkipList(ball.MyPlayer);
+            GetNextPlayerFromLightningSkipList(ball.MyPlayer, playerSkippingForLightning);
         }
         else
         {
             CurrentPlayer = SelectNextPlayer();
         }
-        // Move the player too the tee off location if they haven't teed off yet
-        if(!CurrentPlayer.HasPlayerTeedOff)
+        // Move the player too the tee off location if they haven't teed off yet. Otherwise, move them to their ball object
+        if (!CurrentPlayer.HasPlayerTeedOff)
             MovePlayerToTeeOffLocation(CurrentPlayer);
+        else
+            CurrentPlayer.SetPlayerOnBall();
+        // Diable sprite of players that are not the current player
+        EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
+        // Move the camera to the player
+        SetCameraOnPlayer(CurrentPlayer);
         // Prompt player to start their turn
         PromptPlayerForNextTurn();
     }
@@ -515,6 +521,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         SetCurrentPlayer(GolfPlayersInTeeOffOrder[0]);
         // Move the first player to the tee off location
         MovePlayerToTeeOffLocation(CurrentPlayer);
+        // Diable sprite of players that are not the current player
+        EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
         // Set the camera on the current player
         SetCameraOnPlayer(CurrentPlayer);
         // Prompt player to start their turn
@@ -531,6 +539,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     }
     void PromptPlayerForNextTurn()
     {
+        Debug.Log("PromptPlayerForNextTurn: For player: " + CurrentPlayer.PlayerName);
         if (_lightningManager.IsThereLightning)
         {
             CurrentPlayer.PlayerUIMessage("lightning");
@@ -590,7 +599,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         playersByDistance = playersByDistance.OrderByDescending(x => x.DistanceToHole).ToList();
         return playersByDistance;
     }
-    void GetNextPlayerFromLightningSkipList(GolfPlayerTopDown playerToRemove)
+    void GetNextPlayerFromLightningSkipList(GolfPlayerTopDown playerToRemove, bool didThisPlayerSkip)
     {
         Debug.Log("GetNextPlayerFromLightningSkipList: Player: " + playerToRemove.PlayerName + " has skipped for lightning. They are not the first to do so.");
         if (TurnOrderForLightningSkips.Contains(playerToRemove))
@@ -605,6 +614,16 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             ResetLightningSkipInfo();
             CurrentPlayer = SelectNextPlayer();
             Debug.Log("GetNextPlayerFromLightningSkipList: TurnOrderForLightningSkips should be zero. It is: " + TurnOrderForLightningSkips.Count.ToString() + ". Resetting info and setting current player as normally would. Current Player is: " + CurrentPlayer.PlayerName);
+        }
+    }
+    void EnableAndDisablePlayerSpritesForNewTurn(GolfPlayerTopDown playerToEnable)
+    {
+        foreach (GolfPlayerTopDown player in GolfPlayers)
+        {
+            if (player == playerToEnable)
+                player.EnablePlayerSprite(true);
+            else
+                player.EnablePlayerSprite(false);
         }
     }
 }

@@ -4977,7 +4977,7 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -5098,7 +5098,7 @@ GameObject:
   - component: {fileID: 4414391001200824294}
   - component: {fileID: 578994876}
   - component: {fileID: 578994875}
-  m_Layer: 0
+  m_Layer: 29
   m_Name: GolfBallTopDown
   m_TagString: golfBall
   m_Icon: {fileID: 0}
@@ -5268,7 +5268,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!58 &578994875
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -5280,7 +5280,7 @@ CircleCollider2D:
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_UsedByEffector: 0
+  m_UsedByEffector: 1
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2

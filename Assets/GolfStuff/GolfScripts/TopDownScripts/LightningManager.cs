@@ -229,6 +229,7 @@ public class LightningManager : MonoBehaviour
     bool WillLightningStop()
     {
         float chance = UnityEngine.Random.Range(0f, 1f);
+        Debug.Log("WillLightningStop: Chance is: " + chance.ToString() + " against stop odds of: " + _stopLightningOdds.ToString());
         if (chance > _stopLightningOdds)
             return true;
         else
@@ -257,6 +258,13 @@ public class LightningManager : MonoBehaviour
         if (!IsThereLightning)
             return;
         //StartCoroutine(RandomWaitForLightningAfterHit());
+        // check if the player should be struck by lightning
+        if (WillPlayerBeStruckByLightning())
+        {
+            Debug.Log("WillPlayerBeStruckByLightning: Yes!!!");
+            DistanceFromPlayer = 0f;
+            _lightIntensity = GetLightningBrightnessFromDistance(DistanceFromPlayer);
+        }
         StartLightningStrike();
 
     }
@@ -274,5 +282,9 @@ public class LightningManager : MonoBehaviour
         GetThunderVolumeFromDistance(DistanceFromPlayer);
         StartCoroutine(LightningFlash(numberOfFlashes));
         StartCoroutine(ThunderClap(DistanceFromPlayer, numberOfFlashes));
+    }
+    bool WillPlayerBeStruckByLightning()
+    {
+        return UnityEngine.Random.Range(0f, 1.0f) > DistanceFromPlayer;
     }
 }

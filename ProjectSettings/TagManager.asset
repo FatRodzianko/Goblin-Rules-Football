@@ -78,7 +78,7 @@ TagManager:
   - golfHole
   - golfEnvironmentObstacles
   - spriteCollisions
-  - 
+  - golfBall
   - 
   - 
   m_SortingLayers:

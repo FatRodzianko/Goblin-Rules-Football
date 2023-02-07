@@ -132,6 +132,7 @@ https://www.globalgolf.com/articles/pro-tip-61/
 
 GolfEnvironmentObstacles
 
-- Deactivate player sprite if it is not their turn. Reactivate when their turn starts aka when they become CurrentPlayer
-- - - Recenter the camera on the player's ball/player sprite when they become the Current player
-- - - Maybe have a slight delay when about to change turns to new player so the camera doesn't immediately change before the player who hits can see where their ball settled
+x Deactivate player sprite if it is not their turn. Reactivate when their turn starts aka when they become CurrentPlayer
+- - x Recenter the camera on the player's ball/player sprite when they become the Current player
+- - x Maybe have a slight delay when about to change turns to new player so the camera doesn't immediately change before the player who hits can see where their ball settled
+- - - - - x this was already being done with the "tell player the ground type they are on" function...
