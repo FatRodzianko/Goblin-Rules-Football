@@ -52,7 +52,10 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] Canvas _loadingHoleCanvas;
     [SerializeField] Canvas _holeInfoCanvas;
 
-    
+    [Header("Skip For Lightning Info")]
+    [SerializeField] public bool PlayerHasSkippedTurn = false;
+    [SerializeField] public List<GolfPlayerTopDown> TurnOrderForLightningSkips = new List<GolfPlayerTopDown>();
+    [SerializeField] public int TurnsSinceSkip = 0;
 
     private void Awake()
     {
@@ -126,6 +129,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         _numberOfPlayersTeedOff = 0;
         _haveAllPlayersTeedOff = false;
+        GolfPlayersInTeeOffOrder.Clear();
     }
     async void LoadNewHole(int index)
     {
@@ -163,10 +167,14 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     void OrderListOfPlayers()
     {
         if (CurrentHoleIndex == 0)
-            GolfPlayersInTeeOffOrder = GolfPlayers;
+        {
+            GolfPlayersInTeeOffOrder.Clear();
+            GolfPlayersInTeeOffOrder.AddRange(GolfPlayers);
+        }   
         else
         {
-            GolfPlayersInTeeOffOrder = GolfPlayers.OrderByDescending(x => x.PlayerScore.TotalStrokesForCourse).ToList();
+            GolfPlayersInTeeOffOrder.Clear();
+            GolfPlayersInTeeOffOrder.AddRange(GolfPlayers.OrderByDescending(x => x.PlayerScore.TotalStrokesForCourse).ToList());
         }
     }
     void SetCurrentPlayer(GolfPlayerTopDown player)
@@ -183,9 +191,15 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         player.MyBall.ResetBallSpriteForNewHole();
         
     }
-    public void PlayerTeedOff()
+    public void PlayerTeedOff(GolfPlayerTopDown submittingPlayer)
     {
+        Debug.Log("PlayerTeedOff: Count of all players: " + GolfPlayers.Count.ToString() + " count of Players in tee off order: " + GolfPlayersInTeeOffOrder.Count.ToString());
         _numberOfPlayersTeedOff++;
+        GolfPlayersInTeeOffOrder.Remove(submittingPlayer);
+        Debug.Log("PlayerTeedOff: After doing GolfPlayersInTeeOffOrder.Remove(submittingPlayer): Count of all players: " + GolfPlayers.Count.ToString() + " count of Players in tee off order: " + GolfPlayersInTeeOffOrder.Count.ToString());
+        _haveAllPlayersTeedOff = HaveAllPlayersTeedOff();
+        Debug.Log("PlayerTeedOff: After doing _haveAllPlayersTeedOff = HaveAllPlayersTeedOff(): Count of all players: " + GolfPlayers.Count.ToString() + " count of Players in tee off order: " + GolfPlayersInTeeOffOrder.Count.ToString());
+
     }
     public void StartCurrentPlayersTurn(GolfPlayerTopDown requestingPlayer)
     {
@@ -200,7 +214,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     }
     public async void StartNextPlayersTurn(GolfBallTopDown ball, bool playerSkippingForLightning = false)
     {
-        Debug.Log("GameplayManager: StartNextPlayersTurn: executing...");
+        Debug.Log("GameplayManager: StartNextPlayersTurn: executing... playerSkippingForLightning: " + playerSkippingForLightning.ToString());
 
         // Check if the ball is out-of-bounds. If so, move ball back in bounds before selecting next player
         /*GetCameraBoundingBox();
@@ -231,7 +245,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         }
         
         //TellPlayerGroundBallIsOn(ball);
-        if (!ball.IsInHole)
+        if (!ball.IsInHole && !playerSkippingForLightning)
         {  
             Debug.Log("StartNextPlayersTurn: Calling TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
             await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
@@ -266,12 +280,13 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             if (_numberOfPlayersInHole == GolfPlayers.Count - 1)
             {
                 // If the only player who hasn't made it in the hole is this player, they stay as the current player
+                Debug.Log("StartNextPlayersTurn: Skip For Lighning next player will be: Player: " + ball.MyPlayer.PlayerName + " because they are the only player not in the hole.");
                 CurrentPlayer = ball.MyPlayer;
             }
             else
             {
                 // If players still have not teed off, remove this player from GolfPlayersInTeeOffOrder, then add them back at the end of the list
-                if (!_haveAllPlayersTeedOff)
+                /*if (!_haveAllPlayersTeedOff)
                 {
                     if (!HaveAllPlayersTeedOff())
                     {
@@ -285,14 +300,65 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
 
                     // Once a player has skipped a turn, create an ordered list of players by their distance to the hole. Add the player who just skipped to the end of the list. Everyone takes their turn based on that list until all players have had a turn to either hit or skip turn. Once all players either choose skip/hit and the list makes it back to the first player who skipped, then reset a "player has skipped turn" value and calculate next player normally based on just distance
                     // all of the above is just to make sure that if a player skips their turn, and then the next player goes, it doesn't just go back to the player who skipped (who will still be the furthest away from the hole), penalizing them continuously for their turn taken place near a lightning storm
-                }
+                }*/
 
+                if (PlayerHasSkippedTurn)
+                {
+                    /*Debug.Log("StartNextPlayersTurn: Player: " + ball.MyPlayer.PlayerName + " has skipped for lightning. They are not the first to do so.");
+                    if (TurnOrderForLightningSkips.Contains(ball.MyPlayer))
+                        TurnOrderForLightningSkips.Remove(ball.MyPlayer);
+                    if (TurnOrderForLightningSkips.Count > 0)
+                    {
+                        CurrentPlayer = TurnOrderForLightningSkips[0];
+                        Debug.Log("StartNextPlayersTurn: " + TurnOrderForLightningSkips.Count.ToString() + " players remaining in TurnOrderForLightningSkips. Setting player: " + CurrentPlayer.PlayerName + " as the next player");
+                    }
+                    else
+                    {
+                        ResetLightningSkipInfo();
+                        CurrentPlayer = SelectNextPlayer();
+                        Debug.Log("StartNextPlayersTurn: TurnOrderForLightningSkips should be zero. It is: " + TurnOrderForLightningSkips.Count.ToString() + ". Resetting info and setting current player as normally would. Current Player is: " + CurrentPlayer.PlayerName);
+                    }*/
+                    GetNextPlayerFromLightningSkipList(ball.MyPlayer);
+
+                }
+                else // For the first player skip for lightning, create the TurnOrderForLightningSkips list that will be used to track turn order after the skip
+                {
+                    Debug.Log("StartNextPlayersTurn: First player to skip turn for lightning. Player: " + ball.MyPlayer.PlayerName);
+                    // Reset Lightning Skip player list just in case
+                    ResetLightningSkipInfo();
+                    PlayerHasSkippedTurn = true;
+                    // Check to see if there are any players who haven't teed off yet. If there are, add them to the TurnOrderForLightningSkips list
+                    if (!_haveAllPlayersTeedOff)
+                    {
+                        TurnOrderForLightningSkips.AddRange(GolfPlayersInTeeOffOrder);
+                    }
+                    // if the skip isn't from the first player to tee off, or all players have teed off, then create a list of users based on their distance from the hole to set turn order for TurnOrderForLightningSkips
+                    if (TurnOrderForLightningSkips.Count != GolfPlayers.Count)
+                    {
+                        TurnOrderForLightningSkips.AddRange(SortPlayersByDistanceToHole());
+                    }
+
+                    // Make sure that the current user is at the end of the TurnOrderForLightningSkips list by removing them and then adding them back to the list
+                    if (TurnOrderForLightningSkips.Contains(ball.MyPlayer))
+                        TurnOrderForLightningSkips.Remove(ball.MyPlayer);
+                    TurnOrderForLightningSkips.Add(ball.MyPlayer);
+
+                    CurrentPlayer = TurnOrderForLightningSkips[0];
+                }
             }
+        }
+        else if (PlayerHasSkippedTurn)
+        {
+            Debug.Log("StartNextPlayersTurn: Player did not skip for lightning but PlayerHasSkippedTurn was true before their turn.");
+            GetNextPlayerFromLightningSkipList(ball.MyPlayer);
         }
         else
         {
             CurrentPlayer = SelectNextPlayer();
         }
+        // Move the player too the tee off location if they haven't teed off yet
+        if(!CurrentPlayer.HasPlayerTeedOff)
+            MovePlayerToTeeOffLocation(CurrentPlayer);
         // Prompt player to start their turn
         PromptPlayerForNextTurn();
     }
@@ -306,7 +372,9 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         {
             if (!HaveAllPlayersTeedOff())
             {
-                return GolfPlayersInTeeOffOrder[_numberOfPlayersTeedOff];
+                //return GolfPlayersInTeeOffOrder[_numberOfPlayersTeedOff];
+                Debug.Log("SelectNextPlayer: Returning from tee order");
+                return GolfPlayersInTeeOffOrder[0];
             }
         }
 
@@ -314,7 +382,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     }
     bool HaveAllPlayersTeedOff()
     {
-        if (_numberOfPlayersTeedOff < GolfPlayersInTeeOffOrder.Count)
+        if (_numberOfPlayersTeedOff < GolfPlayers.Count)
             return false;
         else
         {
@@ -324,6 +392,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     }
     GolfPlayerTopDown FindPlayerFurthestFromHole()
     {
+        Debug.Log("FindPlayerFurthestFromHole: executing...");
         float furthestDistance = 0f;
         GolfPlayerTopDown currentClosestPlayer = CurrentPlayer;
         foreach (GolfPlayerTopDown player in GolfPlayers)
@@ -347,10 +416,15 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
                         playerDistanceToHole = thisDistance;
                 }
             }
-
+            
             if (playerDistanceToHole > furthestDistance)
+            {
                 currentClosestPlayer = player;
+                furthestDistance = playerDistanceToHole;
+            }
+            Debug.Log("FindPlayerFurthestFromHole: Checking for player: " + player.PlayerName + " player distance to hole is: " + playerDistanceToHole.ToString() + " furthest distance so far is: " + furthestDistance.ToString());
         }
+        Debug.Log("FindPlayerFurthestFromHole: Returning player: " + currentClosestPlayer.PlayerName);
         return currentClosestPlayer;
     }
     public void ResetCurrentPlayer()
@@ -492,5 +566,45 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         GolfPlayersInTeeOffOrder.Remove(player);
         GolfPlayersInTeeOffOrder.Add(player);
+    }
+    void ResetLightningSkipInfo()
+    {
+        PlayerHasSkippedTurn = false;
+        TurnOrderForLightningSkips.Clear();
+        TurnsSinceSkip = 0;
+    }
+    List<GolfPlayerTopDown> SortPlayersByDistanceToHole()
+    {
+        List<GolfPlayerTopDown> playersByDistance = new List<GolfPlayerTopDown>();
+
+        foreach (GolfPlayerTopDown player in GolfPlayers)
+        {
+            if (player.MyBall.IsInHole)
+                continue;
+            if (!player.HasPlayerTeedOff)
+                continue;
+            player.SetDistanceToHoleForPlayer();
+            playersByDistance.Add(player);
+        }
+
+        playersByDistance = playersByDistance.OrderByDescending(x => x.DistanceToHole).ToList();
+        return playersByDistance;
+    }
+    void GetNextPlayerFromLightningSkipList(GolfPlayerTopDown playerToRemove)
+    {
+        Debug.Log("GetNextPlayerFromLightningSkipList: Player: " + playerToRemove.PlayerName + " has skipped for lightning. They are not the first to do so.");
+        if (TurnOrderForLightningSkips.Contains(playerToRemove))
+            TurnOrderForLightningSkips.Remove(playerToRemove);
+        if (TurnOrderForLightningSkips.Count > 0)
+        {
+            CurrentPlayer = TurnOrderForLightningSkips[0];
+            Debug.Log("GetNextPlayerFromLightningSkipList: " + TurnOrderForLightningSkips.Count.ToString() + " players remaining in TurnOrderForLightningSkips. Setting player: " + CurrentPlayer.PlayerName + " as the next player");
+        }
+        else
+        {
+            ResetLightningSkipInfo();
+            CurrentPlayer = SelectNextPlayer();
+            Debug.Log("GetNextPlayerFromLightningSkipList: TurnOrderForLightningSkips should be zero. It is: " + TurnOrderForLightningSkips.Count.ToString() + ". Resetting info and setting current player as normally would. Current Player is: " + CurrentPlayer.PlayerName);
+        }
     }
 }

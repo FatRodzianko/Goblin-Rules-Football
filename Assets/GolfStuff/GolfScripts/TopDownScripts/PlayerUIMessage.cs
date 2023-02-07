@@ -29,7 +29,7 @@ public class PlayerUIMessage : MonoBehaviour
     {
         if (message == "start turn")
         {
-            _playerMessageText.text = _startTurn;
+            _playerMessageText.text = _myPlayer.PlayerName + " " + _startTurn;
         }
         else if (message == "water")
         {
@@ -133,7 +133,7 @@ public class PlayerUIMessage : MonoBehaviour
     }
     void LightningOnTurn()
     {
-        _playerMessageText.text = _lightningOnTurn;
+        _playerMessageText.text = _myPlayer.PlayerName + " " + _lightningOnTurn;
         _myPlayer.LightningOnTurn();
     }
 }

@@ -17,6 +17,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     [Header("Golf Ball Stuff")]
     [SerializeField] GameObject _golfBallPrefab;
     [SerializeField] public GolfBallTopDown MyBall;
+    public float DistanceToHole;
 
 
     [Header("Hit Values")]
@@ -723,8 +724,12 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     public void SubmitHitToBall()
     {
-        if (this.PlayerScore.StrokesForCurrentHole == 0)
-            GameplayManagerTopDownGolf.instance.PlayerTeedOff();
+        if (!this.HasPlayerTeedOff)
+        {
+            GameplayManagerTopDownGolf.instance.PlayerTeedOff(this);
+            this.HasPlayerTeedOff = true;
+        }
+            
         this.PlayerScore.PlayerHitBall();
         GameplayManagerTopDownGolf.instance.ResetCurrentPlayer();
         //GameplayManagerTopDownGolf.instance.LightningAfterPlayerHit();
@@ -1351,5 +1356,10 @@ public class GolfPlayerTopDown : MonoBehaviour
     {
         PromptedForLightning = true;
     }
-
+    public void SetDistanceToHoleForPlayer()
+    {
+        Vector3 ballPos = MyBall.transform.position; 
+        GameObject closestHole = FindClosestHole(ballPos);
+        DistanceToHole = GetDistanceToHole(closestHole, ballPos);
+    }
 }

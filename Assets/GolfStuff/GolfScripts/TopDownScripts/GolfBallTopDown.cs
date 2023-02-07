@@ -1061,6 +1061,7 @@ public class GolfBallTopDown : MonoBehaviour
         //MyPlayer.EnableOrDisableLineObjects(true);
         MyPlayer.ResetPreviousHitValues();
         //TellPlayerGroundTypeTheyLandedOn();
+        MyPlayer.SetDistanceToHoleForPlayer();
         GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
     Vector2 GetPerpendicular(Vector2 dir, float leftOrRight)
