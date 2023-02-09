@@ -27,7 +27,7 @@ public class GolferAnimator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!IsSwinging)
+        /*if (!IsSwinging)
         {
             AnimatorClipInfo[] animatorInfo = _animator.GetCurrentAnimatorClipInfo(0);
             if (animatorInfo[0].clip.name != _idle)
@@ -36,6 +36,15 @@ public class GolferAnimator : MonoBehaviour
                 _animator.Play(_idle);
             }
             
+        }*/
+        if (IsSwinging)
+            return;
+
+        AnimatorClipInfo[] animatorInfo = _animator.GetCurrentAnimatorClipInfo(0);
+        if (animatorInfo[0].clip.name != _idle)
+        {
+            //Debug.Log("GolferAnimator : starting the idle animation");
+            _animator.Play(_idle);
         }
     }
     public void StartSwing()
@@ -60,10 +69,22 @@ public class GolferAnimator : MonoBehaviour
     }
     public void LightningStrikeForHit()
     {
-        GameplayManagerTopDownGolf.instance.LightningForPlayerHit();
+        GameplayManagerTopDownGolf.instance.LightningForPlayerHit(_myPlayer);
     }
     public void EnablePlayerSprite(bool enable)
     {
         _spriteRenderer.enabled = enable;
+    }
+    public void PlayerStruckByLightning()
+    {
+        Debug.Log("GolferAnimator: PlayerStruckByLightning: Stopping the animation");
+        _animator.enabled = false;
+    }
+    public void ResetGolfAnimator()
+    {
+        if (IsSwinging)
+            IsSwinging = false;
+        if(!_animator.enabled)
+            _animator.enabled = true;
     }
 }

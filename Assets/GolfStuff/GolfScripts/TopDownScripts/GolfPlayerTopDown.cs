@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class GolfPlayerTopDown : MonoBehaviour
 {
-    [Header("Player Infor")]
+    [Header("Player Info")]
     public string PlayerName;
     public GolfPlayerScore PlayerScore;
     [SerializeField] Canvas _playerCanvas;
@@ -55,6 +55,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     public bool DirectionAndDistanceChosen = false;
     public bool HasPlayerTeedOff = false;
     public bool PromptedForLightning = false;
+    public bool PlayerStruckByLightning = false;
 
     [Header("Hit Meter Objects")]
     [SerializeField] GameObject _hitMeterObject;
@@ -129,8 +130,6 @@ public class GolfPlayerTopDown : MonoBehaviour
     [Header("Player Sprite")]
     [SerializeField] GolferAnimator _golfAnimator;
 
-    
-
     private void Awake()
     {
         if (!MyBall)
@@ -197,6 +196,24 @@ public class GolfPlayerTopDown : MonoBehaviour
             //EnableOrDisableLineObjects(false);
             //if (!IsPlayersTurn && !_moveHitMeterIcon)
             //    StartPlayerTurn();
+            if (this.PlayerStruckByLightning)
+            {
+                GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
+                _golfAnimator.ResetGolfAnimator();
+                EnablePlayerSprite(false);
+                this.EnablePlayerCanvas(false);
+                this.IsPlayersTurn = false;
+
+                previousHitDistance = 0;
+
+                ActivateHitUIObjects(false);
+                AttachUIToNewParent(this.transform);
+                //AttachPlayerToCamera(false, myCamera.transform);
+                //UpdateCameraFollowTarget(MyBall.MyBallObject);
+                EnableOrDisableLineObjects(false);
+                this.PlayerStruckByLightning = false;
+                return;
+            }
             if (!DirectionAndDistanceChosen && !_moveHitMeterIcon)
             {
                 PlayerChooseDirectionAndDistance(true);
@@ -445,6 +462,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         }
         ResethitTopSpinForNewTurn();
         PlayerChooseDirectionAndDistance(false);
+        UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
     }
     public void SetCameraOnPlayer()
     {
@@ -1356,6 +1374,7 @@ public class GolfPlayerTopDown : MonoBehaviour
         this.HasPlayerTeedOff = false;
         // reset the ball being in the hole
         MyBall.IsInHole = false;
+        PlayerStruckByLightning = false;
     }
     public void LightningOnTurn()
     {
@@ -1370,5 +1389,13 @@ public class GolfPlayerTopDown : MonoBehaviour
     public void EnablePlayerSprite(bool enable)
     {
         _golfAnimator.EnablePlayerSprite(enable);
+    }
+    public void StruckByLightning()
+    {
+        PlayerStruckByLightning = true;
+        _golfAnimator.PlayerStruckByLightning();
+        PlayerUIMessage("struck by lightning");
+        EnablePlayerCanvas(true);
+        PlayerScore.StrokePenalty(10);
     }
 }

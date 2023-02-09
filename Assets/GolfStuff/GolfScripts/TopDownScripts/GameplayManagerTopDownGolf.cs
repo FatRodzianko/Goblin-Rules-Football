@@ -30,6 +30,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [Header("Player Info")]
     [SerializeField] public List<GolfPlayerTopDown> GolfPlayers = new List<GolfPlayerTopDown>();
     public List<GolfPlayerTopDown> GolfPlayersInTeeOffOrder = new List<GolfPlayerTopDown>();
+    public List<GolfPlayerTopDown> GolfPlayersOutOfCommission = new List<GolfPlayerTopDown>();
     [SerializeField] int _numberOfPlayersTeedOff = 0;
     [SerializeField] int _teeOffOrder = 0;
     [SerializeField] int _numberOfPlayersInHole = 0;
@@ -100,6 +101,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         WindManager.instance.SetInitialWindDirection();
         // Set initial weather for the hole
         RainManager.instance.SetInitialWeatherForHole();
+        //_lightningManager.CheckIfLightningStartsThisTurn();
         // Sort the players by lowest score to start the hole
         OrderListOfPlayers();
         // Set the current player
@@ -215,7 +217,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     {
         player.SetCameraOnPlayer();
     }
-    public async void StartNextPlayersTurn(GolfBallTopDown ball, bool playerSkippingForLightning = false)
+    public async void StartNextPlayersTurn(GolfBallTopDown ball, bool playerSkippingForLightning = false, bool playerWasStruckByLightning = false)
     {
         Debug.Log("GameplayManager: StartNextPlayersTurn: executing... from player: " + ball.MyPlayer.PlayerName + " playerSkippingForLightning: " + playerSkippingForLightning.ToString());
         if (playerSkippingForLightning && Time.time < TimeSinceLastSkip + 0.15f)
@@ -258,7 +260,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         }
         
         //TellPlayerGroundBallIsOn(ball);
-        if (!ball.IsInHole && !playerSkippingForLightning)
+        if (!ball.IsInHole && !playerSkippingForLightning && !playerWasStruckByLightning)
         {  
             Debug.Log("StartNextPlayersTurn: Calling TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
             await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
@@ -491,6 +493,11 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         _lastNewHoleTime = Time.time;
         CurrentHoleIndex++;
         _numberOfPlayersInHole = 0;
+        if (GolfPlayersOutOfCommission.Count > 0)
+        {
+            GolfPlayers.AddRange(GolfPlayersOutOfCommission);
+            GolfPlayersOutOfCommission.Clear();
+        }
         // Save each player's score and reset their "current" score of the new hole
         foreach (GolfPlayerTopDown player in GolfPlayers)
         {   
@@ -567,9 +574,9 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         Debug.Log("EndGame: AFTER calling TellPlayerGameIsOver time is: " + Time.time.ToString());
 
     }
-    public void LightningForPlayerHit()
+    public void LightningForPlayerHit(GolfPlayerTopDown player)
     {
-        _lightningManager.LightningForHit();
+        _lightningManager.LightningForHit(player);
     }
     public void MovePlayerToBackOfTeeOffOrder(GolfPlayerTopDown player)
     {
@@ -625,5 +632,26 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             else
                 player.EnablePlayerSprite(false);
         }
+    }
+    public void PlayerWasStruckByLightning(GolfPlayerTopDown player)
+    {
+        Debug.Log("GameplayManager: PlayerWasStruckByLightning: " + player.PlayerName + " was struck by lightning.");
+        PlayerOutOfCommission(player);
+        StartNextPlayersTurn(player.MyBall, false, true);
+    }
+    void PlayerOutOfCommission(GolfPlayerTopDown player)
+    {
+        if (GolfPlayers.Contains(player))
+            GolfPlayers.Remove(player);
+        if (GolfPlayersInTeeOffOrder.Contains(player))
+            GolfPlayersInTeeOffOrder.Remove(player);
+        if (TurnOrderForLightningSkips.Contains(player))
+        {
+            TurnOrderForLightningSkips.Remove(player);
+            if (TurnOrderForLightningSkips.Count == 0)
+                ResetLightningSkipInfo();
+        }
+        if (!GolfPlayersOutOfCommission.Contains(player))
+            GolfPlayersOutOfCommission.Add(player);
     }
 }

@@ -161,7 +161,7 @@ public class LightningManager : MonoBehaviour
     }
     IEnumerator ThunderClap(float dist, int numberOfFlashes)
     {
-        float soundDelay = Mathf.Abs(dist) * 5f;
+        float soundDelay = Mathf.Abs(dist) * 5f + 0.01f;
         Debug.Log("ThunderClap: delay will be: " + soundDelay.ToString() + " Time: " + Time.time);
         yield return new WaitForSeconds(soundDelay);
         Debug.Log("ThunderClap: Thunder will play now. Time: " + Time.time);
@@ -253,7 +253,7 @@ public class LightningManager : MonoBehaviour
     {
         dist = Mathf.Abs(dist);
     }
-    public void LightningForHit()
+    public void LightningForHit(GolfPlayerTopDown player)
     {
         if (!IsThereLightning)
             return;
@@ -263,7 +263,8 @@ public class LightningManager : MonoBehaviour
         {
             Debug.Log("WillPlayerBeStruckByLightning: Yes!!!");
             DistanceFromPlayer = 0f;
-            _lightIntensity = GetLightningBrightnessFromDistance(DistanceFromPlayer);
+            _lightIntensity = 1.5f;
+            player.StruckByLightning();
         }
         StartLightningStrike();
 
@@ -285,6 +286,6 @@ public class LightningManager : MonoBehaviour
     }
     bool WillPlayerBeStruckByLightning()
     {
-        return UnityEngine.Random.Range(0f, 1.0f) > DistanceFromPlayer;
+        return UnityEngine.Random.Range(0f, 1.0f) > Mathf.Abs(DistanceFromPlayer);
     }
 }
