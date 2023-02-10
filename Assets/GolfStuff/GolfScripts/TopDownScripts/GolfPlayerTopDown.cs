@@ -175,8 +175,9 @@ public class GolfPlayerTopDown : MonoBehaviour
             return;
         if (!IsPlayersTurn)
         {
-            if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Space))
+            if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Space) && Time.time >= (GameplayManagerTopDownGolf.instance.TimeSinceLastTurnStart + 0.15f))
             {
+                Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " will start their turn after pressing space! Time: " + Time.time);
                 this.EnablePlayerCanvas(false);
                 GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
             }
@@ -198,7 +199,7 @@ public class GolfPlayerTopDown : MonoBehaviour
             //    StartPlayerTurn();
             if (this.PlayerStruckByLightning)
             {
-                GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
+                
                 _golfAnimator.ResetGolfAnimator();
                 EnablePlayerSprite(false);
                 this.EnablePlayerCanvas(false);
@@ -212,6 +213,8 @@ public class GolfPlayerTopDown : MonoBehaviour
                 //UpdateCameraFollowTarget(MyBall.MyBallObject);
                 EnableOrDisableLineObjects(false);
                 this.PlayerStruckByLightning = false;
+                Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " has acknowledged they were struck by lightning! Moving on to next turn by calling: GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this). Time: " + Time.time);
+                GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
                 return;
             }
             if (!DirectionAndDistanceChosen && !_moveHitMeterIcon)

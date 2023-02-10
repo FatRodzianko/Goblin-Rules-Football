@@ -209,8 +209,11 @@ public class LightningManager : MonoBehaviour
             {
                 Debug.Log("CheckIfLightningStartsThisTurn: Lightning far enough away to end. Distance: " + DistanceFromPlayer.ToString());
                 IsThereLightning = false;
-                StopCoroutine(_lightningRoutine);
-                _lightningRoutineRunning = false;
+                if (_lightningRoutineRunning)
+                {
+                    StopCoroutine(_lightningRoutine);
+                    _lightningRoutineRunning = false;
+                }
                 return;
             }
             _lightIntensity = GetLightningBrightnessFromDistance(DistanceFromPlayer);
@@ -262,7 +265,7 @@ public class LightningManager : MonoBehaviour
         if (WillPlayerBeStruckByLightning())
         {
             Debug.Log("WillPlayerBeStruckByLightning: Yes!!!");
-            DistanceFromPlayer = 0f;
+            //DistanceFromPlayer = 0f;
             _lightIntensity = 1.5f;
             player.StruckByLightning();
         }
@@ -278,7 +281,7 @@ public class LightningManager : MonoBehaviour
     {
         if (!IsThereLightning)
             return;
-        int numberOfFlashes = UnityEngine.Random.Range(2, 6);
+        int numberOfFlashes = UnityEngine.Random.Range(3, 6);
 
         GetThunderVolumeFromDistance(DistanceFromPlayer);
         StartCoroutine(LightningFlash(numberOfFlashes));

@@ -58,6 +58,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] public List<GolfPlayerTopDown> TurnOrderForLightningSkips = new List<GolfPlayerTopDown>();
     [SerializeField] public int TurnsSinceSkip = 0;
     public float TimeSinceLastSkip = 0f;
+    public float TimeSinceLastTurnStart = 0f;
 
     private void Awake()
     {
@@ -208,6 +209,12 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     }
     public void StartCurrentPlayersTurn(GolfPlayerTopDown requestingPlayer)
     {
+        // to make sure the new player who was struck by lightning is pressing space?
+        if (Time.time < (TimeSinceLastTurnStart + 0.15f))
+            return;
+        else
+            TimeSinceLastTurnStart = Time.time;
+
         if (requestingPlayer != CurrentPlayer)
             return;
         UpdateUIForCurrentPlayer(requestingPlayer);
@@ -493,11 +500,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         _lastNewHoleTime = Time.time;
         CurrentHoleIndex++;
         _numberOfPlayersInHole = 0;
-        if (GolfPlayersOutOfCommission.Count > 0)
-        {
-            GolfPlayers.AddRange(GolfPlayersOutOfCommission);
-            GolfPlayersOutOfCommission.Clear();
-        }
+        AddPlayersOutOfCommissionBack();
         // Save each player's score and reset their "current" score of the new hole
         foreach (GolfPlayerTopDown player in GolfPlayers)
         {   
@@ -560,6 +563,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     }
     async void EndGame()
     {
+        AddPlayersOutOfCommissionBack();
         var tasks = new Task[GolfPlayers.Count];
         Debug.Log("EndGame: Before calling TellPlayerGameIsOver time is: " + Time.time.ToString());
         // Save each player's score and reset their "current" score of the new hole
@@ -636,6 +640,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     public void PlayerWasStruckByLightning(GolfPlayerTopDown player)
     {
         Debug.Log("GameplayManager: PlayerWasStruckByLightning: " + player.PlayerName + " was struck by lightning.");
+        // this is just for testing with "local multiplayer" to make sure when the player that was struck by lightning presses space, it doesn't also get read as the next player pressing space to start their turn
+        TimeSinceLastTurnStart = Time.time;
         PlayerOutOfCommission(player);
         StartNextPlayersTurn(player.MyBall, false, true);
     }
@@ -653,5 +659,13 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         }
         if (!GolfPlayersOutOfCommission.Contains(player))
             GolfPlayersOutOfCommission.Add(player);
+    }
+    void AddPlayersOutOfCommissionBack()
+    {
+        if (GolfPlayersOutOfCommission.Count > 0)
+        {
+            GolfPlayers.AddRange(GolfPlayersOutOfCommission);
+            GolfPlayersOutOfCommission.Clear();
+        }
     }
 }
