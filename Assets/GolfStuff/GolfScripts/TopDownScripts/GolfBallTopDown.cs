@@ -1033,6 +1033,7 @@ public class GolfBallTopDown : MonoBehaviour
         this.IsInHole = true;
         ResetBallMovementBools();
         TellPlayerBallIsInHole();
+        SoundManager.instance.PlaySound("golfball-in-hole", 1.0f);
         GameplayManagerTopDownGolf.instance.PlayersBallInHole();
     }
     float TimeBeforeSinkInHole(float movementSpeed, HoleTopDown holeRolledInto)

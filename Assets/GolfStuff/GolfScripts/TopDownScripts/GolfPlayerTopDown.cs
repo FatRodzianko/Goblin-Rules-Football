@@ -745,10 +745,13 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     public void SubmitHitToBall()
     {
+        bool playerTeeOffSound = false;
         if (!this.HasPlayerTeedOff)
         {
             GameplayManagerTopDownGolf.instance.PlayerTeedOff(this);
             this.HasPlayerTeedOff = true;
+            playerTeeOffSound = true;
+
         }
             
         this.PlayerScore.PlayerHitBall();
@@ -761,17 +764,23 @@ public class GolfPlayerTopDown : MonoBehaviour
             {
                 MyBall.PuttBall(ModifiedHitDirection, HitPowerSubmitted);
                 //MyBall.PuttBall(new Vector2 (1f,0f), 10f);                
+                SoundManager.instance.PlaySound("golfball-hit", 0.8f);
             }
             else
             {
                 MyBall.HitBall(HitPowerSubmitted, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
                 //MyBall.HitBall(CurrentClub.MaxHitDistance, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
+                if(playerTeeOffSound)
+                    SoundManager.instance.PlaySound("golfball-teeoff", 1f);
+                else
+                    SoundManager.instance.PlaySound("golfball-hit", 1f);
             }
         }
         else
         {
             Debug.Log("Was ball shanked? " + IsShanked.ToString());
             DoTheShank();
+            SoundManager.instance.PlaySound("golfball-shank", 1f);
             //MyBall.HitBall(100, hitAngle, hitTopSpin, new Vector2(1f, 0f), hitLeftOrRightspin);
         }
         this.IsPlayersTurn = false;
@@ -877,6 +886,11 @@ public class GolfPlayerTopDown : MonoBehaviour
         if (!CanClubBeUsedOnCurrentGround(_myClubs[_currentClubIndex]))
         {
             _currentClubIndex = GetFirstClubThatCanHitOnThisGround();
+        }
+        // Play the change club sound if the clubs will be different
+        if (CurrentClub != _myClubs[_currentClubIndex])
+        {
+            SoundManager.instance.PlaySound("golf-change-club", 1f);
         }
         CurrentClub = _myClubs[_currentClubIndex];
 
@@ -1397,8 +1411,19 @@ public class GolfPlayerTopDown : MonoBehaviour
     {
         PlayerStruckByLightning = true;
         _golfAnimator.PlayerStruckByLightning();
-        PlayerUIMessage("struck by lightning");
-        EnablePlayerCanvas(true);
+        //PlayerUIMessage("struck by lightning");
+        //EnablePlayerCanvas(true);
         PlayerScore.StrokePenalty(10);
+    }
+    public void StruckByLightningOver()
+    {
+        _golfAnimator.StartDeathFromLightning();
+        //PlayerUIMessage("struck by lightning");
+        //EnablePlayerCanvas(true);
+        //EnablePlayerSprite(false);
+    }
+    public void LightningFlashForPlayerStruck(bool enableStruckSprite)
+    {
+        _golfAnimator.ChangeToStruckByLightningSprite(enableStruckSprite);
     }
 }

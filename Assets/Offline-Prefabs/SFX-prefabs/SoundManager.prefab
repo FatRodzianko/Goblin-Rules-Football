@@ -27,6 +27,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -76,6 +77,12 @@ MonoBehaviour:
     pitch: 1
     isLooping: 0
     source: {fileID: 0}
+  - name: bottle-throw
+    clip: {fileID: 8300000, guid: 2544061af6c1b6f4ab7742af5d058312, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
   - name: pickup-powerup
     clip: {fileID: 8300000, guid: ad897cedfd828444f8a81958974fc45f, type: 3}
     volume: 1
@@ -93,4 +100,274 @@ MonoBehaviour:
     volume: 1
     pitch: 1
     isLooping: 1
+    source: {fileID: 0}
+  - name: glue-drop
+    clip: {fileID: 8300000, guid: ad5a5369684050747b52b5f17e8561bb, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: glue-squirt
+    clip: {fileID: 8300000, guid: c71f91c2d3017514d847b614acf3fd12, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: footstep-1
+    clip: {fileID: 8300000, guid: 57f25df11adef3742afd8b41b96e56a5, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: footstep-2
+    clip: {fileID: 8300000, guid: 8701d4b035774ac49bf66dba07bd95f9, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: glue-footstep-1
+    clip: {fileID: 8300000, guid: 97b8aa7c432d2d2499d03e1fcc2491e2, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: glue-footstep-2
+    clip: {fileID: 8300000, guid: d58bd4114746b5247aec160d6b2501aa, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: water-footstep-1
+    clip: {fileID: 8300000, guid: e714c623e3a1939418e071900fd17fc1, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: water-footstep-2
+    clip: {fileID: 8300000, guid: 33609cb0359785640bc810877b0c11e9, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: brush-enter
+    clip: {fileID: 8300000, guid: 4f467a35c098eda45a5685478e888018, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}
+  - name: brush-footstep-1
+    clip: {fileID: 8300000, guid: 7f160b9f9247a644596a7ff664f63c27, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: brush-footstep-2
+    clip: {fileID: 8300000, guid: 1d03ea5465ae1ae46ad630068f5ba00c, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: lose-possession
+    clip: {fileID: 8300000, guid: 86cd8f054e0dd214199c20eeb20dffd8, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: gain-possession
+    clip: {fileID: 8300000, guid: 890090133b952c04bb24d9c52b040309, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: kicked-ball
+    clip: {fileID: 8300000, guid: 1f5a6d81e2adf60408610ecc3d6072be, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: bounce-ball
+    clip: {fileID: 8300000, guid: 68b5ff18710924f4e9ad4716db838a6b, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: trip-rock
+    clip: {fileID: 8300000, guid: ad76375879447c241b00ed3144203cc7, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: trip-wood
+    clip: {fileID: 8300000, guid: a2f04197210ff3d4f87088f0a7530c39, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: trip-banana
+    clip: {fileID: 8300000, guid: ac2e75560521ec0458474c5a565e283d, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: banana-drop
+    clip: {fileID: 8300000, guid: b76871fd71dbd944ea01b2941d8ae6f6, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: touchdown-cheer
+    clip: {fileID: 8300000, guid: 522105cf91a21ab47a9126c595e40e90, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: touchdown-touchdown
+    clip: {fileID: 8300000, guid: 5293376a27935a34fb4c076d0aa2c9ee, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: yeehaw
+    clip: {fileID: 8300000, guid: dbb5737e03782bf4cbf6b64c52602d66, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: kick-its-good
+    clip: {fileID: 8300000, guid: f9660c14fea1b5b41ac8f1fdbe7f8ee0, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: kick-no-good
+    clip: {fileID: 8300000, guid: e76d52365af2016418eee15ecebaa439, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: kick-blocked
+    clip: {fileID: 8300000, guid: da46160e890bf01409a898b6d283f548, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: ui-click
+    clip: {fileID: 8300000, guid: de62a5c5ab824fb4fb8f2838f64990a2, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: slide
+    clip: {fileID: 8300000, guid: 8c33ec9fee3f5774a922c127d245fd29, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: powerup-used-healNormal
+    clip: {fileID: 8300000, guid: 36b1653982296e741a81fcf193e794c8, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: powerup-used-attackNormal
+    clip: {fileID: 8300000, guid: f0bed58a785fb8b469fc730a8fb48eee, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: powerup-used-defenseNormal
+    clip: {fileID: 8300000, guid: 0bbb50975218f52479197eed7017a9e1, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: powerup-used-speedNormal
+    clip: {fileID: 8300000, guid: 317f71a97fdd3024380cac87efcceacd, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: powerup-used-staminaNormal
+    clip: {fileID: 8300000, guid: 92788affd18791b4a9c29c34225aaff6, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: powerup-used-invincibilityBlueShell
+    clip: {fileID: 8300000, guid: ff58a594ef454f44594a019ab3183ed5, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}
+  - name: powerup-used-ilightningBlueShell
+    clip: {fileID: 8300000, guid: dccd4da7d1b0af54d9670c50fdc8ce31, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: goblin-knocked-out
+    clip: {fileID: 8300000, guid: 8261034ad38767f4b9f0b2ffcf0ae661, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}
+  - name: ref-whistle
+    clip: {fileID: 8300000, guid: 156b7a35fbb175b49be8df96062df1d5, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: thunder-very-far
+    clip: {fileID: 8300000, guid: 6b7296dd3de9c784195105a6a932e91e, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: thunder-medium
+    clip: {fileID: 8300000, guid: 3089b2673a7dfad419ea3c645ef7a817, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: thunder-near
+    clip: {fileID: 8300000, guid: 0d0dbaf9b338257419083f21bbc26928, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: thunder-struck-player
+    clip: {fileID: 8300000, guid: a751d5994728e044f9c3d7c85ca4f556, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golfball-hit
+    clip: {fileID: 8300000, guid: 7a48c081305bfe64d8d1fd7c97389d52, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golfball-teeoff
+    clip: {fileID: 8300000, guid: fcda77bee61e48c43b65205c6e13c260, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golfball-in-hole
+    clip: {fileID: 8300000, guid: 148566e0a8361a7499d21102ce0b5cf6, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golfball-shank
+    clip: {fileID: 8300000, guid: dacc002a6b14a79498fd9a8a4ebbbbeb, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golf-change-club
+    clip: {fileID: 8300000, guid: 2c735f69a2727894d8ade3dc3d4bbb82, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
     source: {fileID: 0}

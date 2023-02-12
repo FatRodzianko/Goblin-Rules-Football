@@ -8,20 +8,29 @@ public class GolferAnimator : MonoBehaviour
     [SerializeField] Animator _animator;
     [SerializeField] string _idle;
     [SerializeField] string _frontSwing;
+    [SerializeField] string _deathFromLightning;
 
     [Header("Player Sprite")]
     [SerializeField] SpriteRenderer _spriteRenderer;
 
     [Header("Animation State")]
     public bool IsSwinging = false;
+    public bool IsDyingFromLightning = false;
 
     [Header("Player Owner")]
     [SerializeField] GolfPlayerTopDown _myPlayer;
+
+    [Header("Struck By Lightning Stuff")]
+    [SerializeField] Sprite _struckByLightningFullSwingFlashOn;
+    [SerializeField] Sprite _struckByLightningFullSwingFlashOff;
+    [SerializeField] GameObject _lightningBoltObject;
     // Start is called before the first frame update
     void Awake()
     {
-        _myPlayer = this.transform.parent.GetComponent<GolfPlayerTopDown>();
-        _spriteRenderer = this.GetComponent<SpriteRenderer>();
+        if(!_myPlayer)
+            _myPlayer = this.transform.parent.GetComponent<GolfPlayerTopDown>();
+        if(!_spriteRenderer)
+            _spriteRenderer = this.GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -38,6 +47,8 @@ public class GolferAnimator : MonoBehaviour
             
         }*/
         if (IsSwinging)
+            return;
+        if (IsDyingFromLightning)
             return;
 
         AnimatorClipInfo[] animatorInfo = _animator.GetCurrentAnimatorClipInfo(0);
@@ -84,7 +95,33 @@ public class GolferAnimator : MonoBehaviour
     {
         if (IsSwinging)
             IsSwinging = false;
+        if (IsDyingFromLightning)
+            IsDyingFromLightning = false;
         if(!_animator.enabled)
             _animator.enabled = true;
+    }
+    public void ChangeToStruckByLightningSprite(bool lightningFlash)
+    {
+        if (lightningFlash)
+        {
+            _spriteRenderer.sprite = _struckByLightningFullSwingFlashOn;
+            _lightningBoltObject.SetActive(true);
+        }
+        else
+        {
+            _spriteRenderer.sprite = _struckByLightningFullSwingFlashOff;
+            _lightningBoltObject.SetActive(false);
+        }   
+    }
+    public void StartDeathFromLightning()
+    {
+        ResetGolfAnimator();
+        IsDyingFromLightning = true;
+        _animator.Play(_deathFromLightning);
+    }
+    public void DeathFromLightningAnimOver()
+    { 
+        _myPlayer.PlayerUIMessage("struck by lightning");
+        _myPlayer.EnablePlayerCanvas(true);
     }
 }
