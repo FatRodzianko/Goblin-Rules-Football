@@ -523,6 +523,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos);
         // update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
+        // Update the "rain sound" for the next hole
+        RainManager.instance.GetRainSoundForHole();
         // Set the weather for the next turn
         SetWeatherForNextTurn();
         // Sort the players by lowest score to start the hole

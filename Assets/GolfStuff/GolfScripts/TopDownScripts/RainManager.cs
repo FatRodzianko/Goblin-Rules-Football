@@ -42,17 +42,27 @@ public class RainManager : MonoBehaviour
     [Header("Lighting Related To Rain")]
     [SerializeField] Light2D _globalLight;
 
+    [Header("Weather SFX")]
+    [SerializeField] string[] _clearSounds;
+    [SerializeField] string _clearSoundForHole;
+    [SerializeField] bool _clearSoundPlaying = false;
+    [SerializeField] string[] _rainSounds;
+    [SerializeField] string _rainSoundForHole;
+    [SerializeField] bool _rainSoundPlaying = false;
+
     public delegate void WeatherEffectChange(string newEffect);
     public event WeatherEffectChange WeatherChanged;
 
     private void Awake()
     {
         MakeInstance();
+        
         WeatherChanged = WeatherChangedFunction;
     }
     // Start is called before the first frame update
     void Start()
     {
+        GetRainSoundForHole();
         SetRainState(RainState);
     }
     void MakeInstance()
@@ -61,6 +71,19 @@ public class RainManager : MonoBehaviour
             instance = this;
         else if (instance != this)
             Destroy(gameObject);
+    }
+    public void GetRainSoundForHole()
+    {
+        var rng = new System.Random();
+        if(!string.IsNullOrWhiteSpace(_rainSoundForHole))
+            SoundManager.instance.StopSound(_rainSoundForHole);
+        if (!string.IsNullOrWhiteSpace(_clearSoundForHole))
+            SoundManager.instance.StopSound(_clearSoundForHole);
+        _rainSoundForHole = _rainSounds[rng.Next(_rainSounds.Length)];
+        _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
+
+        PlaySoundBasedOnRainState(RainState);
+
     }
     // Update is called once per frame
     void Update()
@@ -90,6 +113,8 @@ public class RainManager : MonoBehaviour
             RainBounceModifier = _noRainBounceModifier;
             RainHitModifier = _noRainHitModifier;
 
+            PlaySoundBasedOnRainState(newState);
+
             _globalLight.intensity = 1.0f;
         }
         else if (newState == "light rain")
@@ -108,6 +133,8 @@ public class RainManager : MonoBehaviour
                 _rainBackgroundGround.Play();
             RainBounceModifier = _lightRainBounceModifier;
             RainHitModifier = _lightRainHitModifier;
+
+            PlaySoundBasedOnRainState(newState);
 
             _globalLight.intensity = 0.9f;
 
@@ -130,6 +157,8 @@ public class RainManager : MonoBehaviour
             RainBounceModifier = _medRainBounceModifier;
             RainHitModifier = _medRainHitModifier;
 
+            PlaySoundBasedOnRainState(newState);
+
             _globalLight.intensity = 0.8f;
         }
         else if (newState == "heavy rain")
@@ -149,7 +178,9 @@ public class RainManager : MonoBehaviour
 
             RainBounceModifier = _heavyRainBounceModifier;
             RainHitModifier = _heavyRainHitModifier;
-            
+
+            PlaySoundBasedOnRainState(newState);
+
             _globalLight.intensity = 0.7f;
         }
         else
@@ -159,6 +190,12 @@ public class RainManager : MonoBehaviour
             _rainBackgroundGround.Stop();
             RainBounceModifier = _noRainBounceModifier;
             RainHitModifier = _noRainHitModifier;
+
+            SoundManager.instance.StopSound(_clearSoundForHole);
+            var rng = new System.Random();
+            _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
+            SoundManager.instance.StopSound(_rainSoundForHole);
+            SoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
 
             _globalLight.intensity = 1.0f;
         }
@@ -245,6 +282,56 @@ public class RainManager : MonoBehaviour
                 return;
             }
         }
+
+    }
+    void PlaySoundBasedOnRainState(string state)
+    {
+        if (!RainStates.Contains(state))
+            return;
+        if (state == "clear")
+        {
+
+            SoundManager.instance.StopSound(_clearSoundForHole);
+            var rng = new System.Random();
+            _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
+            SoundManager.instance.StopSound(_rainSoundForHole);
+            SoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
+
+        }
+        else if (state == "light rain")
+        {
+
+            SoundManager.instance.StopSound(_clearSoundForHole);
+            SoundManager.instance.PlaySound(_rainSoundForHole, 0.75f);
+
+
+        }
+        else if (state == "med rain")
+        {
+            SoundManager.instance.StopSound(_clearSoundForHole);
+            SoundManager.instance.PlaySound(_rainSoundForHole, 0.95f);
+
+        }
+        else if (state == "heavy rain")
+        {
+
+
+            SoundManager.instance.StopSound(_clearSoundForHole);
+            SoundManager.instance.PlaySound(_rainSoundForHole, 1.15f);
+
+        }
+        else
+        {
+            SoundManager.instance.StopSound(_clearSoundForHole);
+            var rng = new System.Random();
+            _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
+            SoundManager.instance.StopSound(_rainSoundForHole);
+            SoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
+
+        }
+    }
+    void PlayClearSound()
+    { 
 
     }
 }

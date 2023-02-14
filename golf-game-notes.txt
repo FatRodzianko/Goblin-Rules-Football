@@ -91,10 +91,16 @@
 - - - Use "object pooling" to speed up clearing and loading a new hole?
 - - - - - - https://learn.unity.com/tutorial/object-pooling#
 - - - - - - https://www.youtube.com/watch?v=7EZ2F-TzHYw
-- - - creating lightning and thunder flashes: https://www.youtube.com/watch?v=0NSz-ds4ets and https://www.youtube.com/watch?v=C5FmpgnBRFE
-- - - - - - use a global light to light the scene. Lower the intensity depending on weather (1.0 for clear, 0.85 light rain, 0.75 med., 0.65 heavy rain, whatever)
-- - - - - - have a spot light attached to the camera that turns on and off for lightning strikes
-- - - - - - - - - intensity increases based on distance from player? no more than 1.5 for the lightning or it might get weird...
+- - x creating lightning and thunder flashes: https://www.youtube.com/watch?v=0NSz-ds4ets and https://www.youtube.com/watch?v=C5FmpgnBRFE
+- - - - - x use a global light to light the scene. Lower the intensity depending on weather (1.0 for clear, 0.85 light rain, 0.75 med., 0.65 heavy rain, whatever)
+- - - - - x have a spot light attached to the camera that turns on and off for lightning strikes
+- - - - - - - - x intensity increases based on distance from player? no more than 1.5 for the lightning or it might get weird...
+- - - "rain sounds" for light, med, heavy. Either different sounds for each or just one sounds and adjust its volume based on weather
+- - - create "tornado" effect that spawns during storms and moves about
+- - - - - - players try to "play around" the tornados. If their ball is hit by the tornado, thrown in random direction
+- - - - - - "ritual" to be performed to either fend off the Wind God, or welcome their Judgement
+- - - - - - - - - Whether or not tornadoes appear will be based on if more players welcome the judgement or not, based on minigame type thing, and also weighted based on how "well" either side does the pro/anti-wind god ritual
+- - - - - - - - - Tornados also attracted to players that do the ritual worst?
 
 - GameplayManager requirements for top down golf
 - - - track what player's turn it is

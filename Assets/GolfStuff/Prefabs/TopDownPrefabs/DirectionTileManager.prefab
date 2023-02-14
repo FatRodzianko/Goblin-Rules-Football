@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6061790261330791904
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6061790261330791918}
+  - component: {fileID: 6061790261330791905}
+  m_Layer: 0
+  m_Name: DirectionTileManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6061790261330791918
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6061790261330791904}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6061790261330791905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6061790261330791904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1088c29859382e744aaf5dae4d1df12c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _directionTiles: {fileID: 0}
+  _slowSpeed: 0.02
+  _medSpeed: 0.04
+  _fastSpeed: 0.08
+  _fastNorth: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  _fastNorthEast: {fileID: 11400000, guid: 294638b4801ab924dbb3b3d56697fc04, type: 2}
+  _fastNorthWest: {fileID: 11400000, guid: 954fa9d2cf2ee9c4eb7d49018e092444, type: 2}
+  _fastSouth: {fileID: 11400000, guid: 7abae4c2c3246ac49bcffdacfd39c713, type: 2}
+  _fastSouthEast: {fileID: 11400000, guid: 6b5f4521453cf904c8e46e60d9572cfa, type: 2}
+  _fastSouthWest: {fileID: 11400000, guid: 1b278bab718555742b09931707b262cf, type: 2}
+  _fastEast: {fileID: 11400000, guid: 2c0c74f0268c3a8419a6fec6f03ecf03, type: 2}
+  _fastWest: {fileID: 11400000, guid: cd780a9511ae41243b8603828d55031d, type: 2}
+  _medNorth: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  _medNorthEast: {fileID: 11400000, guid: af705da60f4bbac48b221480b3c7a357, type: 2}
+  _medNorthWest: {fileID: 11400000, guid: 4fa80d7147dda34439de9b82bc1b3547, type: 2}
+  _medSouth: {fileID: 11400000, guid: 8dffa5a79a51c634bb3bcc2c261ca5bb, type: 2}
+  _medSouthEast: {fileID: 11400000, guid: d6467f9495fe3b749af086dd2b1034bd, type: 2}
+  _medSouthWest: {fileID: 11400000, guid: f23a167d3a3ee7149949c060c14a188b, type: 2}
+  _medEast: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  _medWest: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  _slowNorth: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  _slowNorthEast: {fileID: 11400000, guid: 7da63985f92972949b6283a197e51322, type: 2}
+  _slowNorthWest: {fileID: 11400000, guid: a30817fe81cc75041ac255ea30bacc97, type: 2}
+  _slowSouth: {fileID: 11400000, guid: 63dd553052186da43a5459097f36e248, type: 2}
+  _slowSouthEast: {fileID: 11400000, guid: f9ea3af1b45a74645b37d39360aee763, type: 2}
+  _slowSouthWest: {fileID: 11400000, guid: 421dd5d27ed951e41a78b9402ef7c09c, type: 2}
+  _slowEast: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  _slowWest: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  _slopeTiles:
+  - {fileID: 11400000, guid: 2c0c74f0268c3a8419a6fec6f03ecf03, type: 2}
+  - {fileID: 11400000, guid: 294638b4801ab924dbb3b3d56697fc04, type: 2}
+  - {fileID: 11400000, guid: 954fa9d2cf2ee9c4eb7d49018e092444, type: 2}
+  - {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - {fileID: 11400000, guid: 6b5f4521453cf904c8e46e60d9572cfa, type: 2}
+  - {fileID: 11400000, guid: 1b278bab718555742b09931707b262cf, type: 2}
+  - {fileID: 11400000, guid: 7abae4c2c3246ac49bcffdacfd39c713, type: 2}
+  - {fileID: 11400000, guid: cd780a9511ae41243b8603828d55031d, type: 2}
+  - {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - {fileID: 11400000, guid: af705da60f4bbac48b221480b3c7a357, type: 2}
+  - {fileID: 11400000, guid: 4fa80d7147dda34439de9b82bc1b3547, type: 2}
+  - {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - {fileID: 11400000, guid: d6467f9495fe3b749af086dd2b1034bd, type: 2}
+  - {fileID: 11400000, guid: f23a167d3a3ee7149949c060c14a188b, type: 2}
+  - {fileID: 11400000, guid: 8dffa5a79a51c634bb3bcc2c261ca5bb, type: 2}
+  - {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - {fileID: 11400000, guid: 7da63985f92972949b6283a197e51322, type: 2}
+  - {fileID: 11400000, guid: a30817fe81cc75041ac255ea30bacc97, type: 2}
+  - {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - {fileID: 11400000, guid: f9ea3af1b45a74645b37d39360aee763, type: 2}
+  - {fileID: 11400000, guid: 421dd5d27ed951e41a78b9402ef7c09c, type: 2}
+  - {fileID: 11400000, guid: 63dd553052186da43a5459097f36e248, type: 2}
+  - {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  TileToSlopeMap: []
+  _tilePositionsWithSlopes: []

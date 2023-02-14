@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -302,7 +303,14 @@ public class LightningManager : MonoBehaviour
     {
         if (_lightningFlashing)
         {
-            StopCoroutine(_lightningRoutine);
+            try
+            {
+                StopCoroutine(_lightningRoutine);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("StopLightningRoutineStuff: Could stop coroutine. Error: " + e);
+            }
             _lightningFlashing = false;
         }
         if (_lightningFlashing)
