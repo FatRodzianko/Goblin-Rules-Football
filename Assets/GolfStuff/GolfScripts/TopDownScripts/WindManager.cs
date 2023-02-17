@@ -21,6 +21,14 @@ public class WindManager : MonoBehaviour
 
     public string WindSeverity; // none, low, med, high, highest
 
+    [Header("Tornado Stuff")]
+    [SerializeField] GameObject _tornadoPrefab;
+    [SerializeField] GameObject _tornadoObject;
+    public bool IsThereATorndao = false;
+    public Torndao TorndaoScript;
+    [SerializeField] float _minSpawnDist = 10f;
+    [SerializeField] float _maxSpawnDist = 50f;
+
     private void Awake()
     {
         MakeInstance();
@@ -38,7 +46,7 @@ public class WindManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        RainManager.instance.WeatherChanged += UpdateRainForTornado;
     }
 
     // Update is called once per frame
@@ -62,6 +70,9 @@ public class WindManager : MonoBehaviour
     void PowerChangedFunction(int power)
     {
         Debug.Log("PowerChangedFunction: " + power.ToString());
+        // if the power drops to 0, destroy and tornado objects
+        if (power <= 0f)
+            DestroyTornadoObjects();
     }
     public void UpdateWindForNewTurn()
     {
@@ -210,7 +221,108 @@ public class WindManager : MonoBehaviour
                 newWindDir.y = coordinateValue;
         }
         WindDirection = newWindDir;
-
     }
+    void UpdateRainForTornado(string newRainState)
+    {
+        // If the weather is clear, destroy any tornado objects 
+        if (newRainState == "clear")
+        {
+            DestroyTornadoObjects();
+        }
+    }
+    void DestroyTornadoObjects()
+    {
+        IsThereATorndao = false;
+        if (_tornadoObject)
+        {
+            GameObject destroyObject = _tornadoObject;
+            Destroy(destroyObject);
+            _tornadoObject = null;
+        }
+        if (TorndaoScript)
+        {
+            TorndaoScript = null;
+        }
+    }
+    public void CheckIfTornadoWillSpawn()
+    {
+        if (IsThereATorndao)
+            return;
+        if (this.WindPower <= 0f)
+        {
+            DestroyTornadoObjects();
+            return;
+        }
+        if (RainManager.instance.RainState == "clear")
+        {
+            DestroyTornadoObjects();
+            return;
+        }
+        if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
+            return;
+        Debug.Log("CheckIfTornadoWillSpawn: Will Spawn a torndao this turn.");
 
+        Vector3 spawnPos = GetTornadoSpawnPosition();
+
+        _tornadoObject = Instantiate(_tornadoPrefab, spawnPos, Quaternion.identity);
+        TorndaoScript = _tornadoObject.GetComponent<Torndao>();
+
+        IsThereATorndao = true;
+    }
+    Vector3 GetTornadoSpawnPosition()
+    {
+        Vector3 spawnPos = Vector3.zero;
+
+        // For now, select player furthest from the hole?
+        float distance = 0f;
+        GolfPlayerTopDown playerToSpawnBy = null;
+        for (int i = 0; i < GameplayManagerTopDownGolf.instance.GolfPlayers.Count; i++)
+        {
+            GolfPlayerTopDown player = GameplayManagerTopDownGolf.instance.GolfPlayers[i];
+            if (i == 0)
+            {
+                distance = player.DistanceToHole;
+                playerToSpawnBy = player;
+                continue;
+            }
+
+            if (player.DistanceToHole > distance)
+            {
+                distance = player.DistanceToHole;
+                playerToSpawnBy = player;
+            }
+        }
+
+        Vector3 startPos = playerToSpawnBy.MyBall.transform.position;
+
+        spawnPos = GetRandomPositionFromGivenPosition(startPos);
+
+        // Check to make sure the spawn position is in bounds
+        PolygonCollider2D cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
+        bool isSpawnInbounds = cameraBoundingBox.OverlapPoint(spawnPos);
+        if (!isSpawnInbounds)
+        {
+            while (!isSpawnInbounds)
+            {
+                spawnPos = GetRandomPositionFromGivenPosition(startPos);
+                isSpawnInbounds = cameraBoundingBox.OverlapPoint(spawnPos);
+            }
+        }
+
+        return spawnPos;
+    }
+    Vector3 GetRandomPositionFromGivenPosition(Vector3 startPos)
+    {
+        Vector3 randomPos = Vector3.zero;
+
+        float randX = UnityEngine.Random.Range(-1f, 1f);
+        float randY = UnityEngine.Random.Range(-1f, 1f);
+        Vector3 randDir = new Vector2(randX, randY).normalized;
+
+        float randDist = UnityEngine.Random.Range(_minSpawnDist, _maxSpawnDist);
+
+        randomPos = startPos + (randDist * randDir);
+
+        return randomPos;
+    }
 }

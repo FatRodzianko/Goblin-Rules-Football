@@ -48,6 +48,7 @@ TagManager:
   - GolfLandingTarget
   - GolfAimPoint
   - ZoomedOutPosition
+  - tornado
   layers:
   - Default
   - TransparentFX
