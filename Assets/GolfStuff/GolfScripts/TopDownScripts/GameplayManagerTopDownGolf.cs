@@ -549,6 +549,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         RainManager.instance.UpdateWeatherForNewTurn();
         _lightningManager.CheckIfLightningStartsThisTurn();
         WindManager.instance.CheckIfTornadoWillSpawn();
+        WindManager.instance.MoveTornadoForNewTurn();
     }
     void PromptPlayerForNextTurn()
     {

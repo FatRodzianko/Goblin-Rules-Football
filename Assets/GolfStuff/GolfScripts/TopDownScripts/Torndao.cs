@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class Torndao : MonoBehaviour
 {
+    [SerializeField] Rigidbody2D _rb;
     [SerializeField] BoxCollider2D _myCollider;
     [SerializeField] public float HeightInUnityUnits = 3f;
-    [SerializeField] int _tornadoStrength = 1;
+    [SerializeField] public int TornadoStrength = 1;
+    public bool IsMoving = false;
+    [SerializeField] float _speed = 5f;
+    [SerializeField] Vector2 _movementDir = Vector2.zero;
+    [SerializeField] float _distanceToMove = 0f;
     private void Awake()
     {
         if (!_myCollider)
@@ -24,6 +29,19 @@ public class Torndao : MonoBehaviour
     {
         
     }
+    private void FixedUpdate()
+    {
+        if (IsMoving)
+        {
+            Vector2 newPos = _rb.position + _movementDir * _speed * Time.fixedDeltaTime;
+
+            float distSinceLast = Vector2.Distance(newPos, this.transform.position);
+            _rb.MovePosition(_rb.position + _movementDir * _speed * Time.fixedDeltaTime);
+            _distanceToMove -= distSinceLast;
+            if (_distanceToMove <= 0f)
+                IsMoving = false;
+        }
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "golfBall")
@@ -35,7 +53,7 @@ public class Torndao : MonoBehaviour
             float ballZ = golfBallScript.transform.position.z;
             float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
 
-            golfBallScript.HitByTornado(HeightInUnityUnits, ballHeightInUnityUnits,_tornadoStrength);
+            golfBallScript.HitByTornado(HeightInUnityUnits, ballHeightInUnityUnits,TornadoStrength);
         }
     }
     void SetTornadoStrength()
@@ -66,14 +84,14 @@ public class Torndao : MonoBehaviour
 
         if (minStrengthFromWindPower == maxStrengthFromRainLevel)
         {
-            _tornadoStrength = minStrengthFromWindPower;
+            TornadoStrength = minStrengthFromWindPower;
         }
         else
         {
-            _tornadoStrength = UnityEngine.Random.Range(minStrengthFromWindPower, maxStrengthFromRainLevel);
+            TornadoStrength = UnityEngine.Random.Range(minStrengthFromWindPower, maxStrengthFromRainLevel);
         }
-        AdjustScaleOfTornado(_tornadoStrength);
-        AdjustHeightOfTornado(_tornadoStrength);
+        AdjustScaleOfTornado(TornadoStrength);
+        AdjustHeightOfTornado(TornadoStrength);
     }
     void AdjustScaleOfTornado(int scaleToSet)
     {
@@ -82,5 +100,50 @@ public class Torndao : MonoBehaviour
     void AdjustHeightOfTornado(int scaleFactor)
     {
         HeightInUnityUnits *= scaleFactor;
+    }
+    public void MoveTornadoForNewTurn()
+    {
+        GolfPlayerTopDown furthestPlayer = GetFurthestPlayer();
+
+        if (furthestPlayer == null)
+            return;
+
+        _movementDir = (furthestPlayer.MyBall.transform.position - this.transform.position).normalized;
+        _distanceToMove = DistanceToMoveTornadoThisTurn();
+
+        IsMoving = true;
+    }
+    GolfPlayerTopDown GetFurthestPlayer()
+    {
+        float distance = 0f;
+        GolfPlayerTopDown playerToSpawnBy = null;
+        for (int i = 0; i < GameplayManagerTopDownGolf.instance.GolfPlayers.Count; i++)
+        {
+            GolfPlayerTopDown player = GameplayManagerTopDownGolf.instance.GolfPlayers[i];
+            if (i == 0)
+            {
+                distance = player.DistanceToHole;
+                playerToSpawnBy = player;
+                continue;
+            }
+
+            if (player.DistanceToHole > distance)
+            {
+                distance = player.DistanceToHole;
+                playerToSpawnBy = player;
+            }
+        }
+        return playerToSpawnBy;
+    }
+    float DistanceToMoveTornadoThisTurn()
+    {
+        float dist = 0f;
+
+        float min = 5f * (this.TornadoStrength / 2f);
+        float max = 10f * (this.TornadoStrength / 2f);
+
+        dist = UnityEngine.Random.Range(min, max);
+
+        return dist;
     }
 }

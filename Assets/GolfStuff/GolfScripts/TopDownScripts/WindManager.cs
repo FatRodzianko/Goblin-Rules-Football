@@ -25,7 +25,7 @@ public class WindManager : MonoBehaviour
     [SerializeField] GameObject _tornadoPrefab;
     [SerializeField] GameObject _tornadoObject;
     public bool IsThereATorndao = false;
-    public Torndao TorndaoScript;
+    public Torndao TornadoScript;
     [SerializeField] float _minSpawnDist = 10f;
     [SerializeField] float _maxSpawnDist = 50f;
 
@@ -239,9 +239,9 @@ public class WindManager : MonoBehaviour
             Destroy(destroyObject);
             _tornadoObject = null;
         }
-        if (TorndaoScript)
+        if (TornadoScript)
         {
-            TorndaoScript = null;
+            TornadoScript = null;
         }
     }
     public void CheckIfTornadoWillSpawn()
@@ -265,7 +265,7 @@ public class WindManager : MonoBehaviour
         Vector3 spawnPos = GetTornadoSpawnPosition();
 
         _tornadoObject = Instantiate(_tornadoPrefab, spawnPos, Quaternion.identity);
-        TorndaoScript = _tornadoObject.GetComponent<Torndao>();
+        TornadoScript = _tornadoObject.GetComponent<Torndao>();
 
         IsThereATorndao = true;
     }
@@ -275,23 +275,10 @@ public class WindManager : MonoBehaviour
 
         // For now, select player furthest from the hole?
         float distance = 0f;
-        GolfPlayerTopDown playerToSpawnBy = null;
-        for (int i = 0; i < GameplayManagerTopDownGolf.instance.GolfPlayers.Count; i++)
-        {
-            GolfPlayerTopDown player = GameplayManagerTopDownGolf.instance.GolfPlayers[i];
-            if (i == 0)
-            {
-                distance = player.DistanceToHole;
-                playerToSpawnBy = player;
-                continue;
-            }
+        GolfPlayerTopDown playerToSpawnBy = GetFurthestPlayer();
 
-            if (player.DistanceToHole > distance)
-            {
-                distance = player.DistanceToHole;
-                playerToSpawnBy = player;
-            }
-        }
+        if (playerToSpawnBy == null)
+            return spawnPos;
 
         Vector3 startPos = playerToSpawnBy.MyBall.transform.position;
 
@@ -325,4 +312,37 @@ public class WindManager : MonoBehaviour
 
         return randomPos;
     }
+    public void MoveTornadoForNewTurn()
+    {
+        if (!IsThereATorndao)
+            return;
+        if (!TornadoScript)
+            return;
+
+        TornadoScript.MoveTornadoForNewTurn();
+        
+    }
+    GolfPlayerTopDown GetFurthestPlayer()
+    {
+        float distance = 0f;
+        GolfPlayerTopDown playerToSpawnBy = null;
+        for (int i = 0; i < GameplayManagerTopDownGolf.instance.GolfPlayers.Count; i++)
+        {
+            GolfPlayerTopDown player = GameplayManagerTopDownGolf.instance.GolfPlayers[i];
+            if (i == 0)
+            {
+                distance = player.DistanceToHole;
+                playerToSpawnBy = player;
+                continue;
+            }
+
+            if (player.DistanceToHole > distance)
+            {
+                distance = player.DistanceToHole;
+                playerToSpawnBy = player;
+            }
+        }
+        return playerToSpawnBy;
+    }
+
 }
