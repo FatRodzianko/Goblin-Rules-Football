@@ -1181,6 +1181,49 @@ public class GolfBallTopDown : MonoBehaviour
             Debug.Log("HitEnvironmentObstacle: ball CLEARS the obstacle and will keep flying. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString());
         }
     }
+    public void HitByTornado(float obstalceUnityUnits, float ballUnityUnits, int tornadoStrength)
+    {
+        if (DoesBallHitObject(obstalceUnityUnits, ballUnityUnits))
+        {
+            Debug.Log("HitByTornado: ball SUCKED INTO the torndao and will be launched/\"hit\" in a random direction. Ball height: " + ballUnityUnits.ToString() + " tornado height: " + obstalceUnityUnits.ToString());
+            TornadoLaunchBallInRandomDirection(tornadoStrength);
+        }
+        else
+        {
+            Debug.Log("HitByTornado: ball CLEARS the torndao and will keep flying. Ball height: " + ballUnityUnits.ToString() + " tornado height: " + obstalceUnityUnits.ToString());
+        }
+    }
+    void TornadoLaunchBallInRandomDirection(int tornadoStrength)
+    {
+        // reset before hitting the ball again?
+        hitBallCount = 0f;
+        if (isHit)
+            isHit = false;
+        if (isBouncing)
+            isBouncing = false;
+        if (isRolling)
+            isRolling = false;
+
+        Vector2 tornadoLaunchDir = GetRandomDirection();
+        float tornadoLaunchDistance = GetTornadoLaunchDistance(tornadoStrength);
+        float tornadoLaunchAngle = UnityEngine.Random.Range(10f, 40f);
+        float tornadoTopSpin = UnityEngine.Random.Range(-4f, 5f);
+        float tornadoLeftOrRightSpin = UnityEngine.Random.Range(-5f, 5f);
+
+        HitBall(tornadoLaunchDistance, tornadoLaunchAngle, tornadoTopSpin, tornadoLaunchDir, tornadoLeftOrRightSpin);
+    }
+    Vector2 GetRandomDirection()
+    {
+        float randX = UnityEngine.Random.Range(-1f, 1f);
+        float randY = UnityEngine.Random.Range(-1f, 1f);
+        return new Vector2(randX, randY).normalized;
+    }
+    float GetTornadoLaunchDistance(int tornadoStrength)
+    {
+        float minLaunch = 10f * (tornadoStrength / 2f);
+        float maxLaunch = 20f * (tornadoStrength / 2f);
+        return UnityEngine.Random.Range(minLaunch, maxLaunch);
+    }
     public bool DoesBallHitObject(float obstalceUnityUnits, float ballUnityUnits)
     {
         bool doesBallHitObject = false;
