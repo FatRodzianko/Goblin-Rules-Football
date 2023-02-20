@@ -58,12 +58,14 @@ public class LightningManager : MonoBehaviour
     [SerializeField] string _thunderNear;
     [SerializeField] string _thunderMed;
     [SerializeField] string _thunderFarAway;
+    [SerializeField] GameObject _thunderSubtitle;
 
     // Start is called before the first frame update
     void Start()
     {
         //StartCoroutine(StartLightning());
         RainManager.instance.WeatherChanged += UpdateWeather;
+        _thunderSubtitle.SetActive(false);
     }
 
     // Update is called once per frame
@@ -181,9 +183,17 @@ public class LightningManager : MonoBehaviour
         yield return new WaitForSeconds(soundDelay);
         Debug.Log("ThunderClap: Thunder will play now. Time: " + Time.time);
         // Play thunder sound
-        if(!string.IsNullOrWhiteSpace(thunderClip))
+        if (!string.IsNullOrWhiteSpace(thunderClip))
+        {
             SoundManager.instance.PlaySound(thunderClip, 1f);
-        
+            _thunderSubtitle.SetActive(true);
+            yield return new WaitForSeconds(2f);
+        }
+        _thunderSubtitle.SetActive(false);
+    }
+    void ThunderSubtitle()
+    { 
+
     }
     public void CheckIfLightningStartsThisTurn()
     {

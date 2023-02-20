@@ -108,6 +108,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Set the current player
         SetCurrentPlayer(GolfPlayersInTeeOffOrder[0]);
         // Move the first player to the tee off location
+        MoveAllPlayersNearTeeOffLocation();
         MovePlayerToTeeOffLocation(CurrentPlayer);
         // Diable sprite of players that are not the current player
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
@@ -196,6 +197,16 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         player.MyBall.transform.position = TeeOffPosition;
         player.MyBall.ResetBallSpriteForNewHole();
         
+    }
+    void MoveAllPlayersNearTeeOffLocation()
+    {
+        foreach (GolfPlayerTopDown player in GolfPlayers)
+        {
+            Vector3 offset = new Vector3(5f, UnityEngine.Random.Range(-5f,5f), 0f);
+            player.transform.position = TeeOffPosition - offset;
+            player.MyBall.transform.position = TeeOffPosition - offset;
+            //player.MyBall.ResetBallSpriteForNewHole();
+        }
     }
     public void PlayerTeedOff(GolfPlayerTopDown submittingPlayer)
     {
@@ -526,12 +537,14 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Update the "rain sound" for the next hole
         RainManager.instance.GetRainSoundForHole();
         // Set the weather for the next turn
+        MoveAllPlayersNearTeeOffLocation(); // move the players first so the tornado knows where to go?
         SetWeatherForNextTurn();
         // Sort the players by lowest score to start the hole
         OrderListOfPlayers();
         // Set the current player
         SetCurrentPlayer(GolfPlayersInTeeOffOrder[0]);
         // Move the first player to the tee off location
+        
         MovePlayerToTeeOffLocation(CurrentPlayer);
         // Diable sprite of players that are not the current player
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
