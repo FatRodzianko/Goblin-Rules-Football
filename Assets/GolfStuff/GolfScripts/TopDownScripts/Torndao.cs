@@ -4,19 +4,35 @@ using UnityEngine;
 
 public class Torndao : MonoBehaviour
 {
+    [Header("My Components")]
     [SerializeField] Rigidbody2D _rb;
     [SerializeField] BoxCollider2D _myCollider;
+    [SerializeField] SpriteRenderer _spriteRenderer;
+    [SerializeField] GameObject _centerObject;
+
+    [Header("Attributes")]
     [SerializeField] public float HeightInUnityUnits = 3f;
     [SerializeField] public int TornadoStrength = 1;
+
+    [Header("Movement")]
     public bool IsMoving = false;
     [SerializeField] float _speed = 5f;
     [SerializeField] Vector2 _movementDir = Vector2.zero;
     [SerializeField] float _distanceToMove = 0f;
+
+    [Header("Balls Hit")]
+    public bool HitBall = false;
+    public List<GolfBallTopDown> BallsHit = new List<GolfBallTopDown>();
+
+    [Header("Misc.")]
+    CameraFollowScript _cameraFollowScript;
+    
     private void Awake()
     {
         if (!_myCollider)
             _myCollider = this.GetComponent<BoxCollider2D>();
         SetTornadoStrength();
+        GetCameraFollowScript();
     }
     // Start is called before the first frame update
     void Start()
@@ -53,7 +69,13 @@ public class Torndao : MonoBehaviour
             float ballZ = golfBallScript.transform.position.z;
             float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
 
-            golfBallScript.HitByTornado(HeightInUnityUnits, ballHeightInUnityUnits,TornadoStrength);
+            if (this.IsMoving)
+            {
+                HitBall = true;
+                BallsHit.Add(golfBallScript);
+            }
+            golfBallScript.HitByTornado(HeightInUnityUnits, ballHeightInUnityUnits,TornadoStrength, this);
+            
         }
     }
     void SetTornadoStrength()
@@ -92,6 +114,7 @@ public class Torndao : MonoBehaviour
         }
         AdjustScaleOfTornado(TornadoStrength);
         AdjustHeightOfTornado(TornadoStrength);
+        AdjustCenterObject();
     }
     void AdjustScaleOfTornado(int scaleToSet)
     {
@@ -100,6 +123,10 @@ public class Torndao : MonoBehaviour
     void AdjustHeightOfTornado(int scaleFactor)
     {
         HeightInUnityUnits *= scaleFactor;
+    }
+    void AdjustCenterObject()
+    {
+        _centerObject.transform.localPosition = _spriteRenderer.localBounds.center;
     }
     public void MoveTornadoForNewTurn()
     {
@@ -110,7 +137,8 @@ public class Torndao : MonoBehaviour
 
         _movementDir = (furthestPlayer.MyBall.transform.position - this.transform.position).normalized;
         _distanceToMove = DistanceToMoveTornadoThisTurn();
-
+        GetCameraFollowScript();
+        _cameraFollowScript.followTarget = _centerObject;
         IsMoving = true;
     }
     GolfPlayerTopDown GetFurthestPlayer()
@@ -145,5 +173,19 @@ public class Torndao : MonoBehaviour
         dist = UnityEngine.Random.Range(min, max);
 
         return dist;
+    }
+    void GetCameraFollowScript()
+    {
+        if (!_cameraFollowScript)
+            _cameraFollowScript = GameObject.FindGameObjectWithTag("camera").GetComponent<CameraFollowScript>();
+    }
+    public void BallCompletedTornadoHit(GolfBallTopDown ball)
+    {
+        Debug.Log("BallCompletedTornadoHit: From ball: " + ball.gameObject.name);
+        if (BallsHit.Contains(ball))
+            BallsHit.Remove(ball);
+
+        if (BallsHit.Count <= 0)
+            HitBall = false;
     }
 }

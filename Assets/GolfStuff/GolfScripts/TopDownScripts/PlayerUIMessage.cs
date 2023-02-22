@@ -34,11 +34,11 @@ public class PlayerUIMessage : MonoBehaviour
         }
         else if (message == "water")
         {
-            _playerMessageText.text = _water;
+            _playerMessageText.text = _myPlayer.PlayerName + ":\n" + _water;
         }
         else if (message == "out of bounds")
         {
-            _playerMessageText.text = _outOfBounds;
+            _playerMessageText.text = _myPlayer.PlayerName + ":\n" + _outOfBounds;
         }
         else if (message == "ball in hole")
         {
@@ -71,7 +71,7 @@ public class PlayerUIMessage : MonoBehaviour
     }
     string BallInHoleMessage()
     {
-        string ballInHoleMessage = "Strokes: ";
+        string ballInHoleMessage = _myPlayer.PlayerName + ":\n" + "Strokes: ";
 
         int playersScore = _golfPlayerScore.StrokesForCurrentHole;
         int holePar = GameplayManagerTopDownGolf.instance.CurrentHolePar;
@@ -100,25 +100,26 @@ public class PlayerUIMessage : MonoBehaviour
     {
         if (groundType.Contains("water"))
             return;
+        _playerMessageText.text = _myPlayer.PlayerName + ":\n";
         if (groundType.Contains("green"))
         {
-            _playerMessageText.text = "Green";
+            _playerMessageText.text += "Green";
         }
         else if (groundType.Contains("fairway"))
         {
-            _playerMessageText.text = "Fairway";
+            _playerMessageText.text += "Fairway";
         }
         else if (groundType.Contains("deep rough"))
         {
-            _playerMessageText.text = "DEEP rough...";
+            _playerMessageText.text += "DEEP rough...";
         }
         else if (groundType.Contains("rough"))
         {
-            _playerMessageText.text = "rough...";
+            _playerMessageText.text += "rough...";
         }
         else if (groundType.Contains("trap"))
         {
-            _playerMessageText.text = "...bunker...";
+            _playerMessageText.text += "...bunker...";
         }
     }
     void HoleEnded()

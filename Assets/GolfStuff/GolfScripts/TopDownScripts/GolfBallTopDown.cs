@@ -73,6 +73,10 @@ public class GolfBallTopDown : MonoBehaviour
     [Header("Ball State")]
     public bool IsInHole = false;
 
+    [Header("Tornado")]
+    public bool IsHitByTornado = false;
+    public Torndao MyTornado = null;
+
 
     [Header("Ground Material Info")]
     [SerializeField] public float greenRollSpeedModifier = 0.5f;
@@ -1063,6 +1067,17 @@ public class GolfBallTopDown : MonoBehaviour
         MyPlayer.ResetPreviousHitValues();
         //TellPlayerGroundTypeTheyLandedOn();
         MyPlayer.SetDistanceToHoleForPlayer();
+        if (IsHitByTornado)
+        {
+            IsHitByTornado = false;
+            MyTornado.BallCompletedTornadoHit(this);
+            MyTornado = null;
+
+            // check to see if ball is out of bounds or in water to make sure that is handled appropriately. Also, check if the ball is in the hole? Prompt each player sequentially? If possible?
+            // Maybe tell the Tornado object to make a call to GameplayManager with a list of GolfPlayers that need to be told. GameplayManager makes calls to "await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3)" which it should be able to do sequentially because it is a task?
+
+            return;
+        }
         GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
     Vector2 GetPerpendicular(Vector2 dir, float leftOrRight)
@@ -1181,11 +1196,17 @@ public class GolfBallTopDown : MonoBehaviour
             Debug.Log("HitEnvironmentObstacle: ball CLEARS the obstacle and will keep flying. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString());
         }
     }
-    public void HitByTornado(float obstalceUnityUnits, float ballUnityUnits, int tornadoStrength)
+    public void HitByTornado(float obstalceUnityUnits, float ballUnityUnits, int tornadoStrength, Torndao tornado)
     {
         if (DoesBallHitObject(obstalceUnityUnits, ballUnityUnits))
         {
             Debug.Log("HitByTornado: ball SUCKED INTO the torndao and will be launched/\"hit\" in a random direction. Ball height: " + ballUnityUnits.ToString() + " tornado height: " + obstalceUnityUnits.ToString());
+            if (!this.isHit && !this.isBouncing && !this.isRolling)
+            {
+                IsHitByTornado = true;
+                MyTornado = tornado;
+            }
+            
             TornadoLaunchBallInRandomDirection(tornadoStrength);
         }
         else

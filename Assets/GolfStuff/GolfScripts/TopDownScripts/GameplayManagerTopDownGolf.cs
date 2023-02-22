@@ -22,6 +22,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     public List<Vector3> HolePositions;
     public Vector3 TeeOffAimPoint;
     [SerializeField] float _lastNewHoleTime = 0f;
+    public int CurrentTurnNumber = 0;
+    public int LastTurnWithWeatherChange = 0;
 
 
     [Header("Tilemap Manager References")]
@@ -249,26 +251,6 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             TimeSinceLastSkip = Time.time;
         }
 
-        // Check if the ball is out-of-bounds. If so, move ball back in bounds before selecting next player
-        /*GetCameraBoundingBox();
-        if (_cameraBoundingBox)
-        {
-            if (!_cameraBoundingBox.OverlapPoint(ball.transform.position))
-            {
-                Debug.Log("GameplayManager: StartNextPlayersTurn: Ball is NOT in bounds. Moving the ball for the ball");
-                //ball.OutOfBounds();
-                await ball.MyPlayer.TellPlayerBallIsOutOfBounds(3);
-                //return;
-            }
-        }*/
-        // Check if the ball is in water. If so, move ball out of water before selecting next player
-        /*if (ball.bounceContactGroundMaterial.Contains("water"))
-        {
-            Debug.Log("GameplayManager: StartNextPlayersTurn: ball landed in water");
-            ball.BallEndedInWater();
-            return;
-
-        }*/
         if (ball.IsInHole)
         {
             Debug.Log("GameplayManager: StartNextPlayersTurn: the ball is in the hole! Congrats to player: " + ball.MyPlayer.PlayerName);
@@ -277,14 +259,12 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             //return;
         }
         
-        //TellPlayerGroundBallIsOn(ball);
         if (!ball.IsInHole && !playerSkippingForLightning && !playerWasStruckByLightning)
         {  
             Debug.Log("StartNextPlayersTurn: Calling TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
             await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
             Debug.Log("StartNextPlayersTurn: Returning from TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
-        }
-        
+        }        
         
         // Check if any players still have to hit a ball
         if (_numberOfPlayersInHole >= GolfPlayers.Count)
@@ -305,8 +285,9 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             }
             return;
         }
+
         // Set the weather for the next turn
-        SetWeatherForNextTurn();
+        await SetWeatherForNextTurn();
         // Find the next player based on tee off position, or by furthest player from hole if all players teed off
         if (playerSkippingForLightning)
         {
@@ -320,22 +301,6 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             }
             else
             {
-                // If players still have not teed off, remove this player from GolfPlayersInTeeOffOrder, then add them back at the end of the list
-                /*if (!_haveAllPlayersTeedOff)
-                {
-                    if (!HaveAllPlayersTeedOff())
-                    {
-                        MovePlayerToBackOfTeeOffOrder(ball.MyPlayer);
-                        CurrentPlayer = GolfPlayersInTeeOffOrder[_numberOfPlayersTeedOff];
-                    }
-                }
-                else
-                { 
-                    // If all players have teed off, find the next furthest away player
-
-                    // Once a player has skipped a turn, create an ordered list of players by their distance to the hole. Add the player who just skipped to the end of the list. Everyone takes their turn based on that list until all players have had a turn to either hit or skip turn. Once all players either choose skip/hit and the list makes it back to the first player who skipped, then reset a "player has skipped turn" value and calculate next player normally based on just distance
-                    // all of the above is just to make sure that if a player skips their turn, and then the next player goes, it doesn't just go back to the player who skipped (who will still be the furthest away from the hole), penalizing them continuously for their turn taken place near a lightning storm
-                }*/
 
                 if (PlayerHasSkippedTurn)
                 {
@@ -388,10 +353,6 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Prompt player to start their turn
         PromptPlayerForNextTurn();
     }
-    /*async void TellPlayerGroundBallIsOn(GolfBallTopDown ball)
-    {
-        await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
-    }*/
     GolfPlayerTopDown SelectNextPlayer()
     {
         if (!_haveAllPlayersTeedOff)
@@ -503,13 +464,15 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         _cameraViewHole.SetZoomedOutPosition(newPos);
 
     }
-    void NextHole()
+    async void NextHole()
     {
         Debug.Log("Next hole: " + Time.time);
         if (Time.time < _lastNewHoleTime + 0.25f)
             return;
         _lastNewHoleTime = Time.time;
         CurrentHoleIndex++;
+        CurrentTurnNumber = 0;
+        LastTurnWithWeatherChange = 0;
         _numberOfPlayersInHole = 0;
         AddPlayersOutOfCommissionBack();
         // Save each player's score and reset their "current" score of the new hole
@@ -538,7 +501,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         RainManager.instance.GetRainSoundForHole();
         // Set the weather for the next turn
         MoveAllPlayersNearTeeOffLocation(); // move the players first so the tornado knows where to go?
-        SetWeatherForNextTurn();
+        await SetWeatherForNextTurn();
         // Sort the players by lowest score to start the hole
         OrderListOfPlayers();
         // Set the current player
@@ -553,16 +516,25 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Prompt player to start their turn
         PromptPlayerForNextTurn();
     }
-    void SetWeatherForNextTurn()
+    async Task SetWeatherForNextTurn()
     {
+
+        Debug.Log("SetWeatherForNextTurn");
         // Set the new wind for the next turn
         WindManager.instance.UpdateWindForNewTurn();
         WindManager.instance.UpdateWindDirectionForNewTurn();
         // Set new weather for the next turn
         RainManager.instance.UpdateWeatherForNewTurn();
-        _lightningManager.CheckIfLightningStartsThisTurn();
+        
         WindManager.instance.CheckIfTornadoWillSpawn();
-        WindManager.instance.MoveTornadoForNewTurn();
+        //WindManager.instance.MoveTornadoForNewTurn();
+        Debug.Log("SetWeatherForNextTurn: move tornado start at: " + Time.time);
+        await WindManager.instance.MoveTornadoTask();
+        Debug.Log("SetWeatherForNextTurn: move tornado end at: " + Time.time);
+
+        // make sure lightning occurs after the tornado tracking?
+        _lightningManager.CheckIfLightningStartsThisTurn();
+
     }
     void PromptPlayerForNextTurn()
     {

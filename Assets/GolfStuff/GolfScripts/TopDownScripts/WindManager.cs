@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class WindManager : MonoBehaviour
@@ -275,6 +276,7 @@ public class WindManager : MonoBehaviour
 
         // For now, select player furthest from the hole?
         float distance = 0f;
+
         GolfPlayerTopDown playerToSpawnBy = GetFurthestPlayer();
 
         if (playerToSpawnBy == null)
@@ -321,6 +323,25 @@ public class WindManager : MonoBehaviour
 
         TornadoScript.MoveTornadoForNewTurn();
         
+    }
+    public async Task MoveTornadoTask()
+    {
+        if (!IsThereATorndao)
+            return;
+        if (!TornadoScript)
+            return;
+        if (this.WindPower <= 0f || RainManager.instance.RainState == "clear")
+        {
+            DestroyTornadoObjects();
+            return;
+        }
+
+        TornadoScript.MoveTornadoForNewTurn();
+
+        while (this.WindPower > 0 && RainManager.instance.RainState != "clear" && (TornadoScript.IsMoving || TornadoScript.HitBall))
+        {
+            await Task.Yield();
+        }
     }
     GolfPlayerTopDown GetFurthestPlayer()
     {

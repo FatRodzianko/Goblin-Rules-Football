@@ -307,7 +307,8 @@ public class LightningManager : MonoBehaviour
     }
     bool WillPlayerBeStruckByLightning()
     {
-        return UnityEngine.Random.Range(0f, 1.0f) > Mathf.Abs(DistanceFromPlayer);
+        return false;
+        //return UnityEngine.Random.Range(0f, 1.0f) > Mathf.Abs(DistanceFromPlayer);
     }
     void StopLightningRoutineStuff()
     {
