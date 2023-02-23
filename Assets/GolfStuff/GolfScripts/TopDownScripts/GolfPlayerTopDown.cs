@@ -1277,7 +1277,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     public async Task TellPlayerGroundTheyLandedOn(float duration)
     {
-        Debug.Log("TellPlayerGroundTheyLandedOn: on game player");
+        Debug.Log("TellPlayerGroundTheyLandedOn: on game player: " + this.PlayerName);
         float end = Time.time + duration;
         GetCameraBoundingBox();
         bool isInBounds = true;
@@ -1293,8 +1293,14 @@ public class GolfPlayerTopDown : MonoBehaviour
                 //return;
             }
         }
-        if(isInBounds)
+        if (isInBounds && !MyBall.IsInHole)
             MyBall.TellPlayerGroundTypeTheyLandedOn();
+        else if (isInBounds && MyBall.IsInHole)
+        {
+            Debug.Log("TellPlayerGroundTheyLandedOn: on game player: " + this.PlayerName + " ball is in hole!");
+            MyBall.TellPlayerBallIsInHole();
+            end += 1f;
+        }
         while (Time.time < end)
         {
             await Task.Yield();

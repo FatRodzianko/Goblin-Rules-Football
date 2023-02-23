@@ -23,6 +23,7 @@ public class Torndao : MonoBehaviour
     [Header("Balls Hit")]
     public bool HitBall = false;
     public List<GolfBallTopDown> BallsHit = new List<GolfBallTopDown>();
+    public List<GolfBallTopDown> BallsHitThatStopped = new List<GolfBallTopDown>();
 
     [Header("Misc.")]
     CameraFollowScript _cameraFollowScript;
@@ -139,6 +140,7 @@ public class Torndao : MonoBehaviour
         _distanceToMove = DistanceToMoveTornadoThisTurn();
         GetCameraFollowScript();
         _cameraFollowScript.followTarget = _centerObject;
+        ResetHitBallStuff();
         IsMoving = true;
     }
     GolfPlayerTopDown GetFurthestPlayer()
@@ -179,13 +181,38 @@ public class Torndao : MonoBehaviour
         if (!_cameraFollowScript)
             _cameraFollowScript = GameObject.FindGameObjectWithTag("camera").GetComponent<CameraFollowScript>();
     }
-    public void BallCompletedTornadoHit(GolfBallTopDown ball)
+    public async void BallCompletedTornadoHit(GolfBallTopDown ball)
     {
         Debug.Log("BallCompletedTornadoHit: From ball: " + ball.gameObject.name);
-        if (BallsHit.Contains(ball))
+        if (BallsHit.Contains(ball) && !BallsHitThatStopped.Contains(ball))
+        {
             BallsHit.Remove(ball);
+            BallsHitThatStopped.Add(ball);
+        }
+
 
         if (BallsHit.Count <= 0)
+        {
+            foreach (GolfBallTopDown stoppedBall in BallsHitThatStopped)
+            {
+                await stoppedBall.MyPlayer.TellPlayerGroundTheyLandedOn(3);
+                if (stoppedBall.IsInHole)
+                {
+                    Debug.Log("BallCompletedTornadoHit: Ball hit into hole by tornado!");
+                    if (GameplayManagerTopDownGolf.instance.AreAllPlayersInHoleOrIncapacitated())
+                    {
+                        GameplayManagerTopDownGolf.instance.AllPlayersInHoleOrIncapacitated(stoppedBall);
+                    }
+                }
+            }
+
             HitBall = false;
+        }
+    }
+    void ResetHitBallStuff()
+    {
+        HitBall = false;
+        BallsHit.Clear();
+        BallsHitThatStopped.Clear();
     }
 }

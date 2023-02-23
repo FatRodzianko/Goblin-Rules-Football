@@ -258,18 +258,21 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             UpdateUIForCurrentPlayer(ball.MyPlayer);
             //return;
         }
-        
-        if (!ball.IsInHole && !playerSkippingForLightning && !playerWasStruckByLightning)
+
+        //if (!ball.IsInHole && !playerSkippingForLightning && !playerWasStruckByLightning)
+        if (!playerSkippingForLightning && !playerWasStruckByLightning)
         {  
             Debug.Log("StartNextPlayersTurn: Calling TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
             await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
             Debug.Log("StartNextPlayersTurn: Returning from TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
         }        
         
+
+
         // Check if any players still have to hit a ball
         if (_numberOfPlayersInHole >= GolfPlayers.Count)
         {
-            if(PlayerHasSkippedTurn)
+            /*if(PlayerHasSkippedTurn)
                 ResetLightningSkipInfo();
 
             if ((CurrentHoleIndex + 1) < CurrentCourse.HolesInCourse.Length)
@@ -282,7 +285,8 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             {
                 Debug.Log("GameplayManager: StartNextPlayersTurn: All players have made it into the hole. No more remaining players! And this was the last hole! Ending the game...");
                 EndGame();
-            }
+            }*/
+            AllPlayersInHoleOrIncapacitated(ball);
             return;
         }
 
@@ -553,7 +557,9 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     async void EndGame()
     {
         AddPlayersOutOfCommissionBack();
-        var tasks = new Task[GolfPlayers.Count];
+
+        // The below commented out section tells all players at once that the game has ended, causing the UI from each player to overlap. This will be more useful for networked multiplayer, but my "local multiplayer" should instead do it sequentially like below
+        /*var tasks = new Task[GolfPlayers.Count];
         Debug.Log("EndGame: Before calling TellPlayerGameIsOver time is: " + Time.time.ToString());
         // Save each player's score and reset their "current" score of the new hole
         for (int i = 0; i < GolfPlayers.Count; i++)
@@ -563,7 +569,16 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             tasks[i] = player.TellPlayerGameIsOver(5);
         }
 
-        await Task.WhenAll(tasks);
+        await Task.WhenAll(tasks);*/
+        // doing each "TellPlayerGameIsOver" for "local multiplayer"
+        Debug.Log("EndGame: Before calling TellPlayerGameIsOver time is: " + Time.time.ToString());
+        for (int i = 0; i < GolfPlayers.Count; i++)
+        {
+            GolfPlayerTopDown player = GolfPlayers[i];
+            player.ResetForNewHole(CurrentHoleIndex + 1);
+            await player.TellPlayerGameIsOver(5);
+        }
+
         Debug.Log("EndGame: AFTER calling TellPlayerGameIsOver time is: " + Time.time.ToString());
 
     }
@@ -656,5 +671,29 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             GolfPlayers.AddRange(GolfPlayersOutOfCommission);
             GolfPlayersOutOfCommission.Clear();
         }
+    }
+    public async void AllPlayersInHoleOrIncapacitated(GolfBallTopDown ball)
+    {
+        if (PlayerHasSkippedTurn)
+            ResetLightningSkipInfo();
+
+        if ((CurrentHoleIndex + 1) < CurrentCourse.HolesInCourse.Length)
+        {
+            Debug.Log("AllPlayersInHoleOrIncapacitated: All players have made it into the hole. No more remaining players! Loading next hole?");
+            await ball.MyPlayer.TellPlayerHoleEnded(3);
+            NextHole();
+        }
+        else
+        {
+            Debug.Log("AllPlayersInHoleOrIncapacitated: All players have made it into the hole. No more remaining players! And this was the last hole! Ending the game...");
+            EndGame();
+        }
+    }
+    public bool AreAllPlayersInHoleOrIncapacitated()
+    {
+        if (_numberOfPlayersInHole >= GolfPlayers.Count)
+            return true;
+        else
+            return false;
     }
 }

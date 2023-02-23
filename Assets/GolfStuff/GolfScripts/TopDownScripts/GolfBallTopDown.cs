@@ -1036,9 +1036,20 @@ public class GolfBallTopDown : MonoBehaviour
         MyBallObject.GetComponent<SpriteRenderer>().enabled = false;
         this.IsInHole = true;
         ResetBallMovementBools();
-        TellPlayerBallIsInHole();
+        //TellPlayerBallIsInHole();
         SoundManager.instance.PlaySound("golfball-in-hole", 1.0f);
         GameplayManagerTopDownGolf.instance.PlayersBallInHole();
+
+        if (IsHitByTornado)
+        {
+            ResetTornadoStuff();
+            // check to see if ball is out of bounds or in water to make sure that is handled appropriately. Also, check if the ball is in the hole? Prompt each player sequentially? If possible?
+            // Maybe tell the Tornado object to make a call to GameplayManager with a list of GolfPlayers that need to be told. GameplayManager makes calls to "await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3)" which it should be able to do sequentially because it is a task?
+
+            return;
+        }
+
+        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
     float TimeBeforeSinkInHole(float movementSpeed, HoleTopDown holeRolledInto)
     {
@@ -1069,16 +1080,19 @@ public class GolfBallTopDown : MonoBehaviour
         MyPlayer.SetDistanceToHoleForPlayer();
         if (IsHitByTornado)
         {
-            IsHitByTornado = false;
-            MyTornado.BallCompletedTornadoHit(this);
-            MyTornado = null;
-
+            ResetTornadoStuff();
             // check to see if ball is out of bounds or in water to make sure that is handled appropriately. Also, check if the ball is in the hole? Prompt each player sequentially? If possible?
             // Maybe tell the Tornado object to make a call to GameplayManager with a list of GolfPlayers that need to be told. GameplayManager makes calls to "await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3)" which it should be able to do sequentially because it is a task?
 
             return;
         }
         GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+    }
+    void ResetTornadoStuff()
+    {
+        IsHitByTornado = false;
+        MyTornado.BallCompletedTornadoHit(this);
+        MyTornado = null;
     }
     Vector2 GetPerpendicular(Vector2 dir, float leftOrRight)
     {
@@ -1503,12 +1517,12 @@ public class GolfBallTopDown : MonoBehaviour
         //MyPlayer.EnablePlayerCanvas(false);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
-    void TellPlayerBallIsInHole()
+    public void TellPlayerBallIsInHole()
     {
         Debug.Log("TellPlayerBallIsInHole");
         MyPlayer.PlayerUIMessage("ball in hole");
         MyPlayer.EnablePlayerCanvas(true);
-        StartCoroutine(DelayForBallInHole(4f));
+        //StartCoroutine(DelayForBallInHole(4f));
     }
     IEnumerator DelayForBallInHole(float delaySeconds)
     {
