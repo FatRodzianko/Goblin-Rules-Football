@@ -504,9 +504,11 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
         // Update the "rain sound" for the next hole
         RainManager.instance.GetRainSoundForHole();
+        // If there was a tornado on the previous hole, destroy it. They players are in a different location now so it doesn't make sense for the tornado to stay in the same "spot" it was on the previous hole 
+        WindManager.instance.DestroyTornadoForNextHole();
         // Set the weather for the next turn
         MoveAllPlayersNearTeeOffLocation(); // move the players first so the tornado knows where to go?
-        await SetWeatherForNextTurn();
+        await SetWeatherForNextTurn(true);
         // Sort the players by lowest score to start the hole
         OrderListOfPlayers();
         // Set the current player
@@ -521,7 +523,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Prompt player to start their turn
         PromptPlayerForNextTurn();
     }
-    async Task SetWeatherForNextTurn()
+    async Task SetWeatherForNextTurn(bool newHole = false)
     {
 
         Debug.Log("SetWeatherForNextTurn");
@@ -531,7 +533,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         // Set new weather for the next turn
         RainManager.instance.UpdateWeatherForNewTurn();
         
-        WindManager.instance.CheckIfTornadoWillSpawn();
+        WindManager.instance.CheckIfTornadoWillSpawn(newHole);
         //WindManager.instance.MoveTornadoForNewTurn();
         Debug.Log("SetWeatherForNextTurn: move tornado start at: " + Time.time);
         await WindManager.instance.MoveTornadoTask();

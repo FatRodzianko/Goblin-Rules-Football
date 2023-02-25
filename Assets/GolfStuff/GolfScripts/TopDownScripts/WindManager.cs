@@ -258,8 +258,10 @@ public class WindManager : MonoBehaviour
             TornadoScript = null;
         }
     }
-    public void CheckIfTornadoWillSpawn()
+    public void CheckIfTornadoWillSpawn(bool newHole = false)
     {
+        if (newHole)
+            return;
         if (IsThereATorndao)
             return;
         if (this.WindPower <= 0f)
@@ -274,6 +276,20 @@ public class WindManager : MonoBehaviour
         }
         if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
             return;
+
+        float tornadoLikelihood = 0.2f;
+        if (RainManager.instance.RainState == "med rain")
+            tornadoLikelihood += 0.1f;
+        else if (RainManager.instance.RainState == "heavy rain")
+            tornadoLikelihood += 0.25f;
+
+        if (UnityEngine.Random.Range(0f, 1f) > tornadoLikelihood && !IsThereATorndao)
+        {
+            Debug.Log("CheckIfTornadoWillSpawn: Will NOT Spawn a torndao this turn.");
+            IsThereATorndao = false;
+            return;
+        }
+
         Debug.Log("CheckIfTornadoWillSpawn: Will Spawn a torndao this turn.");
 
         Vector3 spawnPos = GetTornadoSpawnPosition();
@@ -377,6 +393,10 @@ public class WindManager : MonoBehaviour
             }
         }
         return playerToSpawnBy;
+    }
+    public void DestroyTornadoForNextHole()
+    {
+        DestroyTornadoObjects();
     }
 
 }
