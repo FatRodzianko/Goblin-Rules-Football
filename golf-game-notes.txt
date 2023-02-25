@@ -97,25 +97,29 @@
 - - - - - - - - x intensity increases based on distance from player? no more than 1.5 for the lightning or it might get weird...
 - - x "rain sounds" for light, med, heavy. Either different sounds for each or just one sounds and adjust its volume based on weather
 - - - create "tornado" effect that spawns during storms and moves about
-- - - - - - players try to "play around" the tornados. If their ball is hit by the tornado, thrown in random direction
+- - - - - x players try to "play around" the tornados. If their ball is hit by the tornado, thrown in random direction
 - - - - - - "ritual" to be performed to either fend off the Wind God, or welcome their Judgement
 - - - - - - - - - Whether or not tornadoes appear will be based on if more players welcome the judgement or not, based on minigame type thing, and also weighted based on how "well" either side does the pro/anti-wind god ritual
 - - - - - - - - - Tornados also attracted to players that do the ritual worst?
+- Icons that point to "special interest" objects that aren't on screen
+- - - hole/flag
+- - - tornados?
+- - - text that also shows the distance to thos objects?
 
-- GameplayManager requirements for top down golf
-- - - track what player's turn it is
-- - - display current number of strokes for the player
-- - - - - - grab this from a player's "score" object?
-- - - when the ball stops moving, switch to the next player (furthest one away from hole?)
-- - - hold list of holes to play in the course
-- - - keep track of current hole, transition to the next hole correctly
-- GameplayManager Next Steps
-- - - Have GameplayManager set which player's turn it is. Tracked by GameplayManager and a bool value on the player for "player's turn" or whatever
-- - - - - - after player hits ball, bool value for their turn is set to false
-- - - - - - to start player's turn, have GameplayManager call StartPlayerTurn() from the GolfPlayerTopDown script?
-- - - After a hit ball stops moving, GameplayManager checks for which player's turn is next
-- - - - - - - if the "number of players who teed off) is less than length of list of players, go to the next player in list using _numberOfPlayersTeedOff as the index
-- - - - - - - if _numberOfPlayersTeedOff is equal or greater than length of player list, calculate next player based on distance of their ball to the hole
+x GameplayManager requirements for top down golf
+- - x track what player's turn it is
+- - x display current number of strokes for the player
+- - - - - x grab this from a player's "score" object?
+- - x when the ball stops moving, switch to the next player (furthest one away from hole?)
+- - x hold list of holes to play in the course
+- - x keep track of current hole, transition to the next hole correctly
+x GameplayManager Next Steps
+- - x Have GameplayManager set which player's turn it is. Tracked by GameplayManager and a bool value on the player for "player's turn" or whatever
+- - - - - x after player hits ball, bool value for their turn is set to false
+- - - - - x to start player's turn, have GameplayManager call StartPlayerTurn() from the GolfPlayerTopDown script?
+- - x After a hit ball stops moving, GameplayManager checks for which player's turn is next
+- - - - - - x if the "number of players who teed off) is less than length of list of players, go to the next player in list using _numberOfPlayersTeedOff as the index
+- - - - - - x if _numberOfPlayersTeedOff is equal or greater than length of player list, calculate next player based on distance of their ball to the hole
 
 
 

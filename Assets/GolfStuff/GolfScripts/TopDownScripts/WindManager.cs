@@ -26,6 +26,9 @@ public class WindManager : MonoBehaviour
     [SerializeField] GameObject _tornadoPrefab;
     [SerializeField] GameObject _tornadoObject;
     public bool IsThereATorndao = false;
+    private bool _isThereATornado = false;
+    public delegate void IsTornadoChanged(bool tornado);
+    public event IsTornadoChanged TornadoChanged;
     public Torndao TornadoScript;
     [SerializeField] float _minSpawnDist = 10f;
     [SerializeField] float _maxSpawnDist = 50f;
@@ -36,6 +39,7 @@ public class WindManager : MonoBehaviour
 
         DirectionChanged = DirectionChangedFunction;
         PowerChanged = PowerChangedFunction;
+        TornadoChanged = TornadoChangedFunction;
     }
     void MakeInstance()
     {
@@ -63,6 +67,11 @@ public class WindManager : MonoBehaviour
             _windDirection = WindDirection;
             DirectionChanged(_windDirection);
         }
+        if (IsThereATorndao != _isThereATornado && TornadoChanged != null)
+        {
+            _isThereATornado = IsThereATorndao;
+            TornadoChanged(_isThereATornado);
+        }
     }
     void DirectionChangedFunction(Vector2 dir)
     {
@@ -74,6 +83,10 @@ public class WindManager : MonoBehaviour
         // if the power drops to 0, destroy and tornado objects
         if (power <= 0f)
             DestroyTornadoObjects();
+    }
+    void TornadoChangedFunction(bool tornado)
+    {
+        Debug.Log("TornadoChangedFunction: Is there a tornado?" + tornado.ToString());
     }
     public void UpdateWindForNewTurn()
     {

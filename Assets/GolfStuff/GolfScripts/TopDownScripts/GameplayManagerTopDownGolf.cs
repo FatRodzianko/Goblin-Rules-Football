@@ -55,6 +55,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
     [SerializeField] Canvas _loadingHoleCanvas;
     [SerializeField] Canvas _holeInfoCanvas;
 
+
     [Header("Skip For Lightning Info")]
     [SerializeField] public bool PlayerHasSkippedTurn = false;
     [SerializeField] public List<GolfPlayerTopDown> TurnOrderForLightningSkips = new List<GolfPlayerTopDown>();
