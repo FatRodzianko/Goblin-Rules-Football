@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8242093619301733083}
   - component: {fileID: 8242093619301733080}
+  - component: {fileID: 6875112187249593470}
   m_Layer: 0
   m_Name: GameplayManager
   m_TagString: Untagged
@@ -44,7 +45,72 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58c74adb0217a434181413003df424d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 6875112187249593470}
+  _networkObjectCache: {fileID: 6875112187249593470}
   CurrentCourse: {fileID: 11400000, guid: f8ed099443d7d0e4cb1143f45263a104, type: 2}
   CurrentHoleInCourse: {fileID: 0}
   CurrentHoleIndex: 0
+  TeeOffPosition: {x: 0, y: 0, z: 0}
+  CurrentHoleName: 
+  CurrentHolePar: 0
+  HolePositions: []
+  TeeOffAimPoint: {x: 0, y: 0, z: 0}
+  _lastNewHoleTime: 0
+  CurrentTurnNumber: 0
+  LastTurnWithWeatherChange: 0
   _tileMapManager: {fileID: 0}
+  GolfPlayers: []
+  GolfPlayersInTeeOffOrder: []
+  GolfPlayersOutOfCommission: []
+  _numberOfPlayersTeedOff: 0
+  _teeOffOrder: 0
+  _numberOfPlayersInHole: 0
+  _lastBallInHoleTime: 0
+  _haveAllPlayersTeedOff: 0
+  CurrentPlayer: {fileID: 0}
+  _lightningManager: {fileID: 0}
+  _cameraViewHole: {fileID: 0}
+  _cameraBoundingBox: {fileID: 0}
+  _holeNumberText: {fileID: 0}
+  _parText: {fileID: 0}
+  _playerNameText: {fileID: 0}
+  _numberOfStrokesText: {fileID: 0}
+  _terrainTypeText: {fileID: 0}
+  _loadingHoleCanvas: {fileID: 0}
+  _holeInfoCanvas: {fileID: 0}
+  PlayerHasSkippedTurn: 0
+  TurnOrderForLightningSkips: []
+  TurnsSinceSkip: 0
+  TimeSinceLastSkip: 0
+  TimeSinceLastTurnStart: 0
+--- !u!114 &6875112187249593470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8242093619301733081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  _networkBehaviours:
+  - {fileID: 8242093619301733080}
+  <ParentNetworkObject>k__BackingField: {fileID: 0}
+  <ChildNetworkObjects>k__BackingField: []
+  _isNetworked: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  <PrefabId>k__BackingField: 0
+  <SpawnableCollectionId>k__BackingField: 0
+  _scenePathHash: 0
+  <SceneId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 2730534501108569411
+  _sceneNetworkObjects: []

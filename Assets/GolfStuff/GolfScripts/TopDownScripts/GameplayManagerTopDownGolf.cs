@@ -5,8 +5,12 @@ using System.Linq;
 using TMPro;
 using System.Globalization;
 using System.Threading.Tasks;
+using FishNet.Object.Synchronizing;
+using FishNet.Object;
+using FishNet.Connection;
+using FishNet;
 
-public class GameplayManagerTopDownGolf : MonoBehaviour
+public class GameplayManagerTopDownGolf : NetworkBehaviour
 {
     public static GameplayManagerTopDownGolf instance;
 
@@ -31,6 +35,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
 
     [Header("Player Info")]
     [SerializeField] public List<GolfPlayerTopDown> GolfPlayers = new List<GolfPlayerTopDown>();
+    [SerializeField] [SyncObject] public readonly SyncList<GolfPlayerTopDown> GolfPlayersServer = new SyncList<GolfPlayerTopDown>();
     public List<GolfPlayerTopDown> GolfPlayersInTeeOffOrder = new List<GolfPlayerTopDown>();
     public List<GolfPlayerTopDown> GolfPlayersOutOfCommission = new List<GolfPlayerTopDown>();
     [SerializeField] int _numberOfPlayersTeedOff = 0;
@@ -69,7 +74,15 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         _loadingHoleCanvas.gameObject.SetActive(false);
         if (!_tileMapManager)
             _tileMapManager = GameObject.FindGameObjectWithTag("TileMapManager").GetComponent<TileMapManager>();
+        GolfPlayersServer.OnChange += GolfPlayersServer_OnChange;
     }
+
+    private void GolfPlayersServer_OnChange(SyncListOperation op, int index, GolfPlayerTopDown oldItem, GolfPlayerTopDown newItem, bool asServer)
+    {
+        //throw new System.NotImplementedException();
+        //Debug.Log("GolfPlayersServer_OnChange: op: " + op.ToString() + " index: " + index.ToString()  + " as server: " + asServer.ToString() + " Length of GolfPlayersServer: " + GolfPlayersServer.Count.ToString());
+    }
+
     void MakeInstance()
     {
         if (instance == null)
@@ -77,9 +90,22 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         else if (instance != this)
             Destroy(gameObject);
     }
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        // set the ownership to the server?
+        Debug.Log("OnStartServer: On GameplayManager: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHost.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
+        GolfPlayersServer.Clear();
+    }
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        GolfPlayersServer.Clear();
+    }
     // Start is called before the first frame update
     void Start()
     {
+        /* commented out for now while getting multiplayer set up. Will probably to something different from start anyway to like onstartserver
         // how to start the game for now
         // Reset each player's score for the current hole to 0
         ResetPlayerScoresForNewHole();
@@ -121,6 +147,7 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
         CurrentPlayer.PlayerUIMessage("start turn");
         CurrentPlayer.EnablePlayerCanvas(true);
         UpdateUIForCurrentPlayer(CurrentPlayer,true);
+        */
     }
 
     // Update is called once per frame
@@ -698,5 +725,42 @@ public class GameplayManagerTopDownGolf : MonoBehaviour
             return true;
         else
             return false;
+    }
+    [Server]
+    public void AddGolfPlayer(GolfPlayerTopDown player)
+    {
+        if (!GolfPlayersServer.Contains(player))
+            GolfPlayersServer.Add(player);
+    }
+    [Server]
+    public void RemoveGolfPlayer(GolfPlayerTopDown player)
+    {
+        Debug.Log("RemoveGolfPlayer: removing player with connection id of: " + player.ConnectionId);
+        if (GolfPlayersServer.Contains(player))
+            GolfPlayersServer.Remove(player);
+    }
+    [Server]
+    public void HostStartGame(NetworkConnection conn)
+    {
+        if (!conn.IsHost)
+            return;
+        Debug.Log("HostStartGame: Starting the game.");
+        GolfPlayers.Clear();
+        for (int i = 0; i < GolfPlayersServer.Count; i++)
+        {
+            GolfPlayers.Add(GolfPlayersServer[i]);
+        }
+        RpcSetGolfPlayersLocally(GolfPlayersServer.ToList());
+
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcSetGolfPlayersLocally(List<GolfPlayerTopDown> players)
+    {
+        Debug.Log("RpcSetGolfPlayersLocally:");
+        GolfPlayers.Clear();
+        for (int i = 0; i < players.Count; i++)
+        {
+            GolfPlayers.Add(players[i]);
+        }
     }
 }

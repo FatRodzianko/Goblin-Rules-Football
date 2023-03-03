@@ -101,10 +101,17 @@
 - - - - - - "ritual" to be performed to either fend off the Wind God, or welcome their Judgement
 - - - - - - - - - Whether or not tornadoes appear will be based on if more players welcome the judgement or not, based on minigame type thing, and also weighted based on how "well" either side does the pro/anti-wind god ritual
 - - - - - - - - - Tornados also attracted to players that do the ritual worst?
-- Icons that point to "special interest" objects that aren't on screen
-- - - hole/flag
-- - - tornados?
-- - - text that also shows the distance to thos objects?
+x Icons that point to "special interest" objects that aren't on screen
+- - x hole/flag
+- - x tornados?
+- - x text that also shows the distance to thos objects?
+- - - too much of a hassle to do correctly...
+- Fishnet multiplayer tutorial playlist: https://www.youtube.com/watch?v=oUPlKYlb27Y&list=PLF6lFlLzb6CSuf4g8ZR1VRq-TAgC6AQWD&index=2
+- Another fishnet tutorial type thing. Particularly interested in how they set up their multiplayer/network manager. Look at the boardgame/fps posts
+- - - https://winterboltgames.com/posts
+- - - fishnet fundamentals: https://www.youtube.com/watch?v=5c1ie6Za5yg
+- - - - - - 27:16
+- fishnet with steam lobbies? https://www.youtube.com/watch?v=-Du_8_NZRWM
 
 x GameplayManager requirements for top down golf
 - - x track what player's turn it is

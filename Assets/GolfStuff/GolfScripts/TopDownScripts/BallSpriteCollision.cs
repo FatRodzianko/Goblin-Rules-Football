@@ -73,7 +73,7 @@ public class BallSpriteCollision : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.Log("BallSpriteCollision: OnTriggerStay2D: could not get sprite renderer from collision object");
+            //Debug.Log("BallSpriteCollision: OnTriggerStay2D: could not get sprite renderer from collision object");
         }
     }
     private void OnTriggerExit2D(Collider2D collision)

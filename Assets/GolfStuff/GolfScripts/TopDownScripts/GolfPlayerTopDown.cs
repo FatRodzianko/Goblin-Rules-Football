@@ -4,14 +4,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using FishNet.Connection;
+using FishNet.Object;
+using FishNet.Managing;
+using FishNet.Object.Synchronizing;
+//using Mirror;
 
-public class GolfPlayerTopDown : MonoBehaviour
+public class GolfPlayerTopDown : NetworkBehaviour
 {
     [Header("Player Info")]
-    public string PlayerName;
+    [SyncVar(OnChange = nameof(SyncPlayerName))] public string PlayerName;
     public GolfPlayerScore PlayerScore;
     [SerializeField] Canvas _playerCanvas;
     [SerializeField] PlayerUIMessage _playerUIMessage;
+    [SyncVar(OnChange = nameof(SyncIsGameLeader))] public bool IsGameLeader = false;
+    [SyncVar(OnChange = nameof(SyncConnectionId))] public int ConnectionId;
 
 
     [Header("Golf Ball Stuff")]
@@ -130,6 +137,9 @@ public class GolfPlayerTopDown : MonoBehaviour
     [Header("Player Sprite")]
     [SerializeField] GolferAnimator _golfAnimator;
 
+    [Header("Start Game UI Stuff")]
+    [SerializeField] GameObject _startGameButton;
+
     private void Awake()
     {
         if (!MyBall)
@@ -143,7 +153,118 @@ public class GolfPlayerTopDown : MonoBehaviour
         if (!_cameraViewHole)
             _cameraViewHole = _vCam.GetComponent<CameraViewHole>();
     }
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        Debug.Log("OnStartServer: On GolfPlayerTopDown: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHost.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
+        this.IsGameLeader = base.Owner.IsHost;
+        this.ConnectionId = this.Owner.ClientId;
+        GameplayManagerTopDownGolf.instance.AddGolfPlayer(this);
+    }
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        if (base.IsServer)
+        {
+            GameplayManagerTopDownGolf.instance.RemoveGolfPlayer(this);
+            //GameplayManagerTopDownGolf.instance.RemoveOwnerFromHost();
+        }
+    }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        Debug.Log("OnStartClient: for " + this.name);
+        if (base.IsOwner)
+        {
+            gameObject.name = "LocalGolfPlayerTopDown";
+            gameObject.tag = "LocalGamePlayer";
+            //IsGameLeader = base.IsHost;
+            //RpcSetPlayerAsGameLeader(base.LocalConnection, base.IsHost);
+            CmdSetPlayerName();
+
+        }
+        else
+        {
+            gameObject.tag = "GamePlayer";
+        }       
+
+    }
+    [ServerRpc]
+    void CmdSetPlayerName()
+    {
+        if (base.Owner.IsHost)
+            PlayerName = "Host";
+        else
+            PlayerName = "Client" + base.OwnerId.ToString();
+    }
+
+    [ServerRpc]
+    void CmdSetPlayerAsGameLeader(NetworkConnection conn, bool isPlayerLeader)
+    {
+        if (conn.IsHost)
+        {
+            Debug.Log("RpcSetPlayerAsGameLeader: Received connection from: " + conn.ToString() + " with a connection id of: " + conn.ClientId.ToString() + " and they are the host!");
+        }
+        else
+        {
+            Debug.Log("RpcSetPlayerAsGameLeader: Received connection from: " + conn.ToString() + " with a connection id of: " + conn.ClientId.ToString() + " and they ARE NOT the host!");
+        }
+        this.SyncIsGameLeader(this.IsGameLeader, conn.IsHost, true);
+    }
+    void SyncIsGameLeader(bool prev, bool next, bool asServer)
+    {
+        if (asServer)
+        {
+            Debug.Log("SyncIsGameLeader: as server");
+            //this.IsGameLeader = next;
+            //if (next)
+                //GameplayManagerTopDownGolf.instance.AssignOwnerToHost(base.Owner);
+        }   
+        else
+        {
+            Debug.Log("SyncIsGameLeader: as client");
+            if (!base.IsOwner)
+            {
+                EnablePlayerCanvas(false);
+                _startGameButton.SetActive(false);
+                return;
+            }   
+            if (next)
+            {
+                EnablePlayerCanvas(true);
+                _startGameButton.SetActive(true);
+            }
+            else
+            {
+                EnablePlayerCanvas(false);
+                _startGameButton.SetActive(false);
+            }
+        }
+    }
+    void SyncConnectionId(int prev, int next, bool asServer)
+    {
+        if (asServer)
+        {
+            //this.ConnectionId = next;
+        }   
+        else
+        {
+            if (!base.IsOwner)
+                return;
+        }
+    }
+    void SyncPlayerName(string prev, string next, bool asServer)
+    {
+        if (asServer)
+        {
+            //PlayerName = next;
+        }   
+        else
+        { 
+
+        }
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -1411,6 +1532,7 @@ public class GolfPlayerTopDown : MonoBehaviour
     }
     public void EnablePlayerSprite(bool enable)
     {
+        Debug.Log("EnablePlayerSprite: " + enable.ToString());
         _golfAnimator.EnablePlayerSprite(enable);
     }
     public void StruckByLightning()
@@ -1431,5 +1553,19 @@ public class GolfPlayerTopDown : MonoBehaviour
     public void LightningFlashForPlayerStruck(bool enableStruckSprite)
     {
         _golfAnimator.ChangeToStruckByLightningSprite(enableStruckSprite);
+    }
+    public void HostStartGame()
+    {
+        //GameplayManagerTopDownGolf.instance.HostStartGame(base.LocalConnection);
+        if (!base.IsOwner)
+            return;
+        CmdHostStartGame();
+    }
+    [ServerRpc]
+    void CmdHostStartGame()
+    {
+        if (!base.IsHost)
+            return;
+        GameplayManagerTopDownGolf.instance.HostStartGame(base.Owner);
     }
 }
