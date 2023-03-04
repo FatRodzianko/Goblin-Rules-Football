@@ -34,6 +34,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] TileMapManager _tileMapManager;
 
     [Header("Player Info")]
+    [SerializeField] [SyncObject] public readonly SyncList<NetworkPlayer> NetworkPlayersServer = new SyncList<NetworkPlayer>();
     [SerializeField] public List<GolfPlayerTopDown> GolfPlayers = new List<GolfPlayerTopDown>();
     [SerializeField] [SyncObject] public readonly SyncList<GolfPlayerTopDown> GolfPlayersServer = new SyncList<GolfPlayerTopDown>();
     public List<GolfPlayerTopDown> GolfPlayersInTeeOffOrder = new List<GolfPlayerTopDown>();
@@ -95,11 +96,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         base.OnStartServer();
         // set the ownership to the server?
         Debug.Log("OnStartServer: On GameplayManager: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHost.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
+        NetworkPlayersServer.Clear();
         GolfPlayersServer.Clear();
     }
     public override void OnStopServer()
     {
         base.OnStopServer();
+        NetworkPlayersServer.Clear();
         GolfPlayersServer.Clear();
     }
     // Start is called before the first frame update
@@ -762,5 +765,22 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         {
             GolfPlayers.Add(players[i]);
         }
+    }
+    [Server]
+    public void AddNetworkPlayer(NetworkPlayer player)
+    {
+        if (NetworkPlayersServer.Contains(player))
+            return;
+        
+        NetworkPlayersServer.Add(player);
+        Debug.Log("AddNetworkPlayer: Player added with connection id of: " + player.OwnerId + " count of NetworkPlayerServers: " + NetworkPlayersServer.Count.ToString());
+    }
+    [Server]
+    public void RemoveNetworkPlayer(NetworkPlayer player)
+    {
+        if (NetworkPlayersServer.Contains(player))
+            NetworkPlayersServer.Remove(player);
+
+        Debug.Log("RemoveNetworkPlayer: Player removed with connection id of: " + player.OwnerId + " count of NetworkPlayerServers: " + NetworkPlayersServer.Count.ToString());
     }
 }

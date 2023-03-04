@@ -157,8 +157,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         base.OnStartServer();
         Debug.Log("OnStartServer: On GolfPlayerTopDown: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHost.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
-        this.IsGameLeader = base.Owner.IsHost;
-        this.ConnectionId = this.Owner.ClientId;
+        //this.IsGameLeader = base.Owner.IsHost;
+        //this.ConnectionId = this.Owner.ClientId;
         GameplayManagerTopDownGolf.instance.AddGolfPlayer(this);
     }
     public override void OnStopServer()
@@ -181,7 +181,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             gameObject.tag = "LocalGamePlayer";
             //IsGameLeader = base.IsHost;
             //RpcSetPlayerAsGameLeader(base.LocalConnection, base.IsHost);
-            CmdSetPlayerName();
+            //CmdSetPlayerName();
 
         }
         else
