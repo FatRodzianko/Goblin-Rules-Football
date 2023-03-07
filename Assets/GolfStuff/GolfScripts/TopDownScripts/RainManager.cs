@@ -2,14 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
-public class RainManager : MonoBehaviour
+public class RainManager : NetworkBehaviour
 {
     public static RainManager instance;
 
     [Header("Rain state")]
     public bool IsRaining = false;
-    public string RainState; // "No Rain" "light rain" "Med Rain" "Heavy Rain"
+    [SyncVar] public string RainState; // "No Rain" "light rain" "Med Rain" "Heavy Rain"
     public List<string> RainStates = new List<string> { "clear", "light rain", "med rain", "heavy rain" };
     [SerializeField] private string _rainState;
 

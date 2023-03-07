@@ -2,14 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
-public class WindManager : MonoBehaviour
+public class WindManager : NetworkBehaviour
 {
     public static WindManager instance;
 
-    public Vector2 WindDirection = Vector2.zero;
+    [SyncVar] public Vector2 WindDirection = Vector2.zero;
     private Vector2 _windDirection = Vector2.zero;
-    [SerializeField] public int WindPower = 0;
+    [SerializeField] [SyncVar] public int WindPower = 0;
     [SerializeField] private int _windPower = 0;
 
 

@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5635657812695722382}
   - component: {fileID: 5635657812695722369}
+  - component: {fileID: 87436914173318899}
+  - component: {fileID: 7356098246433900116}
   m_Layer: 0
   m_Name: RainManager
   m_TagString: Untagged
@@ -44,6 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a36cd8410b6e10409fa40a75c44069a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 87436914173318899}
+  _networkObjectCache: {fileID: 87436914173318899}
   IsRaining: 0
   RainState: clear
   RainStates:
@@ -75,6 +80,55 @@ MonoBehaviour:
   - weather-clear-01
   - weather-clear-02
   - weather-clear-03
+  _clearSoundForHole: 
+  _clearSoundPlaying: 0
   _rainSounds:
   - weather-rain-01
   - weather-rain-02
+  _rainSoundForHole: 
+  _rainSoundPlaying: 0
+--- !u!114 &87436914173318899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5635657812695722383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  _networkBehaviours:
+  - {fileID: 5635657812695722369}
+  <ParentNetworkObject>k__BackingField: {fileID: 0}
+  <ChildNetworkObjects>k__BackingField: []
+  _isNetworked: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  <PrefabId>k__BackingField: 0
+  <SpawnableCollectionId>k__BackingField: 0
+  _scenePathHash: 0
+  <SceneId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 15001495905358534879
+  _sceneNetworkObjects: []
+--- !u!114 &7356098246433900116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5635657812695722383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _overrideType: 3
+  _updateHostVisibility: 1
+  _observerConditions: []

@@ -192,7 +192,7 @@ public class NetworkPlayer : NetworkBehaviour
         if (!this.IsHost)
             return;
         SpawnGolfPlayerObjectsForEachPlayer();
-
+        GameplayManagerTopDownGolf.instance.HostStartGame(base.Owner);
     }
     [Server]
     void SpawnGolfPlayerObjectsForEachPlayer()
@@ -219,7 +219,7 @@ public class NetworkPlayer : NetworkBehaviour
         }
         _golfPlayerScript.PlayerName = playerName;
         _golfPlayerScript.IsGameLeader = this.Owner.IsHost;
-        _golfPlayerScript.ConnectionId = this.OwnerId;
+        _golfPlayerScript.OwnerNetId = this.OwnerId;
         InstanceFinder.ServerManager.Spawn(_golfPlayerScript.gameObject, this.Owner);
     }
     [TargetRpc]

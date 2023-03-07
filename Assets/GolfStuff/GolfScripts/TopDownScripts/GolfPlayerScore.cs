@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FishNet.Connection;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
-public class GolfPlayerScore : MonoBehaviour
+public class GolfPlayerScore : NetworkBehaviour
 {
-    public int StrokesForCurrentHole = 0;
-    public int TotalStrokesForCourse = 0;
+    [SyncVar] public int StrokesForCurrentHole = 0;
+    [SyncVar] public int TotalStrokesForCourse = 0;
     public Dictionary<int, int> HoleWithScores = new Dictionary<int, int>();
     // Start is called before the first frame update
     void Start()
@@ -18,6 +21,7 @@ public class GolfPlayerScore : MonoBehaviour
     {
         
     }
+    [Server]
     public void ResetScoreForNewHole()
     {
         StrokesForCurrentHole = 0;

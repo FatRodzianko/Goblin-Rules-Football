@@ -8,6 +8,7 @@ using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Managing;
 using FishNet.Object.Synchronizing;
+using FishNet;
 //using Mirror;
 
 public class GolfPlayerTopDown : NetworkBehaviour
@@ -18,11 +19,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] Canvas _playerCanvas;
     [SerializeField] PlayerUIMessage _playerUIMessage;
     [SyncVar(OnChange = nameof(SyncIsGameLeader))] public bool IsGameLeader = false;
+    [SyncVar] public int OwnerNetId;
     [SyncVar(OnChange = nameof(SyncConnectionId))] public int ConnectionId;
 
 
     [Header("Golf Ball Stuff")]
     [SerializeField] GameObject _golfBallPrefab;
+    [SerializeField] [SyncVar(OnChange = nameof(SyncMyBallNetId))] int _myBallNetId;
     [SerializeField] public GolfBallTopDown MyBall;
     public float DistanceToHole;
 
@@ -142,8 +145,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
     private void Awake()
     {
-        if (!MyBall)
-            SpawnPlayerBall();
+        //if (!MyBall)
+        //    SpawnPlayerBall();
         if(!myCamera)
             myCamera = Camera.main;
         if (!_vCam)
@@ -160,6 +163,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //this.IsGameLeader = base.Owner.IsHost;
         //this.ConnectionId = this.Owner.ClientId;
         GameplayManagerTopDownGolf.instance.AddGolfPlayer(this);
+        this.ConnectionId = this.ObjectId;
+        this.SpawnBallOnServer();
     }
     public override void OnStopServer()
     {
@@ -179,38 +184,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             gameObject.name = "LocalGolfPlayerTopDown";
             gameObject.tag = "LocalGamePlayer";
-            //IsGameLeader = base.IsHost;
-            //RpcSetPlayerAsGameLeader(base.LocalConnection, base.IsHost);
-            //CmdSetPlayerName();
-
+            GameplayManagerTopDownGolf.instance.SetLocalGolfPlayer(this);
         }
         else
         {
             gameObject.tag = "GamePlayer";
-        }       
-
-    }
-    [ServerRpc]
-    void CmdSetPlayerName()
-    {
-        if (base.Owner.IsHost)
-            PlayerName = "Host";
-        else
-            PlayerName = "Client" + base.OwnerId.ToString();
-    }
-
-    [ServerRpc]
-    void CmdSetPlayerAsGameLeader(NetworkConnection conn, bool isPlayerLeader)
-    {
-        if (conn.IsHost)
-        {
-            Debug.Log("RpcSetPlayerAsGameLeader: Received connection from: " + conn.ToString() + " with a connection id of: " + conn.ClientId.ToString() + " and they are the host!");
         }
-        else
-        {
-            Debug.Log("RpcSetPlayerAsGameLeader: Received connection from: " + conn.ToString() + " with a connection id of: " + conn.ClientId.ToString() + " and they ARE NOT the host!");
-        }
-        this.SyncIsGameLeader(this.IsGameLeader, conn.IsHost, true);
+        Debug.Log("OnStartClient: for playeR: " + this.PlayerName + " with object id of: " + this.ObjectId);
+
     }
     void SyncIsGameLeader(bool prev, bool next, bool asServer)
     {
@@ -232,8 +213,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             }   
             if (next)
             {
-                EnablePlayerCanvas(true);
-                _startGameButton.SetActive(true);
+                //EnablePlayerCanvas(true);
+                //_startGameButton.SetActive(true);
             }
             else
             {
@@ -273,7 +254,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
         
         //AttachUIToNewParent(myCamera.transform);
         StartGameWithDriver();
-        drawTrajectoryTopDown.SetLineWidth(MyBall.pixelUnit * 2f);
+        // do this after getting the players ball
+        //drawTrajectoryTopDown.SetLineWidth(MyBall.pixelUnit * 2f);
         try
         {
             GetCameraBoundingBox();
@@ -283,15 +265,40 @@ public class GolfPlayerTopDown : NetworkBehaviour
             Debug.Log("GolfPlayerTopDown.cs: could not get camera bounding box. Error: " + e);
         }
     }
-    void SpawnPlayerBall()
+    //void SpawnPlayerBall()
+    //{
+    //    GameObject newBall = Instantiate(_golfBallPrefab);
+    //    MyBall = newBall.GetComponent<GolfBallTopDown>();
+    //    MyBall.MyPlayer = this;
+    //}
+    [Server]
+    void SpawnBallOnServer()
     {
+        Debug.Log("SpawnBallOnServer::");
         GameObject newBall = Instantiate(_golfBallPrefab);
-        MyBall = newBall.GetComponent<GolfBallTopDown>();
-        MyBall.MyPlayer = this;
+        GolfBallTopDown newBallScript = newBall.GetComponent<GolfBallTopDown>();
+        InstanceFinder.ServerManager.Spawn(newBall, this.Owner);
+        this._myBallNetId = newBallScript.ObjectId;
+    }
+    void SyncMyBallNetId(int prev, int next, bool asServer)
+    {
+        if (asServer)
+            return;
+        if (!MyBall)
+        {
+            Debug.Log("SyncMyBallNetId: for playeR: " + this.PlayerName + " ball id is: " + next.ToString());
+            MyBall = InstanceFinder.ClientManager.Objects.Spawned[next].GetComponent<GolfBallTopDown>();
+            MyBall.MyPlayer = this;
+            if(this.IsOwner)
+                MyBall.transform.position = this.transform.position;
+        }
+            
     }
     // Update is called once per frame
     void Update()
     {
+        if (!MyBall)
+            return;
         if (MyBall.isHit || MyBall.isBouncing || MyBall.isRolling)
             return;
         if (!IsPlayersTurn)
@@ -434,6 +441,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     private void FixedUpdate()
     {
+        if (!MyBall)
+            return;
         if ((hitDistance != previousHitDistance || hitAngle != previousHitAngle || hitTopSpin != previousHitTopSpin || hitDirection != previousHitDirection || hitLeftOrRightspin != previousHitLeftOrRightSpin) && (!MyBall.isHit && !MyBall.isBouncing && !MyBall.isRolling && IsPlayersTurn))
         {
             // Get the trajaectory line
@@ -1468,6 +1477,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (!_cameraBoundingBox)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
     }
+    [TargetRpc]
+    public void RpcGetCameraBoundingBox(NetworkConnection conn)
+    {
+        if (!this.IsOwner)
+            return;
+        GetCameraBoundingBox();
+    }
     public Vector3 GetNearestPointInBounds(Vector3 startPos, Vector3 endPos, Vector2 dir)
     {
         float distToPlayer = Vector2.Distance(endPos, startPos);
@@ -1554,18 +1570,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         _golfAnimator.ChangeToStruckByLightningSprite(enableStruckSprite);
     }
-    public void HostStartGame()
+    [TargetRpc]
+    public void MovePlayerToPosition(NetworkConnection conn, Vector2 newPos)
     {
-        //GameplayManagerTopDownGolf.instance.HostStartGame(base.LocalConnection);
-        if (!base.IsOwner)
+        if (!this.IsOwner)
             return;
-        CmdHostStartGame();
-    }
-    [ServerRpc]
-    void CmdHostStartGame()
-    {
-        if (!base.IsHost)
-            return;
-        GameplayManagerTopDownGolf.instance.HostStartGame(base.Owner);
+        Debug.Log("MovePlayerToPosition: new position is: " + newPos.ToString());
+        this.transform.position = newPos;
+        /*if(MyBall)
+            this.MyBall.transform.position = newPos;*/
     }
 }

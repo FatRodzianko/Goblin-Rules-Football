@@ -2,8 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FishNet.Connection;
+using FishNet.Object;
+using FishNet.Managing;
+using FishNet.Object.Synchronizing;
+using FishNet;
 
-public class GolfBallTopDown : MonoBehaviour
+public class GolfBallTopDown : NetworkBehaviour
 {
     [SerializeField] Rigidbody2D rb;
     [SerializeField] CircleCollider2D myCollider;

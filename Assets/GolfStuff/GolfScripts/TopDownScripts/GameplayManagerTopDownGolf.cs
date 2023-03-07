@@ -17,7 +17,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [Header("Course Information")]
     [SerializeField] public ScriptableCourse CurrentCourse;
     [SerializeField] public ScriptableHole CurrentHoleInCourse;
-    [SerializeField] public int CurrentHoleIndex;
+    [SerializeField] [SyncVar] public int CurrentHoleIndex;
 
     [Header("Current Hole Information")]
     public Vector3 TeeOffPosition;
@@ -33,6 +33,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [Header("Tilemap Manager References")]
     [SerializeField] TileMapManager _tileMapManager;
 
+    [Header("Local Player")]
+    [SerializeField] public GolfPlayerTopDown LocalGolfPlayer;
+
     [Header("Player Info")]
     [SerializeField] [SyncObject] public readonly SyncList<NetworkPlayer> NetworkPlayersServer = new SyncList<NetworkPlayer>();
     [SerializeField] public List<GolfPlayerTopDown> GolfPlayers = new List<GolfPlayerTopDown>();
@@ -45,6 +48,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] float _lastBallInHoleTime = 0f;
     [SerializeField] bool _haveAllPlayersTeedOff = false;
     public GolfPlayerTopDown CurrentPlayer;
+    [SyncVar(OnChange = nameof(SyncCurrentPlayerNetId))] public int CurrentPlayerNetId;
 
     [Header("Weather Effects")]
     [SerializeField] LightningManager _lightningManager;
@@ -60,6 +64,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     TextInfo titleCase = new CultureInfo("en-US", false).TextInfo;
     [SerializeField] Canvas _loadingHoleCanvas;
     [SerializeField] Canvas _holeInfoCanvas;
+    [SerializeField] GameObject _currentplayerui;
+    [SerializeField] TextMeshProUGUI _currentplayeruiText;
 
 
     [Header("Skip For Lightning Info")]
@@ -81,7 +87,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     private void GolfPlayersServer_OnChange(SyncListOperation op, int index, GolfPlayerTopDown oldItem, GolfPlayerTopDown newItem, bool asServer)
     {
         //throw new System.NotImplementedException();
-        //Debug.Log("GolfPlayersServer_OnChange: op: " + op.ToString() + " index: " + index.ToString()  + " as server: " + asServer.ToString() + " Length of GolfPlayersServer: " + GolfPlayersServer.Count.ToString());
+        if (asServer)
+            return;
+        if (op != SyncListOperation.Add)
+            return;
+        Debug.Log("GolfPlayersServer_OnChange: op: " + op.ToString() + " index: " + index.ToString()  + " as server: " + asServer.ToString() + " Length of GolfPlayersServer: " + GolfPlayersServer.Count.ToString() + " new player name: " + newItem.PlayerName);
     }
 
     void MakeInstance()
@@ -96,14 +106,19 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         base.OnStartServer();
         // set the ownership to the server?
         Debug.Log("OnStartServer: On GameplayManager: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHost.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
-        NetworkPlayersServer.Clear();
-        GolfPlayersServer.Clear();
+        ClearSyncLists();
     }
     public override void OnStopServer()
     {
         base.OnStopServer();
+        ClearSyncLists();
+    }
+    void ClearSyncLists()
+    {
         NetworkPlayersServer.Clear();
         GolfPlayersServer.Clear();
+        //GolfPlayersInTeeOffOrderServer.Clear();
+        //GolfPlayersOutOfCommissionServer.Clear();
     }
     // Start is called before the first frame update
     void Start()
@@ -158,6 +173,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         
     }
+    [Server]
     void ResetPlayerScoresForNewHole()
     {
         foreach (GolfPlayerTopDown player in GolfPlayers)
@@ -181,17 +197,48 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         Debug.Log("GameplayManagerTopDownGolf: ClearMap: start time: " + Time.time.ToString());
         //_tileMapManager.ClearMap(CurrentCourse.HolesInCourse[CurrentHoleIndex]);
         // load the next map in the course
-        CurrentHoleIndex = index;
-        CurrentHoleInCourse = CurrentCourse.HolesInCourse[CurrentHoleIndex];
+        //CurrentHoleIndex = index;
+        //CurrentHoleInCourse = CurrentCourse.HolesInCourse[CurrentHoleIndex];
         //_tileMapManager.LoadMap(CurrentHoleInCourse);
-        Debug.Log("GameplayManagertopDownGolf: LoadNewHole: Starting task to load hole at index: " + CurrentHoleInCourse.ToString() + ". Time: " + Time.time);
+
+        // Old, from singleplayer version
+        Debug.Log("GameplayManagertopDownGolf: LoadNewHole: Starting task to load hole at index: " + index.ToString() + ". Time: " + Time.time);
         _holeInfoCanvas.gameObject.SetActive(false);
         _loadingHoleCanvas.gameObject.SetActive(true);
-        await _tileMapManager.LoadMapAsTask(CurrentHoleInCourse);
-        Debug.Log("GameplayManagertopDownGolf: LoadNewHole: Task to load hole at index: " + CurrentHoleInCourse.ToString() + " completed. Time: " + Time.time);
+        //await _tileMapManager.LoadMapAsTask(CurrentHoleInCourse);
+        await _tileMapManager.LoadMapAsTask(CurrentCourse.HolesInCourse[index]);
+        Debug.Log("GameplayManagertopDownGolf: LoadNewHole: Task to load hole at index: " + index.ToString() + " completed. Time: " + Time.time);
         _loadingHoleCanvas.gameObject.SetActive(false);
         _holeInfoCanvas.gameObject.SetActive(true);
         _holeNumberText.text = CurrentHoleInCourse.CourseName + " #" + (CurrentHoleIndex + 1).ToString();
+        // End of old, singleplayer version
+    }
+    [Server]
+    void LoadNewHoleServer(int index)
+    {
+        CurrentHoleIndex = index;
+        CurrentHoleInCourse = CurrentCourse.HolesInCourse[CurrentHoleIndex];
+        // tell all clients to load the next hole and to then update all the client side stuff
+        RpcLoadNewHoleOnClient(CurrentHoleIndex);
+    }
+    [ObserversRpc]
+    void RpcLoadNewHoleOnClient(int index)
+    {
+        Debug.Log("RpcLoadNewHoleOnClient: Starting task to load hole at index: " + index.ToString() + ". Time: " + Time.time);
+        CurrentHoleInCourse = CurrentCourse.HolesInCourse[index];
+        LoadNewHole(index);
+        GetCameraBoundingBox();
+        TellPlayersToGetCameraBoundingBox();
+        //// Set the Hole Positions for the new hole
+        HolePositions = CurrentHoleInCourse.HolePositions;
+        //// Set the Course aim points for players to use
+        TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
+        //// Set the new tee off location
+        UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
+        //// Set the Camera Zoomed Out position
+        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos);
+        //// update the par value for the hole
+        UpdateParForNewHole(CurrentHoleInCourse.HolePar);
     }
     public void UpdateTeeOffPositionForNewHole(Vector3 newPosition)
     {
@@ -216,6 +263,16 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             GolfPlayersInTeeOffOrder.Clear();
             GolfPlayersInTeeOffOrder.AddRange(GolfPlayers.OrderByDescending(x => x.PlayerScore.TotalStrokesForCourse).ToList());
         }
+        SetGolfPlayersInTeeOffOrderForClients(GolfPlayersInTeeOffOrder);
+    }
+    [ObserversRpc]
+    void SetGolfPlayersInTeeOffOrderForClients(List<GolfPlayerTopDown> playerList)
+    {
+        if (IsLocalPlayerHost())
+            return;
+        Debug.Log("SetGolfPlayersInTeeOffOrderForClients");
+        GolfPlayersInTeeOffOrder.Clear();
+        GolfPlayersInTeeOffOrder.AddRange(playerList);
     }
     void SetCurrentPlayer(GolfPlayerTopDown player)
     {
@@ -223,6 +280,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //if (CurrentPlayer == player)
         //    return;
         CurrentPlayer = player;
+        CurrentPlayerNetId = player.ObjectId;
     }
     void MovePlayerToTeeOffLocation(GolfPlayerTopDown player)
     {
@@ -231,14 +289,25 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         player.MyBall.ResetBallSpriteForNewHole();
         
     }
+    [Server]
     void MoveAllPlayersNearTeeOffLocation()
     {
         foreach (GolfPlayerTopDown player in GolfPlayers)
         {
-            Vector3 offset = new Vector3(5f, UnityEngine.Random.Range(-5f,5f), 0f);
-            player.transform.position = TeeOffPosition - offset;
-            player.MyBall.transform.position = TeeOffPosition - offset;
+            //Vector3 offset = new Vector3(5f, UnityEngine.Random.Range(-5f, 5f), 0f);
+            //player.transform.position = TeeOffPosition - offset;
+            //player.MyBall.transform.position = TeeOffPosition - offset;
             //player.MyBall.ResetBallSpriteForNewHole();
+            if (player == CurrentPlayer)
+            {
+                player.MovePlayerToPosition(player.Owner, TeeOffPosition);
+            }
+            else
+            {
+                Vector3 offset = new Vector3(UnityEngine.Random.Range(3f, 6f), UnityEngine.Random.Range(-5f, 5f), 0f);
+                Vector3 newPos = TeeOffPosition - offset;
+                player.MovePlayerToPosition(player.Owner, newPos);
+            }
         }
     }
     public void PlayerTeedOff(GolfPlayerTopDown submittingPlayer)
@@ -460,11 +529,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (_cameraBoundingBox)
             _cameraViewHole.GetLinePointsForOutOfBoundsBorder(_cameraBoundingBox);
     }
+    [Client]
     void TellPlayersToGetCameraBoundingBox()
     {
         foreach (GolfPlayerTopDown player in GolfPlayers)
         {
             player.GetCameraBoundingBox();
+            //player.RpcGetCameraBoundingBox(player.Owner);
         }
     }
     bool AllPlayersBallsInHole()
@@ -734,13 +805,17 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         if (!GolfPlayersServer.Contains(player))
             GolfPlayersServer.Add(player);
+        if (!GolfPlayers.Contains(player))
+            GolfPlayers.Add(player);
     }
     [Server]
     public void RemoveGolfPlayer(GolfPlayerTopDown player)
     {
-        Debug.Log("RemoveGolfPlayer: removing player with connection id of: " + player.ConnectionId);
+        //Debug.Log("RemoveGolfPlayer: removing player with connection id of: " + player.ConnectionId);
         if (GolfPlayersServer.Contains(player))
             GolfPlayersServer.Remove(player);
+        if (GolfPlayers.Contains(player))
+            GolfPlayers.Remove(player);
     }
     [Server]
     public void HostStartGame(NetworkConnection conn)
@@ -748,18 +823,70 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (!conn.IsHost)
             return;
         Debug.Log("HostStartGame: Starting the game.");
-        GolfPlayers.Clear();
-        for (int i = 0; i < GolfPlayersServer.Count; i++)
-        {
-            GolfPlayers.Add(GolfPlayersServer[i]);
-        }
-        RpcSetGolfPlayersLocally(GolfPlayersServer.ToList());
+        //GolfPlayers.Clear();
+        //for (int i = 0; i < GolfPlayersServer.Count; i++)
+        //{
+        //    GolfPlayers.Add(GolfPlayersServer[i]);
+        //}
+        RpcSetGolfPlayersLocally(GolfPlayers);
+        StartFirstHole();
 
+    }
+    [Server]
+    void StartFirstHole()
+    {
+        ResetPlayerScoresForNewHole();
+        //// Reset the number of players that have teed off
+        ResetNumberOfPlayersWhoHaveTeedOff();
+        //// Load a new hole
+        //LoadNewHole(0);
+        LoadNewHoleServer(0);
+
+        // Client side checks for things that can just be sent to each client to do
+        //// Get the CameraBoundBox and tell players to get it as well?
+        //GetCameraBoundingBox();
+        //TellPlayersToGetCameraBoundingBox();
+        //// Set the Hole Positions for the new hole
+
+        HolePositions = CurrentHoleInCourse.HolePositions;
+        //// Set the Course aim points for players to use
+        TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
+        //// Set the new tee off location
+        UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
+        //// Set the Camera Zoomed Out position
+        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos);
+        //// update the par value for the hole
+        UpdateParForNewHole(CurrentHoleInCourse.HolePar);
+
+        // Server side stuff to set weather conditions?
+        //// Set the Initial Wind for the hole
+        WindManager.instance.SetInitialWindForNewHole();
+        WindManager.instance.SetInitialWindDirection();
+        //// Set initial weather for the hole
+        RainManager.instance.SetInitialWeatherForHole();
+        ////_lightningManager.CheckIfLightningStartsThisTurn();
+        //// Sort the players by lowest score to start the hole
+        OrderListOfPlayers();
+        //// Set the current player
+        SetCurrentPlayer(GolfPlayersInTeeOffOrder[0]);
+        //// Move the first player to the tee off location
+        MoveAllPlayersNearTeeOffLocation();
+        //MovePlayerToTeeOffLocation(CurrentPlayer);
+        //// Diable sprite of players that are not the current player
+        //EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
+        //// Set the camera on the current player
+        //SetCameraOnPlayer(CurrentPlayer);
+        //// Prompt player to start their turn
+        //CurrentPlayer.PlayerUIMessage("start turn");
+        //CurrentPlayer.EnablePlayerCanvas(true);
+        //UpdateUIForCurrentPlayer(CurrentPlayer, true);
     }
     [ObserversRpc(ExcludeOwner = true)]
     void RpcSetGolfPlayersLocally(List<GolfPlayerTopDown> players)
     {
-        Debug.Log("RpcSetGolfPlayersLocally:");
+        if(IsLocalPlayerHost())
+            return;
+        Debug.Log("RpcSetGolfPlayersLocally");
         GolfPlayers.Clear();
         for (int i = 0; i < players.Count; i++)
         {
@@ -782,5 +909,32 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             NetworkPlayersServer.Remove(player);
 
         Debug.Log("RemoveNetworkPlayer: Player removed with connection id of: " + player.OwnerId + " count of NetworkPlayerServers: " + NetworkPlayersServer.Count.ToString());
+    }
+    public void SetLocalGolfPlayer(GolfPlayerTopDown player)
+    {
+        if (player.tag.ToLower().Contains("local"))
+            LocalGolfPlayer = player;
+    }
+    void SyncCurrentPlayerNetId(int prev, int next, bool asServer)
+    {
+        if (IsLocalPlayerHost())
+        {
+            _currentplayerui.SetActive(true);
+            _currentplayeruiText.text = CurrentPlayer.PlayerName + ":" + next.ToString();
+            return;
+        }
+            
+
+        Debug.Log("SyncCurrentPlayerNetId");
+        CurrentPlayer = InstanceFinder.ClientManager.Objects.Spawned[next].GetComponent<GolfPlayerTopDown>();
+        _currentplayerui.SetActive(true);
+        _currentplayeruiText.text = CurrentPlayer.PlayerName + ":" + next.ToString();
+    }
+    bool IsLocalPlayerHost()
+    {
+        if (!LocalGolfPlayer || LocalGolfPlayer.IsHost)
+            return true;
+
+        return false;
     }
 }
