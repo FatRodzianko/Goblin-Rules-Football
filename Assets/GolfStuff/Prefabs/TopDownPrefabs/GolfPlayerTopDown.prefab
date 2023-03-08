@@ -183,7 +183,7 @@ LineRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b25270aabf2f099429e6d711b810c38f, type: 2}
+  - {fileID: 2100000, guid: e83adf9101039654083da63c04d158ec, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -952,10 +952,13 @@ MonoBehaviour:
   _playerCanvas: {fileID: 3381234889782742433}
   _playerUIMessage: {fileID: 5631159995116756437}
   IsGameLeader: 0
+  OwnerNetId: 0
   ConnectionId: -99
   _golfBallPrefab: {fileID: 7504929942250748449, guid: 6721b70aef94bf54988229bfa7f71add, type: 3}
+  _myBallNetId: 0
   MyBall: {fileID: 0}
   DistanceToHole: 0
+  NumberOfBallsSpawnedForClient: 0
   hitDirection: {x: 0, y: 1}
   hitDistance: 200
   hitAngle: 24
@@ -1077,6 +1080,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21600fc32e1272c449ab39c614214dfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 1
+  _addedNetworkObject: {fileID: 5665735165111769197}
+  _networkObjectCache: {fileID: 5665735165111769197}
   StrokesForCurrentHole: 0
   TotalStrokesForCourse: 0
 --- !u!114 &5665735165111769197
@@ -1096,6 +1102,7 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   _networkBehaviours:
   - {fileID: 7513493645420276422}
+  - {fileID: 2653947506407809911}
   - {fileID: 1368494483326148317}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
@@ -1122,7 +1129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 1
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 5665735165111769197}
   _networkObjectCache: {fileID: 5665735165111769197}
   _synchronizeParent: 0

@@ -335,7 +335,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     }
     void SetCameraOnPlayer(GolfPlayerTopDown player)
     {
-        player.SetCameraOnPlayer();
+        //player.SetCameraOnPlayer();
+        Debug.Log("GameplayManager: SetCameraOnPlayer: For player: " + player.PlayerName);
+        player.RpcSetCameraOnPlayer();
     }
     public async void StartNextPlayersTurn(GolfBallTopDown ball, bool playerSkippingForLightning = false, bool playerWasStruckByLightning = false)
     {
@@ -552,6 +554,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         _numberOfPlayersInHole++;
         _lastBallInHoleTime = Time.time;
     }
+    [ObserversRpc]
+    void RpcUpdateUIForCurrentPlayer(GolfPlayerTopDown player, bool forTeeOff = false)
+    {
+        UpdateUIForCurrentPlayer(player, forTeeOff);
+    }
     void UpdateUIForCurrentPlayer(GolfPlayerTopDown player, bool forTeeOff = false)
     {
         if (!player)
@@ -739,10 +746,14 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         foreach (GolfPlayerTopDown player in GolfPlayers)
         {
-            if (player == playerToEnable)
+            /*if (player == playerToEnable)
                 player.EnablePlayerSprite(true);
             else
-                player.EnablePlayerSprite(false);
+                player.EnablePlayerSprite(false);*/
+            if (player == playerToEnable)
+                player.RpcEnablePlayerSprite(true);
+            else
+                player.RpcEnablePlayerSprite(false);
         }
     }
     public void PlayerWasStruckByLightning(GolfPlayerTopDown player)
@@ -873,14 +884,15 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         MoveAllPlayersNearTeeOffLocation();
         //MovePlayerToTeeOffLocation(CurrentPlayer);
         //// Diable sprite of players that are not the current player
-        //EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
+        EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
         //// Set the camera on the current player
-        //SetCameraOnPlayer(CurrentPlayer);
+        //SetCameraOnPlayer(CurrentPlayer); // this doesn't seem to work unless the player ball has been spawned. keep track of the player's spawned balls, and when they're all spawned on each client, then call these camera things?
         //// Prompt player to start their turn
-        //CurrentPlayer.PlayerUIMessage("start turn");
-        //CurrentPlayer.EnablePlayerCanvas(true);
-        //UpdateUIForCurrentPlayer(CurrentPlayer, true);
+        //CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner, "start turn");
+        //CurrentPlayer.RpcEnablePlayerCanvas(true);
+        //RpcUpdateUIForCurrentPlayer(CurrentPlayer, true);
     }
+
     [ObserversRpc(ExcludeOwner = true)]
     void RpcSetGolfPlayersLocally(List<GolfPlayerTopDown> players)
     {
@@ -936,5 +948,26 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             return true;
 
         return false;
+    }
+    [Server]
+    public void CheckIfAllBallsAreSpawned()
+    {
+        bool allSpawned = false;
+        foreach (GolfPlayerTopDown player in GolfPlayers)
+        {
+            if (player.NumberOfBallsSpawnedForClient != GolfPlayers.Count)
+            {
+                allSpawned = false;
+                break;
+            }
+            allSpawned = true;
+        }
+        if (allSpawned)
+        {
+            SetCameraOnPlayer(CurrentPlayer);
+            CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner, "start turn");
+            CurrentPlayer.RpcEnablePlayerCanvas(true);
+            RpcUpdateUIForCurrentPlayer(CurrentPlayer, true);
+        }
     }
 }
