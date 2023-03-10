@@ -72,12 +72,16 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] public bool PlayerHasSkippedTurn = false;
     [SerializeField] public List<GolfPlayerTopDown> TurnOrderForLightningSkips = new List<GolfPlayerTopDown>();
     [SerializeField] public int TurnsSinceSkip = 0;
-    public float TimeSinceLastSkip = 0f;
-    public float TimeSinceLastTurnStart = 0f;
+    [SyncVar] public float TimeSinceLastSkip = 0f;
+    [SyncVar] public float TimeSinceLastTurnStart = 0f;
 
     private void Awake()
     {
+        
         MakeInstance();
+
+        QualitySettings.vSyncCount = 1;
+
         _loadingHoleCanvas.gameObject.SetActive(false);
         if (!_tileMapManager)
             _tileMapManager = GameObject.FindGameObjectWithTag("TileMapManager").GetComponent<TileMapManager>();
@@ -320,6 +324,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         Debug.Log("PlayerTeedOff: After doing _haveAllPlayersTeedOff = HaveAllPlayersTeedOff(): Count of all players: " + GolfPlayers.Count.ToString() + " count of Players in tee off order: " + GolfPlayersInTeeOffOrder.Count.ToString());
 
     }
+    [Server]
     public void StartCurrentPlayersTurn(GolfPlayerTopDown requestingPlayer)
     {
         // to make sure the new player who was struck by lightning is pressing space?
@@ -328,10 +333,14 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         else
             TimeSinceLastTurnStart = Time.time;
 
+
         if (requestingPlayer != CurrentPlayer)
             return;
-        UpdateUIForCurrentPlayer(requestingPlayer);
-        CurrentPlayer.StartPlayerTurn();
+
+        //UpdateUIForCurrentPlayer(requestingPlayer);
+        RpcUpdateUIForCurrentPlayer(requestingPlayer);
+        //CurrentPlayer.StartPlayerTurn();
+        CurrentPlayer.ServerSetIsPlayersTurn(true);
     }
     void SetCameraOnPlayer(GolfPlayerTopDown player)
     {

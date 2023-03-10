@@ -49,6 +49,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public float previousHitAngle;
     public float previousHitTopSpin;
     public float previousHitLeftOrRightSpin;
+    Vector3 _previousLandingTargetPosition; // used for tracking the landing sprite position for players who don't own this object
+    Vector3 _newLandingTargetPosition;
 
     [Header("Line Renderers")]
     [SerializeField] LineRenderer trajectoryLineObject;
@@ -62,7 +64,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] float _changeDistanceRate = 5f;
 
     [Header("Player Turn")]
-    public bool IsPlayersTurn = false;
+    [SyncVar(OnChange = nameof(SyncIsPlayersTurn))] public bool IsPlayersTurn = false;
     public bool DirectionAndDistanceChosen = false;
     public bool HasPlayerTeedOff = false;
     public bool PromptedForLightning = false;
@@ -330,7 +332,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!this.IsOwner)
+        if (!base.IsOwner)
             return;
         if (!MyBall)
             return;
@@ -342,7 +344,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
             {
                 Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " will start their turn after pressing space! Time: " + Time.time);
                 this.EnablePlayerCanvas(false);
-                GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
+                // Begin old way of starting turn
+                //GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
+                // End old way of starting turn
+                CmdStartCurrentPlayersTurnOnServer();
             }
             else if (PromptedForLightning && GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Backspace) && Time.time >= (GameplayManagerTopDownGolf.instance.TimeSinceLastSkip + 0.15f))
             {
@@ -360,9 +365,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
             //EnableOrDisableLineObjects(false);
             //if (!IsPlayersTurn && !_moveHitMeterIcon)
             //    StartPlayerTurn();
+            Debug.Log("Player pressed space");
             if (this.PlayerStruckByLightning)
             {
-                
+                Debug.Log("Player pressed space: this.PlayerStruckByLightning");
                 _golfAnimator.ResetGolfAnimator();
                 EnablePlayerSprite(false);
                 this.EnablePlayerCanvas(false);
@@ -382,10 +388,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
             }
             if (!DirectionAndDistanceChosen && !_moveHitMeterIcon)
             {
+                Debug.Log("Player pressed space: !DirectionAndDistanceChosen && !_moveHitMeterIcon");
                 PlayerChooseDirectionAndDistance(true);
                 if (_cameraViewHole.IsCameraZoomedOut)
                     _cameraViewHole.ZoomOutCamera();
                 UpdateCameraFollowTarget(MyBall.MyBallObject);
+                CmdSetCameraOnMyBallForOtherPlayers();
             }
             else if (DirectionAndDistanceChosen && !_moveHitMeterIcon)
                 StartHitMeterSequence();
@@ -500,7 +508,30 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
             // Update the sprite direction
             _golfAnimator.UpdateSpriteDirection(hitDirection.normalized);
+
+            // Update for the other game players?
+            if(base.IsOwner)
+                CmdUpdateHitValuesForOtherPlayers(hitDistance, hitAngle, hitTopSpin, hitDirection, hitLeftOrRightspin);
         }
+    }
+    [ServerRpc]
+    void CmdUpdateHitValuesForOtherPlayers(float newDist, float newAngle, float newTopSpin, Vector2 newHitDir, float newLeftOrRightSpin)
+    {
+        RpcUpdateHitValuesForOtherPlayers(newDist, newAngle, newTopSpin, newHitDir, newLeftOrRightSpin);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcUpdateHitValuesForOtherPlayers(float newDist, float newAngle, float newTopSpin, Vector2 newHitDir, float newLeftOrRightSpin)
+    {
+        if (hitDistance != newDist)
+            hitDistance = newDist;
+        if (hitAngle != newAngle)
+            hitAngle = newAngle;
+        if (hitTopSpin != newTopSpin)
+            hitTopSpin = newTopSpin;
+        if (hitDirection != newHitDir)
+            hitDirection = newHitDir;
+        if (hitLeftOrRightspin != newLeftOrRightSpin)
+            hitLeftOrRightspin = newLeftOrRightSpin;
     }
     public void EnableOrDisableLineObjects(bool enable)
     {
@@ -576,10 +607,29 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // Adjust the location of the Adjusted Distance Icon
         UpdatePositionOfAdjustedDistanceIcon(hitDistance);
     }
+    [Server]
+    public void ServerSetIsPlayersTurn(bool isItTheirTurn)
+    {
+        this.IsPlayersTurn = isItTheirTurn;
+    }
+    void SyncIsPlayersTurn(bool prev, bool next, bool asServer)
+    {
+        if (asServer)
+            return;
+        if (next)
+        {
+            Debug.Log("SyncIsPlayersTurn: Is it " + this.PlayerName + "'s turn? " + next.ToString());
+            StartPlayerTurn();
+        }
+        else
+        { 
+
+        }
+    }
     public void StartPlayerTurn()
     {
         // IsPlayersTurn will be set by the game manager in a real game. This is just a place holder for now.
-        this.IsPlayersTurn = true;
+        //this.IsPlayersTurn = true; // old way from singleplayer mode
         SetCameraOnPlayer();
         SetPlayerOnBall();
         AttachUIToNewParent(myCamera.transform);
@@ -963,6 +1013,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void UpdateHitSpinForPlayer(Vector2 newSpin)
     {
+        if (!base.IsOwner)
+            return;
         //hitTopSpinSubmitted = newSpin.normalized;
         hitTopSpinSubmitted = newSpin;
         //Debug.Log("UpdateHitSpinForPlayer: new spin submitted: " + newSpin.ToString() + " hitTopSpinSubmitted will then be: " + hitTopSpinSubmitted.ToString());
@@ -1643,5 +1695,20 @@ public class GolfPlayerTopDown : NetworkBehaviour
         this.transform.position = newPos;
         /*if(MyBall)
             this.MyBall.transform.position = newPos;*/
+    }
+    [ServerRpc]
+    void CmdStartCurrentPlayersTurnOnServer()
+    {
+        GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
+    }
+    [ServerRpc]
+    void CmdSetCameraOnMyBallForOtherPlayers()
+    {
+        RpcSetCameraOnMyBallForOtherPlayers();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcSetCameraOnMyBallForOtherPlayers()
+    {
+        UpdateCameraFollowTarget(MyBall.MyBallObject);
     }
 }

@@ -2480,6 +2480,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WindIconHolder
       objectReference: {fileID: 0}
+    - target: {fileID: 8706885257563699752, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
 --- !u!4 &5846459299513484832 stripped

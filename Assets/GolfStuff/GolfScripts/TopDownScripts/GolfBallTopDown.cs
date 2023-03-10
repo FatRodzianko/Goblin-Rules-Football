@@ -97,22 +97,41 @@ public class GolfBallTopDown : NetworkBehaviour
     void Start()
     {
         isHit = false;
-        MyColliderRadius = myCollider.radius;
+        //MyColliderRadius = myCollider.radius;
+    }
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        if (!base.IsOwner)
+        {
+            myCollider.enabled = false;
+        }
+        else
+        {
+            MyColliderRadius = myCollider.radius;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        
     }
     private void FixedUpdate()
     {
+        if (!base.IsOwner)
+            return;
         if (isHit || isBouncing)
         {
             MoveBallOnTrajectory();
             UpdateBallSpriteForHeight();
+            // update other players and stuff
+            CmdUpdateBallSpriteForHeightForOtherPlayers();
+
             if (!trail.enabled)
                 trail.enabled = true;
+
+            CmdEnableTrailForOtherPlayers(true);
         }
         else if (isRolling)
         {
@@ -131,12 +150,14 @@ public class GolfBallTopDown : NetworkBehaviour
             {
                 ResetBallAndPlayerAfterBallStoppedRolling();
             }
-                
+
         }
         else
         {
             if (trail.enabled)
                 trail.enabled = false;
+
+            CmdEnableTrailForOtherPlayers(false);
         }
     }
     void MoveBallOnTrajectory()
@@ -170,6 +191,28 @@ public class GolfBallTopDown : NetworkBehaviour
             rb.MovePosition(hitBallPonts[2]);
             ResetBallInfo(true);
         }
+    }
+    [ServerRpc]
+    void CmdEnableTrailForOtherPlayers(bool enable)
+    {
+        RpcEnableTrailForOtherPlayers(enable);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcEnableTrailForOtherPlayers(bool enable)
+    {
+        if(trail.enabled != enable)
+            trail.enabled = enable;
+    }
+    [ServerRpc]
+    void CmdUpdateBallSpriteForHeightForOtherPlayers()
+    {
+        RpcBallSpriteForHeightForOtherPlayers();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcBallSpriteForHeightForOtherPlayers()
+    {
+        //Debug.Log("RpcBallSpriteForHeightForOtherPlayers: For ball owned by: " + MyPlayer.PlayerName);
+        UpdateBallSpriteForHeight();
     }
     void UpdateBallSpriteForHeight()
     {
@@ -208,7 +251,8 @@ public class GolfBallTopDown : NetworkBehaviour
             radius = pixelUnit * 8f;
         }
 
-        UpdateShadowPosition(height);
+        if(this.IsOwner)
+            UpdateShadowPosition(height);
         UpdateTrailLine(ballObjectRenderer.sprite);
         // Update the sprite collider's radius for accurate sprite collision detection?
         _ballSpriteCollision.UpdateColliderRadius(radius);
@@ -273,13 +317,14 @@ public class GolfBallTopDown : NetworkBehaviour
         float currentSpeed = 0f;
         // Get the distance travelled in last fixed update, then divid by fixed update to get meters/second?
         float dist = Vector2.Distance(start, end);
-        currentSpeed = dist / Time.deltaTime;
+        currentSpeed = dist / Time.fixedDeltaTime;
         //Debug.Log("CalculateCurrentSpeed: current speed: " + currentSpeed.ToString());
         return currentSpeed;
     }
     public void ResetBallInfo(bool checkForBounces)
     {
         isHit = false;
+        
         hitBallCount = 0f;
         timeInAir = 0f;
         myShadow.transform.localPosition = Vector3.zero;
@@ -300,6 +345,7 @@ public class GolfBallTopDown : NetworkBehaviour
     public void ResetPosition()
     {
         isHit = false;
+        
         isRolling = false;
         isBouncing = false;
         IsInHole = false;
@@ -337,6 +383,8 @@ public class GolfBallTopDown : NetworkBehaviour
         isHit = true;
         //ps.Play();
     }
+
+
     public Vector3[] CalculateHitTrajectory(float hitDistance, float hitAngle, float hitTopSpin, float hitLeftOrRightSpin, Vector3 hitDirection, Vector2 windDirection, float windPower, bool isHeightIncluded = false, float heightToUse = 0f, bool calculateRainEffect = false)
     {
         //Debug.Log("CalculateHitTrajectory: hitDistance: " + hitDistance.ToString() + " hitAngle: " + hitAngle.ToString());
@@ -928,14 +976,14 @@ public class GolfBallTopDown : NetworkBehaviour
     void RollBall(float rollSpeed, Vector2 rollDirection)
     {
         //original method
-        /*this.rb.MovePosition(rb.position + rollDirection * rollSpeed * Time.deltaTime);
-        speedMetersPerSecond -= GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime;*/
+        /*this.rb.MovePosition(rb.position + rollDirection * rollSpeed * Time.fixedDeltaTime);
+        speedMetersPerSecond -= GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.fixedDeltaTime;*/
 
         /*
-        //float actualSpeed = CalculateCurrentSpeed(rb.position, (rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 10f)) * Time.deltaTime));
-        //Vector2 newPos = rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier)) * Time.deltaTime;
-        //speedMetersPerSecond = CalculateCurrentSpeed(rb.position, newPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime);
-        //this.rb.MovePosition(rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 10f)) * Time.deltaTime);
+        //float actualSpeed = CalculateCurrentSpeed(rb.position, (rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 10f)) * Time.fixedDeltaTime));
+        //Vector2 newPos = rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier)) * Time.fixedDeltaTime;
+        //speedMetersPerSecond = CalculateCurrentSpeed(rb.position, newPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.fixedDeltaTime);
+        //this.rb.MovePosition(rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 10f)) * Time.fixedDeltaTime);
         //this.rb.MovePosition(newPos);
         */
 
@@ -947,13 +995,13 @@ public class GolfBallTopDown : NetworkBehaviour
         Vector2 rollVector = rollDirection * rollSpeed;
         Vector2 slopeVector = groundSlopeDirection * slopeSpeedModifier;
         Vector3 currentPos = this.transform.position;
-        //Vector3 nextPos = rb.position + rollDirection * rollSpeed * Time.deltaTime;
-        Vector3 nextPos = rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 0.5f)) * Time.deltaTime;
+        //Vector3 nextPos = rb.position + rollDirection * rollSpeed * Time.fixedDeltaTime;
+        Vector3 nextPos = rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 0.5f)) * Time.fixedDeltaTime;
         //Debug.Log("RollBall: current position is: " + currentPos.ToString("0.00000000") + " and the next position will be: " + nextPos.ToString("0.00000000"));
-        //this.rb.MovePosition(rb.position + rollDirection * rollSpeed * Time.deltaTime);
+        //this.rb.MovePosition(rb.position + rollDirection * rollSpeed * Time.fixedDeltaTime);
         //this.rb.MovePosition(rb.position + rollVector + slopeVector);
-        //speedMetersPerSecond -= GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime;
-        float realSpeed = CalculateCurrentSpeed(currentPos, nextPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime);
+        //speedMetersPerSecond -= GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.fixedDeltaTime;
+        float realSpeed = CalculateCurrentSpeed(currentPos, nextPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.fixedDeltaTime);
         //Debug.Log("RollBall: current position is: " + currentPos.ToString("0.00000000") + " and the next position will be: " + nextPos.ToString("0.00000000") + " the speed per seconds WILL BE: " + realSpeed.ToString("0.00000000") + " and the speed previously WAS: " + speedMetersPerSecond.ToString("0.00000000"));
         this.rb.MovePosition(nextPos);
         if (groundSlopeDirection != Vector2.zero && rollDirection == groundSlopeDirection && realSpeed < 0.5f && realSpeed > 0.05f)
@@ -1074,7 +1122,11 @@ public class GolfBallTopDown : NetworkBehaviour
         if (isRolling)
             isRolling = false;
         if (isHit)
+        {
             isHit = false;
+            
+        }
+            
         ResetBouncingInfo(true);
     }
     void ResetBallAndPlayerAfterBallStoppedRolling()
@@ -1238,7 +1290,11 @@ public class GolfBallTopDown : NetworkBehaviour
         // reset before hitting the ball again?
         hitBallCount = 0f;
         if (isHit)
+        {
             isHit = false;
+            
+        }
+            
         if (isBouncing)
             isBouncing = false;
         if (isRolling)
@@ -1300,6 +1356,7 @@ public class GolfBallTopDown : NetworkBehaviour
         // reset before hitting the ball again?
         hitBallCount = 0f;
         isHit = false;
+        
         //hitBallPonts = CalculateHitTrajectory(obstacleBounceDistance, launchAngle, launchTopSpin, launchLeftOrRightSpin, -movementDirection, Vector2.zero, 0f, true, midPointHeight);
         //maxHeight = hitBallPonts[1].z / 2;
         //initialVelocity = CalculateInitialVelocity(launchAngle, maxHeight);

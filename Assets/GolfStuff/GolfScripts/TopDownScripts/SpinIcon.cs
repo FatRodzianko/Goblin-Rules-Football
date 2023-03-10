@@ -23,12 +23,16 @@ public class SpinIcon : MonoBehaviour
     }
     private void OnMouseDown()
     {
+        if (!_myPlayer.IsOwner)
+            return;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         _selectionIconObject.transform.position = new Vector3(mousePos.x, mousePos.y, 0f);
         _myPlayer.UpdateHitSpinForPlayer(AdjustVectorForSpin(_selectionIconObject.transform.localPosition));
     }
     private void OnMouseDrag()
     {
+        if (!_myPlayer.IsOwner)
+            return;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         if (Vector2.Distance(mousePos, this.transform.position) < _maxDistanceFromCenter)
@@ -49,6 +53,8 @@ public class SpinIcon : MonoBehaviour
     }
     private void OnMouseOver()
     {
+        if (!_myPlayer.IsOwner)
+            return;
         if (Input.GetMouseButtonDown(1))
             ResetIconPosition();
     }
