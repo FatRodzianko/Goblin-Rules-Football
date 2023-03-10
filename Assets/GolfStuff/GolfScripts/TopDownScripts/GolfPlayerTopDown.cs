@@ -27,7 +27,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] GameObject _golfBallPrefab;
     [SerializeField] [SyncVar(OnChange = nameof(SyncMyBallNetId))] int _myBallNetId;
     [SerializeField] public GolfBallTopDown MyBall;
-    public float DistanceToHole;
+    [SyncVar] public float DistanceToHole;
     [SyncVar] public int NumberOfBallsSpawnedForClient = 0;
 
 
@@ -66,7 +66,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [Header("Player Turn")]
     [SyncVar(OnChange = nameof(SyncIsPlayersTurn))] public bool IsPlayersTurn = false;
     public bool DirectionAndDistanceChosen = false;
-    public bool HasPlayerTeedOff = false;
+    [SyncVar] public bool HasPlayerTeedOff = false;
     public bool PromptedForLightning = false;
     public bool PlayerStruckByLightning = false;
 
@@ -145,6 +145,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
     [Header("Start Game UI Stuff")]
     [SerializeField] GameObject _startGameButton;
+
+    [Header("Await Tasks Booleans on server")]
+    bool _tellPlayerGroundTheyLandedOn = false;
 
     private void Awake()
     {
@@ -293,11 +296,19 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     void SyncMyBallNetId(int prev, int next, bool asServer)
     {
-        if (asServer)
+        if (asServer) // maybe get rid of this to make sure the server always set the MyBall parameter. Otherwise, if there was a server but no host who is a server and a client, the server would never get MyBall Set?
             return;
         if (!MyBall)
         {
             Debug.Log("SyncMyBallNetId: for playeR: " + this.PlayerName + " ball id is: " + next.ToString());
+            //if (IsServer)
+            //{
+            //    MyBall = InstanceFinder.ServerManager.Objects.Spawned[next].GetComponent<GolfBallTopDown>();
+            //}
+            //else
+            //{
+            //    MyBall = InstanceFinder.ClientManager.Objects.Spawned[next].GetComponent<GolfBallTopDown>();
+            //}
             MyBall = InstanceFinder.ClientManager.Objects.Spawned[next].GetComponent<GolfBallTopDown>();
             MyBall.MyPlayer = this;
             if (this.IsOwner)
@@ -318,10 +329,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 {
                     Debug.Log("SyncMyBallNetId: error finding local game player. Error: " + e);
                 }
-            }
-                
-        }
-            
+            }   
+        }   
     }
     [ServerRpc]
     public void CmdBallSpawnedForPlayer()
@@ -332,6 +341,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("Player pressed space");
+        }
         if (!base.IsOwner)
             return;
         if (!MyBall)
@@ -365,22 +378,26 @@ public class GolfPlayerTopDown : NetworkBehaviour
             //EnableOrDisableLineObjects(false);
             //if (!IsPlayersTurn && !_moveHitMeterIcon)
             //    StartPlayerTurn();
-            Debug.Log("Player pressed space");
+            Debug.Log("Player (the owner) pressed space");
             if (this.PlayerStruckByLightning)
             {
                 Debug.Log("Player pressed space: this.PlayerStruckByLightning");
                 _golfAnimator.ResetGolfAnimator();
                 EnablePlayerSprite(false);
                 this.EnablePlayerCanvas(false);
-                this.IsPlayersTurn = false;
+                //this.IsPlayersTurn = false;
+                CmdEndPlayersTurn();
 
                 previousHitDistance = 0;
 
                 ActivateHitUIObjects(false);
+                CmdTellPlayersToActivateHitUIObjects(false);
                 AttachUIToNewParent(this.transform);
+                CmdTellPlayersToAttachUIToSelf();
                 //AttachPlayerToCamera(false, myCamera.transform);
                 //UpdateCameraFollowTarget(MyBall.MyBallObject);
                 EnableOrDisableLineObjects(false);
+                CmdTellPlayersToEnableOrDisableLineObjects(false);
                 this.PlayerStruckByLightning = false;
                 Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " has acknowledged they were struck by lightning! Moving on to next turn by calling: GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this). Time: " + Time.time);
                 GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
@@ -533,6 +550,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (hitLeftOrRightspin != newLeftOrRightSpin)
             hitLeftOrRightspin = newLeftOrRightSpin;
     }
+    [ServerRpc]
+    void CmdTellPlayersToEnableOrDisableLineObjects(bool enable)
+    {
+        RpcEnableOrDisableLineObjectsForOtherPlayers(enable);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcEnableOrDisableLineObjectsForOtherPlayers(bool enable)
+    {
+        EnableOrDisableLineObjects(enable);
+    }
     public void EnableOrDisableLineObjects(bool enable)
     {
         Debug.Log("EnableOrDisableLineObjects: " + enable.ToString());
@@ -645,9 +672,15 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (!HasPlayerTeedOff)
         {
             if (Vector2.Distance(ballPos, GameplayManagerTopDownGolf.instance.TeeOffPosition) > 25f)
-                HasPlayerTeedOff = true;
+            {
+                //HasPlayerTeedOff = true;
+                CmdPlayerTeedOff();
+            }   
             else
+            {
                 aimTarget = GameplayManagerTopDownGolf.instance.TeeOffAimPoint;
+            }
+                
         }
         // Get the distance to the hole
         float distToHole = GetDistanceToHole(closestHole, ballPos);
@@ -706,6 +739,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
         _hitMeterMovingIcon.SetActive(false);
         _hitMeterPowerSubmissionIcon.SetActive(false);
         _hitMeterAccuracySubmissionIcon.SetActive(false);
+    }
+    [ServerRpc]
+    void CmdTellPlayersToActivateHitUIObjects(bool enable)
+    {
+        RpcTellPlayersToActivateHitUIObjects(enable);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcTellPlayersToActivateHitUIObjects(bool enable)
+    {
+        ActivateHitUIObjects(enable);
     }
     void ActivateHitUIObjects(bool enable)
     {
@@ -966,17 +1009,23 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void SubmitHitToBall()
     {
+        Debug.Log("SubmitHitToBall: For player: " + this.PlayerName);
+        // This will all need to be updated when the network animator is used to make sure only the owner makes certain calls, but that the clients still play sounds and stuff?
         bool playerTeeOffSound = false;
         if (!this.HasPlayerTeedOff)
         {
-            GameplayManagerTopDownGolf.instance.PlayerTeedOff(this);
-            this.HasPlayerTeedOff = true;
+            //GameplayManagerTopDownGolf.instance.PlayerTeedOff(this); // this needs to be updated on the server
+            CmdTellServerPlayerTeedOff();
+            CmdPlayerTeedOff();
+            //this.HasPlayerTeedOff = true;
+
             playerTeeOffSound = true;
 
         }
             
         this.PlayerScore.PlayerHitBall();
-        GameplayManagerTopDownGolf.instance.ResetCurrentPlayer();
+        //GameplayManagerTopDownGolf.instance.ResetCurrentPlayer();
+        CmdResetCurrentPlayer();
         //GameplayManagerTopDownGolf.instance.LightningAfterPlayerHit();
 
         if (!IsShanked)
@@ -1004,12 +1053,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
             SoundManager.instance.PlaySound("golfball-shank", 1f);
             //MyBall.HitBall(100, hitAngle, hitTopSpin, new Vector2(1f, 0f), hitLeftOrRightspin);
         }
-        this.IsPlayersTurn = false;
+        //this.IsPlayersTurn = false;
+        CmdEndPlayersTurn();
         ActivateHitUIObjects(false);
+        CmdTellPlayersToActivateHitUIObjects(false);
         AttachUIToNewParent(this.transform);
+        CmdTellPlayersToAttachUIToSelf();
         //AttachPlayerToCamera(false, myCamera.transform);
         UpdateCameraFollowTarget(MyBall.MyBallObject);
         EnableOrDisableLineObjects(false);
+        CmdTellPlayersToEnableOrDisableLineObjects(false);
     }
     public void UpdateHitSpinForPlayer(Vector2 newSpin)
     {
@@ -1288,6 +1341,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         cameraFollowScript.followTarget = objectToFollow;
     }
+    [ServerRpc]
+    void CmdTellPlayersToAttachUIToSelf()
+    {
+        RpcAttachUIToSelf();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcAttachUIToSelf()
+    {
+        AttachUIToNewParent(this.transform);
+    }
     void AttachUIToNewParent(Transform newParent)
     {
         Vector3 localTransformPosition = _hitMeterObject.transform.localPosition;
@@ -1516,6 +1579,31 @@ public class GolfPlayerTopDown : NetworkBehaviour
             PromptedForLightning = false;
         _playerUIMessage.UpdatePlayerMessageText(message);
     }
+    [Server]
+    public async Task ServerTellPlayerGroundTheyLandedOn(float duration)
+    {
+        _tellPlayerGroundTheyLandedOn = true;
+        float end = Time.time + (duration * 2);
+        RpcTellPlayerGroundTheyLandedOn(duration);
+        Debug.Log("ServerTellPlayerGroundTheyLandedOn: Start time is: " + Time.time.ToString());
+        while (_tellPlayerGroundTheyLandedOn)
+        {
+            //Debug.Log("ServerTellPlayerGroundTheyLandedOn: Task.Yield time is: " + Time.time.ToString());
+            await Task.Yield();
+            if (Time.time >= end)
+                _tellPlayerGroundTheyLandedOn = false;
+        }
+        Debug.Log("ServerTellPlayerGroundTheyLandedOn: End time is: " + Time.time.ToString());
+    }
+    [ObserversRpc]
+    public void RpcTellPlayerGroundTheyLandedOn(float duration)
+    {
+        StartTellPlayerGroundTheyLandedOn(duration);
+    }
+    async void StartTellPlayerGroundTheyLandedOn(float duration)
+    {
+        await TellPlayerGroundTheyLandedOn(duration);
+    }
     public async Task TellPlayerGroundTheyLandedOn(float duration)
     {
         Debug.Log("TellPlayerGroundTheyLandedOn: on game player: " + this.PlayerName);
@@ -1547,6 +1635,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
             await Task.Yield();
         }
         this.EnablePlayerCanvas(false);
+        if (this.IsOwner)
+            CmdTellServerPlayerGroundTheyLandedOnCompleted();
+    }
+    [ServerRpc]
+    void CmdTellServerPlayerGroundTheyLandedOnCompleted()
+    {
+        _tellPlayerGroundTheyLandedOn = false;
     }
     public async Task TellPlayerBallIsOutOfBounds(float duration)
     {
@@ -1653,7 +1748,21 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void SetDistanceToHoleForPlayer()
     {
-        Vector3 ballPos = MyBall.transform.position; 
+        Vector3 ballPos = MyBall.transform.position;
+        CmdSetDistanceToHoleForPlayer(ballPos);
+        //GameObject closestHole = FindClosestHole(ballPos);
+        //DistanceToHole = GetDistanceToHole(closestHole, ballPos);
+    }
+    [Server]
+    public void ServerSetDistanceToHoleForPlayer()
+    {
+        Vector3 ballPos = MyBall.transform.position;
+        GameObject closestHole = FindClosestHole(ballPos);
+        DistanceToHole = GetDistanceToHole(closestHole, ballPos);
+    }
+    [ServerRpc]
+    void CmdSetDistanceToHoleForPlayer(Vector3 ballPos)
+    {
         GameObject closestHole = FindClosestHole(ballPos);
         DistanceToHole = GetDistanceToHole(closestHole, ballPos);
     }
@@ -1687,14 +1796,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
         _golfAnimator.ChangeToStruckByLightningSprite(enableStruckSprite);
     }
     [TargetRpc]
-    public void MovePlayerToPosition(NetworkConnection conn, Vector2 newPos)
+    public void MovePlayerToPosition(NetworkConnection conn, Vector2 newPos, bool moveBall = false)
     {
         if (!this.IsOwner)
             return;
-        Debug.Log("MovePlayerToPosition: new position is: " + newPos.ToString());
+        Debug.Log("MovePlayerToPosition: new position is: " + newPos.ToString() + " and move the ball too? " + moveBall.ToString());
         this.transform.position = newPos;
-        /*if(MyBall)
-            this.MyBall.transform.position = newPos;*/
+        if(moveBall && MyBall)
+            this.MyBall.transform.position = newPos;
     }
     [ServerRpc]
     void CmdStartCurrentPlayersTurnOnServer()
@@ -1710,5 +1819,32 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void RpcSetCameraOnMyBallForOtherPlayers()
     {
         UpdateCameraFollowTarget(MyBall.MyBallObject);
+    }
+    [ObserversRpc]
+    public void RpcResetBallSpriteForNewHole()
+    {
+        if (!MyBall)
+            return;
+        MyBall.ResetBallSpriteForNewHole();
+    }
+    [ServerRpc]
+    void CmdEndPlayersTurn()
+    {
+        this.IsPlayersTurn = false;
+    }
+    [ServerRpc]
+    void CmdPlayerTeedOff()
+    {
+        this.HasPlayerTeedOff = true;
+    }
+    [ServerRpc]
+    void CmdTellServerPlayerTeedOff()
+    {
+        GameplayManagerTopDownGolf.instance.PlayerTeedOff(this);
+    }
+    [ServerRpc]
+    void CmdResetCurrentPlayer()
+    {
+        GameplayManagerTopDownGolf.instance.ResetCurrentPlayer();
     }
 }

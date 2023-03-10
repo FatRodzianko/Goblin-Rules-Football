@@ -288,10 +288,12 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     }
     void MovePlayerToTeeOffLocation(GolfPlayerTopDown player)
     {
-        player.transform.position = TeeOffPosition;
-        player.MyBall.transform.position = TeeOffPosition;
-        player.MyBall.ResetBallSpriteForNewHole();
-        
+        //player.transform.position = TeeOffPosition;
+        //player.MyBall.transform.position = TeeOffPosition;
+        //player.MyBall.ResetBallSpriteForNewHole();
+        player.MovePlayerToPosition(player.Owner, TeeOffPosition, true);
+        player.RpcResetBallSpriteForNewHole();
+
     }
     [Server]
     void MoveAllPlayersNearTeeOffLocation()
@@ -305,12 +307,14 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             if (player == CurrentPlayer)
             {
                 player.MovePlayerToPosition(player.Owner, TeeOffPosition);
+                player.RpcResetBallSpriteForNewHole();
             }
             else
             {
                 Vector3 offset = new Vector3(UnityEngine.Random.Range(3f, 6f), UnityEngine.Random.Range(-5f, 5f), 0f);
                 Vector3 newPos = TeeOffPosition - offset;
                 player.MovePlayerToPosition(player.Owner, newPos);
+                player.RpcResetBallSpriteForNewHole();
             }
         }
     }
@@ -366,7 +370,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         {
             Debug.Log("GameplayManager: StartNextPlayersTurn: the ball is in the hole! Congrats to player: " + ball.MyPlayer.PlayerName);
             // This only needs to happen here for the single player right now, I think?
-            UpdateUIForCurrentPlayer(ball.MyPlayer);
+            //UpdateUIForCurrentPlayer(ball.MyPlayer);
+            RpcUpdateUIForCurrentPlayer(CurrentPlayer, false);
             //return;
         }
 
@@ -374,7 +379,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (!playerSkippingForLightning && !playerWasStruckByLightning)
         {  
             Debug.Log("StartNextPlayersTurn: Calling TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
-            await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
+            //await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
+            await ball.MyPlayer.ServerTellPlayerGroundTheyLandedOn(3);
             Debug.Log("StartNextPlayersTurn: Returning from TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
         }        
         
@@ -383,20 +389,6 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // Check if any players still have to hit a ball
         if (_numberOfPlayersInHole >= GolfPlayers.Count)
         {
-            /*if(PlayerHasSkippedTurn)
-                ResetLightningSkipInfo();
-
-            if ((CurrentHoleIndex + 1) < CurrentCourse.HolesInCourse.Length)
-            {
-                Debug.Log("GameplayManager: StartNextPlayersTurn: All players have made it into the hole. No more remaining players! Loading next hole?");
-                await ball.MyPlayer.TellPlayerHoleEnded(3);
-                NextHole();
-            }
-            else
-            {
-                Debug.Log("GameplayManager: StartNextPlayersTurn: All players have made it into the hole. No more remaining players! And this was the last hole! Ending the game...");
-                EndGame();
-            }*/
             AllPlayersInHoleOrIncapacitated(ball);
             return;
         }
@@ -455,12 +447,18 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         else
         {
             CurrentPlayer = SelectNextPlayer();
+            SetCurrentPlayer(CurrentPlayer);
         }
         // Move the player too the tee off location if they haven't teed off yet. Otherwise, move them to their ball object
         if (!CurrentPlayer.HasPlayerTeedOff)
+        {
             MovePlayerToTeeOffLocation(CurrentPlayer);
+        }
         else
-            CurrentPlayer.SetPlayerOnBall();
+        {
+            //CurrentPlayer.SetPlayerOnBall();
+            CurrentPlayer.MovePlayerToPosition(CurrentPlayer.Owner, CurrentPlayer.MyBall.transform.position);
+        }   
         // Diable sprite of players that are not the current player
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
         // Move the camera to the player
@@ -665,14 +663,18 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         Debug.Log("PromptPlayerForNextTurn: For player: " + CurrentPlayer.PlayerName);
         if (_lightningManager.IsThereLightning)
         {
-            CurrentPlayer.PlayerUIMessage("lightning");
+            //CurrentPlayer.PlayerUIMessage("lightning");
+            CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner, "lightning");
         }
         else
         {
-            CurrentPlayer.PlayerUIMessage("start turn");
+            //CurrentPlayer.PlayerUIMessage("start turn");
+            CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner, "start turn");
         }
-        CurrentPlayer.EnablePlayerCanvas(true);
-        UpdateUIForCurrentPlayer(CurrentPlayer);
+        //CurrentPlayer.EnablePlayerCanvas(true);
+        CurrentPlayer.RpcEnablePlayerCanvas(true);
+        //UpdateUIForCurrentPlayer(CurrentPlayer);
+        RpcUpdateUIForCurrentPlayer(CurrentPlayer, true);
     }
     async void EndGame()
     {
@@ -727,7 +729,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
                 continue;
             if (!player.HasPlayerTeedOff)
                 continue;
-            player.SetDistanceToHoleForPlayer();
+            //player.SetDistanceToHoleForPlayer();
+            player.ServerSetDistanceToHoleForPlayer();
             playersByDistance.Add(player);
         }
 
@@ -894,12 +897,6 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //MovePlayerToTeeOffLocation(CurrentPlayer);
         //// Diable sprite of players that are not the current player
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
-        //// Set the camera on the current player
-        //SetCameraOnPlayer(CurrentPlayer); // this doesn't seem to work unless the player ball has been spawned. keep track of the player's spawned balls, and when they're all spawned on each client, then call these camera things?
-        //// Prompt player to start their turn
-        //CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner, "start turn");
-        //CurrentPlayer.RpcEnablePlayerCanvas(true);
-        //RpcUpdateUIForCurrentPlayer(CurrentPlayer, true);
     }
 
     [ObserversRpc(ExcludeOwner = true)]
@@ -943,8 +940,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             _currentplayerui.SetActive(true);
             _currentplayeruiText.text = CurrentPlayer.PlayerName + ":" + next.ToString();
             return;
-        }
-            
+        }   
 
         Debug.Log("SyncCurrentPlayerNetId");
         CurrentPlayer = InstanceFinder.ClientManager.Objects.Spawned[next].GetComponent<GolfPlayerTopDown>();

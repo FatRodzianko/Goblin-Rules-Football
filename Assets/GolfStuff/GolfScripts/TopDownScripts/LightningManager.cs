@@ -197,6 +197,9 @@ public class LightningManager : MonoBehaviour
     }
     public void CheckIfLightningStartsThisTurn()
     {
+        // avoiding this for now while testing other multiplayer stuff
+        return;
+
         Debug.Log("CheckIfLightningStartsThisTurn: Checking for lightning at new turn. Is there lightning now? " + IsThereLightning.ToString());
         if (!IsThereLightning)
         {

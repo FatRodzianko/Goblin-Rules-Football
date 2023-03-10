@@ -28,6 +28,15 @@ public class GolfPlayerScore : NetworkBehaviour
     }
     public void PlayerHitBall()
     {
+        //StrokesForCurrentHole++;
+        //TotalStrokesForCourse++;
+        if (!this.IsOwner)
+            return;
+        CmdPlayerHitBall();
+    }
+    [ServerRpc]
+    void CmdPlayerHitBall()
+    {
         StrokesForCurrentHole++;
         TotalStrokesForCourse++;
     }

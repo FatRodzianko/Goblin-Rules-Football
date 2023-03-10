@@ -66,8 +66,18 @@ public class RainManager : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GetRainSoundForHole();
+        //GetRainSoundForHole();
+        //SetRainState(RainState);
+    }
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
         SetRainState(RainState);
+    }
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        GetRainSoundForHole();
     }
     void MakeInstance()
     {
@@ -204,11 +214,12 @@ public class RainManager : NetworkBehaviour
             _globalLight.intensity = 1.0f;
         }
 
-        RainState = newState;
+        if(this.IsServer)
+            RainState = newState;
     }
     void WeatherChangedFunction(string newEffect)
     {
-        //Debug.Log("WeatherChangedFunction: the new weather effect is: " + newEffect);
+        Debug.Log("WeatherChangedFunction: the new weather effect is: " + newEffect);
         SetRainState(newEffect);
     }
     public void SetInitialWeatherForHole()

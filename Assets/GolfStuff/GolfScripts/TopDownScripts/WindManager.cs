@@ -268,6 +268,10 @@ public class WindManager : NetworkBehaviour
             return;
         if (IsThereATorndao)
             return;
+
+        // skipping tornado stuff while testing everything else out in multiplayer...
+        return;
+
         if (this.WindPower <= 0f)
         {
             DestroyTornadoObjects();
@@ -363,6 +367,10 @@ public class WindManager : NetworkBehaviour
             return;
         if (!TornadoScript)
             return;
+
+        // skipping tornado stuff while testing everything else out in multiplayer...
+        return;
+
         if (this.WindPower <= 0f || RainManager.instance.RainState == "clear")
         {
             DestroyTornadoObjects();

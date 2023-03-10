@@ -65,6 +65,7 @@ public class GolferAnimator : MonoBehaviour
     }
     public void HitBall()
     {
+        Debug.Log("HitBall:");
         _myPlayer.SubmitHitToBall();
     }
     public void SwingEnded()

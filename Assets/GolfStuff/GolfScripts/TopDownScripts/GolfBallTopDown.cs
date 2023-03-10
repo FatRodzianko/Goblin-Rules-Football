@@ -143,7 +143,11 @@ public class GolfBallTopDown : NetworkBehaviour
             RollBall(speedMetersPerSecond, movementDirection);
 
             if (!trail.enabled)
+            {
                 trail.enabled = true;
+                CmdEnableTrailForOtherPlayers(true);
+            }
+                
 
             isRolling = WillBallRoll();
             if (!isRolling)
@@ -1131,6 +1135,9 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     void ResetBallAndPlayerAfterBallStoppedRolling()
     {
+        if (!this.IsOwner)
+            return;
+        Debug.Log("ResetBallAndPlayerAfterBallStoppedRolling: for player: " + MyPlayer.PlayerName);
         //MyPlayer.EnableOrDisableLineObjects(true);
         MyPlayer.ResetPreviousHitValues();
         //TellPlayerGroundTypeTheyLandedOn();
@@ -1143,6 +1150,13 @@ public class GolfBallTopDown : NetworkBehaviour
 
             return;
         }
+        //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+        CmdTellServerToStartNexPlayersTurn();
+    }
+    [ServerRpc]
+    void CmdTellServerToStartNexPlayersTurn()
+    {
+        Debug.Log("CmdTellServerToStartNexPlayersTurn: From player: " + MyPlayer.PlayerName);
         GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
     void ResetTornadoStuff()
@@ -1622,6 +1636,7 @@ public class GolfBallTopDown : NetworkBehaviour
         MyPlayer.EnablePlayerCanvas(true);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
+    
     public void ResetBallSpriteForNewHole()
     {
         myShadow.GetComponent<SpriteRenderer>().enabled = true;
