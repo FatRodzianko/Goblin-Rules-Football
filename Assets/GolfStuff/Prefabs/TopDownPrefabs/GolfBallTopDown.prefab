@@ -15,8 +15,6 @@ GameObject:
   - component: {fileID: 885962383}
   - component: {fileID: 7168041866932580886}
   - component: {fileID: 5862308198339419254}
-  - component: {fileID: 1411096907933777399}
-  - component: {fileID: 537312767878246394}
   m_Layer: 28
   m_Name: ball-sprite
   m_TagString: GolfBallSprite
@@ -5003,76 +5001,6 @@ MonoBehaviour:
   _defaultOrderInLayer: 0
   _golfBallTopDown: {fileID: 4414391001200824294}
   _trailRenderer: {fileID: 885962383}
---- !u!114 &1411096907933777399
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4374865640907677581}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <IsNested>k__BackingField: 1
-  <ComponentIndex>k__BackingField: 0
-  <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours: []
-  <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
-  _isNetworked: 1
-  _isGlobal: 0
-  _initializeOrder: 0
-  _defaultDespawnType: 0
-  NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 0
-  <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 0
-  <SceneId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 0
-  _sceneNetworkObjects: []
---- !u!114 &537312767878246394
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4374865640907677581}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 1411096907933777399}
-  _networkObjectCache: {fileID: 0}
-  _synchronizeParent: 0
-  _packing:
-    Position: 0
-    Rotation: 1
-    Scale: 1
-  _interpolation: 1
-  _extrapolation: 2
-  _enableTeleport: 0
-  _teleportThreshold: 1
-  _clientAuthoritative: 1
-  _sendToOwner: 1
-  _synchronizePosition: 1
-  _positionSnapping:
-    X: 0
-    Y: 0
-    Z: 0
-  _synchronizeRotation: 0
-  _rotationSnapping:
-    X: 0
-    Y: 0
-    Z: 0
-  _synchronizeScale: 0
-  _scaleSnapping:
-    X: 0
-    Y: 0
-    Z: 0
 --- !u!1 &7447958787880024895
 GameObject:
   m_ObjectHideFlags: 0
@@ -5282,6 +5210,7 @@ MonoBehaviour:
   pixelUnit: 0.0625
   trail: {fileID: 885962383}
   isHit: 0
+  _clientMovingBall: 0
   hitBallPonts:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
@@ -5425,7 +5354,8 @@ MonoBehaviour:
   - {fileID: 4414391001200824294}
   - {fileID: 8404304866366200417}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
+  <ChildNetworkObjects>k__BackingField:
+  - {fileID: 0}
   _isNetworked: 1
   _isGlobal: 0
   _initializeOrder: 0

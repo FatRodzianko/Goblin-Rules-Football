@@ -36,6 +36,11 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         if (collision.tag == "golfBall")
         {
             GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
+
+            // only calculate collisions for balls the client owns...
+            if (!golfBallScript.IsOwner)
+                return;
+
             if (_isHoleFlag && golfBallScript.isRolling)
                 return;
             if (golfBallScript.IsInHole)
@@ -97,7 +102,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         if (collision.tag == "golfBall")
         {
             GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
-            if (golfBallScript.IsInHole || golfBallScript.isRolling || golfBallScript.isHit || golfBallScript.isBouncing)
+            if (!golfBallScript.IsOwner || golfBallScript.IsInHole || golfBallScript.isRolling || golfBallScript.isHit || golfBallScript.isBouncing)
                 return;
             Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: moving ball to prevent issues?");
 

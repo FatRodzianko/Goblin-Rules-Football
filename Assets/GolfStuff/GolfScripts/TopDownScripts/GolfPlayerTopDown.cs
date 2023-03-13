@@ -692,6 +692,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
         CurrentClub = _myClubs[_currentClubIndex];
         // Update the Club UI stuff
         SetSelectedClubUI(CurrentClub);
+        if (this.IsOwner)
+            CmdTellClientsSelectedClub(_currentClubIndex);
         // update the club stats?
         GetNewClubAttributes(CurrentClub);
 
@@ -1147,6 +1149,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 CurrentClub = _myClubs[i];
                 _currentClubIndex = i;
                 SetSelectedClubUI(CurrentClub);
+                if (this.IsOwner)
+                    CmdTellClientsSelectedClub(_currentClubIndex);
                 break;
             }
         }
@@ -1185,6 +1189,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
         else
             UpdateTopSpin(hitTopSpin / _myClubs[oldIndex].MaxBackSpin);
         UpdateLeftRightSpin(hitLeftOrRightspin / _myClubs[oldIndex].MaxSideSpin);
+
+        if (this.IsOwner)
+            CmdTellClientsSelectedClub(_currentClubIndex);
     }
     void SetSelectedClubUI(ClubTopDown club)
     {
@@ -1578,6 +1585,21 @@ public class GolfPlayerTopDown : NetworkBehaviour
         else if (message == "start turn")
             PromptedForLightning = false;
         _playerUIMessage.UpdatePlayerMessageText(message);
+        if (this.IsOwner)
+            CmdTellClientsUpdatePlayerMessageText(message);
+    }
+    [ServerRpc]
+    void CmdTellClientsUpdatePlayerMessageText(string newMessage)
+    {
+        if (newMessage == "lightning" || newMessage == "start turn")
+            return;
+        RpcTellClientsUpdatePlayerMessageText(newMessage);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcTellClientsUpdatePlayerMessageText(string newMessage)
+    {
+        this.EnablePlayerCanvas(true);
+        _playerUIMessage.UpdatePlayerMessageText(newMessage);
     }
     [Server]
     public async Task ServerTellPlayerGroundTheyLandedOn(float duration)
@@ -1607,6 +1629,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public async Task TellPlayerGroundTheyLandedOn(float duration)
     {
         Debug.Log("TellPlayerGroundTheyLandedOn: on game player: " + this.PlayerName);
+        if (!this.IsOwner)
+        {
+            return;
+        }
+
         float end = Time.time + duration;
         GetCameraBoundingBox();
         bool isInBounds = true;
@@ -1642,6 +1669,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void CmdTellServerPlayerGroundTheyLandedOnCompleted()
     {
         _tellPlayerGroundTheyLandedOn = false;
+        RpcTellServerPlayerGroundTheyLandedOnCompleted();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcTellServerPlayerGroundTheyLandedOnCompleted()
+    {
+        this.EnablePlayerCanvas(false);
     }
     public async Task TellPlayerBallIsOutOfBounds(float duration)
     {
@@ -1846,5 +1879,19 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void CmdResetCurrentPlayer()
     {
         GameplayManagerTopDownGolf.instance.ResetCurrentPlayer();
+    }
+    [ServerRpc]
+    void CmdTellClientsSelectedClub(int newClubIndex)
+    {
+        RpcTellClientsSelectedClub(newClubIndex);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcTellClientsSelectedClub(int newClubIndex)
+    {
+        if (this.IsOwner)
+            return;
+        _currentClubIndex = newClubIndex;
+        CurrentClub = _myClubs[_currentClubIndex];
+        SetSelectedClubUI(CurrentClub);
     }
 }

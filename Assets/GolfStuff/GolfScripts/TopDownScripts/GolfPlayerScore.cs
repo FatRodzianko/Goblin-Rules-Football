@@ -42,6 +42,15 @@ public class GolfPlayerScore : NetworkBehaviour
     }
     public void StrokePenalty(int penalty)
     {
+        //StrokesForCurrentHole += penalty;
+        //TotalStrokesForCourse += penalty;
+        if (!this.IsOwner)
+            return;
+        CmdStrokePenalty(penalty);
+    }
+    [ServerRpc]
+    void CmdStrokePenalty(int penalty)
+    {
         StrokesForCurrentHole += penalty;
         TotalStrokesForCourse += penalty;
     }

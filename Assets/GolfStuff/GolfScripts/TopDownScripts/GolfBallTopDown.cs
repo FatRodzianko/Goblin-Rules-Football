@@ -36,8 +36,9 @@ public class GolfBallTopDown : NetworkBehaviour
     [Header("Trail")]
     [SerializeField] TrailRenderer trail;
 
-
+    [Header("Ball Status")]
     public bool isHit = false;
+    [SerializeField][SyncVar(OnChange = nameof(SyncClientMovingBall))] bool _clientMovingBall = false;
 
     [Header("Hit Ball Info")]
     public Vector3[] hitBallPonts = new Vector3[3];
@@ -104,7 +105,7 @@ public class GolfBallTopDown : NetworkBehaviour
         base.OnStartClient();
         if (!base.IsOwner)
         {
-            myCollider.enabled = false;
+            //myCollider.enabled = false;
         }
         else
         {
@@ -115,7 +116,13 @@ public class GolfBallTopDown : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (!this.IsOwner)
+        {
+            if (_clientMovingBall)
+            {
+                UpdateBallSpriteForHeight();
+            }
+        }
     }
     private void FixedUpdate()
     {
@@ -126,7 +133,7 @@ public class GolfBallTopDown : NetworkBehaviour
             MoveBallOnTrajectory();
             UpdateBallSpriteForHeight();
             // update other players and stuff
-            CmdUpdateBallSpriteForHeightForOtherPlayers();
+            //CmdUpdateBallSpriteForHeightForOtherPlayers();
 
             if (!trail.enabled)
                 trail.enabled = true;
@@ -147,7 +154,7 @@ public class GolfBallTopDown : NetworkBehaviour
                 trail.enabled = true;
                 CmdEnableTrailForOtherPlayers(true);
             }
-                
+
 
             isRolling = WillBallRoll();
             if (!isRolling)
@@ -204,7 +211,7 @@ public class GolfBallTopDown : NetworkBehaviour
     [ObserversRpc(ExcludeOwner = true)]
     void RpcEnableTrailForOtherPlayers(bool enable)
     {
-        if(trail.enabled != enable)
+        if (trail.enabled != enable)
             trail.enabled = enable;
     }
     [ServerRpc]
@@ -255,8 +262,9 @@ public class GolfBallTopDown : NetworkBehaviour
             radius = pixelUnit * 8f;
         }
 
-        if(this.IsOwner)
-            UpdateShadowPosition(height);
+        /*if(this.IsOwner)
+            UpdateShadowPosition(height);*/
+        UpdateShadowPosition(height);
         UpdateTrailLine(ballObjectRenderer.sprite);
         // Update the sprite collider's radius for accurate sprite collision detection?
         _ballSpriteCollision.UpdateColliderRadius(radius);
@@ -328,7 +336,7 @@ public class GolfBallTopDown : NetworkBehaviour
     public void ResetBallInfo(bool checkForBounces)
     {
         isHit = false;
-        
+
         hitBallCount = 0f;
         timeInAir = 0f;
         myShadow.transform.localPosition = Vector3.zero;
@@ -349,7 +357,7 @@ public class GolfBallTopDown : NetworkBehaviour
     public void ResetPosition()
     {
         isHit = false;
-        
+
         isRolling = false;
         isBouncing = false;
         IsInHole = false;
@@ -364,13 +372,13 @@ public class GolfBallTopDown : NetworkBehaviour
         //CalculateHitTrajectory(hitDistance, hitAngle, hitTopSpin, hitDirection, Vector2.zero, 0f);
         if (provideHeight)
         {
-            hitBallPonts = CalculateHitTrajectory(hitDistance, hitAngle, hitTopSpin, hitLeftOrRightSpin, hitDirection, WindManager.instance.WindDirection, WindManager.instance.WindPower,true, hieghtProvided, true);
+            hitBallPonts = CalculateHitTrajectory(hitDistance, hitAngle, hitTopSpin, hitLeftOrRightSpin, hitDirection, WindManager.instance.WindDirection, WindManager.instance.WindPower, true, hieghtProvided, true);
         }
         else
         {
             hitBallPonts = CalculateHitTrajectory(hitDistance, hitAngle, hitTopSpin, hitLeftOrRightSpin, hitDirection, WindManager.instance.WindDirection, WindManager.instance.WindPower, false, 0f, true);
         }
-        
+
         maxHeight = hitBallPonts[1].z / 2;
         initialVelocity = CalculateInitialVelocity(hitAngle, maxHeight);
         flightTime = CalculateFlightTime(initialVelocity, hitAngle);
@@ -385,6 +393,7 @@ public class GolfBallTopDown : NetworkBehaviour
         movementDirection = hitDirection.normalized;
         launchAngle = hitAngle;
         isHit = true;
+        CmdTellClientsBallIsMoving(true);
         //ps.Play();
     }
 
@@ -429,7 +438,7 @@ public class GolfBallTopDown : NetworkBehaviour
         //float controlY = ((endPos.y - startPos.y) / 1.2f) + startPos.y;
         // The Z value of the control point will be the max height of the hit?
         float controlZ = heightToUse;
-        
+
 
         // If the height to use wasn't provided, like for initial hits, then calculate it using some trig stuff
         if (!isHeightIncluded)
@@ -450,7 +459,7 @@ public class GolfBallTopDown : NetworkBehaviour
         if (launchLeftOrRightSpin != 0)
         {
             Debug.Log("CalculateHitTrajectory: hitLeftOrRightSpin is not 0. It is: " + launchLeftOrRightSpin.ToString());
-            Vector2 sideSpinShift = ShiftTrajectoryForSideSpin(launchLeftOrRightSpin,trajectoryPoints[0], trajectoryPoints[1], movementDirection, trajectoryPoints[1].z);
+            Vector2 sideSpinShift = ShiftTrajectoryForSideSpin(launchLeftOrRightSpin, trajectoryPoints[0], trajectoryPoints[1], movementDirection, trajectoryPoints[1].z);
             Debug.Log("CalculateHitTrajectory: hitLeftOrRightSpin is not 0. the shift will be: " + sideSpinShift.ToString() + " from the original point of: " + trajectoryPoints[1].ToString());
             trajectoryPoints[1].x = sideSpinShift.x;
             trajectoryPoints[1].y = sideSpinShift.y;
@@ -493,7 +502,7 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         if (windDirection == Vector2.zero || windPower == 0)
             return trajectoryPoint;
-        Vector3 windShift = windDirection.normalized * windPower * (timeInAir / 10f); 
+        Vector3 windShift = windDirection.normalized * windPower * (timeInAir / 10f);
         if (isMidPoint)
         {
             windShift /= 2f;
@@ -563,7 +572,7 @@ public class GolfBallTopDown : NetworkBehaviour
     public float CalculateInitialVelocity(float angle, float height)
     {
         // https://www.youtube.com/watch?v=Y8OMCrQ0eUg
-        Debug.Log("CalculateInitialVelocity: Initial angle: " + angle.ToString() + " max height: " + height.ToString()) ;
+        Debug.Log("CalculateInitialVelocity: Initial angle: " + angle.ToString() + " max height: " + height.ToString());
         float initialVelocity = 0f;
 
         // Calculate the velocity upward
@@ -589,7 +598,7 @@ public class GolfBallTopDown : NetworkBehaviour
         float lengthOfFlight = 0f;
 
         //lengthOfFlight = (2 * velocity * Mathf.Sin(angle * Mathf.Deg2Rad) / Physics2D.gravity.y) * 2; // multiplying by 2 to make it a bit 
-        lengthOfFlight = (2 * velocity * Mathf.Sin(angle * Mathf.Deg2Rad) / Physics2D.gravity.y); 
+        lengthOfFlight = (2 * velocity * Mathf.Sin(angle * Mathf.Deg2Rad) / Physics2D.gravity.y);
         Debug.Log("CalculateFlightTime: the length of the flight in seconds is: " + lengthOfFlight.ToString());
 
         return -lengthOfFlight;
@@ -623,7 +632,7 @@ public class GolfBallTopDown : NetworkBehaviour
             // Reset left or right spin after first bounce. Don't want to affect other bounces?
             launchLeftOrRightSpin = 0f;
         }
-            
+
 
         // Get the ground material the ball will be bouncing off of. Will effect number of bounces and stuff
         bounceContactGroundMaterial = GetGroundMaterial();
@@ -653,7 +662,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
             //Debug.Log("GetBounces: hit direction was: " + hitDirection.ToString() + " and the new bounce direction after checking for ground slope will be: " + bounceDirection.ToString());
             if (bounceDistance <= 0)
-            {   
+            {
                 bounceDistance = Mathf.Abs(bounceDistance);
                 if (originalHitDirection == bounceDirection)
                 {
@@ -663,7 +672,7 @@ public class GolfBallTopDown : NetworkBehaviour
             Debug.Log("GetBounces: hit direction was: " + hitDirection.ToString() + " and the new bounce direction after checking for spin is: " + bounceDirection.ToString());
             // Factor in the slope of ground for bounces???
             bounceDirection += BounceOffSlope();
-            Debug.Log("GetBounces: hit direction was: " + hitDirection.ToString() + " and the new bounce direction after checking for ground slope will be: " + bounceDirection.ToString() + " Bounce direction using reflecion is: " + Vector3.Reflect(hitDirection,Vector3.forward).ToString());
+            Debug.Log("GetBounces: hit direction was: " + hitDirection.ToString() + " and the new bounce direction after checking for ground slope will be: " + bounceDirection.ToString() + " Bounce direction using reflecion is: " + Vector3.Reflect(hitDirection, Vector3.forward).ToString());
 
 
             // Get the new hit angle based on the new bounce distance. If spin is increasing or decreasing the bounce distance, the angle needs to change?
@@ -671,7 +680,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
             // Calculate the trajectory of the bounce
             //CalculateHitTrajectory(bounceDistance, bounceAngle, bounceTopSpin, bounceDirection, Vector2.zero, 0f, true, bounceHeight);
-            hitBallPonts = CalculateHitTrajectory(bounceDistance, bounceAngle, bounceTopSpin, 0f, bounceDirection , WindManager.instance.WindDirection, WindManager.instance.WindPower, true, bounceHeight);
+            hitBallPonts = CalculateHitTrajectory(bounceDistance, bounceAngle, bounceTopSpin, 0f, bounceDirection, WindManager.instance.WindDirection, WindManager.instance.WindPower, true, bounceHeight);
             maxHeight = hitBallPonts[1].z / 2;
             initialVelocity = CalculateInitialVelocity(hitAngle, maxHeight);
             flightTime = CalculateFlightTime(initialVelocity, hitAngle);
@@ -786,7 +795,7 @@ public class GolfBallTopDown : NetworkBehaviour
         bool keepBouncing = false;
 
         // never bounce out of a trap? always set number of bounces to 0
-        if(groundMaterial.Contains("trap"))
+        if (groundMaterial.Contains("trap"))
             return keepBouncing;
 
 
@@ -865,7 +874,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
         if (groundSlopeDirection != Vector2.zero && slopeSpeedModifier != 0f)
         {
-            
+
             Vector2 bounceVector = ballDir * bounceDistance;
             Vector2 slopeVector = groundSlopeDirection * slopeSpeedModifier * 7.5f * (Mathf.Abs(bounceDistance) + 0.1f); // adding 0.1 to prevent it from being zero?
             Vector2 combinedVectors = bounceVector + slopeVector;
@@ -961,11 +970,11 @@ public class GolfBallTopDown : NetworkBehaviour
                     willBallRoll = false;
                     speedMetersPerSecond = 0f;
                 }
-                
+
             }
-            
+
         }
-            
+
 
         // from when I was trying to use forces instead of my bullshit
         /*if (Mathf.Abs(rb.velocity.magnitude) < 0.05f)
@@ -1046,7 +1055,7 @@ public class GolfBallTopDown : NetworkBehaviour
         {
             ResetBallAndPlayerAfterBallStoppedRolling();
         }
-        
+
 
     }
     public float GetPuttSpeed(float distanceToPutt)
@@ -1128,9 +1137,9 @@ public class GolfBallTopDown : NetworkBehaviour
         if (isHit)
         {
             isHit = false;
-            
+
         }
-            
+
         ResetBouncingInfo(true);
     }
     void ResetBallAndPlayerAfterBallStoppedRolling()
@@ -1151,6 +1160,7 @@ public class GolfBallTopDown : NetworkBehaviour
             return;
         }
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+        CmdTellClientsBallIsMoving(false);
         CmdTellServerToStartNexPlayersTurn();
     }
     [ServerRpc]
@@ -1178,7 +1188,7 @@ public class GolfBallTopDown : NetworkBehaviour
         Quaternion rot = Quaternion.AngleAxis(rotAngle, Vector3.forward);
         return rot;
     }
-    Vector2 ShiftTrajectoryForSideSpin(float spinValue,Vector2 startPoint, Vector2 midPoint, Vector2 dir, float heightValue)
+    Vector2 ShiftTrajectoryForSideSpin(float spinValue, Vector2 startPoint, Vector2 midPoint, Vector2 dir, float heightValue)
     {
         Vector2 shift = Vector2.zero;
 
@@ -1202,7 +1212,7 @@ public class GolfBallTopDown : NetworkBehaviour
         float lengthOfHypo = lengthOfAdjacent / (Mathf.Cos(rotAngle));
         // Calculate where the hypo ends based on the length of the hypo, its direction and its starting point
         shift = (hypoDir * lengthOfHypo) + startPoint;
-        
+
 
         return shift;
     }
@@ -1243,7 +1253,7 @@ public class GolfBallTopDown : NetworkBehaviour
     public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector2 collisionPoint, Vector2 ballPos, bool softBounce = false, float bounceModifier = 1.0f)
     {
         //if (ballUnityUnits < obstalceUnityUnits)
-        if(DoesBallHitObject(obstalceUnityUnits,ballUnityUnits))
+        if (DoesBallHitObject(obstalceUnityUnits, ballUnityUnits))
         {
             Debug.Log("HitEnvironmentObstacle: ball is not high enough to clear environmnet obstalce. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString() + " bounce modifier: " + bounceModifier.ToString());
             /*if (isHoleFlag)
@@ -1270,7 +1280,7 @@ public class GolfBallTopDown : NetworkBehaviour
                 //BounceOffTheObstacle(softBounce);
                 BounceOffTheObstacle(softBounce, bounceModifier);
             }
-            
+
             //hitBallPonts = CalculateHitTrajectory(10f, launchAngle, launchTopSpin, launchLeftOrRightSpin, -movementDirection, Vector2.zero, 0f);
             //hitBallCount = 0f;
             //isHit = false;
@@ -1291,7 +1301,7 @@ public class GolfBallTopDown : NetworkBehaviour
                 IsHitByTornado = true;
                 MyTornado = tornado;
             }
-            
+
             TornadoLaunchBallInRandomDirection(tornadoStrength);
         }
         else
@@ -1306,9 +1316,9 @@ public class GolfBallTopDown : NetworkBehaviour
         if (isHit)
         {
             isHit = false;
-            
+
         }
-            
+
         if (isBouncing)
             isBouncing = false;
         if (isRolling)
@@ -1370,7 +1380,7 @@ public class GolfBallTopDown : NetworkBehaviour
         // reset before hitting the ball again?
         hitBallCount = 0f;
         isHit = false;
-        
+
         //hitBallPonts = CalculateHitTrajectory(obstacleBounceDistance, launchAngle, launchTopSpin, launchLeftOrRightSpin, -movementDirection, Vector2.zero, 0f, true, midPointHeight);
         //maxHeight = hitBallPonts[1].z / 2;
         //initialVelocity = CalculateInitialVelocity(launchAngle, maxHeight);
@@ -1473,7 +1483,7 @@ public class GolfBallTopDown : NetworkBehaviour
         movementDirection = newDir;
     }
     Vector2 GetBounceDirection(Vector2 movementDirection, Vector3 collisionPoint, Vector3 ballPos)
-    { 
+    {
         return Vector2.Reflect(movementDirection.normalized, (ballPos - collisionPoint).normalized);
     }
     Vector2 CalculateWindShiftForPutts(Vector2 oldDir)
@@ -1577,6 +1587,10 @@ public class GolfBallTopDown : NetworkBehaviour
         Debug.Log("BallEndedInWater: for player: " + MyPlayer.PlayerName);
         MyPlayer.PlayerUIMessage("water");
         MyPlayer.EnablePlayerCanvas(true);
+
+        if (!this.IsOwner)
+            return;
+
         MyPlayer.PlayerScore.StrokePenalty(1);
         MoveBallOutOfWater();
     }
@@ -1616,10 +1630,14 @@ public class GolfBallTopDown : NetworkBehaviour
         Debug.Log("OutOfBounds: Ball position: " + ballPos.ToString() + " player position: " + playerPos.ToString() + " direction to the playeR: " + dirToPlayer.ToString());
         Vector3 inBoundsPos = MyPlayer.GetNearestPointInBounds(playerPos, ballPos, -dirToPlayer);
         inBoundsPos += (Vector3)(dirToPlayer * MyColliderRadius * 4f);
-        Debug.Log("OutOfBounds: Nearest inbounds position is: " + inBoundsPos.ToString("0.00000") +" for ball: "  + this.name + ":" + this.MyPlayer.PlayerName);
+        Debug.Log("OutOfBounds: Nearest inbounds position is: " + inBoundsPos.ToString("0.00000") + " for ball: " + this.name + ":" + this.MyPlayer.PlayerName);
 
         MyPlayer.PlayerUIMessage("out of bounds");
         MyPlayer.EnablePlayerCanvas(true);
+
+        if (!this.IsOwner)
+            return;
+
         MyPlayer.PlayerScore.StrokePenalty(1);
         StartCoroutine(DelayForPenaltyMessage(inBoundsPos, 2f));
     }
@@ -1636,11 +1654,32 @@ public class GolfBallTopDown : NetworkBehaviour
         MyPlayer.EnablePlayerCanvas(true);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
-    
+
     public void ResetBallSpriteForNewHole()
     {
         myShadow.GetComponent<SpriteRenderer>().enabled = true;
         MyBallObject.GetComponent<SpriteRenderer>().enabled = true;
+    }
+    [ServerRpc]
+    void CmdTellClientsBallIsMoving(bool isBallMoving)
+    {
+        this._clientMovingBall = isBallMoving;
+    }
+    void SyncClientMovingBall(bool prev, bool next, bool asServer)
+    {
+        if (asServer)
+            return;
+        if (this.IsOwner)
+            return;
+        if (next)
+        {
+            Debug.Log("SyncClientMovingBall: Balled started moving for: " + this.MyPlayer.PlayerName);
+        }
+        else
+        {
+            Debug.Log("SyncClientMovingBall: Balled stopped moving for: " + this.MyPlayer.PlayerName);
+            UpdateBallSpriteForHeight();
+        }
     }
 }
 
