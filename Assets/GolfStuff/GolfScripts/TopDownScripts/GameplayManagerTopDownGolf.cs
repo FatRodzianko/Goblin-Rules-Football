@@ -597,16 +597,18 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         AddPlayersOutOfCommissionBack();
         // Save each player's score and reset their "current" score of the new hole
         foreach (GolfPlayerTopDown player in GolfPlayers)
-        {   
-            player.ResetForNewHole(CurrentHoleIndex);
+        {
+            //player.ResetForNewHole(CurrentHoleIndex);
+            player.RpcResetForNewHole(player.Owner, CurrentHoleIndex);
         }
         // Reset the number of players that have teed off
         ResetNumberOfPlayersWhoHaveTeedOff();
         // Load a new hole
-        LoadNewHole(CurrentHoleIndex);
-        // Get the CameraBoundBox and tell players to get it as well?
-        GetCameraBoundingBox();
-        TellPlayersToGetCameraBoundingBox();
+        //LoadNewHole(CurrentHoleIndex);
+        LoadNewHoleServer(CurrentHoleIndex);
+        //// Get the CameraBoundBox and tell players to get it as well?
+        //GetCameraBoundingBox();
+        //TellPlayersToGetCameraBoundingBox();
         // Set the Hole Positions for the new hole
         HolePositions = CurrentHoleInCourse.HolePositions;
         // Set the Course aim points for players to use
@@ -620,17 +622,26 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // Update the "rain sound" for the next hole
         RainManager.instance.GetRainSoundForHole();
         // If there was a tornado on the previous hole, destroy it. They players are in a different location now so it doesn't make sense for the tornado to stay in the same "spot" it was on the previous hole 
-        WindManager.instance.DestroyTornadoForNextHole();
-        // Set the weather for the next turn
-        MoveAllPlayersNearTeeOffLocation(); // move the players first so the tornado knows where to go?
-        await SetWeatherForNextTurn(true);
+
+        //skipping for now while testing other things in multiplayer
+        //WindManager.instance.DestroyTornadoForNextHole();
+
         // Sort the players by lowest score to start the hole
         OrderListOfPlayers();
         // Set the current player
         SetCurrentPlayer(GolfPlayersInTeeOffOrder[0]);
-        // Move the first player to the tee off location
-        
+        // Move the first player to the tee off location        
         MovePlayerToTeeOffLocation(CurrentPlayer);
+        // Set the weather for the next turn
+        MoveAllPlayersNearTeeOffLocation(); // move the players first so the tornado knows where to go?
+        await SetWeatherForNextTurn(true);
+        // Sort the players by lowest score to start the hole
+        //OrderListOfPlayers();
+        // Set the current player
+        //SetCurrentPlayer(GolfPlayersInTeeOffOrder[0]);
+        // Move the first player to the tee off location        
+        //MovePlayerToTeeOffLocation(CurrentPlayer);
+
         // Diable sprite of players that are not the current player
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
         // Set the camera on the current player
@@ -647,15 +658,19 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         WindManager.instance.UpdateWindDirectionForNewTurn();
         // Set new weather for the next turn
         RainManager.instance.UpdateWeatherForNewTurn();
-        
-        WindManager.instance.CheckIfTornadoWillSpawn(newHole);
-        //WindManager.instance.MoveTornadoForNewTurn();
-        Debug.Log("SetWeatherForNextTurn: move tornado start at: " + Time.time);
-        await WindManager.instance.MoveTornadoTask();
-        Debug.Log("SetWeatherForNextTurn: move tornado end at: " + Time.time);
 
+        // skipping for now while testing other things for multiplayer
+        //WindManager.instance.CheckIfTornadoWillSpawn(newHole);
+        ////WindManager.instance.MoveTornadoForNewTurn();
+
+        // skipping for now while testing other things for multiplayer
+        //Debug.Log("SetWeatherForNextTurn: move tornado start at: " + Time.time);
+        //await WindManager.instance.MoveTornadoTask();
+        //Debug.Log("SetWeatherForNextTurn: move tornado end at: " + Time.time);
+
+        // skipping for now while testing other things for multiplayer
         // make sure lightning occurs after the tornado tracking?
-        _lightningManager.CheckIfLightningStartsThisTurn();
+        //_lightningManager.CheckIfLightningStartsThisTurn();
 
     }
     void PromptPlayerForNextTurn()
@@ -807,7 +822,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if ((CurrentHoleIndex + 1) < CurrentCourse.HolesInCourse.Length)
         {
             Debug.Log("AllPlayersInHoleOrIncapacitated: All players have made it into the hole. No more remaining players! Loading next hole?");
-            await ball.MyPlayer.TellPlayerHoleEnded(3);
+            await ball.MyPlayer.ServerTellPlayerHoleEnded(3);
             NextHole();
         }
         else

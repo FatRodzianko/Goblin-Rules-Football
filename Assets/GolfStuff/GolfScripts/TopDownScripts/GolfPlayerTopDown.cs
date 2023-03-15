@@ -148,6 +148,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
     [Header("Await Tasks Booleans on server")]
     bool _tellPlayerGroundTheyLandedOn = false;
+    bool _tellPlayerHoleEnded = false;
 
     private void Awake()
     {
@@ -1687,6 +1688,32 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         this.EnablePlayerCanvas(false);
     }
+    [Server]
+    public async Task ServerTellPlayerHoleEnded(float duration)
+    {
+        _tellPlayerHoleEnded = true;
+        float end = Time.time + (duration * 2);
+        //RpcTellPlayerGroundTheyLandedOn(duration);
+        RpcTellPlayerHoleEnded(this.Owner, duration);
+        Debug.Log("ServerTellPlayerHoleEnded: Start time is: " + Time.time.ToString());
+        while (_tellPlayerHoleEnded)
+        {
+            //Debug.Log("ServerTellPlayerGroundTheyLandedOn: Task.Yield time is: " + Time.time.ToString());
+            await Task.Yield();
+            if (Time.time >= end)
+                _tellPlayerHoleEnded = false;
+        }
+        Debug.Log("ServerTellPlayerHoleEnded: End time is: " + Time.time.ToString());
+    }
+    [TargetRpc]
+    void RpcTellPlayerHoleEnded(NetworkConnection conn, float duration)
+    {
+        StartTellPlayerHoleEnded(duration);
+    }
+    async void StartTellPlayerHoleEnded(float duration)
+    {
+        await TellPlayerHoleEnded(duration);
+    }
     public async Task TellPlayerHoleEnded(float duration)
     {
         Debug.Log("TellPlayerHoleEnded: on game player: " + this.PlayerName);
@@ -1698,6 +1725,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
             await Task.Yield();
         }
         this.EnablePlayerCanvas(false);
+        if (this.IsOwner)
+            CmdTellServerPlayerHoleEndedCompleted();
+    }
+    [ServerRpc]
+    void CmdTellServerPlayerHoleEndedCompleted()
+    {
+        _tellPlayerHoleEnded = false;
     }
     public async Task TellPlayerGameIsOver(float duration)
     {
@@ -1763,6 +1797,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (ground.Contains("deep rough"))
             ground = "deep rough";
         return ground;
+    }
+    [TargetRpc]
+    public void RpcResetForNewHole(NetworkConnection conn, int holeIndex)
+    {
+        if (!this.IsOwner)
+            return;
+        ResetForNewHole(holeIndex);
     }
     public void ResetForNewHole(int holeIndex)
     {
