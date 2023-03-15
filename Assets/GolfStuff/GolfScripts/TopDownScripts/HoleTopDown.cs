@@ -25,6 +25,9 @@ public class HoleTopDown : MonoBehaviour
             Debug.Log("HoleTopDown: collided with a golf ball: " + collision.name);
             GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
 
+            if (!golfBallScript.IsOwner)
+                return;
+
             if (golfBallScript.isRolling)
                 golfBallScript.BallRolledIntoHole(this);
 

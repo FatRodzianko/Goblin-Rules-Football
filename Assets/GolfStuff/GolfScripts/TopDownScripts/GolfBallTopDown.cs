@@ -77,7 +77,8 @@ public class GolfBallTopDown : NetworkBehaviour
     public bool HitApexOfHill = false;
 
     [Header("Ball State")]
-    public bool IsInHole = false;
+    public bool LocalIsInHole = false;
+    [SyncVar(OnChange = nameof(SyncIsInHole))] public bool IsInHole = false;
 
     [Header("Tornado")]
     public bool IsHitByTornado = false;
@@ -1100,11 +1101,13 @@ public class GolfBallTopDown : NetworkBehaviour
         Debug.Log("BallInHole: Wow!");
         myShadow.GetComponent<SpriteRenderer>().enabled = false;
         MyBallObject.GetComponent<SpriteRenderer>().enabled = false;
-        this.IsInHole = true;
+        //this.IsInHole = true;
+        LocalIsInHole = true;
+        CmdSetBallInHoleOnServer(true);
         ResetBallMovementBools();
         //TellPlayerBallIsInHole();
         SoundManager.instance.PlaySound("golfball-in-hole", 1.0f);
-        GameplayManagerTopDownGolf.instance.PlayersBallInHole();
+        //GameplayManagerTopDownGolf.instance.PlayersBallInHole();
 
         if (IsHitByTornado)
         {
@@ -1115,7 +1118,17 @@ public class GolfBallTopDown : NetworkBehaviour
             return;
         }
 
-        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+        //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+        CmdTellServerToStartNexPlayersTurn();
+    }
+    [ServerRpc]
+    public void CmdSetBallInHoleOnServer(bool inHole)
+    {
+        this.IsInHole = inHole;
+        if (inHole)
+        {
+            GameplayManagerTopDownGolf.instance.PlayersBallInHole();
+        }
     }
     float TimeBeforeSinkInHole(float movementSpeed, HoleTopDown holeRolledInto)
     {
@@ -1137,8 +1150,9 @@ public class GolfBallTopDown : NetworkBehaviour
         if (isHit)
         {
             isHit = false;
-
         }
+        if (this.IsOwner)
+            CmdTellClientsBallIsMoving(false);
 
         ResetBouncingInfo(true);
     }
@@ -1679,6 +1693,24 @@ public class GolfBallTopDown : NetworkBehaviour
         {
             Debug.Log("SyncClientMovingBall: Balled stopped moving for: " + this.MyPlayer.PlayerName);
             UpdateBallSpriteForHeight();
+        }
+    }
+    void SyncIsInHole(bool prev, bool next, bool asServer)
+    {
+        if (asServer)
+            return;
+        if (this.IsOwner)
+            return;
+        if (next)
+        {
+            myShadow.GetComponent<SpriteRenderer>().enabled = false;
+            MyBallObject.GetComponent<SpriteRenderer>().enabled = false;
+            SoundManager.instance.PlaySound("golfball-in-hole", 1.0f);
+        }
+        else
+        {
+            myShadow.GetComponent<SpriteRenderer>().enabled = true;
+            MyBallObject.GetComponent<SpriteRenderer>().enabled = true;
         }
     }
 }

@@ -674,7 +674,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             if (Vector2.Distance(ballPos, GameplayManagerTopDownGolf.instance.TeeOffPosition) > 25f)
             {
                 //HasPlayerTeedOff = true;
-                CmdPlayerTeedOff();
+                CmdPlayerTeedOff(true);
             }   
             else
             {
@@ -1018,7 +1018,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             //GameplayManagerTopDownGolf.instance.PlayerTeedOff(this); // this needs to be updated on the server
             CmdTellServerPlayerTeedOff();
-            CmdPlayerTeedOff();
+            CmdPlayerTeedOff(true);
             //this.HasPlayerTeedOff = true;
 
             playerTeeOffSound = true;
@@ -1649,9 +1649,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 //return;
             }
         }
-        if (isInBounds && !MyBall.IsInHole)
+        if (isInBounds && !(MyBall.IsInHole || MyBall.LocalIsInHole))
             MyBall.TellPlayerGroundTypeTheyLandedOn();
-        else if (isInBounds && MyBall.IsInHole)
+        else if (isInBounds && (MyBall.IsInHole || MyBall.LocalIsInHole))
         {
             Debug.Log("TellPlayerGroundTheyLandedOn: on game player: " + this.PlayerName + " ball is in hole!");
             MyBall.TellPlayerBallIsInHole();
@@ -1768,11 +1768,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         // Reset player score for the current hole
         PlayerScore.SaveScoreAtEndOfHole(holeIndex);
-        PlayerScore.ResetScoreForNewHole();
+        //PlayerScore.ResetScoreForNewHole();
+        PlayerScore.CmdResetScoreForNewHole();
         // Reset whether the player has teed off
-        this.HasPlayerTeedOff = false;
+        //this.HasPlayerTeedOff = false;
+        CmdPlayerTeedOff(false);
         // reset the ball being in the hole
-        MyBall.IsInHole = false;
+        //MyBall.IsInHole = false;
+        MyBall.LocalIsInHole = false;
+        MyBall.CmdSetBallInHoleOnServer(false);
+        
         PlayerStruckByLightning = false;
     }
     public void LightningOnTurn()
@@ -1866,9 +1871,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
         this.IsPlayersTurn = false;
     }
     [ServerRpc]
-    void CmdPlayerTeedOff()
+    void CmdPlayerTeedOff(bool teedOff)
     {
-        this.HasPlayerTeedOff = true;
+        this.HasPlayerTeedOff = teedOff;
     }
     [ServerRpc]
     void CmdTellServerPlayerTeedOff()

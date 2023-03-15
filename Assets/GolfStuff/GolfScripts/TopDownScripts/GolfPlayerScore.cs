@@ -9,7 +9,8 @@ public class GolfPlayerScore : NetworkBehaviour
 {
     [SyncVar] public int StrokesForCurrentHole = 0;
     [SyncVar] public int TotalStrokesForCourse = 0;
-    public Dictionary<int, int> HoleWithScores = new Dictionary<int, int>();
+    public Dictionary<int, int> LocalHoleWithScores = new Dictionary<int, int>();
+    [SyncObject] public readonly SyncDictionary<int, int> ServerHoleWithScores = new SyncDictionary<int,int>();
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +21,11 @@ public class GolfPlayerScore : NetworkBehaviour
     void Update()
     {
         
+    }
+    [ServerRpc]
+    public void CmdResetScoreForNewHole()
+    {
+        ResetScoreForNewHole();
     }
     [Server]
     public void ResetScoreForNewHole()
@@ -56,11 +62,17 @@ public class GolfPlayerScore : NetworkBehaviour
     }
     public void SaveScoreAtEndOfHole(int holeIndex)
     {
-        HoleWithScores[holeIndex] = StrokesForCurrentHole;
+        LocalHoleWithScores[holeIndex] = StrokesForCurrentHole;
 
-        foreach (KeyValuePair<int, int> entry in HoleWithScores)
+        foreach (KeyValuePair<int, int> entry in LocalHoleWithScores)
         {
             Debug.Log(transform.GetComponent<GolfPlayerTopDown>().PlayerName + " Score for hole #" + entry.Key.ToString() + " is: " + entry.Value.ToString());
         }
+        CmdSaveScoreAtEndOfHoleOnServer(holeIndex);
+    }
+    [ServerRpc]
+    void CmdSaveScoreAtEndOfHoleOnServer(int holeIndex)
+    {
+        ServerHoleWithScores[holeIndex] = StrokesForCurrentHole;
     }
 }
