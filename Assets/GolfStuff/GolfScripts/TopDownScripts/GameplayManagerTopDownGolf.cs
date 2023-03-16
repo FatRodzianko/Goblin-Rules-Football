@@ -665,7 +665,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         // skipping for now while testing other things for multiplayer
         //Debug.Log("SetWeatherForNextTurn: move tornado start at: " + Time.time);
-        //await WindManager.instance.MoveTornadoTask();
+        await WindManager.instance.MoveTornadoTask();
         //Debug.Log("SetWeatherForNextTurn: move tornado end at: " + Time.time);
 
         // skipping for now while testing other things for multiplayer
@@ -713,7 +713,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         {
             GolfPlayerTopDown player = GolfPlayers[i];
             player.ResetForNewHole(CurrentHoleIndex + 1);
-            await player.TellPlayerGameIsOver(5);
+            //await player.TellPlayerGameIsOver(5);
+            await player.ServerTellPlayerGameIsOver(5);
         }
 
         Debug.Log("EndGame: AFTER calling TellPlayerGameIsOver time is: " + Time.time.ToString());

@@ -495,7 +495,7 @@ public class GolfBallTopDown : NetworkBehaviour
         {
             windShift /= 2f;
         }
-        Debug.Log("CalculateWindShift: Original trajectory point: " + trajectoryPoint.ToString() + " wind shift amount: " + windShift.ToString() + " based on a wind direction of: " + windDirection.ToString() + " and wind power of: " + windPower.ToString() + " and a max height of: " + maxHeight.ToString());
+        //Debug.Log("CalculateWindShift: Original trajectory point: " + trajectoryPoint.ToString() + " wind shift amount: " + windShift.ToString() + " based on a wind direction of: " + windDirection.ToString() + " and wind power of: " + windPower.ToString() + " and a max height of: " + maxHeight.ToString());
         windShift += trajectoryPoint;
         return windShift;
     }
@@ -512,7 +512,7 @@ public class GolfBallTopDown : NetworkBehaviour
         {
             windShift /= 4f;
         }
-        Debug.Log("CalculateWindShiftFromFlightTime: Original trajectory point: " + trajectoryPoint.ToString() + " wind shift amount: " + windShift.ToString() + " based on a wind direction of: " + windDirection.ToString() + " and wind power of: " + windPower.ToString() + " and a flight time of: " + timeInAir.ToString());
+        //Debug.Log("CalculateWindShiftFromFlightTime: Original trajectory point: " + trajectoryPoint.ToString() + " wind shift amount: " + windShift.ToString() + " based on a wind direction of: " + windDirection.ToString() + " and wind power of: " + windPower.ToString() + " and a flight time of: " + timeInAir.ToString());
         windShift += trajectoryPoint;
         return windShift;
     }
@@ -579,7 +579,7 @@ public class GolfBallTopDown : NetworkBehaviour
         // Calculate the velocity upward
         //float metersPerSecondUpward = Mathf.Sqrt(0-2*Physics2D.gravity.y * height);
         float metersPerSecondUpward = Mathf.Sqrt(0 - 2 * (-9.8f) * height);
-        Debug.Log("CalculateInitialVelocity: meters per second upward is: " + metersPerSecondUpward.ToString());
+        //Debug.Log("CalculateInitialVelocity: meters per second upward is: " + metersPerSecondUpward.ToString());
 
         if (angle == 90f)
             return metersPerSecondUpward;
@@ -590,7 +590,7 @@ public class GolfBallTopDown : NetworkBehaviour
         // hypotenuse = opposite/Sin(angle)
         float angle2rad = angle * Mathf.Deg2Rad;
         initialVelocity = metersPerSecondUpward / Mathf.Sin(angle2rad);
-        Debug.Log("CalculateInitialVelocity: meters per second at the launch angle is: " + initialVelocity.ToString());
+        //Debug.Log("CalculateInitialVelocity: meters per second at the launch angle is: " + initialVelocity.ToString());
         return initialVelocity;
     }
     public float CalculateFlightTime(float velocity, float angle)
@@ -600,7 +600,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
         //lengthOfFlight = (2 * velocity * Mathf.Sin(angle * Mathf.Deg2Rad) / Physics2D.gravity.y) * 2; // multiplying by 2 to make it a bit 
         lengthOfFlight = (2 * velocity * Mathf.Sin(angle * Mathf.Deg2Rad) / Physics2D.gravity.y);
-        Debug.Log("CalculateFlightTime: the length of the flight in seconds is: " + lengthOfFlight.ToString());
+        //Debug.Log("CalculateFlightTime: the length of the flight in seconds is: " + lengthOfFlight.ToString());
 
         return -lengthOfFlight;
     }

@@ -149,6 +149,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [Header("Await Tasks Booleans on server")]
     bool _tellPlayerGroundTheyLandedOn = false;
     bool _tellPlayerHoleEnded = false;
+    bool _tellPlayerGameIsOver = false;
 
     private void Awake()
     {
@@ -1714,6 +1715,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         await TellPlayerHoleEnded(duration);
     }
+    
     public async Task TellPlayerHoleEnded(float duration)
     {
         Debug.Log("TellPlayerHoleEnded: on game player: " + this.PlayerName);
@@ -1733,6 +1735,32 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         _tellPlayerHoleEnded = false;
     }
+    [Server]
+    public async Task ServerTellPlayerGameIsOver(float duration)
+    {
+        _tellPlayerGameIsOver = true;
+        float end = Time.time + (duration * 2);
+        //RpcTellPlayerGroundTheyLandedOn(duration);
+        RpcTellPlayerGameIsOver(this.Owner, duration);
+        Debug.Log("ServerTellPlayerGameIsOver: Start time is: " + Time.time.ToString());
+        while (_tellPlayerGameIsOver)
+        {
+            //Debug.Log("ServerTellPlayerGroundTheyLandedOn: Task.Yield time is: " + Time.time.ToString());
+            await Task.Yield();
+            if (Time.time >= end)
+                _tellPlayerGameIsOver = false;
+        }
+        Debug.Log("ServerTellPlayerGameIsOver: End time is: " + Time.time.ToString());
+    }
+    [TargetRpc]
+    void RpcTellPlayerGameIsOver(NetworkConnection conn, float duration)
+    {
+        StartTellPlayerGameIsOver(duration);
+    }
+    public async void StartTellPlayerGameIsOver(float duration)
+    {
+        await TellPlayerGameIsOver(duration);
+    }
     public async Task TellPlayerGameIsOver(float duration)
     {
         Debug.Log("TellPlayerGameIsOver: on game player: " + this.PlayerName);
@@ -1744,6 +1772,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
             await Task.Yield();
         }
         this.EnablePlayerCanvas(false);
+        if (this.IsOwner)
+            CmdTellServerPlayerGameIsOverCompleted();
+    }
+    [ServerRpc]
+    void CmdTellServerPlayerGameIsOverCompleted()
+    {
+        _tellPlayerGameIsOver = false;
     }
     public void GetCameraBoundingBox()
     {
