@@ -965,6 +965,7 @@ MonoBehaviour:
   hitTopSpin: 0
   hitLeftOrRightspin: 0
   IsShanked: 0
+  IsShankedSynced: 0
   drawTrajectoryTopDown: {fileID: 3662651631311076367}
   _landingTargetSprite: {fileID: 4478594324651228388}
   _landingTargetCollider: {fileID: 169311651467970805}
@@ -1104,6 +1105,7 @@ MonoBehaviour:
   - {fileID: 7513493645420276422}
   - {fileID: 2653947506407809911}
   - {fileID: 1368494483326148317}
+  - {fileID: 0}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -1476,6 +1478,7 @@ GameObject:
   - component: {fileID: 3106487267619827375}
   - component: {fileID: 8337812199374243185}
   - component: {fileID: 3891610743640057217}
+  - component: {fileID: 6827658748649619113}
   m_Layer: 0
   m_Name: PlayerSprite
   m_TagString: Untagged
@@ -1583,6 +1586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 8337812199374243185}
+  _networkAnimator: {fileID: 6827658748649619113}
   _idle: golfer-grenadier-idle
   _frontSwing: golfer-grenadier-swing-front-view
   _deathFromLightning: golfer-death-from-lightning
@@ -1593,6 +1597,27 @@ MonoBehaviour:
   _struckByLightningFullSwingFlashOn: {fileID: 21300000, guid: 87533ef9bb06beb479f0b1d17426d073, type: 3}
   _struckByLightningFullSwingFlashOff: {fileID: 21300000, guid: ff0ec44b0db04d742aba42a0b62ac359, type: 3}
   _lightningBoltObject: {fileID: 8989263272828289160}
+--- !u!114 &6827658748649619113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4107736587890252822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 5665735165111769197}
+  _networkObjectCache: {fileID: 0}
+  IgnoredParameters: []
+  _animator: {fileID: 8337812199374243185}
+  _smoothFloats: 1
+  _interpolation: 2
+  _clientAuthoritative: 1
+  _sendToOwner: 0
 --- !u!1 &5009623720184125964
 GameObject:
   m_ObjectHideFlags: 0

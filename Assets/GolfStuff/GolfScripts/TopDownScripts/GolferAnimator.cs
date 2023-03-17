@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FishNet.Object;
+using FishNet.Component.Animating;
 
-public class GolferAnimator : MonoBehaviour
+public class GolferAnimator : NetworkBehaviour
 {
     [Header("Animation Stuff")]
     [SerializeField] Animator _animator;
+    [SerializeField] NetworkAnimator _networkAnimator;
     [SerializeField] string _idle;
     [SerializeField] string _frontSwing;
     [SerializeField] string _deathFromLightning;
@@ -46,6 +49,8 @@ public class GolferAnimator : MonoBehaviour
             }
             
         }*/
+        if (!IsOwner)
+            return;
         if (IsSwinging)
             return;
         if (IsDyingFromLightning)
@@ -55,17 +60,19 @@ public class GolferAnimator : MonoBehaviour
         if (animatorInfo[0].clip.name != _idle)
         {
             //Debug.Log("GolferAnimator : starting the idle animation");
-            _animator.Play(_idle);
+            //_animator.Play(_idle);
+            _networkAnimator.Play(_idle);
         }
     }
     public void StartSwing()
     {
         IsSwinging = true;
-        _animator.Play(_frontSwing);
+        //_animator.Play(_frontSwing);
+        _networkAnimator.Play(_frontSwing);
     }
     public void HitBall()
     {
-        Debug.Log("HitBall:");
+        Debug.Log("HitBall: " + this._myPlayer.PlayerName);
         _myPlayer.SubmitHitToBall();
     }
     public void SwingEnded()

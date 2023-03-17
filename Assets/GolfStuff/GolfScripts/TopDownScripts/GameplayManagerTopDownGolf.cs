@@ -712,9 +712,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         for (int i = 0; i < GolfPlayers.Count; i++)
         {
             GolfPlayerTopDown player = GolfPlayers[i];
-            player.ResetForNewHole(CurrentHoleIndex + 1);
+            //player.ResetForNewHole(CurrentHoleIndex + 1);
+            player.RpcResetForNewHole(player.Owner, CurrentHoleIndex + 1);
             //await player.TellPlayerGameIsOver(5);
             await player.ServerTellPlayerGameIsOver(5);
+            // tell players to close player ui here???
         }
 
         Debug.Log("EndGame: AFTER calling TellPlayerGameIsOver time is: " + Time.time.ToString());

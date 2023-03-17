@@ -38,6 +38,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField][Range(-10f,5f)] public float hitTopSpin = 0f;
     [SerializeField] [Range(-5f, 5f)] public float hitLeftOrRightspin = 0f;
     public bool IsShanked = false;
+    [SyncVar] public bool IsShankedSynced = false;
 
     [Header("Trajectory Drawing Stuff")]
     [SerializeField] DrawTrajectoryTopDown drawTrajectoryTopDown;
@@ -348,7 +349,24 @@ public class GolfPlayerTopDown : NetworkBehaviour
             Debug.Log("Player pressed space");
         }
         if (!base.IsOwner)
+        {
+            // move the hit meter icons for other players
+            if (_moveHitMeterIcon)
+            {
+                if (_powerSubmitted && _accuracySubmitted)
+                {
+                    _moveHitMeterIcon = false;
+                    ActivateMovingIcon(false);
+                }
+                else
+                {
+                    MoveHitMeterIcon();
+                }
+
+            }
+
             return;
+        }
         if (!MyBall)
             return;
         if (MyBall.isHit || MyBall.isBouncing || MyBall.isRolling)
@@ -841,6 +859,24 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
         // IsPlayersTurn will be set by the game manager in a real game. This is just a place holder for now.
         //this.IsPlayersTurn = false;
+        if (IsOwner)
+            CmdStartHitMeterSequence();
+    }
+    [ServerRpc]
+    void CmdStartHitMeterSequence()
+    {
+        RpcStartHitMeterSequence();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcStartHitMeterSequence()
+    {
+        ResetIconPositions();
+        ResetSubmissionValues();
+        BeginMovingHitMeter();
+
+        // Make sure the camera isn't zoomed out?
+        if (_cameraViewHole.IsCameraZoomedOut)
+            _cameraViewHole.ZoomOutCamera();
     }
     void ResetIconPositions()
     {
@@ -856,6 +892,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
         _powerSubmitted = false;
         _accuracySubmitted = false;
         IsShanked = false;
+        if (IsOwner)
+            CmdSetIsShankedForClients(IsShanked);
     }
     void BeginMovingHitMeter()
     {
@@ -881,10 +919,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
             newPos.x = _furthestRightAccuracyPosition;
             _moveHitMeterIcon = false;
             ActivateMovingIcon(false);
-            if (!_accuracySubmitted)
+
+            if (!_accuracySubmitted && this.IsOwner)
             {
                 Debug.Log("MoveHitMeterIcon: Accuracy meter off the right edge without accuracy submitted by player. SHANKED!!!");
                 IsShanked = true;
+                if (IsOwner)
+                    CmdSetIsShankedForClients(IsShanked);
                 //SubmitHitToBall();
                 _golfAnimator.StartSwing();
             }
@@ -905,7 +946,20 @@ public class GolfPlayerTopDown : NetworkBehaviour
         ActivateSubmissionIcon(_hitMeterPowerSubmissionIcon, iconXPosition);
         HitPowerSubmitted = GetHitPowerFromXPosition(iconXPosition, MaxDistanceFromClub);
         _powerSubmitted = true;
+        if (IsOwner)
+            CmdSetHitPowerValue(iconXPosition);
 
+    }
+    [ServerRpc]
+    void CmdSetHitPowerValue(float iconPosition)
+    {
+        RpcSetHitPowerValue(iconPosition);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcSetHitPowerValue(float iconPosition)
+    {
+        ActivateSubmissionIcon(_hitMeterPowerSubmissionIcon, iconPosition);
+        _powerSubmitted = true;
     }
     float GetMovingIconXPosition()
     {
@@ -956,6 +1010,19 @@ public class GolfPlayerTopDown : NetworkBehaviour
             ModifiedHitDirection = ModifyHitDirectionFromAccuracy(hitDirection,accuracyDistance);
         }
         _accuracySubmitted = true;
+        if (IsOwner)
+            CmdSetHitAccuracyValue(iconXPosition);
+    }
+    [ServerRpc]
+    void CmdSetHitAccuracyValue(float iconPosition)
+    {
+        RpcSetHitAccuracyValue(iconPosition);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcSetHitAccuracyValue(float iconPosition)
+    {
+        ActivateSubmissionIcon(_hitMeterAccuracySubmissionIcon, iconPosition);
+        _accuracySubmitted = true;
     }
     bool IsCloseEnoughToTargetPosition(float targetPosition, float submittedPosition)
     {
@@ -979,6 +1046,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             Debug.Log("GetAccuracyDistance: Shanked!!! accuracy distance was: " + accuracyDistance.ToString() + " submitted position: " + submittedPosition.ToString() + " base position: " + basePosition.ToString());
             accuracyDistance = -_accuracyRange;
             IsShanked = true;
+            if (IsOwner)
+                CmdSetIsShankedForClients(IsShanked);
         }
 
         Debug.Log("GetAccuracyDistance: accuracy distance is: " + accuracyDistance.ToString());
@@ -1014,6 +1083,17 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public void SubmitHitToBall()
     {
         Debug.Log("SubmitHitToBall: For player: " + this.PlayerName);
+        if (!this.IsOwner)
+        {
+            if(!this.HasPlayerTeedOff)
+                SoundManager.instance.PlaySound("golfball-teeoff", 1f);
+            else if (this.IsShankedSynced)
+                SoundManager.instance.PlaySound("golfball-shank", 1f);
+            else
+                SoundManager.instance.PlaySound("golfball-hit", 1f);
+
+            return;
+        }
         // This will all need to be updated when the network animator is used to make sure only the owner makes certain calls, but that the clients still play sounds and stuff?
         bool playerTeeOffSound = false;
         if (!this.HasPlayerTeedOff)
@@ -1566,8 +1646,6 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         EnablePlayerCanvas(enable);
     }
-
-
     public void EnablePlayerCanvas(bool enable)
     {
         Debug.Log("EnablePlayerCanvas: " + enable + " for player: " + this.PlayerName);
@@ -1734,6 +1812,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void CmdTellServerPlayerHoleEndedCompleted()
     {
         _tellPlayerHoleEnded = false;
+        RpcTellServerPlayerHoleEndedCompleted();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcTellServerPlayerHoleEndedCompleted()
+    {
+        this.EnablePlayerCanvas(false);
     }
     [Server]
     public async Task ServerTellPlayerGameIsOver(float duration)
@@ -1779,6 +1863,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void CmdTellServerPlayerGameIsOverCompleted()
     {
         _tellPlayerGameIsOver = false;
+        RpcTellServerPlayerGameIsOverCompleted();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcTellServerPlayerGameIsOverCompleted()
+    {
+        this.EnablePlayerCanvas(false);
     }
     public void GetCameraBoundingBox()
     {
@@ -1974,5 +2064,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
         _currentClubIndex = newClubIndex;
         CurrentClub = _myClubs[_currentClubIndex];
         SetSelectedClubUI(CurrentClub);
+    }
+    [ServerRpc]
+    void CmdSetIsShankedForClients(bool shanked)
+    {
+        this.IsShankedSynced = shanked;
     }
 }

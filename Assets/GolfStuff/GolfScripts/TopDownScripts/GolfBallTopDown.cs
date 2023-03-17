@@ -123,6 +123,12 @@ public class GolfBallTopDown : NetworkBehaviour
             {
                 UpdateBallSpriteForHeight();
             }
+            else
+            {
+                if (MyBallObject.transform.localPosition.y != 0 && this.transform.position.z == 0)
+                    UpdateBallSpriteForHeight();
+
+            }
         }
     }
     private void FixedUpdate()
