@@ -220,6 +220,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [Server]
     void LoadNewHoleServer(int index)
     {
+        Debug.Log("LoadNewHoleServer: loading index: " + index.ToString() + ". Total number of courses: " + CurrentCourse.HolesInCourse.Length.ToString());
         CurrentHoleIndex = index;
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[CurrentHoleIndex];
         // tell all clients to load the next hole and to then update all the client side stuff

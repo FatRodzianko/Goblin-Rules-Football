@@ -371,3 +371,63 @@ MonoBehaviour:
     pitch: 1
     isLooping: 0
     source: {fileID: 0}
+  - name: weather-clear-01
+    clip: {fileID: 8300000, guid: c64389c64338af94681efe1125dd8236, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}
+  - name: weather-clear-02
+    clip: {fileID: 8300000, guid: 56c2f3e9a675b9a4b8b1a7688342102f, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}
+  - name: weather-clear-03
+    clip: {fileID: 8300000, guid: 71b74835209be1c438c528040c691571, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}
+  - name: weather-rain-01
+    clip: {fileID: 8300000, guid: 40c125333324eb445a6a67f3429499f9, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}
+  - name: weather-rain-02
+    clip: {fileID: 8300000, guid: d8c4b1938c27f6746a420f981390ab4b, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 1
+    source: {fileID: 0}
+  - name: golfball-bounce-fairway
+    clip: {fileID: 8300000, guid: b7afff268bf3d1b4da3657e6f854446e, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golfball-bounce-green
+    clip: {fileID: 8300000, guid: ac2707761c299ac4198f25d0ddfb0d41, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golfball-bounce-rough
+    clip: {fileID: 8300000, guid: ca524c0888d800a4f9daf06015cd45fd, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golfball-bounce-sand
+    clip: {fileID: 8300000, guid: 68b65037f88bfe440ab65c70cf3f7e33, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golfball-bounce-water
+    clip: {fileID: 8300000, guid: ebaeec04090fc504d950318494862500, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}

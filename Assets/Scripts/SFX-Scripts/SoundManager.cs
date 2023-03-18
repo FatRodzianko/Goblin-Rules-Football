@@ -37,7 +37,7 @@ public class SoundManager : MonoBehaviour
     }
     public void PlaySound(string name, float volume)
     {
-        //Debug.Log("PlaySound: " + name + ":" + volume.ToString());
+        Debug.Log("PlaySound: " + name + ":" + volume.ToString());
         Sound s = Array.Find(sounds, sound => sound.name == name);
         if (s == null)
             return;

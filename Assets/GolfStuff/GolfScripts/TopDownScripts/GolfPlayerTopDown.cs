@@ -152,6 +152,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
     bool _tellPlayerHoleEnded = false;
     bool _tellPlayerGameIsOver = false;
 
+    [Header("Sound References")]
+    [SerializeField] ScriptableBallSounds _ballSounds;
+
     private void Awake()
     {
         //if (!MyBall)
@@ -194,6 +197,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             gameObject.name = "LocalGolfPlayerTopDown";
             gameObject.tag = "LocalGamePlayer";
             GameplayManagerTopDownGolf.instance.SetLocalGolfPlayer(this);
+            Debug.Log("ScriptableBallSound string for tee off: " + _ballSounds.HitTeeOff);
         }
         else
         {
@@ -1086,11 +1090,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (!this.IsOwner)
         {
             if(!this.HasPlayerTeedOff)
-                SoundManager.instance.PlaySound("golfball-teeoff", 1f);
+                SoundManager.instance.PlaySound(_ballSounds.HitTeeOff, 1f);
             else if (this.IsShankedSynced)
-                SoundManager.instance.PlaySound("golfball-shank", 1f);
+                SoundManager.instance.PlaySound(_ballSounds.HitShank, 1f);
             else
-                SoundManager.instance.PlaySound("golfball-hit", 1f);
+                SoundManager.instance.PlaySound(_ballSounds.HitOffGround, 1f);
 
             return;
         }

@@ -5244,6 +5244,7 @@ MonoBehaviour:
   twoBounceDistancesAgo: 0
   isRolling: 0
   HitApexOfHill: 0
+  LocalIsInHole: 0
   IsInHole: 0
   IsHitByTornado: 0
   MyTornado: {fileID: 0}
@@ -5257,6 +5258,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 67108864
   _currentTileCell: {x: 0, y: 0, z: 0}
+  _ballSounds: {fileID: 11400000, guid: b32cc943f2db3b64a987f96b00abadc9, type: 2}
 --- !u!50 &578994876
 Rigidbody2D:
   serializedVersion: 4
@@ -5354,8 +5356,7 @@ MonoBehaviour:
   - {fileID: 4414391001200824294}
   - {fileID: 8404304866366200417}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField:
-  - {fileID: 0}
+  <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
   _isGlobal: 0
   _initializeOrder: 0

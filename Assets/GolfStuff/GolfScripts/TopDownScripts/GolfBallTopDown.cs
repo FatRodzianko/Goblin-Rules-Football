@@ -95,6 +95,9 @@ public class GolfBallTopDown : NetworkBehaviour
     [SerializeField] LayerMask _golfHoleLayerMask;
     [SerializeField] Vector3Int _currentTileCell;
 
+    [Header("Sounds References")]
+    [SerializeField] ScriptableBallSounds _ballSounds;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -705,6 +708,9 @@ public class GolfBallTopDown : NetworkBehaviour
             twoBounceDistancesAgo = hitDistance;
 
             // Adjust the spin for next time
+
+            // Play bounce sound
+            GetBounceSound(bounceContactGroundMaterial);
         }
         else
         {
@@ -718,9 +724,32 @@ public class GolfBallTopDown : NetworkBehaviour
                 ResetBallAndPlayerAfterBallStoppedRolling();
             }
             //speedMetersPerSecond /= 2f;
-
+            GetBounceSound(bounceContactGroundMaterial);
             return;
         }
+    }
+    void GetBounceSound(string groundType)
+    {
+        string soundToPlay = null;
+        if (groundType.Equals("green"))
+            soundToPlay = _ballSounds.BounceGreen;
+        else if (groundType.Equals("fairway"))
+            soundToPlay = _ballSounds.BounceFairway;
+        else if (groundType.Equals("fairway"))
+            soundToPlay = _ballSounds.BounceFairway;
+        else if (groundType.Equals("water trap"))
+            soundToPlay = _ballSounds.BounceWater;
+        else if (groundType.Equals("sand trap"))
+            soundToPlay = _ballSounds.BounceSand;
+        else if (groundType.Contains("rough"))
+            soundToPlay = _ballSounds.BounceRough;
+
+        if (string.IsNullOrEmpty(soundToPlay))
+            return;
+
+        Debug.Log("GetBounceSound: sound to play for bounce is: " + soundToPlay);
+        SoundManager.instance.PlaySound(soundToPlay, 1.0f);
+        CmdSoundForClients(soundToPlay);
     }
     void ResetBouncingInfo(bool resetHasBouncedYet)
     {
@@ -1112,7 +1141,7 @@ public class GolfBallTopDown : NetworkBehaviour
         CmdSetBallInHoleOnServer(true);
         ResetBallMovementBools();
         //TellPlayerBallIsInHole();
-        SoundManager.instance.PlaySound("golfball-in-hole", 1.0f);
+        SoundManager.instance.PlaySound(_ballSounds.BallInHole, 1.0f);
         //GameplayManagerTopDownGolf.instance.PlayersBallInHole();
 
         if (IsHitByTornado)
@@ -1711,13 +1740,23 @@ public class GolfBallTopDown : NetworkBehaviour
         {
             myShadow.GetComponent<SpriteRenderer>().enabled = false;
             MyBallObject.GetComponent<SpriteRenderer>().enabled = false;
-            SoundManager.instance.PlaySound("golfball-in-hole", 1.0f);
+            SoundManager.instance.PlaySound(_ballSounds.BallInHole, 1.0f) ;
         }
         else
         {
             myShadow.GetComponent<SpriteRenderer>().enabled = true;
             MyBallObject.GetComponent<SpriteRenderer>().enabled = true;
         }
+    }
+    [ServerRpc]
+    void CmdSoundForClients(string soundName)
+    {
+        RpcSoundForClients(soundName);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcSoundForClients(string soundName)
+    {
+        SoundManager.instance.PlaySound(soundName, 1.0f);
     }
 }
 

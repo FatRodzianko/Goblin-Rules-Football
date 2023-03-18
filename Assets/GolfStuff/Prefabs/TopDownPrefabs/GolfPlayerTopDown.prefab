@@ -1045,6 +1045,7 @@ MonoBehaviour:
     m_Bits: 2097152
   _golfAnimator: {fileID: 3891610743640057217}
   _startGameButton: {fileID: 2118601439084773887}
+  _ballSounds: {fileID: 11400000, guid: b32cc943f2db3b64a987f96b00abadc9, type: 2}
 --- !u!114 &3662651631311076367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1105,7 +1106,8 @@ MonoBehaviour:
   - {fileID: 7513493645420276422}
   - {fileID: 2653947506407809911}
   - {fileID: 1368494483326148317}
-  - {fileID: 0}
+  - {fileID: 3891610743640057217}
+  - {fileID: 6827658748649619113}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -1585,6 +1587,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c8ed46118065fb4fa1b5f0e146cd886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 3
+  _addedNetworkObject: {fileID: 5665735165111769197}
+  _networkObjectCache: {fileID: 5665735165111769197}
   _animator: {fileID: 8337812199374243185}
   _networkAnimator: {fileID: 6827658748649619113}
   _idle: golfer-grenadier-idle
@@ -1609,9 +1614,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 4
   _addedNetworkObject: {fileID: 5665735165111769197}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 5665735165111769197}
   IgnoredParameters: []
   _animator: {fileID: 8337812199374243185}
   _smoothFloats: 1
