@@ -439,6 +439,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
                     CurrentPlayer = TurnOrderForLightningSkips[0];
                 }
             }
+
+            // new for multiplayeR? Needed to set the current player network id value
+            SetCurrentPlayer(CurrentPlayer);
         }
         else if (!playerSkippingForLightning && PlayerHasSkippedTurn)
         {
@@ -671,7 +674,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         // skipping for now while testing other things for multiplayer
         // make sure lightning occurs after the tornado tracking?
-        //_lightningManager.CheckIfLightningStartsThisTurn();
+        _lightningManager.CheckIfLightningStartsThisTurn();
 
     }
     void PromptPlayerForNextTurn()
@@ -723,6 +726,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         Debug.Log("EndGame: AFTER calling TellPlayerGameIsOver time is: " + Time.time.ToString());
 
     }
+    [Server]
     public void LightningForPlayerHit(GolfPlayerTopDown player)
     {
         _lightningManager.LightningForHit(player);

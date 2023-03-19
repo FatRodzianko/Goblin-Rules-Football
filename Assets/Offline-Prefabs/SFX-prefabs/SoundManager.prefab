@@ -431,3 +431,21 @@ MonoBehaviour:
     pitch: 1
     isLooping: 0
     source: {fileID: 0}
+  - name: golfball-bounce-brush
+    clip: {fileID: 8300000, guid: 8d4b949c3460f3d4fb86a0997591cfc0, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golfball-bounce-hole-pole
+    clip: {fileID: 8300000, guid: b45a6e55f3d9b4c4498bdb3cec2aedd3, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: golfball-bounce-wood
+    clip: {fileID: 8300000, guid: 33de550c33ce27a45be6face9c3a56ed, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}

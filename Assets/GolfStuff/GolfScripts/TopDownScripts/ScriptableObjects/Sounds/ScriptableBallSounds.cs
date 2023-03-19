@@ -14,4 +14,7 @@ public class ScriptableBallSounds : ScriptableObject
     public string BounceSand;
     public string BounceWater;
     public string BallInHole;
+    public string BounceBrush;
+    public string BounceWood;
+    public string BounceHolePole;
 }

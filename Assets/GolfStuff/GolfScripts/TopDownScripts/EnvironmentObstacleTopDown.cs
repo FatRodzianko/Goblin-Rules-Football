@@ -20,10 +20,16 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     [SerializeField] float _minBounceModifier = 1.0f;
     [SerializeField] float _maxBounceModifier = 1.0f;
 
+    [Header("Bounce Sounds")]
+    [SerializeField] ScriptableBallSounds _ballSounds;
+    [SerializeField] string _softBounceSoundType;
+    [SerializeField] string _hardBounceSoundType;
+
     // Start is called before the first frame update
     void Start()
     {
-
+        _softBounceSoundType = myScriptableObject.SoftBounceSoundType;
+        _hardBounceSoundType = myScriptableObject.HardBounceSoundType;
     }
 
     // Update is called once per frame
@@ -59,12 +65,20 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             }*/
 
             bool isSoftBounce = SoftBounce;
+            string soundTypeToUse = _hardBounceSoundType;
             if (SoftBounce && _minHeightForSoftBounce > 0f)
             {
                 if (ballHeightInUnityUnits < _minHeightForSoftBounce)
+                {
                     isSoftBounce = false;
+                }
+
                 else
+                {
                     isSoftBounce = true;
+                    soundTypeToUse = _softBounceSoundType;
+                }
+                    
             }
             float newBounceModifier = GetBounceModifier(ballHeightInUnityUnits);
             Debug.Log("EnvironmentObstacleTopDown: new bounce modifier: " + newBounceModifier);
@@ -80,12 +94,12 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
                 Debug.Log("EnvironmentObstacleTopDown: ball is rolling. Ball position: " + ballPos.ToString("0.00000") + " centerOfCollider: " + centerOfCollider.ToString() + " and the collision point: " + collisionPoint.ToString() + " closest point from collider: " + closestPoint.ToString("0.00000")); ;
                 //golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, collisionPoint, centerOfCollider, this.GetComponent<Collider2D>().bounds.extents);
                 //golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, centerOfCollider, this.GetComponent<Collider2D>().bounds.extents);
-                golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, ballPos, isSoftBounce, newBounceModifier);
+                golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, ballPos, isSoftBounce, newBounceModifier, soundTypeToUse);
             }
             else
             {
                 Debug.Log("EnvironmentObstacleTopDown: ball is NOT rolling."); ;
-                golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, Vector2.zero, Vector2.zero, isSoftBounce, newBounceModifier) ;
+                golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, Vector2.zero, Vector2.zero, isSoftBounce, newBounceModifier, soundTypeToUse) ;
             }
 
             /*Vector3 ballPos = golfBallScript.transform.position;

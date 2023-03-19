@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: Tree
   m_EditorClassIdentifier: 
   ObstaclePrefab: {fileID: 4690552690983110126, guid: 3ffeac65f81e8d84c89bff5b157defdb, type: 3}
+  SoftBounceSoundType: golfball-bounce-brush
+  HardBounceSoundType: golfball-bounce-wood

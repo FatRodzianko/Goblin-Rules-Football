@@ -391,7 +391,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " is skipping their turn due to lightning. At time of: " + Time.time.ToString() + " and last skip was: " + GameplayManagerTopDownGolf.instance.TimeSinceLastSkip.ToString());
                 this.EnablePlayerCanvas(false);
                 PlayerScore.StrokePenalty(1);
-                GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(MyBall, true);
+                //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(MyBall, true);
+                MyBall.CmdTellServerToStartNexPlayersTurn(true);
             }
             return;
         }

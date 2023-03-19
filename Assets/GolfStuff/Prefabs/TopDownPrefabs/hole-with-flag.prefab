@@ -352,16 +352,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5b10ad901f7fb4d992bb6c969ea6e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myScriptableObject: {fileID: 11400000, guid: ef3fdd3951cb7c9469a242d82f44839d, type: 2}
   HeightInUnityUnits: 2
   _isHoleFlag: 1
   SoftBounce: 1
   _minHeightForSoftBounce: 0
+  _myCollider: {fileID: 0}
   _bounceModifier: 1
   _gradualBounceModifier: 1
   _immediateBounceModifier: 0
   _minHeightForImmediateBounceModifier: 0
   _minBounceModifier: 0.85
   _maxBounceModifier: 0.3
+  _softBounceSound: 
+  _hardBounceSound: 
 --- !u!1 &6388697565226876959
 GameObject:
   m_ObjectHideFlags: 0

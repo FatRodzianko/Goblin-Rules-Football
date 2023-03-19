@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FishNet.Object;
 using FishNet.Component.Animating;
+using FishNet;
 
 public class GolferAnimator : NetworkBehaviour
 {
@@ -88,7 +89,8 @@ public class GolferAnimator : NetworkBehaviour
     }
     public void LightningStrikeForHit()
     {
-        GameplayManagerTopDownGolf.instance.LightningForPlayerHit(_myPlayer);
+        if(InstanceFinder.IsServer) // only run on the server?
+            GameplayManagerTopDownGolf.instance.LightningForPlayerHit(_myPlayer);
     }
     public void EnablePlayerSprite(bool enable)
     {

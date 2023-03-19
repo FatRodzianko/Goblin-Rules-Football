@@ -21,3 +21,6 @@ MonoBehaviour:
   BounceSand: golfball-bounce-sand
   BounceWater: golfball-bounce-water
   BallInHole: golfball-in-hole
+  BounceBrush: golfball-bounce-brush
+  BounceWood: golfball-bounce-wood
+  BounceHolePole: golfball-bounce-hole-pole

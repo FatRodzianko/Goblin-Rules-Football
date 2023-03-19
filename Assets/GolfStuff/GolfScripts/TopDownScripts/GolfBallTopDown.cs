@@ -1213,10 +1213,10 @@ public class GolfBallTopDown : NetworkBehaviour
         CmdTellServerToStartNexPlayersTurn();
     }
     [ServerRpc]
-    void CmdTellServerToStartNexPlayersTurn()
+    public void CmdTellServerToStartNexPlayersTurn(bool playerSkippingForLightning = false, bool playerWasStruckByLightning = false)
     {
         Debug.Log("CmdTellServerToStartNexPlayersTurn: From player: " + MyPlayer.PlayerName);
-        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this, playerSkippingForLightning, playerWasStruckByLightning);
     }
     void ResetTornadoStuff()
     {
@@ -1299,41 +1299,25 @@ public class GolfBallTopDown : NetworkBehaviour
         this.HitBall(speedMetersPerSecond / 2, 50f, 0f, movementDirection, 0f);
     }
     //public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector3 collisionPoint, Vector3 centerOfObstacle, Vector3 extentOfObstacle)
-    public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector2 collisionPoint, Vector2 ballPos, bool softBounce = false, float bounceModifier = 1.0f)
+    public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector2 collisionPoint, Vector2 ballPos, bool softBounce = false, float bounceModifier = 1.0f, string bounceSoundType = null)
     {
         //if (ballUnityUnits < obstalceUnityUnits)
         if (DoesBallHitObject(obstalceUnityUnits, ballUnityUnits))
         {
             Debug.Log("HitEnvironmentObstacle: ball is not high enough to clear environmnet obstalce. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString() + " bounce modifier: " + bounceModifier.ToString());
-            /*if (isHoleFlag)
-            {
-                Debug.Log("HitEnvironmentObstacle: the obstacle was a hole flag. Checking if the ball meets conditions to 'bounce' off the flag and into the hole.");
-                if (WillBallBounceIntoHole(collisionObject))
-                {
-                    Debug.Log("Ball Will bounce into the hole!");
-                    BounceOffFlagIntoHole(collisionObject.GetComponent<HoleTopDown>());
-                }
-                else
-                    BounceOffTheObstacle();
-                BounceOffTheObstacle();
-            }*/
-            //else if (isRolling)
             if (isRolling)
             {
-                //BounceOffTheObstacleRolling(collisionPoint, centerOfObstacle, extentOfObstacle);
-                //BounceOffTheObstacleRolling(collisionPoint, ballPos, softBounce);
                 BounceOffTheObstacleRolling(collisionPoint, ballPos, softBounce, bounceModifier);
             }
             else
             {
-                //BounceOffTheObstacle(softBounce);
                 BounceOffTheObstacle(softBounce, bounceModifier);
             }
-
-            //hitBallPonts = CalculateHitTrajectory(10f, launchAngle, launchTopSpin, launchLeftOrRightSpin, -movementDirection, Vector2.zero, 0f);
-            //hitBallCount = 0f;
-            //isHit = false;
-            //HitBall(10f, launchAngle, launchTopSpin, -movementDirection, launchLeftOrRightSpin);
+            if (!string.IsNullOrEmpty(bounceSoundType) && this.IsOwner)
+            {
+                SoundManager.instance.PlaySound(bounceSoundType, 1.0f);
+                CmdSoundForClients(bounceSoundType);
+            }
         }
         else
         {

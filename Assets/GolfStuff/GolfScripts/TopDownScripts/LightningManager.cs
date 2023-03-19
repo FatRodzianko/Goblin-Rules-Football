@@ -3,14 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using FishNet;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
-public class LightningManager : MonoBehaviour
+public class LightningManager : NetworkBehaviour
 {
     [SerializeField] Light2D _lightningLight;
     [SerializeField] bool _lightningFlashing = false;
     IEnumerator _lightningRoutine;
 
-    public bool IsThereLightning = false;
+    [SyncVar(OnChange = nameof(SyncIsThereLightning))] public bool IsThereLightning = false;
 
     [Header("Lightning Cooldown Times")]
     [SerializeField] float _lightRainMin = 20f;
@@ -197,8 +200,6 @@ public class LightningManager : MonoBehaviour
     }
     public void CheckIfLightningStartsThisTurn()
     {
-        // avoiding this for now while testing other multiplayer stuff
-        return;
 
         Debug.Log("CheckIfLightningStartsThisTurn: Checking for lightning at new turn. Is there lightning now? " + IsThereLightning.ToString());
         if (!IsThereLightning)
@@ -275,6 +276,7 @@ public class LightningManager : MonoBehaviour
     {
         dist = Mathf.Abs(dist);
     }
+    [Server]
     public void LightningForHit(GolfPlayerTopDown player)
     {
         if (!IsThereLightning)
@@ -304,13 +306,28 @@ public class LightningManager : MonoBehaviour
             return;
         int numberOfFlashes = UnityEngine.Random.Range(3, 6);
 
-        GetThunderVolumeFromDistance(DistanceFromPlayer);
+        //GetThunderVolumeFromDistance(DistanceFromPlayer);
+        //StartCoroutine(LightningFlash(numberOfFlashes));
+        //StartCoroutine(ThunderClap(DistanceFromPlayer, numberOfFlashes));
+        RpcStartLightningStrike(DistanceFromPlayer,_lightIntensity,numberOfFlashes,_playerWasStruck);
+    }
+    [ObserversRpc]
+    void RpcStartLightningStrike(float distFromPlay, float lightIntensity, int numberOfFlashes, bool wasPlayerStruck)
+    {
+        if (!this.IsServer)
+        {
+            _lightIntensity = lightIntensity;
+            _playerWasStruck = wasPlayerStruck;
+        }
+
+        GetThunderVolumeFromDistance(distFromPlay);
         StartCoroutine(LightningFlash(numberOfFlashes));
-        StartCoroutine(ThunderClap(DistanceFromPlayer, numberOfFlashes));
+        StartCoroutine(ThunderClap(distFromPlay, numberOfFlashes));
     }
     bool WillPlayerBeStruckByLightning()
     {
-        return UnityEngine.Random.Range(0f, 1.0f) > Mathf.Abs(DistanceFromPlayer);
+        return false;
+        //return UnityEngine.Random.Range(0f, 1.0f) > Mathf.Abs(DistanceFromPlayer);
     }
     void StopLightningRoutineStuff()
     {
@@ -332,5 +349,18 @@ public class LightningManager : MonoBehaviour
             _playerWasStruck = false;
         if (_playerThatWasStruck)
             _playerThatWasStruck = null;
+    }
+    void SyncIsThereLightning(bool prev, bool next, bool asServer)
+    {
+        if (asServer)
+            return;
+        if (next)
+        {
+
+        }
+        else
+        {
+            StopLightningRoutineStuff();
+        }
     }
 }
