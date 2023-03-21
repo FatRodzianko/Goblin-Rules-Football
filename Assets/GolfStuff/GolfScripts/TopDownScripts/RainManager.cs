@@ -110,8 +110,7 @@ public class RainManager : NetworkBehaviour
         }
     }
     public void SetRainState(string newState)
-    {
-        
+    {   
         if (string.IsNullOrWhiteSpace(newState))
             return;
 

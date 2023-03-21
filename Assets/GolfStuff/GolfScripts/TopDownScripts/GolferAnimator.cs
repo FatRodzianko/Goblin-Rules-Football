@@ -13,6 +13,8 @@ public class GolferAnimator : NetworkBehaviour
     [SerializeField] string _idle;
     [SerializeField] string _frontSwing;
     [SerializeField] string _deathFromLightning;
+    [SerializeField] string _pauseOnLightningStrike;
+    [SerializeField] string _struckSkeleton;
 
     [Header("Player Sprite")]
     [SerializeField] SpriteRenderer _spriteRenderer;
@@ -20,6 +22,7 @@ public class GolferAnimator : NetworkBehaviour
     [Header("Animation State")]
     public bool IsSwinging = false;
     public bool IsDyingFromLightning = false;
+    public bool IsPausedOnLightningStrike = false;
 
     [Header("Player Owner")]
     [SerializeField] GolfPlayerTopDown _myPlayer;
@@ -56,6 +59,8 @@ public class GolferAnimator : NetworkBehaviour
             return;
         if (IsDyingFromLightning)
             return;
+        if (IsPausedOnLightningStrike)
+            return;
 
         AnimatorClipInfo[] animatorInfo = _animator.GetCurrentAnimatorClipInfo(0);
         if (animatorInfo[0].clip.name != _idle)
@@ -73,6 +78,8 @@ public class GolferAnimator : NetworkBehaviour
     }
     public void HitBall()
     {
+        if (!this.IsOwner)
+            return;
         Debug.Log("HitBall: " + this._myPlayer.PlayerName);
         _myPlayer.SubmitHitToBall();
     }
@@ -99,7 +106,12 @@ public class GolferAnimator : NetworkBehaviour
     public void PlayerStruckByLightning()
     {
         Debug.Log("GolferAnimator: PlayerStruckByLightning: Stopping the animation");
-        _animator.enabled = false;
+        IsPausedOnLightningStrike = true;
+        //_networkAnimator.SetTrigger("PauseForLightning");
+        _networkAnimator.Play(_pauseOnLightningStrike);
+        
+        //_animator.enabled = false;
+        
     }
     public void ResetGolfAnimator()
     {
@@ -109,29 +121,48 @@ public class GolferAnimator : NetworkBehaviour
             IsDyingFromLightning = false;
         if(!_animator.enabled)
             _animator.enabled = true;
+        if (IsPausedOnLightningStrike)
+            IsPausedOnLightningStrike = false;
     }
     public void ChangeToStruckByLightningSprite(bool lightningFlash)
     {
+        Debug.Log("ChangeToStruckByLightningSprite: " + lightningFlash.ToString());
         if (lightningFlash)
         {
-            _spriteRenderer.sprite = _struckByLightningFullSwingFlashOn;
-            _lightningBoltObject.SetActive(true);
+            //_spriteRenderer.sprite = _struckByLightningFullSwingFlashOn;
+            //_lightningBoltObject.SetActive(true);
+            //_networkAnimator.SetTrigger("StruckSkeleton");
+            _networkAnimator.Play(_struckSkeleton);
         }
         else
         {
-            _spriteRenderer.sprite = _struckByLightningFullSwingFlashOff;
-            _lightningBoltObject.SetActive(false);
+            //_spriteRenderer.sprite = _struckByLightningFullSwingFlashOff;
+            //_lightningBoltObject.SetActive(false);
+            //_networkAnimator.SetTrigger("PauseForLightning");
+            _networkAnimator.Play(_pauseOnLightningStrike);
         }   
     }
     public void StartDeathFromLightning()
     {
+        Debug.Log("StartDeathFromLightning");
         ResetGolfAnimator();
         IsDyingFromLightning = true;
-        _animator.Play(_deathFromLightning);
+        //_animator.Play(_deathFromLightning);
+        if (this.IsOwner)
+        {
+            _networkAnimator.Play(_deathFromLightning);
+            //_animator.Play(_deathFromLightning);
+            Debug.Log("StartDeathFromLightning: playing animation _deathFromLightning from owner.");
+        }
+            
     }
     public void DeathFromLightningAnimOver()
-    { 
-        _myPlayer.PlayerUIMessage("struck by lightning");
-        _myPlayer.EnablePlayerCanvas(true);
+    {
+        if (this.IsOwner)
+        {
+            _myPlayer.PlayerUIMessage("struck by lightning");
+            _myPlayer.EnablePlayerCanvas(true);
+        }
+        
     }
 }

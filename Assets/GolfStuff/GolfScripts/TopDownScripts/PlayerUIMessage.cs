@@ -14,6 +14,7 @@ public class PlayerUIMessage : MonoBehaviour
     [SerializeField] const string _outOfBounds = "Out of bounds...\n+1 Stroke Penalty";
     [SerializeField] const string _lightningOnTurn = "Lightning in area.\n\nPress Backspace to skip 1 turn with +1 penalty.\n\nPress Space to start turn now.";
     [SerializeField] const string _struckByLightning = "You've been struck by lightning!\n\n+10 stroke penalty and you're out of commission until next turn!\n\nSpace to continue...";
+    [SerializeField] const string _otherPlayerStruckByLightning = " has been struck by lightning!\n\nThey receive a +10 stroke penalty and are out of commission until next turn!";
 
     // Start is called before the first frame update
     void Start()
@@ -62,7 +63,10 @@ public class PlayerUIMessage : MonoBehaviour
         }
         else if (message == "struck by lightning")
         {
-            _playerMessageText.text = _myPlayer.PlayerName + " " + _struckByLightning;
+            if(_myPlayer.IsOwner)
+                _playerMessageText.text = _myPlayer.PlayerName + " " + _struckByLightning;
+            else
+                _playerMessageText.text = _myPlayer.PlayerName + " " + _otherPlayerStruckByLightning;
         }
         else
         {

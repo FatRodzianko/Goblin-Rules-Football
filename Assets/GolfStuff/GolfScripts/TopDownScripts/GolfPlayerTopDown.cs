@@ -350,7 +350,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log("Player pressed space");
+            Debug.Log("Player pressed space at time: " + Time.time.ToString());
         }
         if (!base.IsOwner)
         {
@@ -377,7 +377,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (!IsPlayersTurn)
         {
-            if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Space) && Time.time >= (GameplayManagerTopDownGolf.instance.TimeSinceLastTurnStart + 0.15f))
+            //if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Space) && Time.time >= (GameplayManagerTopDownGolf.instance.TimeSinceLastTurnStart + 0.15f))
+            if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Space))
             {
                 Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " will start their turn after pressing space! Time: " + Time.time);
                 this.EnablePlayerCanvas(false);
@@ -386,7 +387,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 // End old way of starting turn
                 CmdStartCurrentPlayersTurnOnServer();
             }
-            else if (PromptedForLightning && GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Backspace) && Time.time >= (GameplayManagerTopDownGolf.instance.TimeSinceLastSkip + 0.15f))
+            //else if (PromptedForLightning && GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Backspace) && Time.time >= (GameplayManagerTopDownGolf.instance.TimeSinceLastSkip + 0.15f))
+            else if (PromptedForLightning && GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Backspace))
             {
                 Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " is skipping their turn due to lightning. At time of: " + Time.time.ToString() + " and last skip was: " + GameplayManagerTopDownGolf.instance.TimeSinceLastSkip.ToString());
                 this.EnablePlayerCanvas(false);
@@ -410,6 +412,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 _golfAnimator.ResetGolfAnimator();
                 EnablePlayerSprite(false);
                 this.EnablePlayerCanvas(false);
+                CmdEnablePlayerCanvasForOtherClients(false);
                 //this.IsPlayersTurn = false;
                 CmdEndPlayersTurn();
 
@@ -425,7 +428,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 CmdTellPlayersToEnableOrDisableLineObjects(false);
                 this.PlayerStruckByLightning = false;
                 Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " has acknowledged they were struck by lightning! Moving on to next turn by calling: GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this). Time: " + Time.time);
-                GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
+                //GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
+                CmdTellServerPlayerWasStruckByLightning();
                 return;
             }
             if (!DirectionAndDistanceChosen && !_moveHitMeterIcon)
@@ -897,8 +901,6 @@ public class GolfPlayerTopDown : NetworkBehaviour
         _powerSubmitted = false;
         _accuracySubmitted = false;
         IsShanked = false;
-        if (IsOwner)
-            CmdSetIsShankedForClients(IsShanked);
     }
     void BeginMovingHitMeter()
     {
@@ -929,8 +931,6 @@ public class GolfPlayerTopDown : NetworkBehaviour
             {
                 Debug.Log("MoveHitMeterIcon: Accuracy meter off the right edge without accuracy submitted by player. SHANKED!!!");
                 IsShanked = true;
-                if (IsOwner)
-                    CmdSetIsShankedForClients(IsShanked);
                 //SubmitHitToBall();
                 _golfAnimator.StartSwing();
             }
@@ -1051,8 +1051,6 @@ public class GolfPlayerTopDown : NetworkBehaviour
             Debug.Log("GetAccuracyDistance: Shanked!!! accuracy distance was: " + accuracyDistance.ToString() + " submitted position: " + submittedPosition.ToString() + " base position: " + basePosition.ToString());
             accuracyDistance = -_accuracyRange;
             IsShanked = true;
-            if (IsOwner)
-                CmdSetIsShankedForClients(IsShanked);
         }
 
         Debug.Log("GetAccuracyDistance: accuracy distance is: " + accuracyDistance.ToString());
@@ -1087,18 +1085,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void SubmitHitToBall()
     {
-        Debug.Log("SubmitHitToBall: For player: " + this.PlayerName);
         if (!this.IsOwner)
-        {
-            if(!this.HasPlayerTeedOff)
-                SoundManager.instance.PlaySound(_ballSounds.HitTeeOff, 1f);
-            else if (this.IsShankedSynced)
-                SoundManager.instance.PlaySound(_ballSounds.HitShank, 1f);
-            else
-                SoundManager.instance.PlaySound(_ballSounds.HitOffGround, 1f);
-
             return;
-        }
+        Debug.Log("SubmitHitToBall: For player: " + this.PlayerName);
         // This will all need to be updated when the network animator is used to make sure only the owner makes certain calls, but that the clients still play sounds and stuff?
         bool playerTeeOffSound = false;
         if (!this.HasPlayerTeedOff)
@@ -1117,22 +1106,35 @@ public class GolfPlayerTopDown : NetworkBehaviour
         CmdResetCurrentPlayer();
         //GameplayManagerTopDownGolf.instance.LightningAfterPlayerHit();
 
+        // save info for what sound to play to later be sent to the clients
+        string soundName = null;
+        float soundVolume = 1.0f;
+
         if (!IsShanked)
         {
             if (CurrentClub.ClubType == "putter")
             {
                 MyBall.PuttBall(ModifiedHitDirection, HitPowerSubmitted);
                 //MyBall.PuttBall(new Vector2 (1f,0f), 10f);                
-                SoundManager.instance.PlaySound("golfball-hit", 0.8f);
+                //SoundManager.instance.PlaySound("golfball-hit", 0.8f);
+                soundName = _ballSounds.HitOffGround;
+                soundVolume = 0.8f;
             }
             else
             {
                 MyBall.HitBall(HitPowerSubmitted, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
                 //MyBall.HitBall(CurrentClub.MaxHitDistance, hitAngle, hitTopSpin, ModifiedHitDirection, hitLeftOrRightspin);
-                if(playerTeeOffSound)
-                    SoundManager.instance.PlaySound("golfball-teeoff", 1f);
+                if (playerTeeOffSound)
+                {
+                    //SoundManager.instance.PlaySound("golfball-teeoff", 1f);
+                    soundName = _ballSounds.HitTeeOff;
+                }
                 else
+                {
                     SoundManager.instance.PlaySound("golfball-hit", 1f);
+                    soundName = _ballSounds.HitOffGround;
+                }
+                    
             }
         }
         else
@@ -1140,7 +1142,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
             Debug.Log("Was ball shanked? " + IsShanked.ToString());
             DoTheShank();
             SoundManager.instance.PlaySound("golfball-shank", 1f);
+            soundName = _ballSounds.HitShank;
             //MyBall.HitBall(100, hitAngle, hitTopSpin, new Vector2(1f, 0f), hitLeftOrRightspin);
+        }
+        if (!string.IsNullOrEmpty(soundName))
+        {
+            SoundManager.instance.PlaySound(soundName, soundVolume);
+            CmdPlaySoundForClients(soundName, soundVolume);
         }
         //this.IsPlayersTurn = false;
         CmdEndPlayersTurn();
@@ -1152,6 +1160,18 @@ public class GolfPlayerTopDown : NetworkBehaviour
         UpdateCameraFollowTarget(MyBall.MyBallObject);
         EnableOrDisableLineObjects(false);
         CmdTellPlayersToEnableOrDisableLineObjects(false);
+    }
+    [ServerRpc]
+    void CmdPlaySoundForClients(string soundName, float soundVolume)
+    {
+        RpcPlaySoundForClients(soundName, soundVolume);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcPlaySoundForClients(string soundName, float soundVolume)
+    {
+        if (string.IsNullOrEmpty(soundName))
+            return;
+        SoundManager.instance.PlaySound(soundName, soundVolume);
     }
     public void UpdateHitSpinForPlayer(Vector2 newSpin)
     {
@@ -1641,8 +1661,18 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         return closestHole;
     }
+    [ServerRpc]
+    void CmdEnablePlayerCanvasForOtherClients(bool enable)
+    {
+        RpcEnablePlayerCanvasForOtherClients(enable);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcEnablePlayerCanvasForOtherClients(bool enable)
+    {
+        EnablePlayerCanvas(enable);
+    }
     [ObserversRpc]
-    public void RpcEnablePlayerCanvas(bool enable)
+    public void RpcEnablePlayerCanvasForNewTurn(bool enable)
     {
         if (!this.IsOwner)
         {
@@ -1987,6 +2017,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void StruckByLightning()
     {
+        if (!this.IsOwner)
+            return;
         PlayerStruckByLightning = true;
         _golfAnimator.PlayerStruckByLightning();
         //PlayerUIMessage("struck by lightning");
@@ -1995,6 +2027,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void StruckByLightningOver()
     {
+        if (!this.IsOwner)
+            return;
         _golfAnimator.StartDeathFromLightning();
         //PlayerUIMessage("struck by lightning");
         //EnablePlayerCanvas(true);
@@ -2002,6 +2036,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void LightningFlashForPlayerStruck(bool enableStruckSprite)
     {
+        if (!this.IsOwner)
+            return;
+        Debug.Log("LightningFlashForPlayerStruck: " + enableStruckSprite.ToString() + " for player: " + this.PlayerName);
         _golfAnimator.ChangeToStruckByLightningSprite(enableStruckSprite);
     }
     [TargetRpc]
@@ -2071,8 +2108,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
         SetSelectedClubUI(CurrentClub);
     }
     [ServerRpc]
-    void CmdSetIsShankedForClients(bool shanked)
+    void CmdTellServerPlayerWasStruckByLightning()
     {
-        this.IsShankedSynced = shanked;
+        GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
     }
 }

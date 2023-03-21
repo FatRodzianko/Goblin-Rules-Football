@@ -53,7 +53,8 @@ public class LightningManager : NetworkBehaviour
     [SerializeField] float _maxHeavyRainLightningMove = 0.3f;
 
     [Header("Player Struck By Lightning Stuff")]
-    [SerializeField] bool _playerWasStruck = false;
+    [SerializeField] bool _wasPlayerStruck = false;
+    [SerializeField] int _playerThatWasStruckNetId = -99;
     [SerializeField] GolfPlayerTopDown _playerThatWasStruck;
 
     [Header("Thunder Sound Clip Names")]
@@ -140,16 +141,19 @@ public class LightningManager : NetworkBehaviour
             float flashDelay = UnityEngine.Random.Range(0.15f, 0.25f);
             _lightningLight.intensity = _lightIntensity;
             _lightningLight.enabled = true;
-            if (_playerWasStruck)
+            if (_wasPlayerStruck)
             {
+                Debug.Log("LightningFlash: _wasPlayerStruck: " + _wasPlayerStruck.ToString() + " lightning flash on for player: " + _playerThatWasStruck.PlayerName);
                 _playerThatWasStruck.LightningFlashForPlayerStruck(true);
             }
             yield return new WaitForSeconds(flashDelay);
-            if (_playerWasStruck)
+            if (_wasPlayerStruck)
             {
+                Debug.Log("LightningFlash:  _wasPlayerStruck: " + _wasPlayerStruck.ToString() + " lightning flash off for player: " + _playerThatWasStruck.PlayerName);
                 _playerThatWasStruck.LightningFlashForPlayerStruck(false);
                 if (totalFlashes == numberOfFlashes - 1)
                 {
+                    Debug.Log("LightningFlash:  _wasPlayerStruck: " + _wasPlayerStruck.ToString() + " lightning flashes over for player: " + _playerThatWasStruck.PlayerName);
                     _playerThatWasStruck.StruckByLightningOver();
                 }
             }
@@ -168,7 +172,7 @@ public class LightningManager : NetworkBehaviour
         float soundDelay = Mathf.Abs(dist) * 5f + 0.01f;
         Debug.Log("ThunderClap: delay will be: " + soundDelay.ToString() + " Time: " + Time.time);
         string thunderClip = "";
-        if (_playerWasStruck)
+        if (_wasPlayerStruck)
         {
             thunderClip = _thunderPlayerStruck;
             soundDelay = 0f;
@@ -243,6 +247,7 @@ public class LightningManager : NetworkBehaviour
     }
     bool WillLightningStart()
     {
+
         float chance = UnityEngine.Random.Range(0f, 1f);
         if (chance > _startLightningOdds)
             return true;
@@ -251,6 +256,7 @@ public class LightningManager : NetworkBehaviour
     }
     bool WillLightningStop()
     {
+
         float chance = UnityEngine.Random.Range(0f, 1f);
         Debug.Log("WillLightningStop: Chance is: " + chance.ToString() + " against stop odds of: " + _stopLightningOdds.ToString());
         if (chance > _stopLightningOdds)
@@ -289,10 +295,18 @@ public class LightningManager : NetworkBehaviour
             //DistanceFromPlayer = 0f;
             _lightIntensity = 1.5f;
             _playerThatWasStruck = player;
-            player.StruckByLightning();
-            _playerWasStruck = true;
+            _playerThatWasStruckNetId = player.ObjectId;
+            //player.StruckByLightning(); // this should be called on the clients
+            _wasPlayerStruck = true;
         }
-        StartLightningStrike();
+        else
+        {
+            Debug.Log("WillPlayerBeStruckByLightning: no...");
+            _wasPlayerStruck = false;
+            _playerThatWasStruck = null;
+            _playerThatWasStruckNetId = -99;
+        }
+        StartLightningStrike(true);
 
     }
     IEnumerator RandomWaitForLightningAfterHit()
@@ -300,8 +314,9 @@ public class LightningManager : NetworkBehaviour
         yield return new WaitForSeconds(UnityEngine.Random.Range(0.25f, 1.25f));
         StartLightningStrike();
     }
-    void StartLightningStrike()
+    void StartLightningStrike(bool forHit = false)
     {
+        Debug.Log("StartLightningStrike: for a player hit? " + forHit.ToString());
         if (!IsThereLightning)
             return;
         int numberOfFlashes = UnityEngine.Random.Range(3, 6);
@@ -309,15 +324,27 @@ public class LightningManager : NetworkBehaviour
         //GetThunderVolumeFromDistance(DistanceFromPlayer);
         //StartCoroutine(LightningFlash(numberOfFlashes));
         //StartCoroutine(ThunderClap(DistanceFromPlayer, numberOfFlashes));
-        RpcStartLightningStrike(DistanceFromPlayer,_lightIntensity,numberOfFlashes,_playerWasStruck);
+        RpcStartLightningStrike(DistanceFromPlayer, _lightIntensity, numberOfFlashes, _wasPlayerStruck, _playerThatWasStruckNetId);
     }
     [ObserversRpc]
-    void RpcStartLightningStrike(float distFromPlay, float lightIntensity, int numberOfFlashes, bool wasPlayerStruck)
+    void RpcStartLightningStrike(float distFromPlay, float lightIntensity, int numberOfFlashes, bool wasPlayerStruck, int playerThatWasStruckNetId = -99)
     {
         if (!this.IsServer)
         {
             _lightIntensity = lightIntensity;
-            _playerWasStruck = wasPlayerStruck;
+            _wasPlayerStruck = wasPlayerStruck;
+            if (_wasPlayerStruck && playerThatWasStruckNetId != -99)
+            {
+                _playerThatWasStruckNetId = playerThatWasStruckNetId;
+                _playerThatWasStruck = InstanceFinder.ClientManager.Objects.Spawned[_playerThatWasStruckNetId].GetComponent<GolfPlayerTopDown>();
+            }
+        }
+
+        Debug.Log("RpcStartLightningStrike: Was player struck by lightning? " + _wasPlayerStruck.ToString() + " with net id of: " + playerThatWasStruckNetId.ToString());
+
+        if (_wasPlayerStruck)
+        {
+            _playerThatWasStruck.StruckByLightning();
         }
 
         GetThunderVolumeFromDistance(distFromPlay);
@@ -326,8 +353,11 @@ public class LightningManager : NetworkBehaviour
     }
     bool WillPlayerBeStruckByLightning()
     {
-        return false;
-        //return UnityEngine.Random.Range(0f, 1.0f) > Mathf.Abs(DistanceFromPlayer);
+        if (!this.IsThereLightning)
+            return false;
+        
+        // Still need to make an actual system for when lightning should or should not strike a player
+        return UnityEngine.Random.Range(0f, 1.0f) > Mathf.Abs(DistanceFromPlayer);
     }
     void StopLightningRoutineStuff()
     {
@@ -345,8 +375,8 @@ public class LightningManager : NetworkBehaviour
         }
         if (_lightningFlashing)
             _lightningFlashing = false;
-        if (_playerWasStruck)
-            _playerWasStruck = false;
+        if (_wasPlayerStruck)
+            _wasPlayerStruck = false;
         if (_playerThatWasStruck)
             _playerThatWasStruck = null;
     }
@@ -361,6 +391,23 @@ public class LightningManager : NetworkBehaviour
         else
         {
             StopLightningRoutineStuff();
+        }
+    }
+    [Server]
+    public void DetermineIfPlayerWillBeStruckByLightningThisTurn(GolfPlayerTopDown player)
+    {
+        if (WillPlayerBeStruckByLightning())
+        {
+            _wasPlayerStruck = true;
+            _playerThatWasStruckNetId = player.ObjectId;
+            _playerThatWasStruck = player;
+        }
+        else
+        {
+            _wasPlayerStruck = false;
+            _playerThatWasStruckNetId = -99;
+            _playerThatWasStruck = null;
+            return;
         }
     }
 }

@@ -346,6 +346,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         RpcUpdateUIForCurrentPlayer(requestingPlayer);
         //CurrentPlayer.StartPlayerTurn();
         CurrentPlayer.ServerSetIsPlayersTurn(true);
+
+        // Check if the player will be struck by lightning this turn
+
     }
     void SetCameraOnPlayer(GolfPlayerTopDown player)
     {
@@ -691,7 +694,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner, "start turn");
         }
         //CurrentPlayer.EnablePlayerCanvas(true);
-        CurrentPlayer.RpcEnablePlayerCanvas(true);
+        CurrentPlayer.RpcEnablePlayerCanvasForNewTurn(true);
         //UpdateUIForCurrentPlayer(CurrentPlayer);
         RpcUpdateUIForCurrentPlayer(CurrentPlayer, true);
     }
@@ -789,6 +792,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
                 player.RpcEnablePlayerSprite(true);
             else
                 player.RpcEnablePlayerSprite(false);
+        }
+        if (GolfPlayersOutOfCommission.Count > 0)
+        {
+            foreach (GolfPlayerTopDown player in GolfPlayersOutOfCommission)
+            {
+                player.RpcEnablePlayerSprite(false);                   
+            }
         }
     }
     public void PlayerWasStruckByLightning(GolfPlayerTopDown player)
@@ -994,7 +1004,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         {
             SetCameraOnPlayer(CurrentPlayer);
             CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner, "start turn");
-            CurrentPlayer.RpcEnablePlayerCanvas(true);
+            CurrentPlayer.RpcEnablePlayerCanvasForNewTurn(true);
             RpcUpdateUIForCurrentPlayer(CurrentPlayer, true);
         }
     }
