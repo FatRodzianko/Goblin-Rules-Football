@@ -667,7 +667,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         RainManager.instance.UpdateWeatherForNewTurn();
 
         // skipping for now while testing other things for multiplayer
-        //WindManager.instance.CheckIfTornadoWillSpawn(newHole);
+        WindManager.instance.CheckIfTornadoWillSpawn(newHole);
         ////WindManager.instance.MoveTornadoForNewTurn();
 
         // skipping for now while testing other things for multiplayer

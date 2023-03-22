@@ -1,8 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
-public class Torndao : MonoBehaviour
+public class Torndao : NetworkBehaviour
 {
     [Header("My Components")]
     [SerializeField] Rigidbody2D _rb;
@@ -12,7 +16,7 @@ public class Torndao : MonoBehaviour
 
     [Header("Attributes")]
     [SerializeField] public float HeightInUnityUnits = 3f;
-    [SerializeField] public int TornadoStrength = 1;
+    [SerializeField] [SyncVar(OnChange = nameof(SyncTornadoStrength))] public int TornadoStrength = 0;
 
     [Header("Movement")]
     public bool IsMoving = false;
@@ -27,13 +31,27 @@ public class Torndao : MonoBehaviour
 
     [Header("Misc.")]
     CameraFollowScript _cameraFollowScript;
-    
-    private void Awake()
+
+    public override void OnStartServer()
     {
+        base.OnStartServer();
+        Debug.Log("Tornado.cs: OnStartServer");
+        SetTornadoStrength();
+    }
+    public override void OnStartClient()
+    {   
+        base.OnStartClient();
+        Debug.Log("Tornado.cs: OnStartClient");
         if (!_myCollider)
             _myCollider = this.GetComponent<BoxCollider2D>();
-        SetTornadoStrength();
         GetCameraFollowScript();
+    }
+    private void Awake()
+    {
+        //if (!_myCollider)
+        //    _myCollider = this.GetComponent<BoxCollider2D>();
+        //SetTornadoStrength();
+        //GetCameraFollowScript();
     }
     // Start is called before the first frame update
     void Start()
@@ -61,11 +79,16 @@ public class Torndao : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // remove when done testing
+        return;
+        // remove when done testing
+
         if (collision.tag == "golfBall")
         {
             GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
             if (golfBallScript.IsInHole)
                 return;
+
 
             float ballZ = golfBallScript.transform.position.z;
             float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
@@ -75,6 +98,7 @@ public class Torndao : MonoBehaviour
                 HitBall = true;
                 BallsHit.Add(golfBallScript);
             }
+            // For multiplayer this will need to be changed so that the server tells the client to do the HitByTornado thing?
             golfBallScript.HitByTornado(HeightInUnityUnits, ballHeightInUnityUnits,TornadoStrength, this);
             
         }
@@ -113,9 +137,10 @@ public class Torndao : MonoBehaviour
         {
             TornadoStrength = UnityEngine.Random.Range(minStrengthFromWindPower, maxStrengthFromRainLevel);
         }
-        AdjustScaleOfTornado(TornadoStrength);
-        AdjustHeightOfTornado(TornadoStrength);
-        AdjustCenterObject();
+        // removed for multiplayer. Done on the clients now?
+        //AdjustScaleOfTornado(TornadoStrength);
+        //AdjustHeightOfTornado(TornadoStrength);
+        //AdjustCenterObject();
     }
     void AdjustScaleOfTornado(int scaleToSet)
     {
@@ -138,10 +163,19 @@ public class Torndao : MonoBehaviour
 
         _movementDir = (furthestPlayer.MyBall.transform.position - this.transform.position).normalized;
         _distanceToMove = DistanceToMoveTornadoThisTurn();
-        GetCameraFollowScript();
-        _cameraFollowScript.followTarget = _centerObject;
+
+        //GetCameraFollowScript();
+        //_cameraFollowScript.followTarget = _centerObject;
+        RpcMoveTornadoForNewTurn();
+
         ResetHitBallStuff();
         IsMoving = true;
+    }
+    [ObserversRpc]
+    void RpcMoveTornadoForNewTurn()
+    {
+        GetCameraFollowScript();
+        _cameraFollowScript.followTarget = _centerObject;
     }
     GolfPlayerTopDown GetFurthestPlayer()
     {
@@ -214,5 +248,13 @@ public class Torndao : MonoBehaviour
         HitBall = false;
         BallsHit.Clear();
         BallsHitThatStopped.Clear();
+    }
+    void SyncTornadoStrength(int prev, int next, bool asServer)
+    {
+        if (asServer)
+            return;
+        AdjustScaleOfTornado(next);
+        AdjustHeightOfTornado(next);
+        AdjustCenterObject();
     }
 }

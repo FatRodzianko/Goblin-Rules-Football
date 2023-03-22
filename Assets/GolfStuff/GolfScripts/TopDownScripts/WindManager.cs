@@ -6,6 +6,7 @@ using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using System;
 
 public class WindManager : NetworkBehaviour
 {
@@ -29,7 +30,7 @@ public class WindManager : NetworkBehaviour
     [Header("Tornado Stuff")]
     [SerializeField] GameObject _tornadoPrefab;
     [SerializeField] GameObject _tornadoObject;
-    public bool IsThereATorndao = false;
+    [SyncVar] public bool IsThereATorndao = false;
     private bool _isThereATornado = false;
     public delegate void IsTornadoChanged(bool tornado);
     public event IsTornadoChanged TornadoChanged;
@@ -85,7 +86,7 @@ public class WindManager : NetworkBehaviour
     {
         Debug.Log("PowerChangedFunction: " + power.ToString());
         // if the power drops to 0, destroy and tornado objects
-        if (power <= 0f)
+        if (power <= 0f && this.IsServer)
             DestroyTornadoObjects();
     }
     void TornadoChangedFunction(bool tornado)
@@ -243,18 +244,29 @@ public class WindManager : NetworkBehaviour
     void UpdateRainForTornado(string newRainState)
     {
         // If the weather is clear, destroy any tornado objects 
-        if (newRainState == "clear")
+        if (newRainState == "clear" && this.IsServer)
         {
             DestroyTornadoObjects();
         }
     }
+    [Server]
     void DestroyTornadoObjects()
     {
+        Debug.Log("DestroyTornadoObjects");
         IsThereATorndao = false;
-        if (_tornadoObject)
+        if (_tornadoObject && TornadoScript)
         {
             GameObject destroyObject = _tornadoObject;
-            Destroy(destroyObject);
+            //InstanceFinder.ServerManager.Despawn(destroyObject);
+            TornadoScript.Despawn();
+            try
+            {
+                Destroy(destroyObject);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("DestroyTornadoObjects: Could not destroy tornado object. Error: " + e);
+            }
             _tornadoObject = null;
         }
         if (TornadoScript)
@@ -262,6 +274,7 @@ public class WindManager : NetworkBehaviour
             TornadoScript = null;
         }
     }
+    [Server]
     public void CheckIfTornadoWillSpawn(bool newHole = false)
     {
         if (newHole)
@@ -269,34 +282,33 @@ public class WindManager : NetworkBehaviour
         if (IsThereATorndao)
             return;
 
-        // skipping tornado stuff while testing everything else out in multiplayer...
-        return;
+        // start comment out for testing
+        //if (this.WindPower <= 0f)
+        //{
+        //    DestroyTornadoObjects();
+        //    return;
+        //}
+        //if (RainManager.instance.RainState == "clear")
+        //{
+        //    DestroyTornadoObjects();
+        //    return;
+        //}
+        //if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
+        //    return;
 
-        if (this.WindPower <= 0f)
-        {
-            DestroyTornadoObjects();
-            return;
-        }
-        if (RainManager.instance.RainState == "clear")
-        {
-            DestroyTornadoObjects();
-            return;
-        }
-        if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
-            return;
+        //float tornadoLikelihood = 0.2f;
+        //if (RainManager.instance.RainState == "med rain")
+        //    tornadoLikelihood += 0.1f;
+        //else if (RainManager.instance.RainState == "heavy rain")
+        //    tornadoLikelihood += 0.25f;
 
-        float tornadoLikelihood = 0.2f;
-        if (RainManager.instance.RainState == "med rain")
-            tornadoLikelihood += 0.1f;
-        else if (RainManager.instance.RainState == "heavy rain")
-            tornadoLikelihood += 0.25f;
-
-        if (UnityEngine.Random.Range(0f, 1f) > tornadoLikelihood && !IsThereATorndao)
-        {
-            Debug.Log("CheckIfTornadoWillSpawn: Will NOT Spawn a torndao this turn.");
-            IsThereATorndao = false;
-            return;
-        }
+        //if (UnityEngine.Random.Range(0f, 1f) > tornadoLikelihood && !IsThereATorndao)
+        //{
+        //    Debug.Log("CheckIfTornadoWillSpawn: Will NOT Spawn a torndao this turn.");
+        //    IsThereATorndao = false;
+        //    return;
+        //}
+        // end comment out for testing
 
         Debug.Log("CheckIfTornadoWillSpawn: Will Spawn a torndao this turn.");
 
@@ -304,6 +316,9 @@ public class WindManager : NetworkBehaviour
 
         _tornadoObject = Instantiate(_tornadoPrefab, spawnPos, Quaternion.identity);
         TornadoScript = _tornadoObject.GetComponent<Torndao>();
+
+        InstanceFinder.ServerManager.Spawn(_tornadoObject);
+        Debug.Log("CheckIfTornadoWillSpawn: spawned a tornado with netid of: " + TornadoScript.ObjectId);
 
         IsThereATorndao = true;
     }
@@ -363,16 +378,11 @@ public class WindManager : NetworkBehaviour
     }
     public async Task MoveTornadoTask()
     {
-        // skipping tornado stuff while testing everything else out in multiplayer...
-        return;
 
-        return;
         if (!IsThereATorndao)
             return;
         if (!TornadoScript)
             return;
-
-        
 
         if (this.WindPower <= 0f || RainManager.instance.RainState == "clear")
         {
