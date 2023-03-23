@@ -79,10 +79,8 @@ public class Torndao : NetworkBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // remove when done testing
-        return;
-        // remove when done testing
-
+        if (!this.IsServer)
+            return;
         if (collision.tag == "golfBall")
         {
             GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
@@ -99,8 +97,9 @@ public class Torndao : NetworkBehaviour
                 BallsHit.Add(golfBallScript);
             }
             // For multiplayer this will need to be changed so that the server tells the client to do the HitByTornado thing?
-            golfBallScript.HitByTornado(HeightInUnityUnits, ballHeightInUnityUnits,TornadoStrength, this);
-            
+            //golfBallScript.HitByTornado(HeightInUnityUnits, ballHeightInUnityUnits,TornadoStrength, this);
+            golfBallScript.RpcHitByTornado(golfBallScript.Owner, HeightInUnityUnits, ballHeightInUnityUnits, TornadoStrength, this);
+
         }
     }
     void SetTornadoStrength()
@@ -215,6 +214,7 @@ public class Torndao : NetworkBehaviour
         if (!_cameraFollowScript)
             _cameraFollowScript = GameObject.FindGameObjectWithTag("camera").GetComponent<CameraFollowScript>();
     }
+    [Server]
     public async void BallCompletedTornadoHit(GolfBallTopDown ball)
     {
         Debug.Log("BallCompletedTornadoHit: From ball: " + ball.gameObject.name);

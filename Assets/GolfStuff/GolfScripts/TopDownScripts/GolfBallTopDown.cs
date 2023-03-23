@@ -1220,9 +1220,17 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     void ResetTornadoStuff()
     {
+        if (!this.IsOwner || !MyTornado)
+            return;
         IsHitByTornado = false;
-        MyTornado.BallCompletedTornadoHit(this);
+        //MyTornado.BallCompletedTornadoHit(this);
+        CmdTellTornadoBallCompletedTornadoHit(MyTornado);
         MyTornado = null;
+    }
+    [ServerRpc]
+    void CmdTellTornadoBallCompletedTornadoHit(Torndao tornado)
+    { 
+        tornado.BallCompletedTornadoHit(this);
     }
     Vector2 GetPerpendicular(Vector2 dir, float leftOrRight)
     {
@@ -1323,6 +1331,11 @@ public class GolfBallTopDown : NetworkBehaviour
         {
             Debug.Log("HitEnvironmentObstacle: ball CLEARS the obstacle and will keep flying. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString());
         }
+    }
+    [TargetRpc]
+    public void RpcHitByTornado(NetworkConnection conn, float obstalceUnityUnits, float ballUnityUnits, int tornadoStrength, Torndao tornado)
+    {
+        HitByTornado(obstalceUnityUnits, ballUnityUnits, tornadoStrength, tornado);
     }
     public void HitByTornado(float obstalceUnityUnits, float ballUnityUnits, int tornadoStrength, Torndao tornado)
     {
