@@ -86,6 +86,8 @@ public class Torndao : NetworkBehaviour
             GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
             if (golfBallScript.IsInHole)
                 return;
+            if (BallsHit.Contains(golfBallScript))
+                return;
 
 
             float ballZ = golfBallScript.transform.position.z;
@@ -229,7 +231,8 @@ public class Torndao : NetworkBehaviour
         {
             foreach (GolfBallTopDown stoppedBall in BallsHitThatStopped)
             {
-                await stoppedBall.MyPlayer.TellPlayerGroundTheyLandedOn(3);
+                //await stoppedBall.MyPlayer.TellPlayerGroundTheyLandedOn(3);
+                await ball.MyPlayer.ServerTellPlayerGroundTheyLandedOn(3);
                 if (stoppedBall.IsInHole)
                 {
                     Debug.Log("BallCompletedTornadoHit: Ball hit into hole by tornado!");
