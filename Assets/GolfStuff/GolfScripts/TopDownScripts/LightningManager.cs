@@ -202,10 +202,12 @@ public class LightningManager : NetworkBehaviour
     { 
 
     }
-    public void CheckIfLightningStartsThisTurn()
+    public void CheckIfLightningStartsThisTurn(bool skipLightningCheck = false)
     {
 
         Debug.Log("CheckIfLightningStartsThisTurn: Checking for lightning at new turn. Is there lightning now? " + IsThereLightning.ToString());
+        if (skipLightningCheck)
+            return;
         if (!IsThereLightning)
         {
             if (WillLightningStart())
@@ -408,6 +410,15 @@ public class LightningManager : NetworkBehaviour
             _playerThatWasStruckNetId = -99;
             _playerThatWasStruck = null;
             return;
+        }
+    }
+    [Server]
+    public void EndStorm()
+    {
+        if (IsThereLightning)
+        {
+            StopLightningRoutineStuff();
+            IsThereLightning = false;
         }
     }
 }

@@ -72,6 +72,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] public bool PlayerHasSkippedTurn = false;
     [SerializeField] public List<GolfPlayerTopDown> TurnOrderForLightningSkips = new List<GolfPlayerTopDown>();
     [SerializeField] public int TurnsSinceSkip = 0;
+    [SerializeField] public int SkipsInARow = 0;
+    [SerializeField] bool _skipLightningCheck = false;
     [SyncVar] public float TimeSinceLastSkip = 0f;
     [SyncVar] public float TimeSinceLastTurnStart = 0f;
 
@@ -383,6 +385,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (!playerSkippingForLightning && !playerWasStruckByLightning)
         {  
             Debug.Log("StartNextPlayersTurn: Calling TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
+            
             //await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
             await ball.MyPlayer.ServerTellPlayerGroundTheyLandedOn(3);
             Debug.Log("StartNextPlayersTurn: Returning from TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
@@ -398,11 +401,12 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         }
 
         // Set the weather for the next turn
-        await SetWeatherForNextTurn();
+        //await SetWeatherForNextTurn();
         // Find the next player based on tee off position, or by furthest player from hole if all players teed off
         if (playerSkippingForLightning)
         {
             Debug.Log("GameplayManagerTopDownGolf: StartNextPlayersTurn: Player: " + ball.MyPlayer.PlayerName + " skipping for next turn due to lightning.");
+            SkipsInARow++; // track number of times players have skipped lightning in a row
             // Skip the current player's turn. Find the next player up based on tee off order, or distance to hole. If no other players are left, then this player stays as current player
             if (_numberOfPlayersInHole == GolfPlayers.Count - 1)
             {
@@ -453,6 +457,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         }
         else
         {
+            SkipsInARow = 0; // reset skips in a row if player did not skip for lightning?
             CurrentPlayer = SelectNextPlayer();
             SetCurrentPlayer(CurrentPlayer);
         }
@@ -465,7 +470,14 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         {
             //CurrentPlayer.SetPlayerOnBall();
             CurrentPlayer.MovePlayerToPosition(CurrentPlayer.Owner, CurrentPlayer.MyBall.transform.position);
-        }   
+        }
+        if (SkipsInARow == GolfPlayersServer.Count)
+        {
+            await StormPassesForSkips();
+            _skipLightningCheck = true;
+        }
+        // Set the weather for the next turn
+        await SetWeatherForNextTurn();
         // Diable sprite of players that are not the current player
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
         // Move the camera to the player
@@ -677,7 +689,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         // skipping for now while testing other things for multiplayer
         // make sure lightning occurs after the tornado tracking?
-        _lightningManager.CheckIfLightningStartsThisTurn();
+        _lightningManager.CheckIfLightningStartsThisTurn(_skipLightningCheck);
+        _skipLightningCheck = false;
 
     }
     void PromptPlayerForNextTurn()
@@ -1008,4 +1021,12 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             RpcUpdateUIForCurrentPlayer(CurrentPlayer, true);
         }
     }
+    async Task StormPassesForSkips()
+    {
+        Debug.Log("StormPassesForSkips: Number of skippers: " + SkipsInARow.ToString() + " And total number of players: " + GolfPlayersServer.Count.ToString());
+        await Task.Yield();
+        _lightningManager.EndStorm();
+        SkipsInARow = 0;
+    }
+
 }
