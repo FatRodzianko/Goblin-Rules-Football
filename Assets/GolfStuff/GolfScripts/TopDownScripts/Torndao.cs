@@ -16,7 +16,7 @@ public class Torndao : NetworkBehaviour
 
     [Header("Attributes")]
     [SerializeField] public float HeightInUnityUnits = 3f;
-    [SerializeField] [SyncVar(OnChange = nameof(SyncTornadoStrength))] public int TornadoStrength = 0;
+    [SerializeField] [SyncVar(OnChange = nameof(SyncTornadoStrength))] public int TornadoStrength = -1;
 
     [Header("Movement")]
     public bool IsMoving = false;
@@ -88,6 +88,8 @@ public class Torndao : NetworkBehaviour
                 return;
             if (BallsHit.Contains(golfBallScript))
                 return;
+            if (!golfBallScript.MyPlayer.HasPlayerTeedOff) // don't launch a player's ball if they haven't teed off yet? Seems unfair...
+                return;
 
 
             float ballZ = golfBallScript.transform.position.z;
@@ -138,6 +140,8 @@ public class Torndao : NetworkBehaviour
         {
             TornadoStrength = UnityEngine.Random.Range(minStrengthFromWindPower, maxStrengthFromRainLevel);
         }
+        Debug.Log("SetTornadoStrength: Tornado strength is: " + TornadoStrength.ToString());
+        RpcSetTornadoStrength(TornadoStrength);
         // removed for multiplayer. Done on the clients now?
         //AdjustScaleOfTornado(TornadoStrength);
         //AdjustHeightOfTornado(TornadoStrength);
@@ -256,8 +260,19 @@ public class Torndao : NetworkBehaviour
     {
         if (asServer)
             return;
+        Debug.Log("SyncTornadoStrength: " + next.ToString());
         AdjustScaleOfTornado(next);
         AdjustHeightOfTornado(next);
+        AdjustCenterObject();
+    }
+    [ObserversRpc(BufferLast = true)]
+    void RpcSetTornadoStrength(int tornadoStrength)
+    {
+        if (TornadoStrength == tornadoStrength)
+            return;
+        Debug.Log("RpcSetTornadoStrength: new strength: " + tornadoStrength.ToString() + " old strength: " + TornadoStrength.ToString());
+        AdjustScaleOfTornado(tornadoStrength);
+        AdjustHeightOfTornado(tornadoStrength);
         AdjustCenterObject();
     }
 }

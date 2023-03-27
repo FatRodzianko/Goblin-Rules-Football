@@ -162,7 +162,7 @@ MonoBehaviour:
   _spriteRenderer: {fileID: 1816894770352592240}
   _centerObject: {fileID: 1170567465763194524}
   HeightInUnityUnits: 3
-  TornadoStrength: 0
+  TornadoStrength: -1
   IsMoving: 0
   _speed: 5
   _movementDir: {x: 0, y: 0}
@@ -234,6 +234,7 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   _networkBehaviours:
   - {fileID: 1816894770352592254}
+  - {fileID: 9139398354507141740}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -241,7 +242,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 0
+  <PrefabId>k__BackingField: 7
   <SpawnableCollectionId>k__BackingField: 0
   _scenePathHash: 0
   <SceneId>k__BackingField: 0
@@ -259,9 +260,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 9210322985869054126}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 9210322985869054126}
   _synchronizeParent: 0
   _packing:
     Position: 1

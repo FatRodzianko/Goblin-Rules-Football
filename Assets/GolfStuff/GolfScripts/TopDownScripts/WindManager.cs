@@ -258,7 +258,14 @@ public class WindManager : NetworkBehaviour
         {
             GameObject destroyObject = _tornadoObject;
             //InstanceFinder.ServerManager.Despawn(destroyObject);
-            TornadoScript.Despawn();
+            try
+            {
+                TornadoScript.Despawn();
+            }
+            catch (Exception e)
+            {
+                Debug.Log("DestroyTornadoObjects: Could not DESPAWN tornado object. Error: " + e);
+            }
             try
             {
                 Destroy(destroyObject);
@@ -282,33 +289,33 @@ public class WindManager : NetworkBehaviour
         if (IsThereATorndao)
             return;
 
-        // start comment out for testing
-        //if (this.WindPower <= 0f)
-        //{
-        //    DestroyTornadoObjects();
-        //    return;
-        //}
-        //if (RainManager.instance.RainState == "clear")
-        //{
-        //    DestroyTornadoObjects();
-        //    return;
-        //}
-        //if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
-        //    return;
 
-        //float tornadoLikelihood = 0.2f;
-        //if (RainManager.instance.RainState == "med rain")
-        //    tornadoLikelihood += 0.1f;
-        //else if (RainManager.instance.RainState == "heavy rain")
-        //    tornadoLikelihood += 0.25f;
+        if (this.WindPower <= 0f)
+        {
+            DestroyTornadoObjects();
+            return;
+        }
+        if (RainManager.instance.RainState == "clear")
+        {
+            DestroyTornadoObjects();
+            return;
+        }
+        if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
+            return;
 
-        //if (UnityEngine.Random.Range(0f, 1f) > tornadoLikelihood && !IsThereATorndao)
-        //{
-        //    Debug.Log("CheckIfTornadoWillSpawn: Will NOT Spawn a torndao this turn.");
-        //    IsThereATorndao = false;
-        //    return;
-        //}
-        // end comment out for testing
+        float tornadoLikelihood = 0.2f;
+        if (RainManager.instance.RainState == "med rain")
+            tornadoLikelihood += 0.1f;
+        else if (RainManager.instance.RainState == "heavy rain")
+            tornadoLikelihood += 0.25f;
+
+        if (UnityEngine.Random.Range(0f, 1f) > tornadoLikelihood && !IsThereATorndao)
+        {
+            Debug.Log("CheckIfTornadoWillSpawn: Will NOT Spawn a torndao this turn.");
+            IsThereATorndao = false;
+            return;
+        }
+
 
         Debug.Log("CheckIfTornadoWillSpawn: Will Spawn a torndao this turn.");
 

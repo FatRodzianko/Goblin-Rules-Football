@@ -355,6 +355,10 @@ public class LightningManager : NetworkBehaviour
     }
     bool WillPlayerBeStruckByLightning()
     {
+        // remove for testing
+        return false;
+        // remove for testing
+
         if (!this.IsThereLightning)
             return false;
         

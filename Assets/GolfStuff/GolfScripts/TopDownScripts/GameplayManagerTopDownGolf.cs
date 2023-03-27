@@ -76,6 +76,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] bool _skipLightningCheck = false;
     [SyncVar] public float TimeSinceLastSkip = 0f;
     [SyncVar] public float TimeSinceLastTurnStart = 0f;
+    [SerializeField] bool _tellingPlayersStormWillPass = false;
 
     private void Awake()
     {
@@ -453,7 +454,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         else if (!playerSkippingForLightning && PlayerHasSkippedTurn)
         {
             Debug.Log("StartNextPlayersTurn: Player did not skip for lightning but PlayerHasSkippedTurn was true before their turn.");
+            SkipsInARow = 0;
             GetNextPlayerFromLightningSkipList(ball.MyPlayer, playerSkippingForLightning);
+            SetCurrentPlayer(CurrentPlayer);
         }
         else
         {
@@ -471,9 +474,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             //CurrentPlayer.SetPlayerOnBall();
             CurrentPlayer.MovePlayerToPosition(CurrentPlayer.Owner, CurrentPlayer.MyBall.transform.position);
         }
-        if (SkipsInARow == GolfPlayersServer.Count)
+        if (SkipsInARow == GolfPlayers.Count)
         {
-            await StormPassesForSkips();
+            await StormPassesForSkips(5f);
             _skipLightningCheck = true;
         }
         // Set the weather for the next turn
@@ -691,6 +694,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // make sure lightning occurs after the tornado tracking?
         _lightningManager.CheckIfLightningStartsThisTurn(_skipLightningCheck);
         _skipLightningCheck = false;
+        if (!_lightningManager.IsThereLightning)
+        {
+            SkipsInARow = 0;
+        }
+            
 
     }
     void PromptPlayerForNextTurn()
@@ -988,7 +996,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             return;
         }   
 
-        Debug.Log("SyncCurrentPlayerNetId");
+        Debug.Log("SyncCurrentPlayerNetId: " + next.ToString());
         CurrentPlayer = InstanceFinder.ClientManager.Objects.Spawned[next].GetComponent<GolfPlayerTopDown>();
         _currentplayerui.SetActive(true);
         _currentplayeruiText.text = CurrentPlayer.PlayerName + ":" + next.ToString();
@@ -1021,11 +1029,23 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             RpcUpdateUIForCurrentPlayer(CurrentPlayer, true);
         }
     }
-    async Task StormPassesForSkips()
+    async Task StormPassesForSkips(float duration)
     {
         Debug.Log("StormPassesForSkips: Number of skippers: " + SkipsInARow.ToString() + " And total number of players: " + GolfPlayersServer.Count.ToString());
-        await Task.Yield();
         _lightningManager.EndStorm();
+        float endTime = Time.time + duration;
+
+        // Send the message to the player
+        CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner,"storm passed");
+
+        while (Time.time < endTime)
+        {
+            await Task.Yield();
+        }
+
+        // End the message?
+        CurrentPlayer.RpcEnablePlayerCanvasForNewTurn(false);
+
         SkipsInARow = 0;
     }
 

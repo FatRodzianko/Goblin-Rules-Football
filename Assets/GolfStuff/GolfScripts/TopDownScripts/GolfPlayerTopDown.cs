@@ -1689,12 +1689,15 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [TargetRpc]
     public void RpcPlayerUIMessage(NetworkConnection conn, string message)
     {
+        Debug.Log("RpcPlayerUIMessage: for player: " + this.PlayerName + " message: " + message);
         if (!this.IsOwner)
             return;
+        this.EnablePlayerCanvas(true);
         PlayerUIMessage(message);
     }
     public void PlayerUIMessage(string message)
     {
+        Debug.Log("PlayerUIMessage: for player: " + this.PlayerName + " message: " + message);
         if (message == "lightning")
             PromptedForLightning = true;
         else if (message == "start turn")
@@ -1706,6 +1709,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ServerRpc]
     void CmdTellClientsUpdatePlayerMessageText(string newMessage)
     {
+        Debug.Log("CmdTellClientsUpdatePlayerMessageText: for player: " + this.PlayerName + " message: " + newMessage);
         if (newMessage == "lightning" || newMessage == "start turn")
             return;
         RpcTellClientsUpdatePlayerMessageText(newMessage);
@@ -1713,6 +1717,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ObserversRpc(ExcludeOwner = true)]
     void RpcTellClientsUpdatePlayerMessageText(string newMessage)
     {
+        Debug.Log("RpcTellClientsUpdatePlayerMessageText: with message: " + newMessage);
         this.EnablePlayerCanvas(true);
         _playerUIMessage.UpdatePlayerMessageText(newMessage);
     }
