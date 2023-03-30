@@ -235,7 +235,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         Debug.Log("RpcLoadNewHoleOnClient: Starting task to load hole at index: " + index.ToString() + ". Time: " + Time.time);
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[index];
         LoadNewHole(index);
-        GetCameraBoundingBox();
+        GetCameraBoundingBox(CurrentHoleInCourse.PolygonPoints, true);
         TellPlayersToGetCameraBoundingBox();
         //// Set the Hole Positions for the new hole
         HolePositions = CurrentHoleInCourse.HolePositions;
@@ -553,19 +553,22 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         CurrentPlayer = null;
     }
-    void GetCameraBoundingBox()
+    void GetCameraBoundingBox(Vector2[] polygonPoints, bool forceUpdate = false)
     {
+        Debug.Log("GameplayManager: GetCameraBoundingBox");
         if (!_cameraBoundingBox)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
+        if(forceUpdate)
+            _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
         if (_cameraBoundingBox)
-            _cameraViewHole.GetLinePointsForOutOfBoundsBorder(_cameraBoundingBox);
+            _cameraViewHole.GetLinePointsForOutOfBoundsBorder(polygonPoints);
     }
     [Client]
     void TellPlayersToGetCameraBoundingBox()
     {
         foreach (GolfPlayerTopDown player in GolfPlayers)
         {
-            player.GetCameraBoundingBox();
+            player.GetCameraBoundingBox(true);
             //player.RpcGetCameraBoundingBox(player.Owner);
         }
     }

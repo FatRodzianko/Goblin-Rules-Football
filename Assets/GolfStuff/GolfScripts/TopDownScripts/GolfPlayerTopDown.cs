@@ -797,6 +797,26 @@ public class GolfPlayerTopDown : NetworkBehaviour
         Vector3 ballPos = MyBall.transform.position;
         Vector3 newTargetPos = ballPos + (Vector3)(hitDirection.normalized * newDist);
         GetCameraBoundingBox();
+
+        if (!this.HasPlayerTeedOff)
+        {
+            Debug.Log("GetHitStatsFromClub: player has NOT teed off yet!");
+            // Get the distance to the tee off point. If the max distance from club is greater than distance to tee off aim point, set the hit distance to distance to tee off aim point
+            float distanceToAimPoint = Vector2.Distance(MyBall.transform.position, GameplayManagerTopDownGolf.instance.TeeOffAimPoint);
+            if (MaxDistanceFromClub > distanceToAimPoint)
+            {
+                newDist = distanceToAimPoint;
+            }
+        }
+        else
+        {
+            Debug.Log("GetHitStatsFromClub: player HAS teed off already!");
+            if (MaxDistanceFromClub > this.DistanceToHole)
+            {
+                newDist = this.DistanceToHole;
+            }
+        }
+
         if (_cameraBoundingBox.OverlapPoint(newTargetPos))
         {
             Debug.Log("GetHitStatsFromClub: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000") + ". No change to hit distance.");
@@ -1910,9 +1930,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         this.EnablePlayerCanvas(false);
     }
-    public void GetCameraBoundingBox()
+    public void GetCameraBoundingBox(bool forceUpdate = false)
     {
         if (!_cameraBoundingBox)
+            _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
+        if(forceUpdate)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
     }
     [TargetRpc]

@@ -59,11 +59,15 @@ public class CameraViewHole : MonoBehaviour
     {
         _zoomedOutPos = newPos;
     }
-    public void GetLinePointsForOutOfBoundsBorder(PolygonCollider2D border)
+    //public void GetLinePointsForOutOfBoundsBorder(PolygonCollider2D border)
+    public void GetLinePointsForOutOfBoundsBorder(Vector2[] polygonPoints)
     {
+        Debug.Log("GetLinePointsForOutOfBoundsBorder");
         //https://gamedev.stackexchange.com/questions/197313/show-colliders-in-a-build-game-in-unity
-        var points = border.GetPath(0); // dumb assumption for demo -- only one path
+        //var points = border.GetPath(0); // dumb assumption for demo -- only one path
+        var points = polygonPoints;
 
+        //Vector3[] positions = new Vector3[points.Length + 1];
         Vector3[] positions = new Vector3[points.Length + 1];
         for (int i = 0; i < points.Length; i++)
         {

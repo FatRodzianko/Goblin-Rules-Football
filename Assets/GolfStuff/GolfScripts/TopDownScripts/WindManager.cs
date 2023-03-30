@@ -285,7 +285,13 @@ public class WindManager : NetworkBehaviour
     public void CheckIfTornadoWillSpawn(bool newHole = false)
     {
         if (newHole)
+        {
+            if (IsThereATorndao)
+            {
+                DestroyTornadoObjects();
+            }
             return;
+        }
         if (IsThereATorndao)
             return;
 

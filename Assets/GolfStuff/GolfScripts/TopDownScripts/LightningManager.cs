@@ -385,6 +385,16 @@ public class LightningManager : NetworkBehaviour
             _wasPlayerStruck = false;
         if (_playerThatWasStruck)
             _playerThatWasStruck = null;
+
+        if (IsServer)
+            RpcLightningRoutineStuff();
+    }
+    [ObserversRpc]
+    void RpcLightningRoutineStuff()
+    {
+        if (IsServer)
+            return;
+        StopLightningRoutineStuff();
     }
     void SyncIsThereLightning(bool prev, bool next, bool asServer)
     {
