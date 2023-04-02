@@ -5502,6 +5502,7 @@ GameObject:
   - component: {fileID: -8595113770045884364}
   - component: {fileID: 5128232167220223196}
   - component: {fileID: -2641077922915985335}
+  - component: {fileID: 7229146345318371590}
   m_Layer: 22
   m_Name: goblin-skirmisher
   m_TagString: Goblin
@@ -5925,6 +5926,7 @@ MonoBehaviour:
   avoidForceProximityMultiplier: 100
   avoidObjectDirectionFallOffSpeed: 20
   avoidObjectsScanDistance: 2.2
+  myParent: {fileID: 0}
   goblinTarget: {fileID: 0}
   isTargetingAGoblin: 0
 --- !u!114 &-2641077922915985335
@@ -5941,6 +5943,63 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flashMaterial: {fileID: 2100000, guid: 3cd0b6c203e71604690af0ec8cbbd256, type: 2}
   duration: 0.125
+--- !u!114 &7229146345318371590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6877901074420270458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad225009ad414e1428332cab226f38fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  interpolationBackTime: 0.1
+  extrapolationMode: 1
+  useExtrapolationTimeLimit: 1
+  extrapolationTimeLimit: 5
+  useExtrapolationDistanceLimit: 0
+  extrapolationDistanceLimit: 20
+  sendPositionThreshold: 0
+  sendRotationThreshold: 0
+  sendScaleThreshold: 0
+  sendVelocityThreshold: 0
+  sendAngularVelocityThreshold: 0
+  receivedPositionThreshold: 0
+  receivedRotationThreshold: 0
+  snapPositionThreshold: 0
+  snapRotationThreshold: 0
+  snapScaleThreshold: 0
+  positionLerpSpeed: 0.85
+  rotationLerpSpeed: 0.85
+  scaleLerpSpeed: 0.85
+  timeCorrectionSpeed: 0.1
+  snapTimeThreshold: 0.3
+  syncPosition: 1
+  syncRotation: 7
+  syncScale: 7
+  syncVelocity: 1
+  syncAngularVelocity: 1
+  isPositionCompressed: 0
+  isRotationCompressed: 0
+  isScaleCompressed: 0
+  isVelocityCompressed: 0
+  isAngularVelocityCompressed: 0
+  automaticallyResetTime: 1
+  isSmoothingAuthorityChanges: 0
+  transformSource: 0
+  whenToUpdateTransform: 0
+  sendRate: 30
+  networkChannel: 1
+  childObjectToSync: {fileID: 0}
+  setVelocityInsteadOfPositionOnNonOwners: 0
+  maxPositionDifferenceForVelocitySyncing: 10
+  useLocalTransformOnly: 0
+  ownerChangeIndicator: 1
+  receivedStatesCounter: 0
 --- !u!1 &7893613754978918313
 GameObject:
   m_ObjectHideFlags: 0
