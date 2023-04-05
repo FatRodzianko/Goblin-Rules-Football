@@ -43473,4 +43473,5 @@ MonoBehaviour:
   - {x: 370, y: -25}
   - {x: 370, y: 28}
   ZoomedOutPos: {x: 175.5, y: -44.5, z: 0}
+  CameraZoomValue: 9
   TeeOffAimPoint: {x: 185, y: -80, z: 0}

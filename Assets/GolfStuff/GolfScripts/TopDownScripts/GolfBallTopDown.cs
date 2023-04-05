@@ -1623,8 +1623,12 @@ public class GolfBallTopDown : NetworkBehaviour
                 }
             }
         }
+        else
+            closestContactPoint = ballPos;
+
         // Add the ball's circle collider radius along path to player to get point that is off the water?
         Vector3 newBallPos = closestContactPoint + (Vector3)(directionToPlayer * (this.MyColliderRadius * 2));
+
         Debug.Log("FindPointOutOfWater: Closest contact point was: " + closestContactPoint.ToString("0.00000") + " and after adding ball circle collider radius: " + newBallPos.ToString("0.00000"));
         return newBallPos;
     }
@@ -1642,13 +1646,15 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     void MoveBallOutOfWater()
     {
-        Vector3 newBallPos = FindPointOutOfWater();
+        Vector3 newBallPos = FindPointOutOfWater();        
         StartCoroutine(DelayForPenaltyMessage(newBallPos, 2f));
     }
     IEnumerator DelayForPenaltyMessage(Vector3 newBallPos, float delaySeconds)
     {
         yield return new WaitForSeconds(delaySeconds);
         this.transform.position = newBallPos;
+        if (this.IsOwner)
+            MyPlayer.SetDistanceToHoleForPlayer();
         bounceContactGroundMaterial = GetGroundMaterial();
         //MyPlayer.EnablePlayerCanvas(false);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);

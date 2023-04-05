@@ -19,6 +19,7 @@ public class TileMapManager : MonoBehaviour
     [SerializeField] private int _holeIndex;
     [SerializeField] private string _courseName;
     [SerializeField] private int _holePar;
+    [SerializeField] private float _cameraZoomValue;
 
     [Header("Prefabs for Objects like holes/tee ball things")]
     [SerializeField] GameObject _holePrefab;
@@ -26,6 +27,9 @@ public class TileMapManager : MonoBehaviour
     [SerializeField] GameObject _cameraBoundingBox;
     [SerializeField] GameObject _environmentObstacleHolderPrefab;
     [SerializeField] GameObject _environmentObstacleHolderObject;
+    [SerializeField] GameObject _golfAimPoint;
+    [SerializeField] GameObject _zoomedOutPosition;
+    [SerializeField] GameObject _teeOffPosition;
 
 
     [Header("Camera stuff?")]
@@ -75,6 +79,10 @@ public class TileMapManager : MonoBehaviour
 
         // Find the zoomed out position and save it for later use by the camera
         newHole.ZoomedOutPos = GameObject.FindGameObjectWithTag("ZoomedOutPosition").transform.position;
+        if (this._cameraZoomValue != 0f)
+            newHole.CameraZoomValue = this._cameraZoomValue;
+        else
+            newHole.CameraZoomValue = 9f;
 
         // Find all Environment obstacles and save their locations
         GameObject[] obstacles = GameObject.FindGameObjectsWithTag("GolfEnvironmentObstacle");
@@ -226,8 +234,17 @@ public class TileMapManager : MonoBehaviour
         if (hole == null)
         {
             Debug.LogError($"{_courseName}_{_holeIndex} does not exist.");
+            
             return;
         }
+        // Set the par value in the editor to the saved value from the hole
+        this._holePar = hole.HolePar;
+        // See if map markers such as tee off position or zoom out position exist in the scene. Then set their position to the saved position
+        SetPositionOfMapMarker(hole.TeeOffLocation, "teeOffPosition", _teeOffPosition);
+        SetPositionOfMapMarker(hole.ZoomedOutPos, "ZoomedOutPosition", _zoomedOutPosition);
+        SetPositionOfMapMarker(hole.TeeOffAimPoint, "GolfAimPoint", _golfAimPoint);
+        // Set the camera zoom value in the editor to the saved value from the hole
+        this._cameraZoomValue = hole.CameraZoomValue;
         this.LoadMap(hole);
     }
     public void LoadMap(ScriptableHole hole)
@@ -371,6 +388,17 @@ public class TileMapManager : MonoBehaviour
             doesObjectExist = false;
         }
         return doesObjectExist;
+    }
+    void SetPositionOfMapMarker(Vector3 position, string tagName, GameObject prefabToSpawn)
+    {
+        if (DoesObjectWithTagExist(tagName))
+        {
+            GameObject.FindGameObjectWithTag(tagName).transform.position = position;
+        }
+        else
+        {
+            Instantiate(prefabToSpawn, position, Quaternion.identity);
+        }
     }
 }
 

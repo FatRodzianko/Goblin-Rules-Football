@@ -12,6 +12,7 @@ public class CameraViewHole : MonoBehaviour
     
     public bool IsCameraZoomedOut = false;
     [SerializeField] Vector3 _zoomedOutPos;
+    [SerializeField] float _cameraZoomValue = 9f;
 
     private void Awake()
     {
@@ -39,7 +40,8 @@ public class CameraViewHole : MonoBehaviour
         Debug.Log("ZoomOutCamera: IsCameraZoomedOut: " + IsCameraZoomedOut.ToString());
         if (IsCameraZoomedOut)
         {
-            _vCam.m_Lens.OrthographicSize /= 9f;
+            //_vCam.m_Lens.OrthographicSize /= 9f;
+            _vCam.m_Lens.OrthographicSize /= _cameraZoomValue;
             _pixelPerfect.enabled = true;
             _cameraFollowScript.enabled = true;
             //_outOfBoundsBorderLine.enabled = false;
@@ -47,7 +49,8 @@ public class CameraViewHole : MonoBehaviour
         }
         else
         {
-            _vCam.m_Lens.OrthographicSize *= 9f;
+            //_vCam.m_Lens.OrthographicSize *= 9f;
+            _vCam.m_Lens.OrthographicSize *= _cameraZoomValue;
             _pixelPerfect.enabled = false;
             _cameraFollowScript.enabled = false;
             _outOfBoundsBorderLine.enabled = true;
@@ -58,6 +61,10 @@ public class CameraViewHole : MonoBehaviour
     public void SetZoomedOutPosition(Vector3 newPos)
     {
         _zoomedOutPos = newPos;
+    }
+    public void SetCameraZoomValue(float newZoomValue)
+    {
+        _cameraZoomValue = newZoomValue;
     }
     //public void GetLinePointsForOutOfBoundsBorder(PolygonCollider2D border)
     public void GetLinePointsForOutOfBoundsBorder(Vector2[] polygonPoints)

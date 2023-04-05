@@ -244,7 +244,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //// Set the new tee off location
         UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
         //// Set the Camera Zoomed Out position
-        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos);
+        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos,CurrentHoleInCourse.CameraZoomValue);
         //// update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
     }
@@ -602,12 +602,12 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         else
             _terrainTypeText.text = titleCase.ToTitleCase(player.GetTerrainTypeFromBall());
     }
-    void UpdateZoomedOutPos(Vector3 newPos)
+    void UpdateZoomedOutPos(Vector3 newPos, float newZoomValue)
     {
         if (!_cameraViewHole)
             _cameraViewHole = GameObject.FindGameObjectWithTag("camera").GetComponent<CameraViewHole>();
         _cameraViewHole.SetZoomedOutPosition(newPos);
-
+        _cameraViewHole.SetCameraZoomValue(newZoomValue);
     }
     async void NextHole()
     {
@@ -641,7 +641,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // Set the new tee off location
         UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
         // Set the Camera Zoomed Out position
-        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos);
+        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos, CurrentHoleInCourse.CameraZoomValue);
         // update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
         // Update the "rain sound" for the next hole
@@ -934,7 +934,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //// Set the new tee off location
         UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
         //// Set the Camera Zoomed Out position
-        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos);
+        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos, CurrentHoleInCourse.CameraZoomValue);
         //// update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
 

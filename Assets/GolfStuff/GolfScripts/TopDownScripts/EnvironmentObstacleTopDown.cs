@@ -51,6 +51,8 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
                 return;
             if (golfBallScript.IsInHole)
                 return;
+            if (golfBallScript.LocalIsInHole)
+                return;
 
             float ballZ = golfBallScript.transform.position.z;
             float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
