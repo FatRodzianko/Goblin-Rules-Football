@@ -153,3 +153,7 @@ x Deactivate player sprite if it is not their turn. Reactivate when their turn s
 - - x Recenter the camera on the player's ball/player sprite when they become the Current player
 - - x Maybe have a slight delay when about to change turns to new player so the camera doesn't immediately change before the player who hits can see where their ball settled
 - - - - - x this was already being done with the "tell player the ground type they are on" function...
+
+
+distance calculator
+https://www.calculatorsoup.com/calculators/geometry-plane/distance-two-points.php
