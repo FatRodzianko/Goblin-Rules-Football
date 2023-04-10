@@ -5316,7 +5316,7 @@ MonoBehaviour:
     Position: 0
     Rotation: 1
     Scale: 1
-  _interpolation: 1
+  _interpolation: 2
   _extrapolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1

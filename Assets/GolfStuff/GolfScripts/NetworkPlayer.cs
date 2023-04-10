@@ -14,6 +14,9 @@ public class NetworkPlayer : NetworkBehaviour
     [SerializeField] GameObject _golfPlayerPrefab;
     [SerializeField] GolfPlayerTopDown _golfPlayerScript;
 
+    [Header("Color Picker Stuff")]
+    [SerializeField] [SyncVar] Color _ballColor = Color.white;
+
     [Header("UI Stuff")]
     [SerializeField] GameObject _playerUICanvas;
     [SerializeField] Button _readyButton;
@@ -26,10 +29,10 @@ public class NetworkPlayer : NetworkBehaviour
     [Header("Player Status")]
     [SerializeField] [SyncVar(OnChange = nameof(SyncIsReady))] public bool IsReady = false;
     [SerializeField] [SyncVar(OnChange = nameof(SyncPlayerName))] public string PlayerName;
+
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -53,6 +56,7 @@ public class NetworkPlayer : NetworkBehaviour
         base.OnStartClient();
         if (!this.IsOwner)
         {
+            Debug.Log("OnStartClient: DEactivating player canvas for player with id: " + this.ObjectId);
             _playerUICanvas.SetActive(false);
             _readyButton.gameObject.SetActive(false);
             _playerNameInput.gameObject.SetActive(false);
@@ -60,6 +64,7 @@ public class NetworkPlayer : NetworkBehaviour
         }
         else
         {
+            Debug.Log("OnStartClient: ACTIVATING player canvas for player with id: " + this.ObjectId);
             _playerUICanvas.SetActive(true);
             _readyButton.gameObject.SetActive(true);
             _playerNameInput.gameObject.SetActive(true);
@@ -214,12 +219,13 @@ public class NetworkPlayer : NetworkBehaviour
             playerName = RandomPlayerName();
             if (this.Owner.IsHost)
                 playerName += " (Host)";
-            else
-                playerName += " (Client)";
+            //else
+            //    playerName += " (Client)";
         }
         _golfPlayerScript.PlayerName = playerName;
         _golfPlayerScript.IsGameLeader = this.Owner.IsHost;
         _golfPlayerScript.OwnerNetId = this.OwnerId;
+        _golfPlayerScript.BallColor = this._ballColor;
         InstanceFinder.ServerManager.Spawn(_golfPlayerScript.gameObject, this.Owner);
     }
     [TargetRpc]
@@ -228,6 +234,9 @@ public class NetworkPlayer : NetworkBehaviour
         if (!this.IsOwner)
             return;
         _playerUICanvas.SetActive(false);
+        GameObject networkingTestHudObject = GameObject.FindGameObjectWithTag("NetworkingTestHud");
+        if (networkingTestHudObject)
+            networkingTestHudObject.SetActive(false);
     }
     public void SubmitName()
     {
@@ -260,7 +269,7 @@ public class NetworkPlayer : NetworkBehaviour
     }
     string RandomPlayerName()
     {
-        int rand = UnityEngine.Random.Range(0, 10);
+        int rand = UnityEngine.Random.Range(0, 100);
         string name = "Player[" + rand.ToString() + "]";
         return name;
     }
@@ -271,4 +280,16 @@ public class NetworkPlayer : NetworkBehaviour
         _welcomeText.gameObject.SetActive(true);
         _welcomeText.text = next;
     }
+    public void UpdateBallColorValue(Color newColor)
+    {
+        if (!this.IsOwner)
+            return;
+        CmdUpdateBallColorValue(newColor);
+    }
+    [ServerRpc]
+    void CmdUpdateBallColorValue(Color newColor)
+    {
+        this._ballColor = newColor;
+    }
+
 }

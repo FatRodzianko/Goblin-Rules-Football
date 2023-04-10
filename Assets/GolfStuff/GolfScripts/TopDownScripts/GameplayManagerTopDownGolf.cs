@@ -50,6 +50,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     public GolfPlayerTopDown CurrentPlayer;
     [SyncVar(OnChange = nameof(SyncCurrentPlayerNetId))] public int CurrentPlayerNetId;
 
+    [Header("Player Score Board")]
+    [SerializeField] PlayerScoreBoard _playerScoreBoard;
+
     [Header("Weather Effects")]
     [SerializeField] LightningManager _lightningManager;
 
@@ -64,8 +67,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     TextInfo titleCase = new CultureInfo("en-US", false).TextInfo;
     [SerializeField] Canvas _loadingHoleCanvas;
     [SerializeField] Canvas _holeInfoCanvas;
-    [SerializeField] GameObject _currentplayerui;
-    [SerializeField] TextMeshProUGUI _currentplayeruiText;
+    //[SerializeField] GameObject _currentplayerui;
+    //[SerializeField] TextMeshProUGUI _currentplayeruiText;
 
 
     [Header("Skip For Lightning Info")]
@@ -994,15 +997,15 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         if (IsLocalPlayerHost())
         {
-            _currentplayerui.SetActive(true);
-            _currentplayeruiText.text = CurrentPlayer.PlayerName + ":" + next.ToString();
+            //_currentplayerui.SetActive(true);
+            //_currentplayeruiText.text = CurrentPlayer.PlayerName + ":" + next.ToString();
             return;
         }   
 
         Debug.Log("SyncCurrentPlayerNetId: " + next.ToString());
         CurrentPlayer = InstanceFinder.ClientManager.Objects.Spawned[next].GetComponent<GolfPlayerTopDown>();
-        _currentplayerui.SetActive(true);
-        _currentplayeruiText.text = CurrentPlayer.PlayerName + ":" + next.ToString();
+        //_currentplayerui.SetActive(true);
+        //_currentplayeruiText.text = CurrentPlayer.PlayerName + ":" + next.ToString();
     }
     bool IsLocalPlayerHost()
     {
@@ -1050,6 +1053,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         CurrentPlayer.RpcEnablePlayerCanvasForNewTurn(false);
 
         SkipsInARow = 0;
+    }
+    public void AddPlayerToScoreBoard(GolfPlayerTopDown player, GolfPlayerScore playerScore)
+    {
+        _playerScoreBoard.AddPlayerToScoreBoard(player, playerScore);
     }
 
 }

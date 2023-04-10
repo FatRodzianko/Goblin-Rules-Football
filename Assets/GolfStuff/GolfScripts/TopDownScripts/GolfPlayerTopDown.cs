@@ -9,6 +9,7 @@ using FishNet.Object;
 using FishNet.Managing;
 using FishNet.Object.Synchronizing;
 using FishNet;
+using TMPro;
 //using Mirror;
 
 public class GolfPlayerTopDown : NetworkBehaviour
@@ -21,6 +22,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SyncVar(OnChange = nameof(SyncIsGameLeader))] public bool IsGameLeader = false;
     [SyncVar] public int OwnerNetId;
     [SyncVar(OnChange = nameof(SyncConnectionId))] public int ConnectionId;
+    [SerializeField] TextMeshPro _playerNameText;
 
 
     [Header("Golf Ball Stuff")]
@@ -29,6 +31,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] public GolfBallTopDown MyBall;
     [SyncVar] public float DistanceToHole;
     [SyncVar] public int NumberOfBallsSpawnedForClient = 0;
+    [SyncVar] public Color BallColor;
 
 
     [Header("Hit Values")]
@@ -252,6 +255,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }   
         else
         {
+            GameplayManagerTopDownGolf.instance.AddPlayerToScoreBoard(this, this.PlayerScore);
             if (!base.IsOwner)
                 return;
         }
@@ -263,8 +267,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             //PlayerName = next;
         }   
         else
-        { 
-
+        {
+            _playerNameText.text = next;
         }
     }
     // Start is called before the first frame update
@@ -336,7 +340,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 {
                     Debug.Log("SyncMyBallNetId: error finding local game player. Error: " + e);
                 }
-            }   
+            }
+            MyBall.UpdateBallColor(this.BallColor);
         }   
     }
     [ServerRpc]
@@ -2040,6 +2045,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public void EnablePlayerSprite(bool enable)
     {
         Debug.Log("EnablePlayerSprite: " + enable.ToString());
+        _playerNameText.gameObject.SetActive(enable);
         _golfAnimator.EnablePlayerSprite(enable);
     }
     public void StruckByLightning()

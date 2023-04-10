@@ -512,7 +512,7 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         if (windDirection == Vector2.zero || windPower == 0)
             return trajectoryPoint;
-        Vector3 windShift = windDirection.normalized * windPower * (timeInAir / 10f);
+        Vector3 windShift = windDirection.normalized * windPower * (timeInAir / 7.5f);
         if (isMidPoint)
         {
             windShift /= 2f;
@@ -1760,6 +1760,10 @@ public class GolfBallTopDown : NetworkBehaviour
     void RpcSoundForClients(string soundName)
     {
         SoundManager.instance.PlaySound(soundName, 1.0f);
+    }
+    public void UpdateBallColor(Color newColor)
+    {
+        this.ballObjectRenderer.color = newColor;
     }
 }
 

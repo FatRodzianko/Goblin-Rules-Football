@@ -209,6 +209,12 @@ public class NetworkHudCanvases : MonoBehaviour
         else
             _networkManager.ServerManager.StartConnection();
 
+        // added this to automatically connect the host's client to the server
+        if (_clientState != LocalConnectionState.Stopped)
+            _networkManager.ClientManager.StopConnection();
+        else
+            _networkManager.ClientManager.StartConnection("localhost");
+
         DeselectButtons();
     }
 
@@ -221,7 +227,8 @@ public class NetworkHudCanvases : MonoBehaviour
         if (_clientState != LocalConnectionState.Stopped)
             _networkManager.ClientManager.StopConnection();
         else
-            _networkManager.ClientManager.StartConnection();
+            _networkManager.ClientManager.StartConnection("localhost");
+        //_networkManager.ClientManager.StartConnection();
 
         DeselectButtons();
     }

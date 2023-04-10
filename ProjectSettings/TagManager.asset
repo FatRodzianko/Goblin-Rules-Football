@@ -49,6 +49,7 @@ TagManager:
   - GolfAimPoint
   - ZoomedOutPosition
   - tornado
+  - NetworkingTestHud
   layers:
   - Default
   - TransparentFX

@@ -112,6 +112,9 @@ x Icons that point to "special interest" objects that aren't on screen
 - - - fishnet fundamentals: https://www.youtube.com/watch?v=5c1ie6Za5yg
 - - - - - - 27:16
 - fishnet with steam lobbies? https://www.youtube.com/watch?v=-Du_8_NZRWM
+- Color picker in unity so player's can pick color of ball?
+- - - https://www.youtube.com/watch?v=M6kEW6feh7g
+- - - https://www.youtube.com/watch?v=sBkkeiZsx1s
 
 x GameplayManager requirements for top down golf
 - - x track what player's turn it is

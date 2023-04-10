@@ -204,6 +204,7 @@ namespace FishNet.Managing.Client
         /// </summary>
         public void StartConnection(string address)
         {
+            Debug.Log("StartConnection: " + address + " on port: " + NetworkManager.TransportManager.Transport.GetPort().ToString());
             StartConnection(address, NetworkManager.TransportManager.Transport.GetPort());
         }
         /// <summary>
