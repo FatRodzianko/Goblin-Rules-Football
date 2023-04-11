@@ -219,6 +219,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  borderOffset: {x: 0, y: -0.062, z: 0}
   mySprite: {fileID: 21300000, guid: 330cc8b43e96a3046aba14a81bd13b55, type: 3}
   powerUpAbility: lightningBlueShell
   isBlueShell: 1
@@ -227,6 +228,7 @@ MonoBehaviour:
   aiPowerUpType: blueShellEnemy
   PowerUpImageObject: {fileID: 6338328384912614004}
   PowerUpBorderObject: {fileID: 6338328385406385039}
+  PowerUpShadowObject: {fileID: 1278173312906470304}
   bounceSpeed: 0.25
   powerUpAnimationPrefab: {fileID: 3034892886349171904, guid: a40d30f9c028f8f45a217c06096d997c, type: 3}
   thrownObjectPrefab: {fileID: 0}

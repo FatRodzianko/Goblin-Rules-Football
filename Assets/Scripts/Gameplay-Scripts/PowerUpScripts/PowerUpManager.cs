@@ -36,6 +36,7 @@ public class PowerUpManager : NetworkBehaviour
     public List<GameObject> ActivePowerUps = new List<GameObject>();
     public List<uint> ActivePowerUpNetIds = new List<uint>();
     public int blueShellCount = 0;
+    [SerializeField] float _timeSinceLastBlueShell = 0f;
 
     [Header("Player Picked Up Power Ups")]
     public List<GameObject> PlayerPickedUpPowerUps = new List<GameObject>();
@@ -166,7 +167,7 @@ public class PowerUpManager : NetworkBehaviour
             if ((differenceInScore > 13) || (differenceInScore < -13))
             {
                 Debug.Log("CheckIfAPowerUpDrops: One team is down by at least 14 - increase blueshell likelihood");
-                blueShellLikelihood = 0.55f;
+                blueShellLikelihood = 0.65f;
                 // Get the player that is down
                 foreach (GamePlayer player in Game.GamePlayers)
                 {
@@ -189,8 +190,12 @@ public class PowerUpManager : NetworkBehaviour
 
             if (willPowerUpDrop)
             {
-                if (Random.Range(0f, 1f) > blueShellLikelihood && blueShellCount < 2)
+                if (Random.Range(0f, 1f) > blueShellLikelihood && blueShellCount < 2 && Time.time > _timeSinceLastBlueShell + 15f)
+                {
                     willPowerUpBeBlueShell = true;
+                    _timeSinceLastBlueShell = Time.time;
+                }
+                    
             }
             if (willPowerUpDrop && willPowerUpBeBlueShell)
             {
@@ -501,7 +506,12 @@ public class PowerUpManager : NetworkBehaviour
                     PlayerPickedUpPowerUps.Remove(powerUpToUse);
                     PowerUpPlayerOwnerDictionary.Remove(powerUpNetId);
                     if (powerUpToUse.GetComponent<PowerUp>().isBlueShell)
+                    {
+                        if(blueShellCount >= 2)
+                            _timeSinceLastBlueShell = Time.time;
                         blueShellCount--;
+                    }
+                        
                     NetworkServer.Destroy(powerUpToUse);
                     // Track when a team has picked up a power up
                     TeamManager.instance.PowerUpCollectedOrUsed(player, true);

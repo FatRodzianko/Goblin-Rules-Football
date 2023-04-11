@@ -176,6 +176,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         CurrentPlayer.EnablePlayerCanvas(true);
         UpdateUIForCurrentPlayer(CurrentPlayer,true);
         */
+
+        // This is for now with a hardcoded current course. Will need to update for when host can choose course that is then synced to other players
+        PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CurrentCourse);
     }
 
     // Update is called once per frame
@@ -237,6 +240,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         Debug.Log("RpcLoadNewHoleOnClient: Starting task to load hole at index: " + index.ToString() + ". Time: " + Time.time);
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[index];
+        if (PlayerScoreBoard.instance.IsScoreBoardOpen)
+            PlayerScoreBoard.instance.CloseScoreBoard();
         LoadNewHole(index);
         GetCameraBoundingBox(CurrentHoleInCourse.PolygonPoints, true);
         TellPlayersToGetCameraBoundingBox();
@@ -250,6 +255,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos,CurrentHoleInCourse.CameraZoomValue);
         //// update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
+
     }
     public void UpdateTeeOffPositionForNewHole(Vector3 newPosition)
     {
@@ -746,11 +752,14 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         for (int i = 0; i < GolfPlayers.Count; i++)
         {
             GolfPlayerTopDown player = GolfPlayers[i];
-            //player.ResetForNewHole(CurrentHoleIndex + 1);
             player.RpcResetForNewHole(player.Owner, CurrentHoleIndex + 1);
-            //await player.TellPlayerGameIsOver(5);
+        }
+        // Doing this a second time for the "await" thing to tell each player's score. Can probably skip once the scoreboard works? Instead, just show the scoreboard after everyone has had their score updated?
+        // Would probably still need to do an await type thing to make sure all the scores are synced before bringing up the score board? Similar to how the "tell player type of ground landed on" stuff works where there is an await on the server that then waits for a response from client to confirm they got the new score
+        for (int i = 0; i < GolfPlayers.Count; i++)
+        {
+            GolfPlayerTopDown player = GolfPlayers[i];
             await player.ServerTellPlayerGameIsOver(5);
-            // tell players to close player ui here???
         }
 
         Debug.Log("EndGame: AFTER calling TellPlayerGameIsOver time is: " + Time.time.ToString());
@@ -957,6 +966,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //MovePlayerToTeeOffLocation(CurrentPlayer);
         //// Diable sprite of players that are not the current player
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
+
+        
     }
 
     [ObserversRpc(ExcludeOwner = true)]
@@ -1054,9 +1065,4 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         SkipsInARow = 0;
     }
-    public void AddPlayerToScoreBoard(GolfPlayerTopDown player, GolfPlayerScore playerScore)
-    {
-        _playerScoreBoard.AddPlayerToScoreBoard(player, playerScore);
-    }
-
 }

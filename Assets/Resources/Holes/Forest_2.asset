@@ -6160,7 +6160,7 @@ MonoBehaviour:
   - TilePos: {x: -1, y: 0, z: 0}
     MyTile: {fileID: 11400000, guid: 7402d2173b1d57247bd2e6b4f9d4b813, type: 2}
   - TilePos: {x: 0, y: 0, z: 0}
-    MyTile: {fileID: 11400000, guid: 8be10e2ac4dad814dbfab73c91040537, type: 2}
+    MyTile: {fileID: 11400000, guid: 7402d2173b1d57247bd2e6b4f9d4b813, type: 2}
   - TilePos: {x: 1, y: 0, z: 0}
     MyTile: {fileID: 11400000, guid: 7402d2173b1d57247bd2e6b4f9d4b813, type: 2}
   - TilePos: {x: 2, y: 0, z: 0}

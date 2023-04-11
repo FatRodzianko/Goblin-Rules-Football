@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 8242093619301733083}
   - component: {fileID: 8242093619301733080}
   - component: {fileID: 6875112187249593470}
-  - component: {fileID: 7299971361403675222}
   m_Layer: 0
   m_Name: GameplayManager
   m_TagString: Untagged
@@ -72,7 +71,7 @@ MonoBehaviour:
   _haveAllPlayersTeedOff: 0
   CurrentPlayer: {fileID: 0}
   CurrentPlayerNetId: 0
-  _playerScoreBoard: {fileID: 7299971361403675222}
+  _playerScoreBoard: {fileID: 0}
   _lightningManager: {fileID: 0}
   _cameraViewHole: {fileID: 0}
   _cameraBoundingBox: {fileID: 0}
@@ -121,17 +120,3 @@ MonoBehaviour:
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 2730534501108569411
   _sceneNetworkObjects: []
---- !u!114 &7299971361403675222
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8242093619301733081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07530a1cd529f354997b99ec99e633b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playerScoreBoardItemPrefab: {fileID: 4453851431969889961, guid: c15ced131efcfcb409618afa0bdc0964, type: 3}
-  PlayerScoreItems: []

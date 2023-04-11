@@ -22,6 +22,7 @@ public class PowerUp : NetworkBehaviour
     [Header("Power Up Objects")]
     [SerializeField] GameObject PowerUpImageObject;
     [SerializeField] GameObject PowerUpBorderObject;
+    [SerializeField] GameObject PowerUpShadowObject;
     int directionToMoveUpAndDown = 1;
     Vector3 newPosition = Vector3.zero;
     public float bounceSpeed = 0.25f;
@@ -48,7 +49,10 @@ public class PowerUp : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        if (this.isBlueShell)
+        {
+            HideBlueShellForTeamThatIsUp();
+        }
     }
     public override void OnStartServer()
     {
@@ -60,6 +64,7 @@ public class PowerUp : NetworkBehaviour
     {
         base.OnStartClient();
         //newPosition = PowerUpImageObject.transform.localPosition;
+        
     }
     // Update is called once per frame
     void Update()
@@ -679,5 +684,31 @@ public class PowerUp : NetworkBehaviour
         }
 
         return canPickUp;
+    }
+    void HideBlueShellForTeamThatIsUp()
+    {
+        Debug.Log("HideBlueShellForTeamThatIsUp: Executing");
+        if (!this.isBlueShell)
+            return;
+        if (GameplayManager.instance.isSinglePlayer)
+            return;
+        // Find the local game player
+        GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
+        if (!localPlayer)
+            return;
+
+        if (!CanPlayerPickUpBlueShell(localPlayer.isTeamGrey))
+        {
+            try
+            {
+                PowerUpImageObject.SetActive(false);
+                PowerUpBorderObject.SetActive(false);
+                PowerUpShadowObject.SetActive(false);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("HideBlueShellForTeamThatIsUp: could not disable powershell objects. Error: " + e);
+            }
+        }
     }
 }

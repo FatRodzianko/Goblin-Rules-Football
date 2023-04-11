@@ -255,7 +255,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }   
         else
         {
-            GameplayManagerTopDownGolf.instance.AddPlayerToScoreBoard(this, this.PlayerScore);
+            PlayerScoreBoard.instance.AddPlayerToScoreBoard(this, this.PlayerScore);
             if (!base.IsOwner)
                 return;
         }
@@ -378,6 +378,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         if (!MyBall)
             return;
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            PlayerScoreBoard.instance.OpenScoreBoard();
+        }
+        if (Input.GetKeyUp(KeyCode.Tab))
+        {
+            PlayerScoreBoard.instance.CloseScoreBoard();
+        }
         if (MyBall.isHit || MyBall.isBouncing || MyBall.isRolling)
             return;
         if (!IsPlayersTurn)
@@ -475,7 +483,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
             }
         }
-        if (Input.GetKeyDown(KeyCode.Tab))
+        //if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             //MyBall.PuttBall(hitDirection, hitDistance);
             //EnableOrDisableLineObjects(false);

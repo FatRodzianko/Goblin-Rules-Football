@@ -219,6 +219,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  borderOffset: {x: 0, y: -0.062, z: 0}
   mySprite: {fileID: 21300000, guid: 74a447dc8316ef94686cd817832d1356, type: 3}
   powerUpAbility: bottleBlueShell
   isBlueShell: 1
@@ -227,6 +228,7 @@ MonoBehaviour:
   aiPowerUpType: blueShellEnemy
   PowerUpImageObject: {fileID: 6338328384912614004}
   PowerUpBorderObject: {fileID: 6338328385406385039}
+  PowerUpShadowObject: {fileID: 426797096760255950}
   bounceSpeed: 0.25
   powerUpAnimationPrefab: {fileID: 0}
   thrownObjectPrefab: {fileID: 2503829215579455807, guid: 9b68d51d3f48cfc489439f7c9308c2ad, type: 3}
