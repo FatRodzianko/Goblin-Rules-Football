@@ -532,6 +532,27 @@ public class GolfPlayerTopDown : NetworkBehaviour
             {
                 ChangeHitDistance(distanceUpDown);
             }
+            if (_cameraViewHole.IsCameraZoomedOut)
+            {
+                if (Input.GetMouseButtonDown(2))
+                {
+                    Vector3 mouseScreenPos = Input.mousePosition;
+                    //Debug.Log("Player clicked on screen position: " + mouseScreenPos.ToString());
+                    if (mouseScreenPos.x > 0 && mouseScreenPos.y > 0 && mouseScreenPos.y <= Screen.height && mouseScreenPos.x <= Screen.width)
+                    {
+                        //Debug.Log("Player clicked on screen position INSIDE of window");
+                        Vector3 mouseWorldPos = myCamera.ScreenToWorldPoint(mouseScreenPos);
+                        Vector2 mouseDir = (mouseWorldPos - MyBall.transform.position).normalized;
+                        //Debug.Log("Player clicked on screen/world position: " + mouseScreenPos.ToString() + "/" + mouseWorldPos.ToString() + ". Direction to mouse: " + mouseDir.ToString() + " compared to player's current aim position: " + hitDirection.ToString());
+                        if (this.IsOwner)
+                            ChangeDirectionFromMouseClick(mouseDir);
+                            //hitDirection = mouseDir;
+                    }   
+                    else
+                        Debug.Log("Player clicked on screen position OUTSIDE of window");
+                    
+                }
+            }
         }
         if (Input.GetKeyDown(KeyCode.BackQuote) && !_powerSubmitted && !_accuracySubmitted)
         {
@@ -677,6 +698,20 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // Adjust the location of the Adjusted Distance Icon
         UpdatePositionOfAdjustedDistanceIcon(hitDistance);
     }
+    void ChangeDirectionFromMouseClick(Vector2 newDir)
+    {
+        Vector3 newTargetPos = MyBall.transform.position + (Vector3)(newDir.normalized * hitDistance);
+        GetCameraBoundingBox();
+        if (_cameraBoundingBox.OverlapPoint(newTargetPos))
+        {
+            //Debug.Log("ChangeDirectionFromMouseClick: new point is colliding with the camera bounding box at point: " + newTargetPos.ToString("0.00000"));
+            hitDirection = newDir.normalized;
+        }
+        else
+        {
+            //Debug.Log("ChangeDirectionFromMouseClick: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000") + ". Will try and adjust distance to stay in bounds?");            
+        }
+    }
     [Server]
     public void ServerSetIsPlayersTurn(bool isItTheirTurn)
     {
@@ -815,9 +850,23 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (!this.HasPlayerTeedOff)
         {
             Debug.Log("GetHitStatsFromClub: player has NOT teed off yet!");
+            // Get direction to the aim point
+            bool isAimingAtAimPoint = false;
+            Vector2 dirToAimPoint = (GameplayManagerTopDownGolf.instance.TeeOffAimPoint - MyBall.transform.position).normalized;
+            if (Vector2.Angle(dirToAimPoint, hitDirection) < 15f)
+            {
+                Debug.Log("GetHitStatsFromClub: Player aim direction is LESS than 15 degrees away from aim point");
+                isAimingAtAimPoint = true;
+            }   
+            else
+            {
+                Debug.Log("GetHitStatsFromClub: Player aim direction is MORE than 15 degrees away from aim point");
+            }
+                
+
             // Get the distance to the tee off point. If the max distance from club is greater than distance to tee off aim point, set the hit distance to distance to tee off aim point
             float distanceToAimPoint = Vector2.Distance(MyBall.transform.position, GameplayManagerTopDownGolf.instance.TeeOffAimPoint);
-            if (MaxDistanceFromClub > distanceToAimPoint)
+            if (MaxDistanceFromClub > distanceToAimPoint && isAimingAtAimPoint)
             {
                 newDist = distanceToAimPoint;
             }

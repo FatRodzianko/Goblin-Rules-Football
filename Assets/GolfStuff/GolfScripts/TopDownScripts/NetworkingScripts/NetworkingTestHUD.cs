@@ -10,6 +10,7 @@ using FishNet.Transporting;
 public class NetworkingTestHUD : MonoBehaviour
 {
     [Header("UI Components")]
+    [SerializeField] private GameObject _canvas;
     [SerializeField] private Button _startServerButton;
     [SerializeField] private TextMeshProUGUI _startServerButtonText;
     [SerializeField] private TMP_InputField _serverAddressInputField;
@@ -25,6 +26,7 @@ public class NetworkingTestHUD : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _canvas.SetActive(true);
         _networkManager = FindObjectOfType<NetworkManager>();
         if (_networkManager == null)
         {
