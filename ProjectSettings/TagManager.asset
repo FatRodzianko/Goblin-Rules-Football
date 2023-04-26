@@ -50,6 +50,7 @@ TagManager:
   - ZoomedOutPosition
   - tornado
   - NetworkingTestHud
+  - StatueRingRadius
   layers:
   - Default
   - TransparentFX
