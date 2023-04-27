@@ -152,7 +152,7 @@ LineRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Positions:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
@@ -249,7 +249,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 991ba008c45e4514991ef7440709c110, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   _myStatue: {fileID: 2370977877022451250}
+  _bounceModifier: 1
   _softBounceSoundType: 
   _hardBounceSoundType: 
 --- !u!1 &2370977878139627932
