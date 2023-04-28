@@ -5237,6 +5237,9 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 16777216
+  _defaultLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
   minBounceHeight: 0.16
   defaultBounceHeightModifier: 0.3
   spinBounceDistanceModifier: 0.15

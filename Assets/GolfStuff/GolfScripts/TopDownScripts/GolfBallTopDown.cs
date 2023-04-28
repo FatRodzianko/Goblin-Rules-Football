@@ -66,6 +66,7 @@ public class GolfBallTopDown : NetworkBehaviour
     public int numberOfBouncesToDo = 0;
     public string bounceContactGroundMaterial;
     [SerializeField] LayerMask groundMask;
+    [SerializeField] LayerMask _defaultLayerMask;
     public float minBounceHeight = 0.16f;
     public float defaultBounceHeightModifier = 0.3f;
     public float spinBounceDistanceModifier = 0.15f;
@@ -1706,7 +1707,38 @@ public class GolfBallTopDown : NetworkBehaviour
         MyPlayer.EnablePlayerCanvas(true);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
-
+    public void CheckIfInStatueRingRadius()
+    {
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(this.transform.position, pixelUnit, Vector2.zero, 0f, _defaultLayerMask);
+        if (hits.Length <= 0)
+            return;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].transform.tag == "StatueRingRadius")
+            {
+                Debug.Log("CheckIfInStatueRingRadius: ball landed in a statue's ring radius");
+                GetStatueFavorEffect(hits[i].transform.parent.GetComponent<Statue>());
+            }
+        }
+    }
+    void GetStatueFavorEffect(Statue statue)
+    {
+        if (statue.StatueType == "bad-weather")
+        {
+            Debug.Log("GetStatueFavorEffect: Ball landed in Bad Weather statue's radius");
+            MyPlayer.StatueEffectFromBallLanding("bad");
+        }
+        else if (statue.StatueType == "good-weather")
+        {
+            Debug.Log("GetStatueFavorEffect: Ball landed in Good Weather statue's radius");
+            MyPlayer.StatueEffectFromBallLanding("good");
+        }
+        else if (statue.StatueType == "wind")
+        {
+            Debug.Log("GetStatueFavorEffect: Ball landed in Wind statue's radius");
+            MyPlayer.StatueEffectFromBallLanding("wind");
+        }
+    }
     public void ResetBallSpriteForNewHole()
     {
         myShadow.GetComponent<SpriteRenderer>().enabled = true;

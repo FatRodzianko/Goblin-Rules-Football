@@ -24,6 +24,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SyncVar(OnChange = nameof(SyncConnectionId))] public int ConnectionId;
     [SerializeField] TextMeshPro _playerNameText;
 
+    [Header("Favor of the Gods")]
+    [SerializeField] [SyncVar] public int FavorWeather;
+    [SerializeField] [SyncVar] public int FavorWind;
+
 
     [Header("Golf Ball Stuff")]
     [SerializeField] GameObject _golfBallPrefab;
@@ -1853,7 +1857,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
             }
         }
         if (isInBounds && !(MyBall.IsInHole || MyBall.LocalIsInHole))
+        {
             MyBall.TellPlayerGroundTypeTheyLandedOn();
+            MyBall.CheckIfInStatueRingRadius();
+        }   
         else if (isInBounds && (MyBall.IsInHole || MyBall.LocalIsInHole))
         {
             Debug.Log("TellPlayerGroundTheyLandedOn: on game player: " + this.PlayerName + " ball is in hole!");
@@ -2202,5 +2209,27 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void CmdTellServerPlayerWasStruckByLightning()
     {
         GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
+    }
+    public void StatueEffectFromBallLanding(string effect)
+    {
+        if (!this.IsOwner)
+            return;
+        CmdStatueEffectFromBallLanding(effect);
+    }
+    [ServerRpc]
+    void CmdStatueEffectFromBallLanding(string effect)
+    {
+        if (effect == "good")
+        {
+            FavorWeather++;
+        }
+        else if (effect == "bad")
+        {
+            FavorWeather--;
+        }
+        else if (effect == "wind") // probably need to think of a way to make player be able to improve wind favor?
+        {
+            FavorWind--;
+        }
     }
 }
