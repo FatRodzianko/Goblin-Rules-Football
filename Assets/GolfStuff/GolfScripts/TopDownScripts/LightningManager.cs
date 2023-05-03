@@ -291,7 +291,7 @@ public class LightningManager : NetworkBehaviour
             return;
         //StartCoroutine(RandomWaitForLightningAfterHit());
         // check if the player should be struck by lightning
-        if (WillPlayerBeStruckByLightning())
+        if (WillPlayerBeStruckByLightning(player))
         {
             Debug.Log("WillPlayerBeStruckByLightning: Yes!!!");
             //DistanceFromPlayer = 0f;
@@ -353,14 +353,48 @@ public class LightningManager : NetworkBehaviour
         StartCoroutine(LightningFlash(numberOfFlashes));
         StartCoroutine(ThunderClap(distFromPlay, numberOfFlashes));
     }
-    bool WillPlayerBeStruckByLightning()
+    bool WillPlayerBeStruckByLightning(GolfPlayerTopDown player)
     {
-
+        // Can't be struck by lightning if there is no lightning storm. May need to change with the move toward individualized weather? Or "IsThereLightning" will be based on the "base" weather which will be determined by the average favor of the player group?
         if (!this.IsThereLightning)
             return false;
-        
+        // If player has perfect +10 favor, no lightning strike. If player has perfect -10 favor, always strike them
+        if (player.FavorWeather >= 10)
+        {
+            Debug.Log("WillPlayerBeStruckByLightning: Player has max favor of: " + player.FavorWeather.ToString() + " so lightning CANNOT strike them down.");
+            return false;
+        }
+        if (player.FavorWeather <= -10)
+        {
+            Debug.Log("WillPlayerBeStruckByLightning: Player has minimum favor of: " + player.FavorWeather.ToString() + " so lightning WILL ALWAYS strike them down.");
+            return true;
+        }
+
+        // If the distance from the player is (almost) exactly zero, the player gets struck unless they have a perfect 10 favor
+        if (Mathf.Abs(DistanceFromPlayer) <= 0.001f)
+        {
+            Debug.Log("WillPlayerBeStruckByLightning: Distance from player is almost exactly zero (" + DistanceFromPlayer.ToString("0.0000") + ") AND player has a favor of: " + player.FavorWeather.ToString() + " so they WILL be struck by lightning!!!");
+            return true;
+        }
+        //If the distance from the player is (almost) exactly 1.5f, the player will NOT be struck unless they have max negative favor
+        if (Mathf.Abs(DistanceFromPlayer) >= 1.499f)
+        {
+            Debug.Log("WillPlayerBeStruckByLightning: Distance from player is almost exactly 1.5f (" + DistanceFromPlayer.ToString("0.0000") + ") AND player has a favor of: " + player.FavorWeather.ToString() + " so they WILL NOT be struck by lightning!!!");
+            return false;
+        }
+
+        // Get the weather favor modifer for the player. The further negative they are, the more likely to be struck by lightning. The more positive, the less likely to be struck?
+        float favorModifier = GetFavorModifierForPlayer(player);
+        float lightningChance = UnityEngine.Random.Range(0f, 1.0f);
+        Debug.Log("WillPlayerBeStruckByLightning: DistanceFromPlayer is: " + DistanceFromPlayer.ToString() + " and their favor modifier is: " + favorModifier.ToString() + " and the lightning chance will be: " + lightningChance.ToString());
+        return lightningChance > (Mathf.Abs(DistanceFromPlayer) + favorModifier);
         // Still need to make an actual system for when lightning should or should not strike a player
-        return UnityEngine.Random.Range(0f, 1.0f) > Mathf.Abs(DistanceFromPlayer);
+        //return UnityEngine.Random.Range(0f, 1.0f) > Mathf.Abs(DistanceFromPlayer);
+    }
+    float GetFavorModifierForPlayer(GolfPlayerTopDown player)
+    {
+        float favorModifier = player.FavorWeather / 9f;
+        return favorModifier;
     }
     void StopLightningRoutineStuff()
     {
@@ -406,23 +440,24 @@ public class LightningManager : NetworkBehaviour
             StopLightningRoutineStuff();
         }
     }
-    [Server]
-    public void DetermineIfPlayerWillBeStruckByLightningThisTurn(GolfPlayerTopDown player)
-    {
-        if (WillPlayerBeStruckByLightning())
-        {
-            _wasPlayerStruck = true;
-            _playerThatWasStruckNetId = player.ObjectId;
-            _playerThatWasStruck = player;
-        }
-        else
-        {
-            _wasPlayerStruck = false;
-            _playerThatWasStruckNetId = -99;
-            _playerThatWasStruck = null;
-            return;
-        }
-    }
+    //[Server]
+    //public void DetermineIfPlayerWillBeStruckByLightningThisTurn(GolfPlayerTopDown player)
+    //{
+    //    Debug.Log("DetermineIfPlayerWillBeStruckByLightningThisTurn");
+    //    if (WillPlayerBeStruckByLightning(player))
+    //    {
+    //        _wasPlayerStruck = true;
+    //        _playerThatWasStruckNetId = player.ObjectId;
+    //        _playerThatWasStruck = player;
+    //    }
+    //    else
+    //    {
+    //        _wasPlayerStruck = false;
+    //        _playerThatWasStruckNetId = -99;
+    //        _playerThatWasStruck = null;
+    //        return;
+    //    }
+    //}
     [Server]
     public void EndStorm()
     {
