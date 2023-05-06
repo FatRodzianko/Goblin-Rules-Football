@@ -1,18 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FishNet.Connection;
+using FishNet.Object;
+using FishNet.Managing;
+using FishNet.Object.Synchronizing;
+using FishNet;
 
-public class Statue : MonoBehaviour
+public class Statue : NetworkBehaviour
 {
 
     [Header("Sprite Stuff")]
     [SerializeField] SpriteRenderer _myRenderer;
     [SerializeField] Sprite _mySprite;
+    [SerializeField] StatueAnimator _statueAnimator;
 
     [Header("Statue Info")]
     [SerializeField] public string StatueType;
     [SerializeField] public float HeightInUnityUnits;
-    [SerializeField] public float RingRadius;
+    [SerializeField] float _brokenHeight;
+    [SerializeField] float _originalHeight;
+    [SerializeField] [SyncVar(OnChange = nameof(SyncRingRadius))] public float RingRadius;
+    [SerializeField] public bool IsBroken;
 
     [Header("Collider Stuff")]
     [SerializeField] BoxCollider2D _myCollider;
@@ -29,13 +38,35 @@ public class Statue : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        RingRadius = GetStartingRadius();
-        _lineSegments = GetRingSegments(RingRadius);
-        SetLineThickness(RingRadius);
-        DrawCircle(_lineSegments, RingRadius);
-        UpdateInnerCircleSize(RingRadius);
+        //RingRadius = GetStartingRadius();
+        //_lineSegments = GetRingSegments(RingRadius);
+        //SetLineThickness(RingRadius);
+        //DrawCircle(_lineSegments, RingRadius);
+        //UpdateInnerCircleSize(RingRadius);
+        HeightInUnityUnits = _originalHeight;
+        if (!_statueAnimator)
+            _statueAnimator = this.transform.GetComponent<StatueAnimator>();
     }
-
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        RingRadius = GetStartingRadius();
+    }
+    void SyncRingRadius(float prev, float next, bool asServer)
+    {
+        if (asServer)
+        {
+            return;
+        }
+        UpdateStatueCircle(next);
+    }
+    void UpdateStatueCircle(float newRadius)
+    {
+        _lineSegments = GetRingSegments(newRadius);
+        SetLineThickness(newRadius);
+        DrawCircle(_lineSegments, newRadius);
+        UpdateInnerCircleSize(newRadius);
+    }
     // Update is called once per frame
     void Update()
     {
@@ -51,7 +82,7 @@ public class Statue : MonoBehaviour
     }
     void SetLineThickness(float radius)
     {
-        _lineWidth = radius * 0.04f;
+        _lineWidth = radius * 0.03f;
         _myLineRenderer.startWidth = _lineWidth;
         _myLineRenderer.endWidth = _lineWidth;
     }
@@ -59,11 +90,17 @@ public class Statue : MonoBehaviour
     {
         _innerCircle.transform.localScale = new Vector3(radius * 2, radius * 2, 1f);
     }
+    [ObserversRpc(BufferLast = true)]
+    public void RpcUpdatePosition(Vector3 newPos)
+    {
+        this.transform.position = newPos;
+        _innerCircle.GetComponent<SpriteRenderer>().enabled = true;
+    }
     void DrawCircle(int steps, float radius)
     {
 
         _myLineRenderer.positionCount = steps + 1;
-        Vector3 myPos = this.transform.position;
+        Vector3 myPos = this.transform.localPosition;
         for (int currentStep = 0; currentStep < steps; currentStep++)
         {
             float circumferenceProgress = (float)currentStep / steps;
@@ -75,14 +112,38 @@ public class Statue : MonoBehaviour
             float y = yScaled * radius;
 
             Vector3 currentPos = new Vector3(x, y, 0);
-            currentPos += myPos;
+            //currentPos += myPos;
 
 
             _myLineRenderer.SetPosition(currentStep, currentPos);
         }
 
         _myLineRenderer.SetPosition(_myLineRenderer.positionCount - 1, _myLineRenderer.GetPosition(0));
-
         
+    }
+    public void BreakStatueAnimation()
+    {
+        CmdBreakStatueAnimation();
+        _statueAnimator.BreakStatue();
+    }
+    [ServerRpc(RequireOwnership = false)]
+    void CmdBreakStatueAnimation()
+    {
+        RpcBreakStatueAnimation();
+    }
+    [ObserversRpc(BufferLast = true)]
+    void RpcBreakStatueAnimation()
+    {
+        _statueAnimator.BreakStatue();
+    }
+    public void DisableRingRadiusForBrokenStatue()
+    {
+        _innerCircle.SetActive(false);
+        _myLineRenderer.enabled = false;
+        SetBrokenStatueHeight();
+    }
+    void SetBrokenStatueHeight()
+    {
+        HeightInUnityUnits = _brokenHeight;
     }
 }

@@ -48,7 +48,7 @@ public class StatueCollision : MonoBehaviour
 
         // Check to see how fast the ball is going on collision. If it is going fast enough, the statue will break?
         
-        if (golfBallScript.speedMetersPerSecond < 12.5f)
+        if (golfBallScript.speedMetersPerSecond < 5f || _myStatue.IsBroken) // was 12.5f before. set to only 1 for testing breaking the statue
         {
             Debug.Log("StatueCollision.cs: Ball had a speed of: " + golfBallScript.speedMetersPerSecond + " at the time of collision. Ball will BOUNCE off the statue");
             if (golfBallScript.isRolling)
@@ -75,6 +75,7 @@ public class StatueCollision : MonoBehaviour
     }
     void BreakStatue()
     {
-        Destroy(this.gameObject);
+        //Destroy(this.gameObject);
+        this.transform.GetComponent<Statue>().BreakStatueAnimation();
     }
 }

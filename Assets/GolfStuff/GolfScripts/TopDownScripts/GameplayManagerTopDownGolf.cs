@@ -234,6 +234,30 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[CurrentHoleIndex];
         // tell all clients to load the next hole and to then update all the client side stuff
         RpcLoadNewHoleOnClient(CurrentHoleIndex);
+
+        // Spawn the statues on the server
+        StartSpawnStatues(CurrentHoleInCourse);
+
+    }
+    [Server]
+    void StartSpawnStatues(ScriptableHole hole)
+    {
+        if (hole.GoodStatuePositions.Length > 0)
+        {
+            SpawnStatues(hole.GoodStatuePositions, "good");
+        }
+        if (hole.BadStatuePositions.Length > 0)
+        {
+            SpawnStatues(hole.BadStatuePositions, "bad");
+        }
+    }
+    [Server]
+    void SpawnStatues(Vector3[] spawnPositions, string statueType)
+    {
+        for (int i = 0; i < spawnPositions.Length; i++)
+        {
+            StatueSpawner.instance.SpawnStatue(spawnPositions[i], statueType);
+        }
     }
     [ObserversRpc]
     void RpcLoadNewHoleOnClient(int index)

@@ -34,6 +34,9 @@ public class ScriptableHole : ScriptableObject
     [Header("Course Aim Points")]
     public Vector3 TeeOffAimPoint;
     //public Vector3[] 
+    [Header("Statue Positions")]
+    public Vector3[] BadStatuePositions;
+    public Vector3[] GoodStatuePositions;
 
 }
 [Serializable]

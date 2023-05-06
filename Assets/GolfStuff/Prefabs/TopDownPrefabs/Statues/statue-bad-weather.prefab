@@ -14,9 +14,12 @@ GameObject:
   - component: {fileID: 2370977877022451253}
   - component: {fileID: 6243970928968063507}
   - component: {fileID: 8491916916937820228}
+  - component: {fileID: 698239185559862178}
+  - component: {fileID: 3432858679223941275}
+  - component: {fileID: 5434865612403811146}
   m_Layer: 0
   m_Name: statue-bad-weather
-  m_TagString: Untagged
+  m_TagString: Statue
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -101,11 +104,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ea0aa4f168dd89478a37c99d9928b6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 5434865612403811146}
+  _networkObjectCache: {fileID: 5434865612403811146}
   _myRenderer: {fileID: 2370977877022451248}
   _mySprite: {fileID: 21300000, guid: 949341255e2c50f4db50e0722c521cf3, type: 3}
+  _statueAnimator: {fileID: 3432858679223941275}
   StatueType: bad-weather
   HeightInUnityUnits: 3.375
+  _brokenHeight: 0.25
+  _originalHeight: 3.375
   RingRadius: 5
+  IsBroken: 0
   _myCollider: {fileID: 6243970928968063507}
   _ringRadiusCollider: {fileID: 413128912236590859}
   _myLineRenderer: {fileID: 2370977877022451253}
@@ -209,7 +219,7 @@ LineRenderer:
     textureMode: 0
     shadowBias: 0.5
     generateLightingData: 0
-  m_UseWorldSpace: 1
+  m_UseWorldSpace: 0
   m_Loop: 0
 --- !u!61 &6243970928968063507
 BoxCollider2D:
@@ -254,6 +264,71 @@ MonoBehaviour:
   _bounceModifier: 1
   _softBounceSoundType: 
   _hardBounceSoundType: 
+--- !u!95 &698239185559862178
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2370977877022451249}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 45842d4eee3d72a468ddc304f128ad82, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &3432858679223941275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2370977877022451249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 031b46d9788948f44a2f00de80003052, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _myStatue: {fileID: 0}
+  _animator: {fileID: 698239185559862178}
+  _breakAnimation: bad-statue-break
+--- !u!114 &5434865612403811146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2370977877022451249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  _networkBehaviours:
+  - {fileID: 2370977877022451250}
+  <ParentNetworkObject>k__BackingField: {fileID: 0}
+  <ChildNetworkObjects>k__BackingField: []
+  _isNetworked: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  <PrefabId>k__BackingField: 8
+  <SpawnableCollectionId>k__BackingField: 0
+  _scenePathHash: 0
+  <SceneId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 14246519237433203975
+  _sceneNetworkObjects: []
 --- !u!1 &2370977878139627932
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,7 +356,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2370977878139627932}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
   m_LocalScale: {x: 10, y: 10, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
