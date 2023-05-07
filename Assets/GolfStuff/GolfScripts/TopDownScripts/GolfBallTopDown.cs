@@ -1797,6 +1797,14 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         this.ballObjectRenderer.color = newColor;
     }
+    public void BrokenStatuePenalty(string statueType)
+    {
+        if (!this.IsOwner)
+            return;
+        MyPlayer.BrokenStatuePenalty(statueType);
+        //CmdBrokenStatuePenalty(statueType);
+    }
+    
 }
 
  

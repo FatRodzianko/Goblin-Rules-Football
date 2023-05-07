@@ -43479,4 +43479,5 @@ MonoBehaviour:
   TeeOffAimPoint: {x: 185, y: -80, z: 0}
   BadStatuePositions:
   - {x: 190, y: -80, z: 0}
-  GoodStatuePositions: []
+  GoodStatuePositions:
+  - {x: 175, y: -70, z: 0}

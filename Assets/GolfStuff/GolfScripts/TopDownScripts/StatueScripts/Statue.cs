@@ -24,7 +24,7 @@ public class Statue : NetworkBehaviour
     [SerializeField] public bool IsBroken;
 
     [Header("Collider Stuff")]
-    [SerializeField] BoxCollider2D _myCollider;
+    [SerializeField] Collider2D _myCollider;
     [SerializeField] CircleCollider2D _ringRadiusCollider;
 
     [Header("Ring Components")]

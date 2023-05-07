@@ -49,7 +49,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 868425389592874398}
   _networkObjectCache: {fileID: 868425389592874398}
   _badStatue: {fileID: 2370977877022451249, guid: 954e062882dd042439c783690da1cf25, type: 3}
-  _goodStatue: {fileID: 2370977877022451249, guid: 7baf599180d95664faa87b8544716f60, type: 3}
+  _goodStatue: {fileID: 2370977877022451249, guid: 148eb07b1564cfc42bd1539f0bf9d426, type: 3}
 --- !u!114 &868425389592874398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,8 +80,8 @@ MonoBehaviour:
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 4636637906056599267
   _sceneNetworkObjects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 868425389592874398}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   - {fileID: 0}

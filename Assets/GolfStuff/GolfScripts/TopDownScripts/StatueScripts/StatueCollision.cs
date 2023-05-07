@@ -72,6 +72,7 @@ public class StatueCollision : MonoBehaviour
         }
         Debug.Log("StatueCollision.cs: Ball had a speed of: " + golfBallScript.speedMetersPerSecond + " at the time of collision. Ball will BREAK the statue");
         BreakStatue();
+        golfBallScript.BrokenStatuePenalty(_myStatue.StatueType);
     }
     void BreakStatue()
     {

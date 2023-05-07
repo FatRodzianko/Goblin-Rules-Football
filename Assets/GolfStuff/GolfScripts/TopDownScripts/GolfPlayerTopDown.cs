@@ -2219,17 +2219,51 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ServerRpc]
     void CmdStatueEffectFromBallLanding(string effect)
     {
+        int newWeatherFavor = FavorWeather;
+        int newWindFavor = FavorWind;
+
         if (effect == "good")
         {
-            FavorWeather++;
+            newWeatherFavor++;
         }
         else if (effect == "bad")
         {
-            FavorWeather--;
+            newWeatherFavor--;
         }
         else if (effect == "wind") // probably need to think of a way to make player be able to improve wind favor?
         {
-            FavorWind--;
+            newWindFavor--;
         }
+
+        if (newWeatherFavor != FavorWeather)
+            FavorWeather = CapWeatherFavor(newWeatherFavor);
+        if (newWindFavor != FavorWind)
+            FavorWind = CapWeatherFavor(newWindFavor);
+
+    }
+    public void BrokenStatuePenalty(string statueType)
+    {
+        CmdBrokenStatuePenalty(statueType);
+    }
+    [ServerRpc]
+    void CmdBrokenStatuePenalty(string statueType)
+    {
+        int newFavor = FavorWeather;
+        if (statueType == "good-weather")
+            newFavor += 5;
+        else if (statueType == "bad-weather")
+            newFavor -= 5;
+
+        FavorWeather = CapWeatherFavor(newFavor);
+    }
+    [Server]
+    int CapWeatherFavor(int newFavor)
+    {
+        if (newFavor > 10)
+            newFavor = 10;
+        if (newFavor < -10)
+            newFavor = -10;
+
+        return newFavor;
     }
 }

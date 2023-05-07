@@ -299,6 +299,7 @@ MonoBehaviour:
   _myStatue: {fileID: 0}
   _animator: {fileID: 698239185559862178}
   _breakAnimation: bad-statue-break
+  _idleAnimation: bad-statue-idle
 --- !u!114 &5434865612403811146
 MonoBehaviour:
   m_ObjectHideFlags: 0
