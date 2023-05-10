@@ -7,6 +7,7 @@ public class StatueCollision : MonoBehaviour
     [SerializeField] public ScriptableObstacle myScriptableObject;
     [SerializeField] Statue _myStatue;
     [SerializeField] float _bounceModifier = 1f;
+
     [Header("Bounce Sounds")]
     [SerializeField] string _softBounceSoundType;
     [SerializeField] string _hardBounceSoundType;

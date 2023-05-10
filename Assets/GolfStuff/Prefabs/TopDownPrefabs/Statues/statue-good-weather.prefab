@@ -13,11 +13,11 @@ GameObject:
   - component: {fileID: 2370977877022451250}
   - component: {fileID: 496341148850869613}
   - component: {fileID: 2370977877022451253}
-  - component: {fileID: 8491916916937820228}
   - component: {fileID: 698239185559862178}
   - component: {fileID: 3432858679223941275}
   - component: {fileID: 5434865612403811146}
-  m_Layer: 0
+  - component: {fileID: -4008634397265702048}
+  m_Layer: 27
   m_Name: statue-good-weather
   m_TagString: Statue
   m_Icon: {fileID: 0}
@@ -118,6 +118,7 @@ MonoBehaviour:
   IsBroken: 0
   _myCollider: {fileID: 496341148850869613}
   _ringRadiusCollider: {fileID: 413128912236590859}
+  _myEnvironmentObstacleTopDownScript: {fileID: -4008634397265702048}
   _myLineRenderer: {fileID: 2370977877022451253}
   _lineWidth: 0
   _lineSegments: 0
@@ -254,23 +255,6 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 0
   m_Loop: 0
---- !u!114 &8491916916937820228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2370977877022451249}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 991ba008c45e4514991ef7440709c110, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  myScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  _myStatue: {fileID: 2370977877022451250}
-  _bounceModifier: 1
-  _softBounceSoundType: 
-  _hardBounceSoundType: 
 --- !u!95 &698239185559862178
 Animator:
   serializedVersion: 4
@@ -331,12 +315,41 @@ MonoBehaviour:
   _initializeOrder: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 8
+  <PrefabId>k__BackingField: 5
   <SpawnableCollectionId>k__BackingField: 0
   _scenePathHash: 0
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 11581338514232946917
   _sceneNetworkObjects: []
+--- !u!114 &-4008634397265702048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2370977877022451249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d5b10ad901f7fb4d992bb6c969ea6e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  HeightInUnityUnits: 0
+  _isHoleFlag: 0
+  SoftBounce: 0
+  _minHeightForSoftBounce: 0
+  _myCollider: {fileID: 496341148850869613}
+  _bounceModifier: 1
+  _gradualBounceModifier: 0
+  _immediateBounceModifier: 0
+  _minHeightForImmediateBounceModifier: 0
+  _minBounceModifier: 1
+  _maxBounceModifier: 1
+  _ballSounds: {fileID: 0}
+  _softBounceSoundType: 
+  _hardBounceSoundType: 
+  _isStatue: 1
+  _myStatue: {fileID: 2370977877022451250}
 --- !u!1 &2370977878139627932
 GameObject:
   m_ObjectHideFlags: 0

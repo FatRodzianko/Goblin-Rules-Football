@@ -25,11 +25,17 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     [SerializeField] string _softBounceSoundType;
     [SerializeField] string _hardBounceSoundType;
 
+    [Header("Statue Stuff")]
+    [SerializeField] bool _isStatue = false;
+    [SerializeField] Statue _myStatue;
+
     // Start is called before the first frame update
     void Start()
     {
         _softBounceSoundType = myScriptableObject.SoftBounceSoundType;
         _hardBounceSoundType = myScriptableObject.HardBounceSoundType;
+        if (_isStatue && !_myStatue)
+            _myStatue = this.GetComponent<Statue>();
     }
 
     // Update is called once per frame
@@ -49,10 +55,20 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
 
             if (_isHoleFlag && golfBallScript.isRolling)
                 return;
+
             if (golfBallScript.IsInHole)
                 return;
+
             if (golfBallScript.LocalIsInHole)
                 return;
+
+            if (_isStatue)
+            {
+                StatueCollisionCheck(golfBallScript);
+                Debug.Log("EnvironmentObstacleTopDown: Done with statue checks");
+                return;
+            }
+                
 
             float ballZ = golfBallScript.transform.position.z;
             float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
@@ -170,5 +186,53 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         }
 
         return newModifier;
+    }
+    void StatueCollisionCheck(GolfBallTopDown golfBallScript)
+    {
+        Debug.Log("StatueCollisionCheck: Is statue broken: " + _myStatue.IsBroken);
+        // Get the height of the ball:
+        float ballZ = golfBallScript.transform.position.z;
+        float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
+
+        // Check to see if the ball will hit the statue or not:
+        if (!golfBallScript.DoesBallHitObject(_myStatue.HeightInUnityUnits, ballHeightInUnityUnits))
+        {
+            Debug.Log("StatueCollisionCheck: Ball DOES NOT hit statue. Ball height: " + ballHeightInUnityUnits.ToString() + " and statue height: " + _myStatue.HeightInUnityUnits.ToString());
+            return;
+        }
+        Debug.Log("StatueCollisionCheck: Ball DOES hit statue. Ball height: " + ballHeightInUnityUnits.ToString() + " and statue height: " + _myStatue.HeightInUnityUnits.ToString());
+
+        // Check to see how fast the ball is going on collision. If it is going fast enough, the statue will break?
+
+        if (golfBallScript.speedMetersPerSecond < 5f || _myStatue.IsBroken) // was 12.5f before. set to only 1 for testing breaking the statue
+        {
+            Debug.Log("StatueCollisionCheck: Ball had a speed of: " + golfBallScript.speedMetersPerSecond + " at the time of collision. Ball will BOUNCE off the statue. Is statue broken?: " + _myStatue.IsBroken);
+            if (golfBallScript.isRolling)
+            {
+                Vector3 centerOfCollider = this.GetComponent<Collider2D>().bounds.center;
+                Vector3 ballPos = golfBallScript.transform.position;
+                Vector2 closestPoint = this.GetComponent<Collider2D>().ClosestPoint(ballPos);
+                Vector3 collisionDir = (centerOfCollider - ballPos).normalized;
+                Vector3 collisionPoint = ballPos + (collisionDir * golfBallScript.MyColliderRadius) - (Vector3)(golfBallScript.movementDirection.normalized * golfBallScript.speedMetersPerSecond * Time.deltaTime);
+                Debug.Log("StatueCollisionCheck: ball is rolling. Ball position: " + ballPos.ToString("0.00000") + " centerOfCollider: " + centerOfCollider.ToString() + " and the collision point: " + collisionPoint.ToString() + " closest point from collider: " + closestPoint.ToString("0.00000")); ;
+                //golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, collisionPoint, centerOfCollider, this.GetComponent<Collider2D>().bounds.extents);
+                //golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, centerOfCollider, this.GetComponent<Collider2D>().bounds.extents);
+                golfBallScript.HitEnvironmentObstacle(_myStatue.HeightInUnityUnits, ballHeightInUnityUnits, false, closestPoint, ballPos, false, _bounceModifier, _hardBounceSoundType);
+            }
+            else
+            {
+                golfBallScript.HitEnvironmentObstacle(_myStatue.HeightInUnityUnits, ballHeightInUnityUnits, false, Vector2.zero, Vector2.zero, false, _bounceModifier, _hardBounceSoundType);
+            }
+            // Don't continue execution after the ball bounces?
+            return;
+        }
+        Debug.Log("StatueCollisionCheck: Ball had a speed of: " + golfBallScript.speedMetersPerSecond + " at the time of collision. Ball will BREAK the statue");
+        BreakStatue();
+        golfBallScript.BrokenStatuePenalty(_myStatue.StatueType);
+    }
+    void BreakStatue()
+    {
+        //Destroy(this.gameObject);
+        this.transform.GetComponent<Statue>().BreakStatueAnimation();
     }
 }

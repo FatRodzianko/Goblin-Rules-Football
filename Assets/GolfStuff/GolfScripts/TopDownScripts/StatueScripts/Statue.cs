@@ -26,6 +26,7 @@ public class Statue : NetworkBehaviour
     [Header("Collider Stuff")]
     [SerializeField] Collider2D _myCollider;
     [SerializeField] CircleCollider2D _ringRadiusCollider;
+    [SerializeField] EnvironmentObstacleTopDown _myEnvironmentObstacleTopDownScript;
 
     [Header("Ring Components")]
     [SerializeField] LineRenderer _myLineRenderer;
@@ -44,6 +45,7 @@ public class Statue : NetworkBehaviour
         //DrawCircle(_lineSegments, RingRadius);
         //UpdateInnerCircleSize(RingRadius);
         HeightInUnityUnits = _originalHeight;
+        _myEnvironmentObstacleTopDownScript.HeightInUnityUnits = HeightInUnityUnits;
         if (!_statueAnimator)
             _statueAnimator = this.transform.GetComponent<StatueAnimator>();
     }
@@ -145,5 +147,6 @@ public class Statue : NetworkBehaviour
     void SetBrokenStatueHeight()
     {
         HeightInUnityUnits = _brokenHeight;
+        _myEnvironmentObstacleTopDownScript.HeightInUnityUnits = HeightInUnityUnits;
     }
 }
