@@ -103,6 +103,9 @@ public class TileMapManager : MonoBehaviour
         GameObject aimPoint = GameObject.FindGameObjectWithTag("GolfAimPoint");
         newHole.TeeOffAimPoint = aimPoint.transform.position;
 
+        // Save the statues for the hole
+        newHole.Statues = SaveAllStatues(GameObject.FindGameObjectsWithTag("Statue")).ToList();
+
         // Save the scriptable object to a file
 #if UNITY_EDITOR
         ScriptableObjectUtility.SaveHoleToFile(newHole);
@@ -140,6 +143,28 @@ public class TileMapManager : MonoBehaviour
                         ObstacleScriptableObject = obstaclesToSave[i].GetComponent<EnvironmentObstacleTopDown>().myScriptableObject
                     };
                 }
+            }
+        }
+        // Local Function to iterate through all statue objects and save their position and statue type
+        IEnumerable<SavedStatue> SaveAllStatues(GameObject[] statuesToSave)
+        {
+            if (statuesToSave.Length <= 0)
+            {
+                Debug.Log("SaveAllStatues: No statues to save. yield break?");
+                yield break;
+            }
+
+            for (int i = 0; i < statuesToSave.Length; i++)
+            {
+                if (statuesToSave[i].GetComponent<Statue>() == null)
+                    continue;
+
+                yield return new SavedStatue()
+                {
+                    StatuePosition = statuesToSave[i].transform.position,
+                    StatueType = statuesToSave[i].GetComponent<Statue>().StatueType,
+                    StatueScriptableObstacle = statuesToSave[i].GetComponent<EnvironmentObstacleTopDown>().myScriptableObject
+                };
             }
         }
     }
@@ -226,6 +251,18 @@ public class TileMapManager : MonoBehaviour
         {
             Debug.Log("ClearMap: Could not find/delete objects. Error: " + e);
         }
+        // Delete Statue objects, but only from the editor. In game, the server will destroy the statue objects as they are all networked objects, and need to be networked objects to sync the animations and do other networkbehavior stuff
+#if UNITY_EDITOR
+        try
+        {
+            GameObject[] statues = GameObject.FindGameObjectsWithTag("Statue");
+            DeleteObjects(statues);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("ClearMap: Could not find/delete objects. Error: " + e);
+        }
+#endif
 
     }
     public void LoadMapFromEditor()
@@ -245,7 +282,21 @@ public class TileMapManager : MonoBehaviour
         SetPositionOfMapMarker(hole.TeeOffAimPoint, "GolfAimPoint", _golfAimPoint);
         // Set the camera zoom value in the editor to the saved value from the hole
         this._cameraZoomValue = hole.CameraZoomValue;
+
+        // If there are statues on the map, spawn them. Only use this script to spawn statues in the editor. During gameplay, the server spawns statues because they are networked objects
+        if (hole.Statues.Count > 0)
+        {
+            SpawnStatuesForEditor(hole.Statues);
+        }
+
         this.LoadMap(hole);
+    }
+    void SpawnStatuesForEditor(List<SavedStatue> statuesToSpawn)
+    {
+        foreach (SavedStatue statue in statuesToSpawn)
+        {
+            Instantiate(statue.StatueScriptableObstacle.ObstaclePrefab, statue.StatuePosition, Quaternion.identity);
+        }
     }
     public void LoadMap(ScriptableHole hole)
     {

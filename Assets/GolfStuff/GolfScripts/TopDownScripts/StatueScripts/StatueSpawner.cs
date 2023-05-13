@@ -6,6 +6,7 @@ using FishNet.Object;
 using FishNet.Managing;
 using FishNet.Object.Synchronizing;
 using FishNet;
+using System;
 
 public class StatueSpawner : NetworkBehaviour
 {
@@ -45,6 +46,32 @@ public class StatueSpawner : NetworkBehaviour
         InstanceFinder.ServerManager.Spawn(newStatue);
         //newStatue.transform.position = spawnPos;
         newStatue.GetComponent<Statue>().RpcUpdatePosition(spawnPos);
+    }
+    [Server]
+    public void SpawnStatuesOnServer(List<SavedStatue> savedStatues)
+    {
+        Debug.Log("SpawnStatuesOnServer:");
+        if (savedStatues.Count <= 0)
+            return;
+        List<GameObject> spawnedStatues = new List<GameObject>();
+        foreach (SavedStatue savedStatue in savedStatues)
+        {
+            Debug.Log("SpawnStatuesOnServer: " + savedStatue.StatueType + " statue to spawn at position: " + savedStatue.StatuePosition);
+            try
+            {
+                GameObject newStatue = Instantiate(savedStatue.StatueScriptableObstacle.ObstaclePrefab);
+                spawnedStatues.Add(newStatue);
+                InstanceFinder.ServerManager.Spawn(newStatue);
+                newStatue.GetComponent<Statue>().RpcUpdatePosition(savedStatue.StatuePosition);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("SpawnStatuesOnServer: error spawning statue ont he server. Error: " + e);
+            }
+            
+        }
+        GameplayManagerTopDownGolf.instance.SaveStatues(spawnedStatues);
+
     }
     GameObject GetStatuePrefab(string statueType)
     {

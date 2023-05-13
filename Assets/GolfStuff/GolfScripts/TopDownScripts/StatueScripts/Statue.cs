@@ -96,7 +96,7 @@ public class Statue : NetworkBehaviour
     public void RpcUpdatePosition(Vector3 newPos)
     {
         this.transform.position = newPos;
-        _innerCircle.GetComponent<SpriteRenderer>().enabled = true;
+        _innerCircle.SetActive(true);
     }
     void DrawCircle(int steps, float radius)
     {

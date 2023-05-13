@@ -35,8 +35,9 @@ public class ScriptableHole : ScriptableObject
     public Vector3 TeeOffAimPoint;
     //public Vector3[] 
     [Header("Statue Positions")]
-    public Vector3[] BadStatuePositions;
-    public Vector3[] GoodStatuePositions;
+    //public Vector3[] BadStatuePositions;
+    //public Vector3[] GoodStatuePositions;
+    public List<SavedStatue> Statues;
 
 }
 [Serializable]
@@ -50,4 +51,11 @@ public class SavedObstacle
 {
     public Vector3 ObstaclePos;
     public ScriptableObstacle ObstacleScriptableObject;
+}
+[Serializable]
+public class SavedStatue
+{
+    public Vector3 StatuePosition;
+    public string StatueType;
+    public ScriptableObstacle StatueScriptableObstacle;
 }

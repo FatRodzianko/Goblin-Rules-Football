@@ -326,7 +326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5b10ad901f7fb4d992bb6c969ea6e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  myScriptableObject: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
   HeightInUnityUnits: 0
   _isHoleFlag: 0
   SoftBounce: 0

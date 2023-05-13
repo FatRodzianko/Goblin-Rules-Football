@@ -81,6 +81,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SyncVar] public float TimeSinceLastTurnStart = 0f;
     [SerializeField] bool _tellingPlayersStormWillPass = false;
 
+    [Header("Statue Stuff")]
+    [SerializeField] List<GameObject> StatesOnServer = new List<GameObject>();
+
     private void Awake()
     {
         
@@ -236,20 +239,21 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         RpcLoadNewHoleOnClient(CurrentHoleIndex);
 
         // Spawn the statues on the server
-        StartSpawnStatues(CurrentHoleInCourse);
+        //StartSpawnStatues(CurrentHoleInCourse);
+        //StatueSpawner.instance.SpawnStatuesOnServer(CurrentHoleInCourse.Statues);
 
     }
     [Server]
     void StartSpawnStatues(ScriptableHole hole)
     {
-        if (hole.GoodStatuePositions.Length > 0)
-        {
-            SpawnStatues(hole.GoodStatuePositions, "good");
-        }
-        if (hole.BadStatuePositions.Length > 0)
-        {
-            SpawnStatues(hole.BadStatuePositions, "bad");
-        }
+        //if (hole.GoodStatuePositions.Length > 0)
+        //{
+        //    SpawnStatues(hole.GoodStatuePositions, "good");
+        //}
+        //if (hole.BadStatuePositions.Length > 0)
+        //{
+        //    SpawnStatues(hole.BadStatuePositions, "bad");
+        //}
     }
     [Server]
     void SpawnStatues(Vector3[] spawnPositions, string statueType)
@@ -279,7 +283,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos,CurrentHoleInCourse.CameraZoomValue);
         //// update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
-
+        if (IsServer)
+        {
+            StatueSpawner.instance.SpawnStatuesOnServer(CurrentHoleInCourse.Statues);
+        }
     }
     public void UpdateTeeOffPositionForNewHole(Vector3 newPosition)
     {
@@ -661,6 +668,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         }
         // Reset the number of players that have teed off
         ResetNumberOfPlayersWhoHaveTeedOff();
+
+        // Remove all statues on the server
+        RemoveStatuesForNewHole();
+
         // Load a new hole
         //LoadNewHole(CurrentHoleIndex);
         LoadNewHoleServer(CurrentHoleIndex);
@@ -1088,5 +1099,23 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         CurrentPlayer.RpcEnablePlayerCanvasForNewTurn(false);
 
         SkipsInARow = 0;
+    }
+    public void SaveStatues(List<GameObject> statuesSpawned)
+    {
+        StatesOnServer.Clear();
+        if (statuesSpawned.Count <= 0)
+            return;
+        StatesOnServer.AddRange(statuesSpawned);
+    }
+    void RemoveStatuesForNewHole()
+    {
+        if (StatesOnServer.Count <= 0)
+            return;
+
+        foreach (GameObject statue in StatesOnServer)
+        {
+            GameObject objectToDestroy = statue;
+            InstanceFinder.ServerManager.Despawn(objectToDestroy);
+        }
     }
 }
