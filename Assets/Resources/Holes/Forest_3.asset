@@ -58531,3 +58531,19 @@ MonoBehaviour:
   ZoomedOutPos: {x: 200, y: -30, z: 0}
   CameraZoomValue: 11.5
   TeeOffAimPoint: {x: 44.5, y: -38.5, z: 0}
+  Statues:
+  - StatuePosition: {x: 188.5, y: -128.5, z: 0}
+    StatueType: bad-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
+  - StatuePosition: {x: 264.5, y: 56.5, z: 0}
+    StatueType: bad-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
+  - StatuePosition: {x: 11.5, y: -75.5, z: 0}
+    StatueType: good-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
+  - StatuePosition: {x: 116.5, y: 42.5, z: 0}
+    StatueType: good-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
+  - StatuePosition: {x: 387.5, y: 80.5, z: 0}
+    StatueType: bad-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
