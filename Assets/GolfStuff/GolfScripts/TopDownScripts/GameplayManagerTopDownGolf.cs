@@ -726,7 +726,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         WindManager.instance.UpdateWindForNewTurn();
         WindManager.instance.UpdateWindDirectionForNewTurn();
         // Set new weather for the next turn
-        RainManager.instance.UpdateWeatherForNewTurn();
+        RainManager.instance.UpdateWeatherForNewTurn(this.CurrentPlayer);
 
         // skipping for now while testing other things for multiplayer
         WindManager.instance.CheckIfTornadoWillSpawn(newHole);

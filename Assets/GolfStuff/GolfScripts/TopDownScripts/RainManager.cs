@@ -13,7 +13,7 @@ public class RainManager : NetworkBehaviour
 
     [Header("Rain state")]
     public bool IsRaining = false;
-    [SyncVar] public string RainState; // "clear" "light rain" "med Rain" "heavy Rain"
+    [SyncVar] public string RainState; // player's rain state. Based on the BaseRainState value and the player's weather favor
     public List<string> RainStates = new List<string> { "clear", "light rain", "med rain", "heavy rain" };
     [SerializeField] private string _rainState;
     [SyncVar] public string BaseRainState; // rain state that player's favor modifies. ex: base state is light rain, but player has +3 good weather favor, so there's a chance they have clear weather for their turn. Next player has -5 favor, so they get med rain for their turn
@@ -74,6 +74,7 @@ public class RainManager : NetworkBehaviour
     {
         base.OnStartServer();
         SetRainState(RainState);
+        BaseRainState = "clear";
     }
     public override void OnStartClient()
     {
@@ -238,8 +239,12 @@ public class RainManager : NetworkBehaviour
 
         Debug.Log("SetInitialWeatherForHole: Setting the rain state to: " + RainState + " from weather chance of: " + weatherChance.ToString());
     }
-    public void UpdateWeatherForNewTurn()
+    [Server]
+    public void UpdateWeatherForNewTurn(GolfPlayerTopDown currentPlayer)
     {
+        // Get the BaseRainState for the game before calculating what the rain state is for the player
+        SetBaseRainState();
+
         // For these update functions for wind/rain, will probably have a game setting for players that's something like "Can Wind/Rain Change? Yes/No" to either allow this or not
         if (_rainState == "clear")
         {
@@ -298,6 +303,163 @@ public class RainManager : NetworkBehaviour
             }
         }
 
+    }
+    [Server]
+    void SetBaseRainState()
+    {
+        Debug.Log("SetBaseRainState");
+        string baseState = BaseRainState;
+
+        // Calculate the average weather favor of all players
+        float averagePlayerFavor = GetAveragePlayerFavor();
+        float weatherChangeChanceFloor = 0f;
+        float weatherChangeChanceTotal = 0f;
+
+        float changeChance = UnityEngine.Random.Range(0f, 1f);
+
+        if (averagePlayerFavor > 0)
+        {
+            Debug.Log("SetBaseRainState: Average player favor is positive. BaseRainState MAY get BETTER.");
+            if (averagePlayerFavor >= 10)
+            {
+                Debug.Log("SetBaseRainState: Average player favor is PERFECT. Rain state will be set to clear no matter what!");
+                BaseRainState = "clear";
+                return;
+            }
+
+            // Based on the current BaseRainState, set the weather chance floor that will be used to see if the weather changes?
+            if (BaseRainState == "heavy rain")
+                weatherChangeChanceFloor = 0.5f;
+            else if (BaseRainState == "med rain")
+                weatherChangeChanceFloor = 0.7f;
+            else if (BaseRainState == "light rain")
+                weatherChangeChanceFloor = 0.85f;
+
+            weatherChangeChanceTotal = weatherChangeChanceFloor - (averagePlayerFavor / 10);
+            Debug.Log("SetBaseRainState: change chance is: " + changeChance.ToString() + " weatherChangeChanceTotal is: " + weatherChangeChanceTotal.ToString());
+            if (changeChance <= 0.01f || changeChance >= 0.99f)
+            {
+                Debug.Log("SetBaseRainState: The change chaces was either almost exactly zero or almost exactly 1. Making it WORSE because players have positive favor. Owned!");
+                MakeRainWorse();
+            }            
+            else if (changeChance > weatherChangeChanceTotal)
+            {
+                MakeRainBetter();
+            }
+
+        }
+        else if (averagePlayerFavor < 0)
+        {
+            Debug.Log("SetBaseRainState: Average player favor is negative. BaseRainState MAY get WORSE.");
+            if (averagePlayerFavor <= -10)
+            {
+                Debug.Log("SetBaseRainState: Average player favor is THE WORST IT CAN GET. Rain state will be set to HEAVY RAIN no matter what!");
+                BaseRainState = "heavy rain";
+                return;
+            }
+
+            // Based on the current BaseRainState, set the weather chance floor that will be used to see if the weather changes?
+            if (BaseRainState == "clear")
+                weatherChangeChanceFloor = 0.85f;
+            else if (BaseRainState == "light rain")
+                weatherChangeChanceFloor = 0.8f;
+            else if (BaseRainState == "med rain")
+                weatherChangeChanceFloor = 0.85f;
+
+            weatherChangeChanceTotal = weatherChangeChanceFloor - (Mathf.Abs(averagePlayerFavor) / 10);
+            Debug.Log("SetBaseRainState: change chance is: " + changeChance.ToString() + " weatherChangeChanceTotal is: " + weatherChangeChanceTotal.ToString());
+            if (changeChance <= 0.01f || changeChance >= 0.99f)
+            {
+                Debug.Log("SetBaseRainState: The change chaces was either almost exactly zero or almost exactly 1. Making it BETTER because players have negative favor. Lucky!!");
+                MakeRainBetter();
+            }            
+            else if (changeChance > weatherChangeChanceTotal)
+            {
+                MakeRainWorse();
+            }
+
+        }
+        else
+        {
+            Debug.Log("SetBaseRainState: Average player favor is 0. BaseRainState SHOULD stay the same (random chance to get better or worsE?)");
+            if (changeChance >= 0.95f)
+            {
+                Debug.Log("SetBaseRainState: change chance was " + changeChance.ToString() + " unfortunately weather will get worse!");
+                MakeRainWorse();
+            }
+            else if (changeChance <= 0.05f)
+            {
+                Debug.Log("SetBaseRainState: change chance was " + changeChance.ToString() + " fortuantely weather will get better!!");
+                MakeRainBetter();
+            }
+        }
+
+    }
+    [Server]
+    void SetPlayerRainState()
+    { 
+
+    }
+    float GetAveragePlayerFavor()
+    {
+        float averageFavor = 0f;
+
+        if (GameplayManagerTopDownGolf.instance.GolfPlayersServer.Count <= 0)
+            return averageFavor;
+
+        float totalFavor = 0f;
+        foreach (GolfPlayerTopDown player in GameplayManagerTopDownGolf.instance.GolfPlayersServer)
+        {
+            totalFavor += player.FavorWeather;
+        }
+        averageFavor = totalFavor / GameplayManagerTopDownGolf.instance.GolfPlayersServer.Count;
+        Debug.Log("GetAveragePlayerFavor: Average player favor is: " + averageFavor.ToString() + " based on total favor of: " + totalFavor.ToString() + " and " + GameplayManagerTopDownGolf.instance.GolfPlayersServer.Count.ToString() + " number of players.");
+
+        return averageFavor;
+    }
+    void MakeRainBetter()
+    {
+        Debug.Log("MakeRainBetter");
+        string baseState = BaseRainState;
+        if (baseState == "clear") // can't get better if its already clear
+            return;
+        else if (baseState == "light rain")
+        {
+            BaseRainState = "clear";
+            return; // returning after changing the BaseRainState in case the Update function is somehow called part way through and changes baseState to what BaseRainState was updated to during the middle of this, cascading downward or something
+        }
+        else if (baseState == "med rain")
+        {
+            BaseRainState = "light rain";
+            return;
+        }
+        else if (baseState == "heavy rain")
+        {
+            BaseRainState = "med rain";
+            return;
+        }
+    }
+    void MakeRainWorse()
+    {
+        Debug.Log("MakeRainWorse");
+        string baseState = BaseRainState;
+        if (baseState == "heavy rain") // can't get worse if its heavy rain
+            return;
+        else if (baseState == "light rain")
+        {
+            BaseRainState = "med rain";
+            return; // returning after changing the BaseRainState in case the Update function is somehow called part way through and changes baseState to what BaseRainState was updated to during the middle of this, cascading downward or something
+        }
+        else if (baseState == "med rain")
+        {
+            BaseRainState = "heavy rain";
+            return;
+        }
+        else if (baseState == "clear")
+        {
+            BaseRainState = "light rain";
+            return;
+        }
     }
     void PlaySoundBasedOnRainState(string state)
     {
