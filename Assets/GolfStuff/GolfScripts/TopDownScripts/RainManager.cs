@@ -442,7 +442,11 @@ public class RainManager : NetworkBehaviour
                 RainState = "light rain";
                 Debug.Log("SetPlayerRainState: Player RainState will be: " + RainState + " because player has negative favor and base state is clear");
             }
-            if (playerFavor < (rainStateModifier - 2))
+            if (playerFavor < (rainStateModifier - 5))
+            {
+                MakePlayerRainStateWorseTwice();
+            }
+            else if (playerFavor < (rainStateModifier - 2))
             {
                 MakePlayerRainStateWorse();
             }
@@ -574,6 +578,22 @@ public class RainManager : NetworkBehaviour
         else if (baseState == "clear")
         {
             RainState = "light rain";
+            return;
+        }
+    }
+    void MakePlayerRainStateWorseTwice()
+    {
+        string baseState = BaseRainState;
+        if (baseState == "heavy rain") // can't get worse if its heavy rain
+            return;
+        else if (baseState == "light rain" || baseState == "med rain")
+        {
+            RainState = "heavy rain";
+            return; // returning after changing the BaseRainState in case the Update function is somehow called part way through and changes baseState to what BaseRainState was updated to during the middle of this, cascading downward or something
+        }
+        else if (baseState == "clear")
+        {
+            RainState = "med rain";
             return;
         }
     }

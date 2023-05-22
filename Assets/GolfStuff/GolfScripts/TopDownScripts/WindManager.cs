@@ -14,8 +14,9 @@ public class WindManager : NetworkBehaviour
 
     [SyncVar] public Vector2 WindDirection = Vector2.zero;
     private Vector2 _windDirection = Vector2.zero;
-    [SerializeField] [SyncVar] public int WindPower = 0;
+    [SerializeField] [SyncVar] public int WindPower = 0; // WindPower for the player's turn that uses player FavorWeather to set its value relative to BaseWindPower. Negative favor = higher wind power. Positive favor = lower wind power
     [SerializeField] private int _windPower = 0;
+    [SerializeField] [SyncVar] public int BaseWindPower = 0; // this is the base wind power that server tracks
 
 
     // followed event instructions from here https://answers.unity.com/questions/1206632/trigger-event-on-variable-change.html
