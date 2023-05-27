@@ -286,6 +286,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (IsServer)
         {
             StatueSpawner.instance.SpawnStatuesOnServer(CurrentHoleInCourse.Statues);
+            PowerUpManagerTopDownGolf.instance.SpawnBallonsForNewHole();
         }
     }
     public void UpdateTeeOffPositionForNewHole(Vector3 newPosition)
