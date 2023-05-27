@@ -17,6 +17,7 @@ public class BalloonAnimator : MonoBehaviour
 
     [Header("Animation Stats")]
     [SerializeField] bool _isIdle = false;
+    [SerializeField] bool _isPopped = false;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +41,24 @@ public class BalloonAnimator : MonoBehaviour
     public void SetIsIdle(bool isIdle)
     {
         Debug.Log("SetIsIdle");
+        if (isIdle)
+        {
+            StartCoroutine(RandomStartAnimationDelay(isIdle));
+        }
+        else
+            _isIdle = isIdle;
+    }
+    public void PopBalloon()
+    {
+        if (_isPopped)
+            return;
+        _isIdle = false;
+        _animator.Play(_popAnimation);
+        _isPopped = true;
+    }
+    IEnumerator RandomStartAnimationDelay(bool isIdle)
+    {   
+        yield return new WaitForSeconds(UnityEngine.Random.Range(0f, 0.5f));
         _isIdle = isIdle;
     }
 }

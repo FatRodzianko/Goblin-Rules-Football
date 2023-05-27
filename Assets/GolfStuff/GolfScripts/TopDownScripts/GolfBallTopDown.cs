@@ -1391,10 +1391,10 @@ public class GolfBallTopDown : NetworkBehaviour
         float maxLaunch = 20f * (tornadoStrength / 2f);
         return UnityEngine.Random.Range(minLaunch, maxLaunch);
     }
-    public bool DoesBallHitObject(float obstalceUnityUnits, float ballUnityUnits)
+    public bool DoesBallHitObject(float obstalceUnityUnits, float ballUnityUnits, float obstacleStartHeight = 0f)
     {
         bool doesBallHitObject = false;
-        if (ballUnityUnits < obstalceUnityUnits)
+        if (ballUnityUnits < obstalceUnityUnits && ballUnityUnits > obstacleStartHeight)
         {
             doesBallHitObject = true;
         }

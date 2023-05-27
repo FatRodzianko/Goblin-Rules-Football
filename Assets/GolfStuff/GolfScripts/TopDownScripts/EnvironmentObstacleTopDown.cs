@@ -10,6 +10,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     // have a unity for "hardness" of the object? Balls bounce far from hard objects, don't bounce as much off soft objects? Pass that value to golfBallScript.HitEnvironmentObstacle to determine how far to bounce off the object???
     [SerializeField] public bool SoftBounce = false;
     [SerializeField] float _minHeightForSoftBounce = 0f; // for things like trees. Make it a hard bounce if the ball hits low (as in, the ball hit the tree trunk) and make it a soft bounce if the ball hits high (hits the tree leaves)
+    [SerializeField] public float StartHeight = 0f;
     [SerializeField] Collider2D _myCollider;
 
     [Header("Bounce Modifier Stuff")]
@@ -29,6 +30,10 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     [SerializeField] bool _isStatue = false;
     [SerializeField] Statue _myStatue;
 
+    [Header("Balloon Stuff")]
+    [SerializeField] bool _isBalloon = false;
+    [SerializeField] BalloonPowerUp _myBalloon;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +41,8 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         _hardBounceSoundType = myScriptableObject.HardBounceSoundType;
         if (_isStatue && !_myStatue)
             _myStatue = this.GetComponent<Statue>();
+        if (_isBalloon && !_myBalloon)
+            _myBalloon = this.GetComponent<BalloonPowerUp>();
     }
 
     // Update is called once per frame
@@ -66,6 +73,13 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             {
                 StatueCollisionCheck(golfBallScript);
                 Debug.Log("EnvironmentObstacleTopDown: Done with statue checks");
+                return;
+            }
+
+            if (_isBalloon)
+            {
+                BalloonCollisionCheck(golfBallScript);
+                Debug.Log("EnvironmentObstacleTopDown: Done with balloon checks");
                 return;
             }
                 
@@ -130,6 +144,8 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (_isHoleFlag)
+            return;
+        if (_isBalloon)
             return;
         if (collision.tag == "golfBall")
         {
@@ -234,5 +250,25 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     {
         //Destroy(this.gameObject);
         this.transform.GetComponent<Statue>().BreakStatueAnimation();
+    }
+    void BalloonCollisionCheck(GolfBallTopDown golfBallScript)
+    {
+        Debug.Log("BalloonCollisionCheck: is balloon already popped? " + this._myBalloon.IsPopped);
+        if (_myBalloon.IsPopped)
+            return;
+
+        float ballZ = golfBallScript.transform.position.z;
+        float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
+
+        if (ballHeightInUnityUnits >= StartHeight && ballHeightInUnityUnits <= HeightInUnityUnits)
+        {
+            this.GetComponent<BalloonPowerUp>().PopBalloon();
+        }
+
+    }
+    public void SetBalloonHeightValues(float start, float top)
+    {
+        this.HeightInUnityUnits = top;
+        this.StartHeight = start;
     }
 }
