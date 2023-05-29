@@ -18,7 +18,9 @@ public class BalloonPowerUp : NetworkBehaviour
     [SerializeField] public bool IsPopped = false;
 
     [Header("Collider Stuff")]
-    [SerializeField] Collider2D _myCollider;
+    [SerializeField] PolygonCollider2D _myCollider;
+    [SerializeField] Vector2[] _originalColliderPoints;
+    [SerializeField] Vector2[] _newColliderPoints;
 
     [Header("Height Values")]
     [SerializeField] float _lowStartHeight;
@@ -84,18 +86,20 @@ public class BalloonPowerUp : NetworkBehaviour
         Debug.Log("RpcUpdateBalloonPosition: " + newPos.ToString());
         this.transform.position = newPos;
     }
-    public void PopBalloon()
+    public void CollisionToPopBalloon()
     {
         Debug.Log("PopBalloon: is popped alreadyt? " + IsPopped);
         if (IsPopped)
             return;
         CmdPopBalloon();
-        _balloonAnimator.PopBalloon();
-        IsPopped = true;
+        //_balloonAnimator.PopBalloon();
+        //IsPopped = true;
+        PopBalloon();
     }
     [ServerRpc(RequireOwnership = false)]
     void CmdPopBalloon()
     {
+
         RpcBreakStatueAnimation();
     }
     [ObserversRpc(BufferLast = true)]
@@ -103,7 +107,26 @@ public class BalloonPowerUp : NetworkBehaviour
     {
         if (IsPopped)
             return;
+        PopBalloon();
+    }
+    void PopBalloon()
+    {
+        if (IsPopped)
+            return;
         _balloonAnimator.PopBalloon();
         IsPopped = true;
+        StartCoroutine(UpdateColliderPointsDelay());
+    }
+    IEnumerator UpdateColliderPointsDelay()
+    {
+        yield return new WaitForSeconds(1.0f);
+        UpdateColliderPointsAfterBalloonPop();
+        _environmentObstacleTopDown.RemoveIsBalloon();
+        _environmentObstacleTopDown.SetBalloonHeightValues(0f, 0.1875f);
+    }
+    void UpdateColliderPointsAfterBalloonPop()
+    {
+        Debug.Log("UpdateColliderPointsAfterBalloonPop:");
+        _myCollider.SetPath(0, _newColliderPoints);
     }
 }

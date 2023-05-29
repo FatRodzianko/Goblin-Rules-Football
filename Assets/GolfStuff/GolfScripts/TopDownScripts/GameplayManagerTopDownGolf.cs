@@ -673,6 +673,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // Remove all statues on the server
         RemoveStatuesForNewHole();
 
+        // Remove all power up balloons on the server
+        PowerUpManagerTopDownGolf.instance.DespawnBalloonsForNewHole();
+
         // Load a new hole
         //LoadNewHole(CurrentHoleIndex);
         LoadNewHoleServer(CurrentHoleIndex);

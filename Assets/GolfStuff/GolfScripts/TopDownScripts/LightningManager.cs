@@ -68,7 +68,8 @@ public class LightningManager : NetworkBehaviour
     void Start()
     {
         //StartCoroutine(StartLightning());
-        RainManager.instance.WeatherChanged += UpdateWeather;
+        //RainManager.instance.WeatherChanged += UpdateWeather;
+        RainManager.instance.BaseWeatherChanged += UpdateWeather;
         _thunderSubtitle.SetActive(false);
     }
 
@@ -121,10 +122,11 @@ public class LightningManager : NetworkBehaviour
         // If the weath has rain, start the lightning routine. If no rain, end the lightning routine
         if (isRain)
         {
-
+            Debug.Log("LightningManager: UpdateWeather: is there rain?: " + isRain.ToString());
         }
         else
         {
+            Debug.Log("LightningManager: UpdateWeather: is there rain?: " + isRain.ToString());
             StopLightningRoutineStuff();
             IsThereLightning = false;
 
@@ -358,6 +360,13 @@ public class LightningManager : NetworkBehaviour
         // Can't be struck by lightning if there is no lightning storm. May need to change with the move toward individualized weather? Or "IsThereLightning" will be based on the "base" weather which will be determined by the average favor of the player group?
         if (!this.IsThereLightning)
             return false;
+        // If the weather is clear for the player, then they won't be struck by lightning
+        Debug.Log("WillPlayerBeStruckByLightning: The base weather is: " + RainManager.instance.RainState);
+        if (RainManager.instance.RainState == "clear")
+        {
+            Debug.Log("WillPlayerBeStruckByLightning: The player's weather is: " + RainManager.instance.RainState + " and you can't be struck by lightning if it is clear out!!");
+            return false;
+        }
         // If player has perfect +10 favor, no lightning strike. If player has perfect -10 favor, always strike them
         if (player.FavorWeather >= 10)
         {

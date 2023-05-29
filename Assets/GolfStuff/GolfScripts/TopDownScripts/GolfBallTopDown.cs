@@ -1394,7 +1394,7 @@ public class GolfBallTopDown : NetworkBehaviour
     public bool DoesBallHitObject(float obstalceUnityUnits, float ballUnityUnits, float obstacleStartHeight = 0f)
     {
         bool doesBallHitObject = false;
-        if (ballUnityUnits < obstalceUnityUnits && ballUnityUnits > obstacleStartHeight)
+        if (ballUnityUnits < obstalceUnityUnits && ballUnityUnits >= obstacleStartHeight)
         {
             doesBallHitObject = true;
         }

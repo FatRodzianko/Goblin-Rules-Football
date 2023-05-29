@@ -110,12 +110,30 @@ MonoBehaviour:
   HeightOfBalloon: 
   IsPopped: 0
   _myCollider: {fileID: 1294718589790411386}
+  _originalColliderPoints:
+  - {x: 0.375, y: 0.375}
+  - {x: -0.3125, y: 0.375}
+  - {x: -0.875, y: 0.1875}
+  - {x: -0.875, y: -0.1875}
+  - {x: -0.3125, y: -0.375}
+  - {x: 0.375, y: -0.375}
+  - {x: 0.9375, y: -0.1875}
+  - {x: 0.9375, y: 0.1875}
+  _newColliderPoints:
+  - {x: 0.1875, y: 0.4375}
+  - {x: -0.0625, y: 0.4375}
+  - {x: -0.6875, y: 0.1875}
+  - {x: -0.6875, y: 0}
+  - {x: -0.0625, y: -0.375}
+  - {x: 0.1875, y: -0.375}
+  - {x: 0.8125, y: 0}
+  - {x: 0.8125, y: 0.1875}
   _lowStartHeight: 2.75
   _lowTopHeight: 4.5625
-  _medStartHeight: 4.25
-  _medTopHeight: 6.0625
-  _highStartHeight: 5.75
-  _highTopHeight: 7.5625
+  _medStartHeight: 3.75
+  _medTopHeight: 5.5625
+  _highStartHeight: 4.75
+  _highTopHeight: 6.5625
   _possibleHieghts:
   - low
   - med
@@ -204,8 +222,8 @@ PolygonCollider2D:
     m_Paths:
     - - {x: 0.375, y: 0.375}
       - {x: -0.3125, y: 0.375}
-      - {x: -0.8742786, y: 0.1875}
-      - {x: -0.87236124, y: -0.1875}
+      - {x: -0.875, y: 0.1875}
+      - {x: -0.875, y: -0.1875}
       - {x: -0.3125, y: -0.375}
       - {x: 0.375, y: -0.375}
       - {x: 0.9375, y: -0.1875}

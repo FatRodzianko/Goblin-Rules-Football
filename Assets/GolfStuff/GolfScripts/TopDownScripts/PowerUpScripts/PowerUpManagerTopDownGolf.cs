@@ -62,4 +62,18 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
             BalloonNetIds.Add(balloonScript.ObjectId);
         balloonScript.RpcUpdateBalloonPosition(pos);
     }
+    [Server]
+    public void DespawnBalloonsForNewHole()
+    {
+        Debug.Log("DespawnBalloonsForNewHole: destroying this many balloons: " + _activeBallonPowerUps.Count.ToString());
+        if (_activeBallonPowerUps.Count <= 0)
+            return;
+        foreach (BalloonPowerUp balloon in _activeBallonPowerUps)
+        {
+            GameObject objectToDestroy = balloon.gameObject;
+            InstanceFinder.ServerManager.Despawn(objectToDestroy);
+        }
+        _activeBallonPowerUps.Clear();
+        BalloonNetIds.Clear();
+    }
 }

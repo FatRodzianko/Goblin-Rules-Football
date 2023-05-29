@@ -17,6 +17,7 @@ public class RainManager : NetworkBehaviour
     public List<string> RainStates = new List<string> { "clear", "light rain", "med rain", "heavy rain" };
     [SerializeField] private string _rainState;
     [SyncVar] public string BaseRainState; // rain state that player's favor modifies. ex: base state is light rain, but player has +3 good weather favor, so there's a chance they have clear weather for their turn. Next player has -5 favor, so they get med rain for their turn
+    [SerializeField] private string _baseRainState;
 
     [Header("Rain Rates")]
     [SerializeField] int _rainGroundLow;
@@ -64,11 +65,15 @@ public class RainManager : NetworkBehaviour
     public delegate void WeatherEffectChange(string newEffect);
     public event WeatherEffectChange WeatherChanged;
 
+    public delegate void BaseWeatherEffectChange(string newEffect);
+    public event BaseWeatherEffectChange BaseWeatherChanged;
+
     private void Awake()
     {
         MakeInstance();
         
         WeatherChanged = WeatherChangedFunction;
+        BaseWeatherChanged = BaseChangedFunction;
     }
     // Start is called before the first frame update
     void Start()
@@ -80,7 +85,9 @@ public class RainManager : NetworkBehaviour
     {
         base.OnStartServer();
         SetRainState(RainState);
+        _baseRainState = "";
         BaseRainState = "clear";
+        
     }
     public override void OnStartClient()
     {
@@ -115,6 +122,11 @@ public class RainManager : NetworkBehaviour
             //Debug.Log("RainManager: rain states no longer match. RainState: " + RainState.ToString() + " _rainState: " + _rainState.ToString());
             _rainState = RainState;
             WeatherChanged(_rainState);
+        }
+        if (BaseRainState != _baseRainState && BaseWeatherChanged != null)
+        {
+            _baseRainState = BaseRainState;
+            BaseWeatherChanged(_baseRainState);
         }
     }
     public void SetRainState(string newState)
@@ -228,6 +240,10 @@ public class RainManager : NetworkBehaviour
     {
         Debug.Log("WeatherChangedFunction: the new weather effect is: " + newEffect);
         SetRainState(newEffect);
+    }
+    void BaseChangedFunction(string newEffect)
+    {
+        Debug.Log("BaseChangedFunction: the new weather effect is: " + newEffect);
     }
     public void SetInitialWeatherForHole()
     {

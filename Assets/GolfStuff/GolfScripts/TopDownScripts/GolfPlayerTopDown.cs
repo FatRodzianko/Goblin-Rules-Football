@@ -104,6 +104,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     bool _moveRight = false;
     public bool _powerSubmitted = false;
     public bool _accuracySubmitted = false;
+    public bool HitSequenceStarted = false;
 
     [Header("Hit Meter Submissions")]
     public float HitPowerSubmitted;
@@ -458,7 +459,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 UpdateCameraFollowTarget(MyBall.MyBallObject);
                 CmdSetCameraOnMyBallForOtherPlayers();
             }
-            else if (DirectionAndDistanceChosen && !_moveHitMeterIcon)
+            else if (DirectionAndDistanceChosen && !_moveHitMeterIcon && !_golfAnimator.IsSwinging)
                 StartHitMeterSequence();
             else if (_moveHitMeterIcon)
             {
@@ -744,6 +745,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         AttachUIToNewParent(myCamera.transform);
         DeactivateIconsForNewTurn();
         ResetSubmissionValues();
+        HitSequenceStarted = false;
         UpdateBallGroundMaterial();
 
         // Find the closest hole to the player

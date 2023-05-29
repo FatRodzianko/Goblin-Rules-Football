@@ -61,4 +61,5 @@ public class BalloonAnimator : MonoBehaviour
         yield return new WaitForSeconds(UnityEngine.Random.Range(0f, 0.5f));
         _isIdle = isIdle;
     }
+
 }
