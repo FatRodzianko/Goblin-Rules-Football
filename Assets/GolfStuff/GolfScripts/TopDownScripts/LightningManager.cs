@@ -260,6 +260,8 @@ public class LightningManager : NetworkBehaviour
     }
     bool WillLightningStop()
     {
+        if (RainManager.instance.BaseRainState == "clear")
+            return true;
 
         float chance = UnityEngine.Random.Range(0f, 1f);
         Debug.Log("WillLightningStop: Chance is: " + chance.ToString() + " against stop odds of: " + _stopLightningOdds.ToString());
