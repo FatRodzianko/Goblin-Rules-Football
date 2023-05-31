@@ -110,9 +110,9 @@ public class Torndao : NetworkBehaviour
     {
         int maxStrengthFromRainLevel = 1;
         int minStrengthFromWindPower = 1;
-        if (RainManager.instance.RainState.ToLower().Contains("med"))
+        if (RainManager.instance.BaseRainState.ToLower().Contains("med")) // changed RainState to BaseRainState
             maxStrengthFromRainLevel = 3;
-        else if (RainManager.instance.RainState.ToLower().Contains("heavy"))
+        else if (RainManager.instance.BaseRainState.ToLower().Contains("heavy"))
             maxStrengthFromRainLevel = 5;
 
         float currentWindPower = WindManager.instance.WindPower;
@@ -161,7 +161,8 @@ public class Torndao : NetworkBehaviour
     }
     public void MoveTornadoForNewTurn()
     {
-        GolfPlayerTopDown furthestPlayer = GetFurthestPlayer();
+        //GolfPlayerTopDown furthestPlayer = GetFurthestPlayer();
+        GolfPlayerTopDown furthestPlayer = GetPlayerWithWorstFavor();
 
         if (furthestPlayer == null)
             return;
@@ -204,12 +205,49 @@ public class Torndao : NetworkBehaviour
         }
         return playerToSpawnBy;
     }
+    GolfPlayerTopDown GetPlayerWithWorstFavor()
+    {
+        GolfPlayerTopDown playerToSpawnBy = null;
+        int lowestFavor = 0;
+        for (int i = 0; i < GameplayManagerTopDownGolf.instance.GolfPlayersServer.Count; i++)
+        {
+            GolfPlayerTopDown player = GameplayManagerTopDownGolf.instance.GolfPlayersServer[i];
+            if (i == 0)
+            {
+                lowestFavor = player.FavorWeather;
+                playerToSpawnBy = player;
+                continue;
+            }
+
+            if (player.FavorWeather < lowestFavor)
+            {
+                lowestFavor = player.FavorWeather;
+                playerToSpawnBy = player;
+            }
+            else if (player.FavorWeather == lowestFavor)
+            {
+                Debug.Log("GetPlayerWithWorstFavor: Two players with same favor of: " + lowestFavor.ToString() + " randomly picking between them");
+                string[] headsTails = new[] { "heads","tails"};
+                var rng = new System.Random();
+                string result = headsTails[rng.Next(headsTails.Length)];
+                if (result == "heads")
+                    continue;
+                else
+                {
+                    lowestFavor = player.FavorWeather;
+                    playerToSpawnBy = player;
+                }
+            }
+        }
+        Debug.Log("GetPlayerWithWorstFavor: will have tornado follow player: " + playerToSpawnBy.PlayerName);
+        return playerToSpawnBy;
+    }
     float DistanceToMoveTornadoThisTurn()
     {
         float dist = 0f;
 
-        float min = 5f * (this.TornadoStrength / 2f);
-        float max = 10f * (this.TornadoStrength / 2f);
+        float min = 7.5f * (this.TornadoStrength / 2f);
+        float max = 15f * (this.TornadoStrength / 2f);
 
         dist = UnityEngine.Random.Range(min, max);
 

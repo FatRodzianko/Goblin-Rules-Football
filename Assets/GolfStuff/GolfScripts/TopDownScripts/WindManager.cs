@@ -17,6 +17,7 @@ public class WindManager : NetworkBehaviour
     [SerializeField] [SyncVar] public int WindPower = 0; // WindPower for the player's turn that uses player FavorWeather to set its value relative to BaseWindPower. Negative favor = higher wind power. Positive favor = lower wind power
     [SerializeField] private int _windPower = 0;
     [SerializeField] [SyncVar] public int BaseWindPower = 0; // this is the base wind power that server tracks
+    private int _baseWindPower = 0;
 
 
     // followed event instructions from here https://answers.unity.com/questions/1206632/trigger-event-on-variable-change.html
@@ -25,6 +26,9 @@ public class WindManager : NetworkBehaviour
 
     public delegate void WindPowerChanged(int power);
     public event WindPowerChanged PowerChanged;
+
+    public delegate void BaseWindPowerChanged(int power);
+    public event BaseWindPowerChanged BasePowerChanged;
 
     public string WindSeverity; // none, low, med, high, highest
 
@@ -57,7 +61,8 @@ public class WindManager : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        RainManager.instance.WeatherChanged += UpdateRainForTornado;
+        //RainManager.instance.WeatherChanged += UpdateRainForTornado;
+        RainManager.instance.BaseWeatherChanged += UpdateRainForTornado;
     }
 
     // Update is called once per frame
@@ -86,6 +91,15 @@ public class WindManager : NetworkBehaviour
     void PowerChangedFunction(int power)
     {
         Debug.Log("PowerChangedFunction: " + power.ToString());
+        // if the power drops to 0, destroy and tornado objects
+        
+        // this was done before there was weather favor and so on to change weather on a per player basis. now Tornadoes are only destroyed if the BaseWindPower is 0
+        //if (power <= 0f && this.IsServer)
+        //    DestroyTornadoObjects();
+    }
+    void BasePowerChangedFunction(int power)
+    {
+        Debug.Log("BasePowerChangedFunction: " + power.ToString());
         // if the power drops to 0, destroy and tornado objects
         if (power <= 0f && this.IsServer)
             DestroyTornadoObjects();
@@ -302,7 +316,8 @@ public class WindManager : NetworkBehaviour
             DestroyTornadoObjects();
             return;
         }
-        if (RainManager.instance.RainState == "clear")
+        //if (RainManager.instance.RainState == "clear") // Changed RainState to BaseRainState through this function
+        if (RainManager.instance.BaseRainState == "clear")
         {
             DestroyTornadoObjects();
             return;
@@ -310,10 +325,11 @@ public class WindManager : NetworkBehaviour
         if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
             return;
 
-        float tornadoLikelihood = 0.2f;
-        if (RainManager.instance.RainState == "med rain")
+        //float tornadoLikelihood = 0.2f;
+        float tornadoLikelihood = 0.9f; // for testing only
+        if (RainManager.instance.BaseRainState == "med rain")
             tornadoLikelihood += 0.1f;
-        else if (RainManager.instance.RainState == "heavy rain")
+        else if (RainManager.instance.BaseRainState == "heavy rain")
             tornadoLikelihood += 0.25f;
 
         if (UnityEngine.Random.Range(0f, 1f) > tornadoLikelihood && !IsThereATorndao)
@@ -398,7 +414,7 @@ public class WindManager : NetworkBehaviour
         if (!TornadoScript)
             return;
 
-        if (this.WindPower <= 0f || RainManager.instance.RainState == "clear")
+        if (this.WindPower <= 0f || RainManager.instance.BaseRainState == "clear")
         {
             DestroyTornadoObjects();
             return;
@@ -406,7 +422,7 @@ public class WindManager : NetworkBehaviour
 
         TornadoScript.MoveTornadoForNewTurn();
 
-        while (this.WindPower > 0 && RainManager.instance.RainState != "clear" && (TornadoScript.IsMoving || TornadoScript.HitBall))
+        while (this.WindPower > 0 && RainManager.instance.BaseRainState != "clear" && (TornadoScript.IsMoving || TornadoScript.HitBall))
         {
             await Task.Yield();
         }
