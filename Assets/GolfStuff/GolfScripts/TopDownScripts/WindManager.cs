@@ -18,6 +18,7 @@ public class WindManager : NetworkBehaviour
     [SerializeField] private int _windPower = 0;
     [SerializeField] [SyncVar] public int BaseWindPower = 0; // this is the base wind power that server tracks
     private int _baseWindPower = 0;
+    [SerializeField] public int InitialWindPower = 0; // this is the initial wind power. used when modifying the "Base" wind power from player favor. Average player favor modifies the base wind power relative to the initial wind power. negative average favor = Base Wind Power increases from initial window. Oppositve for positive average favor
 
 
     // followed event instructions from here https://answers.unity.com/questions/1206632/trigger-event-on-variable-change.html
@@ -49,6 +50,7 @@ public class WindManager : NetworkBehaviour
 
         DirectionChanged = DirectionChangedFunction;
         PowerChanged = PowerChangedFunction;
+        BasePowerChanged = BasePowerChangedFunction;
         TornadoChanged = TornadoChangedFunction;
     }
     void MakeInstance()
@@ -72,6 +74,11 @@ public class WindManager : NetworkBehaviour
         {
             _windPower = WindPower;
             PowerChanged(_windPower);
+        }
+        if (BaseWindPower != _baseWindPower && BasePowerChanged != null)
+        {
+            _baseWindPower = BaseWindPower;
+            BasePowerChanged(_baseWindPower);
         }
         if (WindDirection != _windDirection && DirectionChanged != null)
         {
@@ -108,9 +115,14 @@ public class WindManager : NetworkBehaviour
     {
         Debug.Log("TornadoChangedFunction: Is there a tornado?" + tornado.ToString());
     }
-    public void UpdateWindForNewTurn()
+    public void UpdateWindForNewTurn(GolfPlayerTopDown currentPlayer)
     {
-        WindPower = GetNewWindPower(_windPower);
+        // old way before weather favor
+        //WindPower = GetNewWindPower(_windPower);
+
+        // begin new way with weather favor
+        SetBaseWindPower();
+        SetPlayerWindPower(currentPlayer);
     }
     public void SetInitialWindForNewHole()
     {
@@ -119,7 +131,10 @@ public class WindManager : NetworkBehaviour
         // Get how severe the wind will be
         WindSeverity = GetWindSeverity();
         //float newWind = GetInitialWindSpeedFromSeverity(WindSeverity);
-        WindPower = GetInitialWindSpeedFromSeverity(WindSeverity);
+        //WindPower = GetInitialWindSpeedFromSeverity(WindSeverity);
+        InitialWindPower = GetInitialWindSpeedFromSeverity(WindSeverity); // this is the initial wind power (think of it as the wind for that "day"). Base wind power will be modified from that based on average player favor
+        BaseWindPower = InitialWindPower; // set the initial value for the BaseWindPower?
+        WindPower = InitialWindPower;
         //WindPower = GetNewWindPower(newWind);
     }
     public void SetInitialWindDirection()
@@ -186,6 +201,53 @@ public class WindManager : NetworkBehaviour
             maxRange = 25;
 
         return (int)UnityEngine.Random.Range(minRange, maxRange);
+    }
+    [Server]
+    void SetBaseWindPower()
+    {
+        Debug.Log("SetBaseWindPower: ");
+        float averagePlayerFavor = GameplayManagerTopDownGolf.instance.AveragePlayerWeatherFavor;
+        if (averagePlayerFavor >= -1 && averagePlayerFavor <= 1)
+        {
+            BaseWindPower = InitialWindPower;
+            return;
+        }
+
+        //float windModifierValue = GetWindModifierPercentFromSeverity(WindSeverity);
+        //int windModifier = Mathf.RoundToInt(averagePlayerFavor / 2 * windModifierValue);
+        int windModifier = Mathf.RoundToInt(averagePlayerFavor / 2);
+
+        BaseWindPower = InitialWindPower - windModifier;
+        Debug.Log("SetBaseWindPower: New BaseWindPower will be: " + BaseWindPower.ToString() + " based on windModifier of: " + windModifier.ToString() + " and average player weather favor of: " + averagePlayerFavor.ToString());
+    }
+    [Server]
+    void SetPlayerWindPower(GolfPlayerTopDown currentPlayer)
+    {
+        Debug.Log("SetPlayerWindPower: ");
+        int playerFavor = currentPlayer.FavorWeather;
+
+        Debug.Log("SetPlayerWindPower: Rounded player favor: " + Mathf.RoundToInt(playerFavor * 0.75f).ToString());
+        int newWindPower = BaseWindPower - Mathf.RoundToInt(playerFavor * 0.75f);
+        if (newWindPower < 0)
+            newWindPower = 0;
+        if (newWindPower > 25)
+            newWindPower = 25;
+
+        Debug.Log("SetPlayerWindPower: New Player wind power will be " + newWindPower.ToString() + " based on BaseWindPower of: " + BaseWindPower.ToString() + " and current player favor of: " + playerFavor.ToString());
+        WindPower = newWindPower;
+    }
+    float GetWindModifierPercentFromSeverity(string severity)
+    {
+        if (severity == "none")
+            return 1f;
+        else if (severity == "low")
+            return 1f;
+        else if (severity == "med")
+            return 1.5f;
+        else if (severity == "high")
+            return 1.75f;
+        else
+            return 2f;
     }
     public void UpdateWindDirectionForNewTurn()
     {

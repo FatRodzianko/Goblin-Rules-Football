@@ -34,6 +34,7 @@ public class WindIconHolder : MonoBehaviour
     {
         WindManager.instance.DirectionChanged += UpdateWindDirection;
         WindManager.instance.PowerChanged += UpdateWindPower;
+        //WindManager.instance.BasePowerChanged += UpdateWindPower;
     }
 
     // Update is called once per frame

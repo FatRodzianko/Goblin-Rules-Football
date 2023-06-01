@@ -55,6 +55,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
     [Header("Weather Effects")]
     [SerializeField] LightningManager _lightningManager;
+    [SerializeField] [SyncVar] public float AveragePlayerWeatherFavor = 0;
 
     [Header("Camera and UI Stuff?")]
     [SerializeField] CameraViewHole _cameraViewHole;
@@ -726,8 +727,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
 
         Debug.Log("SetWeatherForNextTurn");
+        // Get the average weather favor of all players?
+        AveragePlayerWeatherFavor = GetAveragePlayerFavor();
         // Set the new wind for the next turn
-        WindManager.instance.UpdateWindForNewTurn();
+        WindManager.instance.UpdateWindForNewTurn(this.CurrentPlayer);
         WindManager.instance.UpdateWindDirectionForNewTurn();
         // Set new weather for the next turn
         RainManager.instance.UpdateWeatherForNewTurn(this.CurrentPlayer);
@@ -1121,5 +1124,22 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             GameObject objectToDestroy = statue;
             InstanceFinder.ServerManager.Despawn(objectToDestroy);
         }
+    }
+    public float GetAveragePlayerFavor()
+    {
+        float averageFavor = 0f;
+
+        if (this.GolfPlayersServer.Count <= 0)
+            return averageFavor;
+
+        float totalFavor = 0f;
+        foreach (GolfPlayerTopDown player in this.GolfPlayersServer)
+        {
+            totalFavor += player.FavorWeather;
+        }
+        averageFavor = totalFavor / this.GolfPlayersServer.Count;
+        Debug.Log("GameplayManagerTopDownGolf.cs: GetAveragePlayerFavor: Average player favor is: " + averageFavor.ToString() + " based on total favor of: " + totalFavor.ToString() + " and " + this.GolfPlayersServer.Count.ToString() + " number of players.");
+
+        return averageFavor;
     }
 }

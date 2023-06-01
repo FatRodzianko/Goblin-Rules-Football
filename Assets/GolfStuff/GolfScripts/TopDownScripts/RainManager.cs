@@ -250,15 +250,20 @@ public class RainManager : NetworkBehaviour
         // similar to wind stuff, this will probably be controlled by player settings in the full game. Right now, just randomly selecting it
         float weatherChance = UnityEngine.Random.Range(0f, 1.0f);
 
-        if (weatherChance < 0.7f)
-            RainState = "clear";
-        else if (weatherChance < 0.85f)
-            RainState = "light rain";
-        else if (weatherChance < 0.95f)
-            RainState = "med rain";
-        else
-            RainState = "heavy rain";
+        // previous way before weather favor
+        //if (weatherChance < 0.7f)
+        //    RainState = "clear";
+        //else if (weatherChance < 0.85f)
+        //    RainState = "light rain";
+        //else if (weatherChance < 0.95f)
+        //    RainState = "med rain";
+        //else
+        //    RainState = "heavy rain";
 
+        // Begin new way with weather favor. Always start the game with "clear" weather. No one wants to golf on a rainy day? Maybe later change so it's like wind where the base state is relative to the "initial" weather state that's set randomly?
+        RainState = "clear";
+        BaseRainState = RainState; // make sure the base rain state matches the initial rain state?
+        
         Debug.Log("SetInitialWeatherForHole: Setting the rain state to: " + RainState + " from weather chance of: " + weatherChance.ToString());
     }
     [Server]
@@ -336,7 +341,8 @@ public class RainManager : NetworkBehaviour
         string baseState = BaseRainState;
 
         // Calculate the average weather favor of all players
-        float averagePlayerFavor = GetAveragePlayerFavor();
+        //float averagePlayerFavor = GetAveragePlayerFavor();
+        float averagePlayerFavor = GameplayManagerTopDownGolf.instance.AveragePlayerWeatherFavor;
         // Get the modifier value for the current BaseRainState
         float rainStateModifier = GetRainStateModifier();
         float combinedFavorAndModifier = averagePlayerFavor + rainStateModifier;
@@ -500,23 +506,6 @@ public class RainManager : NetworkBehaviour
         //    RainState = "heavy rain";
         //    Debug.Log("SetPlayerRainState: Player RainState will be: " + RainState + "rainStateModifier: " + rainStateModifier.ToString() + " averagePlayerFavor: " + currentPlayer.FavorWeather.ToString() + " combinedFavorAndModifier: " + combinedFavorAndModifier.ToString());
         //}
-    }
-    float GetAveragePlayerFavor()
-    {
-        float averageFavor = 0f;
-
-        if (GameplayManagerTopDownGolf.instance.GolfPlayersServer.Count <= 0)
-            return averageFavor;
-
-        float totalFavor = 0f;
-        foreach (GolfPlayerTopDown player in GameplayManagerTopDownGolf.instance.GolfPlayersServer)
-        {
-            totalFavor += player.FavorWeather;
-        }
-        averageFavor = totalFavor / GameplayManagerTopDownGolf.instance.GolfPlayersServer.Count;
-        Debug.Log("GetAveragePlayerFavor: Average player favor is: " + averageFavor.ToString() + " based on total favor of: " + totalFavor.ToString() + " and " + GameplayManagerTopDownGolf.instance.GolfPlayersServer.Count.ToString() + " number of players.");
-
-        return averageFavor;
     }
     float GetRainStateModifier()
     {
