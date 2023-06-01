@@ -38,6 +38,7 @@ public class ScriptableHole : ScriptableObject
     //public Vector3[] BadStatuePositions;
     //public Vector3[] GoodStatuePositions;
     public List<SavedStatue> Statues;
+    public List<SavedBalloonPowerUp> BalloonPowerUps;
 
 }
 [Serializable]
@@ -58,4 +59,11 @@ public class SavedStatue
     public Vector3 StatuePosition;
     public string StatueType;
     public ScriptableObstacle StatueScriptableObstacle;
+}
+[Serializable]
+public class SavedBalloonPowerUp
+{
+    public Vector3 BalloonPosition;
+    public string BalloonHeight;
+    public ScriptableObstacle BalloonScriptableObstacle;
 }

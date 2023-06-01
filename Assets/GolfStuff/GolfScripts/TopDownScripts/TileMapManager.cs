@@ -105,6 +105,7 @@ public class TileMapManager : MonoBehaviour
 
         // Save the statues for the hole
         newHole.Statues = SaveAllStatues(GameObject.FindGameObjectsWithTag("Statue")).ToList();
+        newHole.BalloonPowerUps = SaveAllBalloonPowerUps(GameObject.FindGameObjectsWithTag("BalloonPowerUp")).ToList();
 
         // Save the scriptable object to a file
 #if UNITY_EDITOR
@@ -164,6 +165,27 @@ public class TileMapManager : MonoBehaviour
                     StatuePosition = statuesToSave[i].transform.position,
                     StatueType = statuesToSave[i].GetComponent<Statue>().StatueType,
                     StatueScriptableObstacle = statuesToSave[i].GetComponent<EnvironmentObstacleTopDown>().myScriptableObject
+                };
+            }
+        }
+        IEnumerable<SavedBalloonPowerUp> SaveAllBalloonPowerUps(GameObject[] balloonPowerUpsToSave)
+        {
+            if (balloonPowerUpsToSave.Length <= 0)
+            {
+                Debug.Log("SaveAllBalloonPowerUps: Nothing to save. yield break?");
+                yield break;
+            }
+
+            for (int i = 0; i < balloonPowerUpsToSave.Length; i++)
+            {
+                if (balloonPowerUpsToSave[i].GetComponent<BalloonPowerUp>() == null)
+                    continue;
+
+                yield return new SavedBalloonPowerUp()
+                {
+                    BalloonPosition = balloonPowerUpsToSave[i].transform.position,
+                    BalloonHeight = balloonPowerUpsToSave[i].GetComponent<BalloonPowerUp>().SavedHeightOfBalloon,
+                    BalloonScriptableObstacle = balloonPowerUpsToSave[i].GetComponent<EnvironmentObstacleTopDown>().myScriptableObject
                 };
             }
         }
@@ -257,6 +279,8 @@ public class TileMapManager : MonoBehaviour
         {
             GameObject[] statues = GameObject.FindGameObjectsWithTag("Statue");
             DeleteObjects(statues);
+            GameObject[] balloonPowerUps = GameObject.FindGameObjectsWithTag("BalloonPowerUp");
+            DeleteObjects(balloonPowerUps);
         }
         catch (Exception e)
         {
@@ -288,6 +312,10 @@ public class TileMapManager : MonoBehaviour
         {
             SpawnStatuesForEditor(hole.Statues);
         }
+        if (hole.BalloonPowerUps.Count > 0)
+        {
+            SpawnBalloonPowerUpsForEditor(hole.BalloonPowerUps);
+        }
 
         this.LoadMap(hole);
     }
@@ -296,6 +324,13 @@ public class TileMapManager : MonoBehaviour
         foreach (SavedStatue statue in statuesToSpawn)
         {
             Instantiate(statue.StatueScriptableObstacle.ObstaclePrefab, statue.StatuePosition, Quaternion.identity);
+        }
+    }
+    void SpawnBalloonPowerUpsForEditor(List<SavedBalloonPowerUp> balloonPowerUpsToSpawn)
+    {
+        foreach (SavedBalloonPowerUp balloon in balloonPowerUpsToSpawn)
+        {
+            Instantiate(balloon.BalloonScriptableObstacle.ObstaclePrefab, balloon.BalloonPosition, Quaternion.identity);
         }
     }
     public void LoadMap(ScriptableHole hole)

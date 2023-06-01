@@ -373,7 +373,7 @@ public class WindManager : NetworkBehaviour
             return;
 
 
-        if (this.WindPower <= 0f)
+        if (this.BaseWindPower <= 0f)
         {
             DestroyTornadoObjects();
             return;
@@ -476,7 +476,7 @@ public class WindManager : NetworkBehaviour
         if (!TornadoScript)
             return;
 
-        if (this.WindPower <= 0f || RainManager.instance.BaseRainState == "clear")
+        if (this.BaseWindPower <= 0f || RainManager.instance.BaseRainState == "clear")
         {
             DestroyTornadoObjects();
             return;
@@ -484,7 +484,7 @@ public class WindManager : NetworkBehaviour
 
         TornadoScript.MoveTornadoForNewTurn();
 
-        while (this.WindPower > 0 && RainManager.instance.BaseRainState != "clear" && (TornadoScript.IsMoving || TornadoScript.HitBall))
+        while (this.BaseWindPower > 0 && RainManager.instance.BaseRainState != "clear" && (TornadoScript.IsMoving || TornadoScript.HitBall))
         {
             await Task.Yield();
         }

@@ -52,6 +52,7 @@ TagManager:
   - NetworkingTestHud
   - StatueRingRadius
   - Statue
+  - BalloonPowerUp
   layers:
   - Default
   - TransparentFX

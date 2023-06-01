@@ -14,6 +14,7 @@ public class BalloonPowerUp : NetworkBehaviour
     [SerializeField] BalloonAnimator _balloonAnimator;
 
     [Header("Balloon Info")]
+    [SerializeField] public string SavedHeightOfBalloon; // used in the map editor to save the height of the balloon, which is then set when the balloon is spawned
     [SerializeField] [SyncVar(OnChange = nameof(SyncHeightOfBalloon))] public string HeightOfBalloon;
     [SerializeField] public bool IsPopped = false;
 

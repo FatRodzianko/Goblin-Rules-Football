@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 3773523054185311849}
   m_Layer: 27
   m_Name: balloon-powerup
-  m_TagString: Untagged
+  m_TagString: BalloonPowerUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -107,6 +107,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 1294718589790411384}
   _myRenderer: {fileID: 1294718589790411388}
   _balloonAnimator: {fileID: 1294718589790411385}
+  SavedHeightOfBalloon: 
   HeightOfBalloon: 
   IsPopped: 0
   _myCollider: {fileID: 1294718589790411386}
@@ -260,7 +261,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5b10ad901f7fb4d992bb6c969ea6e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  myScriptableObject: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   HeightInUnityUnits: 0
   _isHoleFlag: 0
   SoftBounce: 0
