@@ -25,8 +25,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] TextMeshPro _playerNameText;
 
     [Header("Favor of the Gods")]
-    [SerializeField] [SyncVar] public int FavorWeather;
+    [SerializeField] [SyncVar(OnChange = nameof(SyncFavorWeather))] public int FavorWeather;
     [SerializeField] [SyncVar] public int FavorWind;
+    [SerializeField] [SyncVar] public float AccuracyFavorModifier = 1.0f;
+    [SerializeField] [SyncVar] public float DistanceFavorModifier = 1.0f;
 
 
     [Header("Golf Ball Stuff")]
@@ -1142,6 +1144,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             IsShanked = true;
         }
 
+
+
         Debug.Log("GetAccuracyDistance: accuracy distance is: " + accuracyDistance.ToString());
         return accuracyDistance;
     }
@@ -1161,6 +1165,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // Also punish driver hits?
         if (CurrentClub.ClubType == "driver")
             accuracyDistance *= 1.5f;
+
+        // Adjust the accuracy distance based on player's weather favor
+        float newAccuracyDistance = accuracyDistance * this.AccuracyFavorModifier;
+        Debug.Log("ModifyHitDirectionFromAccuracy: " + this.PlayerName + "'s original accuracy distance is: " + accuracyDistance.ToString() + " but their new accuracy distance will be: " + newAccuracyDistance.ToString() + " based on AccuracyFavorModifier of: " + AccuracyFavorModifier.ToString());
 		
 		// https://www.youtube.com/watch?v=HH6JzH5pTGo
         var rotation = Quaternion.AngleAxis(accuracyDistance, Vector3.forward);
@@ -1406,6 +1414,15 @@ public class GolfPlayerTopDown : NetworkBehaviour
     float GetDistanceFromClub(ClubTopDown club)
     {
         float dist = club.MaxHitDistance;
+
+        // Modify the max distance of the club based on the player's distance favor modifer, but not for putters
+        if (club.ClubType != "putter")
+        {
+            //dist *= this.DistanceFavorModifier;
+            float newDist = dist * this.DistanceFavorModifier;
+            Debug.Log("GetDistanceFromClub: New hit distance of: " + newDist.ToString() + " compared to original distance of: " + dist.ToString() + ". Player " + this.PlayerName + " has DistanceFavorModifier of: " + DistanceFavorModifier.ToString() + " based on favor of: " + this.FavorWeather.ToString());
+            dist = newDist;
+        }
 
         // code here to adjust hit distance if it is in rough terrain or a trap
         if (MyBall.bounceContactGroundMaterial == "rough")
@@ -2267,5 +2284,33 @@ public class GolfPlayerTopDown : NetworkBehaviour
             newFavor = -10;
 
         return newFavor;
+    }
+    void SyncFavorWeather(int prev, int next, bool asServer)
+    {
+        if (asServer)
+        {
+            Debug.Log("SyncFavorWeather: as server? " + asServer.ToString());
+            SetAccuracyFavorModifier(next);
+            SetDistanceFavorModifier(next);
+        }
+    }
+    [Server]
+    void SetAccuracyFavorModifier(int newPlayerFavor)
+    {
+        float newFavorModifier = (float)newPlayerFavor / 100f;
+        if (newPlayerFavor > 0)
+            newFavorModifier *= 2f;
+        this.AccuracyFavorModifier = 1.0f - newFavorModifier;
+        Debug.Log("SetAccuracyFavorModifier: new accuracy modifier for player " + this.PlayerName + " will be: " + AccuracyFavorModifier.ToString() + " based on their weather favor of: " + newPlayerFavor.ToString());
+    }
+    [Server]
+    void SetDistanceFavorModifier(int newPlayerFavor)
+    {
+        float newFavorModifier = (float)newPlayerFavor / 50f;
+        if (newFavorModifier > 0)
+            newFavorModifier /= 2f;
+
+        this.DistanceFavorModifier = 1.0f + newFavorModifier;
+        Debug.Log("SetDistanceFavorModifier: new distance modifier for player " + this.PlayerName + " will be: " + DistanceFavorModifier.ToString() + " based on their weather favor of: " + newPlayerFavor.ToString());
     }
 }

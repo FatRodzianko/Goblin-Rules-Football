@@ -51,6 +51,10 @@ MonoBehaviour:
   _powerUpBallonPrefab: {fileID: 1294718589790411390, guid: ec4c4ca1e943cba47a816a5c937a90c2, type: 3}
   _activeBallonPowerUps: []
   _spawnPoint: {x: 183.469, y: -79.61863, z: 0}
+  _possibleBalloonHeights:
+  - low
+  - med
+  - high
 --- !u!114 &7030450351127779416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75,16 +79,15 @@ MonoBehaviour:
   _initializeOrder: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 0
+  <PrefabId>k__BackingField: 6
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 0
+  _scenePathHash: 1727917535
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 10476865128425371143
   _sceneNetworkObjects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 7030450351127779416}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   - {fileID: 0}

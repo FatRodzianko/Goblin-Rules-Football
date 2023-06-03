@@ -43,7 +43,6 @@ public class BalloonPowerUp : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
-        SetBalloonHeight();
     }
 
     // Update is called once per frame
@@ -52,11 +51,9 @@ public class BalloonPowerUp : NetworkBehaviour
         
     }
     [Server]
-    public void SetBalloonHeight()
+    public void SetBalloonHeight(string balloonHeight)
     {
-        var random = new System.Random();
-        int index = random.Next(_possibleHieghts.Count);
-        HeightOfBalloon = _possibleHieghts[index];
+        HeightOfBalloon = balloonHeight;
         Debug.Log("SetBalloonHeight: " + HeightOfBalloon);
     }
     void SyncHeightOfBalloon(string prev, string next, bool asServer)
@@ -69,8 +66,6 @@ public class BalloonPowerUp : NetworkBehaviour
         _balloonAnimator.SetHeightOfBallon(next);
         _balloonAnimator.SetIsIdle(true);
         SetObstacleHeightValues(next);
-
-
     }
     void SetObstacleHeightValues(string height)
     {
