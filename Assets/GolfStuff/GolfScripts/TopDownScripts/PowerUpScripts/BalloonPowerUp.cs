@@ -31,6 +31,19 @@ public class BalloonPowerUp : NetworkBehaviour
     [SerializeField] float _highStartHeight;
     [SerializeField] float _highTopHeight;
 
+    [Header("PowerUp Info")]
+    [SyncVar(OnChange = nameof(SyncPowerUpType))] public string PowerUpType;
+    [SerializeField] Sprite _powerUpSprite;
+    [SerializeField] string _powerUpText;
+
+    [Header("PowerUp Icon")]
+    [SerializeField] SpriteRenderer _iconRenderer;
+    bool _raiseIcon = false;
+    float _transparencyRate = 1f;
+    float _moveUpRate = 1.5f;
+    [SerializeField] Vector3 _iconInitialPosition;
+    [SerializeField] float _iconMaxHeight = 3.0f;
+
     [Header("Misc.")]
     [SerializeField] List<string> _possibleHieghts = new List<string>();
     [SerializeField] EnvironmentObstacleTopDown _environmentObstacleTopDown;
@@ -48,7 +61,12 @@ public class BalloonPowerUp : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (_raiseIcon)
+        {
+            IconGoesUp();
+            IconBecomesVisible();
+
+        }
     }
     [Server]
     public void SetBalloonHeight(string balloonHeight)
@@ -124,5 +142,47 @@ public class BalloonPowerUp : NetworkBehaviour
     {
         Debug.Log("UpdateColliderPointsAfterBalloonPop:");
         _myCollider.SetPath(0, _newColliderPoints);
+    }
+    [Server]
+    public void SetBalloonPowerUpType(string newType)
+    {
+        // default to setting the power up type to "power" if for some reason it is null?
+        if (string.IsNullOrEmpty(newType))
+        {
+            PowerUpType = "power";
+            return;
+        }
+        PowerUpType = newType;
+        Debug.Log("SetBalloonPowerUpType: " + PowerUpType);
+    }
+    void SyncPowerUpType(string prev, string next, bool asServer)
+    {
+        if (asServer)
+            return;
+        _powerUpSprite = PowerUpManagerTopDownGolf.instance.GetPowerUpSprite(next);
+        
+    }
+    public void StartShowIcon()
+    {
+        _iconRenderer.sprite = _powerUpSprite;
+        _raiseIcon = true;
+    }
+    void IconGoesUp()
+    {
+        _iconInitialPosition.y += (_moveUpRate * Time.deltaTime);
+        _iconRenderer.transform.localPosition = _iconInitialPosition;
+        if (_iconInitialPosition.y >= _iconMaxHeight)
+            _raiseIcon = false;
+
+
+    }
+    void IconBecomesVisible()
+    {
+        if (_iconRenderer.color.a >= 1)
+            return;
+
+        Color newColor = _iconRenderer.color;
+        newColor.a += (_transparencyRate * Time.deltaTime);
+        _iconRenderer.color = newColor;
     }
 }

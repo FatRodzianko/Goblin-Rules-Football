@@ -957,11 +957,16 @@ MonoBehaviour:
   OwnerNetId: 0
   ConnectionId: -99
   _playerNameText: {fileID: 8036728465122121126}
+  FavorWeather: 0
+  FavorWind: 0
+  AccuracyFavorModifier: 1
+  DistanceFavorModifier: 1
   _golfBallPrefab: {fileID: 7504929942250748449, guid: 6721b70aef94bf54988229bfa7f71add, type: 3}
   _myBallNetId: 0
   MyBall: {fileID: 0}
   DistanceToHole: 0
   NumberOfBallsSpawnedForClient: 0
+  BallColor: {r: 0, g: 0, b: 0, a: 0}
   hitDirection: {x: 0, y: 1}
   hitDistance: 200
   hitAngle: 24
@@ -1010,6 +1015,7 @@ MonoBehaviour:
   _moveHitMeterIcon: 0
   _powerSubmitted: 0
   _accuracySubmitted: 0
+  HitSequenceStarted: 0
   HitPowerSubmitted: 0
   HitAccuracySubmitted: 0
   ModifiedHitDirection: {x: 0, y: 0}
@@ -1704,8 +1710,8 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 747716661
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &8036728465122121126

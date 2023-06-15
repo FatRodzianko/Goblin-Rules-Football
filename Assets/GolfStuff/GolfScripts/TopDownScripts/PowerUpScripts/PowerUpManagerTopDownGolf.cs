@@ -5,6 +5,7 @@ using FishNet.Object.Synchronizing;
 using FishNet.Object;
 using FishNet.Connection;
 using FishNet;
+using System;
 
 public class PowerUpManagerTopDownGolf : NetworkBehaviour
 {
@@ -22,6 +23,17 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
 
     [Header("Ballon Characteristics")]
     [SerializeField] List<string> _possibleBalloonHeights = new List<string>();
+
+    [Header("PowerUp Types")]
+    [SerializeField] List<PowerUpTypeMapping> PowerUpTypeToSpriteMapping = new List<PowerUpTypeMapping>();
+
+    [Serializable]
+    public struct PowerUpTypeMapping
+    {
+        public string powerUpType;
+        public Sprite powerUpSprite;
+        public string powerUpText;
+    }
 
     // Start is called before the first frame update
     void Awake()
@@ -76,6 +88,7 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
             BalloonNetIds.Add(balloonScript.ObjectId);
         balloonScript.SetBalloonHeight(balloonHeight);
         balloonScript.RpcUpdateBalloonPosition(pos);
+        balloonScript.SetBalloonPowerUpType(GetPowerUpType());
     }
     [Server]
     string GetRandomBalloonHeight()
@@ -83,6 +96,18 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
         var random = new System.Random();
         int index = random.Next(_possibleBalloonHeights.Count);
         return _possibleBalloonHeights[index];
+    }
+    [Server]
+    string GetPowerUpType()
+    {
+        var random = new System.Random();
+        int index = random.Next(PowerUpTypeToSpriteMapping.Count);
+        return PowerUpTypeToSpriteMapping[index].powerUpType;
+    }
+    public Sprite GetPowerUpSprite(string type)
+    {
+        Sprite spriteToReturn = PowerUpTypeToSpriteMapping.Find(x => x.powerUpType == type).powerUpSprite;
+        return spriteToReturn;
     }
     [Server]
     public void DespawnBalloonsForNewHole()
