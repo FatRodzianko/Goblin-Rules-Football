@@ -262,7 +262,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
 
         if (ballHeightInUnityUnits >= StartHeight && ballHeightInUnityUnits <= HeightInUnityUnits)
         {
-            this.GetComponent<BalloonPowerUp>().CollisionToPopBalloon();
+            this.GetComponent<BalloonPowerUp>().CollisionToPopBalloon(golfBallScript);
         }
 
     }

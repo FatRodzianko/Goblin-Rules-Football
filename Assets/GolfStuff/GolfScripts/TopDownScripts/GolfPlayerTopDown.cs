@@ -140,6 +140,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] Sprite _shortPuttTextImage;
     [SerializeField] Sprite _longPuttTextImage;
 
+    [Header("Power Ups")]
+
     [Header("Wind UI")]
     [SerializeField] GameObject _windUIHolder;
 

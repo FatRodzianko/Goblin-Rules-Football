@@ -13,6 +13,7 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
 
     [Header("Prefabs")]
     [SerializeField] GameObject _powerUpBallonPrefab;
+    [SerializeField] GameObject _powerUpObject;
 
     [Header("Balloons")]
     [SerializeField] List<BalloonPowerUp> _activeBallonPowerUps = new List<BalloonPowerUp>(); // only maintained by the server?
@@ -26,6 +27,9 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
 
     [Header("PowerUp Types")]
     [SerializeField] List<PowerUpTypeMapping> PowerUpTypeToSpriteMapping = new List<PowerUpTypeMapping>();
+
+    [Header("Player PowerUps")]
+    Dictionary<int, PowerUpTopDown> _playerOwnedPowerUps = new Dictionary<int, PowerUpTopDown>();
 
     [Serializable]
     public struct PowerUpTypeMapping
@@ -122,5 +126,53 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
         }
         _activeBallonPowerUps.Clear();
         BalloonNetIds.Clear();
+    }
+    [Server]
+    public void SpawnPowerUpObjectForPlayer(int ballNetId, string powerUpType)
+    {
+        Debug.Log("SpawnPowerUpObjectForPlayer: PowerUpManagerTopDownGolf");
+
+        GolfPlayerTopDown playerOwner = InstanceFinder.ServerManager.Objects.Spawned[ballNetId].GetComponent<GolfBallTopDown>().MyPlayer;
+
+        GameObject powerUpObject = Instantiate(_powerUpObject);
+        InstanceFinder.ServerManager.Spawn(powerUpObject, playerOwner.Owner);
+
+        PowerUpTopDown powerUpObjectScript = powerUpObject.GetComponent<PowerUpTopDown>();
+        powerUpObjectScript.SetOwnerID(playerOwner.ObjectId);
+        powerUpObjectScript.SetPowerUpType(powerUpType);
+
+
+        this.AddNewPlayerOwnedPowerUp(playerOwner.ObjectId, powerUpObjectScript);
+
+
+        Debug.Log("SpawnPowerUpObjectForPlayer: Spawned powerup of type: " + powerUpType + " for player: " + playerOwner.PlayerName + ":" + playerOwner.ObjectId);
+    }
+    [Server]
+    void AddNewPlayerOwnedPowerUp(int playerNetId, PowerUpTopDown newPowerUp)
+    {
+        if (!_playerOwnedPowerUps.ContainsKey(playerNetId))
+        {
+            _playerOwnedPowerUps.Add(playerNetId, newPowerUp);
+        }
+        else
+        {
+            // Remove power up from player if they already had one
+            RemovePowerUpObjectFromPlayer(playerNetId, newPowerUp);
+        }
+    }
+    [Server]
+    void RemovePowerUpObjectFromPlayer(int playerNetId, PowerUpTopDown powerUp)
+    {
+        PowerUpTopDown powerUpToRemove = _playerOwnedPowerUps[playerNetId];
+        _playerOwnedPowerUps.Remove(playerNetId);
+        // call to player script to remove the power up from them?
+
+        // For now, destroy. Maybe in the future have it randomly give the old power up to a random player that doesn't have a power up? And if all have power ups, then destroy it?
+        InstanceFinder.ServerManager.Despawn(powerUp.gameObject);
+    }
+    [Server]
+    void DestroyPowerUpObject(GameObject powerUpToDestroy)
+    {
+        InstanceFinder.ServerManager.Despawn(powerUpToDestroy);
     }
 }

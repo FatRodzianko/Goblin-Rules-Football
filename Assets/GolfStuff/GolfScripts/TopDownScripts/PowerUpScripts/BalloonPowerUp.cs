@@ -47,6 +47,7 @@ public class BalloonPowerUp : NetworkBehaviour
     [Header("Misc.")]
     [SerializeField] List<string> _possibleHieghts = new List<string>();
     [SerializeField] EnvironmentObstacleTopDown _environmentObstacleTopDown;
+    GolfBallTopDown _ballThatPoppedMe;
 
     // Start is called before the first frame update
     void Start()
@@ -100,21 +101,22 @@ public class BalloonPowerUp : NetworkBehaviour
         Debug.Log("RpcUpdateBalloonPosition: " + newPos.ToString());
         this.transform.position = newPos;
     }
-    public void CollisionToPopBalloon()
+    public void CollisionToPopBalloon(GolfBallTopDown ball)
     {
         Debug.Log("PopBalloon: is popped alreadyt? " + IsPopped);
         if (IsPopped)
             return;
-        CmdPopBalloon();
+        CmdPopBalloon(ball.ObjectId);
         //_balloonAnimator.PopBalloon();
         //IsPopped = true;
         PopBalloon();
+        _ballThatPoppedMe = ball;
     }
     [ServerRpc(RequireOwnership = false)]
-    void CmdPopBalloon()
+    void CmdPopBalloon(int ballNetId)
     {
-
         RpcBreakStatueAnimation();
+        SpawnPowerUpObjectForPlayer(ballNetId);
     }
     [ObserversRpc(BufferLast = true)]
     void RpcBreakStatueAnimation()
@@ -130,6 +132,12 @@ public class BalloonPowerUp : NetworkBehaviour
         _balloonAnimator.PopBalloon();
         IsPopped = true;
         StartCoroutine(UpdateColliderPointsDelay());
+    }
+    [Server]
+    void SpawnPowerUpObjectForPlayer(int ballNetId)
+    {
+        Debug.Log("SpawnPowerUpObjectForPlayer: ball that popped this balloon: " + ballNetId.ToString());
+        PowerUpManagerTopDownGolf.instance.SpawnPowerUpObjectForPlayer(ballNetId, PowerUpType);
     }
     IEnumerator UpdateColliderPointsDelay()
     {
@@ -172,9 +180,10 @@ public class BalloonPowerUp : NetworkBehaviour
         _iconInitialPosition.y += (_moveUpRate * Time.deltaTime);
         _iconRenderer.transform.localPosition = _iconInitialPosition;
         if (_iconInitialPosition.y >= _iconMaxHeight)
+        {
             _raiseIcon = false;
-
-
+            StartCoroutine(HidePowerUpIconCountdown());
+        }
     }
     void IconBecomesVisible()
     {
@@ -184,5 +193,10 @@ public class BalloonPowerUp : NetworkBehaviour
         Color newColor = _iconRenderer.color;
         newColor.a += (_transparencyRate * Time.deltaTime);
         _iconRenderer.color = newColor;
+    }
+    IEnumerator HidePowerUpIconCountdown()
+    {
+        yield return new WaitForSeconds(2.0f);
+        _iconRenderer.enabled = false;
     }
 }
