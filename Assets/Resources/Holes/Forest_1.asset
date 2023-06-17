@@ -43507,14 +43507,20 @@ MonoBehaviour:
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
   BalloonPowerUps:
   - BalloonPosition: {x: 269.5, y: -49.5, z: 0}
-    BalloonHeight: low
+    BalloonHeight: 
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: 120.5, y: -47.5, z: 0}
-    BalloonHeight: med
+    BalloonHeight: 
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: 200.5, y: -57.5, z: 0}
-    BalloonHeight: high
+    BalloonHeight: 
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: 331.5, y: -25.5, z: 0}
     BalloonHeight: 
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 5.7, y: -6.7, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 10.3, y: -3.9, z: 0}
+    BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}

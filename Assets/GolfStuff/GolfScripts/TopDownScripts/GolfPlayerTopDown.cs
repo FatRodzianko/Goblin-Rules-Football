@@ -10,6 +10,7 @@ using FishNet.Managing;
 using FishNet.Object.Synchronizing;
 using FishNet;
 using TMPro;
+using UnityEngine.UI;
 //using Mirror;
 
 public class GolfPlayerTopDown : NetworkBehaviour
@@ -141,6 +142,15 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] Sprite _longPuttTextImage;
 
     [Header("Power Ups")]
+    [SyncVar] public bool HasPowerUp = false;
+    [SyncVar] public string PlayerPowerUpType = null;
+    string _playerPowerUpText = null;
+
+    [Header("Power Up UI")]
+    [SerializeField] Canvas _powerUpCanvas;
+    [SerializeField] TextMeshProUGUI _powerUpMessageText;
+    [SerializeField] GameObject _powerUpDisplayHolder;
+    [SerializeField] RawImage _powerUpImage;
 
     [Header("Wind UI")]
     [SerializeField] GameObject _windUIHolder;
@@ -2314,5 +2324,33 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
         this.DistanceFavorModifier = 1.0f + newFavorModifier;
         Debug.Log("SetDistanceFavorModifier: new distance modifier for player " + this.PlayerName + " will be: " + DistanceFavorModifier.ToString() + " based on their weather favor of: " + newPlayerFavor.ToString());
+    }
+    [Server]
+    public void NewPowerUpForPlayer(string newPowerUpType, string newPowerUpText)
+    {
+        this.HasPowerUp = true;
+        this.PlayerPowerUpType = newPowerUpType;
+        this.RpcPlayerGotNewPowerUp(newPowerUpType, newPowerUpText);
+    }
+    [ObserversRpc(BufferLast = true)]
+    void RpcPlayerGotNewPowerUp(string newPowerUpType, string newPowerUpText)
+    {
+        Debug.Log("RpcPlayerGotNewPowerUp: new power up for player of type: " + newPowerUpType);
+        this._playerPowerUpText = newPowerUpText;
+        StartCoroutine(NewPowerUpMessage(newPowerUpText));
+    }
+    IEnumerator NewPowerUpMessage(string newPowerUpText)
+    {
+        bool wasPowerUpCanvasEnabled = _powerUpCanvas.gameObject.activeInHierarchy;
+        _powerUpMessageText.text = "New Power Up! " + newPowerUpText;
+        _powerUpCanvas.gameObject.SetActive(true);
+        yield return new WaitForSeconds(5.0f);
+        _powerUpMessageText.text = "";
+        if (!wasPowerUpCanvasEnabled)
+            _powerUpCanvas.gameObject.SetActive(false);
+    }
+    public void UpdatePlayerPowerUpSprite(Sprite newPowerUpSprite)
+    {
+        this._powerUpImage.texture = newPowerUpSprite.texture;
     }
 }

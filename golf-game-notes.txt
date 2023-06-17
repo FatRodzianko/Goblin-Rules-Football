@@ -131,6 +131,51 @@ x GameplayManager Next Steps
 - - - - - - x if the "number of players who teed off) is less than length of list of players, go to the next player in list using _numberOfPlayersTeedOff as the index
 - - - - - - x if _numberOfPlayersTeedOff is equal or greater than length of player list, calculate next player based on distance of their ball to the hole
 
+### Power Up Tasks
+x make sure that getting a second powerup removes the first power up, then adds the second
+- hitboxes should be updated. It's a bit hard to hit them right now....
+- - - might want to draw the balloons bigger?
+- change the "PowerUpTypeMapping" thing in the PowerUpManagerTopDown script to be from a scriptable object instead?
+- - - that way other objects, like the power ups and players, can just reference the one scriptable object instead of querying the powerupmanager? That might be better idk?
+- set the player's "HasPowerUp" and PowerUpType fields
+- display in player's UI the powerup they have
+- - - sprite for the power up displayed
+- - x message sent to player with the "power up text" that says what it does
+- - - have it as part of the "Hole Info Canvas" UI?
+- - - - - - for each new player's turn, will need to retrieve new power up image?
+- - x have a new Canvas on the player object, separate from the "player canvas"
+- - - - - - checks at beginning of player's turn to see if it should turn on or not
+- - - - - - make sure to set the power up message text to null before turning the canvas on at the beginning of the turn?
+- if player has a power up, make sure they are alerted to it at the beginning of their turn that they can use it?
+- - - arrow under the power up sprite that moves up and down to tell them it's there?
+- - - message to player to press "p" key to use the power up
+- mulligan power up will be different
+- - - prompt player for mulligan at end of their shot?
+- - - make it so they have like 5 seconds to chose to mulligan? If they don't decide, end turn
+- - - - - - p to use the mulligan, space or something else to end the turn?
+- - - need to have some sort of check that prevents the mulligan from being used on the turn the player gets it? Want to make sure they aren't just aiming for an out-of-the-way powerup and then redo the shot right after?
+- - - - - - might not really be a needed check since the power up types are chosen randomly?
+- If they use rain/wind powerup
+- - - send message to server. Set the player rain to clear/wind to 0. The player's shot should then not take those into account when doing their shot
+- - - - - - and hopefully won't cause lightning/tornadoes to be affected because it isn't affecting the base weather/wind?
+- for power/accuracy power ups
+- - - set modifier for power/accuracy on the server in a syncvar
+- - - when shots are calculated, the modifier is used by the client to calculate distance/accuracy
+- - - for distance, make sure to update a new trajectory for the player so their max distance is shown right away? otherwise, they'd have to change their club to update it?
+
+### Misc. Tasks
+- ball sprite currently goes "behind" the statues and power up ball/crate sprites. Need to do the sprite mask thing I did for trees?
+- Have the player that tees off first at the start of the game be determined by a "shot challenge"
+- - - Hole/flag set ~100 meters away from players
+- - - can only use the iron
+- - - each player gets 1 shot
+- - - random weather and wind? But always SOME wind to account for
+- - - maybe have a bunch of different "challenge holes" that are configured slightly differently. Game picks random between them for the new game?
+- - - - - - or have some way to dynamically generate the hole and send that info to all palyers
+- - - after each player takes 1 shot, calculate their distance from the hole
+- - - - - - closest goes first, farthest away goes last
+- - - - - - if tied, such as multiple holes in one, choose randomly who will go first?
+
 
 
 - - - other based on Cursed to Golf. Side view, 2d golf platforming
