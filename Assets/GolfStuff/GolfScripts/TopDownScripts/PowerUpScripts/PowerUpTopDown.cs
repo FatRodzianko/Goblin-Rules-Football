@@ -50,23 +50,23 @@ public class PowerUpTopDown : NetworkBehaviour
     {
         if (asServer)
             return;
-        //_powerUpSprite = PowerUpManagerTopDownGolf.instance.GetPowerUpSprite(next);
+        _powerUpSprite = PowerUpManagerTopDownGolf.instance.GetPowerUpSprite(next);
     }
     [Server]
     public void SetPowerUpText(string newText)
     {
         this._powerUpText = newText;
     }
-    [ObserversRpc(BufferLast = true)]
-    public void RpcSetPowerUpSpriteInPlayerUI(int ownerId, string type)
-    {
-        Debug.Log("RpcSetPowerUpSpriteInPlayerUI: for palyer with id: " + ownerId.ToString() + " for power up type: " + type);
-        GolfPlayerTopDown playerOwner = InstanceFinder.ClientManager.Objects.Spawned[ownerId].GetComponent<GolfPlayerTopDown>();
-        _powerUpSprite = PowerUpManagerTopDownGolf.instance.GetPowerUpSprite(type);
-        UpdatePowerUpSpriteOnPlayer(playerOwner, _powerUpSprite);
-    }
-    void UpdatePowerUpSpriteOnPlayer(GolfPlayerTopDown playerOwner, Sprite sprite)
-    {
-        playerOwner.UpdatePlayerPowerUpSprite(sprite);
-    }
+    //[ObserversRpc(BufferLast = true)]
+    //public void RpcSetPowerUpSpriteInPlayerUI(int ownerId, string type)
+    //{
+    //    Debug.Log("RpcSetPowerUpSpriteInPlayerUI: for palyer with id: " + ownerId.ToString() + " for power up type: " + type);
+    //    GolfPlayerTopDown playerOwner = InstanceFinder.ClientManager.Objects.Spawned[ownerId].GetComponent<GolfPlayerTopDown>();
+    //    _powerUpSprite = PowerUpManagerTopDownGolf.instance.GetPowerUpSprite(type);
+    //    UpdatePowerUpSpriteOnPlayer(playerOwner, _powerUpSprite);
+    //}
+    //void UpdatePowerUpSpriteOnPlayer(GolfPlayerTopDown playerOwner, Sprite sprite)
+    //{
+    //    playerOwner.UpdatePlayerPowerUpSprite(sprite);
+    //}
 }

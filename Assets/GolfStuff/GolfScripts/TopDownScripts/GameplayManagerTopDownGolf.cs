@@ -9,6 +9,7 @@ using FishNet.Object.Synchronizing;
 using FishNet.Object;
 using FishNet.Connection;
 using FishNet;
+using UnityEngine.UI;
 
 public class GameplayManagerTopDownGolf : NetworkBehaviour
 {
@@ -70,6 +71,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] Canvas _holeInfoCanvas;
     //[SerializeField] GameObject _currentplayerui;
     //[SerializeField] TextMeshProUGUI _currentplayeruiText;
+
+    [Header("Power Up UI Stuff")]
+    [SerializeField] TextMeshProUGUI _powerUpMessageText;
+    [SerializeField] GameObject _powerUpDisplayHolder;
+    [SerializeField] RawImage _powerUpImage;
 
 
     [Header("Skip For Lightning Info")]
@@ -632,6 +638,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     void RpcUpdateUIForCurrentPlayer(GolfPlayerTopDown player, bool forTeeOff = false)
     {
         UpdateUIForCurrentPlayer(player, forTeeOff);
+        UpdatePowerUpUIForCurrentPlayer(player);
     }
     void UpdateUIForCurrentPlayer(GolfPlayerTopDown player, bool forTeeOff = false)
     {
@@ -643,6 +650,20 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             _terrainTypeText.text = "";
         else
             _terrainTypeText.text = titleCase.ToTitleCase(player.GetTerrainTypeFromBall());
+    }
+    void UpdatePowerUpUIForCurrentPlayer(GolfPlayerTopDown player)
+    {
+        if (!player.HasPowerUp)
+        {
+            DeactivatePowerUpUI();
+            return;
+        }
+        
+        _powerUpMessageText.gameObject.SetActive(false);
+        _powerUpMessageText.text = "";
+
+        SetPowerUpSpriteByType(player.PlayerPowerUpType);
+        _powerUpDisplayHolder.SetActive(true);
     }
     void UpdateZoomedOutPos(Vector3 newPos, float newZoomValue)
     {
@@ -1141,5 +1162,32 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         Debug.Log("GameplayManagerTopDownGolf.cs: GetAveragePlayerFavor: Average player favor is: " + averageFavor.ToString() + " based on total favor of: " + totalFavor.ToString() + " and " + this.GolfPlayersServer.Count.ToString() + " number of players.");
 
         return averageFavor;
+    }
+    public void PlayerGotNewPowerUp(string newPowerUpType, string newPowerUpText)
+    {
+        StartCoroutine(NewPowerUpMessage(newPowerUpText));
+        SetPowerUpSpriteByType(newPowerUpType);
+        _powerUpDisplayHolder.SetActive(true);
+    }
+    IEnumerator NewPowerUpMessage(string newPowerUpText)
+    {
+        _powerUpMessageText.text = "New Power Up! " + newPowerUpText;
+        _powerUpMessageText.gameObject.SetActive(true);
+        yield return new WaitForSeconds(5.0f);
+        _powerUpMessageText.gameObject.SetActive(false);
+        _powerUpMessageText.text = "";
+    }
+    void SetPowerUpSpriteByType(string type)
+    {
+        Debug.Log("SetPowerUpSpriteByType: " + type);
+        _powerUpImage.texture = PowerUpManagerTopDownGolf.instance.GetPowerUpSprite(type).texture;
+        _powerUpImage.enabled = true;
+    }
+    void DeactivatePowerUpUI()
+    {
+        _powerUpMessageText.text = "";
+        _powerUpMessageText.gameObject.SetActive(false);
+        _powerUpDisplayHolder.SetActive(false);
+        _powerUpImage.enabled = false;
     }
 }

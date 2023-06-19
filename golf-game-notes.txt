@@ -137,6 +137,7 @@ x make sure that getting a second powerup removes the first power up, then adds 
 - - - might want to draw the balloons bigger?
 - change the "PowerUpTypeMapping" thing in the PowerUpManagerTopDown script to be from a scriptable object instead?
 - - - that way other objects, like the power ups and players, can just reference the one scriptable object instead of querying the powerupmanager? That might be better idk?
+- replace the observerrpc in the powerupscript to set player's power up type with a similar function but in the player's script
 - set the player's "HasPowerUp" and PowerUpType fields
 - display in player's UI the powerup they have
 - - - sprite for the power up displayed

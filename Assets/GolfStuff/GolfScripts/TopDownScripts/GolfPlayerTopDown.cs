@@ -146,11 +146,6 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SyncVar] public string PlayerPowerUpType = null;
     string _playerPowerUpText = null;
 
-    [Header("Power Up UI")]
-    [SerializeField] Canvas _powerUpCanvas;
-    [SerializeField] TextMeshProUGUI _powerUpMessageText;
-    [SerializeField] GameObject _powerUpDisplayHolder;
-    [SerializeField] RawImage _powerUpImage;
 
     [Header("Wind UI")]
     [SerializeField] GameObject _windUIHolder;
@@ -2328,6 +2323,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [Server]
     public void NewPowerUpForPlayer(string newPowerUpType, string newPowerUpText)
     {
+        Debug.Log("NewPowerUpForPlayer: " + this.PlayerName + " " + newPowerUpType);
         this.HasPowerUp = true;
         this.PlayerPowerUpType = newPowerUpType;
         this.RpcPlayerGotNewPowerUp(newPowerUpType, newPowerUpText);
@@ -2337,20 +2333,21 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         Debug.Log("RpcPlayerGotNewPowerUp: new power up for player of type: " + newPowerUpType);
         this._playerPowerUpText = newPowerUpText;
-        StartCoroutine(NewPowerUpMessage(newPowerUpText));
+        GameplayManagerTopDownGolf.instance.PlayerGotNewPowerUp(newPowerUpType, newPowerUpText);
+        //StartCoroutine(NewPowerUpMessage(newPowerUpText));
     }
-    IEnumerator NewPowerUpMessage(string newPowerUpText)
-    {
-        bool wasPowerUpCanvasEnabled = _powerUpCanvas.gameObject.activeInHierarchy;
-        _powerUpMessageText.text = "New Power Up! " + newPowerUpText;
-        _powerUpCanvas.gameObject.SetActive(true);
-        yield return new WaitForSeconds(5.0f);
-        _powerUpMessageText.text = "";
-        if (!wasPowerUpCanvasEnabled)
-            _powerUpCanvas.gameObject.SetActive(false);
-    }
-    public void UpdatePlayerPowerUpSprite(Sprite newPowerUpSprite)
-    {
-        this._powerUpImage.texture = newPowerUpSprite.texture;
-    }
+    //IEnumerator NewPowerUpMessage(string newPowerUpText)
+    //{
+    //    bool wasPowerUpCanvasEnabled = _powerUpCanvas.gameObject.activeInHierarchy;
+    //    _powerUpMessageText.text = "New Power Up! " + newPowerUpText;
+    //    _powerUpCanvas.gameObject.SetActive(true);
+    //    yield return new WaitForSeconds(5.0f);
+    //    _powerUpMessageText.text = "";
+    //    if (!wasPowerUpCanvasEnabled)
+    //        _powerUpCanvas.gameObject.SetActive(false);
+    //}
+    //public void UpdatePlayerPowerUpSprite(Sprite newPowerUpSprite)
+    //{
+    //    this._powerUpImage.texture = newPowerUpSprite.texture;
+    //}
 }

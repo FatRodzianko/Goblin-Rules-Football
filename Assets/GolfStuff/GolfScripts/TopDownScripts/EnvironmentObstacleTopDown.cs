@@ -34,9 +34,13 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     [SerializeField] bool _isBalloon = false;
     [SerializeField] BalloonPowerUp _myBalloon;
 
+    [Header("Spawn Protection")]
+    bool _spawnProtection = true;
+
     // Start is called before the first frame update
     void Start()
     {
+        StartCoroutine(SpawnProtectionRoutine());
         _softBounceSoundType = myScriptableObject.SoftBounceSoundType;
         _hardBounceSoundType = myScriptableObject.HardBounceSoundType;
         if (_isStatue && !_myStatue)
@@ -54,6 +58,12 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     {
         if (collision.tag == "golfBall")
         {
+            if (_spawnProtection)
+            {
+                Debug.Log("EnvironmentObstacleTopDown: OnTriggerEnter2D: spawn protection? " + this._spawnProtection);
+                return;
+            }
+
             GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
 
             // only calculate collisions for balls the client owns...
@@ -253,6 +263,11 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     }
     void BalloonCollisionCheck(GolfBallTopDown golfBallScript)
     {
+        if (_spawnProtection)
+        {
+            Debug.Log("BalloonCollisionCheck: spawn protection? " + this._spawnProtection);
+            return;
+        }
         Debug.Log("BalloonCollisionCheck: is balloon already popped? " + this._myBalloon.IsPopped);
         if (_myBalloon.IsPopped)
             return;
@@ -260,8 +275,15 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         float ballZ = golfBallScript.transform.position.z;
         float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
 
+        //if (StartHeight == 0f && HeightInUnityUnits == 0f)
+        //{
+        //    Debug.Log("BalloonCollisionCheck: Height of the ball is " + ballHeightInUnityUnits.ToString() + " start height: " + StartHeight.ToString() + " HeightInUnityUnits: " + HeightInUnityUnits.ToString());
+        //    return;
+        //}
+
         if (ballHeightInUnityUnits >= StartHeight && ballHeightInUnityUnits <= HeightInUnityUnits)
         {
+            Debug.Log("BalloonCollisionCheck: Height of the ball is " + ballHeightInUnityUnits.ToString() + " start height: " + StartHeight.ToString() + " HeightInUnityUnits: " + HeightInUnityUnits.ToString());
             this.GetComponent<BalloonPowerUp>().CollisionToPopBalloon(golfBallScript);
         }
 
@@ -274,6 +296,12 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     public void RemoveIsBalloon()
     {
         _isBalloon = false;
+    }
+    IEnumerator SpawnProtectionRoutine()
+    {
+        this._spawnProtection = true;
+        yield return new WaitForSeconds(0.5f);
+        this._spawnProtection = false;
     }
 
 }

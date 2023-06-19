@@ -148,7 +148,7 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
         powerUpObjectScript.SetPowerUpType(powerUpType);
         string powerUpText = GetPowerUpText(powerUpType);
         powerUpObjectScript.SetPowerUpText(powerUpText);
-        powerUpObjectScript.RpcSetPowerUpSpriteInPlayerUI(playerOwner.ObjectId, powerUpType);
+        //powerUpObjectScript.RpcSetPowerUpSpriteInPlayerUI(playerOwner.ObjectId, powerUpType);
 
         // Set the player power up parameters
         playerOwner.NewPowerUpForPlayer(powerUpType, powerUpText);
