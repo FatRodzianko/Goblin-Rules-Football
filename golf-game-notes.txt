@@ -140,13 +140,14 @@ x make sure that getting a second powerup removes the first power up, then adds 
 - replace the observerrpc in the powerupscript to set player's power up type with a similar function but in the player's script
 - set the player's "HasPowerUp" and PowerUpType fields
 - display in player's UI the powerup they have
-- - - sprite for the power up displayed
+- - x sprite for the power up displayed
 - - x message sent to player with the "power up text" that says what it does
-- - - have it as part of the "Hole Info Canvas" UI?
-- - - - - - for each new player's turn, will need to retrieve new power up image?
+- - x have it as part of the "Hole Info Canvas" UI?
+- - - - - x for each new player's turn, will need to retrieve new power up image?
 - - x have a new Canvas on the player object, separate from the "player canvas"
-- - - - - - checks at beginning of player's turn to see if it should turn on or not
-- - - - - - make sure to set the power up message text to null before turning the canvas on at the beginning of the turn?
+- - - - - x checks at beginning of player's turn to see if it should turn on or not
+- - - - - x make sure to set the power up message text to null before turning the canvas on at the beginning of the turn?
+- - - - - - changed this to be on the gameplayermanager hole info UI instead
 - if player has a power up, make sure they are alerted to it at the beginning of their turn that they can use it?
 - - - arrow under the power up sprite that moves up and down to tell them it's there?
 - - - message to player to press "p" key to use the power up
@@ -163,6 +164,14 @@ x make sure that getting a second powerup removes the first power up, then adds 
 - - - set modifier for power/accuracy on the server in a syncvar
 - - - when shots are calculated, the modifier is used by the client to calculate distance/accuracy
 - - - for distance, make sure to update a new trajectory for the player so their max distance is shown right away? otherwise, they'd have to change their club to update it?
+
+ballon heights
+2.75
+4.5625
+3.75
+5.5625
+4.75
+6.5625
 
 ### Misc. Tasks
 - ball sprite currently goes "behind" the statues and power up ball/crate sprites. Need to do the sprite mask thing I did for trees?

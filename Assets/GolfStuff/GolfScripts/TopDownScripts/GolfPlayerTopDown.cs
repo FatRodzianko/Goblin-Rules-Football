@@ -467,6 +467,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                     _cameraViewHole.ZoomOutCamera();
                 UpdateCameraFollowTarget(MyBall.MyBallObject);
                 CmdSetCameraOnMyBallForOtherPlayers();
+                GameplayManagerTopDownGolf.instance.PowerUpHideInstructions();
             }
             else if (DirectionAndDistanceChosen && !_moveHitMeterIcon && !_golfAnimator.IsSwinging)
                 StartHitMeterSequence();
@@ -485,6 +486,15 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 }
             }
         }
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Debug.Log("Player pressed \"p\"");
+            if (!DirectionAndDistanceChosen && !_moveHitMeterIcon && !(MyBall.isHit || MyBall.isBouncing || MyBall.isRolling))
+            {
+                Debug.Log("Player pressed \"p\": allowed to use powerup because: !DirectionAndDistanceChosen && !_moveHitMeterIcon && !(MyBall.isHit || MyBall.isBouncing || MyBall.isRolling)");
+            }
+
+        }
         //if (Input.GetKeyDown(KeyCode.LeftControl) && !IsPlayersTurn)
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
@@ -495,6 +505,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             {
                 PlayerChooseDirectionAndDistance(false);
                 UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
+                GameplayManagerTopDownGolf.instance.PowerUpShowInstructions(this);
+
             }
         }
         //if (Input.GetKeyDown(KeyCode.Tab))
@@ -739,6 +751,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             Debug.Log("SyncIsPlayersTurn: Is it " + this.PlayerName + "'s turn? " + next.ToString());
             StartPlayerTurn();
+            if (this.IsOwner)
+            {
+                GameplayManagerTopDownGolf.instance.PowerUpShowInstructions(this);
+            }
         }
         else
         { 

@@ -76,6 +76,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] TextMeshProUGUI _powerUpMessageText;
     [SerializeField] GameObject _powerUpDisplayHolder;
     [SerializeField] RawImage _powerUpImage;
+    [SerializeField] TextMeshProUGUI _powerUpInstructionsText;
 
 
     [Header("Skip For Lightning Info")]
@@ -653,6 +654,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     }
     void UpdatePowerUpUIForCurrentPlayer(GolfPlayerTopDown player)
     {
+        _powerUpInstructionsText.gameObject.SetActive(false);
+
         if (!player.HasPowerUp)
         {
             DeactivatePowerUpUI();
@@ -664,6 +667,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         SetPowerUpSpriteByType(player.PlayerPowerUpType);
         _powerUpDisplayHolder.SetActive(true);
+        PowerUpHideInstructions();
+        //PowerUpShowInstructions(player);
     }
     void UpdateZoomedOutPos(Vector3 newPos, float newZoomValue)
     {
@@ -1189,5 +1194,26 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         _powerUpMessageText.gameObject.SetActive(false);
         _powerUpDisplayHolder.SetActive(false);
         _powerUpImage.enabled = false;
+    }
+    public void PowerUpShowInstructions(GolfPlayerTopDown player)
+    {
+        if (!player.HasPowerUp)
+        {
+            _powerUpInstructionsText.gameObject.SetActive(false);
+            return;
+        }
+
+        if (player.PlayerPowerUpType != "mulligan")
+        {
+            _powerUpInstructionsText.gameObject.SetActive(true);
+        }
+        else
+        {
+            _powerUpInstructionsText.gameObject.SetActive(false);
+        }
+    }
+    public void PowerUpHideInstructions()
+    {
+        _powerUpInstructionsText.gameObject.SetActive(false);
     }
 }
