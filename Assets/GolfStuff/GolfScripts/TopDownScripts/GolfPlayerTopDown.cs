@@ -145,7 +145,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SyncVar] public bool HasPowerUp = false;
     [SyncVar] public string PlayerPowerUpType = null;
     string _playerPowerUpText = null;
-
+    PowerUpTopDown _myPowerUp;
+    [SyncVar(OnChange = nameof(SyncUsedPowerUpType))] public string UsedPowerUpType;
+    
 
     [Header("Wind UI")]
     [SerializeField] GameObject _windUIHolder;
@@ -492,6 +494,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             if (!DirectionAndDistanceChosen && !_moveHitMeterIcon && !(MyBall.isHit || MyBall.isBouncing || MyBall.isRolling))
             {
                 Debug.Log("Player pressed \"p\": allowed to use powerup because: !DirectionAndDistanceChosen && !_moveHitMeterIcon && !(MyBall.isHit || MyBall.isBouncing || MyBall.isRolling)");
+                this.UsePowerUp();
             }
 
         }
@@ -2366,4 +2369,59 @@ public class GolfPlayerTopDown : NetworkBehaviour
     //{
     //    this._powerUpImage.texture = newPowerUpSprite.texture;
     //}
+    public void NewPowerUpObject(PowerUpTopDown newPowerUp, bool removePowerUp = false)
+    {
+        if (removePowerUp && this._myPowerUp == newPowerUp)
+        {
+            this._myPowerUp = null;
+            return;
+        }
+        this._myPowerUp = newPowerUp;
+    }
+    void UsePowerUp()
+    {
+        if (!this.IsOwner)
+            return;
+        if (!this.HasPowerUp)
+            return;
+
+        Debug.Log("UsePowerUp: for player: " + this.PlayerName + " and their power up of type: " + this.PlayerPowerUpType);
+        CmdUsePowerUp();
+    }
+    [ServerRpc]
+    void CmdUsePowerUp()
+    {
+        if (!this.HasPowerUp)
+            return;
+        Debug.Log("CmdUsePowerUp: for player: " + this.PlayerName + " and their power up of type: " + this.PlayerPowerUpType);
+        PowerUpManagerTopDownGolf.instance.PlayerIsUsingPowerUp(this.ObjectId);
+    }
+    void SyncUsedPowerUpType(string prev, string next, bool asServer)
+    {
+        if (asServer)
+        {
+            return;
+        }
+        if (!this.IsOwner)
+        {
+            return;
+        }
+        Debug.Log("SyncUsedPowerUpType: " + next + " on player: " + this.PlayerName);
+    }
+    [Server]
+    public void SetUsedPowerUpType(string usedType)
+    {
+        Debug.Log("SetUsedPowerUpType: " + usedType + " on player: " + this.PlayerName);
+        this.UsedPowerUpType = usedType;
+        PlayerUsedPowerUp(usedType);
+    }
+    [Server]
+    public void PlayerUsedPowerUp(string usedPowerUpType)
+    {
+        Debug.Log("PlayerUsedPowerUp: " + this.PlayerName + " " + usedPowerUpType);
+        this.HasPowerUp = false;
+        this.PlayerPowerUpType = null;
+        // replace with RPC that just says the player used the power up? Should alert all clients?
+        //this.RpcPlayerGotNewPowerUp(newPowerUpType, newPowerUpText);
+    }
 }

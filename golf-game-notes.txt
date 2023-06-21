@@ -137,8 +137,8 @@ x make sure that getting a second powerup removes the first power up, then adds 
 - - - might want to draw the balloons bigger?
 - change the "PowerUpTypeMapping" thing in the PowerUpManagerTopDown script to be from a scriptable object instead?
 - - - that way other objects, like the power ups and players, can just reference the one scriptable object instead of querying the powerupmanager? That might be better idk?
-- replace the observerrpc in the powerupscript to set player's power up type with a similar function but in the player's script
-- set the player's "HasPowerUp" and PowerUpType fields
+x replace the observerrpc in the powerupscript to set player's power up type with a similar function but in the player's script
+x set the player's "HasPowerUp" and PowerUpType fields
 - display in player's UI the powerup they have
 - - x sprite for the power up displayed
 - - x message sent to player with the "power up text" that says what it does
@@ -150,7 +150,10 @@ x make sure that getting a second powerup removes the first power up, then adds 
 - - - - - - changed this to be on the gameplayermanager hole info UI instead
 - if player has a power up, make sure they are alerted to it at the beginning of their turn that they can use it?
 - - - arrow under the power up sprite that moves up and down to tell them it's there?
-- - - message to player to press "p" key to use the power up
+- - x message to player to press "p" key to use the power up
+- have the player's used powerup be used/removed from them on the sever/ when they hit the ball?
+- - - instead of right now where it's removed at the beginning of the next turn?
+- - - I think this will be good because then a player can get a power up after their hit. So, use power up, hit ball, pop balloon, get new power up on same turn
 - mulligan power up will be different
 - - - prompt player for mulligan at end of their shot?
 - - - make it so they have like 5 seconds to chose to mulligan? If they don't decide, end turn

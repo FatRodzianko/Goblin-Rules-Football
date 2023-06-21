@@ -30,6 +30,7 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
 
     [Header("Player PowerUps")]
     Dictionary<int, PowerUpTopDown> _playerOwnedPowerUps = new Dictionary<int, PowerUpTopDown>();
+    List<int> _playerNetIdsWhoUsedPowerUps = new List<int>();
 
     [Serializable]
     public struct PowerUpTypeMapping
@@ -187,6 +188,36 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
 
         // For now, destroy. Maybe in the future have it randomly give the old power up to a random player that doesn't have a power up? And if all have power ups, then destroy it?
         InstanceFinder.ServerManager.Despawn(powerUpToRemove.gameObject);
+    }
+    [Server]
+    public void PlayerIsUsingPowerUp(int playerNetId)
+    {
+        if (!_playerOwnedPowerUps.ContainsKey(playerNetId))
+        {
+            Debug.Log("PlayerIsUsingPowerUp: Player net id of: " + playerNetId.ToString() + " not found. aborting...");
+            return;
+        }
+        PowerUpTopDown powerUpToUse = _playerOwnedPowerUps[playerNetId];
+        if (powerUpToUse.HasBeenUsed)
+        {
+            Debug.Log("PlayerIsUsingPowerUp: power up has already been used. Aborting... " + powerUpToUse.PowerUpType + ":" + powerUpToUse.HasBeenUsed.ToString());
+            return;
+        }
+        GolfPlayerTopDown playerWhoUsed = InstanceFinder.ServerManager.Objects.Spawned[playerNetId].GetComponent<GolfPlayerTopDown>();
+        _playerNetIdsWhoUsedPowerUps.Add(playerWhoUsed.ObjectId);
+        playerWhoUsed.SetUsedPowerUpType(powerUpToUse.PowerUpType);
+        powerUpToUse.HasBeenUsed = true;
+    }
+    [Server]
+    public void RemoveUsedPowerUps()
+    {
+        if (_playerNetIdsWhoUsedPowerUps.Count <= 0)
+            return;
+        foreach (int playerId in _playerNetIdsWhoUsedPowerUps)
+        {
+            PowerUpTopDown powerup = _playerOwnedPowerUps[playerId];
+            RemovePowerUpObjectFromPlayer(playerId, powerup);
+        }
     }
     [Server]
     void DestroyPowerUpObject(GameObject powerUpToDestroy)

@@ -528,6 +528,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             await StormPassesForSkips(5f);
             _skipLightningCheck = true;
         }
+        // removed used powerups
+        PowerUpManagerTopDownGolf.instance.RemoveUsedPowerUps();
         // Set the weather for the next turn
         await SetWeatherForNextTurn();
         // Diable sprite of players that are not the current player

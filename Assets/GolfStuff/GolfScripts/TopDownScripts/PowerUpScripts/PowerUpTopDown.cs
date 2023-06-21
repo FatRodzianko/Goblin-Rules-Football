@@ -12,11 +12,13 @@ public class PowerUpTopDown : NetworkBehaviour
 {
     [Header("Owner Info")]
     [SyncVar(OnChange = nameof(SyncOwnerID))] public int OwnerID;
+    GolfPlayerTopDown _myOwner;
 
     [Header("PowerUp Attributes")]
     [SyncVar(OnChange = nameof(SyncPowerUpType))] public string PowerUpType;
     [SyncVar] string _powerUpText;
     Sprite _powerUpSprite;
+    [SyncVar] public bool HasBeenUsed = false;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +42,8 @@ public class PowerUpTopDown : NetworkBehaviour
 
         Transform owner = InstanceFinder.ClientManager.Objects.Spawned[next].transform;
         this.transform.parent = owner;
+        _myOwner = owner.GetComponent<GolfPlayerTopDown>();
+        _myOwner.NewPowerUpObject(this, false);
     }
     [Server]
     public void SetPowerUpType(string newType)
@@ -56,6 +60,12 @@ public class PowerUpTopDown : NetworkBehaviour
     public void SetPowerUpText(string newText)
     {
         this._powerUpText = newText;
+    }
+    private void OnDestroy()
+    {
+        if (!_myOwner)
+            return;
+        _myOwner.NewPowerUpObject(this, true);
     }
     //[ObserversRpc(BufferLast = true)]
     //public void RpcSetPowerUpSpriteInPlayerUI(int ownerId, string type)
