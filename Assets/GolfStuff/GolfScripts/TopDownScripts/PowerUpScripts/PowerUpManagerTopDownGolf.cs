@@ -220,6 +220,16 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
         }
     }
     [Server]
+    public void RemoveUsedPowerupsFromPlayer(int playerNetId)
+    {
+        Debug.Log("RemoveUsedPowerupsFromPlayer: for player with net id: " + playerNetId.ToString());
+        if (!_playerOwnedPowerUps.ContainsKey(playerNetId))
+        {
+            return;
+        }
+        RemovePowerUpObjectFromPlayer(playerNetId, _playerOwnedPowerUps[playerNetId]);
+    }
+    [Server]
     void DestroyPowerUpObject(GameObject powerUpToDestroy)
     {
         InstanceFinder.ServerManager.Despawn(powerUpToDestroy);

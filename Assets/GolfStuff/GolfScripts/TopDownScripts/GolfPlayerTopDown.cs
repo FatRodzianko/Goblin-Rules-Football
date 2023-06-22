@@ -147,7 +147,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     string _playerPowerUpText = null;
     PowerUpTopDown _myPowerUp;
     [SyncVar(OnChange = nameof(SyncUsedPowerUpType))] public string UsedPowerUpType;
-    
+    [SyncVar] public bool UsedPowerupThisTurn = false;
+
+    [Header("Power Up Effects")]
+    [SyncVar(OnChange = nameof(SyncPowerUpDistanceModifier))] public float PowerUpDistanceModifier = 1.0f;
+    [SyncVar] public float PowerUpAccuracyModifier = 1.0f;
 
     [Header("Wind UI")]
     [SerializeField] GameObject _windUIHolder;
@@ -1283,6 +1287,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         UpdateCameraFollowTarget(MyBall.MyBallObject);
         EnableOrDisableLineObjects(false);
         CmdTellPlayersToEnableOrDisableLineObjects(false);
+        CmdRemoveUsedPowerUps();
     }
     [ServerRpc]
     void CmdPlaySoundForClients(string soundName, float soundVolume)
@@ -1445,7 +1450,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (club.ClubType != "putter")
         {
             //dist *= this.DistanceFavorModifier;
-            float newDist = dist * this.DistanceFavorModifier;
+            //float newDist = dist * this.DistanceFavorModifier;
+            float newDist = dist * this.DistanceFavorModifier * this.PowerUpDistanceModifier;
             Debug.Log("GetDistanceFromClub: New hit distance of: " + newDist.ToString() + " compared to original distance of: " + dist.ToString() + ". Player " + this.PlayerName + " has DistanceFavorModifier of: " + DistanceFavorModifier.ToString() + " based on favor of: " + this.FavorWeather.ToString());
             dist = newDist;
         }
@@ -2413,7 +2419,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         Debug.Log("SetUsedPowerUpType: " + usedType + " on player: " + this.PlayerName);
         this.UsedPowerUpType = usedType;
+        this.UsedPowerupThisTurn = true;
         PlayerUsedPowerUp(usedType);
+        GetPowerUpEffect(usedType);
     }
     [Server]
     public void PlayerUsedPowerUp(string usedPowerUpType)
@@ -2423,5 +2431,49 @@ public class GolfPlayerTopDown : NetworkBehaviour
         this.PlayerPowerUpType = null;
         // replace with RPC that just says the player used the power up? Should alert all clients?
         //this.RpcPlayerGotNewPowerUp(newPowerUpType, newPowerUpText);
+    }
+    [Server]
+    void GetPowerUpEffect(string usedPowerUpType)
+    {
+        if (string.IsNullOrEmpty(usedPowerUpType))
+            return;
+
+        switch (usedPowerUpType)
+        {
+            case "power":
+                PowerPowerUpEffect();
+                break;
+            case "accuracy":
+                AccuracyPowerUpEffect();
+                break;
+        }
+    }
+    [Server]
+    void PowerPowerUpEffect()
+    {
+        this.PowerUpDistanceModifier = 1.5f;
+    }
+    void SyncPowerUpDistanceModifier(float prev, float next, bool asServer)
+    {
+        if (asServer)
+            return;
+        if (!this.IsOwner)
+            return;
+        if (next != 1.0f)
+        {
+            Debug.Log("SyncPowerUpDistanceModifier: Player " + this.PlayerName + "'s PowerUpDistanceModifier is not 1.0f. Forcing a recalculation of trajectory to increase max distance?");
+            GetNewClubAttributes(CurrentClub);
+            GetHitStatsFromClub();
+        }
+    }
+    [Server]
+    void AccuracyPowerUpEffect()
+    {
+        this.PowerUpAccuracyModifier = 0.5f;
+    }
+    [ServerRpc]
+    void CmdRemoveUsedPowerUps()
+    {
+        PowerUpManagerTopDownGolf.instance.RemoveUsedPowerupsFromPlayer(this.ObjectId);
     }
 }
