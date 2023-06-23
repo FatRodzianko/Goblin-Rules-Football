@@ -422,6 +422,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             TimeSinceLastSkip = Time.time;
         }
 
+        // Reset the player's used power up stuff after their turn? Should be done before calculating the next player and before any returns from this function that would prevent it from happening?
+        ResetPlayersUsedPowerUpEffects(ball.MyPlayer);
+
         if (ball.IsInHole)
         {
             Debug.Log("GameplayManager: StartNextPlayersTurn: the ball is in the hole! Congrats to player: " + ball.MyPlayer.PlayerName);
@@ -441,7 +444,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             Debug.Log("StartNextPlayersTurn: Returning from TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
         }        
         
-
+        
 
         // Check if any players still have to hit a ball
         if (_numberOfPlayersInHole >= GolfPlayers.Count)
@@ -538,6 +541,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         SetCameraOnPlayer(CurrentPlayer);
         // Prompt player to start their turn
         PromptPlayerForNextTurn();
+
+        // Reset the player's used power up stuff before their turn starts. This is kind of a "just in case" type deal?
+        ResetPlayersUsedPowerUpEffects(CurrentPlayer);
     }
     GolfPlayerTopDown SelectNextPlayer()
     {
@@ -750,6 +756,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         SetCameraOnPlayer(CurrentPlayer);
         // Prompt player to start their turn
         PromptPlayerForNextTurn();
+
+        // Reset the player's used power up stuff before their turn starts. This is kind of a "just in case" type deal?
+        ResetPlayersUsedPowerUpEffects(CurrentPlayer);
     }
     async Task SetWeatherForNextTurn(bool newHole = false)
     {
@@ -1217,5 +1226,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     public void PowerUpHideInstructions()
     {
         _powerUpInstructionsText.gameObject.SetActive(false);
+    }
+    void ResetPlayersUsedPowerUpEffects(GolfPlayerTopDown player)
+    {
+        Debug.Log("GameplayManagerTopDownGolf.cs: ResetPlayersUsedPowerUpEffects: " + player.PlayerName);
+        player.ResetPlayersUsedPowerUpEffects();
     }
 }

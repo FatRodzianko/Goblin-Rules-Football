@@ -2476,4 +2476,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         PowerUpManagerTopDownGolf.instance.RemoveUsedPowerupsFromPlayer(this.ObjectId);
     }
+    [Server]
+    public void ResetPlayersUsedPowerUpEffects()
+    {
+        this.UsedPowerUpType = "";
+        this.UsedPowerupThisTurn = false;
+        this.PowerUpAccuracyModifier = 1.0f;
+        this.PowerUpDistanceModifier = 1.0f;
+    }
 }
