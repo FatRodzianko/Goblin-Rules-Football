@@ -81,7 +81,7 @@ public class DrawTrajectoryTopDown : MonoBehaviour
                 // with new position calculated, and the ball's height at that position calculated, check if the movement from the previous position to the new position would be blocked by an environment obstalce (like a tree...)
                 bool willBallHitObject = false;
                 RaycastHit2D[] obstaclesHit = EnvironmentObstaclesHit(prevPos, newPos, ball);
-                if (obstaclesHit.Length > 0)
+                if (obstaclesHit.Length > 0 && !(ball.MyPlayer.UsedPowerupThisTurn && ball.MyPlayer.UsedPowerUpType == "drill")) // don't make the collision checks if the player used their drill power up
                 {
                     // Every object along the shadow path is in obstaclesHit. Now, check to see if any of those have a height value that is higher than the balls height. If so, add to list of objects the ball will hit?
                     List<RaycastHit2D> environmentObstaclesHigherThanBall = EnvironmentObstaclesHigherThanBall(obstaclesHit, ball, prevPos, newPos);

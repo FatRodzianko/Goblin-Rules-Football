@@ -662,6 +662,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     }
     void UpdatePowerUpUIForCurrentPlayer(GolfPlayerTopDown player)
     {
+        if (!player)
+            return;
         _powerUpInstructionsText.gameObject.SetActive(false);
 
         if (!player.HasPowerUp)

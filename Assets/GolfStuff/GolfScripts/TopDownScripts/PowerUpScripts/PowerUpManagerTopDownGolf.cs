@@ -227,7 +227,8 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
         {
             return;
         }
-        RemovePowerUpObjectFromPlayer(playerNetId, _playerOwnedPowerUps[playerNetId]);
+        if(_playerOwnedPowerUps[playerNetId].GetComponent<PowerUpTopDown>().HasBeenUsed)
+            RemovePowerUpObjectFromPlayer(playerNetId, _playerOwnedPowerUps[playerNetId]);
     }
     [Server]
     void DestroyPowerUpObject(GameObject powerUpToDestroy)

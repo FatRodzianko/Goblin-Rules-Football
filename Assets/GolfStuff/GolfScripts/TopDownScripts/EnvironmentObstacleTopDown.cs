@@ -78,6 +78,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
 
             if (golfBallScript.LocalIsInHole)
                 return;
+            
 
             if (_isStatue)
             {
@@ -92,7 +93,15 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
                 Debug.Log("EnvironmentObstacleTopDown: Done with balloon checks");
                 return;
             }
-                
+
+            // Check for the drill power up. If the player is using it, skip all checks?
+            if (golfBallScript.MyPlayer.UsedPowerupThisTurn && golfBallScript.MyPlayer.UsedPowerUpType == "drill")
+            {
+                Debug.Log("EnvironmentObstacleTopDown: OnTriggerEnter2D: Player is using a drill power up. Skipping all collision checks.");
+                // have a call to a function to play a drill sound? Will probably need to move this to after the height checks then...
+                return;
+            }
+
 
             float ballZ = golfBallScript.transform.position.z;
             float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);

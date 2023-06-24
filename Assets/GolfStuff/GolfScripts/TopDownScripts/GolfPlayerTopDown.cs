@@ -2390,7 +2390,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (!this.HasPowerUp)
             return;
-
+        if (this.UsedPowerupThisTurn)
+            return;
         Debug.Log("UsePowerUp: for player: " + this.PlayerName + " and their power up of type: " + this.PlayerPowerUpType);
         CmdUsePowerUp();
     }
@@ -2398,6 +2399,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void CmdUsePowerUp()
     {
         if (!this.HasPowerUp)
+            return;
+        if (this.UsedPowerupThisTurn)
             return;
         Debug.Log("CmdUsePowerUp: for player: " + this.PlayerName + " and their power up of type: " + this.PlayerPowerUpType);
         PowerUpManagerTopDownGolf.instance.PlayerIsUsingPowerUp(this.ObjectId);

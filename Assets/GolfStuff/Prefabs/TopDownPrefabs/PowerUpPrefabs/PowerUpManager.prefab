@@ -59,25 +59,28 @@ MonoBehaviour:
   PowerUpTypeToSpriteMapping:
   - powerUpType: accuracy
     powerUpSprite: {fileID: 21300000, guid: 06cd2229c7cc8ce48845a36f87fe9a13, type: 3}
-    powerUpText: 
+    powerUpText: 'Accuracy: Shot will be 50% more accurate!'
   - powerUpType: higher
     powerUpSprite: {fileID: 21300000, guid: 89d28029c63d0cb4d8995b3512047b4b, type: 3}
-    powerUpText: 
+    powerUpText: 'Higher: Shot will be X% higher!'
   - powerUpType: mulligan
     powerUpSprite: {fileID: 21300000, guid: 1b250531cc9944b47a3f800dc476ba87, type: 3}
-    powerUpText: 
+    powerUpText: 'Mulligan: Redo previous shot!'
   - powerUpType: no-bounce
     powerUpSprite: {fileID: 21300000, guid: 4f9024559128d2e4182ae624f554dc91, type: 3}
-    powerUpText: 
+    powerUpText: 'No Bounce: Ball won''t bounce!'
   - powerUpType: power
     powerUpSprite: {fileID: 21300000, guid: c16a291fbbb9c494b90f8579ffde794d, type: 3}
-    powerUpText: 
+    powerUpText: 'Power: Hit ball 50% further!'
   - powerUpType: rain
     powerUpSprite: {fileID: 21300000, guid: ab6cec9923322a94cae3d24e358c84a4, type: 3}
-    powerUpText: 
+    powerUpText: 'No Rain: No rain for 1 turn!'
   - powerUpType: wind
     powerUpSprite: {fileID: 21300000, guid: c02c4da01671d7d46b7f1d667781ec64, type: 3}
-    powerUpText: 
+    powerUpText: 'No Wind: No wind for 1 turn!'
+  - powerUpType: drill
+    powerUpSprite: {fileID: 21300000, guid: 1c8e10707fed33643a59f493f6d23af3, type: 3}
+    powerUpText: 'Drill: Ball goes through obstacles!'
 --- !u!114 &7030450351127779416
 MonoBehaviour:
   m_ObjectHideFlags: 0
