@@ -51,6 +51,9 @@ public class RainManager : NetworkBehaviour
     [SerializeField] float _medRainStateModifer = -2;
     [SerializeField] float _heavyRainStateModifer = -3;
 
+    [Header("Rain Power Up Stuff")]
+    [SerializeField] List<GolfPlayerTopDown> _playersWhoDidntUsePowerUp = new List<GolfPlayerTopDown>();
+
     [Header("Lighting Related To Rain")]
     [SerializeField] Light2D _globalLight;
 
@@ -272,66 +275,66 @@ public class RainManager : NetworkBehaviour
         // Get the BaseRainState for the game before calculating what the rain state is for the player
         SetBaseRainState();
         SetPlayerRainState(currentPlayer);
-
+        ModifyRainStateByPowerUp(currentPlayer);
         return;
 
-        // For these update functions for wind/rain, will probably have a game setting for players that's something like "Can Wind/Rain Change? Yes/No" to either allow this or not
-        if (_rainState == "clear")
-        {
-            if (UnityEngine.Random.Range(0f, 1f) < 0.9f)
-                return;
-        }
-        else
-        {
-            if (UnityEngine.Random.Range(0f, 1f) < 0.7f)
-                return;
-        }
+        //// For these update functions for wind/rain, will probably have a game setting for players that's something like "Can Wind/Rain Change? Yes/No" to either allow this or not
+        //if (_rainState == "clear")
+        //{
+        //    if (UnityEngine.Random.Range(0f, 1f) < 0.9f)
+        //        return;
+        //}
+        //else
+        //{
+        //    if (UnityEngine.Random.Range(0f, 1f) < 0.7f)
+        //        return;
+        //}
 
-        // Generate a random value of either -1 or 1 to determine if weather should get better or worse
-        int negOrPos = UnityEngine.Random.Range(0, 2) * 2 - 1;
-        if (negOrPos > 0)
-        {
-            Debug.Log("UpdateWeatherForNewTurn: Weather will get BETTER based on value of: " + negOrPos.ToString());
-            if (_rainState == "clear") // can't get better if its already clear
-                return;
-            else if (_rainState == "light rain")
-            {
-                RainState = "clear";
-                return; // returning after changing the rainstate in case the Update function is somehow called part way through and changes _rainState to what RainState was updated to during the middle of this, cascading downward or something
-            }
-            else if (_rainState == "med rain")
-            {
-                RainState = "light rain";
-                return;
-            }
-            else if (_rainState == "heavy rain")
-            {
-                RainState = "med rain";
-                return;
-            }
+        //// Generate a random value of either -1 or 1 to determine if weather should get better or worse
+        //int negOrPos = UnityEngine.Random.Range(0, 2) * 2 - 1;
+        //if (negOrPos > 0)
+        //{
+        //    Debug.Log("UpdateWeatherForNewTurn: Weather will get BETTER based on value of: " + negOrPos.ToString());
+        //    if (_rainState == "clear") // can't get better if its already clear
+        //        return;
+        //    else if (_rainState == "light rain")
+        //    {
+        //        RainState = "clear";
+        //        return; // returning after changing the rainstate in case the Update function is somehow called part way through and changes _rainState to what RainState was updated to during the middle of this, cascading downward or something
+        //    }
+        //    else if (_rainState == "med rain")
+        //    {
+        //        RainState = "light rain";
+        //        return;
+        //    }
+        //    else if (_rainState == "heavy rain")
+        //    {
+        //        RainState = "med rain";
+        //        return;
+        //    }
                 
-        }
-        else
-        {
-            Debug.Log("UpdateWeatherForNewTurn: Weather will get WORSE based on value of: " + negOrPos.ToString());
-            if (_rainState == "heavy rain") // can't get worse if its heavy rain
-                return;
-            else if (_rainState == "light rain")
-            {
-                RainState = "med rain";
-                return; // returning after changing the rainstate in case the Update function is somehow called part way through and changes _rainState to what RainState was updated to during the middle of this, cascading downward or something
-            }
-            else if (_rainState == "med rain")
-            {
-                RainState = "heavy rain";
-                return;
-            }
-            else if (_rainState == "clear")
-            {
-                RainState = "light rain";
-                return;
-            }
-        }
+        //}
+        //else
+        //{
+        //    Debug.Log("UpdateWeatherForNewTurn: Weather will get WORSE based on value of: " + negOrPos.ToString());
+        //    if (_rainState == "heavy rain") // can't get worse if its heavy rain
+        //        return;
+        //    else if (_rainState == "light rain")
+        //    {
+        //        RainState = "med rain";
+        //        return; // returning after changing the rainstate in case the Update function is somehow called part way through and changes _rainState to what RainState was updated to during the middle of this, cascading downward or something
+        //    }
+        //    else if (_rainState == "med rain")
+        //    {
+        //        RainState = "heavy rain";
+        //        return;
+        //    }
+        //    else if (_rainState == "clear")
+        //    {
+        //        RainState = "light rain";
+        //        return;
+        //    }
+        //}
 
     }
     [Server]
@@ -650,6 +653,40 @@ public class RainManager : NetworkBehaviour
     }
     void PlayClearSound()
     { 
+
+    }
+    [Server]
+    public void RainPowerUpUsed(GolfPlayerTopDown powerUpPlayer)
+    {
+        RainState = "clear";
+        _playersWhoDidntUsePowerUp.Clear();
+        foreach (GolfPlayerTopDown player in GameplayManagerTopDownGolf.instance.GolfPlayersServer)
+        {
+            if (player.ObjectId != powerUpPlayer.ObjectId)
+                _playersWhoDidntUsePowerUp.Add(player);
+        }
+    }
+    [Server]
+    void ModifyRainStateByPowerUp(GolfPlayerTopDown player)
+    {
+        if (_playersWhoDidntUsePowerUp.Count <= 0)
+            return;
+        if (!_playersWhoDidntUsePowerUp.Contains(player))
+            return;
+
+        Debug.Log("ModifyRainStateByPowerUp: for player: " + player.PlayerName);
+        _playersWhoDidntUsePowerUp.Remove(player);
+        if (player.FavorWeather >= 10)
+        {
+            RainState = "clear";
+            return;
+        }
+        if (RainState == "clear")
+            RainState = "light rain";
+        else if (RainState == "light rain")
+            RainState = "med rain";
+        else if (RainState == "med rain")
+            RainState = "heavy rain";
 
     }
 }

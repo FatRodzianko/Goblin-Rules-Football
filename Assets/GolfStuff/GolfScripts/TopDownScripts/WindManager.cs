@@ -44,6 +44,9 @@ public class WindManager : NetworkBehaviour
     [SerializeField] float _minSpawnDist = 10f;
     [SerializeField] float _maxSpawnDist = 50f;
 
+    [Header("Wind Power Up Stuff")]
+    [SerializeField] List<GolfPlayerTopDown> _playersWhoDidntUsePowerUp = new List<GolfPlayerTopDown>();
+
     private void Awake()
     {
         MakeInstance();
@@ -228,6 +231,8 @@ public class WindManager : NetworkBehaviour
 
         Debug.Log("SetPlayerWindPower: Rounded player favor: " + Mathf.RoundToInt(playerFavor * 0.75f).ToString());
         int newWindPower = BaseWindPower - Mathf.RoundToInt(playerFavor * 0.75f);
+        newWindPower = ModifyWindByPowerUp(currentPlayer, newWindPower);
+        
         if (newWindPower < 0)
             newWindPower = 0;
         if (newWindPower > 25)
@@ -510,6 +515,43 @@ public class WindManager : NetworkBehaviour
             }
         }
         return playerToSpawnBy;
+    }
+    [Server]
+    public void WindPowerUpUsed(GolfPlayerTopDown powerUpPlayer)
+    {
+        WindPower = 0;
+        _playersWhoDidntUsePowerUp.Clear();
+        foreach (GolfPlayerTopDown player in GameplayManagerTopDownGolf.instance.GolfPlayersServer)
+        {
+            if (player.ObjectId != powerUpPlayer.ObjectId)
+                _playersWhoDidntUsePowerUp.Add(player);
+        }
+
+    }
+    [Server]
+    int ModifyWindByPowerUp(GolfPlayerTopDown player, int currentWindPower)
+    {
+        if (_playersWhoDidntUsePowerUp.Count <= 0)
+            return currentWindPower;
+        if (!_playersWhoDidntUsePowerUp.Contains(player))
+            return currentWindPower;
+
+        Debug.Log("ModifyRainStateByPowerUp: for player: " + player.PlayerName);
+        _playersWhoDidntUsePowerUp.Remove(player);
+        if (player.FavorWeather >= 10)
+        {
+            return currentWindPower;
+        }
+
+        if (currentWindPower < 6)
+            return currentWindPower + 2;
+        else if (currentWindPower < 11)
+            return currentWindPower + 3;
+        else if (currentWindPower < 21)
+            return currentWindPower + 4;
+        else
+            return currentWindPower + 5;
+
     }
     public void DestroyTornadoForNextHole()
     {

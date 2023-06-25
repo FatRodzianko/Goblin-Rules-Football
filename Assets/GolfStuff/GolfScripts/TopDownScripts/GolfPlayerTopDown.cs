@@ -2440,7 +2440,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (string.IsNullOrEmpty(usedPowerUpType))
             return;
-
+        Debug.Log("GetPowerUpEffect: " + usedPowerUpType);
         switch (usedPowerUpType)
         {
             case "power":
@@ -2448,6 +2448,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 break;
             case "accuracy":
                 AccuracyPowerUpEffect();
+                break;
+            case "rain":
+                RainPowerUpEffect();
+                break;
+            case "wind":
+                WindPowerUpEffect();
                 break;
         }
     }
@@ -2473,6 +2479,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void AccuracyPowerUpEffect()
     {
         this.PowerUpAccuracyModifier = 0.5f;
+    }
+    [Server]
+    void RainPowerUpEffect()
+    {
+        RainManager.instance.RainPowerUpUsed(this);
+    }
+    [Server]
+    void WindPowerUpEffect()
+    {
+        WindManager.instance.WindPowerUpUsed(this);
     }
     [ServerRpc]
     void CmdRemoveUsedPowerUps()
