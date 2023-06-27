@@ -438,6 +438,14 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (!playerSkippingForLightning && !playerWasStruckByLightning)
         {  
             Debug.Log("StartNextPlayersTurn: Calling TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
+            // check if the player has a mulligan power up here. If they do, prompt them for it?
+            if (ball.MyPlayer.HasPowerUp && ball.MyPlayer.PlayerPowerUpType == "mulligan")
+            {
+                Debug.Log("StartNextPlayersTurn: Player has a mulligan power up they need to be prompted about?");
+                // may want to use / lookup a "TaskCompletionSource" to do this? https://stackoverflow.com/questions/15122936/write-an-async-method-that-will-await-a-bool
+                await ball.MyPlayer.ServerAskPlayerIfTheyWantToMulligan(3);
+                Debug.Log("StartNextPlayersTurn: done checking for mulligan. Moving on...");
+            }
             
             //await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
             await ball.MyPlayer.ServerTellPlayerGroundTheyLandedOn(3);

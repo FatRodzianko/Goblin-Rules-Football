@@ -831,6 +831,10 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         bool keepBouncing = false;
 
+        // check to see if the player used their "no bounces" power up
+        if (this.MyPlayer.UsedPowerupThisTurn && this.MyPlayer.UsedPowerUpType == "no-bounce")
+            return keepBouncing;
+
         // never bounce out of a trap? always set number of bounces to 0
         if (groundMaterial.Contains("trap"))
             return keepBouncing;

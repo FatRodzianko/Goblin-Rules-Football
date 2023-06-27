@@ -161,21 +161,24 @@ x have the player's used powerup be used/removed from them on the sever/ when th
 - - - - - - p to use the mulligan, space or something else to end the turn?
 - - - need to have some sort of check that prevents the mulligan from being used on the turn the player gets it? Want to make sure they aren't just aiming for an out-of-the-way powerup and then redo the shot right after?
 - - - - - - might not really be a needed check since the power up types are chosen randomly?
-- If they use rain/wind powerup
-- - - send message to server. Set the player rain to clear/wind to 0. The player's shot should then not take those into account when doing their shot
-- - - - - - and hopefully won't cause lightning/tornadoes to be affected because it isn't affecting the base weather/wind?
-- for power/accuracy power ups
-- - - set modifier for power/accuracy on the server in a syncvar
-- - - when shots are calculated, the modifier is used by the client to calculate distance/accuracy
-- - - for distance, make sure to update a new trajectory for the player so their max distance is shown right away? otherwise, they'd have to change their club to update it?
+x If they use rain/wind powerup
+- - x send message to server. Set the player rain to clear/wind to 0. The player's shot should then not take those into account when doing their shot
+- - - - - x and hopefully won't cause lightning/tornadoes to be affected because it isn't affecting the base weather/wind?
+x for power/accuracy power ups
+- - x set modifier for power/accuracy on the server in a syncvar
+- - x when shots are calculated, the modifier is used by the client to calculate distance/accuracy
+- - x for distance, make sure to update a new trajectory for the player so their max distance is shown right away? otherwise, they'd have to change their club to update it?
 - maybe make power ups more ridiculous and value
 - - - keep distance and accuracy, but it make it so it's perfect accuracy and distance is like +50%
 - - - have things like rocket ball that you can aim (that will be hard...)
 - - - - - - if player runs into obstacle whil using the rocket engine, blow the player up - but only if the rocket is on. if they stopped, they just bounce
-- - - drill ball goes through obstacles
+- - x drill ball goes through obstacles
 - - - one that pushes nearby balls away from you (may be over powered on greens...)
-- - - for rain/wind - make it so player that uses it has always clear weather / no wind. Every other player gets 1 turn with weather one worse than the base, and wind that is +5 stronger than base?
-- - - - - - set an effect on the managers when it is used. Manager gets a list of all players in the game, minus the player that used the power up. Each new turn, track current player. If they are on the list, take the power up effect and then remove from list. If not, calculate weather normally. Keep checking until list is empty
+- - x for rain/wind - make it so player that uses it has always clear weather / no wind. Every other player gets 1 turn with weather one worse than the base, and wind that is +5 stronger than base?
+- - - - - x set an effect on the managers when it is used. Manager gets a list of all players in the game, minus the player that used the power up. Each new turn, track current player. If they are on the list, take the power up effect and then remove from list. If not, calculate weather normally. Keep checking until list is empty
+- visual indicator that a power is used
+- - - text that pops up with the power up text?
+- - - change the "press p" text to say press p again to cancel power up use? will need to add that functionality....
 
 ballon heights
 2.75

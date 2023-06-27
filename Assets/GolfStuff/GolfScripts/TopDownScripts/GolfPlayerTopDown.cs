@@ -494,10 +494,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         if (Input.GetKeyDown(KeyCode.P))
         {
-            Debug.Log("Player pressed \"p\"");
+            //Debug.Log("Player pressed \"p\"");
             if (!DirectionAndDistanceChosen && !_moveHitMeterIcon && !(MyBall.isHit || MyBall.isBouncing || MyBall.isRolling))
             {
-                Debug.Log("Player pressed \"p\": allowed to use powerup because: !DirectionAndDistanceChosen && !_moveHitMeterIcon && !(MyBall.isHit || MyBall.isBouncing || MyBall.isRolling)");
+                //Debug.Log("Player pressed \"p\": allowed to use powerup because: !DirectionAndDistanceChosen && !_moveHitMeterIcon && !(MyBall.isHit || MyBall.isBouncing || MyBall.isRolling)");
                 this.UsePowerUp();
             }
 
@@ -1860,6 +1860,21 @@ public class GolfPlayerTopDown : NetworkBehaviour
         _playerUIMessage.UpdatePlayerMessageText(newMessage);
     }
     [Server]
+    public async Task ServerAskPlayerIfTheyWantToMulligan(float duration)
+    {
+        float end = Time.time + (duration * 2);
+        Debug.Log("ServerAskPlayerIfTheyWantToMulligan: for player: " + this.PlayerName + " started at time: " + Time.time.ToString());
+        while (Time.time < end)
+        {
+            await Task.Yield();
+        }
+        this.HasPowerUp = false;
+        this.PlayerPowerUpType = "";
+        Debug.Log("ServerAskPlayerIfTheyWantToMulligan: for player: " + this.PlayerName + " ended at time: " + Time.time.ToString());
+        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this.MyBall);
+        
+    }
+    [Server]
     public async Task ServerTellPlayerGroundTheyLandedOn(float duration)
     {
         _tellPlayerGroundTheyLandedOn = true;
@@ -2391,7 +2406,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (!this.HasPowerUp)
             return;
         if (this.UsedPowerupThisTurn)
+        {
+            // future functionality to cancel power up usage? Or maybe just have it so if you use it, it's gone forever. Sorry.
             return;
+        }
         Debug.Log("UsePowerUp: for player: " + this.PlayerName + " and their power up of type: " + this.PlayerPowerUpType);
         CmdUsePowerUp();
     }
