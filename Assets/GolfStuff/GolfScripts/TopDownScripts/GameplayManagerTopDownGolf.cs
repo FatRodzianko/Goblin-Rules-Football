@@ -443,7 +443,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             {
                 Debug.Log("StartNextPlayersTurn: Player has a mulligan power up they need to be prompted about?");
                 // may want to use / lookup a "TaskCompletionSource" to do this? https://stackoverflow.com/questions/15122936/write-an-async-method-that-will-await-a-bool
-                await ball.MyPlayer.ServerAskPlayerIfTheyWantToMulligan(3);
+                await ball.MyPlayer.ServerAskPlayerIfTheyWantToMulligan(10);
                 Debug.Log("StartNextPlayersTurn: done checking for mulligan. Moving on...");
             }
             

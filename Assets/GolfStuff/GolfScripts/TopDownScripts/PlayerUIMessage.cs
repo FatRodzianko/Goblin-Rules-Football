@@ -16,6 +16,8 @@ public class PlayerUIMessage : MonoBehaviour
     [SerializeField] const string _struckByLightning = "You've been struck by lightning!\n\n+10 stroke penalty and you're out of commission until next turn!\n\nSpace to continue...";
     [SerializeField] const string _otherPlayerStruckByLightning = " has been struck by lightning!\n\nThey receive a +10 stroke penalty and are out of commission until next turn!";
     [SerializeField] const string _stormPassed = "All players have agreed to let the storm pass until there is no more lightning.";
+    [SerializeField] const string _mulliganOwner = "You have a mulligan power up. Press \"p\" if you want to use it now. Press space to continue to next turn.\n";
+    [SerializeField] const string _mulliganClients = " is deciding if they want to use their mulligan...";
 
     // Start is called before the first frame update
     void Start()
@@ -64,7 +66,7 @@ public class PlayerUIMessage : MonoBehaviour
         }
         else if (message == "struck by lightning")
         {
-            if(_myPlayer.IsOwner)
+            if (_myPlayer.IsOwner)
                 _playerMessageText.text = _myPlayer.PlayerName + " " + _struckByLightning;
             else
                 _playerMessageText.text = _myPlayer.PlayerName + " " + _otherPlayerStruckByLightning;
@@ -72,6 +74,17 @@ public class PlayerUIMessage : MonoBehaviour
         else if (message == "storm passed")
         {
             _playerMessageText.text = _stormPassed;
+        }
+        else if (message.StartsWith("mulligan"))
+        {
+            if (_myPlayer.IsOwner)
+            {
+                string[] mulliganMessage = message.Split(" ");
+                _playerMessageText.text = _mulliganOwner + mulliganMessage[1].ToString() + " seconds remaining...";
+            }
+                
+            else
+                _playerMessageText.text = _myPlayer.PlayerName + _mulliganClients;
         }
         else
         {

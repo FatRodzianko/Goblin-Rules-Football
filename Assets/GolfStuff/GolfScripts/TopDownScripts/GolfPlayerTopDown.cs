@@ -80,6 +80,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SyncVar] public bool HasPlayerTeedOff = false;
     public bool PromptedForLightning = false;
     public bool PlayerStruckByLightning = false;
+    public bool PromptedForMulligan = false;
 
     [Header("Hit Meter Objects")]
     [SerializeField] GameObject _hitMeterObject;
@@ -152,6 +153,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [Header("Power Up Effects")]
     [SyncVar(OnChange = nameof(SyncPowerUpDistanceModifier))] public float PowerUpDistanceModifier = 1.0f;
     [SyncVar] public float PowerUpAccuracyModifier = 1.0f;
+    [SyncVar] public bool PlayerMulligan = false;
 
     [Header("Wind UI")]
     [SerializeField] GameObject _windUIHolder;
@@ -1840,6 +1842,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             PromptedForLightning = true;
         else if (message == "start turn")
             PromptedForLightning = false;
+        else if (message == "mulligan")
+            PromptedForMulligan = true;
         _playerUIMessage.UpdatePlayerMessageText(message);
         if (this.IsOwner)
             CmdTellClientsUpdatePlayerMessageText(message);
@@ -1860,19 +1864,43 @@ public class GolfPlayerTopDown : NetworkBehaviour
         _playerUIMessage.UpdatePlayerMessageText(newMessage);
     }
     [Server]
-    public async Task ServerAskPlayerIfTheyWantToMulligan(float duration)
+    public async Task ServerAskPlayerIfTheyWantToMulligan(int duration)
     {
-        float end = Time.time + (duration * 2);
+        
         Debug.Log("ServerAskPlayerIfTheyWantToMulligan: for player: " + this.PlayerName + " started at time: " + Time.time.ToString());
-        while (Time.time < end)
+        this.PlayerMulligan = true;
+        this.RpcPromptPlayerForMulligan(duration);
+        StartCoroutine(MulliganPromptCountDown(duration));
+        while (PlayerMulligan)
         {
             await Task.Yield();
         }
-        this.HasPowerUp = false;
-        this.PlayerPowerUpType = "";
+        //this.HasPowerUp = false;
+        //this.PlayerPowerUpType = "";
         Debug.Log("ServerAskPlayerIfTheyWantToMulligan: for player: " + this.PlayerName + " ended at time: " + Time.time.ToString());
-        GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this.MyBall);
+        //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this.MyBall);
         
+    }
+    IEnumerator MulliganPromptCountDown(int timeRemaining)
+    {
+        while (timeRemaining > 0)
+        {
+            yield return new WaitForSeconds(1.0f);
+            timeRemaining--;
+            RpcMulliganCountdown(this.Owner, timeRemaining);
+        }
+        yield break;
+    }
+    [ObserversRpc]
+    void RpcPromptPlayerForMulligan(int duration)
+    {
+        PlayerUIMessage("mulligan " + duration.ToString());
+        EnablePlayerCanvas(true);
+    }
+    [TargetRpc]
+    void RpcMulliganCountdown(NetworkConnection conn, int timeRemaining)
+    {
+        PlayerUIMessage("mulligan " + timeRemaining.ToString());
     }
     [Server]
     public async Task ServerTellPlayerGroundTheyLandedOn(float duration)
