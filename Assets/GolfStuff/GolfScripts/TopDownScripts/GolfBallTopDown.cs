@@ -1215,6 +1215,9 @@ public class GolfBallTopDown : NetworkBehaviour
         }
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
         CmdTellClientsBallIsMoving(false);
+
+        //prompt player for mulligan here?
+
         CmdTellServerToStartNexPlayersTurn();
     }
     [ServerRpc]

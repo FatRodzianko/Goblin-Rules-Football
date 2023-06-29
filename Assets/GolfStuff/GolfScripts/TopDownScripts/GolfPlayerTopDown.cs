@@ -413,15 +413,31 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (!IsPlayersTurn)
         {
             //if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Space) && Time.time >= (GameplayManagerTopDownGolf.instance.TimeSinceLastTurnStart + 0.15f))
-            if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " will start their turn after pressing space! Time: " + Time.time);
-                this.EnablePlayerCanvas(false);
-                // Begin old way of starting turn
-                //GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
-                // End old way of starting turn
-                CmdStartCurrentPlayersTurnOnServer();
+                if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && !this.PlayerMulligan)
+                {
+                    Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " will start their turn after pressing space! Time: " + Time.time);
+                    this.EnablePlayerCanvas(false);
+                    // Begin old way of starting turn
+                    //GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
+                    // End old way of starting turn
+                    CmdStartCurrentPlayersTurnOnServer();
+                }
+                else if (this.PlayerMulligan)
+                {
+                    SkipMulligan();
+                }
             }
+            //if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Space))
+            //{
+            //    Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " will start their turn after pressing space! Time: " + Time.time);
+            //    this.EnablePlayerCanvas(false);
+            //    // Begin old way of starting turn
+            //    //GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
+            //    // End old way of starting turn
+            //    CmdStartCurrentPlayersTurnOnServer();
+            //}
             //else if (PromptedForLightning && GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Backspace) && Time.time >= (GameplayManagerTopDownGolf.instance.TimeSinceLastSkip + 0.15f))
             else if (PromptedForLightning && GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Backspace))
             {
@@ -497,10 +513,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.P))
         {
             //Debug.Log("Player pressed \"p\"");
-            if (!DirectionAndDistanceChosen && !_moveHitMeterIcon && !(MyBall.isHit || MyBall.isBouncing || MyBall.isRolling))
+            if (this.IsPlayersTurn && !DirectionAndDistanceChosen && !_moveHitMeterIcon && !(MyBall.isHit || MyBall.isBouncing || MyBall.isRolling) && !this.PlayerMulligan)
             {
                 //Debug.Log("Player pressed \"p\": allowed to use powerup because: !DirectionAndDistanceChosen && !_moveHitMeterIcon && !(MyBall.isHit || MyBall.isBouncing || MyBall.isRolling)");
                 this.UsePowerUp();
+            }
+            else if (this.PlayerMulligan)
+            {
+                UseMulligan();
             }
 
         }
@@ -1829,7 +1849,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [TargetRpc]
     public void RpcPlayerUIMessage(NetworkConnection conn, string message)
     {
-        Debug.Log("RpcPlayerUIMessage: for player: " + this.PlayerName + " message: " + message);
+        //Debug.Log("RpcPlayerUIMessage: for player: " + this.PlayerName + " message: " + message);
         if (!this.IsOwner)
             return;
         this.EnablePlayerCanvas(true);
@@ -1837,7 +1857,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void PlayerUIMessage(string message)
     {
-        Debug.Log("PlayerUIMessage: for player: " + this.PlayerName + " message: " + message);
+        //Debug.Log("PlayerUIMessage: for player: " + this.PlayerName + " message: " + message);
         if (message == "lightning")
             PromptedForLightning = true;
         else if (message == "start turn")
@@ -1851,7 +1871,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ServerRpc]
     void CmdTellClientsUpdatePlayerMessageText(string newMessage)
     {
-        Debug.Log("CmdTellClientsUpdatePlayerMessageText: for player: " + this.PlayerName + " message: " + newMessage);
+        //Debug.Log("CmdTellClientsUpdatePlayerMessageText: for player: " + this.PlayerName + " message: " + newMessage);
         if (newMessage == "lightning" || newMessage == "start turn")
             return;
         RpcTellClientsUpdatePlayerMessageText(newMessage);
@@ -1859,7 +1879,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ObserversRpc(ExcludeOwner = true)]
     void RpcTellClientsUpdatePlayerMessageText(string newMessage)
     {
-        Debug.Log("RpcTellClientsUpdatePlayerMessageText: with message: " + newMessage);
+        //Debug.Log("RpcTellClientsUpdatePlayerMessageText: with message: " + newMessage);
         this.EnablePlayerCanvas(true);
         _playerUIMessage.UpdatePlayerMessageText(newMessage);
     }
@@ -1883,11 +1903,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     IEnumerator MulliganPromptCountDown(int timeRemaining)
     {
-        while (timeRemaining > 0)
+        while (timeRemaining > 0 && PlayerMulligan)
         {
+            RpcMulliganCountdown(this.Owner, timeRemaining);
             yield return new WaitForSeconds(1.0f);
             timeRemaining--;
-            RpcMulliganCountdown(this.Owner, timeRemaining);
+            
         }
         yield break;
     }
@@ -2548,5 +2569,27 @@ public class GolfPlayerTopDown : NetworkBehaviour
         this.UsedPowerupThisTurn = false;
         this.PowerUpAccuracyModifier = 1.0f;
         this.PowerUpDistanceModifier = 1.0f;
+    }
+    void UseMulligan()
+    {
+        if (!this.IsOwner)
+            return;
+        if (!this.PlayerMulligan)
+            return;
+        Debug.Log("UseMulligan: for player: " + this.PlayerName);
+    }
+    void SkipMulligan()
+    {
+        if (!this.IsOwner)
+            return;
+        if (!this.PlayerMulligan)
+            return;
+        Debug.Log("SkipMulligan: for player: " + this.PlayerName);
+        CmdSkipMulligan();
+    }
+    [ServerRpc]
+    void CmdSkipMulligan()
+    {
+        this.PlayerMulligan = false;
     }
 }
