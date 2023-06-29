@@ -45,7 +45,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] public Vector2 hitDirection = Vector2.zero;
     [SerializeField] public float hitDistance = 0f; // changes based on type of club used. Clubs will have a "max distance" and the distance hit will be a % of the max distance based on the player submitted distance
     [SerializeField] public float hitAngle = 45f; // changes based on the type of club used? Drivers lower angles. Irons middle angles. Wedges higher angles?
-    [SerializeField][Range(-10f,5f)] public float hitTopSpin = 0f;
+    [SerializeField] [Range(-10f, 5f)] public float hitTopSpin = 0f;
     [SerializeField] [Range(-5f, 5f)] public float hitLeftOrRightspin = 0f;
     public bool IsShanked = false;
     [SyncVar] public bool IsShankedSynced = false;
@@ -246,8 +246,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             Debug.Log("SyncIsGameLeader: as server");
             //this.IsGameLeader = next;
             //if (next)
-                //GameplayManagerTopDownGolf.instance.AssignOwnerToHost(base.Owner);
-        }   
+            //GameplayManagerTopDownGolf.instance.AssignOwnerToHost(base.Owner);
+        }
         else
         {
             Debug.Log("SyncIsGameLeader: as client");
@@ -256,7 +256,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 EnablePlayerCanvas(false);
                 _startGameButton.SetActive(false);
                 return;
-            }   
+            }
             if (next)
             {
                 //EnablePlayerCanvas(true);
@@ -274,7 +274,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (asServer)
         {
             //this.ConnectionId = next;
-        }   
+        }
         else
         {
             PlayerScoreBoard.instance.AddPlayerToScoreBoard(this, this.PlayerScore);
@@ -287,7 +287,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (asServer)
         {
             //PlayerName = next;
-        }   
+        }
         else
         {
             _playerNameText.text = next;
@@ -297,8 +297,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void Start()
     {
         //SetPlayerOnBall();
-        
-        
+
+
         //AttachUIToNewParent(myCamera.transform);
         StartGameWithDriver();
         // do this after getting the players ball
@@ -364,7 +364,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 }
             }
             MyBall.UpdateBallColor(this.BallColor);
-        }   
+        }
     }
     [ServerRpc]
     public void CmdBallSpawnedForPlayer()
@@ -446,6 +446,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 PlayerScore.StrokePenalty(1);
                 //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(MyBall, true);
                 MyBall.CmdTellServerToStartNexPlayersTurn(true);
+            }
+            else if (Input.GetKeyDown(KeyCode.P) && this.PlayerMulligan)
+            {
+                UseMulligan();
             }
             return;
         }
@@ -573,7 +577,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             {
                 MoveHitMeterIcon();
             }
-                
+
         }
         else if (!DirectionAndDistanceChosen)
         {
@@ -601,11 +605,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
                         //Debug.Log("Player clicked on screen/world position: " + mouseScreenPos.ToString() + "/" + mouseWorldPos.ToString() + ". Direction to mouse: " + mouseDir.ToString() + " compared to player's current aim position: " + hitDirection.ToString());
                         if (this.IsOwner)
                             ChangeDirectionFromMouseClick(mouseDir);
-                            //hitDirection = mouseDir;
-                    }   
+                        //hitDirection = mouseDir;
+                    }
                     else
                         Debug.Log("Player clicked on screen position OUTSIDE of window");
-                    
+
                 }
             }
         }
@@ -614,8 +618,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             Debug.Log("GolfPlayer: BackQuote key pressed. _moveHitMeterIcon: " + _moveHitMeterIcon.ToString());
             _cameraViewHole.ZoomOutCamera();
         }
-            
-        
+
+
 
     }
     private void FixedUpdate()
@@ -630,7 +634,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             else
                 trajectoryPoints = MyBall.CalculatePutterTrajectoryPoints(hitDistance, hitDirection);
             // Draw the trajectory
-            drawTrajectoryTopDown.UpdateTrajectory(trajectoryPoints, MyBall,CurrentClub.ClubType, hitDistance);
+            drawTrajectoryTopDown.UpdateTrajectory(trajectoryPoints, MyBall, CurrentClub.ClubType, hitDistance);
             UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
 
 
@@ -646,7 +650,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             _golfAnimator.UpdateSpriteDirection(hitDirection.normalized);
 
             // Update for the other game players?
-            if(base.IsOwner)
+            if (base.IsOwner)
                 CmdUpdateHitValuesForOtherPlayers(hitDistance, hitAngle, hitTopSpin, hitDirection, hitLeftOrRightspin);
         }
     }
@@ -727,7 +731,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     void ChangeHitDistance(float changeDirection)
     {
-        
+
         float newDist = hitDistance + (changeDirection * Time.deltaTime * _changeDistanceRate);
         // check if the new distance will be out of bounds
         Vector3 newTargetPos = MyBall.transform.position + (Vector3)(hitDirection.normalized * newDist);
@@ -786,7 +790,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             }
         }
         else
-        { 
+        {
 
         }
     }
@@ -813,12 +817,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
             {
                 //HasPlayerTeedOff = true;
                 CmdPlayerTeedOff(true);
-            }   
+            }
             else
             {
                 aimTarget = GameplayManagerTopDownGolf.instance.TeeOffAimPoint;
             }
-                
+
         }
         // Get the distance to the hole
         float distToHole = GetDistanceToHole(closestHole, ballPos);
@@ -842,7 +846,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         ActivateHitUIObjects(true);
         // Set the initial direction of the hit to be in the direction of the hole
         //hitDirection = SetInitialDirection(ballPos, closestHole.transform.position);
-        
+
 
         // Check to see if the current club's max distance is greater than distance to the hole. If so, adjust the player's shot so that their initial hit distance is right at the hole
         DidPlayerAdjustDistance = false;
@@ -917,12 +921,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
             {
                 Debug.Log("GetHitStatsFromClub: Player aim direction is LESS than 15 degrees away from aim point");
                 isAimingAtAimPoint = true;
-            }   
+            }
             else
             {
                 Debug.Log("GetHitStatsFromClub: Player aim direction is MORE than 15 degrees away from aim point");
             }
-                
+
 
             // Get the distance to the tee off point. If the max distance from club is greater than distance to tee off aim point, set the hit distance to distance to tee off aim point
             float distanceToAimPoint = Vector2.Distance(MyBall.transform.position, GameplayManagerTopDownGolf.instance.TeeOffAimPoint);
@@ -951,7 +955,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             //Vector3 inBoundsPos = GetNearestPointInBounds(ballPos, newTargetPos, hitDirection);
             //hitDistance = Vector2.Distance(inBoundsPos, ballPos);
             hitDistance = GetInBoundsDistance(newDist, hitDirection, ballPos);
-            Debug.Log("GetHitStatsFromClub: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000") + ". CHANGING hit distance to: " + hitDistance + " from original distance: " + newDist.ToString()) ;
+            Debug.Log("GetHitStatsFromClub: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000") + ". CHANGING hit distance to: " + hitDistance + " from original distance: " + newDist.ToString());
         }
 
         hitAngle = DefaultLaunchAngleFromClub;
@@ -981,7 +985,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             _adjustedDistanceIcon.SetActive(true);
             //DidPlayerAdjustDistance = true;
         }
-            
+
 
         // Get the new distance as a percentage of the max distance
         float distancePercentage = newDistance / MaxDistanceFromClub;
@@ -993,7 +997,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //Vector2 newPos = _adjustedDistanceIcon.transform.localPosition;
         //newPos.x = adjustedDistancePosition;
         //_adjustedDistanceIcon.transform.localPosition = newPos;
-        _adjustedDistanceIcon.transform.localPosition = new Vector3(adjustedDistancePosition,0f,0f);
+        _adjustedDistanceIcon.transform.localPosition = new Vector3(adjustedDistancePosition, 0f, 0f);
         TargetDistanceXPosForPlayer = adjustedDistancePosition;
 
     }
@@ -1077,7 +1081,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 //SubmitHitToBall();
                 _golfAnimator.StartSwing();
             }
-                
+
         }
 
         _hitMeterMovingIcon.transform.localPosition = newPos;
@@ -1123,7 +1127,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             xPos = _maxDistancePosition;
         if (xPos >= _furthestRightAccuracyPosition)
             xPos = _furthestRightAccuracyPosition;
-            
+
         Debug.Log("GetMovingIconXPosition: " + xPos.ToString());
         return xPos;
     }
@@ -1155,7 +1159,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         float accuracyDistance = GetAccuracyDistance(iconXPosition, _centerAccuracyPosition);
         if (!IsShanked)
         {
-            ModifiedHitDirection = ModifyHitDirectionFromAccuracy(hitDirection,accuracyDistance);
+            ModifiedHitDirection = ModifyHitDirectionFromAccuracy(hitDirection, accuracyDistance);
         }
         _accuracySubmitted = true;
         if (IsOwner)
@@ -1221,8 +1225,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // Adjust the accuracy distance based on player's weather favor
         float newAccuracyDistance = accuracyDistance * this.AccuracyFavorModifier;
         Debug.Log("ModifyHitDirectionFromAccuracy: " + this.PlayerName + "'s original accuracy distance is: " + accuracyDistance.ToString() + " but their new accuracy distance will be: " + newAccuracyDistance.ToString() + " based on AccuracyFavorModifier of: " + AccuracyFavorModifier.ToString());
-		
-		// https://www.youtube.com/watch?v=HH6JzH5pTGo
+
+        // https://www.youtube.com/watch?v=HH6JzH5pTGo
         var rotation = Quaternion.AngleAxis(accuracyDistance, Vector3.forward);
         newDir = (rotation * direction).normalized;
         Debug.Log("ModifyHitDirectionFromAccuracy: The new direction is: " + newDir.ToString() + " based on the original direction: " + direction.ToString() + " rotate " + accuracyDistance.ToString() + " degrees from rotation of: " + rotation.ToString());
@@ -1249,7 +1253,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             playerTeeOffSound = true;
 
         }
-            
+
         this.PlayerScore.PlayerHitBall();
         //GameplayManagerTopDownGolf.instance.ResetCurrentPlayer();
         CmdResetCurrentPlayer();
@@ -1283,7 +1287,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                     SoundManager.instance.PlaySound("golfball-hit", 1f);
                     soundName = _ballSounds.HitOffGround;
                 }
-                    
+
             }
         }
         else
@@ -1332,7 +1336,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //Debug.Log("UpdateHitSpinForPlayer: new spin submitted: " + newSpin.ToString() + " hitTopSpinSubmitted will then be: " + hitTopSpinSubmitted.ToString());
         UpdateTopSpin(hitTopSpinSubmitted.y);
         UpdateLeftRightSpin(hitTopSpinSubmitted.x);
-        if(DirectionAndDistanceChosen)
+        if (DirectionAndDistanceChosen)
             PlayerChooseDirectionAndDistance(false);
     }
     void UpdateTopSpin(float newTopSpin)
@@ -1390,7 +1394,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             //hitAngle = DefaultLaunchAngleFromClub * (1f + ((spin * -1f) / 100f));
             hitAngle = DefaultLaunchAngleFromClub * (1f + ((spin * -3f) / 100f));
         }
-            
+
     }
     void ResethitTopSpinForNewTurn()
     {
@@ -1488,7 +1492,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             dist *= club.DeepRoughTerrainDistModifer;
         }
         else if (MyBall.bounceContactGroundMaterial.Contains("trap") && club.ClubType != "wedge")
-        { 
+        {
             dist *= club.TrapTerrainDistModifer;
         }
 
@@ -1568,7 +1572,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         else
         {
             float shankAngle = ShankAngle(hitAngle);
-            float shankTopSpin = ShankTopSpin(MaxBackSpinFromClub,MaxTopSpinFromClub);
+            float shankTopSpin = ShankTopSpin(MaxBackSpinFromClub, MaxTopSpinFromClub);
             float shankSideSpin = ShankSideSpin(-MaxSideSpinFromClub, MaxSideSpinFromClub);
             Debug.Log("DoTheShank: Hitting with new direction of: " + ModifiedHitDirection.ToString() + " and new power of: " + HitPowerSubmitted.ToString() + " and new launch angle of: " + shankAngle.ToString() + " and new top spin of: " + shankTopSpin.ToString() + " and new side spin of: " + shankSideSpin.ToString());
             MyBall.HitBall(HitPowerSubmitted, shankAngle, shankTopSpin, ModifiedHitDirection, shankSideSpin);
@@ -1675,7 +1679,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 hitDistance = MaxDistanceFromClub;
                 UpdatePositionOfAdjustedDistanceIcon(hitDistance);
                 MinDistance = GetMinDistance(hitDistance);
-                
+
             }
             else
             {
@@ -1718,7 +1722,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }*/
         Vector2 newDir = (aimPoint - ballPos).normalized;
         return newDir;
-        
+
     }
     void PlayerChooseDirectionAndDistance(bool enable)
     {
@@ -1733,7 +1737,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         UpdateBallGroundMaterial();
         float bestDifferenceFromHoleDistance = 0f;
         int bestClubIndex = 0;
-        bool firstCheckDone = false;        
+        bool firstCheckDone = false;
 
         for (int i = 0; i < _myClubs.Length; i++)
         {
@@ -1767,7 +1771,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                     firstCheckDone = true;
                     continue;
                 }
-                
+
                 if (distDifference < bestDifferenceFromHoleDistance)
                 {
                     bestDifferenceFromHoleDistance = distDifference;
@@ -1865,7 +1869,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         else if (message == "mulligan")
             PromptedForMulligan = true;
         _playerUIMessage.UpdatePlayerMessageText(message);
-        if (this.IsOwner)
+        if (this.IsOwner && (!message.Contains("mulligan")))
             CmdTellClientsUpdatePlayerMessageText(message);
     }
     [ServerRpc]
@@ -1886,11 +1890,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [Server]
     public async Task ServerAskPlayerIfTheyWantToMulligan(int duration)
     {
-        
+
         Debug.Log("ServerAskPlayerIfTheyWantToMulligan: for player: " + this.PlayerName + " started at time: " + Time.time.ToString());
         this.PlayerMulligan = true;
         this.RpcPromptPlayerForMulligan(duration);
-        StartCoroutine(MulliganPromptCountDown(duration));
+        //StartCoroutine(MulliganPromptCountDown(duration));
         while (PlayerMulligan)
         {
             await Task.Yield();
@@ -1899,17 +1903,19 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //this.PlayerPowerUpType = "";
         Debug.Log("ServerAskPlayerIfTheyWantToMulligan: for player: " + this.PlayerName + " ended at time: " + Time.time.ToString());
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this.MyBall);
-        
+
     }
     IEnumerator MulliganPromptCountDown(int timeRemaining)
     {
         while (timeRemaining > 0 && PlayerMulligan)
         {
-            RpcMulliganCountdown(this.Owner, timeRemaining);
+            //RpcMulliganCountdown(this.Owner, timeRemaining);
+            PlayerUIMessage("mulligan " + timeRemaining.ToString());
             yield return new WaitForSeconds(1.0f);
             timeRemaining--;
-            
+
         }
+        this.SkipMulligan();
         yield break;
     }
     [ObserversRpc]
@@ -1917,11 +1923,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         PlayerUIMessage("mulligan " + duration.ToString());
         EnablePlayerCanvas(true);
-    }
-    [TargetRpc]
-    void RpcMulliganCountdown(NetworkConnection conn, int timeRemaining)
-    {
-        PlayerUIMessage("mulligan " + timeRemaining.ToString());
+        if (this.IsOwner)
+        {
+            StartCoroutine(MulliganPromptCountDown(duration));
+        }
     }
     [Server]
     public async Task ServerTellPlayerGroundTheyLandedOn(float duration)
@@ -1975,7 +1980,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             MyBall.TellPlayerGroundTypeTheyLandedOn();
             MyBall.CheckIfInStatueRingRadius();
-        }   
+        }
         else if (isInBounds && (MyBall.IsInHole || MyBall.LocalIsInHole))
         {
             Debug.Log("TellPlayerGroundTheyLandedOn: on game player: " + this.PlayerName + " ball is in hole!");
@@ -2038,7 +2043,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         await TellPlayerHoleEnded(duration);
     }
-    
+
     public async Task TellPlayerHoleEnded(float duration)
     {
         Debug.Log("TellPlayerHoleEnded: on game player: " + this.PlayerName);
@@ -2119,7 +2124,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!_cameraBoundingBox)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
-        if(forceUpdate)
+        if (forceUpdate)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
     }
     [TargetRpc]
@@ -2190,7 +2195,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //MyBall.IsInHole = false;
         MyBall.LocalIsInHole = false;
         MyBall.CmdSetBallInHoleOnServer(false);
-        
+
         PlayerStruckByLightning = false;
     }
     public void LightningOnTurn()
@@ -2261,7 +2266,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         Debug.Log("MovePlayerToPosition: new position is: " + newPos.ToString() + " and move the ball too? " + moveBall.ToString());
         this.transform.position = newPos;
-        if(moveBall && MyBall)
+        if (moveBall && MyBall)
             this.MyBall.transform.position = newPos;
     }
     [ServerRpc]

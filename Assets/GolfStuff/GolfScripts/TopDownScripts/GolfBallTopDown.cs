@@ -38,7 +38,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
     [Header("Ball Status")]
     public bool isHit = false;
-    [SerializeField][SyncVar(OnChange = nameof(SyncClientMovingBall))] bool _clientMovingBall = false;
+    [SerializeField] [SyncVar(OnChange = nameof(SyncClientMovingBall))] bool _clientMovingBall = false;
 
     [Header("Hit Ball Info")]
     public Vector3[] hitBallPonts = new Vector3[3];
@@ -1237,7 +1237,7 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     [ServerRpc]
     void CmdTellTornadoBallCompletedTornadoHit(Torndao tornado)
-    { 
+    {
         tornado.BallCompletedTornadoHit(this);
     }
     Vector2 GetPerpendicular(Vector2 dir, float leftOrRight)
@@ -1654,7 +1654,7 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     void MoveBallOutOfWater()
     {
-        Vector3 newBallPos = FindPointOutOfWater();        
+        Vector3 newBallPos = FindPointOutOfWater();
         StartCoroutine(DelayForPenaltyMessage(newBallPos, 2f));
     }
     IEnumerator DelayForPenaltyMessage(Vector3 newBallPos, float delaySeconds)
@@ -1782,7 +1782,7 @@ public class GolfBallTopDown : NetworkBehaviour
         {
             myShadow.GetComponent<SpriteRenderer>().enabled = false;
             MyBallObject.GetComponent<SpriteRenderer>().enabled = false;
-            SoundManager.instance.PlaySound(_ballSounds.BallInHole, 1.0f) ;
+            SoundManager.instance.PlaySound(_ballSounds.BallInHole, 1.0f);
         }
         else
         {
@@ -1811,7 +1811,7 @@ public class GolfBallTopDown : NetworkBehaviour
         MyPlayer.BrokenStatuePenalty(statueType);
         //CmdBrokenStatuePenalty(statueType);
     }
-    
+
 }
 
- 
+

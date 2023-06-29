@@ -94,7 +94,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
     private void Awake()
     {
-        
+
         MakeInstance();
 
         QualitySettings.vSyncCount = 1;
@@ -112,7 +112,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             return;
         if (op != SyncListOperation.Add)
             return;
-        Debug.Log("GolfPlayersServer_OnChange: op: " + op.ToString() + " index: " + index.ToString()  + " as server: " + asServer.ToString() + " Length of GolfPlayersServer: " + GolfPlayersServer.Count.ToString() + " new player name: " + newItem.PlayerName);
+        Debug.Log("GolfPlayersServer_OnChange: op: " + op.ToString() + " index: " + index.ToString() + " as server: " + asServer.ToString() + " Length of GolfPlayersServer: " + GolfPlayersServer.Count.ToString() + " new player name: " + newItem.PlayerName);
     }
 
     void MakeInstance()
@@ -195,7 +195,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     [Server]
     void ResetPlayerScoresForNewHole()
@@ -288,7 +288,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //// Set the new tee off location
         UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
         //// Set the Camera Zoomed Out position
-        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos,CurrentHoleInCourse.CameraZoomValue);
+        UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos, CurrentHoleInCourse.CameraZoomValue);
         //// update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
         if (IsServer)
@@ -314,7 +314,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         {
             GolfPlayersInTeeOffOrder.Clear();
             GolfPlayersInTeeOffOrder.AddRange(GolfPlayers);
-        }   
+        }
         else
         {
             GolfPlayersInTeeOffOrder.Clear();
@@ -436,7 +436,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         //if (!ball.IsInHole && !playerSkippingForLightning && !playerWasStruckByLightning)
         if (!playerSkippingForLightning && !playerWasStruckByLightning)
-        {  
+        {
             Debug.Log("StartNextPlayersTurn: Calling TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
             // check if the player has a mulligan power up here. If they do, prompt them for it?
             if (ball.MyPlayer.HasPowerUp && ball.MyPlayer.PlayerPowerUpType == "mulligan")
@@ -446,13 +446,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
                 await ball.MyPlayer.ServerAskPlayerIfTheyWantToMulligan(10);
                 Debug.Log("StartNextPlayersTurn: done checking for mulligan. Moving on...");
             }
-            
+
             //await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
             await ball.MyPlayer.ServerTellPlayerGroundTheyLandedOn(3);
             Debug.Log("StartNextPlayersTurn: Returning from TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
-        }        
-        
-        
+        }
+
+
 
         // Check if any players still have to hit a ball
         if (_numberOfPlayersInHole >= GolfPlayers.Count)
@@ -597,13 +597,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
                     playerDistanceToHole = Vector2.Distance(playerBallPosition, this.HolePositions[i]);
                 }
                 else
-                { 
+                {
                     float thisDistance = Vector2.Distance(playerBallPosition, this.HolePositions[i]);
                     if (thisDistance < playerDistanceToHole)
                         playerDistanceToHole = thisDistance;
                 }
             }
-            
+
             if (playerDistanceToHole > furthestDistance)
             {
                 currentClosestPlayer = player;
@@ -623,7 +623,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         Debug.Log("GameplayManager: GetCameraBoundingBox");
         if (!_cameraBoundingBox)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
-        if(forceUpdate)
+        if (forceUpdate)
             _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
         if (_cameraBoundingBox)
             _cameraViewHole.GetLinePointsForOutOfBoundsBorder(polygonPoints);
@@ -679,7 +679,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             DeactivatePowerUpUI();
             return;
         }
-        
+
         _powerUpMessageText.gameObject.SetActive(false);
         _powerUpMessageText.text = "";
 
@@ -799,7 +799,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         {
             SkipsInARow = 0;
         }
-            
+
 
     }
     void PromptPlayerForNextTurn()
@@ -922,7 +922,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         {
             foreach (GolfPlayerTopDown player in GolfPlayersOutOfCommission)
             {
-                player.RpcEnablePlayerSprite(false);                   
+                player.RpcEnablePlayerSprite(false);
             }
         }
     }
@@ -1056,13 +1056,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //// Diable sprite of players that are not the current player
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
 
-        
+
     }
 
     [ObserversRpc(ExcludeOwner = true)]
     void RpcSetGolfPlayersLocally(List<GolfPlayerTopDown> players)
     {
-        if(IsLocalPlayerHost())
+        if (IsLocalPlayerHost())
             return;
         Debug.Log("RpcSetGolfPlayersLocally");
         GolfPlayers.Clear();
@@ -1076,7 +1076,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         if (NetworkPlayersServer.Contains(player))
             return;
-        
+
         NetworkPlayersServer.Add(player);
         Debug.Log("AddNetworkPlayer: Player added with connection id of: " + player.OwnerId + " count of NetworkPlayerServers: " + NetworkPlayersServer.Count.ToString());
     }
@@ -1100,7 +1100,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             //_currentplayerui.SetActive(true);
             //_currentplayeruiText.text = CurrentPlayer.PlayerName + ":" + next.ToString();
             return;
-        }   
+        }
 
         Debug.Log("SyncCurrentPlayerNetId: " + next.ToString());
         CurrentPlayer = InstanceFinder.ClientManager.Objects.Spawned[next].GetComponent<GolfPlayerTopDown>();
@@ -1142,7 +1142,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         float endTime = Time.time + duration;
 
         // Send the message to the player
-        CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner,"storm passed");
+        CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner, "storm passed");
 
         while (Time.time < endTime)
         {
