@@ -80,7 +80,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SyncVar] public bool HasPlayerTeedOff = false;
     public bool PromptedForLightning = false;
     public bool PlayerStruckByLightning = false;
-    public bool PromptedForMulligan = false;
+    
 
     [Header("Hit Meter Objects")]
     [SerializeField] GameObject _hitMeterObject;
@@ -153,7 +153,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [Header("Power Up Effects")]
     [SyncVar(OnChange = nameof(SyncPowerUpDistanceModifier))] public float PowerUpDistanceModifier = 1.0f;
     [SyncVar] public float PowerUpAccuracyModifier = 1.0f;
-    [SyncVar] public bool PlayerMulligan = false;
+    
+
+    [Header("Mulligan Stuff")]
+    [SyncVar(OnChange = nameof(SyncPlayerMulligan))] public bool PlayerMulligan = false;
+    public bool PromptedForMulligan = false;
+    [SerializeField] Vector3 _ballStartPosition = Vector3.zero;
+    IEnumerator _mulliganRoutine;
+    [SerializeField] bool _isMulliganRoutineRunning = false;
 
     [Header("Wind UI")]
     [SerializeField] GameObject _windUIHolder;
@@ -424,7 +431,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                     // End old way of starting turn
                     CmdStartCurrentPlayersTurnOnServer();
                 }
-                else if (this.PlayerMulligan)
+                else if (this.PlayerMulligan && !this.UsedPowerupThisTurn)
                 {
                     SkipMulligan();
                 }
@@ -808,6 +815,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
         // Find the closest hole to the player
         Vector3 ballPos = MyBall.transform.position;
+        // Save the ball's starting position for if the player uses a mulligan
+        this._ballStartPosition = ballPos;
+
         GameObject closestHole = FindClosestHole(ballPos);
         Vector3 aimTarget = closestHole.transform.position;
         // Check if the player has teed off yet
@@ -1869,7 +1879,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         else if (message == "mulligan")
             PromptedForMulligan = true;
         _playerUIMessage.UpdatePlayerMessageText(message);
-        if (this.IsOwner && (!message.Contains("mulligan")))
+        if (this.IsOwner && (!message.StartsWith("mulligan")))
             CmdTellClientsUpdatePlayerMessageText(message);
     }
     [ServerRpc]
@@ -1907,6 +1917,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     IEnumerator MulliganPromptCountDown(int timeRemaining)
     {
+        Debug.Log("MulliganPromptCountDown: starting...");
+        _isMulliganRoutineRunning = true;
         while (timeRemaining > 0 && PlayerMulligan)
         {
             //RpcMulliganCountdown(this.Owner, timeRemaining);
@@ -1915,6 +1927,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             timeRemaining--;
 
         }
+        _isMulliganRoutineRunning = false;
         this.SkipMulligan();
         yield break;
     }
@@ -1923,10 +1936,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         PlayerUIMessage("mulligan " + duration.ToString());
         EnablePlayerCanvas(true);
-        if (this.IsOwner)
-        {
-            StartCoroutine(MulliganPromptCountDown(duration));
-        }
+
     }
     [Server]
     public async Task ServerTellPlayerGroundTheyLandedOn(float duration)
@@ -2575,6 +2585,20 @@ public class GolfPlayerTopDown : NetworkBehaviour
         this.PowerUpAccuracyModifier = 1.0f;
         this.PowerUpDistanceModifier = 1.0f;
     }
+    void SyncPlayerMulligan(bool prev, bool next, bool asServer)
+    {
+        if (asServer)
+            return;
+        if (this.IsOwner)
+        {
+            if (next)
+            {
+                //StartCoroutine(MulliganPromptCountDown(duration));
+                _mulliganRoutine = MulliganPromptCountDown(10);
+                StartCoroutine(_mulliganRoutine);
+            }
+        }
+    }
     void UseMulligan()
     {
         if (!this.IsOwner)
@@ -2582,6 +2606,36 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (!this.PlayerMulligan)
             return;
         Debug.Log("UseMulligan: for player: " + this.PlayerName);
+        if (_isMulliganRoutineRunning)
+        {
+            StopCoroutine(_mulliganRoutine);
+            _isMulliganRoutineRunning = false;
+        }
+        PlayerUIMessage("UsingMulligan");
+        this.MyBall.transform.position = _ballStartPosition;
+        CmdUseMulligan();
+    }
+    [ServerRpc]
+    void CmdUseMulligan()
+    {
+        if (!this.PlayerMulligan)
+            return;
+        StartCoroutine(DelayForUsedMulligan(5));
+        PowerUpManagerTopDownGolf.instance.PlayerIsUsingPowerUp(this.ObjectId);
+        this.PlayerScore.RemoveStrokeForMulligan();
+        
+        if (this.HasPlayerTeedOff && this.PlayerScore.StrokesForCurrentHole == 0)
+        {
+            Debug.Log("CmdUseMulligan: Player is mulliganing their tee off hit. Reseting HasPlayerTeedOff to false");
+            this.HasPlayerTeedOff = false;
+        }
+    }
+    IEnumerator DelayForUsedMulligan(int delay)
+    {
+        yield return new WaitForSeconds(delay);
+        GameplayManagerTopDownGolf.instance.PlayerUsedMulligan(this);
+        this.ServerSetIsPlayersTurn(true);
+        this.RpcPlayerUIMessage(this.Owner, "");
     }
     void SkipMulligan()
     {
@@ -2589,11 +2643,28 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (!this.PlayerMulligan)
             return;
+        if (this.UsedPowerupThisTurn)
+            return;
         Debug.Log("SkipMulligan: for player: " + this.PlayerName);
+        if (_isMulliganRoutineRunning)
+        {
+            StopCoroutine(_mulliganRoutine);
+            _isMulliganRoutineRunning = false;
+        }
         CmdSkipMulligan();
     }
     [ServerRpc]
     void CmdSkipMulligan()
+    {
+        if (!this.PlayerMulligan)
+            return;
+        if (this.UsedPowerupThisTurn)
+            return;
+        Debug.Log("CmdSkipMulligan: for player: " + this.PlayerName);
+        this.PlayerMulligan = false;
+    }
+    [Server]
+    public void RemovePlayerMulligan()
     {
         this.PlayerMulligan = false;
     }

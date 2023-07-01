@@ -1242,4 +1242,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         Debug.Log("GameplayManagerTopDownGolf.cs: ResetPlayersUsedPowerUpEffects: " + player.PlayerName);
         player.ResetPlayersUsedPowerUpEffects();
     }
+    public void PlayerUsedMulligan(GolfPlayerTopDown mulliganPlayer)
+    {
+        SetCurrentPlayer(mulliganPlayer);
+        StartCurrentPlayersTurn(mulliganPlayer);
+    }
 }

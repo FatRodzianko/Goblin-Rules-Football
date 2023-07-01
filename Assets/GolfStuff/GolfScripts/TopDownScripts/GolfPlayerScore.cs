@@ -60,6 +60,12 @@ public class GolfPlayerScore : NetworkBehaviour
         StrokesForCurrentHole += penalty;
         TotalStrokesForCourse += penalty;
     }
+    [Server]
+    public void RemoveStrokeForMulligan()
+    {
+        StrokesForCurrentHole--;
+        TotalStrokesForCourse--;
+    }
     public void SaveScoreAtEndOfHole(int holeIndex)
     {
         LocalHoleWithScores[holeIndex] = StrokesForCurrentHole;

@@ -156,12 +156,13 @@ x have the player's used powerup be used/removed from them on the sever/ when th
 - - x I think this will be good because then a player can get a power up after their hit. So, use power up, hit ball, pop balloon, get new power up on same turn
 - remember to reset the "player used power up this turn" bool and the UsedPowerUpType string at the end of the player's turn
 - mulligan power up will be different
-- - - prompt player for mulligan at end of their shot?
-- - - make it so they have like 5 seconds to chose to mulligan? If they don't decide, end turn
+- - x prompt player for mulligan at end of their shot?
+- - x make it so they have like 5 seconds to chose to mulligan? If they don't decide, end turn
 - - - - - - p to use the mulligan, space or something else to end the turn?
-- - - need to have some sort of check that prevents the mulligan from being used on the turn the player gets it? Want to make sure they aren't just aiming for an out-of-the-way powerup and then redo the shot right after?
-- - - - - - might not really be a needed check since the power up types are chosen randomly?
-- - - maybe don't do the "prompt for mulligan" stuff from GameplayManager's "StartNextPlayersTurn" and instead just have the player get prompted when their ball comes to a stop? aka before StartNextPlayersTurn is ever called make the check to see if a player has a mulligan?
+- - - - - - space to skip mulligan and move onto next turn
+- - - make sure that when a player uses a mulligan, lightning strikes and stuff still function? maybe?
+- - x maybe don't do the "prompt for mulligan" stuff from GameplayManager's "StartNextPlayersTurn" and instead just have the player get prompted when their ball comes to a stop? aka before StartNextPlayersTurn is ever called make the check to see if a player has a mulligan?
+- - - - - x wasn't working so did it from gameplaymanager like before
 x If they use rain/wind powerup
 - - x send message to server. Set the player rain to clear/wind to 0. The player's shot should then not take those into account when doing their shot
 - - - - - x and hopefully won't cause lightning/tornadoes to be affected because it isn't affecting the base weather/wind?

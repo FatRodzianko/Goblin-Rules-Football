@@ -1224,6 +1224,12 @@ public class GolfBallTopDown : NetworkBehaviour
     public void CmdTellServerToStartNexPlayersTurn(bool playerSkippingForLightning = false, bool playerWasStruckByLightning = false)
     {
         Debug.Log("CmdTellServerToStartNexPlayersTurn: From player: " + MyPlayer.PlayerName);
+        if (MyPlayer.PlayerMulligan)
+        {
+            Debug.Log("CmdTellServerToStartNexPlayersTurn: " + MyPlayer.PlayerName + "'s turn ended after they used their mulligan. Resetting their PlayerMulligan value...");
+            MyPlayer.RemovePlayerMulligan();
+            return;
+        }
         GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this, playerSkippingForLightning, playerWasStruckByLightning);
     }
     void ResetTornadoStuff()

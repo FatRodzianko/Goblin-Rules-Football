@@ -169,12 +169,14 @@ public class WindManager : NetworkBehaviour
             return "none";
         else if (windSeverity < 0.6f)
             return "low";
-        else if (windSeverity < 0.85f)
-            return "med";
-        else if (windSeverity < 0.95f)
-            return "high";
         else
-            return "highest";
+            return "med";
+        //else if (windSeverity < 0.85f)
+        //    return "med";
+        //else if (windSeverity < 0.95f)
+        //    return "high";
+        //else
+        //    return "highest";
         
     }
     int GetInitialWindSpeedFromSeverity(string severity)

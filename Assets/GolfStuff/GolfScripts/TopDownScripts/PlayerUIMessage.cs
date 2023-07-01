@@ -18,6 +18,8 @@ public class PlayerUIMessage : MonoBehaviour
     [SerializeField] const string _stormPassed = "All players have agreed to let the storm pass until there is no more lightning.";
     [SerializeField] const string _mulliganOwner = "You have a mulligan power up. Press \"p\" if you want to use it now. Press space to continue to next turn.\n";
     [SerializeField] const string _mulliganClients = " is deciding if they want to use their mulligan...";
+    [SerializeField] const string _usingMulliganOwner = "Using mulligan. Setting the ball back to where you started...";
+    [SerializeField] const string _usingMulliganClients = " is using their mulligan!";
 
     // Start is called before the first frame update
     void Start()
@@ -82,9 +84,19 @@ public class PlayerUIMessage : MonoBehaviour
                 string[] mulliganMessage = message.Split(" ");
                 _playerMessageText.text = _mulliganOwner + mulliganMessage[1].ToString() + " seconds remaining...";
             }
-                
+
             else
                 _playerMessageText.text = _myPlayer.PlayerName + _mulliganClients;
+        }
+        else if (message == "UsingMulligan")
+        {
+            if (_myPlayer.IsOwner)
+            {
+                _playerMessageText.text = _usingMulliganOwner;
+            }
+
+            else
+                _playerMessageText.text = _myPlayer.PlayerName + _usingMulliganClients;
         }
         else
         {
