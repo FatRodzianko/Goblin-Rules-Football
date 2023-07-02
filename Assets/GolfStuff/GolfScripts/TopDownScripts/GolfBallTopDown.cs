@@ -460,9 +460,15 @@ public class GolfBallTopDown : NetworkBehaviour
             var rightAngle = 90f * Mathf.Deg2Rad;
             // https://math.stackexchange.com/questions/2532397/calculate-height-of-triangle-given-angle-and-base
             controlZ = ((launchDistance / 2) * Mathf.Sin(rightAngle) * Mathf.Sin(hitAngleRad)) / Mathf.Sin(oppositeHitAngleRad);
+            
+            if (MyPlayer.UsedPowerupThisTurn && MyPlayer.UsedPowerUpType == "higher")
+            {
+                controlZ *= 2f;
+            }
         }
         // Save the maximum height of the flight path
         //maxHeight = controlZ;
+        
         controlZ *= 2; // double the controlZ value because the height of the flight path is always controlZ / 2
         trajectoryPoints[1] = new Vector3(controlX, controlY, controlZ);
 

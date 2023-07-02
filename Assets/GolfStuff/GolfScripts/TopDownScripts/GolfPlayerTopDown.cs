@@ -2496,6 +2496,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (!this.IsOwner)
         {
             return;
+            
+        }
+        if (next == "higher")
+        {
+            this.previousHitDistance = 0f;
         }
         Debug.Log("SyncUsedPowerUpType: " + next + " on player: " + this.PlayerName);
     }
