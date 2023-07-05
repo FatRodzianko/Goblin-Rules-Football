@@ -209,9 +209,10 @@ public class Torndao : NetworkBehaviour
     {
         GolfPlayerTopDown playerToSpawnBy = null;
         int lowestFavor = 0;
-        for (int i = 0; i < GameplayManagerTopDownGolf.instance.GolfPlayersServer.Count; i++)
+        // was originally using GolfPlayersServer here, but that means a tornado could target a player that had been struck by lightning. Making sure not to target them any more?
+        for (int i = 0; i < GameplayManagerTopDownGolf.instance.GolfPlayers.Count; i++)
         {
-            GolfPlayerTopDown player = GameplayManagerTopDownGolf.instance.GolfPlayersServer[i];
+            GolfPlayerTopDown player = GameplayManagerTopDownGolf.instance.GolfPlayers[i];
             if (i == 0)
             {
                 lowestFavor = player.FavorWeather;

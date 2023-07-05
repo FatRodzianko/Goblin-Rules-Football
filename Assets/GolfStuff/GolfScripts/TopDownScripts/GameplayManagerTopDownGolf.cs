@@ -932,6 +932,12 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // this is just for testing with "local multiplayer" to make sure when the player that was struck by lightning presses space, it doesn't also get read as the next player pressing space to start their turn
         TimeSinceLastTurnStart = Time.time;
         PlayerOutOfCommission(player);
+        if (player.PlayerMulligan)
+        {
+            Debug.Log("PlayerWasStruckByLightning: Player " + player.PlayerName + " was struck by lightning while using their mulligan? " + player.PlayerMulligan.ToString() + " resetting their PlayerMulligan value...");
+            player.RemovePlayerMulligan();
+            return;
+        }
         StartNextPlayersTurn(player.MyBall, false, true);
     }
     void PlayerOutOfCommission(GolfPlayerTopDown player)

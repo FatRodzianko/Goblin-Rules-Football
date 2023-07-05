@@ -108,9 +108,16 @@ public class GolferAnimator : NetworkBehaviour
         Debug.Log("GolferAnimator: PlayerStruckByLightning: Stopping the animation");
         IsPausedOnLightningStrike = true;
         //_networkAnimator.SetTrigger("PauseForLightning");
-        _networkAnimator.Play(_pauseOnLightningStrike);
-        
+        //_networkAnimator.Play(_pauseOnLightningStrike);
+        _networkAnimator.SetTrigger("StruckSkeleton");
+
         //_animator.enabled = false;
+
+    }
+    public void PlayerStruckByLightningForClients()
+    {
+        IsPausedOnLightningStrike = true;
+        _animator.Play(_pauseOnLightningStrike);
         
     }
     public void ResetGolfAnimator()

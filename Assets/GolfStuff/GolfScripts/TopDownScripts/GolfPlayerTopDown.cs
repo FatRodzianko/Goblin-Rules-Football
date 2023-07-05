@@ -473,6 +473,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 Debug.Log("Player pressed space: this.PlayerStruckByLightning");
                 _golfAnimator.ResetGolfAnimator();
                 EnablePlayerSprite(false);
+                CmdDisableSpriteForLightningStrike();
                 this.EnablePlayerCanvas(false);
                 CmdEnablePlayerCanvasForOtherClients(false);
                 //this.IsPlayersTurn = false;
@@ -2237,16 +2238,25 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         EnablePlayerSprite(enable);
     }
+    [ServerRpc]
+    void CmdDisableSpriteForLightningStrike()
+    {
+        RpcEnablePlayerSprite(false);
+    }
     public void EnablePlayerSprite(bool enable)
     {
-        Debug.Log("EnablePlayerSprite: " + enable.ToString());
+        Debug.Log("EnablePlayerSprite: " + enable.ToString() + " for player: " + this.PlayerName);
         _playerNameText.gameObject.SetActive(enable);
         _golfAnimator.EnablePlayerSprite(enable);
     }
     public void StruckByLightning()
     {
         if (!this.IsOwner)
+        {
+            //_golfAnimator.PlayerStruckByLightningForClients();
             return;
+        }
+            
         PlayerStruckByLightning = true;
         _golfAnimator.PlayerStruckByLightning();
         //PlayerUIMessage("struck by lightning");

@@ -1045,6 +1045,14 @@ MonoBehaviour:
   _longPuttTextImage: {fileID: 21300000, guid: 21cf22b8677268049a7cac29ab6ebcbc, type: 3}
   HasPowerUp: 0
   PlayerPowerUpType: 
+  UsedPowerUpType: 
+  UsedPowerupThisTurn: 0
+  PowerUpDistanceModifier: 1
+  PowerUpAccuracyModifier: 1
+  PlayerMulligan: 0
+  PromptedForMulligan: 0
+  _ballStartPosition: {x: 0, y: 0, z: 0}
+  _isMulliganRoutineRunning: 0
   _windUIHolder: {fileID: 8772944465458510233}
   myCamera: {fileID: 0}
   _vCam: {fileID: 0}
@@ -2030,7 +2038,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1427359746002268329
 Transform:
   m_ObjectHideFlags: 0
