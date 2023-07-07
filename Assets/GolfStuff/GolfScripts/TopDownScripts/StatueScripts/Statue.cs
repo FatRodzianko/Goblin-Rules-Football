@@ -76,7 +76,10 @@ public class Statue : NetworkBehaviour
     }
     float GetStartingRadius()
     {
-        return UnityEngine.Random.Range(3f, 10f);
+        if(this.StatueType == "good-weather")
+            return UnityEngine.Random.Range(3f, 7.5f);
+        else
+            return UnityEngine.Random.Range(8f, 12.5f);
     }
     int GetRingSegments(float radius)
     {

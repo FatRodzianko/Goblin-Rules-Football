@@ -330,7 +330,8 @@ public class TileMapManager : MonoBehaviour
     {
         foreach (SavedBalloonPowerUp balloon in balloonPowerUpsToSpawn)
         {
-            Instantiate(balloon.BalloonScriptableObstacle.ObstaclePrefab, balloon.BalloonPosition, Quaternion.identity);
+            GameObject balloonObject = Instantiate(balloon.BalloonScriptableObstacle.ObstaclePrefab, balloon.BalloonPosition, Quaternion.identity);
+            balloonObject.GetComponent<BalloonPowerUp>().SavedHeightOfBalloon = balloon.BalloonHeight;
         }
     }
     public void LoadMap(ScriptableHole hole)
