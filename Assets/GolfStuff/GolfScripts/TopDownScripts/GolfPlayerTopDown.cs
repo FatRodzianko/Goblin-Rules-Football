@@ -148,7 +148,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     string _playerPowerUpText = null;
     PowerUpTopDown _myPowerUp;
     [SyncVar(OnChange = nameof(SyncUsedPowerUpType))] public string UsedPowerUpType;
-    [SyncVar] public bool UsedPowerupThisTurn = false;
+    [SyncVar(OnChange = nameof(SyncUsedPowerupThisTurn))] public bool UsedPowerupThisTurn = false;
 
     [Header("Power Up Effects")]
     [SyncVar(OnChange = nameof(SyncPowerUpDistanceModifier))] public float PowerUpDistanceModifier = 1.0f;
@@ -547,7 +547,6 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 PlayerChooseDirectionAndDistance(false);
                 UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
                 GameplayManagerTopDownGolf.instance.PowerUpShowInstructions(this);
-
             }
         }
         //if (Input.GetKeyDown(KeyCode.Tab))
@@ -869,6 +868,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
         ResethitTopSpinForNewTurn();
         PlayerChooseDirectionAndDistance(false);
         UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
+
+        PlayerScoreBoard.instance.UpdatePlayerScoreBoardItemPlayerFavor(this);
     }
     [ObserversRpc]
     public void RpcSetCameraOnPlayer()
@@ -1990,7 +1991,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (isInBounds && !(MyBall.IsInHole || MyBall.LocalIsInHole))
         {
             MyBall.TellPlayerGroundTypeTheyLandedOn();
-            MyBall.CheckIfInStatueRingRadius();
+            //MyBall.CheckIfInStatueRingRadius();
         }
         else if (isInBounds && (MyBall.IsInHole || MyBall.LocalIsInHole))
         {
@@ -2413,7 +2414,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
             Debug.Log("SyncFavorWeather: as server? " + asServer.ToString());
             SetAccuracyFavorModifier(next);
             SetDistanceFavorModifier(next);
+            return;
         }
+        PlayerScoreBoard.instance.UpdatePlayerScoreBoardItemPlayerFavor(this);
     }
     [Server]
     void SetAccuracyFavorModifier(int newPlayerFavor)
@@ -2513,6 +2516,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
             this.previousHitDistance = 0f;
         }
         Debug.Log("SyncUsedPowerUpType: " + next + " on player: " + this.PlayerName);
+    }
+    void SyncUsedPowerupThisTurn(bool prev, bool next, bool asServer)
+    {
+        if (asServer)
+            return;
+        GameplayManagerTopDownGolf.instance.SetInstructionsText(next);
     }
     [Server]
     public void SetUsedPowerUpType(string usedType)
@@ -2628,6 +2637,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         PlayerUIMessage("UsingMulligan");
         this.MyBall.transform.position = _ballStartPosition;
+        SetDistanceToHoleForPlayer();
         CmdUseMulligan();
     }
     [ServerRpc]

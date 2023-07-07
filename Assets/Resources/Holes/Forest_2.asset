@@ -26665,14 +26665,14 @@ MonoBehaviour:
   - StatuePosition: {x: 172.5, y: -34.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
-  - StatuePosition: {x: 212.5, y: 0.5, z: 0}
+  - StatuePosition: {x: 212.5, y: -9.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
   - StatuePosition: {x: 202.5, y: 10.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
   BalloonPowerUps:
-  - BalloonPosition: {x: 73.5, y: -55.5, z: 0}
+  - BalloonPosition: {x: 72.5, y: -48.5, z: 0}
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: 190.5, y: -20.5, z: 0}

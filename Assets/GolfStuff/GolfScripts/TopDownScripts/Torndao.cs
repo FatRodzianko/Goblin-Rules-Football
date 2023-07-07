@@ -213,6 +213,8 @@ public class Torndao : NetworkBehaviour
         for (int i = 0; i < GameplayManagerTopDownGolf.instance.GolfPlayers.Count; i++)
         {
             GolfPlayerTopDown player = GameplayManagerTopDownGolf.instance.GolfPlayers[i];
+            if (player.MyBall.IsInHole)
+                continue;
             if (i == 0)
             {
                 lowestFavor = player.FavorWeather;

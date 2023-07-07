@@ -14,10 +14,12 @@ public class PlayerScoreBoardItem : MonoBehaviour
 
     [Header("UI Components")]
     [SerializeField] TextMeshProUGUI _name;
+    [SerializeField] TextMeshProUGUI _playerFavor;
     [SerializeField] TextMeshProUGUI _totalScore;
     [SerializeField] GameObject _scoreItemHolderPanel;
     [SerializeField] GameObject _scoreTextPrefab;
     [SerializeField] List<TextMeshProUGUI> _scoreItems = new List<TextMeshProUGUI>();
+    
 
     // Start is called before the first frame update
     void Start()
@@ -65,6 +67,7 @@ public class PlayerScoreBoardItem : MonoBehaviour
     {
         _name.text = PlayerName;
         _name.color = PlayerColor;
+        _playerFavor.color = PlayerColor;
 
         for (int i = 0; i < numberOfHoles; i++)
         {
@@ -85,4 +88,10 @@ public class PlayerScoreBoardItem : MonoBehaviour
         PlayerScoreForCourse = newStrokes;
         _totalScore.text = newStrokes.ToString();
     }
+    public void UpdatePlayerFavor(int playerFavor)
+    {
+        Debug.Log("UpdatePlayerFavor: for player: " + this.PlayerName + " with new favor of: " + playerFavor.ToString());
+        _playerFavor.text = ":"+playerFavor.ToString();
+    }
 }
+

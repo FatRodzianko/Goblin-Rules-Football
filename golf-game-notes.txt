@@ -207,6 +207,8 @@ ballon heights
 - - - - - - if tied, such as multiple holes in one, choose randomly who will go first?
 x tornadoes target player with lowest favor, which could be a player that is struck by lightning. Need to make sure to skip those players...
 - - - tornado was using the GolfPlayersServer list to get its targets. Changed it to just GolfPlayers, since a player is removed from GolfPlayers when they are struck by lightning.
+- If a player hits a ball out of bounds or in water, Player Favor is calculated BEFORE the ball is moved. Change to afterward?
+
 
 
 

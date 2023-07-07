@@ -77,6 +77,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] GameObject _powerUpDisplayHolder;
     [SerializeField] RawImage _powerUpImage;
     [SerializeField] TextMeshProUGUI _powerUpInstructionsText;
+    [SerializeField] const string _instructionsPressP = "Press \"p\" to use";
 
 
     [Header("Skip For Lightning Info")]
@@ -1224,7 +1225,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     }
     public void PowerUpShowInstructions(GolfPlayerTopDown player)
     {
-        if (!player.HasPowerUp)
+        if (!player.HasPowerUp && !player.UsedPowerupThisTurn)
         {
             _powerUpInstructionsText.gameObject.SetActive(false);
             return;
@@ -1233,6 +1234,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (player.PlayerPowerUpType != "mulligan")
         {
             _powerUpInstructionsText.gameObject.SetActive(true);
+            SetInstructionsText(player.UsedPowerupThisTurn);
         }
         else
         {
@@ -1252,5 +1254,12 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         SetCurrentPlayer(mulliganPlayer);
         StartCurrentPlayersTurn(mulliganPlayer);
+    }
+    public void SetInstructionsText(bool usedPowerUp)
+    {
+        if (usedPowerUp)
+            _powerUpInstructionsText.text = "Used!";
+        else
+            _powerUpInstructionsText.text = _instructionsPressP;
     }
 }

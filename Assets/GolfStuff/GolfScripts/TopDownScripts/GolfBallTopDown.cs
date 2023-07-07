@@ -1673,9 +1673,11 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         yield return new WaitForSeconds(delaySeconds);
         this.transform.position = newBallPos;
+        this.CheckIfInStatueRingRadius();
         if (this.IsOwner)
             MyPlayer.SetDistanceToHoleForPlayer();
         bounceContactGroundMaterial = GetGroundMaterial();
+        
         //MyPlayer.EnablePlayerCanvas(false);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
@@ -1722,6 +1724,7 @@ public class GolfBallTopDown : NetworkBehaviour
             BallEndedInWater();
             return;
         }
+        this.CheckIfInStatueRingRadius();
         MyPlayer.PlayerUIMessage("ground: " + this.bounceContactGroundMaterial);
         MyPlayer.EnablePlayerCanvas(true);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
@@ -1737,6 +1740,7 @@ public class GolfBallTopDown : NetworkBehaviour
             {
                 Debug.Log("CheckIfInStatueRingRadius: ball landed in a statue's ring radius");
                 GetStatueFavorEffect(hits[i].transform.parent.GetComponent<Statue>());
+                break;
             }
         }
     }

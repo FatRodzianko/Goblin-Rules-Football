@@ -93,6 +93,7 @@ public class PlayerScoreBoard : MonoBehaviour
         PlayerScoreBoardItem itemToUpdate = PlayerScoreItems.FirstOrDefault(x => x.PlayerConnectionId == player.ConnectionId);
         //int holeIndex = GameplayManagerTopDownGolf.instance.CurrentHoleIndex + 1;
         itemToUpdate.UpdateStrokesForCurrentHole(GameplayManagerTopDownGolf.instance.CurrentHoleIndex, strokes);
+        itemToUpdate.UpdatePlayerFavor(player.FavorWeather);
         //itemToUpdate.PlayerScoresPerHole[holeIndex] = strokes;
     }
     public void UpdatePlayerScoreBoardItemScoreForCourse(GolfPlayerTopDown player, int strokes)
@@ -104,10 +105,17 @@ public class PlayerScoreBoard : MonoBehaviour
 
         PlayerScoreBoardItem itemToUpdate = PlayerScoreItems.FirstOrDefault(x => x.PlayerConnectionId == player.ConnectionId);
         itemToUpdate.UpdateTotalStrokesForCourse(strokes);
+        itemToUpdate.UpdatePlayerFavor(player.FavorWeather);
         //itemToUpdate.PlayerScoreForCourse = strokes;
 
         // Sort the list after a new score for the course is received?
         SortScoreBoardList();
+    }
+    public void UpdatePlayerScoreBoardItemPlayerFavor(GolfPlayerTopDown player)
+    {
+        Debug.Log("UpdatePlayerScoreBoardItemPlayerFavor: for player: " + player.PlayerName);
+        PlayerScoreBoardItem itemToUpdate = PlayerScoreItems.FirstOrDefault(x => x.PlayerConnectionId == player.ConnectionId);
+        itemToUpdate.UpdatePlayerFavor(player.FavorWeather);
     }
     public void UpdateCourseScore(GolfPlayerTopDown player, Dictionary<int, int> courseScoresPerHole)
     {
