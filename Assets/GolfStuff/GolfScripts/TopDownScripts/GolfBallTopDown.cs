@@ -39,6 +39,7 @@ public class GolfBallTopDown : NetworkBehaviour
     [Header("Ball Status")]
     public bool isHit = false;
     [SerializeField] [SyncVar(OnChange = nameof(SyncClientMovingBall))] bool _clientMovingBall = false;
+    public bool PlayerUsingRocket = false;
 
     [Header("Hit Ball Info")]
     public Vector3[] hitBallPonts = new Vector3[3];
@@ -347,6 +348,9 @@ public class GolfBallTopDown : NetworkBehaviour
     public void ResetBallInfo(bool checkForBounces)
     {
         isHit = false;
+        //PlayerUsingRocket = false;
+        SetPlayerUsingRocket(false);
+        MyPlayer.SetCanUseRocket(false);
 
         hitBallCount = 0f;
         timeInAir = 0f;
@@ -1200,6 +1204,8 @@ public class GolfBallTopDown : NetworkBehaviour
         if (this.IsOwner)
             CmdTellClientsBallIsMoving(false);
 
+        SetPlayerUsingRocket(false);
+
         ResetBouncingInfo(true);
     }
     void ResetBallAndPlayerAfterBallStoppedRolling()
@@ -1211,6 +1217,7 @@ public class GolfBallTopDown : NetworkBehaviour
         MyPlayer.ResetPreviousHitValues();
         //TellPlayerGroundTypeTheyLandedOn();
         MyPlayer.SetDistanceToHoleForPlayer();
+        SetPlayerUsingRocket(false);
         if (IsHitByTornado)
         {
             ResetTornadoStuff();
@@ -1332,13 +1339,22 @@ public class GolfBallTopDown : NetworkBehaviour
         //if (ballUnityUnits < obstalceUnityUnits)
         if (DoesBallHitObject(obstalceUnityUnits, ballUnityUnits))
         {
-            Debug.Log("HitEnvironmentObstacle: ball is not high enough to clear environmnet obstalce. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString() + " bounce modifier: " + bounceModifier.ToString());
+            Debug.Log("HitEnvironmentObstacle: ball is not high enough to clear environmnet obstalce. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString() + " bounce modifier: " + bounceModifier.ToString() + " using rocket? " + this.PlayerUsingRocket.ToString());
+            
+            // Player can no longer use rocket if it hits an obstacle?
+            MyPlayer.SetCanUseRocket(false);
+
             if (isRolling)
             {
                 BounceOffTheObstacleRolling(collisionPoint, ballPos, softBounce, bounceModifier);
             }
             else
             {
+                if (this.PlayerUsingRocket)
+                {
+                    // explode the ball after this?
+                    SetPlayerUsingRocket(false);
+                }
                 BounceOffTheObstacle(softBounce, bounceModifier);
             }
             if (!string.IsNullOrEmpty(bounceSoundType) && this.IsOwner)
@@ -1382,7 +1398,6 @@ public class GolfBallTopDown : NetworkBehaviour
         if (isHit)
         {
             isHit = false;
-
         }
 
         if (isBouncing)
@@ -1827,7 +1842,29 @@ public class GolfBallTopDown : NetworkBehaviour
         MyPlayer.BrokenStatuePenalty(statueType);
         //CmdBrokenStatuePenalty(statueType);
     }
+    public void MoveBallWithRocketPowerUp(Vector3 movementVector, float rocketBoost)
+    {
+        if (!this.isHit)
+        {
+            //this.PlayerUsingRocket = false;
+            SetPlayerUsingRocket(false);
+            return;
+        }   
+        
+        Vector3 totalMovement = movementVector * rocketBoost * Time.fixedDeltaTime;
 
+        Debug.Log("MoveBallWithRocketPowerUp: Original trajectory points: " + this.hitBallPonts[1].ToString() + ":" + this.hitBallPonts[2].ToString());
+        this.hitBallPonts[1] += (totalMovement / 2);
+        this.hitBallPonts[2] += totalMovement;
+        Debug.Log("MoveBallWithRocketPowerUp: New trajectory points: " + this.hitBallPonts[1].ToString() + ":" + this.hitBallPonts[2].ToString());
+
+        //this.PlayerUsingRocket = true;
+        SetPlayerUsingRocket(true);
+    }
+    public void SetPlayerUsingRocket(bool enable)
+    {
+        this.PlayerUsingRocket = enable;
+    }
 }
 
 

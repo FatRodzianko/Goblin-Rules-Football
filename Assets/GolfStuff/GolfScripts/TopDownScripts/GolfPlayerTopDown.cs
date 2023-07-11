@@ -153,6 +153,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [Header("Power Up Effects")]
     [SyncVar(OnChange = nameof(SyncPowerUpDistanceModifier))] public float PowerUpDistanceModifier = 1.0f;
     [SyncVar] public float PowerUpAccuracyModifier = 1.0f;
+    Vector2 _rocketMove = Vector2.zero;
+    float _rocketBoost = 5f;
+    [SerializeField] bool _canUseRocketPower = false;
     
 
     [Header("Mulligan Stuff")]
@@ -400,7 +403,6 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 {
                     MoveHitMeterIcon();
                 }
-
             }
 
             return;
@@ -460,7 +462,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             }
             return;
         }
-
+        
+        // actions player can do while it is their "turn" aka after their turn as started and before they hit the ball
         if (Input.GetKeyDown(KeyCode.Space))
         {
             //MyBall.HitBall(hitDistance, hitAngle, hitTopSpin, hitDirection);
@@ -659,6 +662,25 @@ public class GolfPlayerTopDown : NetworkBehaviour
             // Update for the other game players?
             if (base.IsOwner)
                 CmdUpdateHitValuesForOtherPlayers(hitDistance, hitAngle, hitTopSpin, hitDirection, hitLeftOrRightspin);
+        }
+        // allow player to move the ball when they use the rocket power up?
+        if (this.IsOwner && this.MyBall.isHit)
+        {
+            if(!this.UsedPowerupThisTurn || this.UsedPowerUpType != "rocket")
+                return;
+            if (!this._canUseRocketPower)
+            {
+                MyBall.SetPlayerUsingRocket(false);
+                return;
+            }
+            _rocketMove.x = Input.GetAxisRaw("Horizontal");
+            _rocketMove.y = Input.GetAxisRaw("Vertical");
+            if (_rocketMove == Vector2.zero)
+            {
+                MyBall.SetPlayerUsingRocket(false);
+                return;
+            }
+            this.MyBall.MoveBallWithRocketPowerUp(_rocketMove.normalized,_rocketBoost);
         }
     }
     [ServerRpc]
@@ -2561,6 +2583,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
             case "wind":
                 WindPowerUpEffect();
                 break;
+            case "rocket":
+                RpcRocketPowerUpEffect(this.Owner, true);
+                break;
         }
     }
     [Server]
@@ -2596,6 +2621,15 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         WindManager.instance.WindPowerUpUsed(this);
     }
+    [TargetRpc]
+    void RpcRocketPowerUpEffect(NetworkConnection conn, bool enable)
+    {
+        this._canUseRocketPower = enable;
+    }
+    public void SetCanUseRocket(bool enable)
+    {
+        this._canUseRocketPower = enable;
+    }
     [ServerRpc]
     void CmdRemoveUsedPowerUps()
     {
@@ -2604,6 +2638,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [Server]
     public void ResetPlayersUsedPowerUpEffects()
     {
+        if (this.UsedPowerUpType == "rocket")
+            RpcRocketPowerUpEffect(this.Owner, false);
         this.UsedPowerUpType = "";
         this.UsedPowerupThisTurn = false;
         this.PowerUpAccuracyModifier = 1.0f;
@@ -2693,4 +2729,5 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         this.PlayerMulligan = false;
     }
+    
 }

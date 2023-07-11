@@ -177,6 +177,8 @@ x for power/accuracy power ups
 - - - keep distance and accuracy, but it make it so it's perfect accuracy and distance is like +50%
 - - - have things like rocket ball that you can aim (that will be hard...)
 - - - - - - if player runs into obstacle whil using the rocket engine, blow the player up - but only if the rocket is on. if they stopped, they just bounce
+- - - - - - what to do if hit by tornado? tornado launches ball in random direction. Maybe make it so the rocket just stops? Have a bool on the player object like "canUseRocketPower" and set it to false when a tornado hits it?
+- - - - - - change the color of the trail renderer from purple to orange and grey to look like fire and smoke from a rocket?
 - - x drill ball goes through obstacles
 - - - one that pushes nearby balls away from you (may be over powered on greens...)
 - - x for rain/wind - make it so player that uses it has always clear weather / no wind. Every other player gets 1 turn with weather one worse than the base, and wind that is +5 stronger than base?
