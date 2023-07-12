@@ -249,8 +249,13 @@ public class Torndao : NetworkBehaviour
     {
         float dist = 0f;
 
-        float min = 7.5f * (this.TornadoStrength / 2f);
-        float max = 15f * (this.TornadoStrength / 2f);
+        float numberOfPlayers = GameplayManagerTopDownGolf.instance.GolfPlayers.Count;
+
+        // changed it so the max distance a tornado moves is based on the number of players in the game?
+        //float min = 7.5f * (this.TornadoStrength / 2f);
+        //float max = 15f * (this.TornadoStrength / 2f);
+        float min = 10f * (this.TornadoStrength / numberOfPlayers);
+        float max = 18.5f * (this.TornadoStrength / numberOfPlayers);
 
         dist = UnityEngine.Random.Range(min, max);
 

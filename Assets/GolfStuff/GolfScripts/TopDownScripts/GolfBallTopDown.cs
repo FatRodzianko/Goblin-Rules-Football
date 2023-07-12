@@ -35,6 +35,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
     [Header("Trail")]
     [SerializeField] TrailRenderer trail;
+    [SerializeField] ParticleSystem _rocketParticle;
 
     [Header("Ball Status")]
     public bool isHit = false;
@@ -1381,6 +1382,8 @@ public class GolfBallTopDown : NetworkBehaviour
             if (!this.isHit && !this.isBouncing && !this.isRolling)
             {
                 IsHitByTornado = true;
+                this.SetPlayerUsingRocket(false);
+                MyPlayer.SetCanUseRocket(false);
                 MyTornado = tornado;
             }
 
@@ -1864,6 +1867,21 @@ public class GolfBallTopDown : NetworkBehaviour
     public void SetPlayerUsingRocket(bool enable)
     {
         this.PlayerUsingRocket = enable;
+        RocketParticleEffect(enable);
+    }
+    void RocketParticleEffect(bool enable)
+    {
+        this._rocketParticle.gameObject.SetActive(enable);
+        if (enable)
+        {
+            if (!_rocketParticle.isPlaying)
+                _rocketParticle.Play();
+        }
+        else
+        {
+            if (_rocketParticle.isPlaying)
+                _rocketParticle.Stop();
+        }
     }
 }
 
