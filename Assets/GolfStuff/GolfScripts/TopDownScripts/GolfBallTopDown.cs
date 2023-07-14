@@ -148,10 +148,13 @@ public class GolfBallTopDown : NetworkBehaviour
             // update other players and stuff
             //CmdUpdateBallSpriteForHeightForOtherPlayers();
 
-            if (!trail.enabled)
+            if (!trail.enabled && !this.PlayerUsingRocket)
+            {
                 trail.enabled = true;
+                CmdEnableTrailForOtherPlayers(true);
+            }
 
-            CmdEnableTrailForOtherPlayers(true);
+            
         }
         else if (isRolling)
         {
@@ -162,7 +165,7 @@ public class GolfBallTopDown : NetworkBehaviour
             //Debug.Log("IsRolling: Roll direction AFTER WIND: " + movementDirection.ToString());
             RollBall(speedMetersPerSecond, movementDirection);
 
-            if (!trail.enabled)
+            if (!trail.enabled && !this.PlayerUsingRocket)
             {
                 trail.enabled = true;
                 CmdEnableTrailForOtherPlayers(true);
@@ -1870,17 +1873,55 @@ public class GolfBallTopDown : NetworkBehaviour
         RocketParticleEffect(enable);
     }
     void RocketParticleEffect(bool enable)
-    {
-        this._rocketParticle.gameObject.SetActive(enable);
+    {   
         if (enable)
         {
+            this._rocketParticle.gameObject.SetActive(enable);
             if (!_rocketParticle.isPlaying)
+            {
                 _rocketParticle.Play();
+                trail.enabled = false;
+                CmdEnableRocketParticleForOtherPlayers(enable);
+            }   
         }
         else
         {
             if (_rocketParticle.isPlaying)
+            {
                 _rocketParticle.Stop();
+                trail.enabled = true;
+                CmdEnableRocketParticleForOtherPlayers(enable);
+            }
+            this._rocketParticle.gameObject.SetActive(enable);
+        }
+    }
+    [ServerRpc]
+    void CmdEnableRocketParticleForOtherPlayers(bool enable)
+    {
+        RpcEnableRocketParticleForOtherPlayers(enable);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcEnableRocketParticleForOtherPlayers(bool enable)
+    {
+        Debug.Log("RpcEnableRocketParticleForOtherPlayers: " + enable.ToString());
+       
+        if (enable)
+        {
+            this._rocketParticle.gameObject.SetActive(enable);
+            if (!_rocketParticle.isPlaying)
+            {
+                _rocketParticle.Play();
+                trail.enabled = false;
+            }
+        }
+        else
+        {
+            if (_rocketParticle.isPlaying)
+            {
+                _rocketParticle.Stop();
+                trail.enabled = true;
+            }
+            this._rocketParticle.gameObject.SetActive(enable);
         }
     }
 }
