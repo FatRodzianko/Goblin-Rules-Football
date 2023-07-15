@@ -62,7 +62,7 @@ MonoBehaviour:
     powerUpText: 'Accuracy: Shot will be 50% more accurate!'
   - powerUpType: higher
     powerUpSprite: {fileID: 21300000, guid: 89d28029c63d0cb4d8995b3512047b4b, type: 3}
-    powerUpText: 'Higher: Shot will be X% higher!'
+    powerUpText: 'Higher: Shot will be 50% higher!'
   - powerUpType: mulligan
     powerUpSprite: {fileID: 21300000, guid: 1b250531cc9944b47a3f800dc476ba87, type: 3}
     powerUpText: 'Mulligan: Redo previous shot!'
@@ -74,13 +74,18 @@ MonoBehaviour:
     powerUpText: 'Power: Hit ball 50% further!'
   - powerUpType: rain
     powerUpSprite: {fileID: 21300000, guid: ab6cec9923322a94cae3d24e358c84a4, type: 3}
-    powerUpText: 'No Rain: No rain for 1 turn!'
+    powerUpText: 'No Rain: No rain for 1 turn! All other players have worse rain
+      for 1 turn.'
   - powerUpType: wind
     powerUpSprite: {fileID: 21300000, guid: c02c4da01671d7d46b7f1d667781ec64, type: 3}
-    powerUpText: 'No Wind: No wind for 1 turn!'
+    powerUpText: 'No Wind: No wind for 1 turn! All other players have worse wind
+      for 1 turn.'
   - powerUpType: drill
     powerUpSprite: {fileID: 21300000, guid: 1c8e10707fed33643a59f493f6d23af3, type: 3}
     powerUpText: 'Drill: Ball goes through obstacles!'
+  - powerUpType: rocket
+    powerUpSprite: {fileID: 21300000, guid: c68c30ae453660f469abf097a5b4f8f3, type: 3}
+    powerUpText: 'Rocket: Move your ball while it''s in flight!'
 --- !u!114 &7030450351127779416
 MonoBehaviour:
   m_ObjectHideFlags: 0

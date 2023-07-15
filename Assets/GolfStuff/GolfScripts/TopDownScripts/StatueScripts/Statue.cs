@@ -14,6 +14,7 @@ public class Statue : NetworkBehaviour
     [SerializeField] SpriteRenderer _myRenderer;
     [SerializeField] Sprite _mySprite;
     [SerializeField] StatueAnimator _statueAnimator;
+    [SerializeField] Sprite _crackedSprite;
 
     [Header("Statue Info")]
     [SerializeField] public string StatueType;
@@ -22,6 +23,13 @@ public class Statue : NetworkBehaviour
     [SerializeField] float _originalHeight;
     [SerializeField] [SyncVar(OnChange = nameof(SyncRingRadius))] public float RingRadius;
     [SerializeField] public bool IsBroken;
+    [SerializeField] public bool IsCracked;
+
+    [Header("Statue Damage")]
+    [SerializeField] float _startingHealth = 5f;
+    [SerializeField] [SyncVar] public float Health = 5f;
+    [SerializeField] float _lastDamageTime = 0f;
+    [SerializeField] float _lastDamageThreshold = 0.5f;
 
     [Header("Collider Stuff")]
     [SerializeField] Collider2D _myCollider;
@@ -53,6 +61,7 @@ public class Statue : NetworkBehaviour
     {
         base.OnStartServer();
         RingRadius = GetStartingRadius();
+        this.Health = _startingHealth;
     }
     void SyncRingRadius(float prev, float next, bool asServer)
     {
@@ -76,10 +85,11 @@ public class Statue : NetworkBehaviour
     }
     float GetStartingRadius()
     {
-        if(this.StatueType == "good-weather")
-            return UnityEngine.Random.Range(3f, 7.5f);
-        else
-            return UnityEngine.Random.Range(8f, 12.5f);
+        //if(this.StatueType == "good-weather")
+        //    return UnityEngine.Random.Range(3f, 7.5f);
+        //else
+        //    return UnityEngine.Random.Range(8f, 12.5f);
+        return UnityEngine.Random.Range(7.5f, 12.5f);
     }
     int GetRingSegments(float radius)
     {
@@ -151,5 +161,30 @@ public class Statue : NetworkBehaviour
     {
         HeightInUnityUnits = _brokenHeight;
         _myEnvironmentObstacleTopDownScript.HeightInUnityUnits = HeightInUnityUnits;
+    }
+    public bool WillStatueBreak(float ballSpeed)
+    {
+        this.CmdDamageStatue(ballSpeed);
+        if (this.Health - ballSpeed <= 0f)
+            return true;
+        else
+            return false;
+    }
+    [ServerRpc(RequireOwnership = false)]
+    void CmdDamageStatue(float ballSpeed)
+    {
+        if (Time.time < _lastDamageTime + _lastDamageThreshold)
+            return;
+
+        this.Health -= ballSpeed;
+        if (this.Health <= (this._startingHealth / 2) && this.Health > 0)
+        {
+            RpcCrackStatue();
+        }
+    }
+    [ObserversRpc]
+    void RpcCrackStatue()
+    {
+        this.IsCracked = true;
     }
 }

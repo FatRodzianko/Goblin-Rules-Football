@@ -24,6 +24,10 @@ public class Torndao : NetworkBehaviour
     [SerializeField] Vector2 _movementDir = Vector2.zero;
     [SerializeField] float _distanceToMove = 0f;
 
+    [Header("Player Target")]
+    [SerializeField] GolfPlayerTopDown _playerTarget = null;
+    [SerializeField] public bool HitPlayerTarget = false;
+
     [Header("Balls Hit")]
     public bool HitBall = false;
     public List<GolfBallTopDown> BallsHit = new List<GolfBallTopDown>();
@@ -100,6 +104,15 @@ public class Torndao : NetworkBehaviour
                 HitBall = true;
                 BallsHit.Add(golfBallScript);
             }
+
+            // check if the ball that was hit was owned by the player target
+            if (golfBallScript.MyPlayer == this._playerTarget)
+            {
+                Debug.Log("Tornado.cs: Tornado hit player target. " + golfBallScript.MyPlayer.PlayerName + ":" + this._playerTarget.PlayerName);
+                this.HitPlayerTarget = true;
+            }
+                
+
             // For multiplayer this will need to be changed so that the server tells the client to do the HitByTornado thing?
             //golfBallScript.HitByTornado(HeightInUnityUnits, ballHeightInUnityUnits,TornadoStrength, this);
             golfBallScript.RpcHitByTornado(golfBallScript.Owner, HeightInUnityUnits, ballHeightInUnityUnits, TornadoStrength, this);
@@ -159,10 +172,20 @@ public class Torndao : NetworkBehaviour
     {
         _centerObject.transform.localPosition = _spriteRenderer.localBounds.center;
     }
+    public void GetPlayerTarget(GolfPlayerTopDown newTarget)
+    {
+        if (this._playerTarget)
+            return;
+
+
+        //this._playerTarget = GetPlayerWithWorstFavor();
+        this._playerTarget = newTarget;
+    }
     public void MoveTornadoForNewTurn()
     {
         //GolfPlayerTopDown furthestPlayer = GetFurthestPlayer();
-        GolfPlayerTopDown furthestPlayer = GetPlayerWithWorstFavor();
+        //GolfPlayerTopDown furthestPlayer = GetPlayerWithWorstFavor();
+        GolfPlayerTopDown furthestPlayer = _playerTarget;
 
         if (furthestPlayer == null)
             return;

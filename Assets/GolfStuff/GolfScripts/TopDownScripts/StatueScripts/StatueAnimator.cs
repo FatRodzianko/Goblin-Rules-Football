@@ -16,6 +16,7 @@ public class StatueAnimator : MonoBehaviour
     [Header("Animations")]
     [SerializeField] string _breakAnimation;
     [SerializeField] string _idleAnimation;
+    [SerializeField] string _crackedAnimation;
 
     // Start is called before the first frame update
     void Start()
@@ -27,8 +28,15 @@ public class StatueAnimator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!_myStatue.IsBroken)
+        if (!_myStatue.IsBroken && !_myStatue.IsCracked)
+        {
             _animator.Play(_idleAnimation);
+        }
+        else if (!_myStatue.IsBroken)
+        {
+            _animator.Play(_crackedAnimation);
+        }
+            
     }
     public void BreakStatue()
     {
@@ -36,6 +44,6 @@ public class StatueAnimator : MonoBehaviour
             return;
         _myStatue.IsBroken = true;
         _animator.Play(_breakAnimation);
-        
     }
+
 }

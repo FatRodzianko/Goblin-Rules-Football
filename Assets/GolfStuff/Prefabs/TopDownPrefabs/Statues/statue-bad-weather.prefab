@@ -110,12 +110,18 @@ MonoBehaviour:
   _myRenderer: {fileID: 2370977877022451248}
   _mySprite: {fileID: 21300000, guid: 949341255e2c50f4db50e0722c521cf3, type: 3}
   _statueAnimator: {fileID: 3432858679223941275}
+  _crackedSprite: {fileID: 21300000, guid: 1d43c6152f0e9644592eb250d593b717, type: 3}
   StatueType: bad-weather
   HeightInUnityUnits: 3.375
   _brokenHeight: 0.25
   _originalHeight: 3.375
   RingRadius: 5
   IsBroken: 0
+  IsCracked: 0
+  _startingHealth: 7.5
+  Health: 5
+  _lastDamageTime: 0
+  _lastDamageThreshold: 0.5
   _myCollider: {fileID: 6243970928968063507}
   _ringRadiusCollider: {fileID: 413128912236590859}
   _myEnvironmentObstacleTopDownScript: {fileID: 2452447529520024882}
@@ -284,6 +290,7 @@ MonoBehaviour:
   _animator: {fileID: 698239185559862178}
   _breakAnimation: bad-statue-break
   _idleAnimation: bad-statue-idle
+  _crackedAnimation: bad-statue-cracked
 --- !u!114 &5434865612403811146
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -331,6 +338,7 @@ MonoBehaviour:
   _isHoleFlag: 0
   SoftBounce: 0
   _minHeightForSoftBounce: 0
+  StartHeight: 0
   _myCollider: {fileID: 6243970928968063507}
   _bounceModifier: 1
   _gradualBounceModifier: 0
@@ -343,6 +351,8 @@ MonoBehaviour:
   _hardBounceSoundType: 
   _isStatue: 1
   _myStatue: {fileID: 2370977877022451250}
+  _isBalloon: 0
+  _myBalloon: {fileID: 0}
 --- !u!1 &2370977878139627932
 GameObject:
   m_ObjectHideFlags: 0

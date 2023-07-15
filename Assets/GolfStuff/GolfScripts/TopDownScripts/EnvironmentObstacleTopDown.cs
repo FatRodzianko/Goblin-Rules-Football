@@ -237,9 +237,10 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         }
         Debug.Log("StatueCollisionCheck: Ball DOES hit statue. Ball height: " + ballHeightInUnityUnits.ToString() + " and statue height: " + _myStatue.HeightInUnityUnits.ToString());
 
-        // Check to see how fast the ball is going on collision. If it is going fast enough, the statue will break?
 
-        if (golfBallScript.speedMetersPerSecond < 5f || _myStatue.IsBroken) // was 12.5f before. set to only 1 for testing breaking the statue
+        // Check to see how fast the ball is going on collision. If it is going fast enough, the statue will break?
+        // Now Have ball deal damage to the statue based on it's speed, then check to see if it will break the statue?
+        if (!this.GetComponent<Statue>().WillStatueBreak(golfBallScript.speedMetersPerSecond) || _myStatue.IsBroken) // was 12.5f before. set to only 1 for testing breaking the statue
         {
             Debug.Log("StatueCollisionCheck: Ball had a speed of: " + golfBallScript.speedMetersPerSecond + " at the time of collision. Ball will BOUNCE off the statue. Is statue broken?: " + _myStatue.IsBroken);
             if (golfBallScript.isRolling)

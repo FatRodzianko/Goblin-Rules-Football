@@ -41,8 +41,10 @@ public class WindManager : NetworkBehaviour
     public delegate void IsTornadoChanged(bool tornado);
     public event IsTornadoChanged TornadoChanged;
     public Torndao TornadoScript;
-    [SerializeField] float _minSpawnDist = 10f;
+    [SerializeField] float _minSpawnDist = 25f;
     [SerializeField] float _maxSpawnDist = 50f;
+    [SerializeField] bool _spawnedThisHoleAlready = false;
+    [SerializeField] GolfPlayerTopDown _targetPlayer = null;
 
     [Header("Wind Power Up Stuff")]
     [SerializeField] List<GolfPlayerTopDown> _playersWhoDidntUsePowerUp = new List<GolfPlayerTopDown>();
@@ -374,11 +376,14 @@ public class WindManager : NetworkBehaviour
             {
                 DestroyTornadoObjects();
             }
+            _spawnedThisHoleAlready = false;
             return;
         }
         if (IsThereATorndao)
             return;
 
+        if (_spawnedThisHoleAlready)
+            return;
 
         if (this.BaseWindPower <= 0f)
         {
@@ -394,8 +399,9 @@ public class WindManager : NetworkBehaviour
         if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
             return;
 
-        //float tornadoLikelihood = 0.2f;
-        float tornadoLikelihood = 0.9f; // for testing only
+        // update this so it will only spawn if a player hits a treshhold, like one player has to be below -5f?
+        float tornadoLikelihood = 0.2f;
+        //float tornadoLikelihood = 0.9f; // for testing only
         if (RainManager.instance.BaseRainState == "med rain")
             tornadoLikelihood += 0.1f;
         else if (RainManager.instance.BaseRainState == "heavy rain")
@@ -409,26 +415,35 @@ public class WindManager : NetworkBehaviour
         }
 
 
+        SpawnTornado();
+    }
+    void SpawnTornado()
+    {
         Debug.Log("CheckIfTornadoWillSpawn: Will Spawn a torndao this turn.");
 
-        Vector3 spawnPos = GetTornadoSpawnPosition();
+        GolfPlayerTopDown playerToSpawnBy = GetFurthestPlayer();
+
+        Vector3 spawnPos = GetTornadoSpawnPosition(playerToSpawnBy);
 
         _tornadoObject = Instantiate(_tornadoPrefab, spawnPos, Quaternion.identity);
         TornadoScript = _tornadoObject.GetComponent<Torndao>();
+
+        TornadoScript.GetPlayerTarget(playerToSpawnBy);
 
         InstanceFinder.ServerManager.Spawn(_tornadoObject);
         Debug.Log("CheckIfTornadoWillSpawn: spawned a tornado with netid of: " + TornadoScript.ObjectId);
 
         IsThereATorndao = true;
+        _spawnedThisHoleAlready = true;
     }
-    Vector3 GetTornadoSpawnPosition()
+    Vector3 GetTornadoSpawnPosition(GolfPlayerTopDown playerToSpawnBy)
     {
         Vector3 spawnPos = Vector3.zero;
 
         // For now, select player furthest from the hole?
         float distance = 0f;
 
-        GolfPlayerTopDown playerToSpawnBy = GetFurthestPlayer();
+        //GolfPlayerTopDown playerToSpawnBy = GetFurthestPlayer();
 
         if (playerToSpawnBy == null)
             return spawnPos;
@@ -489,11 +504,18 @@ public class WindManager : NetworkBehaviour
             return;
         }
 
+        
+
         TornadoScript.MoveTornadoForNewTurn();
 
         while (this.BaseWindPower > 0 && RainManager.instance.BaseRainState != "clear" && (TornadoScript.IsMoving || TornadoScript.HitBall))
         {
             await Task.Yield();
+        }
+        if (TornadoScript.HitPlayerTarget)
+        {
+            Debug.Log("MoveTornadoTask: Tornado hit their target last turn. Destroying the tornado");
+            DestroyTornadoObjects();
         }
     }
     GolfPlayerTopDown GetFurthestPlayer()
@@ -518,6 +540,47 @@ public class WindManager : NetworkBehaviour
         }
         return playerToSpawnBy;
     }
+    GolfPlayerTopDown GetPlayerWithWorstFavor()
+    {
+        GolfPlayerTopDown playerToSpawnBy = null;
+        int lowestFavor = 0;
+        // was originally using GolfPlayersServer here, but that means a tornado could target a player that had been struck by lightning. Making sure not to target them any more?
+        for (int i = 0; i < GameplayManagerTopDownGolf.instance.GolfPlayers.Count; i++)
+        {
+            GolfPlayerTopDown player = GameplayManagerTopDownGolf.instance.GolfPlayers[i];
+            if (player.MyBall.IsInHole)
+                continue;
+            if (i == 0)
+            {
+                lowestFavor = player.FavorWeather;
+                playerToSpawnBy = player;
+                continue;
+            }
+
+            if (player.FavorWeather < lowestFavor)
+            {
+                lowestFavor = player.FavorWeather;
+                playerToSpawnBy = player;
+            }
+            else if (player.FavorWeather == lowestFavor)
+            {
+                Debug.Log("GetPlayerWithWorstFavor: Two players with same favor of: " + lowestFavor.ToString() + " randomly picking between them");
+                string[] headsTails = new[] { "heads", "tails" };
+                var rng = new System.Random();
+                string result = headsTails[rng.Next(headsTails.Length)];
+                if (result == "heads")
+                    continue;
+                else
+                {
+                    lowestFavor = player.FavorWeather;
+                    playerToSpawnBy = player;
+                }
+            }
+        }
+        Debug.Log("GetPlayerWithWorstFavor: will have tornado follow player: " + playerToSpawnBy.PlayerName);
+        return playerToSpawnBy;
+    }
+
     [Server]
     public void WindPowerUpUsed(GolfPlayerTopDown powerUpPlayer)
     {

@@ -52,13 +52,18 @@ MonoBehaviour:
   WindDirection: {x: 0, y: -1}
   WindPower: 0
   _windPower: 0
+  BaseWindPower: 0
+  InitialWindPower: 0
   WindSeverity: 
   _tornadoPrefab: {fileID: 1816894770352592253, guid: 636b6bdd4aa23de4c810ce27dd13f5d5, type: 3}
   _tornadoObject: {fileID: 0}
   IsThereATorndao: 0
   TornadoScript: {fileID: 0}
-  _minSpawnDist: 10
+  _minSpawnDist: 30
   _maxSpawnDist: 50
+  _spawnedThisHoleAlready: 0
+  _targetPlayer: {fileID: 0}
+  _playersWhoDidntUsePowerUp: []
 --- !u!114 &8837063655550505329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,12 +88,18 @@ MonoBehaviour:
   _initializeOrder: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 3
+  <PrefabId>k__BackingField: 17
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 0
+  _scenePathHash: 1727917535
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 18005856110100590155
-  _sceneNetworkObjects: []
+  _sceneNetworkObjects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 8837063655550505329}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &576748318750095402
 MonoBehaviour:
   m_ObjectHideFlags: 0
