@@ -478,4 +478,12 @@ public class LightningManager : NetworkBehaviour
             IsThereLightning = false;
         }
     }
+    [Server]
+    public void WeatherTurnedClear(string weatherState)
+    {
+        Debug.Log("WeatherTurnedClear: ");
+        UpdateWeather(weatherState);
+        //StopLightningRoutineStuff();
+        //IsThereLightning = false;
+    }
 }

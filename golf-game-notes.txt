@@ -209,11 +209,18 @@ ballon heights
 - - - - - - if tied, such as multiple holes in one, choose randomly who will go first?
 x tornadoes target player with lowest favor, which could be a player that is struck by lightning. Need to make sure to skip those players...
 - - - tornado was using the GolfPlayersServer list to get its targets. Changed it to just GolfPlayers, since a player is removed from GolfPlayers when they are struck by lightning.
-- If a player hits a ball out of bounds or in water, Player Favor is calculated BEFORE the ball is moved. Change to afterward?
+x If a player hits a ball out of bounds or in water, Player Favor is calculated BEFORE the ball is moved. Change to afterward?
+- If there is a lightning storm occuring, and player's get server average favor high enough to make base weather clear, a lightning strike still occurs
+- - - double check when the player is prompted for lightning, and when the average player favor is calculated
+- - - - - - make sure average is calculated before the prompt for lightning
+- - - - - - if average favor will set weather to clear, don't rely on the BaseWeather event to stop the lightning storm. Make call to Lightning manager to turn off IsThereLightning (orwhatever its called)
+- - - I don't think this is an actual issue right now. One thing I do need to change, though, is that if a player's rainstate is clear, they shouldn't be prompted for lightning or see a flash. Just don't send that info but keep the IsThereLightning bool to true
+- The "start next turn" process should really be re-written I think? Right now, it's a bit of a mess with so many different weird things going through it. Should try and separate it out a bit I think?
+
 
 # Post playtest things to fix:
-- fewer bad weather statues, more good weather statues
-- - - specifically remove bad weather statues on the greens. Too many bad weather statues there. Should only have one in a location that players would get to if they try and bomb a shot to the hole and miss
+x fewer bad weather statues, more good weather statues
+- - x specifically remove bad weather statues on the greens. Too many bad weather statues there. Should only have one in a location that players would get to if they try and bomb a shot to the hole and miss
 - remove "feature" where bad weather statues have larger radiuses than good weather statues
 x "health" for statues
 - - x currently ball has to hit statue at 5 m/s to break statue
@@ -229,10 +236,10 @@ x make it so tornado selects target on spawn, then despawns when it hits it's ta
 - - - - - - player breaks bad weather statue -> spawn tornado that targets that player
 - - - - - - player gets below specific treshhold - say -5 favor - spawn tornado that targets them?
 - make power ups easier to hit
-- - - have a second collider for the box? Not sure if I can have two colliders... worth a shot though
-- - - - - - Second collider would be smaller and only effect if player hit the box
+- - x have a second collider for the box? Not sure if I can have two colliders... worth a shot though
+- - - - - x Second collider would be smaller and only effect if player hit the box
 - - - - - - animation of box falling off balloon and balloon flying away upward?
-- more powerups on a hole?
+x more powerups on a hole?
 - fix it so when a tornado throws you, it doesn't recalculate bad weather favor
 - The Rick Lightning issue:
 - - - rick was struck but lightning, but still hit ball

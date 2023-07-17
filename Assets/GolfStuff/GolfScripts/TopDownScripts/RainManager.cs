@@ -65,6 +65,9 @@ public class RainManager : NetworkBehaviour
     [SerializeField] string _rainSoundForHole;
     [SerializeField] bool _rainSoundPlaying = false;
 
+    [Header("Lightning Manager")]
+    [SerializeField] LightningManager _lightningManager;
+
     public delegate void WeatherEffectChange(string newEffect);
     public event WeatherEffectChange WeatherChanged;
 
@@ -355,6 +358,8 @@ public class RainManager : NetworkBehaviour
         {
             BaseRainState = "clear";
             Debug.Log("SetBaseRainState: BaseState will be: " + BaseRainState + " averagePlayerFavor: " + averagePlayerFavor.ToString());
+            // Tell lightning manager to end lightning?
+            _lightningManager.WeatherTurnedClear(BaseRainState);
         }
         else if (averagePlayerFavor >= _medRainStateModifer)
         {

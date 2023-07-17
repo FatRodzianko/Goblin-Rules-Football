@@ -23,13 +23,21 @@ public class BalloonPowerUp : NetworkBehaviour
     [SerializeField] Vector2[] _originalColliderPoints;
     [SerializeField] Vector2[] _newColliderPoints;
 
-    [Header("Height Values")]
+    [Header("Balloon Height Values")]
     [SerializeField] float _lowStartHeight;
     [SerializeField] float _lowTopHeight;
     [SerializeField] float _medStartHeight;
     [SerializeField] float _medTopHeight;
     [SerializeField] float _highStartHeight;
     [SerializeField] float _highTopHeight;
+
+    [Header("Box Height Values")]
+    [SerializeField] float _boxLowStartHeight;
+    [SerializeField] float _boxLowTopHeight;
+    [SerializeField] float _boxMedStartHeight;
+    [SerializeField] float _boxMedTopHeight;
+    [SerializeField] float _boxHighStartHeight;
+    [SerializeField] float _boxHighTopHeight;
 
     [Header("PowerUp Info")]
     [SyncVar(OnChange = nameof(SyncPowerUpType))] public string PowerUpType;
@@ -48,6 +56,12 @@ public class BalloonPowerUp : NetworkBehaviour
     [SerializeField] List<string> _possibleHieghts = new List<string>();
     [SerializeField] EnvironmentObstacleTopDown _environmentObstacleTopDown;
     GolfBallTopDown _ballThatPoppedMe;
+    
+
+    [Header("Two Collider Stuff")]
+    [SerializeField] bool _twoColliders = false;
+    [SerializeField] EnvironmentObstacleTopDown _balloonEnvironmentObstacleTopDown;
+    [SerializeField] EnvironmentObstacleTopDown _boxEnvironmentObstacleTopDown;
 
     // Start is called before the first frame update
     void Start()
@@ -88,6 +102,29 @@ public class BalloonPowerUp : NetworkBehaviour
     }
     void SetObstacleHeightValues(string height)
     {
+        if (_twoColliders)
+        {
+            if (height == "low")
+            {
+                _balloonEnvironmentObstacleTopDown.SetBalloonHeightValues(_lowStartHeight, _lowTopHeight);
+                _boxEnvironmentObstacleTopDown.SetBalloonHeightValues(_boxLowStartHeight, _boxLowTopHeight);
+            }
+            else if (height == "high")
+            {
+                _balloonEnvironmentObstacleTopDown.SetBalloonHeightValues(_highStartHeight, _highTopHeight);
+                _boxEnvironmentObstacleTopDown.SetBalloonHeightValues(_boxHighStartHeight, _boxHighTopHeight);
+            }                
+            else 
+            {
+                _balloonEnvironmentObstacleTopDown.SetBalloonHeightValues(_medStartHeight, _medTopHeight);
+                _boxEnvironmentObstacleTopDown.SetBalloonHeightValues(_boxMedStartHeight, _boxMedTopHeight);
+            }
+                
+             
+            return;
+        }
+
+        // old code!
         if (height == "high")
             _environmentObstacleTopDown.SetBalloonHeightValues(_highStartHeight, _highTopHeight);
         if (height == "med")

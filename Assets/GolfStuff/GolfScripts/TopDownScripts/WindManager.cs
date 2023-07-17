@@ -169,7 +169,7 @@ public class WindManager : NetworkBehaviour
         Debug.Log("GetWindSeverity: The wind severity chance value is: " + windSeverity.ToString());
         if (windSeverity < 0.05)
             return "none";
-        else if (windSeverity < 0.6f)
+        else if (windSeverity < 0.95f)
             return "low";
         else
             return "med";
