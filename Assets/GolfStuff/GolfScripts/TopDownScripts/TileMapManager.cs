@@ -185,7 +185,9 @@ public class TileMapManager : MonoBehaviour
                 {
                     BalloonPosition = balloonPowerUpsToSave[i].transform.position,
                     BalloonHeight = balloonPowerUpsToSave[i].GetComponent<BalloonPowerUp>().SavedHeightOfBalloon,
-                    BalloonScriptableObstacle = balloonPowerUpsToSave[i].GetComponent<EnvironmentObstacleTopDown>().myScriptableObject
+                    //BalloonScriptableObstacle = balloonPowerUpsToSave[i].GetComponent<EnvironmentObstacleTopDown>().myScriptableObject
+                    //BalloonScriptableObstacle = balloonPowerUpsToSave[i].GetComponent<EnvironmentObstacleTopDown>().myScriptableObject
+                    BalloonScriptableObstacle = balloonPowerUpsToSave[i].GetComponent<BalloonPowerUp>().myScriptableObject
                 };
             }
         }

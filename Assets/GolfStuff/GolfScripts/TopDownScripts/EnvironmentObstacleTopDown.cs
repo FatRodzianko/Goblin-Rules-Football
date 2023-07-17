@@ -34,6 +34,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     [SerializeField] bool _isBalloon = false;
     [SerializeField] BalloonPowerUp _myBalloon;
     [SerializeField] bool _twoColliders = false;
+    [SerializeField] bool _crateCollider = false;
 
     [Header("Spawn Protection")]
     bool _spawnProtection = true;
@@ -293,20 +294,27 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         //    return;
         //}
 
-        if (this._twoColliders)
-        {
-            if (ballHeightInUnityUnits >= StartHeight && ballHeightInUnityUnits <= HeightInUnityUnits)
-            {
-                Debug.Log("BalloonCollisionCheck: Height of the ball is " + ballHeightInUnityUnits.ToString() + " start height: " + StartHeight.ToString() + " HeightInUnityUnits: " + HeightInUnityUnits.ToString());
-                this.transform.parent.GetComponent<BalloonPowerUp>().CollisionToPopBalloon(golfBallScript);
-            }
-            return;
-        }
+        // old code from when I was testing if two colliders could be used
+        //if (this._twoColliders)
+        //{
+        //    if (ballHeightInUnityUnits >= StartHeight && ballHeightInUnityUnits <= HeightInUnityUnits)
+        //    {
+        //        Debug.Log("BalloonCollisionCheck: Height of the ball is " + ballHeightInUnityUnits.ToString() + " start height: " + StartHeight.ToString() + " HeightInUnityUnits: " + HeightInUnityUnits.ToString());
+        //        this.transform.parent.GetComponent<BalloonPowerUp>().CollisionToPopBalloon(golfBallScript);
+        //    }
+        //    return;
+        //}
+
+        //if (ballHeightInUnityUnits >= StartHeight && ballHeightInUnityUnits <= HeightInUnityUnits)
+        //{
+        //    Debug.Log("BalloonCollisionCheck: Height of the ball is " + ballHeightInUnityUnits.ToString() + " start height: " + StartHeight.ToString() + " HeightInUnityUnits: " + HeightInUnityUnits.ToString());
+        //    this.GetComponent<BalloonPowerUp>().CollisionToPopBalloon(golfBallScript);
+        //}
 
         if (ballHeightInUnityUnits >= StartHeight && ballHeightInUnityUnits <= HeightInUnityUnits)
         {
             Debug.Log("BalloonCollisionCheck: Height of the ball is " + ballHeightInUnityUnits.ToString() + " start height: " + StartHeight.ToString() + " HeightInUnityUnits: " + HeightInUnityUnits.ToString());
-            this.GetComponent<BalloonPowerUp>().CollisionToPopBalloon(golfBallScript);
+            this.transform.parent.GetComponent<BalloonPowerUp>().CollisionToPopBalloon(golfBallScript, _crateCollider);
         }
 
     }

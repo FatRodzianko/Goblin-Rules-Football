@@ -153,6 +153,7 @@ MonoBehaviour:
   - med
   - high
   _environmentObstacleTopDown: {fileID: 9025297558204602755}
+  myScriptableObject: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   _twoColliders: 1
   _balloonEnvironmentObstacleTopDown: {fileID: 9025297558204602755}
   _boxEnvironmentObstacleTopDown: {fileID: 8231427580595959782}
@@ -172,6 +173,7 @@ MonoBehaviour:
   _animator: {fileID: 359966342195928935}
   _heightOfBallon: 
   _popAnimation: -pop
+  _crateHitAnimation: -crate-hit
   _idleAnimation: -idle
   _isIdle: 0
   _isPopped: 0
@@ -331,6 +333,7 @@ MonoBehaviour:
   _isBalloon: 1
   _myBalloon: {fileID: 1294718589790411389}
   _twoColliders: 1
+  _crateCollider: 0
 --- !u!1 &3551204756378181811
 GameObject:
   m_ObjectHideFlags: 0
@@ -481,6 +484,7 @@ MonoBehaviour:
   _isBalloon: 1
   _myBalloon: {fileID: 1294718589790411389}
   _twoColliders: 1
+  _crateCollider: 1
 --- !u!61 &3946281511935004908
 BoxCollider2D:
   m_ObjectHideFlags: 0

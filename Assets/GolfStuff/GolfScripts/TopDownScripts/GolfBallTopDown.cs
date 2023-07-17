@@ -993,10 +993,16 @@ public class GolfBallTopDown : NetworkBehaviour
         }
         if (bounceContactGroundMaterial.Contains("trap"))
         {
-            Debug.Log("WillBallRoll: stopping due to ground material of: " + bounceContactGroundMaterial);
+            
+        }
+
+        if (this.MyPlayer.UsedPowerupThisTurn && this.MyPlayer.UsedPowerUpType == "no-bounce")
+        {
+            Debug.Log("WillBallRoll: stopping due no-bounce power up");
             willBallRoll = false;
             return willBallRoll;
         }
+            
 
         // Need to update this so if a ball rolls back down a hill, it doesn't stop rolling when the speed goes from 0 at its apex to then increase again when rolls down, this doesn't stop it from rolling down?
         // probably need to do something like, get current direction of the ball and the direction of the slope. If the angle between the two is greater than 180, continue to roll down?

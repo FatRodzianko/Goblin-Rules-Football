@@ -56,7 +56,8 @@ public class BalloonPowerUp : NetworkBehaviour
     [SerializeField] List<string> _possibleHieghts = new List<string>();
     [SerializeField] EnvironmentObstacleTopDown _environmentObstacleTopDown;
     GolfBallTopDown _ballThatPoppedMe;
-    
+    [SerializeField] public ScriptableObstacle myScriptableObject; // scriptable object for the obstacle. Used to store the prefab of the obstacle for when the tilemapmanager needs to save/load new holes
+
 
     [Header("Two Collider Stuff")]
     [SerializeField] bool _twoColliders = false;
@@ -138,35 +139,35 @@ public class BalloonPowerUp : NetworkBehaviour
         Debug.Log("RpcUpdateBalloonPosition: " + newPos.ToString());
         this.transform.position = newPos;
     }
-    public void CollisionToPopBalloon(GolfBallTopDown ball)
+    public void CollisionToPopBalloon(GolfBallTopDown ball, bool hitCrate)
     {
         Debug.Log("PopBalloon: is popped alreadyt? " + IsPopped);
         if (IsPopped)
             return;
-        CmdPopBalloon(ball.ObjectId);
+        CmdPopBalloon(ball.ObjectId, hitCrate);
         //_balloonAnimator.PopBalloon();
         //IsPopped = true;
-        PopBalloon();
+        PopBalloon(hitCrate);
         _ballThatPoppedMe = ball;
     }
     [ServerRpc(RequireOwnership = false)]
-    void CmdPopBalloon(int ballNetId)
+    void CmdPopBalloon(int ballNetId, bool hitCrate)
     {
-        RpcBreakStatueAnimation();
+        RpcPopBalloonAnimation(hitCrate);
         SpawnPowerUpObjectForPlayer(ballNetId);
     }
     [ObserversRpc(BufferLast = true)]
-    void RpcBreakStatueAnimation()
+    void RpcPopBalloonAnimation(bool hitCrate)
     {
         if (IsPopped)
             return;
-        PopBalloon();
+        PopBalloon(hitCrate);
     }
-    void PopBalloon()
+    void PopBalloon(bool hitCrate)
     {
         if (IsPopped)
             return;
-        _balloonAnimator.PopBalloon();
+        _balloonAnimator.PopBalloon(hitCrate);
         IsPopped = true;
         StartCoroutine(UpdateColliderPointsDelay());
     }
@@ -180,8 +181,11 @@ public class BalloonPowerUp : NetworkBehaviour
     {
         yield return new WaitForSeconds(1.0f);
         UpdateColliderPointsAfterBalloonPop();
-        _environmentObstacleTopDown.RemoveIsBalloon();
-        _environmentObstacleTopDown.SetBalloonHeightValues(0f, 0.1875f);
+        //_environmentObstacleTopDown.RemoveIsBalloon();
+        //_environmentObstacleTopDown.SetBalloonHeightValues(0f, 0.1875f);
+        _balloonEnvironmentObstacleTopDown.RemoveIsBalloon();
+        _balloonEnvironmentObstacleTopDown.SetBalloonHeightValues(0f, 0.1875f);
+        _boxEnvironmentObstacleTopDown.gameObject.SetActive(false);
     }
     void UpdateColliderPointsAfterBalloonPop()
     {

@@ -37257,3 +37257,12 @@ MonoBehaviour:
   - BalloonPosition: {x: 205.5, y: -83.5, z: 0}
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 4.2, y: -6.5, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 7, y: -1.1, z: 0}
+    BalloonHeight: med
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 6.4, y: 4.4, z: 0}
+    BalloonHeight: high
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}

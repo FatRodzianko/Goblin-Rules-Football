@@ -224,7 +224,8 @@ public class WindManager : NetworkBehaviour
         //int windModifier = Mathf.RoundToInt(averagePlayerFavor / 2 * windModifierValue);
         int windModifier = Mathf.RoundToInt(averagePlayerFavor / 2);
 
-        BaseWindPower = InitialWindPower - windModifier;
+        //BaseWindPower = InitialWindPower - windModifier;
+        BaseWindPower = Mathf.Clamp((InitialWindPower - windModifier), 0, 26);
         Debug.Log("SetBaseWindPower: New BaseWindPower will be: " + BaseWindPower.ToString() + " based on windModifier of: " + windModifier.ToString() + " and average player weather favor of: " + averagePlayerFavor.ToString());
     }
     [Server]

@@ -13,6 +13,7 @@ public class BalloonAnimator : MonoBehaviour
     [Header("Animations")]
     [SerializeField] string _heightOfBallon;
     [SerializeField] string _popAnimation;
+    [SerializeField] string _crateHitAnimation;
     [SerializeField] string _idleAnimation;
 
     [Header("Animation Stats")]
@@ -35,6 +36,7 @@ public class BalloonAnimator : MonoBehaviour
     {
         _heightOfBallon = height;
         _popAnimation = _heightOfBallon + _popAnimation;
+        _crateHitAnimation = _heightOfBallon + _crateHitAnimation;
         _idleAnimation = _heightOfBallon + _idleAnimation;
         Debug.Log("SetHeightOfBallon: " + _heightOfBallon + " : " + _popAnimation + " : " + _idleAnimation);
     }
@@ -48,12 +50,19 @@ public class BalloonAnimator : MonoBehaviour
         else
             _isIdle = isIdle;
     }
-    public void PopBalloon()
+    public void PopBalloon(bool hitCrate)
     {
         if (_isPopped)
             return;
         _isIdle = false;
-        _animator.Play(_popAnimation);
+        if (hitCrate)
+        {
+            _animator.Play(_crateHitAnimation);
+        }
+        else
+        {
+            _animator.Play(_popAnimation);
+        }
         _isPopped = true;
     }
     IEnumerator RandomStartAnimationDelay(bool isIdle)

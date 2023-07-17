@@ -216,6 +216,8 @@ x If a player hits a ball out of bounds or in water, Player Favor is calculated 
 - - - - - - if average favor will set weather to clear, don't rely on the BaseWeather event to stop the lightning storm. Make call to Lightning manager to turn off IsThereLightning (orwhatever its called)
 - - - I don't think this is an actual issue right now. One thing I do need to change, though, is that if a player's rainstate is clear, they shouldn't be prompted for lightning or see a flash. Just don't send that info but keep the IsThereLightning bool to true
 - The "start next turn" process should really be re-written I think? Right now, it's a bit of a mess with so many different weird things going through it. Should try and separate it out a bit I think?
+- The "no bounce" power up seemed to fail on me. Ball didn't bounce, but it did keep rolling. Had side spin on an iron club that landed in rough
+- - - working now, but test "no bounce" when landing on a hill. Will the ball roll at the start of next turn?
 
 
 # Post playtest things to fix:
