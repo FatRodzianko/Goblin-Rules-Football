@@ -169,10 +169,12 @@ public class WindManager : NetworkBehaviour
         Debug.Log("GetWindSeverity: The wind severity chance value is: " + windSeverity.ToString());
         if (windSeverity < 0.05)
             return "none";
-        else if (windSeverity < 0.95f)
-            return "low";
         else
-            return "med";
+            return "low";
+        //else if (windSeverity < 0.95f)
+        //    return "low";
+        //else
+        //    return "med";
         //else if (windSeverity < 0.85f)
         //    return "med";
         //else if (windSeverity < 0.95f)
@@ -185,14 +187,17 @@ public class WindManager : NetworkBehaviour
     {
         if (severity == "none")
             return 0;
-        else if (severity == "low")
-            return UnityEngine.Random.Range(1, 5);
-        else if (severity == "med")
-            return UnityEngine.Random.Range(5, 10);
-        else if (severity == "high")
-            return UnityEngine.Random.Range(10, 18);
         else
-            return UnityEngine.Random.Range(18, 25);
+            return UnityEngine.Random.Range(1, 6);
+
+        //else if (severity == "low")
+        //    return UnityEngine.Random.Range(1, 5);
+        //else if (severity == "med")
+        //    return UnityEngine.Random.Range(5, 10);
+        //else if (severity == "high")
+        //    return UnityEngine.Random.Range(10, 18);
+        //else
+        //    return UnityEngine.Random.Range(18, 25);
     }
     int GetNewWindPower(float currentWindPower)
     {
@@ -402,7 +407,7 @@ public class WindManager : NetworkBehaviour
 
         // update this so it will only spawn if a player hits a treshhold, like one player has to be below -5f?
         float tornadoLikelihood = 0.2f;
-        //float tornadoLikelihood = 0.9f; // for testing only
+        //float tornadoLikelihood = 1.0f; // for testing only
         if (RainManager.instance.BaseRainState == "med rain")
             tornadoLikelihood += 0.1f;
         else if (RainManager.instance.BaseRainState == "heavy rain")

@@ -282,7 +282,7 @@ public class LightningManager : NetworkBehaviour
     {
         float distPercent = (_maxDistanceFromPlayer - Mathf.Abs(DistanceFromPlayer)) / _maxDistanceFromPlayer;
         float intensityRange = _maxLightIntensity - _minLightIntensity;
-        return _minLightIntensity + (intensityRange * distPercent);
+        return Mathf.Clamp((_minLightIntensity + (intensityRange * distPercent)), 0f, 1.0f);
     }
     void GetThunderVolumeFromDistance(float dist)
     {
@@ -357,7 +357,7 @@ public class LightningManager : NetworkBehaviour
         StartCoroutine(LightningFlash(numberOfFlashes));
         StartCoroutine(ThunderClap(distFromPlay, numberOfFlashes));
     }
-    bool WillPlayerBeStruckByLightning(GolfPlayerTopDown player)
+    public bool WillPlayerBeStruckByLightning(GolfPlayerTopDown player)
     {
         // Can't be struck by lightning if there is no lightning storm. May need to change with the move toward individualized weather? Or "IsThereLightning" will be based on the "base" weather which will be determined by the average favor of the player group?
         if (!this.IsThereLightning)

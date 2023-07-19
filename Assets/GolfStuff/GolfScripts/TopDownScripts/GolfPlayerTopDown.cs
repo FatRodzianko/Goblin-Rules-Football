@@ -519,9 +519,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 else if (_powerSubmitted && !_accuracySubmitted)
                 {
                     SetHitAccuracyValue();
-                    // Later SubmitHitToBall() will be called by the animation instead of right here:
-                    _golfAnimator.StartSwing();
-                    //SubmitHitToBall();
+                    // change this to the player sending a command to the server to see if they swing normally or do the "struck by lightning" swing instead
+                    //_golfAnimator.StartSwing();
+                    GetPermissionToStartHitFromServer();
                 }
             }
         }
@@ -949,32 +949,44 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             Debug.Log("GetHitStatsFromClub: player has NOT teed off yet!");
             // Get direction to the aim point
-            bool isAimingAtAimPoint = false;
-            Vector2 dirToAimPoint = (GameplayManagerTopDownGolf.instance.TeeOffAimPoint - MyBall.transform.position).normalized;
-            if (Vector2.Angle(dirToAimPoint, hitDirection) < 15f)
-            {
-                Debug.Log("GetHitStatsFromClub: Player aim direction is LESS than 15 degrees away from aim point");
-                isAimingAtAimPoint = true;
-            }
-            else
-            {
-                Debug.Log("GetHitStatsFromClub: Player aim direction is MORE than 15 degrees away from aim point");
-            }
+            //bool isAimingAtAimPoint = false;
+            //Vector2 dirToAimPoint = (GameplayManagerTopDownGolf.instance.TeeOffAimPoint - ballPos).normalized;
+            //if (Vector2.Angle(dirToAimPoint, hitDirection) < 15f)
+            //{
+            //    Debug.Log("GetHitStatsFromClub: Player aim direction is LESS than 15 degrees away from aim point");
+            //    isAimingAtAimPoint = true;
+            //}
+            //else
+            //{
+            //    Debug.Log("GetHitStatsFromClub: Player aim direction is MORE than 15 degrees away from aim point");
+            //}
 
-
+            if(IsPlayerAimingAtAimPoint(ballPos, GameplayManagerTopDownGolf.instance.TeeOffAimPoint))
+            {
+                float distanceToAimPoint = Vector2.Distance(MyBall.transform.position, GameplayManagerTopDownGolf.instance.TeeOffAimPoint);
+                if (MaxDistanceFromClub > distanceToAimPoint)
+                {
+                    newDist = distanceToAimPoint;
+                }
+            }
             // Get the distance to the tee off point. If the max distance from club is greater than distance to tee off aim point, set the hit distance to distance to tee off aim point
-            float distanceToAimPoint = Vector2.Distance(MyBall.transform.position, GameplayManagerTopDownGolf.instance.TeeOffAimPoint);
-            if (MaxDistanceFromClub > distanceToAimPoint && isAimingAtAimPoint)
-            {
-                newDist = distanceToAimPoint;
-            }
+            //float distanceToAimPoint = Vector2.Distance(MyBall.transform.position, GameplayManagerTopDownGolf.instance.TeeOffAimPoint);
+            //if (MaxDistanceFromClub > distanceToAimPoint && isAimingAtAimPoint)
+            //{
+            //    newDist = distanceToAimPoint;
+            //}
         }
         else
         {
             Debug.Log("GetHitStatsFromClub: player HAS teed off already!");
-            if (MaxDistanceFromClub > this.DistanceToHole)
+            Vector2 dirToHole = (FindClosestHole(ballPos).transform.position - ballPos).normalized;
+
+            if (IsPlayerAimingAtAimPoint(ballPos, FindClosestHole(ballPos).transform.position))
             {
-                newDist = this.DistanceToHole;
+                if (MaxDistanceFromClub > this.DistanceToHole)
+                {
+                    newDist = this.DistanceToHole;
+                }
             }
         }
 
@@ -997,6 +1009,20 @@ public class GolfPlayerTopDown : NetworkBehaviour
         UpdatePositionOfAdjustedDistanceIcon(hitDistance);
         MinDistance = GetMinDistance(hitDistance);
         // maybe also set the icon movement speed based on the club?
+    }
+    bool IsPlayerAimingAtAimPoint(Vector3 ballPos, Vector3 aimPos)
+    {
+        Vector2 dirToAimPoint = (aimPos - ballPos).normalized;
+        if (Vector2.Angle(dirToAimPoint, hitDirection) < 15f)
+        {
+            Debug.Log("IsPlayerAimingAtAimPoint: Player aim direction is LESS than 15 degrees away from aim point");
+            return true;
+        }
+        else
+        {
+            Debug.Log("IsPlayerAimingAtAimPoint: Player aim direction is MORE than 15 degrees away from aim point");
+            return false;
+        }
     }
     float GetMinDistance(float distance)
     {
@@ -1112,8 +1138,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
             {
                 Debug.Log("MoveHitMeterIcon: Accuracy meter off the right edge without accuracy submitted by player. SHANKED!!!");
                 IsShanked = true;
-                //SubmitHitToBall();
-                _golfAnimator.StartSwing();
+                // change this to the player sending a command to the server to see if they swing normally or do the "struck by lightning" swing instead
+                //_golfAnimator.StartSwing();
+                GetPermissionToStartHitFromServer();
             }
 
         }
@@ -2729,5 +2756,31 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         this.PlayerMulligan = false;
     }
-    
+    void GetPermissionToStartHitFromServer()
+    {
+        if (!this.IsOwner)
+            return;
+        CmdCanPlayerHitBall();
+    }
+    [ServerRpc]
+    void CmdCanPlayerHitBall()
+    {
+        // Check to see if the player will be struck by lightning or not. If they will be, tell player to play the "struck by lightning animation. If not, normal animation
+        bool willPlayerBeStruck = GameplayManagerTopDownGolf.instance.WillPlayerBeStruckByLightning(this);
+        Debug.Log("CmdCanPlayerHitBall: Will the player be struck by lightning? " + willPlayerBeStruck.ToString());
+        this.RpcTellPlayerIfTheyWereStruckByLightningDuringHit(this.Owner, willPlayerBeStruck);
+    }
+    [TargetRpc]
+    void RpcTellPlayerIfTheyWereStruckByLightningDuringHit(NetworkConnection conn, bool wasStruck)
+    {
+        Debug.Log("RpcTellPlayerIfTheyWereStruckByLightningDuringHit: " + wasStruck.ToString());
+        if (wasStruck)
+        {
+            
+            return;
+        }
+
+        _golfAnimator.StartSwing();
+
+    }
 }

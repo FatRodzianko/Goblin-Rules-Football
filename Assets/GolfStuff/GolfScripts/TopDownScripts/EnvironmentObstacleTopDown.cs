@@ -310,10 +310,10 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         //    Debug.Log("BalloonCollisionCheck: Height of the ball is " + ballHeightInUnityUnits.ToString() + " start height: " + StartHeight.ToString() + " HeightInUnityUnits: " + HeightInUnityUnits.ToString());
         //    this.GetComponent<BalloonPowerUp>().CollisionToPopBalloon(golfBallScript);
         //}
-
+        Debug.Log("BalloonCollisionCheck: Height of the ball is " + ballHeightInUnityUnits.ToString() + " start height: " + StartHeight.ToString() + " HeightInUnityUnits: " + HeightInUnityUnits.ToString());
         if (ballHeightInUnityUnits >= StartHeight && ballHeightInUnityUnits <= HeightInUnityUnits)
         {
-            Debug.Log("BalloonCollisionCheck: Height of the ball is " + ballHeightInUnityUnits.ToString() + " start height: " + StartHeight.ToString() + " HeightInUnityUnits: " + HeightInUnityUnits.ToString());
+            
             this.transform.parent.GetComponent<BalloonPowerUp>().CollisionToPopBalloon(golfBallScript, _crateCollider);
         }
 

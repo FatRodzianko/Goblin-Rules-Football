@@ -1259,7 +1259,7 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         if (!this.IsOwner || !MyTornado)
             return;
-        IsHitByTornado = false;
+        //IsHitByTornado = false;
         //MyTornado.BallCompletedTornadoHit(this);
         CmdTellTornadoBallCompletedTornadoHit(MyTornado);
         MyTornado = null;
@@ -1694,7 +1694,7 @@ public class GolfBallTopDown : NetworkBehaviour
     void MoveBallOutOfWater()
     {
         Vector3 newBallPos = FindPointOutOfWater();
-        StartCoroutine(DelayForPenaltyMessage(newBallPos, 2f));
+        StartCoroutine(DelayForPenaltyMessage(newBallPos, 3.5f));
     }
     IEnumerator DelayForPenaltyMessage(Vector3 newBallPos, float delaySeconds)
     {
@@ -1740,7 +1740,7 @@ public class GolfBallTopDown : NetworkBehaviour
             return;
 
         MyPlayer.PlayerScore.StrokePenalty(1);
-        StartCoroutine(DelayForPenaltyMessage(inBoundsPos, 2f));
+        StartCoroutine(DelayForPenaltyMessage(inBoundsPos, 3.5f));
     }
     public void TellPlayerGroundTypeTheyLandedOn()
     {
@@ -1758,6 +1758,11 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     public void CheckIfInStatueRingRadius()
     {
+        if (IsHitByTornado)
+        {
+            IsHitByTornado = false;
+            return;
+        }
         RaycastHit2D[] hits = Physics2D.CircleCastAll(this.transform.position, pixelUnit, Vector2.zero, 0f, _defaultLayerMask);
         if (hits.Length <= 0)
             return;

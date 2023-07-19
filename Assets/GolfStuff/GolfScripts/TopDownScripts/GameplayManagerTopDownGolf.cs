@@ -1262,4 +1262,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         else
             _powerUpInstructionsText.text = _instructionsPressP;
     }
+    public bool WillPlayerBeStruckByLightning(GolfPlayerTopDown player)
+    {
+        return _lightningManager.WillPlayerBeStruckByLightning(player);
+    }
 }

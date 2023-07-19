@@ -214,16 +214,16 @@ x If a player hits a ball out of bounds or in water, Player Favor is calculated 
 - - - double check when the player is prompted for lightning, and when the average player favor is calculated
 - - - - - - make sure average is calculated before the prompt for lightning
 - - - - - - if average favor will set weather to clear, don't rely on the BaseWeather event to stop the lightning storm. Make call to Lightning manager to turn off IsThereLightning (orwhatever its called)
-- - - I don't think this is an actual issue right now. One thing I do need to change, though, is that if a player's rainstate is clear, they shouldn't be prompted for lightning or see a flash. Just don't send that info but keep the IsThereLightning bool to true
+- - x I don't think this is an actual issue right now. One thing I do need to change, though, is that if a player's rainstate is clear, they shouldn't be prompted for lightning or see a flash. Just don't send that info but keep the IsThereLightning bool to true
 - The "start next turn" process should really be re-written I think? Right now, it's a bit of a mess with so many different weird things going through it. Should try and separate it out a bit I think?
-- The "no bounce" power up seemed to fail on me. Ball didn't bounce, but it did keep rolling. Had side spin on an iron club that landed in rough
-- - - working now, but test "no bounce" when landing on a hill. Will the ball roll at the start of next turn?
+x The "no bounce" power up seemed to fail on me. Ball didn't bounce, but it did keep rolling. Had side spin on an iron club that landed in rough
+- - x working now, but test "no bounce" when landing on a hill. Will the ball roll at the start of next turn? - tested and it seems to work fine
 
 
 # Post playtest things to fix:
 x fewer bad weather statues, more good weather statues
 - - x specifically remove bad weather statues on the greens. Too many bad weather statues there. Should only have one in a location that players would get to if they try and bomb a shot to the hole and miss
-- remove "feature" where bad weather statues have larger radiuses than good weather statues
+x remove "feature" where bad weather statues have larger radiuses than good weather statues
 x "health" for statues
 - - x currently ball has to hit statue at 5 m/s to break statue
 - - x change it so statue has 5 total health, and each hit the ball does damage equal to its speed
@@ -231,18 +231,21 @@ x "health" for statues
 - breaking statue has global weather effects and not just the favor boost:
 - - - good weather - immediately dispels any lightning storms and tornadoes. Clear weather for next 5 turns?
 - - - bad weather -  immediately starts a lightning storm or spawns a tornado. tornado targets that player who broke the statue?
-- fix tornado spawning so they don't always spawn in bad weather
+x fix tornado spawning so they don't always spawn in bad weather
 x make it so tornado selects target on spawn, then despawns when it hits it's target.
 - - x then have a turn cooldown after it despawns? or just one tornado per hole?
 - - - currently have it set to only spawn once per hole. May want to change so it spawns on events:
 - - - - - - player breaks bad weather statue -> spawn tornado that targets that player
 - - - - - - player gets below specific treshhold - say -5 favor - spawn tornado that targets them?
-- make power ups easier to hit
+x make power ups easier to hit
 - - x have a second collider for the box? Not sure if I can have two colliders... worth a shot though
 - - - - - x Second collider would be smaller and only effect if player hit the box
-- - - - - - animation of box falling off balloon and balloon flying away upward?
+- - - - - x animation of box falling off balloon and balloon flying away upward?
 x more powerups on a hole?
-- fix it so when a tornado throws you, it doesn't recalculate bad weather favor
+x fix it so when a tornado throws you, it doesn't recalculate bad weather favor
+- - x when a ball is hit by a tornado, check to see if the ball has IsHit/IsBouncing/IsRolling set to true. If not, mark the ball as "HitByTornado" or something similar
+- - x then, when going to calculate favor for the ball, if "HitByTornado" is true, don't calculate favor. Only do so if it is not true
+- - x remember to reset the HitByTornado value after the ball is done being "hit" by the tornado
 - The Rick Lightning issue:
 - - - rick was struck but lightning, but still hit ball
 - - - pretty sure this is caused by playing being struck by lightning being calculated on the server, and the ball hit being on the client
@@ -250,7 +253,7 @@ x more powerups on a hole?
 - - - when there is lightning, make sure the player doesn't hit the ball unless the server says they can?
 - - - change the lightning strike process:
 - - - - - - currently player will start normal swing animation. When their swing gets to the top, they tell server to calculate lightning strike. Server sets a syncvar. If the syncvar is true, they stop the swing animation and start the lightning strike animation
-- - - - - - change it so before the player does any swing animation or ball hit, they ask the server if they can hit normally or not
+- - - - - x change it so before the player does any swing animation or ball hit, they ask the server if they can hit normally or not
 - - - - - - server calculates lightning strike then. If they are struck, tells player to play the "struck by lightning" animation. If they are not struck, server tells them to play the normal hit animation and hit normally
 - - - - - - player will have two hit animations: normal hit, lightning strike "hit"
 - - - - - - - - - the lightning strike hit will have the flashes/skeleton, which call function to make the light flash
