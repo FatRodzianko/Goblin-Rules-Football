@@ -109,8 +109,10 @@ public class GolferAnimator : NetworkBehaviour
         IsPausedOnLightningStrike = true;
         //_networkAnimator.SetTrigger("PauseForLightning");
         //_networkAnimator.Play(_pauseOnLightningStrike);
-        _networkAnimator.SetTrigger("StruckSkeleton");
 
+        //old animation call
+        //_networkAnimator.SetTrigger("StruckSkeleton");
+        _networkAnimator.Play("golfer-grenadier-swing-struck-by-lightning");
         //_animator.enabled = false;
 
     }
@@ -170,6 +172,13 @@ public class GolferAnimator : NetworkBehaviour
             _myPlayer.PlayerUIMessage("struck by lightning");
             _myPlayer.EnablePlayerCanvas(true);
         }
-        
+    }
+    public void TurnOnLightForLightningFlash()
+    { 
+
+    }
+    public void TurnOffLightForLightningFlash()
+    {
+
     }
 }

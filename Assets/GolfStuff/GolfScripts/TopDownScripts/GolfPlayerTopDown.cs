@@ -2768,19 +2768,31 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // Check to see if the player will be struck by lightning or not. If they will be, tell player to play the "struck by lightning animation. If not, normal animation
         bool willPlayerBeStruck = GameplayManagerTopDownGolf.instance.WillPlayerBeStruckByLightning(this);
         Debug.Log("CmdCanPlayerHitBall: Will the player be struck by lightning? " + willPlayerBeStruck.ToString());
-        this.RpcTellPlayerIfTheyWereStruckByLightningDuringHit(this.Owner, willPlayerBeStruck);
-    }
-    [TargetRpc]
-    void RpcTellPlayerIfTheyWereStruckByLightningDuringHit(NetworkConnection conn, bool wasStruck)
-    {
-        Debug.Log("RpcTellPlayerIfTheyWereStruckByLightningDuringHit: " + wasStruck.ToString());
-        if (wasStruck)
+        if (willPlayerBeStruck)
         {
-            
+            //this.RpcTellPlayerTheyWereStruckByLightning(this.Owner);
+            this.SetUpLightningStrikeForPlayer();
             return;
         }
 
+        this.RpcTellPlayerToHitBallNormally(this.Owner);
+    }
+    [Server]
+    void SetUpLightningStrikeForPlayer()
+    {
+        this.RpcTellPlayerTheyWereStruckByLightning(this.Owner);
+    }
+    [TargetRpc]
+    void RpcTellPlayerToHitBallNormally(NetworkConnection conn)
+    {
+        Debug.Log("RpcTellPlayerToHitBallNormally: " + this.PlayerName);
         _golfAnimator.StartSwing();
-
+    }
+    [TargetRpc]
+    void RpcTellPlayerTheyWereStruckByLightning(NetworkConnection conn)
+    {
+        Debug.Log("RpcTellPlayerTheyWereStruckByLightning: " + this.PlayerName);
+        // code for the lightning strike animation
+        _golfAnimator.PlayerStruckByLightning();
     }
 }

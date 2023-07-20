@@ -258,6 +258,8 @@ x fix it so when a tornado throws you, it doesn't recalculate bad weather favor
 - - - - - - player will have two hit animations: normal hit, lightning strike "hit"
 - - - - - - - - - the lightning strike hit will have the flashes/skeleton, which call function to make the light flash
 - - - - - - - - - will also have the disintergration animation that then calls function to prompt user about being struke
+- new lightning strike:
+- - - make sure to call StruckByLightning() so that PlayerStruckByLightning gets set to true
 
 
 
