@@ -900,7 +900,6 @@ GameObject:
   - component: {fileID: 5665735165111769197}
   - component: {fileID: 1368494483326148317}
   - component: {fileID: 8221651573399834111}
-  - component: {fileID: 3870330409707206963}
   m_Layer: 0
   m_Name: GolfPlayerTopDown
   m_TagString: Untagged
@@ -1049,6 +1048,7 @@ MonoBehaviour:
   UsedPowerupThisTurn: 0
   PowerUpDistanceModifier: 1
   PowerUpAccuracyModifier: 1
+  _canUseRocketPower: 0
   PlayerMulligan: 0
   PromptedForMulligan: 0
   _ballStartPosition: {x: 0, y: 0, z: 0}
@@ -1125,7 +1125,8 @@ MonoBehaviour:
   - {fileID: 7513493645420276422}
   - {fileID: 2653947506407809911}
   - {fileID: 1368494483326148317}
-  - {fileID: 3870330409707206963}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 3891610743640057217}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
@@ -1196,27 +1197,6 @@ MonoBehaviour:
   _overrideType: 3
   _updateHostVisibility: 1
   _observerConditions: []
---- !u!114 &3870330409707206963
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3144715486186738516}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 3
-  _addedNetworkObject: {fileID: 5665735165111769197}
-  _networkObjectCache: {fileID: 5665735165111769197}
-  IgnoredParameters: []
-  _animator: {fileID: 8337812199374243185}
-  _smoothFloats: 1
-  _interpolation: 1
-  _clientAuthoritative: 1
-  _sendToOwner: 0
 --- !u!1 &3549653242320339040
 GameObject:
   m_ObjectHideFlags: 0
@@ -1520,6 +1500,7 @@ GameObject:
   - component: {fileID: 3106487267619827375}
   - component: {fileID: 8337812199374243185}
   - component: {fileID: 3891610743640057217}
+  - component: {fileID: 5853080995522655165}
   m_Layer: 0
   m_Name: PlayerSprite
   m_TagString: Untagged
@@ -1626,16 +1607,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c8ed46118065fb4fa1b5f0e146cd886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 4
+  _componentIndexCache: 5
   _addedNetworkObject: {fileID: 5665735165111769197}
   _networkObjectCache: {fileID: 5665735165111769197}
   _animator: {fileID: 8337812199374243185}
-  _networkAnimator: {fileID: 3870330409707206963}
+  _networkAnimator: {fileID: 5853080995522655165}
   _idle: golfer-grenadier-idle
   _frontSwing: golfer-grenadier-swing-front-view
   _deathFromLightning: golfer-death-from-lightning
   _pauseOnLightningStrike: golfer-pause-on-lightning-strike
   _struckSkeleton: golfer-struck-skeleton
+  _swingStruckByLightning: golfer-grenadier-swing-struck-by-lightning
   _spriteRenderer: {fileID: 3106487267619827375}
   IsSwinging: 0
   IsDyingFromLightning: 0
@@ -1644,6 +1626,27 @@ MonoBehaviour:
   _struckByLightningFullSwingFlashOn: {fileID: 21300000, guid: 87533ef9bb06beb479f0b1d17426d073, type: 3}
   _struckByLightningFullSwingFlashOff: {fileID: 21300000, guid: ff0ec44b0db04d742aba42a0b62ac359, type: 3}
   _lightningBoltObject: {fileID: 8989263272828289160}
+--- !u!114 &5853080995522655165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4107736587890252822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 3
+  _addedNetworkObject: {fileID: 5665735165111769197}
+  _networkObjectCache: {fileID: 5665735165111769197}
+  IgnoredParameters: []
+  _animator: {fileID: 8337812199374243185}
+  _smoothFloats: 1
+  _interpolation: 2
+  _clientAuthoritative: 1
+  _sendToOwner: 0
 --- !u!1 &4734507168245818501
 GameObject:
   m_ObjectHideFlags: 0

@@ -15,6 +15,7 @@ public class GolferAnimator : NetworkBehaviour
     [SerializeField] string _deathFromLightning;
     [SerializeField] string _pauseOnLightningStrike;
     [SerializeField] string _struckSkeleton;
+    [SerializeField] string _swingStruckByLightning;
 
     [Header("Player Sprite")]
     [SerializeField] SpriteRenderer _spriteRenderer;
@@ -74,7 +75,9 @@ public class GolferAnimator : NetworkBehaviour
     {
         IsSwinging = true;
         //_animator.Play(_frontSwing);
-        _networkAnimator.Play(_frontSwing);
+        //_networkAnimator.Play(_frontSwing);
+        //_networkAnimator.Animator.Play(_frontSwing);
+        _networkAnimator.SetTrigger("front swing");
     }
     public void HitBall()
     {
@@ -112,7 +115,9 @@ public class GolferAnimator : NetworkBehaviour
 
         //old animation call
         //_networkAnimator.SetTrigger("StruckSkeleton");
-        _networkAnimator.Play("golfer-grenadier-swing-struck-by-lightning");
+
+        //_networkAnimator.Play(_swingStruckByLightning);
+        _networkAnimator.SetTrigger("struck by lightning");
         //_animator.enabled = false;
 
     }
