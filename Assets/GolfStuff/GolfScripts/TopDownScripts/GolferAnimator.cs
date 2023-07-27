@@ -32,6 +32,8 @@ public class GolferAnimator : NetworkBehaviour
     [SerializeField] Sprite _struckByLightningFullSwingFlashOn;
     [SerializeField] Sprite _struckByLightningFullSwingFlashOff;
     [SerializeField] GameObject _lightningBoltObject;
+    LightningManager _lightningManager;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -40,7 +42,10 @@ public class GolferAnimator : NetworkBehaviour
         if(!_spriteRenderer)
             _spriteRenderer = this.GetComponent<SpriteRenderer>();
     }
-
+    private void Start()
+    {
+        _lightningManager = GameplayManagerTopDownGolf.instance.GetLightningManager();
+    }
     // Update is called once per frame
     void Update()
     {
@@ -179,11 +184,15 @@ public class GolferAnimator : NetworkBehaviour
         }
     }
     public void TurnOnLightForLightningFlash()
-    { 
-
+    {
+        _lightningManager.TurnOnLightForLightningStrike(_lightningManager.LightIntensityMax);
     }
     public void TurnOffLightForLightningFlash()
     {
-
+        _lightningManager.TurnOffLightForLightningStrike();
+    }
+    public void ThunderForLightningStrike()
+    {
+        _lightningManager.PlayThunderClip(true, 0f);
     }
 }

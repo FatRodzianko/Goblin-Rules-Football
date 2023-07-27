@@ -25,7 +25,7 @@ public class Torndao : NetworkBehaviour
     [SerializeField] float _distanceToMove = 0f;
 
     [Header("Player Target")]
-    [SerializeField] GolfPlayerTopDown _playerTarget = null;
+    [SerializeField] public GolfPlayerTopDown _playerTarget = null;
     [SerializeField] public bool HitPlayerTarget = false;
 
     [Header("Balls Hit")]
@@ -343,5 +343,14 @@ public class Torndao : NetworkBehaviour
         AdjustScaleOfTornado(tornadoStrength);
         AdjustHeightOfTornado(tornadoStrength);
         AdjustCenterObject();
+    }
+    public void ChangeTornadoTarget(GolfPlayerTopDown newTargetPlayer)
+    {
+        if (this._playerTarget != newTargetPlayer)
+            this._playerTarget = newTargetPlayer;
+    }
+    public GolfPlayerTopDown ReturnPlayerTarget()
+    {
+        return this._playerTarget;
     }
 }

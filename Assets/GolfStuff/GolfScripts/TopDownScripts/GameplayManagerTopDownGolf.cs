@@ -1266,4 +1266,26 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         return _lightningManager.WillPlayerBeStruckByLightning(player);
     }
+    public LightningManager GetLightningManager()
+    {
+        return _lightningManager;
+    }
+    public void BrokenStatueWeatherEffects(string statueType, GolfPlayerTopDown playerThatBrokeStatue)
+    {
+        Debug.Log("BrokenStatueWeatherEffects: " + statueType + " for player: " + playerThatBrokeStatue.PlayerName);
+        if (statueType == "bad-weather")
+            BrokenBadStatueWeatherEffects(playerThatBrokeStatue);
+        else
+            BrokenGoodStatueWeatherEffects(playerThatBrokeStatue);
+    }
+    void BrokenBadStatueWeatherEffects(GolfPlayerTopDown playerThatBrokeStatue)
+    {
+        // tornado stuff for bad statue
+        WindManager.instance.PlayerBrokeBadStatue(playerThatBrokeStatue);
+    }
+    void BrokenGoodStatueWeatherEffects(GolfPlayerTopDown playerThatBrokeStatue)
+    {
+        _lightningManager.StopLightningForBrokenGoodWeatherStatue();
+        WindManager.instance.PlayerBrokeGoodStatue();
+    }
 }

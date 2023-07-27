@@ -45,6 +45,7 @@ public class WindManager : NetworkBehaviour
     [SerializeField] float _maxSpawnDist = 50f;
     [SerializeField] bool _spawnedThisHoleAlready = false;
     [SerializeField] GolfPlayerTopDown _targetPlayer = null;
+    [SerializeField] bool _spawnTornadoFromBrokenStatue = false;
 
     [Header("Wind Power Up Stuff")]
     [SerializeField] List<GolfPlayerTopDown> _playersWhoDidntUsePowerUp = new List<GolfPlayerTopDown>();
@@ -373,6 +374,59 @@ public class WindManager : NetworkBehaviour
             TornadoScript = null;
         }
     }
+    // old tornado spawn code before it depended on player's breaking statues?
+    //[Server]
+    //public void CheckIfTornadoWillSpawn(bool newHole = false)
+    //{
+    //    if (newHole)
+    //    {
+    //        if (IsThereATorndao)
+    //        {
+    //            DestroyTornadoObjects();
+    //        }
+    //        _spawnedThisHoleAlready = false;
+    //        return;
+    //    }
+    //    if (IsThereATorndao)
+    //        return;
+
+    //    if (_spawnedThisHoleAlready)
+    //        return;
+
+    //    if (this.BaseWindPower <= 0f)
+    //    {
+    //        DestroyTornadoObjects();
+    //        return;
+    //    }
+    //    //if (RainManager.instance.RainState == "clear") // Changed RainState to BaseRainState through this function
+    //    if (RainManager.instance.BaseRainState == "clear")
+    //    {
+    //        DestroyTornadoObjects();
+    //        return;
+    //    }
+    //    if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
+    //        return;
+
+    //    // update this so it will only spawn if a player hits a treshhold, like one player has to be below -5f?
+    //    float tornadoLikelihood = 0.2f;
+    //    //float tornadoLikelihood = 1.0f; // for testing only
+    //    if (RainManager.instance.BaseRainState == "med rain")
+    //        tornadoLikelihood += 0.1f;
+    //    else if (RainManager.instance.BaseRainState == "heavy rain")
+    //        tornadoLikelihood += 0.25f;
+
+    //    if (UnityEngine.Random.Range(0f, 1f) > tornadoLikelihood && !IsThereATorndao)
+    //    {
+    //        Debug.Log("CheckIfTornadoWillSpawn: Will NOT Spawn a torndao this turn.");
+    //        IsThereATorndao = false;
+    //        return;
+    //    }
+
+
+    //    SpawnTornado();
+    //}
+    
+    // new code for spawning tornadoes when a player breaks a statue
     [Server]
     public void CheckIfTornadoWillSpawn(bool newHole = false)
     {
@@ -385,43 +439,39 @@ public class WindManager : NetworkBehaviour
             _spawnedThisHoleAlready = false;
             return;
         }
+        // if the player the tornado is targeting gets their ball in the hole, destroy the tornado object
+        if (IsThereATorndao && TornadoScript.ReturnPlayerTarget().MyBall.IsInHole)
+        {
+            DestroyTornadoObjects();
+            return;
+        }
+
         if (IsThereATorndao)
             return;
 
-        if (_spawnedThisHoleAlready)
+        // Don't spawn a tornado if a player didn't break a statue last turn
+        if (!_spawnTornadoFromBrokenStatue)
+            return;
+        if (!_targetPlayer)
             return;
 
-        if (this.BaseWindPower <= 0f)
-        {
-            DestroyTornadoObjects();
-            return;
-        }
-        //if (RainManager.instance.RainState == "clear") // Changed RainState to BaseRainState through this function
-        if (RainManager.instance.BaseRainState == "clear")
-        {
-            DestroyTornadoObjects();
-            return;
-        }
-        if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
-            return;
+        SpawnTornadoForBrokenStatue(_targetPlayer);
 
-        // update this so it will only spawn if a player hits a treshhold, like one player has to be below -5f?
-        float tornadoLikelihood = 0.2f;
-        //float tornadoLikelihood = 1.0f; // for testing only
-        if (RainManager.instance.BaseRainState == "med rain")
-            tornadoLikelihood += 0.1f;
-        else if (RainManager.instance.BaseRainState == "heavy rain")
-            tornadoLikelihood += 0.25f;
+        _spawnTornadoFromBrokenStatue = false;
+    }
+    void SpawnTornadoForBrokenStatue(GolfPlayerTopDown targetPlayer)
+    {
+        Vector3 spawnPos = GetTornadoSpawnPosition(targetPlayer);
 
-        if (UnityEngine.Random.Range(0f, 1f) > tornadoLikelihood && !IsThereATorndao)
-        {
-            Debug.Log("CheckIfTornadoWillSpawn: Will NOT Spawn a torndao this turn.");
-            IsThereATorndao = false;
-            return;
-        }
+        _tornadoObject = Instantiate(_tornadoPrefab, spawnPos, Quaternion.identity);
+        TornadoScript = _tornadoObject.GetComponent<Torndao>();
 
+        TornadoScript.GetPlayerTarget(targetPlayer);
 
-        SpawnTornado();
+        InstanceFinder.ServerManager.Spawn(_tornadoObject);
+        Debug.Log("SpawnTornadoForBrokenStatue: spawned a tornado with netid of: " + TornadoScript.ObjectId);
+
+        IsThereATorndao = true;
     }
     void SpawnTornado()
     {
@@ -626,6 +676,24 @@ public class WindManager : NetworkBehaviour
     }
     public void DestroyTornadoForNextHole()
     {
+        DestroyTornadoObjects();
+    }
+    public void PlayerBrokeBadStatue(GolfPlayerTopDown playerThatBrokeStatue)
+    {
+        if (IsThereATorndao && TornadoScript)
+        {
+            Debug.Log("PlayerBrokeBadStatue: Tornado already exists. Updating Tornado target to player: " + playerThatBrokeStatue.PlayerName);
+            TornadoScript.ChangeTornadoTarget(playerThatBrokeStatue);
+            return;
+        }
+
+        Debug.Log("PlayerBrokeBadStatue: No tornado exists. Will spawn tornado after this turn to target to player: " + playerThatBrokeStatue.PlayerName);
+        _spawnTornadoFromBrokenStatue = true;
+        _targetPlayer = playerThatBrokeStatue;
+    }
+    public void PlayerBrokeGoodStatue()
+    {
+        Debug.Log("PlayerBrokeGoodStatue:");
         DestroyTornadoObjects();
     }
 

@@ -165,6 +165,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
     IEnumerator _mulliganRoutine;
     [SerializeField] bool _isMulliganRoutineRunning = false;
 
+    [Header("Statue and Weather Effects")]
+    [SyncVar] public bool BrokeGoodWeatherStatue = false;
+    [SyncVar] public bool BrokeBadWeatherStatue = false;
+
     [Header("Wind UI")]
     [SerializeField] GameObject _windUIHolder;
 
@@ -2444,7 +2448,40 @@ public class GolfPlayerTopDown : NetworkBehaviour
         else if (statueType == "bad-weather")
             newFavor -= 5;
 
+        this.SetPlayerBrokenStatueEffect(statueType);
+        GameplayManagerTopDownGolf.instance.BrokenStatueWeatherEffects(statueType, this);
+
         FavorWeather = CapWeatherFavor(newFavor);
+    }
+    [Server]
+    void SetPlayerBrokenStatueEffect(string statueType)
+    {
+        if (statueType == "good-weather")
+        {
+            this.BrokeGoodWeatherStatue = true;
+            if (this.BrokeBadWeatherStatue)
+            {
+                ResetBrokenBadStatueEffect();
+            }
+        }
+        else if (statueType == "bad-weather")
+        {
+            this.BrokeBadWeatherStatue = true;
+            if (this.BrokeGoodWeatherStatue)
+            {
+                ResetBrokenGoodStatueEffect();
+            }
+        }
+    }
+    [Server]
+    public void ResetBrokenGoodStatueEffect()
+    {
+        this.BrokeGoodWeatherStatue = false;
+    }
+    [Server]
+    public void ResetBrokenBadStatueEffect()
+    {
+        this.BrokeBadWeatherStatue = false;
     }
     [Server]
     int CapWeatherFavor(int newFavor)
@@ -2793,6 +2830,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         Debug.Log("RpcTellPlayerTheyWereStruckByLightning: " + this.PlayerName);
         // code for the lightning strike animation
-        _golfAnimator.PlayerStruckByLightning();
+        //_golfAnimator.PlayerStruckByLightning();
+        this.StruckByLightning();
     }
 }

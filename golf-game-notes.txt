@@ -218,6 +218,9 @@ x If a player hits a ball out of bounds or in water, Player Favor is calculated 
 - The "start next turn" process should really be re-written I think? Right now, it's a bit of a mess with so many different weird things going through it. Should try and separate it out a bit I think?
 x The "no bounce" power up seemed to fail on me. Ball didn't bounce, but it did keep rolling. Had side spin on an iron club that landed in rough
 - - x working now, but test "no bounce" when landing on a hill. Will the ball roll at the start of next turn? - tested and it seems to work fine
+- make it so that a lightning storm can only "start" once per hole?
+- - - distance is calculated by severity - same as before
+- - - if the storm disappears on its own, no more lightning that round. If it disappears because someone broke a good weather statue, no more lightning!
 
 
 # Post playtest things to fix:
@@ -254,12 +257,12 @@ x fix it so when a tornado throws you, it doesn't recalculate bad weather favor
 - - - change the lightning strike process:
 - - - - - - currently player will start normal swing animation. When their swing gets to the top, they tell server to calculate lightning strike. Server sets a syncvar. If the syncvar is true, they stop the swing animation and start the lightning strike animation
 - - - - - x change it so before the player does any swing animation or ball hit, they ask the server if they can hit normally or not
-- - - - - - server calculates lightning strike then. If they are struck, tells player to play the "struck by lightning" animation. If they are not struck, server tells them to play the normal hit animation and hit normally
-- - - - - - player will have two hit animations: normal hit, lightning strike "hit"
-- - - - - - - - - the lightning strike hit will have the flashes/skeleton, which call function to make the light flash
-- - - - - - - - - will also have the disintergration animation that then calls function to prompt user about being struke
-- new lightning strike:
-- - - make sure to call StruckByLightning() so that PlayerStruckByLightning gets set to true
+- - - - - x server calculates lightning strike then. If they are struck, tells player to play the "struck by lightning" animation. If they are not struck, server tells them to play the normal hit animation and hit normally
+- - - - - x player will have two hit animations: normal hit, lightning strike "hit"
+- - - - - - - - x the lightning strike hit will have the flashes/skeleton, which call function to make the light flash
+- - - - - - - - x will also have the disintergration animation that then calls function to prompt user about being struck
+x new lightning strike:
+- - x make sure to call StruckByLightning() so that PlayerStruckByLightning gets set to true
 
 
 

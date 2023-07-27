@@ -41,6 +41,7 @@ public class LightningManager : NetworkBehaviour
     [SerializeField] float _maxDistanceFromPlayer = 1.5f;
     [SerializeField] float _minLightIntensity = 0.25f;
     [SerializeField] float _maxLightIntensity = 0.75f;
+    public float LightIntensityMax = 1.5f;
 
     [Header("Movement Ranges")]
     [SerializeField] float _minLightningMove;
@@ -485,5 +486,30 @@ public class LightningManager : NetworkBehaviour
         UpdateWeather(weatherState);
         //StopLightningRoutineStuff();
         //IsThereLightning = false;
+    }
+    public void TurnOnLightForLightningStrike(float lightIntensity)
+    {
+        _lightIntensity = lightIntensity;
+        _lightningLight.enabled = true;
+    }
+    public void TurnOffLightForLightningStrike()
+    {
+        _lightningLight.enabled = false;
+    }
+    public void PlayThunderClip(bool playerStruck, float distance)
+    {
+        if (playerStruck)
+        {
+            SoundManager.instance.PlaySound(_thunderPlayerStruck, 1f);
+            return;
+        }
+
+        StartCoroutine(ThunderClap(distance, 0));
+    }
+    [Server]
+    public void StopLightningForBrokenGoodWeatherStatue()
+    {
+        IsThereLightning = false;
+        StopLightningRoutineStuff();
     }
 }

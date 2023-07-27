@@ -409,6 +409,20 @@ public class RainManager : NetworkBehaviour
         float rainStateModifier = GetRainStateModifier();
         float playerFavor = currentPlayer.FavorWeather;
 
+        // weather effects from broken weather statues
+        if (currentPlayer.BrokeGoodWeatherStatue)
+        {
+            RainState = "clear";
+            currentPlayer.ResetBrokenGoodStatueEffect();
+            return;
+        }
+        if (currentPlayer.BrokeBadWeatherStatue)
+        {
+            // this is just to reset the BrokeBadWeatherStatue bool. It doesn't do anything yet but might in the future? idk
+            currentPlayer.ResetBrokenBadStatueEffect();
+            //return;
+        }
+
         // if player favor is at the extremes, automatically set it to highest/lowest rain values
         if (playerFavor >= 10)
         {
@@ -420,6 +434,8 @@ public class RainManager : NetworkBehaviour
             RainState = "heavy rain";
             return;
         }
+
+        
 
         if (playerFavor > 0) // if the player has positive favor, add their favor to the base state modifier. If it crosses another state modifier above the current state, move their weather up?
         {
