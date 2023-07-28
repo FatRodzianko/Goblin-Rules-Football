@@ -115,6 +115,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public float HitAccuracySubmitted;
     public Vector2 ModifiedHitDirection = Vector2.zero;
     public Vector2 hitTopSpinSubmitted = Vector2.zero;
+    bool _perfectPowerSubmission = false;
+    bool _perfectAccuracySubmission = false;
 
     [Header("Player Turn Attributes")]
     public float MaxDistanceFromClub = 100f;
@@ -1071,6 +1073,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //MyBall.HitBall(hitDistance, hitAngle, hitTopSpin, hitDirection);
         ResetIconPositions();
         ResetSubmissionValues();
+        ResetPerfectSubmissions();
         BeginMovingHitMeter();
 
         // Make sure the camera isn't zoomed out?
@@ -1155,12 +1158,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         Debug.Log("SetHitPowerValue");
         float iconXPosition = GetMovingIconXPosition();
-        // Check if player was close to their target? If they are close enough, give it to them!
-
+        // Check if player was close to their target? If they are close enough, give it to them!        
         if (IsCloseEnoughToTargetPosition(TargetDistanceXPosForPlayer, iconXPosition))
         {
             iconXPosition = TargetDistanceXPosForPlayer;
-            PerfectHitSubmission();
+            PerfectPowerSubmission();
         }   
 
         ActivateSubmissionIcon(_hitMeterPowerSubmissionIcon, iconXPosition);
@@ -1223,7 +1225,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (IsCloseEnoughToTargetPosition(_centerAccuracyPosition, iconXPosition))
         {
             iconXPosition = _centerAccuracyPosition;
-            PerfectHitSubmission();
+            PerfectAccuracySubmission();
         }
             
         ActivateSubmissionIcon(_hitMeterAccuracySubmissionIcon, iconXPosition);
@@ -1296,7 +1298,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
         // Adjust the accuracy distance based on player's weather favor
         float newAccuracyDistance = accuracyDistance * this.AccuracyFavorModifier * this.PowerUpAccuracyModifier;
-        Debug.Log("ModifyHitDirectionFromAccuracy: " + this.PlayerName + "'s original accuracy distance is: " + accuracyDistance.ToString() + " but their new accuracy distance will be: " + newAccuracyDistance.ToString() + " based on AccuracyFavorModifier of: " + AccuracyFavorModifier.ToString());
+        Debug.Log("ModifyHitDirectionFromAccuracy: " + this.PlayerName + "'s original accuracy distance is: " + accuracyDistance.ToString() + " but their new accuracy distance will be: " + newAccuracyDistance.ToString() + " based on AccuracyFavorModifier of: " + AccuracyFavorModifier.ToString() + " and power up modifier of: " + this.PowerUpAccuracyModifier.ToString());
 
         // https://www.youtube.com/watch?v=HH6JzH5pTGo
         var rotation = Quaternion.AngleAxis(accuracyDistance, Vector3.forward);
@@ -2840,23 +2842,68 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //_golfAnimator.PlayerStruckByLightning();
         this.StruckByLightning();
     }
-    void PerfectHitSubmission()
+    void PerfectPowerSubmission()
     {
         if (!this.IsOwner)
             return;
-        CmdPerfectHitSubmission();
-        SoundManager.instance.PlaySound("good-ding", 1f);
+        CmdPerfectPowerSubmission();
+        SoundManager.instance.PlaySound("player-perfect-power-submission", 1f);
+        _perfectPowerSubmission = true;
     }
     [ServerRpc]
-    void CmdPerfectHitSubmission()
+    void CmdPerfectPowerSubmission()
     {
-        Debug.Log("CmdPerfectHitSubmission: Perfect power submission from player: " + this.PlayerName);
+        Debug.Log("CmdPerfectPowerSubmission: Perfect power submission from player: " + this.PlayerName);
         this.FavorWeather += 1;
-        this.RpcPerfectHitSubmission();
+        this.RpcPerfectPowerSubmission();
     }
     [ObserversRpc(ExcludeOwner = true)]
-    void RpcPerfectHitSubmission()
+    void RpcPerfectPowerSubmission()
     {
-        SoundManager.instance.PlaySound("good-ding", 1f);
+        SoundManager.instance.PlaySound("player-perfect-power-submission", 1f);
+    }
+    void PerfectAccuracySubmission()
+    {
+        if (!this.IsOwner)
+            return;
+        CmdPerfectAccuracySubmission();
+        SoundManager.instance.PlaySound("player-perfect-accuracy-submission", 1f);
+        _perfectPowerSubmission = true;
+
+        if (_perfectPowerSubmission)
+            StartCoroutine(BothSubmissionPerfect());
+    }
+    [ServerRpc]
+    void CmdPerfectAccuracySubmission()
+    {
+        Debug.Log("CmdPerfectAccuracySubmission: Perfect Accuracy submission from player: " + this.PlayerName);
+        this.FavorWeather += 1;
+        this.RpcPerfectAccuracySubmission();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcPerfectAccuracySubmission()
+    {
+        SoundManager.instance.PlaySound("player-perfect-accuracy-submission", 1f);
+    }
+    IEnumerator BothSubmissionPerfect()
+    {
+        yield return new WaitForSeconds(SoundManager.instance.GetClipLength("player-perfect-accuracy-submission"));
+        SoundManager.instance.PlaySound("player-both-perfect-submissions", 1f);
+        CmdBothSubmissionPerfect();
+    }
+    [Server]
+    void CmdBothSubmissionPerfect()
+    {
+        RpcBothSubmissionPerfect();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcBothSubmissionPerfect()
+    {
+        SoundManager.instance.PlaySound("player-both-perfect-submissions", 1f);
+    }
+    void ResetPerfectSubmissions()
+    {
+        _perfectPowerSubmission = false;
+        _perfectAccuracySubmission = false;
     }
 }

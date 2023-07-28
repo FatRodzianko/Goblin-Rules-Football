@@ -62,4 +62,11 @@ public class SoundManager : MonoBehaviour
         
         Debug.Log("StopSound: " + name + " is still playing? " + s.source.isPlaying.ToString());
     }
+    public float GetClipLength(string name)
+    {
+        Sound s = Array.Find(sounds, sound => sound.name == name);
+        if (s == null)
+            return 0f;
+        return s.clip.length;
+    }
 }

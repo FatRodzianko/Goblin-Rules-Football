@@ -993,7 +993,9 @@ public class GolfBallTopDown : NetworkBehaviour
         }
         if (bounceContactGroundMaterial.Contains("trap"))
         {
-            
+            Debug.Log("WillBallRoll: stopping due being in a trap");
+            willBallRoll = false;
+            return willBallRoll;
         }
 
         if (this.MyPlayer.UsedPowerupThisTurn && this.MyPlayer.UsedPowerUpType == "no-bounce")
