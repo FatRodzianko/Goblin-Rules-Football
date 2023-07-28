@@ -535,7 +535,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             //CurrentPlayer.SetPlayerOnBall();
             CurrentPlayer.MovePlayerToPosition(CurrentPlayer.Owner, CurrentPlayer.MyBall.transform.position);
         }
-        if (SkipsInARow == GolfPlayers.Count)
+        if (SkipsInARow >= (GolfPlayers.Count - _numberOfPlayersInHole))
         {
             await StormPassesForSkips(5f);
             _skipLightningCheck = true;
@@ -794,7 +794,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         // skipping for now while testing other things for multiplayer
         // make sure lightning occurs after the tornado tracking?
-        _lightningManager.CheckIfLightningStartsThisTurn(_skipLightningCheck);
+        _lightningManager.CheckIfLightningStartsThisTurn(_skipLightningCheck, newHole);
         _skipLightningCheck = false;
         if (!_lightningManager.IsThereLightning)
         {

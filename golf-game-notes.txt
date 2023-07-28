@@ -218,9 +218,9 @@ x If a player hits a ball out of bounds or in water, Player Favor is calculated 
 - The "start next turn" process should really be re-written I think? Right now, it's a bit of a mess with so many different weird things going through it. Should try and separate it out a bit I think?
 x The "no bounce" power up seemed to fail on me. Ball didn't bounce, but it did keep rolling. Had side spin on an iron club that landed in rough
 - - x working now, but test "no bounce" when landing on a hill. Will the ball roll at the start of next turn? - tested and it seems to work fine
-- make it so that a lightning storm can only "start" once per hole?
-- - - distance is calculated by severity - same as before
-- - - if the storm disappears on its own, no more lightning that round. If it disappears because someone broke a good weather statue, no more lightning!
+x make it so that a lightning storm can only "start" once per hole?
+- - x distance is calculated by severity - same as before
+- - x if the storm disappears on its own, no more lightning that round. If it disappears because someone broke a good weather statue, no more lightning!
 
 
 # Post playtest things to fix:
@@ -232,13 +232,14 @@ x "health" for statues
 - - x change it so statue has 5 total health, and each hit the ball does damage equal to its speed
 - - x so now statue will break after 5 "damage." aka player 1 hits statue first at 2 m/s, doesn't break. Player 2 hits statue second at 3 m/s, statue breaks
 - breaking statue has global weather effects and not just the favor boost:
-- - - good weather - immediately dispels any lightning storms and tornadoes. Clear weather for next 5 turns?
-- - - bad weather -  immediately starts a lightning storm or spawns a tornado. tornado targets that player who broke the statue?
+- - x good weather - immediately dispels any lightning storms and tornadoes. Clear weather for next 5 turns?
+- - x bad weather -  immediately starts a lightning storm or spawns a tornado. tornado targets that player who broke the statue?
+- - - - - x just going to have bad weather statue = tornado. No additional storms. too much...
 x fix tornado spawning so they don't always spawn in bad weather
 x make it so tornado selects target on spawn, then despawns when it hits it's target.
 - - x then have a turn cooldown after it despawns? or just one tornado per hole?
 - - - currently have it set to only spawn once per hole. May want to change so it spawns on events:
-- - - - - - player breaks bad weather statue -> spawn tornado that targets that player
+- - - - - x player breaks bad weather statue -> spawn tornado that targets that player
 - - - - - - player gets below specific treshhold - say -5 favor - spawn tornado that targets them?
 x make power ups easier to hit
 - - x have a second collider for the box? Not sure if I can have two colliders... worth a shot though

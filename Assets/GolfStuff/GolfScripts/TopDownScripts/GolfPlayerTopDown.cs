@@ -1158,7 +1158,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // Check if player was close to their target? If they are close enough, give it to them!
 
         if (IsCloseEnoughToTargetPosition(TargetDistanceXPosForPlayer, iconXPosition))
+        {
             iconXPosition = TargetDistanceXPosForPlayer;
+            PerfectHitSubmission();
+        }   
 
         ActivateSubmissionIcon(_hitMeterPowerSubmissionIcon, iconXPosition);
         HitPowerSubmitted = GetHitPowerFromXPosition(iconXPosition, MaxDistanceFromClub);
@@ -1218,7 +1221,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
         float iconXPosition = GetMovingIconXPosition();
 
         if (IsCloseEnoughToTargetPosition(_centerAccuracyPosition, iconXPosition))
+        {
             iconXPosition = _centerAccuracyPosition;
+            PerfectHitSubmission();
+        }
+            
         ActivateSubmissionIcon(_hitMeterAccuracySubmissionIcon, iconXPosition);
 
         float accuracyDistance = GetAccuracyDistance(iconXPosition, _centerAccuracyPosition);
@@ -1288,7 +1295,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             accuracyDistance *= 1.5f;
 
         // Adjust the accuracy distance based on player's weather favor
-        float newAccuracyDistance = accuracyDistance * this.AccuracyFavorModifier;
+        float newAccuracyDistance = accuracyDistance * this.AccuracyFavorModifier * this.PowerUpAccuracyModifier;
         Debug.Log("ModifyHitDirectionFromAccuracy: " + this.PlayerName + "'s original accuracy distance is: " + accuracyDistance.ToString() + " but their new accuracy distance will be: " + newAccuracyDistance.ToString() + " based on AccuracyFavorModifier of: " + AccuracyFavorModifier.ToString());
 
         // https://www.youtube.com/watch?v=HH6JzH5pTGo
@@ -2832,5 +2839,24 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // code for the lightning strike animation
         //_golfAnimator.PlayerStruckByLightning();
         this.StruckByLightning();
+    }
+    void PerfectHitSubmission()
+    {
+        if (!this.IsOwner)
+            return;
+        CmdPerfectHitSubmission();
+        SoundManager.instance.PlaySound("good-ding", 1f);
+    }
+    [ServerRpc]
+    void CmdPerfectHitSubmission()
+    {
+        Debug.Log("CmdPerfectHitSubmission: Perfect power submission from player: " + this.PlayerName);
+        this.FavorWeather += 1;
+        this.RpcPerfectHitSubmission();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcPerfectHitSubmission()
+    {
+        SoundManager.instance.PlaySound("good-ding", 1f);
     }
 }

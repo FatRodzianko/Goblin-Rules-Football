@@ -26,6 +26,7 @@ public class LightningManager : NetworkBehaviour
     [SerializeField] float _cooldownMax;
 
     [Header("Lightning Odds and Stuff")]
+    [SerializeField] bool _lightningStormThisTurnAlready = false;
     [SerializeField] float _startLightningOdds;
     [SerializeField] float _lightRainOddsToStart = 0.9f;
     [SerializeField] float _medRainOddsToStart = 0.75f;
@@ -205,14 +206,21 @@ public class LightningManager : NetworkBehaviour
     { 
 
     }
-    public void CheckIfLightningStartsThisTurn(bool skipLightningCheck = false)
+    public void CheckIfLightningStartsThisTurn(bool skipLightningCheck = false, bool forNewhole = false)
     {
 
         Debug.Log("CheckIfLightningStartsThisTurn: Checking for lightning at new turn. Is there lightning now? " + IsThereLightning.ToString());
+        // if this check is for a new hole, reset the _lightningStormThisTurnAlready value so lightning storms can start again on the new hole
+        if (forNewhole)
+            _lightningStormThisTurnAlready = false;
+
         if (skipLightningCheck)
             return;
         if (!IsThereLightning)
         {
+            // only one lightning storm per turn/hole
+            if (_lightningStormThisTurnAlready)
+                return;
             if (WillLightningStart())
             {
                 Debug.Log("CheckIfLightningStartsThisTurn: Lightning will start this turn");
@@ -223,6 +231,7 @@ public class LightningManager : NetworkBehaviour
                 //_lightningRoutine = StartLightning();
                 //StartCoroutine(_lightningRoutine);
                 StartLightningStrike();
+                _lightningStormThisTurnAlready = true;
             }
         }
         else
