@@ -57,6 +57,8 @@ public class BalloonPowerUp : NetworkBehaviour
     [SerializeField] EnvironmentObstacleTopDown _environmentObstacleTopDown;
     GolfBallTopDown _ballThatPoppedMe;
     [SerializeField] public ScriptableObstacle myScriptableObject; // scriptable object for the obstacle. Used to store the prefab of the obstacle for when the tilemapmanager needs to save/load new holes
+    [SerializeField] BalloonSpriteCollision _balloonSpriteCollision;
+    [SerializeField] GameObject _spriteColliderObject;
 
 
     [Header("Two Collider Stuff")]
@@ -100,6 +102,7 @@ public class BalloonPowerUp : NetworkBehaviour
         _balloonAnimator.SetHeightOfBallon(next);
         _balloonAnimator.SetIsIdle(true);
         SetObstacleHeightValues(next);
+        _balloonSpriteCollision.SetHeightOfBalloon(next);
     }
     void SetObstacleHeightValues(string height)
     {
@@ -149,6 +152,7 @@ public class BalloonPowerUp : NetworkBehaviour
         //IsPopped = true;
         PopBalloon(hitCrate);
         _ballThatPoppedMe = ball;
+        _spriteColliderObject.SetActive(false);
     }
     [ServerRpc(RequireOwnership = false)]
     void CmdPopBalloon(int ballNetId, bool hitCrate)
@@ -162,6 +166,7 @@ public class BalloonPowerUp : NetworkBehaviour
         if (IsPopped)
             return;
         PopBalloon(hitCrate);
+        _spriteColliderObject.SetActive(false);
     }
     void PopBalloon(bool hitCrate)
     {

@@ -208,7 +208,7 @@ ballon heights
 - - - - - - closest goes first, farthest away goes last
 - - - - - - if tied, such as multiple holes in one, choose randomly who will go first?
 x tornadoes target player with lowest favor, which could be a player that is struck by lightning. Need to make sure to skip those players...
-- - - tornado was using the GolfPlayersServer list to get its targets. Changed it to just GolfPlayers, since a player is removed from GolfPlayers when they are struck by lightning.
+- - x tornado was using the GolfPlayersServer list to get its targets. Changed it to just GolfPlayers, since a player is removed from GolfPlayers when they are struck by lightning.
 x If a player hits a ball out of bounds or in water, Player Favor is calculated BEFORE the ball is moved. Change to afterward?
 - If there is a lightning storm occuring, and player's get server average favor high enough to make base weather clear, a lightning strike still occurs
 - - - double check when the player is prompted for lightning, and when the average player favor is calculated
@@ -231,7 +231,7 @@ x "health" for statues
 - - x currently ball has to hit statue at 5 m/s to break statue
 - - x change it so statue has 5 total health, and each hit the ball does damage equal to its speed
 - - x so now statue will break after 5 "damage." aka player 1 hits statue first at 2 m/s, doesn't break. Player 2 hits statue second at 3 m/s, statue breaks
-- breaking statue has global weather effects and not just the favor boost:
+x breaking statue has global weather effects and not just the favor boost:
 - - x good weather - immediately dispels any lightning storms and tornadoes. Clear weather for next 5 turns?
 - - x bad weather -  immediately starts a lightning storm or spawns a tornado. tornado targets that player who broke the statue?
 - - - - - x just going to have bad weather statue = tornado. No additional storms. too much...
@@ -265,6 +265,16 @@ x fix it so when a tornado throws you, it doesn't recalculate bad weather favor
 x new lightning strike:
 - - x make sure to call StruckByLightning() so that PlayerStruckByLightning gets set to true
 
+# to complete before "release"
+x the sprite collision stuff for statues and power ups so the ball isn't always "behind" them when the ball should be rendered in front
+- - x the balloon powerups will need to do this somewhat dynamically. A sprite needs to be provided for the sprite mask. The sprite to use will change depending on if it is a low/med/high balloon
+- - - - - x will also need to adjust the sprite collision collider based on balloon height. Have a script change the "offset" of a collider?
+- use the input system instead of the ad-hoc, hardcoded inputs detected in update
+- - - make input schemes/maps/whatever they're called for each "phase" - aiming/chosing club and all that, the hit meter, and so on
+- tee off challenge to see who hits first?
+- integrate into GRF? Convert GRF to fishnet, or convert golf to mirror? Or leave separate
+- - - ideally the "join game" menu will show both GRF and Golf games
+- "map maker" - optional
 
 
 0.2708333
