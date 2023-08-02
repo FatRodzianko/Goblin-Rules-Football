@@ -272,6 +272,17 @@ x the sprite collision stuff for statues and power ups so the ball isn't always 
 - use the input system instead of the ad-hoc, hardcoded inputs detected in update
 - - - make input schemes/maps/whatever they're called for each "phase" - aiming/chosing club and all that, the hit meter, and so on
 - tee off challenge to see who hits first?
+- - - hole 75~ feet away
+- - - random wind and direction , between say 3 - 12 mph
+- - - always clear weather and no lightning/tornadoes
+- - - display to player their distance
+- - - make a new scriptable hole for "tee off challenge" or whatever
+- - - - - - gameplay manager will just load it before the first real hole of the course
+- - - gameplay manager will have a "game state" or similar value
+- - - - - - right now it will just be "tee off challenge" and "course-holes" or something
+- - - - - - the "SetNextPlayer" super function can just have a check for that bool and send the next turn logic to a new function just for that
+- - - - - - - - - this is just to make it so all the stuff feeding into SetNextPlayer can be re-used?
+- - - 
 - integrate into GRF? Convert GRF to fishnet, or convert golf to mirror? Or leave separate
 - - - ideally the "join game" menu will show both GRF and Golf games
 - "map maker" - optional
