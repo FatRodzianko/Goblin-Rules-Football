@@ -282,7 +282,8 @@ x the sprite collision stuff for statues and power ups so the ball isn't always 
 - - - - - - right now it will just be "tee off challenge" and "course-holes" or something
 - - - - - - the "SetNextPlayer" super function can just have a check for that bool and send the next turn logic to a new function just for that
 - - - - - - - - - this is just to make it so all the stuff feeding into SetNextPlayer can be re-used?
-- - - 
+- - - maybe make it so whoever wins starts with +1 favor? (or ties for the win?)
+- - - make at least two different "challenges." One is the tee off challenge, the other is a putting challenge? The putting one having a lot of weid direction tile changes, and maybe things to bounce off of? like mini golf...
 - integrate into GRF? Convert GRF to fishnet, or convert golf to mirror? Or leave separate
 - - - ideally the "join game" menu will show both GRF and Golf games
 - "map maker" - optional
