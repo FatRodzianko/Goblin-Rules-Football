@@ -19,6 +19,12 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] public ScriptableCourse CurrentCourse;
     [SerializeField] public ScriptableHole CurrentHoleInCourse;
     [SerializeField] [SyncVar] public int CurrentHoleIndex;
+    [SerializeField] public ScriptableCourse CourseToPlay;
+
+    [Header("TeeOffChallenge Info:")]
+    [SerializeField] public ScriptableCourse TeeOffChallenges;
+    [SerializeField] public ScriptableHole SelectedChallenge;
+    [SerializeField] List<GolfPlayerTopDown> _playerOrderFromChallenege = new List<GolfPlayerTopDown>();
 
     [Header("Current Hole Information")]
     public Vector3 TeeOffPosition;
@@ -92,6 +98,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
     [Header("Statue Stuff")]
     [SerializeField] List<GameObject> StatesOnServer = new List<GameObject>();
+
+    [Header("Game Phase")] // this should probably be changed to an enum or something at some point? Or switch to a "finite state machine?"
+    [SyncVar] public bool IsTeeOffChallenge = false;
 
     private void Awake()
     {
@@ -245,12 +254,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         CurrentHoleIndex = index;
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[CurrentHoleIndex];
         // tell all clients to load the next hole and to then update all the client side stuff
-        RpcLoadNewHoleOnClient(CurrentHoleIndex);
+        RpcLoadNewHoleOnClient(CurrentHoleIndex, this.IsTeeOffChallenge);
 
         // Spawn the statues on the server
         //StartSpawnStatues(CurrentHoleInCourse);
         //StatueSpawner.instance.SpawnStatuesOnServer(CurrentHoleInCourse.Statues);
-
     }
     [Server]
     void StartSpawnStatues(ScriptableHole hole)
@@ -273,9 +281,18 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         }
     }
     [ObserversRpc]
-    void RpcLoadNewHoleOnClient(int index)
+    void RpcLoadNewHoleOnClient(int index, bool teeOffChallenge = false)
     {
         Debug.Log("RpcLoadNewHoleOnClient: Starting task to load hole at index: " + index.ToString() + ". Time: " + Time.time);
+        if (teeOffChallenge)
+        {
+            CurrentCourse = TeeOffChallenges;
+        }
+        else
+        {
+            CurrentCourse = CourseToPlay;
+        }
+
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[index];
         if (PlayerScoreBoard.instance.IsScoreBoardOpen)
             PlayerScoreBoard.instance.CloseScoreBoard();
@@ -309,9 +326,14 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         CurrentHolePar = newPar;
         _parText.text = "Par " + CurrentHolePar.ToString();
     }
-    void OrderListOfPlayers()
+    void OrderListOfPlayers(bool firstHoleAfterChallenge = false)
     {
-        if (CurrentHoleIndex == 0)
+        if (firstHoleAfterChallenge)
+        {
+            GolfPlayersInTeeOffOrder.Clear();
+            GolfPlayersInTeeOffOrder.AddRange(GolfPlayers);
+        }
+        else if (CurrentHoleIndex == 0)
         {
             GolfPlayersInTeeOffOrder.Clear();
             GolfPlayersInTeeOffOrder.AddRange(GolfPlayers);
@@ -405,6 +427,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     }
     void SetCameraOnPlayer(GolfPlayerTopDown player)
     {
+        if (!player)
+            return;
         //player.SetCameraOnPlayer();
         Debug.Log("GameplayManager: SetCameraOnPlayer: For player: " + player.PlayerName);
         player.RpcSetCameraOnPlayer();
@@ -412,6 +436,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     public async void StartNextPlayersTurn(GolfBallTopDown ball, bool playerSkippingForLightning = false, bool playerWasStruckByLightning = false)
     {
         Debug.Log("GameplayManager: StartNextPlayersTurn: executing... from player: " + ball.MyPlayer.PlayerName + " playerSkippingForLightning: " + playerSkippingForLightning.ToString());
+        if (this.IsTeeOffChallenge)
+        {
+            NextPlayerForChallenege(ball);
+            return;
+        }
         if (playerSkippingForLightning && Time.time < TimeSinceLastSkip + 0.15f)
         {
             Debug.Log("GameplayManager: StartNextPlayersTurn: playerSkippingForLightning: " + playerSkippingForLightning.ToString() + " current time is: " + Time.time + " and last skip was: " + TimeSinceLastSkip.ToString() + " SKIPPING this StartNextPlayersTurn call...");
@@ -1017,8 +1046,18 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //    GolfPlayers.Add(GolfPlayersServer[i]);
         //}
         RpcSetGolfPlayersLocally(GolfPlayers);
-        StartFirstHole();
 
+        // check for tee off challenge
+        //if (GolfPlayers.Count <= 1)
+        //{
+        //    StartFirstHole();
+        //}
+        //else
+        //{
+        //    StartTeeOffChallenge();
+        //}
+
+        StartTeeOffChallenge();
     }
     [Server]
     void StartFirstHole()
@@ -1028,7 +1067,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         ResetNumberOfPlayersWhoHaveTeedOff();
         //// Load a new hole
         //LoadNewHole(0);
-        LoadNewHoleServer(0);
+        //LoadNewHoleServer(0);
+        if (this.IsTeeOffChallenge)
+            LoadNewHoleServer(CurrentHoleIndex);
+        else
+            LoadNewHoleServer(0);
 
         // Client side checks for things that can just be sent to each client to do
         //// Get the CameraBoundBox and tell players to get it as well?
@@ -1062,8 +1105,6 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //MovePlayerToTeeOffLocation(CurrentPlayer);
         //// Diable sprite of players that are not the current player
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
-
-
     }
 
     [ObserversRpc(ExcludeOwner = true)]
@@ -1288,4 +1329,43 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         _lightningManager.StopLightningForBrokenGoodWeatherStatue();
         WindManager.instance.PlayerBrokeGoodStatue();
     }
+
+    #region Tee Off Challenge
+    void StartTeeOffChallenge()
+    {
+        this.IsTeeOffChallenge = true;
+        //SelectedChallenge = GetChallenge(TeeOffChallenges);
+        _playerOrderFromChallenege.Clear();
+        CurrentCourse = TeeOffChallenges;
+        CurrentHoleIndex = GetChallenegeIndex(TeeOffChallenges);
+        StartFirstHole();
+    }
+    ScriptableHole GetChallenge(ScriptableCourse challenges)
+    {
+        System.Random random = new System.Random();
+        int index = random.Next(0, challenges.HolesInCourse.Length);
+        return challenges.HolesInCourse[index];
+    }
+    int GetChallenegeIndex(ScriptableCourse challenges)
+    {
+        System.Random random = new System.Random();
+        int index = random.Next(0, challenges.HolesInCourse.Length);
+        return index;
+    }
+    void NextPlayerForChallenege(GolfBallTopDown ball)
+    {
+        Debug.Log("NextPlayerForChallenege: from player: " + ball.MyPlayer.name + " and their distance to the hole: " + ball.MyPlayer.DistanceToHole.ToString());
+        if (GolfPlayersInTeeOffOrder.Count <= 0)
+        {
+            Debug.Log("NextPlayerForChallenege: All players have teed off. Will calculate who is furthest away from the hole beep boop.");
+            return;
+        }
+        CurrentPlayer = SelectNextPlayer();
+        SetCurrentPlayer(CurrentPlayer);
+        MovePlayerToTeeOffLocation(CurrentPlayer);
+        EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
+        SetCameraOnPlayer(CurrentPlayer);
+        PromptPlayerForNextTurn();
+    }
+    #endregion
 }

@@ -40,6 +40,10 @@ public class ScriptableHole : ScriptableObject
     public List<SavedStatue> Statues;
     public List<SavedBalloonPowerUp> BalloonPowerUps;
 
+    [Header("Tee Off Challenge Stuff")]
+    public bool IsTeeOffChallenge = false;
+    public string ClubToUse = ""; 
+
 }
 [Serializable]
 public class SavedTile 

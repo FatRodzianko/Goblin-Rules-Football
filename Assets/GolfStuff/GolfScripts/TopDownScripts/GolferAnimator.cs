@@ -83,6 +83,7 @@ public class GolferAnimator : NetworkBehaviour
         //_networkAnimator.Play(_frontSwing);
         //_networkAnimator.Animator.Play(_frontSwing);
         _networkAnimator.SetTrigger("front swing");
+        Debug.Log("StartSwing: _networkAnimator.SetTrigger(\"front swing\");");
     }
     public void HitBall()
     {
