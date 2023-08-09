@@ -192,6 +192,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     bool _tellPlayerGroundTheyLandedOn = false;
     bool _tellPlayerHoleEnded = false;
     bool _tellPlayerGameIsOver = false;
+    bool _tellPlayerHowFarTheyAreFromHoleForChallenege = false;
 
     [Header("Sound References")]
     [SerializeField] ScriptableBallSounds _ballSounds;
@@ -2906,4 +2907,72 @@ public class GolfPlayerTopDown : NetworkBehaviour
         _perfectPowerSubmission = false;
         _perfectAccuracySubmission = false;
     }
+    #region Tee Off Challenge
+    [Server]
+    public async Task ServerTellPlayerHowFarTheyAreFromHoleForChallenege(float duration, float distance)
+    {
+        _tellPlayerHowFarTheyAreFromHoleForChallenege = true;
+        float end = Time.time + (duration * 2);
+        RpcTellPlayerHowFarTheyAreFromHoleForChallenege(duration, distance);
+        Debug.Log("ServerTellPlayerHowFarTheyAreFromHoleForChallenege: Start time is: " + Time.time.ToString());
+        while (_tellPlayerHowFarTheyAreFromHoleForChallenege)
+        {
+            //Debug.Log("ServerTellPlayerGroundTheyLandedOn: Task.Yield time is: " + Time.time.ToString());
+            await Task.Yield();
+            if (Time.time >= end)
+                _tellPlayerHowFarTheyAreFromHoleForChallenege = false;
+        }
+        Debug.Log("ServerTellPlayerHowFarTheyAreFromHoleForChallenege: End time is: " + Time.time.ToString());
+    }
+    [ObserversRpc]
+    public void RpcTellPlayerHowFarTheyAreFromHoleForChallenege(float duration, float distance)
+    {
+        StartTellPlayerHowFarTheyAreFromHoleForChallenege(duration, distance);
+    }
+    async void StartTellPlayerHowFarTheyAreFromHoleForChallenege(float duration, float distance)
+    {
+        await TellPlayerHowFarTheyAreFromHoleForChallenege(duration, distance);
+    }
+    public async Task TellPlayerHowFarTheyAreFromHoleForChallenege(float duration, float distance)
+    {
+        Debug.Log("TellPlayerHowFarTheyAreFromHoleForChallenege: on game player: " + this.PlayerName);
+        if (!this.IsOwner)
+        {
+            return;
+        }
+
+        float end = Time.time + duration;
+        if (MyBall.IsInHole || MyBall.LocalIsInHole)
+        {
+            Debug.Log("TellPlayerHowFarTheyAreFromHoleForChallenege: on game player: " + this.PlayerName + " ball is in hole!");
+            this.PlayerUIMessage("challenege:hole");
+            this.EnablePlayerCanvas(true);
+            end += 1f;
+        }
+        else
+        {
+            this.PlayerUIMessage("challenege:" + distance.ToString("0.00"));
+            this.EnablePlayerCanvas(true);
+        }
+        while (Time.time < end)
+        {
+            await Task.Yield();
+        }
+
+        this.EnablePlayerCanvas(false);
+        if (this.IsOwner)
+            CmdTellPlayerHowFarTheyAreFromHoleForChallenegeCompleted();
+    }
+    [ServerRpc]
+    void CmdTellPlayerHowFarTheyAreFromHoleForChallenegeCompleted()
+    {
+        _tellPlayerHowFarTheyAreFromHoleForChallenege = false;
+        RpcTellPlayerHowFarTheyAreFromHoleForChallenegeCompleted();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcTellPlayerHowFarTheyAreFromHoleForChallenegeCompleted()
+    {
+        this.EnablePlayerCanvas(false);
+    }
+    #endregion
 }

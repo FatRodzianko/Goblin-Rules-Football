@@ -98,6 +98,18 @@ public class PlayerUIMessage : MonoBehaviour
             else
                 _playerMessageText.text = _myPlayer.PlayerName + _usingMulliganClients;
         }
+        else if (message.StartsWith("challenege"))
+        {
+            string[] challenegeMessage = message.Split(":");
+            if (challenegeMessage[1].Contains("hole"))
+            {
+                _playerMessageText.text = _myPlayer.PlayerName + " made it in the hole! (that's a distance of 0f)";
+            }
+            else
+            {
+                _playerMessageText.text = _myPlayer.PlayerName + " is " + challenegeMessage[1] + " meters away from the hole.";
+            }
+        }
         else
         {
             _playerMessageText.text = "";

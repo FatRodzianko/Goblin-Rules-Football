@@ -1352,14 +1352,18 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         int index = random.Next(0, challenges.HolesInCourse.Length);
         return index;
     }
-    void NextPlayerForChallenege(GolfBallTopDown ball)
+    public async void NextPlayerForChallenege(GolfBallTopDown ball)
     {
         Debug.Log("NextPlayerForChallenege: from player: " + ball.MyPlayer.name + " and their distance to the hole: " + ball.MyPlayer.DistanceToHole.ToString());
-        if (GolfPlayersInTeeOffOrder.Count <= 0)
-        {
-            Debug.Log("NextPlayerForChallenege: All players have teed off. Will calculate who is furthest away from the hole beep boop.");
-            return;
-        }
+        //if (GolfPlayersInTeeOffOrder.Count <= 0)
+        //{
+        //    Debug.Log("NextPlayerForChallenege: All players have teed off. Will calculate who is furthest away from the hole beep boop.");
+        //    return;
+        //}
+
+        // Prompt player about their distance to the hole
+        await ball.MyPlayer.ServerTellPlayerHowFarTheyAreFromHoleForChallenege(3, ball.MyPlayer.DistanceToHole);
+
         CurrentPlayer = SelectNextPlayer();
         SetCurrentPlayer(CurrentPlayer);
         MovePlayerToTeeOffLocation(CurrentPlayer);

@@ -314,6 +314,7 @@ x the sprite collision stuff for statues and power ups so the ball isn't always 
 - - - put the pipes in non-ideal locations. If a player misses it, they're kind of stuck?
 - - - multiple pipes per hole: make them color coded? or multiple entries and one exit?
 - - - should be somewhat of a challenge. The player has to "pong" the ball" in, and if they miss, they bounce off the rim?
+- Get rid of all the "CmdTellServerPlayerHoleEndedCompleted" functions and the "_tellPlayerHoleEnded" type variables. Only one message is ever sent to players at a time. Can reuse just one bool and and reuse functions that just send messages. Just one "message from server" function that then tells the player which task to actually start? Instead of all this bullshit where I have 4 different things that are functionally all the same 
 
 
 0.2708333
