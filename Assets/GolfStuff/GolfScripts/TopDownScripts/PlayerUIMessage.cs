@@ -20,6 +20,7 @@ public class PlayerUIMessage : MonoBehaviour
     [SerializeField] const string _mulliganClients = " is deciding if they want to use their mulligan...";
     [SerializeField] const string _usingMulliganOwner = "Using mulligan. Setting the ball back to where you started...";
     [SerializeField] const string _usingMulliganClients = " is using their mulligan!";
+    [SerializeField] const string _playerClosestToHole = " won the challenge and will hit first!";
 
     // Start is called before the first frame update
     void Start()
@@ -109,6 +110,10 @@ public class PlayerUIMessage : MonoBehaviour
             {
                 _playerMessageText.text = _myPlayer.PlayerName + " is " + challenegeMessage[1] + " meters away from the hole.";
             }
+        }
+        else if (message == "PlayerClosest")
+        {
+            _playerMessageText.text = _myPlayer.PlayerName + _playerClosestToHole;
         }
         else
         {

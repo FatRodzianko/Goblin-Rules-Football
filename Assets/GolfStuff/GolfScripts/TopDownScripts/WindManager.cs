@@ -164,6 +164,12 @@ public class WindManager : NetworkBehaviour
         Debug.Log("SetInitialWindDirection: setting new wind direction of " + x.ToString() + "," + y.ToString());
         WindDirection = new Vector2(x, y);
     }
+    public void SetRandomWindPowerForChallenegeShot()
+    {
+        int newPower = UnityEngine.Random.Range(3, 6);
+        BaseWindPower = newPower;
+        WindPower = newPower;
+    }
     string GetWindSeverity()
     {
         float windSeverity = UnityEngine.Random.Range(0f, 1f);

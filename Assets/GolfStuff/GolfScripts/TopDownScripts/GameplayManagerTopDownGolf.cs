@@ -326,17 +326,20 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         CurrentHolePar = newPar;
         _parText.text = "Par " + CurrentHolePar.ToString();
     }
-    void OrderListOfPlayers(bool firstHoleAfterChallenge = false)
+    void OrderListOfPlayers()
     {
-        if (firstHoleAfterChallenge)
+
+        if (CurrentHoleIndex == 0)
         {
             GolfPlayersInTeeOffOrder.Clear();
-            GolfPlayersInTeeOffOrder.AddRange(GolfPlayers);
-        }
-        else if (CurrentHoleIndex == 0)
-        {
-            GolfPlayersInTeeOffOrder.Clear();
-            GolfPlayersInTeeOffOrder.AddRange(GolfPlayers);
+            if (_playerOrderFromChallenege.Count > 0)
+            {
+                GolfPlayersInTeeOffOrder.AddRange(_playerOrderFromChallenege);
+            }
+            else
+            {
+                GolfPlayersInTeeOffOrder.AddRange(GolfPlayers);
+            }
         }
         else
         {
@@ -364,6 +367,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     }
     void MovePlayerToTeeOffLocation(GolfPlayerTopDown player)
     {
+        Debug.Log("MovePlayerToTeeOffLocation: " + player.PlayerName);
         //player.transform.position = TeeOffPosition;
         //player.MyBall.transform.position = TeeOffPosition;
         //player.MyBall.ResetBallSpriteForNewHole();
@@ -374,6 +378,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [Server]
     void MoveAllPlayersNearTeeOffLocation()
     {
+        Debug.Log("MoveAllPlayersNearTeeOffLocation: ");
         foreach (GolfPlayerTopDown player in GolfPlayers)
         {
             //Vector3 offset = new Vector3(5f, UnityEngine.Random.Range(-5f, 5f), 0f);
@@ -1046,18 +1051,18 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //    GolfPlayers.Add(GolfPlayersServer[i]);
         //}
         RpcSetGolfPlayersLocally(GolfPlayers);
-
+        _playerOrderFromChallenege.Clear();
         // check for tee off challenge
-        //if (GolfPlayers.Count <= 1)
-        //{
-        //    StartFirstHole();
-        //}
-        //else
-        //{
-        //    StartTeeOffChallenge();
-        //}
+        if (GolfPlayers.Count <= 1)
+        {
+            StartFirstHole();
+        }
+        else
+        {
+            StartTeeOffChallenge();
+        }
 
-        StartTeeOffChallenge();
+        //StartTeeOffChallenge();
     }
     [Server]
     void StartFirstHole()
@@ -1091,10 +1096,19 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         // Server side stuff to set weather conditions?
         //// Set the Initial Wind for the hole
-        WindManager.instance.SetInitialWindForNewHole();
+
+        if (this.IsTeeOffChallenge)
+        {
+            WindManager.instance.SetRandomWindPowerForChallenegeShot();
+        }
+        else
+        {
+            WindManager.instance.SetInitialWindForNewHole();            
+        }
         WindManager.instance.SetInitialWindDirection();
         //// Set initial weather for the hole
         RainManager.instance.SetInitialWeatherForHole();
+
         ////_lightningManager.CheckIfLightningStartsThisTurn();
         //// Sort the players by lowest score to start the hole
         OrderListOfPlayers();
@@ -1102,9 +1116,16 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         SetCurrentPlayer(GolfPlayersInTeeOffOrder[0]);
         //// Move the first player to the tee off location
         MoveAllPlayersNearTeeOffLocation();
-        //MovePlayerToTeeOffLocation(CurrentPlayer);
+
         //// Diable sprite of players that are not the current player
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
+
+        // move the player and their ball if this is after the tee off challenege?
+        //if (_wasThereATeeOffChallenege)
+        //{
+        //    MovePlayerToTeeOffLocation(CurrentPlayer);
+        //    PromptPlayerForNextTurn();
+        //}
     }
 
     [ObserversRpc(ExcludeOwner = true)]
@@ -1329,7 +1350,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         _lightningManager.StopLightningForBrokenGoodWeatherStatue();
         WindManager.instance.PlayerBrokeGoodStatue();
     }
-
+    void ClearPlayerWeatherFavorForFirstHole()
+    {
+        foreach (GolfPlayerTopDown player in GolfPlayers)
+        {
+            player.ResetFavorWeatherForNewGame();
+        }
+    }
     #region Tee Off Challenge
     void StartTeeOffChallenge()
     {
@@ -1355,14 +1382,29 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     public async void NextPlayerForChallenege(GolfBallTopDown ball)
     {
         Debug.Log("NextPlayerForChallenege: from player: " + ball.MyPlayer.name + " and their distance to the hole: " + ball.MyPlayer.DistanceToHole.ToString());
-        //if (GolfPlayersInTeeOffOrder.Count <= 0)
-        //{
-        //    Debug.Log("NextPlayerForChallenege: All players have teed off. Will calculate who is furthest away from the hole beep boop.");
-        //    return;
-        //}
 
         // Prompt player about their distance to the hole
-        await ball.MyPlayer.ServerTellPlayerHowFarTheyAreFromHoleForChallenege(3, ball.MyPlayer.DistanceToHole);
+        //await ball.MyPlayer.ServerTellPlayerHowFarTheyAreFromHoleForChallenege(5, ball.MyPlayer.DistanceToHole);
+        await ball.MyPlayer.ServerSendMessagetoPlayer(5f, "DistanceFromHoleOnChallenege", ball.MyPlayer.DistanceToHole);
+
+        // check to see if there are any players remaining to take their challenege shot. If they have all taken their shot, then calculate player order and move on to the game...
+        if (GolfPlayersInTeeOffOrder.Count <= 0)
+        {
+            Debug.Log("NextPlayerForChallenege: All players have teed off. Will calculate who is furthest away from the hole beep boop.");
+            _playerOrderFromChallenege.AddRange(OrderPlayersFromTeeOffChallenge());
+            // Tell players who will hit first
+            await _playerOrderFromChallenege[0].ServerSendMessagetoPlayer(5f, "PlayerClosest");
+            //DebugOutPlayerOrder();
+            ClearPlayerWeatherFavorForFirstHole();
+            RewardTeeOffChallenegeWinnersWithFavor();
+            this.IsTeeOffChallenge = false;
+            SwitchToCourse();
+            return;
+        }
+
+        // remember to change weather for each player
+        WindManager.instance.SetInitialWindDirection();
+        WindManager.instance.SetRandomWindPowerForChallenegeShot();
 
         CurrentPlayer = SelectNextPlayer();
         SetCurrentPlayer(CurrentPlayer);
@@ -1370,6 +1412,40 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
         SetCameraOnPlayer(CurrentPlayer);
         PromptPlayerForNextTurn();
+    }
+    List <GolfPlayerTopDown> OrderPlayersFromTeeOffChallenge()
+    {
+        return GolfPlayers.OrderBy(x => x.DistanceToHole).ThenBy(x => x.FavorWeather).ToList();
+    }
+    void DebugOutPlayerOrder()
+    {
+        for (int i = 0; i < _playerOrderFromChallenege.Count; i++)
+        {
+            Debug.Log("DebugOutPlayerOrder: Player " + _playerOrderFromChallenege[i].PlayerName + " in order: " + i.ToString() + " had a distance from hole of: " + _playerOrderFromChallenege[i].DistanceToHole.ToString());
+        }
+    }
+    void RewardTeeOffChallenegeWinnersWithFavor()
+    {
+        float closestDistance = _playerOrderFromChallenege[0].DistanceToHole;
+        for (int i = 0; i < _playerOrderFromChallenege.Count; i++)
+        {
+            if (i == 0)
+            {
+                _playerOrderFromChallenege[i].RewardPlayerForWinningChallenege();
+                continue;
+            }
+
+            if(_playerOrderFromChallenege[i].DistanceToHole <= closestDistance)
+                _playerOrderFromChallenege[i].RewardPlayerForWinningChallenege();
+        }
+
+    }
+    void SwitchToCourse()
+    {
+        CurrentCourse = CourseToPlay;
+        CurrentHoleIndex = -1;
+        WindManager.instance.SetInitialWindForNewHole();
+        NextHole();
     }
     #endregion
 }

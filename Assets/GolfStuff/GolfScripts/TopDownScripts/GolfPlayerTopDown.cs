@@ -193,6 +193,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     bool _tellPlayerHoleEnded = false;
     bool _tellPlayerGameIsOver = false;
     bool _tellPlayerHowFarTheyAreFromHoleForChallenege = false;
+    bool _messageSentToPlayer = false;
 
     [Header("Sound References")]
     [SerializeField] ScriptableBallSounds _ballSounds;
@@ -2503,6 +2504,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
         return newFavor;
     }
+    [Server]
+    public void ResetFavorWeatherForNewGame()
+    {
+        this.FavorWeather = 0;
+    }
     void SyncFavorWeather(int prev, int next, bool asServer)
     {
         if (asServer)
@@ -2855,7 +2861,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void CmdPerfectPowerSubmission()
     {
         Debug.Log("CmdPerfectPowerSubmission: Perfect power submission from player: " + this.PlayerName);
-        this.FavorWeather += 1;
+        this.FavorWeather = CapWeatherFavor(FavorWeather + 1);
         this.RpcPerfectPowerSubmission();
     }
     [ObserversRpc(ExcludeOwner = true)]
@@ -2869,7 +2875,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         CmdPerfectAccuracySubmission();
         SoundManager.instance.PlaySound("player-perfect-accuracy-submission", 1f);
-        _perfectPowerSubmission = true;
+        _perfectAccuracySubmission = true;
 
         if (_perfectPowerSubmission)
             StartCoroutine(BothSubmissionPerfect());
@@ -2878,7 +2884,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void CmdPerfectAccuracySubmission()
     {
         Debug.Log("CmdPerfectAccuracySubmission: Perfect Accuracy submission from player: " + this.PlayerName);
-        this.FavorWeather += 1;
+        this.FavorWeather = CapWeatherFavor(FavorWeather + 1);
         this.RpcPerfectAccuracySubmission();
     }
     [ObserversRpc(ExcludeOwner = true)]
@@ -2971,6 +2977,89 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     [ObserversRpc(ExcludeOwner = true)]
     void RpcTellPlayerHowFarTheyAreFromHoleForChallenegeCompleted()
+    {
+        this.EnablePlayerCanvas(false);
+    }
+    [Server]
+    public void RewardPlayerForWinningChallenege()
+    {
+        this.FavorWeather = CapWeatherFavor(1);
+    }
+    #endregion
+    #region Server Messages To Players
+    [Server]
+    public async Task ServerSendMessagetoPlayer(float duration, string messageType, float distance = 0f)
+    {
+        _messageSentToPlayer = true;
+        float end = Time.time + (duration * 2);
+
+        RpcSelectMessageToSend(this.Owner, duration, messageType, distance);
+
+        Debug.Log("ServerTellPlayerHowFarTheyAreFromHoleForChallenege: Start time is: " + Time.time.ToString());
+        while (_messageSentToPlayer)
+        {
+            //Debug.Log("ServerTellPlayerGroundTheyLandedOn: Task.Yield time is: " + Time.time.ToString());
+            await Task.Yield();
+            if (Time.time >= end)
+                _messageSentToPlayer = false;
+        }
+        Debug.Log("ServerSendMessagetoPlayer: End time is: " + Time.time.ToString());
+    }
+    [TargetRpc]
+    void RpcSelectMessageToSend(NetworkConnection conn, float duration, string messageType, float distance = 0f)
+    {
+        StartTellPlayerMessageFromServer(duration, messageType, distance);
+    }
+    async void StartTellPlayerMessageFromServer(float duration, string messageType, float distance = 0f)
+    {
+        float end = Time.time + duration;
+
+        // select message function to call based on message type
+        switch (messageType)
+        {
+            default:
+            case "PlayerClosest":
+                TellPlayerWhoWasClosestOnChallenege();
+                break;
+            case "DistanceFromHoleOnChallenege":
+                TellPlayerHowFarTheyWereFromHole(distance);
+                break;
+        }
+
+        while (Time.time < end)
+        {
+            await Task.Yield();
+        }
+        this.EnablePlayerCanvas(false);
+        CmdServerSendMessagetoPlayerCompleted();
+    }
+    void TellPlayerWhoWasClosestOnChallenege()
+    {
+        this.PlayerUIMessage("PlayerClosest");
+        this.EnablePlayerCanvas(true);
+    }
+    void TellPlayerHowFarTheyWereFromHole(float distance)
+    {
+        if (MyBall.IsInHole || MyBall.LocalIsInHole)
+        {
+            Debug.Log("TellPlayerHowFarTheyWereFromHole: on game player: " + this.PlayerName + " ball is in hole!");
+            this.PlayerUIMessage("challenege:hole");
+            this.EnablePlayerCanvas(true);
+        }
+        else
+        {
+            this.PlayerUIMessage("challenege:" + distance.ToString("0.00"));
+            this.EnablePlayerCanvas(true);
+        }
+    }
+    [ServerRpc]
+    void CmdServerSendMessagetoPlayerCompleted()
+    {
+        _messageSentToPlayer = false;
+        RpcServerSendMessagetoPlayerCompleted();
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcServerSendMessagetoPlayerCompleted()
     {
         this.EnablePlayerCanvas(false);
     }
