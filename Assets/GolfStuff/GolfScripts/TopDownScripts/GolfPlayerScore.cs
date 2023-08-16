@@ -43,6 +43,8 @@ public class GolfPlayerScore : NetworkBehaviour
     [ServerRpc]
     void CmdPlayerHitBall()
     {
+        if (GameplayManagerTopDownGolf.instance.IsTeeOffChallenge)
+            return;
         StrokesForCurrentHole++;
         TotalStrokesForCourse++;
     }
@@ -57,6 +59,8 @@ public class GolfPlayerScore : NetworkBehaviour
     [ServerRpc]
     void CmdStrokePenalty(int penalty)
     {
+        if (GameplayManagerTopDownGolf.instance.IsTeeOffChallenge)
+            return;
         StrokesForCurrentHole += penalty;
         TotalStrokesForCourse += penalty;
     }

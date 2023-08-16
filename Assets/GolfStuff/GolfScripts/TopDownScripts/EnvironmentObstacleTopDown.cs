@@ -36,6 +36,9 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     [SerializeField] bool _twoColliders = false;
     [SerializeField] bool _crateCollider = false;
 
+    [Header("Spining Hoop Stuff")]
+    [SerializeField] bool _isSpinningHoop = false;
+
     [Header("Spawn Protection")]
     bool _spawnProtection = true;
 

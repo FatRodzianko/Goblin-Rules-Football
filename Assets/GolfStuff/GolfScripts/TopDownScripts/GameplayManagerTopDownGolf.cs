@@ -1396,6 +1396,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             await _playerOrderFromChallenege[0].ServerSendMessagetoPlayer(5f, "PlayerClosest");
             //DebugOutPlayerOrder();
             ClearPlayerWeatherFavorForFirstHole();
+            ResetPlayerScoresForNewHole();
             RewardTeeOffChallenegeWinnersWithFavor();
             this.IsTeeOffChallenge = false;
             SwitchToCourse();

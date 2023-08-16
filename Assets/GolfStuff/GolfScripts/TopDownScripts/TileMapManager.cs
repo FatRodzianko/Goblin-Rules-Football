@@ -10,6 +10,7 @@ using UnityEditor;
 using System;
 using Cinemachine;
 using System.Threading.Tasks;
+using System.IO;
 
 public class TileMapManager : MonoBehaviour
 {
@@ -110,6 +111,18 @@ public class TileMapManager : MonoBehaviour
         // Save the scriptable object to a file
 #if UNITY_EDITOR
         ScriptableObjectUtility.SaveHoleToFile(newHole);
+        //try
+        //{
+        //    string json = JsonUtility.ToJson(newHole);
+        //    string path = $"Assets/Resources/Holes/{newHole.name}.json";
+        //    StreamWriter writer = new StreamWriter(path, true);
+        //    writer.Write(json);
+        //    writer.Close();
+        //}
+        //catch (Exception e)
+        //{
+        //    Debug.Log("SaveMap: could not save scriptable object as json. Error: " + e);
+        //}
 #endif
 
         // Local function to iterate through a tilemap, check if a tile exists at a location, and then save that tile's info + location
