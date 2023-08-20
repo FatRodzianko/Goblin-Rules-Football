@@ -2763,7 +2763,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         StartCoroutine(DelayForUsedMulligan(5));
         PowerUpManagerTopDownGolf.instance.PlayerIsUsingPowerUp(this.ObjectId);
-        this.PlayerScore.RemoveStrokeForMulligan();
+        this.PlayerScore.RemoveStroke();
         
         if (this.HasPlayerTeedOff && this.PlayerScore.StrokesForCurrentHole == 0)
         {
@@ -2912,6 +2912,18 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         _perfectPowerSubmission = false;
         _perfectAccuracySubmission = false;
+    }
+    public void BallThroughHoop()
+    {
+        if (!this.IsOwner)
+            return;
+
+        CmdBallThroughHoop();
+    }
+    [ServerRpc]
+    void CmdBallThroughHoop()
+    {
+        this.PlayerScore.RemoveStroke();
     }
     #region Tee Off Challenge
     [Server]

@@ -35912,6 +35912,10 @@ MonoBehaviour:
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 227.7, y: 5.3, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 236.82, y: -47.36, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: ffe9e1047a6c73c43a711b78583be9e3, type: 2}
+  - ObstaclePos: {x: 259.82, y: -78.36, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: ffe9e1047a6c73c43a711b78583be9e3, type: 2}
   CameraBoundingBoxPos: {x: 0, y: 0, z: 0}
   PolygonPoints:
   - {x: -18, y: 28}
@@ -35988,3 +35992,5 @@ MonoBehaviour:
   - BalloonPosition: {x: 241.5, y: -33.5, z: 0}
     BalloonHeight: med
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  IsTeeOffChallenge: 0
+  ClubToUse: 

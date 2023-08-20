@@ -38,6 +38,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
 
     [Header("Spining Hoop Stuff")]
     [SerializeField] bool _isSpinningHoop = false;
+    [SerializeField] SpinningHoop _spinningHoopScript;
 
     [Header("Spawn Protection")]
     bool _spawnProtection = true;
@@ -51,7 +52,9 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         if (_isStatue && !_myStatue)
             _myStatue = this.GetComponent<Statue>();
         if (_isBalloon && !_myBalloon)
-            _myBalloon = this.GetComponent<BalloonPowerUp>();
+            _myBalloon = this.transform.parent.GetComponent<BalloonPowerUp>();
+        if (_isSpinningHoop && !_spinningHoopScript)
+            _spinningHoopScript = this.transform.parent.GetComponent<SpinningHoop>();
     }
 
     // Update is called once per frame
@@ -97,6 +100,12 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             {
                 BalloonCollisionCheck(golfBallScript);
                 Debug.Log("EnvironmentObstacleTopDown: Done with balloon checks");
+                return;
+            }
+            if (_isSpinningHoop)
+            {
+                SpinningHoopCollision(golfBallScript);
+                Debug.Log("EnvironmentObstacleTopDown: Done with spinning hoop checks");
                 return;
             }
 
@@ -172,11 +181,20 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             return;
         if (_isBalloon)
             return;
+        
         if (collision.tag == "golfBall")
         {
             GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
             if (!golfBallScript.IsOwner || golfBallScript.IsInHole || golfBallScript.isRolling || golfBallScript.isHit || golfBallScript.isBouncing)
                 return;
+
+            if (_isSpinningHoop)
+            {
+                SpinningHoopCollision(golfBallScript);
+                Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: Done with spinning hoop checks");
+                return;
+            }
+
             Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: moving ball to prevent issues?");
 
             Vector2 closestExitPoint = this._myCollider.ClosestPoint(collision.transform.position);
@@ -228,6 +246,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
 
         return newModifier;
     }
+    #region Statue
     void StatueCollisionCheck(GolfBallTopDown golfBallScript)
     {
         Debug.Log("StatueCollisionCheck: Is statue broken: " + _myStatue.IsBroken);
@@ -277,6 +296,8 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         //Destroy(this.gameObject);
         this.transform.GetComponent<Statue>().BreakStatueAnimation();
     }
+    #endregion
+    #region Power Up Balloon
     void BalloonCollisionCheck(GolfBallTopDown golfBallScript)
     {
         if (_spawnProtection)
@@ -330,6 +351,34 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     {
         _isBalloon = false;
     }
+    #endregion
+    #region Spinning Hoop
+    void SpinningHoopCollision(GolfBallTopDown golfBallScript)
+    {
+        if (_spinningHoopScript.BallAlreadyWentThroughHoop)
+            return;
+
+        //if (_spinningHoopScript.TopHoopCollider.bounds.Contains(golfBallScript.MyBallObject.transform.position))
+        //{
+        //    Debug.Log("SpinningHoopCollision: Ball based through hoop!");
+        //    _spinningHoopScript.BallPassedThroughHoop(golfBallScript);
+        //}
+
+        RaycastHit2D[] obstaclesHit = Physics2D.CircleCastAll(golfBallScript.MyBallObject.transform.position, golfBallScript.MyColliderRadius, Vector2.zero, 0f);
+        if (obstaclesHit.Length <= 0)
+            return;
+        for (int i = 0; i < obstaclesHit.Length; i++)
+        {
+            if (obstaclesHit[i].collider == _spinningHoopScript.TopHoopCollider)
+            {
+                Debug.Log("SpinningHoopCollision: Ball based through hoop!");
+                _spinningHoopScript.BallPassedThroughHoop(golfBallScript);
+                break;
+            }
+        }
+
+    }
+    #endregion
     IEnumerator SpawnProtectionRoutine()
     {
         this._spawnProtection = true;

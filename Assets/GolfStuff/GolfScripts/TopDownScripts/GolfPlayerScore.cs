@@ -11,6 +11,11 @@ public class GolfPlayerScore : NetworkBehaviour
     [SyncVar(OnChange = nameof(SyncTotalStrokesForCourse))] public int TotalStrokesForCourse = 0;
     public Dictionary<int, int> LocalHoleWithScores = new Dictionary<int, int>();
     [SyncObject] public readonly SyncDictionary<int, int> ServerHoleWithScores = new SyncDictionary<int,int>();
+
+    [SerializeField] float _timeLastStrokeRemoved = 0f;
+    float _timeLastHit = 0f;
+    float _timeLastPenalty = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -45,6 +50,12 @@ public class GolfPlayerScore : NetworkBehaviour
     {
         if (GameplayManagerTopDownGolf.instance.IsTeeOffChallenge)
             return;
+
+        if (Time.time < (_timeLastHit + 0.15f))
+            return;
+
+        _timeLastHit = Time.time;
+
         StrokesForCurrentHole++;
         TotalStrokesForCourse++;
     }
@@ -65,8 +76,13 @@ public class GolfPlayerScore : NetworkBehaviour
         TotalStrokesForCourse += penalty;
     }
     [Server]
-    public void RemoveStrokeForMulligan()
+    public void RemoveStroke()
     {
+        if (Time.time < (_timeLastStrokeRemoved + 0.15f))
+            return;
+
+        _timeLastStrokeRemoved = Time.time;
+
         StrokesForCurrentHole--;
         TotalStrokesForCourse--;
     }

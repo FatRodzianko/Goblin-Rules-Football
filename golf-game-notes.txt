@@ -272,17 +272,17 @@ x the sprite collision stuff for statues and power ups so the ball isn't always 
 - use the input system instead of the ad-hoc, hardcoded inputs detected in update
 - - - make input schemes/maps/whatever they're called for each "phase" - aiming/chosing club and all that, the hit meter, and so on
 - tee off challenge to see who hits first?
-- - - hole 75~ feet away
-- - - random wind and direction , between say 3 - 12 mph
-- - - always clear weather and no lightning/tornadoes
-- - - display to player their distance
-- - - make a new scriptable hole for "tee off challenge" or whatever
-- - - - - - gameplay manager will just load it before the first real hole of the course
+- - x hole 75~ feet away
+- - x random wind and direction , between say 3 - 12 mph
+- - x always clear weather and no lightning/tornadoes
+- - x display to player their distance
+- - x make a new scriptable hole for "tee off challenge" or whatever
+- - - - - x gameplay manager will just load it before the first real hole of the course
 - - - gameplay manager will have a "game state" or similar value
 - - - - - - right now it will just be "tee off challenge" and "course-holes" or something
-- - - - - - the "SetNextPlayer" super function can just have a check for that bool and send the next turn logic to a new function just for that
+- - - - - x the "SetNextPlayer" super function can just have a check for that bool and send the next turn logic to a new function just for that
 - - - - - - - - - this is just to make it so all the stuff feeding into SetNextPlayer can be re-used?
-- - - maybe make it so whoever wins starts with +1 favor? (or ties for the win?)
+- - x maybe make it so whoever wins starts with +1 favor? (or ties for the win?)
 - - - make at least two different "challenges." One is the tee off challenge, the other is a putting challenge? The putting one having a lot of weid direction tile changes, and maybe things to bounce off of? like mini golf...
 - - - consolidate some of "NextHole"'s and "StartFirstHole"'s function calls to be in one function that they both call. Don't need them to call same functions from different areas, and the "start tee off challenge" function will need to call them too?
 - integrate into GRF? Convert GRF to fishnet, or convert golf to mirror? Or leave separate
@@ -297,6 +297,8 @@ x the sprite collision stuff for statues and power ups so the ball isn't always 
 - - - - - - logic in scriptable objects to support state machines? https://www.youtube.com/watch?v=iOYo7flBUW4
 - - - https://www.youtube.com/watch?v=zGEtN4nXIYQ (dapper dino)
 - - - https://www.youtube.com/watch?v=4Lom_lqSGoY
+- - - https://www.youtube.com/watch?v=5PTd0WdKB-4
+- - - https://www.youtube.com/watch?v=4k16sSm4tZA (inheritance and interfaces)
 - - - environment obstacles may be a good target for this. Different types of obstacles: trees, statues, holes, etc. Each should have different functionality that a base class passes to? for how to respond to collisions
 - - - - - - and some obstacles, like statues, change the "type" of obstacle they are when they are broken, making this state machine with interfaces and stuff make sense for them?
 - spinning hoop targets

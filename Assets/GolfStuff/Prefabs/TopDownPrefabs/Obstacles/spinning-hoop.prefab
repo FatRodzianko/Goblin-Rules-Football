@@ -1,5 +1,53 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5224607204645973876
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2223117984331548150}
+  - component: {fileID: 4150740436815725036}
+  m_Layer: 0
+  m_Name: TopHoopCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2223117984331548150
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5224607204645973876}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8740297031622800172}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &4150740436815725036
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5224607204645973876}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 4.6875}
+  serializedVersion: 2
+  m_Radius: 1.34375
 --- !u!1 &5684346978448280173
 GameObject:
   m_ObjectHideFlags: 0
@@ -32,7 +80,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8740297031622800172}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7678143234466672803
 MonoBehaviour:
@@ -137,7 +185,7 @@ SpriteMask:
   m_BackSortingOrder: 0
   m_IsCustomRangeActive: 0
   m_SpriteSortPoint: 1
---- !u!1 &6844371342312251121
+--- !u!1 &5818372812819828115
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -145,38 +193,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 143984217782110544}
-  - component: {fileID: 3194926278010499392}
-  - component: {fileID: 6164555849018106130}
+  - component: {fileID: 1958902411693352493}
+  - component: {fileID: 451874104324413311}
+  - component: {fileID: 6776719878151890262}
   m_Layer: 27
-  m_Name: HoopCollider
+  m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &143984217782110544
+--- !u!4 &1958902411693352493
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6844371342312251121}
+  m_GameObject: {fileID: 5818372812819828115}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8740297031622800172}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!58 &3194926278010499392
+--- !u!58 &451874104324413311
 CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6844371342312251121}
+  m_GameObject: {fileID: 5818372812819828115}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -186,13 +234,13 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0.0625}
   serializedVersion: 2
   m_Radius: 1.34375
---- !u!114 &6164555849018106130
+--- !u!114 &6776719878151890262
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6844371342312251121}
+  m_GameObject: {fileID: 5818372812819828115}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d5b10ad901f7fb4d992bb6c969ea6e3, type: 3}
@@ -204,7 +252,7 @@ MonoBehaviour:
   SoftBounce: 0
   _minHeightForSoftBounce: 0
   StartHeight: 3.5
-  _myCollider: {fileID: 3194926278010499392}
+  _myCollider: {fileID: 451874104324413311}
   _bounceModifier: 1
   _gradualBounceModifier: 0
   _immediateBounceModifier: 0
@@ -221,6 +269,7 @@ MonoBehaviour:
   _twoColliders: 0
   _crateCollider: 0
   _isSpinningHoop: 1
+  _spinningHoopScript: {fileID: 6847695503802684275}
 --- !u!1 &8740297031622800146
 GameObject:
   m_ObjectHideFlags: 0
@@ -233,6 +282,8 @@ GameObject:
   - component: {fileID: 8740297031622800173}
   - component: {fileID: 6847695503802684275}
   - component: {fileID: 3850670013208606673}
+  - component: {fileID: 2193832166866638059}
+  - component: {fileID: 6044926403558421651}
   m_Layer: 27
   m_Name: spinning-hoop
   m_TagString: GolfEnvironmentObstacle
@@ -252,9 +303,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7159196974389548205}
-  - {fileID: 143984217782110544}
   - {fileID: 8316334629889876562}
+  - {fileID: 2223117984331548150}
+  - {fileID: 1958902411693352493}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -322,6 +373,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cac33629fa066c547b661342e77b7eab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TopHoopCollider: {fileID: 4150740436815725036}
+  _inBaseCollider: 0
+  _inTopCollider: 0
+  BallAlreadyWentThroughHoop: 0
+  _mySpriteRenderer: {fileID: 8740297031622800173}
+  _mySpriteMask: {fileID: 1918126948279682121}
+  _myAnimator: {fileID: 3850670013208606673}
 --- !u!95 &3850670013208606673
 Animator:
   serializedVersion: 4
@@ -342,46 +400,13 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!1 &9054512722768257349
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7159196974389548205}
-  - component: {fileID: 3506487462439696868}
-  - component: {fileID: 8201968222292546172}
-  m_Layer: 27
-  m_Name: PoleCollider
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7159196974389548205
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9054512722768257349}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8740297031622800172}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!58 &3506487462439696868
+--- !u!58 &2193832166866638059
 CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9054512722768257349}
+  m_GameObject: {fileID: 8740297031622800146}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -391,13 +416,13 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0.0625}
   serializedVersion: 2
   m_Radius: 0.25
---- !u!114 &8201968222292546172
+--- !u!114 &6044926403558421651
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9054512722768257349}
+  m_GameObject: {fileID: 8740297031622800146}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d5b10ad901f7fb4d992bb6c969ea6e3, type: 3}
@@ -409,7 +434,7 @@ MonoBehaviour:
   SoftBounce: 0
   _minHeightForSoftBounce: 0
   StartHeight: 0
-  _myCollider: {fileID: 3506487462439696868}
+  _myCollider: {fileID: 2193832166866638059}
   _bounceModifier: 1
   _gradualBounceModifier: 0
   _immediateBounceModifier: 0
@@ -426,3 +451,4 @@ MonoBehaviour:
   _twoColliders: 0
   _crateCollider: 0
   _isSpinningHoop: 0
+  _spinningHoopScript: {fileID: 6847695503802684275}
