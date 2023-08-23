@@ -17,7 +17,7 @@ public class TubeScript : MonoBehaviour
     [SerializeField] Vector2 _ballMovementDirection = Vector2.zero;
     [SerializeField] float _ballDistanceToTravel = 0f;
     [SerializeField] float _timeSinceMovementStarted = 0f;
-    [SerializeField] float _maxTravelTime = 3.0f;
+    [SerializeField] float _maxTravelTime = 4.5f;
     float _movePercentage = 0f;
     float _distanceTraveled = 0f;
 
@@ -53,6 +53,8 @@ public class TubeScript : MonoBehaviour
     {
         if (!CompanionTube)
             return;
+        if (_moveBall)
+            return;
         Debug.Log("BallLandedInTubeHole: will send ball to companion tube at: " + CompanionTube.transform.position.ToString() + " and ball's current position is: " + golfBallScript.transform.position) ;
 
         if (!golfBallScript.IsOwner)
@@ -75,14 +77,20 @@ public class TubeScript : MonoBehaviour
         Debug.Log("BallLandedInTubeHole: Starting point: " + _ballStartingPoint.ToString() + " destination pont: " + _ballDestination.ToString() + " direction: " + _ballMovementDirection.ToString() + " distance to travel: " + _ballDistanceToTravel);
         //Debug.Break();
         _timeSinceMovementStarted = 0f;
+        //_moveBall = true;
+        StartCoroutine(DelayBeforeMoveBall());
+    }
+    IEnumerator DelayBeforeMoveBall()
+    {
+        yield return new WaitForSeconds(1f);
         _moveBall = true;
     }
     void BallDoneMoving()
     {
         _moveBall = false;
         _ballToMove.transform.position = _ballDestination;
-        Debug.Break();
         // launch ball out of the tube?
+        _ballToMove.MyPlayer.LaunchBallOutOfTube(this.IsPrimaryTube);
     }
 
 }

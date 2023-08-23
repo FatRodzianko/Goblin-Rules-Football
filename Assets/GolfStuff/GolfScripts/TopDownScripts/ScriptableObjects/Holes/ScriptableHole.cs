@@ -39,6 +39,7 @@ public class ScriptableHole : ScriptableObject
     //public Vector3[] GoodStatuePositions;
     public List<SavedStatue> Statues;
     public List<SavedBalloonPowerUp> BalloonPowerUps;
+    public List<SavedTube> Tubes;
 
     [Header("Tee Off Challenge Stuff")]
     public bool IsTeeOffChallenge = false;
@@ -70,4 +71,11 @@ public class SavedBalloonPowerUp
     public Vector3 BalloonPosition;
     public string BalloonHeight;
     public ScriptableObstacle BalloonScriptableObstacle;
+}
+[Serializable]
+public class SavedTube
+{
+    public Vector3 TubePosition;
+    public bool IsPrimaryTube;
+    public ScriptableObstacle TubeScriptableObstacle;
 }

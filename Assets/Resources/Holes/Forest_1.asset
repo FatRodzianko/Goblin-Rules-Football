@@ -35992,5 +35992,12 @@ MonoBehaviour:
   - BalloonPosition: {x: 241.5, y: -33.5, z: 0}
     BalloonHeight: med
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  Tubes:
+  - TubePosition: {x: 36.5, y: -31.5, z: 0}
+    IsPrimaryTube: 1
+    TubeScriptableObstacle: {fileID: 11400000, guid: c609b74f5b25db04abf8f7bc30c3db9e, type: 2}
+  - TubePosition: {x: 351.5, y: 15.5, z: 0}
+    IsPrimaryTube: 0
+    TubeScriptableObstacle: {fileID: 11400000, guid: c609b74f5b25db04abf8f7bc30c3db9e, type: 2}
   IsTeeOffChallenge: 0
   ClubToUse: 

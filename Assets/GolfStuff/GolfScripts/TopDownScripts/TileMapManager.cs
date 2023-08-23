@@ -107,6 +107,7 @@ public class TileMapManager : MonoBehaviour
         // Save the statues for the hole
         newHole.Statues = SaveAllStatues(GameObject.FindGameObjectsWithTag("Statue")).ToList();
         newHole.BalloonPowerUps = SaveAllBalloonPowerUps(GameObject.FindGameObjectsWithTag("BalloonPowerUp")).ToList();
+        newHole.Tubes = SaveAllTubes(GameObject.FindGameObjectsWithTag("TubeGolf")).ToList();
 
         // Save the scriptable object to a file
 #if UNITY_EDITOR
@@ -204,6 +205,40 @@ public class TileMapManager : MonoBehaviour
                 };
             }
         }
+        IEnumerable<SavedTube> SaveAllTubes(GameObject[] tubesToSave)
+        {
+            if (tubesToSave.Length != 2)
+            {
+                Debug.Log("SaveAllTubes: There needs to be 2 tubes to save. " + tubesToSave.Length.ToString());
+                yield break;
+            }
+            bool primarySet = false;
+            for (int i = 0; i < tubesToSave.Length; i++)
+            {
+                if (tubesToSave[i].GetComponent<TubeScript>().IsPrimaryTube)
+                {
+                    primarySet = true;
+                    break;
+                }
+            }
+            if (!primarySet)
+            {
+                Debug.Log("SaveAllTubes: No primary tube set. Cancling the saving of tubes...");
+                yield break;
+            }
+            for (int i = 0; i < tubesToSave.Length; i++)
+            {
+                if (tubesToSave[i].GetComponent<TubeScript>() == null)
+                    continue;
+
+                yield return new SavedTube()
+                {
+                    TubePosition = tubesToSave[i].transform.position,
+                    IsPrimaryTube = tubesToSave[i].GetComponent<TubeScript>().IsPrimaryTube,
+                    TubeScriptableObstacle = tubesToSave[i].GetComponent<EnvironmentObstacleTopDown>().myScriptableObject
+                };
+            }
+        }
     }
     public void ClearMapFromEditor()
     {
@@ -288,6 +323,15 @@ public class TileMapManager : MonoBehaviour
         {
             Debug.Log("ClearMap: Could not find/delete objects. Error: " + e);
         }
+        try
+        {
+            GameObject[] tubes = GameObject.FindGameObjectsWithTag("TubeGolf");
+            DeleteObjects(tubes);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("ClearMap: Could not find/delete tube objects. Error: " + e);
+        }
         // Delete Statue objects, but only from the editor. In game, the server will destroy the statue objects as they are all networked objects, and need to be networked objects to sync the animations and do other networkbehavior stuff
 #if UNITY_EDITOR
         try
@@ -371,8 +415,18 @@ public class TileMapManager : MonoBehaviour
         // Spawn the holes
         foreach (Vector3 pos in hole.HolePositions)
         {
-            Instantiate(_holePrefab, pos, Quaternion.identity);
+            
+            GameObject newHole = Instantiate(_holePrefab, pos, Quaternion.identity);
             // LATER save these positions to the GameManager for the hole?
+            try
+            {
+                GameplayManagerTopDownGolf.instance.HoleHoleObjects.Add(newHole);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("LoadMap: could not add hole objects to gameplaymanager. Error: " + e);
+            }
+            
         }
         // Spawn the tee markers
         foreach (Vector3 pos in hole.TeeMarkerPositions)
@@ -394,6 +448,8 @@ public class TileMapManager : MonoBehaviour
         {
             Instantiate(savedObstacle.ObstacleScriptableObject.ObstaclePrefab, savedObstacle.ObstaclePos, Quaternion.identity, _environmentObstacleHolderObject.transform);
         }
+        // Spawn the tube objects and make sure to set their companion tube values and the IsPrimary value
+        SpawnTubeObjects(hole.Tubes);
         // Spawn the camera bounding box and add it to the camera
         GameObject boundingBox = Instantiate(_cameraBoundingBox, hole.CameraBoundingBoxPos, Quaternion.identity);
         PolygonCollider2D polygonCollider = boundingBox.GetComponent<PolygonCollider2D>();
@@ -413,6 +469,32 @@ public class TileMapManager : MonoBehaviour
         //GameplayManagerTopDownGolf.instance.UpdateParForNewHole(hole.HolePar);
         Debug.Log("LoadMap: end time: " + Time.time.ToString());
 
+    }
+    void SpawnTubeObjects(List<SavedTube> tubes)
+    {
+        if (tubes.Count != 2)
+            return;
+
+        TubeScript tube1 = null;
+        TubeScript tube2 = null;
+        for (int i = 0; i < tubes.Count; i++)
+        {
+            GameObject newTube = Instantiate(tubes[i].TubeScriptableObstacle.ObstaclePrefab, tubes[i].TubePosition, Quaternion.identity);
+            TubeScript newTubeScript = newTube.GetComponent<TubeScript>();
+            newTubeScript.IsPrimaryTube = tubes[i].IsPrimaryTube;
+
+            if (i == 0)
+            {
+                tube1 = newTubeScript;
+            }
+            else
+            { 
+                tube2 = newTubeScript;
+            }
+        }
+
+        tube1.CompanionTube = tube2;
+        tube2.CompanionTube = tube1;
     }
     public async Task LoadMapAsTask(ScriptableHole hole)
     {

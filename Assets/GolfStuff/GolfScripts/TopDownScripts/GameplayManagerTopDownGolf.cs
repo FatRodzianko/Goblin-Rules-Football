@@ -31,6 +31,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     public string CurrentHoleName;
     public int CurrentHolePar;
     public List<Vector3> HolePositions;
+    public List<GameObject> HoleHoleObjects = new List<GameObject>();
     public Vector3 TeeOffAimPoint;
     [SerializeField] float _lastNewHoleTime = 0f;
     public int CurrentTurnNumber = 0;
@@ -240,6 +241,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         _holeInfoCanvas.gameObject.SetActive(false);
         _loadingHoleCanvas.gameObject.SetActive(true);
         //await _tileMapManager.LoadMapAsTask(CurrentHoleInCourse);
+        HoleHoleObjects.Clear();
         await _tileMapManager.LoadMapAsTask(CurrentCourse.HolesInCourse[index]);
         Debug.Log("GameplayManagertopDownGolf: LoadNewHole: Task to load hole at index: " + index.ToString() + " completed. Time: " + Time.time);
         _loadingHoleCanvas.gameObject.SetActive(false);

@@ -114,8 +114,8 @@ public class WindManager : NetworkBehaviour
     {
         Debug.Log("BasePowerChangedFunction: " + power.ToString());
         // if the power drops to 0, destroy and tornado objects
-        if (power <= 0f && this.IsServer)
-            DestroyTornadoObjects();
+        //if (power <= 0f && this.IsServer)
+        //    DestroyTornadoObjects();
     }
     void TornadoChangedFunction(bool tornado)
     {
@@ -345,7 +345,7 @@ public class WindManager : NetworkBehaviour
         // If the weather is clear, destroy any tornado objects 
         if (newRainState == "clear" && this.IsServer)
         {
-            DestroyTornadoObjects();
+            //DestroyTornadoObjects();
         }
     }
     [Server]
@@ -562,23 +562,31 @@ public class WindManager : NetworkBehaviour
 
         if (this.BaseWindPower <= 0f || RainManager.instance.BaseRainState == "clear")
         {
-            DestroyTornadoObjects();
-            return;
+            //DestroyTornadoObjects();
+            //return;
         }
 
         
 
         TornadoScript.MoveTornadoForNewTurn();
 
-        while (this.BaseWindPower > 0 && RainManager.instance.BaseRainState != "clear" && (TornadoScript.IsMoving || TornadoScript.HitBall))
+        //while (this.BaseWindPower > 0 && RainManager.instance.BaseRainState != "clear" && (TornadoScript.IsMoving || TornadoScript.HitBall))
+        while (TornadoScript.IsMoving || TornadoScript.HitBall)
         {
             await Task.Yield();
+        }
+        if (TornadoScript.ReturnPlayerTarget().MyBall.IsInHole)
+        {
+            Debug.Log("MoveTornadoTask: Tornado tagert is in the hole");
+            DestroyTornadoObjects();
+            return;
         }
         if (TornadoScript.HitPlayerTarget)
         {
             Debug.Log("MoveTornadoTask: Tornado hit their target last turn. Destroying the tornado");
             DestroyTornadoObjects();
         }
+        
     }
     GolfPlayerTopDown GetFurthestPlayer()
     {

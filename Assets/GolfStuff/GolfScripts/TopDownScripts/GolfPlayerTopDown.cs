@@ -1872,7 +1872,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     GameObject FindClosestHole(Vector3 ballPos)
     {
         // Find the flag hole objects
-        GameObject[] flagHoles = GameObject.FindGameObjectsWithTag("golfHole");
+        //GameObject[] flagHoles = GameObject.FindGameObjectsWithTag("golfHole");
+        GameObject[] flagHoles = GameplayManagerTopDownGolf.instance.HoleHoleObjects.ToArray();
         GameObject closestHole = null;
         if (flagHoles.Length > 0)
         {
@@ -3074,6 +3075,27 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void RpcServerSendMessagetoPlayerCompleted()
     {
         this.EnablePlayerCanvas(false);
+    }
+    #endregion
+    #region Ball In Tube
+    public void LaunchBallOutOfTube(bool enteredPrimaryTube)
+    {
+        Vector3 ballPos = MyBall.transform.position;
+        GameObject nearestHole = FindClosestHole(ballPos);
+        Vector3 holePos = nearestHole.transform.position;
+        Vector2 dir = (holePos - ballPos).normalized;
+        float dist = 7.5f;
+
+        if (enteredPrimaryTube)
+        {
+            dist = Vector2.Distance(holePos, ballPos) * 0.5f;
+        }
+        else
+        {
+            dir = -dir;
+        }
+        
+        MyBall.LaunchBallOutOfTube(dist, dir);
     }
     #endregion
 }

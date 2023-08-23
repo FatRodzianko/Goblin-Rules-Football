@@ -84,7 +84,7 @@ public class BallSpriteCollision : MonoBehaviour
             if (spriteCollision.MySpriteMask.enabled && collision.transform.position.y <= _shadowObject.transform.position.y && spriteCollision.MySpriteRenderer.sortingOrder <= _spriteRenderer.sortingOrder)
             {
                 spriteCollision.MySpriteMask.enabled = false;
-                Debug.Log("BallSpriteCollision: Setting sprite mask to FALSE for: " + collision.gameObject.name);
+                Debug.Log("BallSpriteCollision: Setting sprite mask to FALSE for: " + collision.gameObject.name); 
             }
             if (_spriteRenderer.sortingOrder != _defaultOrderInLayer)
             {
@@ -101,6 +101,8 @@ public class BallSpriteCollision : MonoBehaviour
     void IncreaseSortingLayer(Collider2D collision)
     {
         if (_golfBallTopDown.isRolling)
+            return;
+        if (_golfBallTopDown.BallInTube)
             return;
         SpriteCollision spriteCollision = collision.GetComponent<SpriteCollision>();
         SpriteRenderer collisionRenderer = spriteCollision.MySpriteRenderer;
@@ -125,6 +127,7 @@ public class BallSpriteCollision : MonoBehaviour
                 //Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Ball Sprite should be BEHIND sprite collision. Setting sort order to sprite collision sort order of: " + collisionRenderer.sortingOrder.ToString());
                 //_spriteRenderer.sortingOrder = collisionRenderer.sortingOrder;
                 //Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Ball Sprite should be BEHIND sprite collision. Setting sprite mask to true for: " + collision.gameObject.name);
+                Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Setting sprite mask to TRUE for: " + collision.gameObject.name);
                 spriteCollision.MySpriteMask.enabled = true;
 
             }

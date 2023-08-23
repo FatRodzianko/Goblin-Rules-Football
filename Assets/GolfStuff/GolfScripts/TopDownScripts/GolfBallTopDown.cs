@@ -1978,6 +1978,7 @@ public class GolfBallTopDown : NetworkBehaviour
             return;
         EnableOrDisableBallSpriteRenderer(enable);
     }
+    #region Ball In Tube
     public void SetBallInTube(bool inTube)
     {
         this.BallInTube = inTube;
@@ -1995,6 +1996,18 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         SetBallInTube(inTube);
     }
+    public void LaunchBallOutOfTube(float dist, Vector2 direction)
+    {
+        EnableOrDisableBallSpriteRenderer(true);
+        HitBall(dist, 45f, 0f, direction, 0f, true, (this.transform.position.z * 2.5f));
+        StartCoroutine(BallInTubeCooldown());
+    }
+    IEnumerator BallInTubeCooldown()
+    {
+        yield return new WaitForSeconds(0.2f);
+        SetBallInTube(false);
+    }
+    #endregion
 }
 
 
