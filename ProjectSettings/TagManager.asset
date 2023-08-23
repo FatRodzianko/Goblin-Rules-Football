@@ -53,6 +53,7 @@ TagManager:
   - StatueRingRadius
   - Statue
   - BalloonPowerUp
+  - TubeGolf
   layers:
   - Default
   - TransparentFX

@@ -301,21 +301,36 @@ x the sprite collision stuff for statues and power ups so the ball isn't always 
 - - - https://www.youtube.com/watch?v=4k16sSm4tZA (inheritance and interfaces)
 - - - environment obstacles may be a good target for this. Different types of obstacles: trees, statues, holes, etc. Each should have different functionality that a base class passes to? for how to respond to collisions
 - - - - - - and some obstacles, like statues, change the "type" of obstacle they are when they are broken, making this state machine with interfaces and stuff make sense for them?
-- spinning hoop targets
-- - - if a player hits their ball through a hoop, they get -1 stroke (that's a good thing)
-- - - off the beaten path of the course so they have to hook their shots into it?
-- - - spinning to make it look more realistic to hit "through" from any angle
-- - - collision detector on the ground, as normal. When the ball's shadow hits that collider:
-- - - - - - check to see if the ball sprite collider is overlapping the spinning hoop collider. If yes, ball passed through hoop
-- - - - - - have to check constantly through OnTriggerStay? Or have a second check on the spritecollision: check if the shadow is in the in the base collider when the sprites collide? If so, do the -1 stroke thing
-- - - - - - - - will need to make sure it isn't done twice, though
-- - - - - - have base collider be a circle as well as the hoop sprite collider?
+x spinning hoop targets
+- - x if a player hits their ball through a hoop, they get -1 stroke (that's a good thing)
+- - x off the beaten path of the course so they have to hook their shots into it?
+- - x spinning to make it look more realistic to hit "through" from any angle
+- - x collision detector on the ground, as normal. When the ball's shadow hits that collider:
+- - - - - x check to see if the ball sprite collider is overlapping the spinning hoop collider. If yes, ball passed through hoop
+- - - - - x have to check constantly through OnTriggerStay? Or have a second check on the spritecollision: check if the shadow is in the in the base collider when the sprites collide? If so, do the -1 stroke thing
+- - - - - - - x will need to make sure it isn't done twice, though
+- - - - - x have base collider be a circle as well as the hoop sprite collider?
 - mario pipe/tunnel things
 - - - small pipes on the course. If a player hits their ball into it, they go through the tunnel and out the other side
 - - - end pipe will be near the hole. Plops the player near the hole
 - - - put the pipes in non-ideal locations. If a player misses it, they're kind of stuck?
 - - - multiple pipes per hole: make them color coded? or multiple entries and one exit?
 - - - should be somewhat of a challenge. The player has to "pong" the ball" in, and if they miss, they bounce off the rim?
+- - - tubes "A" and "B" that have to be paired
+- - - - - - tile map manager checks to make sure there are at least two tubes before saving. If not, don't save the tubes
+- - - - - - when the tubes are spawned:
+- - - - - - - - - spawn tube A, then tube B
+- - - - - - - - - make sure each tube has a reference to the other tube, it's "pair" that it sends the ball too
+- Rock power up
+- leave behind a small rock obstacle after you hit. Idea is to do it on putting green to block other players' shots
+- - - would need to make sure that it can't completely block a hole. collision check where it is placed?
+ - - - - - when it spawns, check distance to the nearest hole. If the distance is within a certain threshold to the hole move the object
+ - - - - - - - - - get direction from object to hole
+ - - - - - - - - - have a "minimum distance" from the hole value
+ - - - - - - - - - move the object in the opposite direction from it and the hole that will be at least the "minimum distance" away from the hole
+ - - - - - - - - - Find equation to find point given distance, direction, and starting point (the hole)? Shouldn't be that hard?
+ - - - - - - - - - make sure not to place the rock until after the players hit?
+ - - - - - - - - - also make sure that if the spawned object is "on top" of a ball, that ball gets moved?
 - Get rid of all the "CmdTellServerPlayerHoleEndedCompleted" functions and the "_tellPlayerHoleEnded" type variables. Only one message is ever sent to players at a time. Can reuse just one bool and and reuse functions that just send messages. Just one "message from server" function that then tells the player which task to actually start? Instead of all this bullshit where I have 4 different things that are functionally all the same 
 
 

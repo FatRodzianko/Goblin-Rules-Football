@@ -41,6 +41,7 @@ public class GolfBallTopDown : NetworkBehaviour
     public bool isHit = false;
     [SerializeField] [SyncVar(OnChange = nameof(SyncClientMovingBall))] bool _clientMovingBall = false;
     public bool PlayerUsingRocket = false;
+    public bool BallInTube = false;
 
     [Header("Hit Ball Info")]
     public Vector3[] hitBallPonts = new Vector3[3];
@@ -82,6 +83,7 @@ public class GolfBallTopDown : NetworkBehaviour
     [Header("Ball State")]
     public bool LocalIsInHole = false;
     [SyncVar(OnChange = nameof(SyncIsInHole))] public bool IsInHole = false;
+    public bool BouncedOffObstacle = false;
 
     [Header("Tornado")]
     public bool IsHitByTornado = false;
@@ -1346,7 +1348,7 @@ public class GolfBallTopDown : NetworkBehaviour
         this.HitBall(speedMetersPerSecond / 2, 50f, 0f, movementDirection, 0f);
     }
     //public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector3 collisionPoint, Vector3 centerOfObstacle, Vector3 extentOfObstacle)
-    public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector2 collisionPoint, Vector2 ballPos, bool softBounce = false, float bounceModifier = 1.0f, string bounceSoundType = null)
+    public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector2 collisionPoint, Vector2 ballPos, bool softBounce = false, float bounceModifier = 1.0f, string bounceSoundType = null, bool bounceOffTop = false)
     {
         //if (ballUnityUnits < obstalceUnityUnits)
         if (DoesBallHitObject(obstalceUnityUnits, ballUnityUnits))
@@ -1369,6 +1371,8 @@ public class GolfBallTopDown : NetworkBehaviour
                 }
                 BounceOffTheObstacle(softBounce, bounceModifier);
             }
+            this.BouncedOffObstacle = true;
+            StartCoroutine(BouncedOffObstacleCoolDown());
             if (!string.IsNullOrEmpty(bounceSoundType) && this.IsOwner)
             {
                 SoundManager.instance.PlaySound(bounceSoundType, 1.0f);
@@ -1452,7 +1456,7 @@ public class GolfBallTopDown : NetworkBehaviour
         }
         return doesBallHitObject;
     }
-    void BounceOffTheObstacle(bool softBounce, float bounceModifier = 1.0f)
+    void BounceOffTheObstacle(bool softBounce, float bounceModifier = 1.0f, bool bounceOffTop = false)
     {
         if (hitBallCount < 0.5f)
         {
@@ -1471,6 +1475,13 @@ public class GolfBallTopDown : NetworkBehaviour
         float midPointHeight = GetObstacleBounceHeight(currentHeight, hitBallCount, bounceModifier);
         //float obstacleBounceDistance = GetObstacleBounceDistance(launchDistance, hitBallCount, softBounceModifier);
         float obstacleBounceDistance = GetObstacleBounceDistance(launchDistance, hitBallCount, bounceModifier);
+        
+        // need a check for if the bounce distance is short enough, the ball just stops? Otherwise it just bounces forever?
+        if (obstacleBounceDistance <= 0.1f)
+        {
+            ResetBallInfo(true);
+            return;
+        }
 
         // reset before hitting the ball again?
         hitBallCount = 0f;
@@ -1483,6 +1494,10 @@ public class GolfBallTopDown : NetworkBehaviour
         //hitBallModifer = 1 / flightTime;
         //isHit = true;
         //movementDirection = GetBounceDirection(movementDirection, collisionPoint, ballPos);
+
+        if (bounceOffTop)
+            movementDirection = -movementDirection;
+
         HitBall(obstacleBounceDistance, launchAngle, launchTopSpin, -movementDirection, launchLeftOrRightSpin, true, midPointHeight);
         //HitBall(obstacleBounceDistance, launchAngle, launchTopSpin, movementDirection, launchLeftOrRightSpin, true, midPointHeight);
 
@@ -1580,6 +1595,11 @@ public class GolfBallTopDown : NetworkBehaviour
     Vector2 GetBounceDirection(Vector2 movementDirection, Vector3 collisionPoint, Vector3 ballPos)
     {
         return Vector2.Reflect(movementDirection.normalized, (ballPos - collisionPoint).normalized);
+    }
+    IEnumerator BouncedOffObstacleCoolDown()
+    {
+        yield return new WaitForSeconds(0.1f);
+        this.BouncedOffObstacle = false;
     }
     Vector2 CalculateWindShiftForPutts(Vector2 oldDir)
     {
@@ -1936,6 +1956,44 @@ public class GolfBallTopDown : NetworkBehaviour
             }
             this._rocketParticle.gameObject.SetActive(enable);
         }
+    }
+    public void EnableOrDisableBallSpriteRenderer(bool enable)
+    {
+        Debug.Log("EnableOrDisableBallSpriteRenderer: " + enable.ToString());
+        this.MyBallObject.GetComponent<SpriteRenderer>().enabled = enable;
+        if (this.IsOwner)
+        {
+            CmdEnableOrDisableBallSpriteRenderer(enable, true);
+        }
+    }
+    [ServerRpc]
+    void CmdEnableOrDisableBallSpriteRenderer(bool enable, bool ignoreOwner = false)
+    {
+        RpcEnableOrDisableBallSpriteRenderer(enable, ignoreOwner);
+    }
+    [ObserversRpc]
+    void RpcEnableOrDisableBallSpriteRenderer(bool enable, bool ignoreOwner = false)
+    {
+        if (this.IsOwner && ignoreOwner)
+            return;
+        EnableOrDisableBallSpriteRenderer(enable);
+    }
+    public void SetBallInTube(bool inTube)
+    {
+        this.BallInTube = inTube;
+        if (this.IsOwner)
+            CmdSetBallInTube(inTube);
+
+    }
+    [ServerRpc]
+    void CmdSetBallInTube(bool inTube)
+    {
+        RpcSetBallInTube(inTube);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcSetBallInTube(bool inTube)
+    {
+        SetBallInTube(inTube);
     }
 }
 

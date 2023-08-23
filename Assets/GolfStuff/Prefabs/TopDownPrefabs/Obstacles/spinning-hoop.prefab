@@ -47,7 +47,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 4.6875}
   serializedVersion: 2
-  m_Radius: 1.34375
+  m_Radius: 1.21875
 --- !u!1 &5684346978448280173
 GameObject:
   m_ObjectHideFlags: 0
@@ -233,7 +233,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0.0625}
   serializedVersion: 2
-  m_Radius: 1.34375
+  m_Radius: 1.21875
 --- !u!114 &6776719878151890262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,6 +270,8 @@ MonoBehaviour:
   _crateCollider: 0
   _isSpinningHoop: 1
   _spinningHoopScript: {fileID: 6847695503802684275}
+  _isTube: 0
+  _tubeScript: {fileID: 0}
 --- !u!1 &8740297031622800146
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,3 +454,5 @@ MonoBehaviour:
   _crateCollider: 0
   _isSpinningHoop: 0
   _spinningHoopScript: {fileID: 6847695503802684275}
+  _isTube: 0
+  _tubeScript: {fileID: 0}

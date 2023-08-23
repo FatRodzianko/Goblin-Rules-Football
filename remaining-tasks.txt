@@ -26,6 +26,25 @@
 - - - these are kind of like fighting games but with dodgeball???
 - Soccer:
 - - - Nintendo world cup https://www.youtube.com/watch?v=mPKoHVO5g3o
+- "Stunt Driver" roguelite type thing?
+- - - doesn't necessarily need to be goblin themed
+- - - player drives through a course that is timed. Have to make it to the end by a certain time limit
+- - - hitting "stunts" like jumps and stuff gives more time? Better rating?
+- - - - - - in addition to a timer there's a "stunt score" that you get by hitting stunts
+- - - if player doesn't finish in time or doesn't get a high enough stunt score, they're "fired"
+- - - - - - get paid a "union day minimum" for "at least showing up to work" or something
+- - - fired 3 times = game over
+- - - players can get in really bad wrecks as well
+- - - - - - minor wrecks just end the run. Player is "fired"
+- - - - - - major wrecks, like taking a jump into a building or crashing head on at high speed, player gets "wasted" aka dies - run immediately over
+- - - between stunt jobs player spends money on upgrades (faster car, better handling, boost after jumps or something)
+- - - - - - higher stunt score = higher pay
+- - - normally single player, but possible multiplayer mode?
+- - - - - - players all do same race. Can't really interact with each other. See other player's "ghost" racing them or something - think track mania
+- - - - - - players play until they are knocked out of the game - either fired too many times or wasted
+- - - - - - last player standing "wins"
+- - - - - - - - - maybe also do eliminations at certain stages, like fall guys. Every other round players are eliminated based on total stunt score?
+
 
 ### Remaining tasks
 (x) Punch animations while goblins are running

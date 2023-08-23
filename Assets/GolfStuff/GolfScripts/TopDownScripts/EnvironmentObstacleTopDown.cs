@@ -40,6 +40,11 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     [SerializeField] bool _isSpinningHoop = false;
     [SerializeField] SpinningHoop _spinningHoopScript;
 
+    [Header("Tube Stuff")]
+    [SerializeField] bool _isTube = false;
+    [SerializeField] TubeScript _tubeScript;
+    [SerializeField] bool _ballInTube = false;
+
     [Header("Spawn Protection")]
     bool _spawnProtection = true;
 
@@ -79,6 +84,9 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             if (!golfBallScript.IsOwner)
                 return;
 
+            if (golfBallScript.BouncedOffObstacle)
+                return;
+
             if (_isHoleFlag && golfBallScript.isRolling)
                 return;
 
@@ -86,6 +94,8 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
                 return;
 
             if (golfBallScript.LocalIsInHole)
+                return;
+            if (golfBallScript.BallInTube)
                 return;
             
 
@@ -148,25 +158,28 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             }
             float newBounceModifier = GetBounceModifier(ballHeightInUnityUnits);
             Debug.Log("EnvironmentObstacleTopDown: new bounce modifier: " + newBounceModifier);
-            // Make a call to the ball here. Give it the height of the ball in Unity Units and the height of the obstalce in Unity Units. The ball will then decide if it should continue flying, or bounce back
-            if (golfBallScript.isRolling)
-            {
+
+            BounceBallOffObstalce(golfBallScript, ballHeightInUnityUnits, this.HeightInUnityUnits, isSoftBounce, newBounceModifier, soundTypeToUse);
+
+            //// Make a call to the ball here. Give it the height of the ball in Unity Units and the height of the obstalce in Unity Units. The ball will then decide if it should continue flying, or bounce back
+            //if (golfBallScript.isRolling)
+            //{
                 
-                Vector3 centerOfCollider = this.GetComponent<Collider2D>().bounds.center;
-                Vector3 ballPos = golfBallScript.transform.position;
-                Vector2 closestPoint = this.GetComponent<Collider2D>().ClosestPoint(ballPos);
-                Vector3 collisionDir = (centerOfCollider - ballPos).normalized;
-                Vector3 collisionPoint = ballPos + (collisionDir * golfBallScript.MyColliderRadius) - (Vector3)(golfBallScript.movementDirection.normalized * golfBallScript.speedMetersPerSecond * Time.deltaTime);
-                Debug.Log("EnvironmentObstacleTopDown: ball is rolling. Ball position: " + ballPos.ToString("0.00000") + " centerOfCollider: " + centerOfCollider.ToString() + " and the collision point: " + collisionPoint.ToString() + " closest point from collider: " + closestPoint.ToString("0.00000")); ;
-                //golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, collisionPoint, centerOfCollider, this.GetComponent<Collider2D>().bounds.extents);
-                //golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, centerOfCollider, this.GetComponent<Collider2D>().bounds.extents);
-                golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, ballPos, isSoftBounce, newBounceModifier, soundTypeToUse);
-            }
-            else
-            {
-                Debug.Log("EnvironmentObstacleTopDown: ball is NOT rolling."); ;
-                golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, Vector2.zero, Vector2.zero, isSoftBounce, newBounceModifier, soundTypeToUse) ;
-            }
+            //    Vector3 centerOfCollider = this.GetComponent<Collider2D>().bounds.center;
+            //    Vector3 ballPos = golfBallScript.transform.position;
+            //    Vector2 closestPoint = this.GetComponent<Collider2D>().ClosestPoint(ballPos);
+            //    Vector3 collisionDir = (centerOfCollider - ballPos).normalized;
+            //    Vector3 collisionPoint = ballPos + (collisionDir * golfBallScript.MyColliderRadius) - (Vector3)(golfBallScript.movementDirection.normalized * golfBallScript.speedMetersPerSecond * Time.deltaTime);
+            //    Debug.Log("EnvironmentObstacleTopDown: ball is rolling. Ball position: " + ballPos.ToString("0.00000") + " centerOfCollider: " + centerOfCollider.ToString() + " and the collision point: " + collisionPoint.ToString() + " closest point from collider: " + closestPoint.ToString("0.00000")); ;
+            //    //golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, collisionPoint, centerOfCollider, this.GetComponent<Collider2D>().bounds.extents);
+            //    //golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, centerOfCollider, this.GetComponent<Collider2D>().bounds.extents);
+            //    golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, closestPoint, ballPos, isSoftBounce, newBounceModifier, soundTypeToUse);
+            //}
+            //else
+            //{
+            //    Debug.Log("EnvironmentObstacleTopDown: ball is NOT rolling."); ;
+            //    golfBallScript.HitEnvironmentObstacle(HeightInUnityUnits, ballHeightInUnityUnits, _isHoleFlag, Vector2.zero, Vector2.zero, isSoftBounce, newBounceModifier, soundTypeToUse) ;
+            //}
 
             /*Vector3 ballPos = golfBallScript.transform.position;
             Vector2 closestPoint = this.GetComponent<Collider2D>().ClosestPoint(ballPos);
@@ -185,15 +198,38 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         if (collision.tag == "golfBall")
         {
             GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
-            if (!golfBallScript.IsOwner || golfBallScript.IsInHole || golfBallScript.isRolling || golfBallScript.isHit || golfBallScript.isBouncing)
+
+            if (!golfBallScript.IsOwner)
                 return;
 
-            if (_isSpinningHoop)
+            if (golfBallScript.BouncedOffObstacle)
+                return;
+            if (golfBallScript.IsInHole)
+                return;
+            if (golfBallScript.BallInTube)
+                return;
+
+            if (golfBallScript.isRolling || golfBallScript.isHit || golfBallScript.isBouncing)
             {
-                SpinningHoopCollision(golfBallScript);
-                Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: Done with spinning hoop checks");
+                if (_isSpinningHoop)
+                {
+                    SpinningHoopCollision(golfBallScript);
+                    Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: Done with spinning hoop checks");
+                    return;
+                }
+                if (_isTube)
+                {
+                    TubeOnStayCollision(golfBallScript);
+                    Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: Done with TUBE checks");
+                    return;
+                }
                 return;
             }
+
+            
+
+            //if (golfBallScript.IsInHole || golfBallScript.isRolling || golfBallScript.isHit || golfBallScript.isBouncing)
+            //    return;
 
             Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: moving ball to prevent issues?");
 
@@ -245,6 +281,50 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         }
 
         return newModifier;
+    }
+    void BounceBallOffObstalce(GolfBallTopDown golfBallScript, float ballHeightInUnityUnits, float obstacleHeight, bool isSoftBounce, float newBounceModifier, string soundTypeToUse, bool bounceOffTop = false)
+    {
+        if (golfBallScript.isRolling)
+        {
+
+            Vector3 centerOfCollider = this.GetComponent<Collider2D>().bounds.center;
+            Vector3 ballPos = golfBallScript.transform.position;
+            Vector2 closestPoint = this.GetComponent<Collider2D>().ClosestPoint(ballPos);
+            Vector3 collisionDir = (centerOfCollider - ballPos).normalized;
+            Vector3 collisionPoint = ballPos + (collisionDir * golfBallScript.MyColliderRadius) - (Vector3)(golfBallScript.movementDirection.normalized * golfBallScript.speedMetersPerSecond * Time.deltaTime);
+            Debug.Log("BounceBallOffObstalce: ball is rolling. Ball position: " + ballPos.ToString("0.00000") + " centerOfCollider: " + centerOfCollider.ToString() + " and the collision point: " + collisionPoint.ToString() + " closest point from collider: " + closestPoint.ToString("0.00000")); ;
+
+            golfBallScript.HitEnvironmentObstacle(obstacleHeight, ballHeightInUnityUnits, _isHoleFlag, closestPoint, ballPos, isSoftBounce, newBounceModifier, soundTypeToUse, bounceOffTop);
+        }
+        else
+        {
+            Debug.Log("BounceBallOffObstalce: ball is NOT rolling."); 
+            golfBallScript.HitEnvironmentObstacle(obstacleHeight, ballHeightInUnityUnits, _isHoleFlag, Vector2.zero, Vector2.zero, isSoftBounce, newBounceModifier, soundTypeToUse, bounceOffTop);
+        }
+    }
+    bool DoesBallHitExtraCollider(GolfBallTopDown golfBallScript, Collider2D extraCollider)
+    {
+        RaycastHit2D[] obstaclesHit = Physics2D.CircleCastAll(golfBallScript.MyBallObject.transform.position, (golfBallScript.pixelUnit * 2f), Vector2.zero, 0f);
+        if (obstaclesHit.Length <= 0)
+            return false;
+        for (int i = 0; i < obstaclesHit.Length; i++)
+        {
+            if (obstaclesHit[i].collider == extraCollider)
+            {
+                float ballZ = golfBallScript.transform.position.z;
+                float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
+
+                // double check that the ball is still in the right height zone?
+                if (ballHeightInUnityUnits <= this.StartHeight || ballHeightInUnityUnits >= this.HeightInUnityUnits)
+                    return false;
+
+                Debug.Log("DoesBallHitExtraCollider: ball hit the extra collider!");
+                
+                return true;
+            }
+        }
+
+        return false;
     }
     #region Statue
     void StatueCollisionCheck(GolfBallTopDown golfBallScript)
@@ -336,8 +416,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         //}
         Debug.Log("BalloonCollisionCheck: Height of the ball is " + ballHeightInUnityUnits.ToString() + " start height: " + StartHeight.ToString() + " HeightInUnityUnits: " + HeightInUnityUnits.ToString());
         if (ballHeightInUnityUnits >= StartHeight && ballHeightInUnityUnits <= HeightInUnityUnits)
-        {
-            
+        {   
             this.transform.parent.GetComponent<BalloonPowerUp>().CollisionToPopBalloon(golfBallScript, _crateCollider);
         }
 
@@ -364,19 +443,57 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         //    _spinningHoopScript.BallPassedThroughHoop(golfBallScript);
         //}
 
-        RaycastHit2D[] obstaclesHit = Physics2D.CircleCastAll(golfBallScript.MyBallObject.transform.position, golfBallScript.MyColliderRadius, Vector2.zero, 0f);
+        RaycastHit2D[] obstaclesHit = Physics2D.CircleCastAll(golfBallScript.MyBallObject.transform.position, (golfBallScript.pixelUnit * 2f), Vector2.zero, 0f);
         if (obstaclesHit.Length <= 0)
             return;
         for (int i = 0; i < obstaclesHit.Length; i++)
         {
             if (obstaclesHit[i].collider == _spinningHoopScript.TopHoopCollider)
             {
+                float ballZ = golfBallScript.transform.position.z;
+                float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
+
+                // double check that the ball is still in the right height zone?
+                if (ballHeightInUnityUnits <= this.StartHeight || ballHeightInUnityUnits >= this.HeightInUnityUnits)
+                    break;
+
                 Debug.Log("SpinningHoopCollision: Ball based through hoop!");
                 _spinningHoopScript.BallPassedThroughHoop(golfBallScript);
                 break;
             }
         }
 
+    }
+    #endregion
+    #region Tube
+    void TubeOnStayCollision(GolfBallTopDown golfBallScript)
+    {
+        if (_ballInTube)
+            return;
+        
+        float ballZ = golfBallScript.transform.position.z;
+        float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
+        Debug.Log("TubeOnStayCollision: Checking for ball with height: " + ballHeightInUnityUnits.ToString());
+        if (ballHeightInUnityUnits <= this.HeightInUnityUnits)
+        {
+            if (DoesBallHitExtraCollider(golfBallScript, _tubeScript.HoleCollider))
+            {
+                Debug.Log("TubeOnStayCollision: ball hit the hole collider!");
+                // teleport to other tube stuff here!!!
+                _ballInTube = true;
+                _tubeScript.BallLandedInTubeHole(golfBallScript);
+                StartCoroutine(BallInTubeCooldown());
+                return;
+            }
+
+            Debug.Log("TubeOnStayCollision: Will bounce off the top! Ball height: " + ballHeightInUnityUnits.ToString() + " and the tube's height: " + this.HeightInUnityUnits);
+            BounceBallOffObstalce(golfBallScript, ballHeightInUnityUnits, this.HeightInUnityUnits, false, 1.0f, this._hardBounceSoundType, true);
+        }
+    }
+    IEnumerator BallInTubeCooldown()
+    {
+        yield return new WaitForSeconds(0.5f);
+        _ballInTube = false;
     }
     #endregion
     IEnumerator SpawnProtectionRoutine()
