@@ -321,6 +321,7 @@ x spinning hoop targets
 - - - - - - when the tubes are spawned:
 - - - - - - - - - spawn tube A, then tube B
 - - - - - - - - - make sure each tube has a reference to the other tube, it's "pair" that it sends the ball too
+- - - when a ball bounces off the top of a tube/obstacle, maybe give it some extra "juice"/distance to the bounce? Right now, seems easy to get stuck bouncing off the top continuously
 - Rock power up
 - leave behind a small rock obstacle after you hit. Idea is to do it on putting green to block other players' shots
 - - - would need to make sure that it can't completely block a hole. collision check where it is placed?
