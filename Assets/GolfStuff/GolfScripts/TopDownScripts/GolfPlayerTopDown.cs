@@ -1389,7 +1389,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
         UpdateCameraFollowTarget(MyBall.MyBallObject);
         EnableOrDisableLineObjects(false);
         CmdTellPlayersToEnableOrDisableLineObjects(false);
+
+        //SpawnPowerUpObjects();
         CmdRemoveUsedPowerUps();
+        
     }
     [ServerRpc]
     void CmdPlaySoundForClients(string soundName, float soundVolume)
@@ -2809,6 +2812,19 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public void RemovePlayerMulligan()
     {
         this.PlayerMulligan = false;
+    }
+    public void SpawnPowerUpObjects()
+    {
+        if (!this.UsedPowerupThisTurn)
+            return;
+        if (this.UsedPowerUpType != "rock")
+            return;
+        CmdSpawnRockFromPowerUp(this._ballStartPosition);
+    }
+    [ServerRpc]
+    void CmdSpawnRockFromPowerUp(Vector3 rockPosition)
+    {
+        PowerUpManagerTopDownGolf.instance.SpawnRockFromPowerUp(rockPosition);
     }
     void GetPermissionToStartHitFromServer()
     {

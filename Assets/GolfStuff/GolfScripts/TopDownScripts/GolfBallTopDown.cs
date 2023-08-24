@@ -1183,7 +1183,8 @@ public class GolfBallTopDown : NetworkBehaviour
         }
 
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
-        CmdTellServerToStartNexPlayersTurn();
+        //CmdTellServerToStartNexPlayersTurn();
+        EndOfTurnTasks();
     }
     [ServerRpc]
     public void CmdSetBallInHoleOnServer(bool inHole)
@@ -1245,6 +1246,12 @@ public class GolfBallTopDown : NetworkBehaviour
 
         //prompt player for mulligan here?
 
+        //CmdTellServerToStartNexPlayersTurn();
+        EndOfTurnTasks();
+    }
+    void EndOfTurnTasks()
+    {
+        MyPlayer.SpawnPowerUpObjects();
         CmdTellServerToStartNexPlayersTurn();
     }
     [ServerRpc]

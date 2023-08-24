@@ -32,6 +32,10 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
     Dictionary<int, PowerUpTopDown> _playerOwnedPowerUps = new Dictionary<int, PowerUpTopDown>();
     List<int> _playerNetIdsWhoUsedPowerUps = new List<int>();
 
+    [Header("Objects SpawnedByPowerUps")]
+    [SerializeField] GameObject _rockPowerUpPrefab;
+    [SerializeField] List<GameObject> _spawnedObjectsFromPowerUps = new List<GameObject>();
+
     [Serializable]
     public struct PowerUpTypeMapping
     {
@@ -229,6 +233,97 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
         }
         if(_playerOwnedPowerUps[playerNetId].GetComponent<PowerUpTopDown>().HasBeenUsed)
             RemovePowerUpObjectFromPlayer(playerNetId, _playerOwnedPowerUps[playerNetId]);
+    }
+    [Server]
+    public void SpawnRockFromPowerUp(Vector3 rockPosition)
+    {
+        Debug.Log("SpawnRockFromPowerUp: " + rockPosition.ToString());
+        Vector3 spawnPosition = GetValidSpawnPosition(rockPosition);
+        SpawnObjectFromPowerUp(_rockPowerUpPrefab, spawnPosition);
+    }
+    Vector3 GetValidSpawnPosition(Vector3 originalPosition)
+    {
+        bool isTooCloseToHoleOrTeeOff = IsPositionTooCloseToHoleOrTeeOffPositions(originalPosition);
+
+        if (!isTooCloseToHoleOrTeeOff)
+            return originalPosition;
+
+        Vector3 newPos = originalPosition;
+
+        while (isTooCloseToHoleOrTeeOff)
+        {
+            Vector3 tooCloseObjectPos = GetNearestObjectToAvoid(originalPosition);
+            Vector2 moveDirection = (originalPosition - tooCloseObjectPos).normalized;
+
+            newPos = tooCloseObjectPos + (Vector3)(moveDirection * 1.21f);
+            isTooCloseToHoleOrTeeOff = IsPositionTooCloseToHoleOrTeeOffPositions(newPos);
+        }
+
+        return newPos;
+    }
+    bool IsPositionTooCloseToHoleOrTeeOffPositions(Vector3 position)
+    {
+        bool tooClose = false;
+
+        foreach (Vector3 holePosition in GameplayManagerTopDownGolf.instance.HolePositions)
+        {
+            if (Vector2.Distance(position, holePosition) <= 1.2f)
+            {
+                tooClose = true;
+                Debug.Log("IsPositionTooCloseToHoleOrTeeOffPositions: " + tooClose.ToString() + " from hole");
+                return tooClose;
+            }
+        }
+
+        if (!tooClose)
+        {
+            if (Vector2.Distance(GameplayManagerTopDownGolf.instance.TeeOffPosition, position) <= 1.2f)
+            {
+                tooClose = true;
+                Debug.Log("IsPositionTooCloseToHoleOrTeeOffPositions: " + tooClose.ToString() + " from tee off position");
+                return tooClose;
+            }
+        }
+        Debug.Log("IsPositionTooCloseToHoleOrTeeOffPositions: " + tooClose.ToString());
+        return tooClose;
+    }
+    Vector3 GetNearestObjectToAvoid(Vector3 position)
+    {
+        foreach (Vector3 holePosition in GameplayManagerTopDownGolf.instance.HolePositions)
+        {
+            if (Vector2.Distance(position, holePosition) <= 1.2f)
+            {
+                Debug.Log("GetNearestObjectToAvoid: return hole position");
+                return holePosition;
+            }
+        }
+
+        if (Vector2.Distance(GameplayManagerTopDownGolf.instance.TeeOffPosition, position) <= 1.2f)
+        {
+            Debug.Log("GetNearestObjectToAvoid: return tee off position");
+            return GameplayManagerTopDownGolf.instance.TeeOffPosition;
+        }
+
+        return position;
+    }
+    void SpawnObjectFromPowerUp(GameObject prefabToSpawn, Vector3 spawnPos)
+    {
+        GameObject spawnedObject = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
+        InstanceFinder.ServerManager.Spawn(spawnedObject);
+        this._spawnedObjectsFromPowerUps.Add(spawnedObject);
+    }
+    public void DespawnObjectsFromPowerUpsForNewTurn()
+    {
+        if(this._spawnedObjectsFromPowerUps.Count == 0)
+            return;
+
+        foreach (GameObject spawnedObject in _spawnedObjectsFromPowerUps)
+        {
+            GameObject objectToDestroy = spawnedObject.gameObject;
+            InstanceFinder.ServerManager.Despawn(objectToDestroy);
+        }
+
+        this._spawnedObjectsFromPowerUps.Clear();
     }
     [Server]
     void DestroyPowerUpObject(GameObject powerUpToDestroy)

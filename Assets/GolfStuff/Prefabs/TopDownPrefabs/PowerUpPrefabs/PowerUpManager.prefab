@@ -48,7 +48,7 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 7030450351127779416}
   _networkObjectCache: {fileID: 7030450351127779416}
-  _powerUpBallonPrefab: {fileID: 1294718589790411390, guid: ec4c4ca1e943cba47a816a5c937a90c2, type: 3}
+  _powerUpBallonPrefab: {fileID: 1294718589790411390, guid: c8516667c86eb314d9c4bd1e33939af9, type: 3}
   _powerUpObject: {fileID: 7825031202014497402, guid: adaed3167587a884fb31418df48316b5, type: 3}
   _activeBallonPowerUps: []
   _spawnPoint: {x: 183.469, y: -79.61863, z: 0}
@@ -86,6 +86,11 @@ MonoBehaviour:
   - powerUpType: rocket
     powerUpSprite: {fileID: 21300000, guid: c68c30ae453660f469abf097a5b4f8f3, type: 3}
     powerUpText: 'Rocket: Move your ball while it''s in flight!'
+  - powerUpType: rock
+    powerUpSprite: {fileID: 21300000, guid: 1cd57171dd91cb6479f1de937a13fcfc, type: 3}
+    powerUpText: 'Rock: Drop a rock to block putts!'
+  _rockPowerUpPrefab: {fileID: 4945871248816518468, guid: be283ec9eb8e82748bce00c2754a63bb, type: 3}
+  _spawnedPowerUpObjects: []
 --- !u!114 &7030450351127779416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,7 +117,7 @@ MonoBehaviour:
   NetworkObserver: {fileID: 0}
   <PrefabId>k__BackingField: 7
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 1727917535
+  _scenePathHash: 0
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 10476865128425371143
   _sceneNetworkObjects:

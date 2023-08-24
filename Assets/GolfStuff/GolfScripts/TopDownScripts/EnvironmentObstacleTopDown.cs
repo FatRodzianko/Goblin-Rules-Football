@@ -197,6 +197,12 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         
         if (collision.tag == "golfBall")
         {
+            //if (_spawnProtection)
+            //{
+            //    Debug.Log("EnvironmentObstacleTopDown: OnTriggerEnter2D: spawn protection? " + this._spawnProtection);
+            //    return;
+            //}
+
             GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
 
             if (!golfBallScript.IsOwner)
