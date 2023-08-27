@@ -45,6 +45,11 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     [SerializeField] TubeScript _tubeScript;
     [SerializeField] bool _ballInTube = false;
 
+    [Header("TNT")]
+    [SerializeField] bool _isTNT = false;
+    [SerializeField] bool _isTNTInnerCircle = false;
+    [SerializeField] TNTScript _tntScript;
+
     [Header("Spawn Protection")]
     bool _spawnProtection = true;
 
@@ -116,6 +121,16 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             {
                 SpinningHoopCollision(golfBallScript);
                 Debug.Log("EnvironmentObstacleTopDown: Done with spinning hoop checks");
+                return;
+            }
+            if (_isTNT)
+            {
+                TNTCollision(golfBallScript);
+                return;
+            }
+            if (_isTNTInnerCircle)
+            {
+                TNTEnterInnerCircle(golfBallScript);
                 return;
             }
 
@@ -250,16 +265,41 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
 
         }
     }
-    /*private void OnTriggerExit2D(Collider2D collision)
+    private void OnTriggerExit2D(Collider2D collision)
     {
         if (_isHoleFlag)
             return;
         if (collision.tag == "golfBall")
         {
+            Debug.Log("EnvironmentObstacleTopDown: This object's name is: " + this.name);
+            GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
+
+            if (!golfBallScript.IsOwner)
+                return;
+
+            if (golfBallScript.BouncedOffObstacle)
+                return;
+
+            if (_isHoleFlag && golfBallScript.isRolling)
+                return;
+
+            if (golfBallScript.IsInHole)
+                return;
+
+            if (golfBallScript.LocalIsInHole)
+                return;
+            if (golfBallScript.BallInTube)
+                return;
+
+            if (_isTNTInnerCircle)
+            {
+                TNTExitInnerCircle(golfBallScript);
+                return;
+            }
             Debug.Log("EnvironmentObstacleTopDown: OnTriggerExit2D: ball is leaving collider. Re-enabling the collider?");
 
         }
-    }*/
+    }
     float GetBounceModifier(float ballHeightInUnityUnits)
     {
         if (!_gradualBounceModifier && !_immediateBounceModifier)
@@ -500,6 +540,30 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         _ballInTube = false;
+    }
+    #endregion
+    #region TNT
+    void TNTCollision(GolfBallTopDown golfBallScript)
+    {
+        float ballZ = golfBallScript.transform.position.z;
+        float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
+        Debug.Log("TNTCollision: Checking for ball with height: " + ballHeightInUnityUnits.ToString());
+        if (ballHeightInUnityUnits <= this.HeightInUnityUnits)
+        {
+            Debug.Log("TNTCollision: Ball hit TNT directly. Time to blow up!");
+            // blow up the TNT
+            golfBallScript.InsideTNTCircle = false;
+        }
+    }
+    void TNTEnterInnerCircle(GolfBallTopDown golfBallScript)
+    {
+        Debug.Log("TNTEnterInnerCircle: " + golfBallScript.MyPlayer.PlayerName);
+        golfBallScript.InsideTNTCircle = true;
+    }
+    void TNTExitInnerCircle(GolfBallTopDown golfBallScript)
+    {
+        Debug.Log("TNTExitInnerCircle: " + golfBallScript.MyPlayer.PlayerName);
+        golfBallScript.InsideTNTCircle = false;
     }
     #endregion
     IEnumerator SpawnProtectionRoutine()

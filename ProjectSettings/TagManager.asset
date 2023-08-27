@@ -54,6 +54,7 @@ TagManager:
   - Statue
   - BalloonPowerUp
   - TubeGolf
+  - TNTRadius
   layers:
   - Default
   - TransparentFX

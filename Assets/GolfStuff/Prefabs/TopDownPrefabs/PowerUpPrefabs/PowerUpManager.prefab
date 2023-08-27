@@ -89,8 +89,13 @@ MonoBehaviour:
   - powerUpType: rock
     powerUpSprite: {fileID: 21300000, guid: 1cd57171dd91cb6479f1de937a13fcfc, type: 3}
     powerUpText: 'Rock: Drop a rock to block putts!'
+  - powerUpType: tnt
+    powerUpSprite: {fileID: 21300000, guid: 56171a3b3063def4c9565aec4c3bb994, type: 3}
+    powerUpText: 'TNT: Place a bomb where your ball lands. Blow up any balls that
+      get too close!'
   _rockPowerUpPrefab: {fileID: 4945871248816518468, guid: be283ec9eb8e82748bce00c2754a63bb, type: 3}
-  _spawnedPowerUpObjects: []
+  _tntPowerUpPrefab: {fileID: 0}
+  _spawnedObjectsFromPowerUps: []
 --- !u!114 &7030450351127779416
 MonoBehaviour:
   m_ObjectHideFlags: 0

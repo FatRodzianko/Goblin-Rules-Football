@@ -34,6 +34,7 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
 
     [Header("Objects SpawnedByPowerUps")]
     [SerializeField] GameObject _rockPowerUpPrefab;
+    [SerializeField] GameObject _tntPowerUpPrefab;
     [SerializeField] List<GameObject> _spawnedObjectsFromPowerUps = new List<GameObject>();
 
     [Serializable]

@@ -89,6 +89,9 @@ public class GolfBallTopDown : NetworkBehaviour
     public bool IsHitByTornado = false;
     public Torndao MyTornado = null;
 
+    [Header("TNT Stuff")]
+    public bool InsideTNTCircle = false;
+
 
     [Header("Ground Material Info")]
     [SerializeField] public float greenRollSpeedModifier = 0.5f;
