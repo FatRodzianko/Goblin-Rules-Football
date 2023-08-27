@@ -646,6 +646,7 @@ public class GolfBallTopDown : NetworkBehaviour
         if (!hasBouncedYet)
         {
             originalHitDirection = hitDirection;
+            CheckForTNTPowerUp();
         }
 
         // Check if there is side spin. IF so, change the original direction to account for the side spin
@@ -2018,6 +2019,14 @@ public class GolfBallTopDown : NetworkBehaviour
         SetBallInTube(false);
     }
     #endregion
+    #region TNT
+    void CheckForTNTPowerUp()
+    {
+        Debug.Log("CheckForTNTPowerUp()");
+        Debug.Break();
+    }
+    #endregion
+
 }
 
 
