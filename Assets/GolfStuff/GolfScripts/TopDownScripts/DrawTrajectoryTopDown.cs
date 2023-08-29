@@ -168,6 +168,7 @@ public class DrawTrajectoryTopDown : MonoBehaviour
             float ballHeightInUnityUnits = ball.GetBallHeightYValue(ballHeightAtCollision);
             // Check if the ball will hit the object or not
             EnvironmentObstacleTopDown obstacleHitScript = obstaclesHit[i].transform.GetComponent<EnvironmentObstacleTopDown>();
+            Debug.Log("EnvironmentObstaclesHigherThanBall: hit object: " + obstaclesHit[i].transform.name);
             if (ball.DoesBallHitObject(obstacleHitScript.HeightInUnityUnits, ballHeightInUnityUnits, obstacleHitScript.StartHeight))
             {
                 //Debug.Log("EnvironmentObstaclesHigherThanBall: Found object heigher than the ball: " + obstaclesHit[i].transform.gameObject.name);

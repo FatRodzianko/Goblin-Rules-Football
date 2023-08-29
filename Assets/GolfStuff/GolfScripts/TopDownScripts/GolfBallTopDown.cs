@@ -91,6 +91,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
     [Header("TNT Stuff")]
     public bool InsideTNTCircle = false;
+    public TNTScript TNTScriptInSide;
 
 
     [Header("Ground Material Info")]
@@ -643,10 +644,19 @@ public class GolfBallTopDown : NetworkBehaviour
         // Sanity check to reset bouncing before calculating new bouncing stuff
         ResetBouncingInfo(false);
 
+        // check if ball should blow up tnt because it landed inside a tnt circle
+        if (this.InsideTNTCircle)
+        {
+            // make sure that the "blow up TNT" thing is also called on other bounces aka outside of this
+            BlowUpTNT();
+            return;
+        }
+
         if (!hasBouncedYet)
         {
             originalHitDirection = hitDirection;
-            CheckForTNTPowerUp();
+            
+            CheckForTNTPowerUpSpawn();
         }
 
         // Check if there is side spin. IF so, change the original direction to account for the side spin
@@ -1255,7 +1265,7 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     void EndOfTurnTasks()
     {
-        MyPlayer.SpawnPowerUpObjects();
+        MyPlayer.SpawnRockFromPowerUp();
         CmdTellServerToStartNexPlayersTurn();
     }
     [ServerRpc]
@@ -2020,9 +2030,18 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     #endregion
     #region TNT
-    void CheckForTNTPowerUp()
+    void CheckForTNTPowerUpSpawn()
     {
         Debug.Log("CheckForTNTPowerUp()");
+        if (MyPlayer.UsedPowerupThisTurn && MyPlayer.UsedPowerUpType == "tnt")
+        {
+            MyPlayer.SpawnTNTFromPowerUp();
+        }
+        Debug.Break();
+    }
+    void BlowUpTNT()
+    {
+        Debug.Log("BlowUpTNT: ");
         Debug.Break();
     }
     #endregion

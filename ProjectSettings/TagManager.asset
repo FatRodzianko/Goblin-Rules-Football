@@ -55,6 +55,7 @@ TagManager:
   - BalloonPowerUp
   - TubeGolf
   - TNTRadius
+  - TNTObject
   layers:
   - Default
   - TransparentFX

@@ -336,6 +336,12 @@ x spinning hoop targets
 - other powerups that a player "Drops"
 - - - Tree that can be a blocker on fairways and stuff
 - - - a bomb: player hits their ball, and a bomb is placed where they first bounce. Bomb has a radius when planted. Any other player that hits their ball into the bomb radius causes the bomb to go off and send them in a random direction (similar to tornado)
+- - - - - - tnt blows up if ball lands in radius, or if it rolls into the radius
+- - - - - - when the tnt blows up, have it find all objects in the explosion radius?
+- - - - - - - - if another TNT object is found, blow that one up too?
+- - - - - - - - if a statue is in the radius, break the statue, and give whoever blew up the TNT the benefit/penalty for good/bad statue breaks?
+- - - - - - - - for any balls in the radius, get their position and direction toward the TNT. Have the ball get sent in the opposite direction away from tnt
+- - - - - - - - - - - the distance the ball is launched should be relative to how close it is to the tnt? Further away, not launched as far. Closer to the tnt, launched further away?
 - - - air patrol? Little planes that fly in a circle and if a ball is hit through their "area" in the sky, the planes shoot the ball down? (cause the ball to land a few feet below the planes)
 - - - - - - the "area" would be similar to the hoop ring? and how collisions for that work?
 - Get rid of all the "CmdTellServerPlayerHoleEndedCompleted" functions and the "_tellPlayerHoleEnded" type variables. Only one message is ever sent to players at a time. Can reuse just one bool and and reuse functions that just send messages. Just one "message from server" function that then tells the player which task to actually start? Instead of all this bullshit where I have 4 different things that are functionally all the same 

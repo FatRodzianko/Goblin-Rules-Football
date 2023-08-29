@@ -242,6 +242,11 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
         Vector3 spawnPosition = GetValidSpawnPosition(rockPosition);
         SpawnObjectFromPowerUp(_rockPowerUpPrefab, spawnPosition);
     }
+    [Server]
+    public void SpawnTNTFromPowerUp(Vector3 tntPosition)
+    { 
+
+    }
     Vector3 GetValidSpawnPosition(Vector3 originalPosition)
     {
         bool isTooCloseToHoleOrTeeOff = IsPositionTooCloseToHoleOrTeeOffPositions(originalPosition);

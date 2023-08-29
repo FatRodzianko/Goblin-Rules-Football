@@ -229,6 +229,11 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
                 return;
             if (golfBallScript.BallInTube)
                 return;
+            if (_isTNTInnerCircle)
+            {
+                //TNTStayInnerCircle(golfBallScript);
+                return;
+            }   
 
             if (golfBallScript.isRolling || golfBallScript.isHit || golfBallScript.isBouncing)
             {
@@ -557,13 +562,28 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     }
     void TNTEnterInnerCircle(GolfBallTopDown golfBallScript)
     {
-        Debug.Log("TNTEnterInnerCircle: " + golfBallScript.MyPlayer.PlayerName);
+        Debug.Log("TNTEnterInnerCircle: " + golfBallScript.MyPlayer.PlayerName + " is ball rolling? " + golfBallScript.isRolling);
         golfBallScript.InsideTNTCircle = true;
+        golfBallScript.TNTScriptInSide = this._tntScript;
+        Debug.Break();
+    }
+    void TNTStayInnerCircle(GolfBallTopDown golfBallScript)
+    {
+        if (golfBallScript.InsideTNTCircle)
+            return;
+        golfBallScript.InsideTNTCircle = true;
+        
     }
     void TNTExitInnerCircle(GolfBallTopDown golfBallScript)
     {
         Debug.Log("TNTExitInnerCircle: " + golfBallScript.MyPlayer.PlayerName);
-        golfBallScript.InsideTNTCircle = false;
+        if (golfBallScript.TNTScriptInSide == this._tntScript)
+        {
+            golfBallScript.TNTScriptInSide = null;
+            golfBallScript.InsideTNTCircle = false;
+        }
+
+        Debug.Break();
     }
     #endregion
     IEnumerator SpawnProtectionRoutine()

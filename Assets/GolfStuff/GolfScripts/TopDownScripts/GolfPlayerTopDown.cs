@@ -2813,18 +2813,29 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         this.PlayerMulligan = false;
     }
-    public void SpawnPowerUpObjects()
+    public void SpawnRockFromPowerUp()
     {
         if (!this.UsedPowerupThisTurn)
             return;
         if (this.UsedPowerUpType != "rock")
             return;
+        
         CmdSpawnRockFromPowerUp(this._ballStartPosition);
+        
+    }
+    public void SpawnTNTFromPowerUp()
+    {
+        CmdSpawnTNTFromPowerUp(MyBall.transform.position);
     }
     [ServerRpc]
     void CmdSpawnRockFromPowerUp(Vector3 rockPosition)
     {
         PowerUpManagerTopDownGolf.instance.SpawnRockFromPowerUp(rockPosition);
+    }
+    [ServerRpc]
+    void CmdSpawnTNTFromPowerUp(Vector3 ballPos)
+    {
+        PowerUpManagerTopDownGolf.instance.SpawnTNTFromPowerUp(ballPos);
     }
     void GetPermissionToStartHitFromServer()
     {

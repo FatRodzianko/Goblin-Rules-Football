@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7031204598550359105}
   - component: {fileID: 774165602101071803}
   - component: {fileID: 1241216985834752967}
-  m_Layer: 27
+  m_Layer: 28
   m_Name: SpriteCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 8444654747662979381}
   - component: {fileID: 6332050692217960628}
   - component: {fileID: 7841912899918671403}
-  m_Layer: 27
+  m_Layer: 0
   m_Name: InnerCircle
   m_TagString: TNTRadius
   m_Icon: {fileID: 0}
@@ -349,7 +349,7 @@ GameObject:
   - component: {fileID: 4684508778142369644}
   m_Layer: 27
   m_Name: tnt-powerup-2
-  m_TagString: Untagged
+  m_TagString: TNTObject
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -547,7 +547,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0.28125}
