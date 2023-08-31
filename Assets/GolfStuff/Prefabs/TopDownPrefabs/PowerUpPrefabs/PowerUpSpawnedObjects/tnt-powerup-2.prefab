@@ -677,7 +677,7 @@ MonoBehaviour:
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 2749274148255648493}
   _networkObjectCache: {fileID: 2749274148255648493}
-  PlayerConnectionID: 0
+  PlayerConnectionID: -99
   _radius: 4
   _lineRadiusDrawer: {fileID: 4684508778142369644}
 --- !u!114 &4684508778142369644

@@ -2835,7 +2835,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ServerRpc]
     void CmdSpawnTNTFromPowerUp(Vector3 ballPos)
     {
-        PowerUpManagerTopDownGolf.instance.SpawnTNTFromPowerUp(ballPos);
+        PowerUpManagerTopDownGolf.instance.SpawnTNTFromPowerUp(ballPos, this);
     }
     void GetPermissionToStartHitFromServer()
     {

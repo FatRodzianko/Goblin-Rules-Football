@@ -92,6 +92,8 @@ public class GolfBallTopDown : NetworkBehaviour
     [Header("TNT Stuff")]
     public bool InsideTNTCircle = false;
     public TNTScript TNTScriptInSide;
+    public bool PlantedTNTThisTurn = false;
+    public TNTScript TNTThatBlewMeUp;
 
 
     [Header("Ground Material Info")]
@@ -648,8 +650,12 @@ public class GolfBallTopDown : NetworkBehaviour
         if (this.InsideTNTCircle)
         {
             // make sure that the "blow up TNT" thing is also called on other bounces aka outside of this
-            BlowUpTNT();
-            return;
+            if (TNTScriptInSide.WillTNTBlowUp(this))
+            {
+                Debug.Log("GetBounces: Ball landed inside of TNT radius that the player does not own. Blowing up the TNT");
+                BlowUpTNT();
+                return;
+            }
         }
 
         if (!hasBouncedYet)
@@ -1266,6 +1272,11 @@ public class GolfBallTopDown : NetworkBehaviour
     void EndOfTurnTasks()
     {
         MyPlayer.SpawnRockFromPowerUp();
+        if (this.PlantedTNTThisTurn)
+        { 
+            // call await task to have the TNT blow up and launch any nearby balls
+        }
+        this.PlantedTNTThisTurn = false;
         CmdTellServerToStartNexPlayersTurn();
     }
     [ServerRpc]
@@ -2033,15 +2044,18 @@ public class GolfBallTopDown : NetworkBehaviour
     void CheckForTNTPowerUpSpawn()
     {
         Debug.Log("CheckForTNTPowerUp()");
-        if (MyPlayer.UsedPowerupThisTurn && MyPlayer.UsedPowerUpType == "tnt")
+        if (MyPlayer.UsedPowerupThisTurn && MyPlayer.UsedPowerUpType == "tnt" && !this.PlantedTNTThisTurn)
         {
             MyPlayer.SpawnTNTFromPowerUp();
+            this.PlantedTNTThisTurn = true;
         }
-        Debug.Break();
+        //Debug.Break();
     }
+
     void BlowUpTNT()
     {
         Debug.Log("BlowUpTNT: ");
+        TNTScriptInSide.BlowUpTNT(this);
         Debug.Break();
     }
     #endregion

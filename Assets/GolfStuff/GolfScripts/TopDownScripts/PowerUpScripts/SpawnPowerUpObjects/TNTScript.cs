@@ -14,6 +14,11 @@ public class TNTScript : NetworkBehaviour
     [Header("Line Radius Stuff")]
     [SerializeField] LineRadiusDrawer _lineRadiusDrawer;
 
+    [Header("Balls blown up")]
+    public bool WaitingOnBlownUpBalls = false;
+    public List<GolfBallTopDown> BallsBlownUp = new List<GolfBallTopDown>();
+    public List<GolfBallTopDown> BallsBlownUpThatStopped = new List<GolfBallTopDown>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,5 +33,23 @@ public class TNTScript : NetworkBehaviour
     void UpdateRadius(float newRadius)
     {
         _lineRadiusDrawer.DrawRadius(newRadius);
+    }
+    public bool WillTNTBlowUp(GolfBallTopDown golfBallAsking)
+    {
+        Debug.Log("WillTNTBlowUp: Golfball with player connection id of: " + golfBallAsking.MyPlayer.ConnectionId.ToString());
+        if (PlayerConnectionID == -99)
+            return false;
+        if (PlayerConnectionID == golfBallAsking.MyPlayer.ConnectionId)
+            return false;
+
+        return true;
+    }
+    public void BlowUpTNT(GolfBallTopDown golfBallThatInitiatedThis)
+    {
+        // Player that planted the TNT won't blow it up?
+        if (PlayerConnectionID == -99)
+            return;
+        if (PlayerConnectionID == golfBallThatInitiatedThis.MyPlayer.ConnectionId)
+            return;
     }
 }

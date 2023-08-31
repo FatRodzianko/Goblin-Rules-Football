@@ -243,8 +243,17 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
         SpawnObjectFromPowerUp(_rockPowerUpPrefab, spawnPosition);
     }
     [Server]
-    public void SpawnTNTFromPowerUp(Vector3 tntPosition)
-    { 
+    public void SpawnTNTFromPowerUp(Vector3 tntPosition, GolfPlayerTopDown playerThatSpawnedTNT)
+    {
+        Vector3 spawnPosition = GetValidSpawnPosition(tntPosition);
+
+        GameObject spawnedObject = Instantiate(_tntPowerUpPrefab, spawnPosition, Quaternion.identity);
+        TNTScript spawnedObjectTNTScript = spawnedObject.GetComponent<TNTScript>();
+
+        spawnedObjectTNTScript.PlayerConnectionID = playerThatSpawnedTNT.ConnectionId;
+
+        InstanceFinder.ServerManager.Spawn(spawnedObject);
+        this._spawnedObjectsFromPowerUps.Add(spawnedObject);
 
     }
     Vector3 GetValidSpawnPosition(Vector3 originalPosition)

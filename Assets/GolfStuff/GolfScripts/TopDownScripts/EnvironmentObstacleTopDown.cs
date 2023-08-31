@@ -556,16 +556,26 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         if (ballHeightInUnityUnits <= this.HeightInUnityUnits)
         {
             Debug.Log("TNTCollision: Ball hit TNT directly. Time to blow up!");
-            // blow up the TNT
+            this._tntScript.BlowUpTNT(golfBallScript);
             golfBallScript.InsideTNTCircle = false;
         }
     }
     void TNTEnterInnerCircle(GolfBallTopDown golfBallScript)
     {
         Debug.Log("TNTEnterInnerCircle: " + golfBallScript.MyPlayer.PlayerName + " is ball rolling? " + golfBallScript.isRolling);
+
+        // if the ball is rolling when it enters a circle, blow up the TNT?
+        if (golfBallScript.isRolling && this._tntScript.WillTNTBlowUp(golfBallScript))
+        {
+            this._tntScript.BlowUpTNT(golfBallScript);
+            golfBallScript.InsideTNTCircle = false;
+            golfBallScript.TNTScriptInSide = null;
+            return;
+        }
+
         golfBallScript.InsideTNTCircle = true;
         golfBallScript.TNTScriptInSide = this._tntScript;
-        Debug.Break();
+        //Debug.Break();
     }
     void TNTStayInnerCircle(GolfBallTopDown golfBallScript)
     {
@@ -583,7 +593,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             golfBallScript.InsideTNTCircle = false;
         }
 
-        Debug.Break();
+        //Debug.Break();
     }
     #endregion
     IEnumerator SpawnProtectionRoutine()

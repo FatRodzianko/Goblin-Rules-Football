@@ -342,6 +342,15 @@ x spinning hoop targets
 - - - - - - - - if a statue is in the radius, break the statue, and give whoever blew up the TNT the benefit/penalty for good/bad statue breaks?
 - - - - - - - - for any balls in the radius, get their position and direction toward the TNT. Have the ball get sent in the opposite direction away from tnt
 - - - - - - - - - - - the distance the ball is launched should be relative to how close it is to the tnt? Further away, not launched as far. Closer to the tnt, launched further away?
+- - - - - - - - - will need to have the TNT track what balls were blown up, wait for those balls to stop moving after they are launched, and then end the turn
+- - - - - - - - - - - - similar process to how the tornado tracks when it hits multiple balls as it moves
+- - - - - - - - - - - - might want to do this in PowerupManagerTopDownGolf instead of each TNT incase a ball is launched by 1 TNT and then lands in another TNT circle and blows up that one too?
+- - - - - - - - - - - - - - - track the first ball/player that started the TNT chain. When all balls stop moving, then send RPC to that player to finally end their turn?
+- - - - - - - - - - - - probably don't need to tell each player "where they landed" or whatever, just the player that started the chain. Still make sure to move balls out of water or back in bounds though
+- - - - - - different way the TNT could work: Player "plants" the TNT with their hit. At the end of their turn, the TNT blows up. Any balls in the area of the TNT will get launched
+- - - - - - - - - idea would be that the player with the TNT tries to hit their ball to bounce near another player's ball to plant the TNT. Then, the TNT blows up launching any of those balls it was near?
+- - - - - - - - - should be a lot simpler? Maybe?
+- - - - - - - - - have the EndOfTurnTasks function on the golfball handle await/asyncs. If the player planted TNT, have the EndOfTurnTasks call and await the TNT blow up task?
 - - - air patrol? Little planes that fly in a circle and if a ball is hit through their "area" in the sky, the planes shoot the ball down? (cause the ball to land a few feet below the planes)
 - - - - - - the "area" would be similar to the hoop ring? and how collisions for that work?
 - Get rid of all the "CmdTellServerPlayerHoleEndedCompleted" functions and the "_tellPlayerHoleEnded" type variables. Only one message is ever sent to players at a time. Can reuse just one bool and and reuse functions that just send messages. Just one "message from server" function that then tells the player which task to actually start? Instead of all this bullshit where I have 4 different things that are functionally all the same 
