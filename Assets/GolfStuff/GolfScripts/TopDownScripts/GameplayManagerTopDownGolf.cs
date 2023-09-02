@@ -568,6 +568,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         }
         else
         {
+            Debug.Log("StartNextPlayersTurn: move current player to their ball's position");
             //CurrentPlayer.SetPlayerOnBall();
             CurrentPlayer.MovePlayerToPosition(CurrentPlayer.Owner, CurrentPlayer.MyBall.transform.position);
         }

@@ -1793,10 +1793,13 @@ public class GolfBallTopDown : NetworkBehaviour
         MyPlayer.PlayerScore.StrokePenalty(1);
         MoveBallOutOfWater();
     }
-    void MoveBallOutOfWater()
+    void MoveBallOutOfWater(bool notFromNormalHit = false)
     {
         Vector3 newBallPos = FindPointOutOfWater();
-        StartCoroutine(DelayForPenaltyMessage(newBallPos, 3.5f));
+        float delayTime = 1.5f;
+        if (notFromNormalHit)
+            delayTime = 0f;
+        StartCoroutine(DelayForPenaltyMessage(newBallPos, delayTime));
     }
     IEnumerator DelayForPenaltyMessage(Vector3 newBallPos, float delaySeconds)
     {
@@ -1823,17 +1826,22 @@ public class GolfBallTopDown : NetworkBehaviour
         MyPlayer.EnablePlayerCanvas(false);
         GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
-    public void OutOfBounds()
+    public void OutOfBounds(bool notNormalHit = false)
     {
         Debug.Log("OutOfBounds: This ball is out of bounds: " + this.name + ":" + this.MyPlayer.PlayerName);
-        // Get the nearest inbounds point from the player object
-        Vector3 ballPos = this.transform.position;
-        Vector3 playerPos = MyPlayer.transform.position;
-        Vector2 dirToPlayer = (playerPos - ballPos).normalized;
-        Debug.Log("OutOfBounds: Ball position: " + ballPos.ToString() + " player position: " + playerPos.ToString() + " direction to the playeR: " + dirToPlayer.ToString());
-        Vector3 inBoundsPos = MyPlayer.GetNearestPointInBounds(playerPos, ballPos, -dirToPlayer);
-        inBoundsPos += (Vector3)(dirToPlayer * MyColliderRadius * 4f);
-        Debug.Log("OutOfBounds: Nearest inbounds position is: " + inBoundsPos.ToString("0.00000") + " for ball: " + this.name + ":" + this.MyPlayer.PlayerName);
+        //// Get the nearest inbounds point from the player object
+        //Vector3 ballPos = this.transform.position;
+        //Vector3 playerPos = MyPlayer.transform.position;
+        //Vector2 dirToPlayer = (playerPos - ballPos).normalized;
+        //Debug.Log("OutOfBounds: Ball position: " + ballPos.ToString() + " player position: " + playerPos.ToString() + " direction to the playeR: " + dirToPlayer.ToString());
+        //Vector3 inBoundsPos = MyPlayer.GetNearestPointInBounds(playerPos, ballPos, -dirToPlayer);
+        //inBoundsPos += (Vector3)(dirToPlayer * MyColliderRadius * 4f);
+        //Debug.Log("OutOfBounds: Nearest inbounds position is: " + inBoundsPos.ToString("0.00000") + " for ball: " + this.name + ":" + this.MyPlayer.PlayerName);
+
+        MoveBallInBounds(notNormalHit);
+
+        if (notNormalHit)
+            return;
 
         MyPlayer.PlayerUIMessage("out of bounds");
         MyPlayer.EnablePlayerCanvas(true);
@@ -1842,7 +1850,25 @@ public class GolfBallTopDown : NetworkBehaviour
             return;
 
         MyPlayer.PlayerScore.StrokePenalty(1);
-        StartCoroutine(DelayForPenaltyMessage(inBoundsPos, 3.5f));
+        //StartCoroutine(DelayForPenaltyMessage(inBoundsPos, 3.5f));
+    }
+    void MoveBallInBounds(bool notNormalHit = false)
+    {
+        Debug.Log("MoveBallInBounds: This ball is out of bounds: " + this.name + ":" + this.MyPlayer.PlayerName);
+        // Get the nearest inbounds point from the player object
+        Vector3 ballPos = this.transform.position;
+        Vector3 playerPos = MyPlayer.transform.position;
+        Vector2 dirToPlayer = (playerPos - ballPos).normalized;
+        Debug.Log("MoveBallInBounds: Ball position: " + ballPos.ToString() + " player position: " + playerPos.ToString() + " direction to the playeR: " + dirToPlayer.ToString());
+        Vector3 inBoundsPos = MyPlayer.GetNearestPointInBounds(playerPos, ballPos, -dirToPlayer);
+        inBoundsPos += (Vector3)(dirToPlayer * MyColliderRadius * 4f);
+        Debug.Log("MoveBallInBounds: Nearest inbounds position is: " + inBoundsPos.ToString("0.00000") + " for ball: " + this.name + ":" + this.MyPlayer.PlayerName);
+
+        float delayTime = 1.5f;
+        if (notNormalHit)
+            delayTime = 0f;
+
+        StartCoroutine(DelayForPenaltyMessage(inBoundsPos, delayTime));
     }
     public void TellPlayerGroundTypeTheyLandedOn()
     {
@@ -2173,6 +2199,23 @@ public class GolfBallTopDown : NetworkBehaviour
         //IsHitByTornado = false;
         //MyTornado.BallCompletedTornadoHit(this);
         Debug.Log("ResetTNTThatBlewMeUp: ");
+
+        if (!this.PlantedTNTThisTurn)
+        {
+            // check if the ball is out of bounds or in water. If so, move them back onto land?
+            if (!MyPlayer.IsBallInBounds())
+            {
+                this.OutOfBounds(true);
+            }
+
+            GetGroundMaterial();
+            if (this.bounceContactGroundMaterial.Contains("water"))
+            {
+                MoveBallOutOfWater(true);
+            }
+            
+        }
+
         CmdTellTNTBallDoneBeingBlownUp(TNTThatBlewMeUp);
         TNTThatBlewMeUp = null;
     }

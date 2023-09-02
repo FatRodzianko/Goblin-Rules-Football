@@ -918,6 +918,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void SetPlayerOnBall()
     {
+        Debug.Log("SetPlayerOnBall: ");
         this.transform.position = MyBall.transform.position;
     }
     void DeactivateIconsForNewTurn()
@@ -2952,6 +2953,23 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void CmdBallThroughHoop()
     {
         this.PlayerScore.RemoveStroke();
+    }
+    public bool IsBallInBounds()
+    {
+        bool isInBounds = true;
+        if (_cameraBoundingBox)
+        {
+            if (!_cameraBoundingBox.OverlapPoint(MyBall.transform.position))
+            {
+                Debug.Log("IsBallInBounds: Ball is NOT in bounds. Moving the ball for the ball");
+                isInBounds = false;
+                //MyBall.OutOfBounds();
+                //ball.OutOfBounds();
+                //await ball.MyPlayer.TellPlayerBallIsOutOfBounds(3);
+                //return;
+            }
+        }
+        return isInBounds;
     }
     #region Tee Off Challenge
     [Server]
