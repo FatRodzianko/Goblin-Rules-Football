@@ -45,10 +45,10 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
     [SerializeField] TubeScript _tubeScript;
     [SerializeField] bool _ballInTube = false;
 
-    [Header("TNT")]
-    [SerializeField] bool _isTNT = false;
-    [SerializeField] bool _isTNTInnerCircle = false;
-    [SerializeField] TNTScript _tntScript;
+    [Header("Land Mine")]
+    [SerializeField] bool _isLandMine = false;
+    [SerializeField] bool _isLandMineInnerCircle = false;
+    [SerializeField] LandMineScript _landMineScript;
 
     [Header("Spawn Protection")]
     bool _spawnProtection = true;
@@ -123,12 +123,12 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
                 Debug.Log("EnvironmentObstacleTopDown: Done with spinning hoop checks");
                 return;
             }
-            if (_isTNT)
+            if (_isLandMine)
             {
                 TNTCollision(golfBallScript);
                 return;
             }
-            if (_isTNTInnerCircle)
+            if (_isLandMineInnerCircle)
             {
                 TNTEnterInnerCircle(golfBallScript);
                 return;
@@ -229,7 +229,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
                 return;
             if (golfBallScript.BallInTube)
                 return;
-            if (_isTNTInnerCircle)
+            if (_isLandMineInnerCircle)
             {
                 //TNTStayInnerCircle(golfBallScript);
                 return;
@@ -296,7 +296,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
             if (golfBallScript.BallInTube)
                 return;
 
-            if (_isTNTInnerCircle)
+            if (_isLandMineInnerCircle)
             {
                 TNTExitInnerCircle(golfBallScript);
                 return;
@@ -547,7 +547,7 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         _ballInTube = false;
     }
     #endregion
-    #region TNT
+    #region LandMine
     void TNTCollision(GolfBallTopDown golfBallScript)
     {
         float ballZ = golfBallScript.transform.position.z;
@@ -556,8 +556,8 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         if (ballHeightInUnityUnits <= this.HeightInUnityUnits)
         {
             Debug.Log("TNTCollision: Ball hit TNT directly. Time to blow up!");
-            this._tntScript.BlowUpTNT(golfBallScript);
-            golfBallScript.InsideTNTCircle = false;
+            this._landMineScript.BlowUpLandMine(golfBallScript);
+            golfBallScript.InsideLandMineCircle = false;
         }
     }
     void TNTEnterInnerCircle(GolfBallTopDown golfBallScript)
@@ -565,32 +565,32 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
         Debug.Log("TNTEnterInnerCircle: " + golfBallScript.MyPlayer.PlayerName + " is ball rolling? " + golfBallScript.isRolling);
 
         // if the ball is rolling when it enters a circle, blow up the TNT?
-        if (golfBallScript.isRolling && this._tntScript.WillTNTBlowUp(golfBallScript))
+        if (golfBallScript.isRolling && this._landMineScript.WillLandMineBlowUp(golfBallScript))
         {
-            this._tntScript.BlowUpTNT(golfBallScript);
-            golfBallScript.InsideTNTCircle = false;
-            golfBallScript.TNTScriptInSide = null;
+            this._landMineScript.BlowUpLandMine(golfBallScript);
+            golfBallScript.InsideLandMineCircle = false;
+            golfBallScript.LandMineScriptInSide = null;
             return;
         }
 
-        golfBallScript.InsideTNTCircle = true;
-        golfBallScript.TNTScriptInSide = this._tntScript;
+        golfBallScript.InsideLandMineCircle = true;
+        golfBallScript.LandMineScriptInSide = this._landMineScript;
         //Debug.Break();
     }
     void TNTStayInnerCircle(GolfBallTopDown golfBallScript)
     {
-        if (golfBallScript.InsideTNTCircle)
+        if (golfBallScript.InsideLandMineCircle)
             return;
-        golfBallScript.InsideTNTCircle = true;
+        golfBallScript.InsideLandMineCircle = true;
         
     }
     void TNTExitInnerCircle(GolfBallTopDown golfBallScript)
     {
         Debug.Log("TNTExitInnerCircle: " + golfBallScript.MyPlayer.PlayerName);
-        if (golfBallScript.TNTScriptInSide == this._tntScript)
+        if (golfBallScript.LandMineScriptInSide == this._landMineScript)
         {
-            golfBallScript.TNTScriptInSide = null;
-            golfBallScript.InsideTNTCircle = false;
+            golfBallScript.LandMineScriptInSide = null;
+            golfBallScript.InsideLandMineCircle = false;
         }
 
         //Debug.Break();

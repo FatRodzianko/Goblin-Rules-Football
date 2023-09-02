@@ -7,6 +7,7 @@ using FishNet.Object;
 using FishNet.Managing;
 using FishNet.Object.Synchronizing;
 using FishNet;
+using System.Threading.Tasks;
 
 public class GolfBallTopDown : NetworkBehaviour
 {
@@ -90,10 +91,14 @@ public class GolfBallTopDown : NetworkBehaviour
     public Torndao MyTornado = null;
 
     [Header("TNT Stuff")]
-    public bool InsideTNTCircle = false;
-    public TNTScript TNTScriptInSide;
     public bool PlantedTNTThisTurn = false;
-    public TNTScript TNTThatBlewMeUp;
+    bool _waitingForTNTToBlowUp = false;
+
+    [Header("LandMine Stuff")]
+    public bool InsideLandMineCircle = false;
+    public LandMineScript LandMineScriptInSide;
+    public bool PlantedLandMine = false;
+    public LandMineScript LandMineThatBlewMeUp;
 
 
     [Header("Ground Material Info")]
@@ -647,13 +652,13 @@ public class GolfBallTopDown : NetworkBehaviour
         ResetBouncingInfo(false);
 
         // check if ball should blow up tnt because it landed inside a tnt circle
-        if (this.InsideTNTCircle)
+        if (this.InsideLandMineCircle)
         {
             // make sure that the "blow up TNT" thing is also called on other bounces aka outside of this
-            if (TNTScriptInSide.WillTNTBlowUp(this))
+            if (LandMineScriptInSide.WillLandMineBlowUp(this))
             {
                 Debug.Log("GetBounces: Ball landed inside of TNT radius that the player does not own. Blowing up the TNT");
-                BlowUpTNT();
+                BlowUpLandMine();
                 return;
             }
         }
@@ -661,8 +666,8 @@ public class GolfBallTopDown : NetworkBehaviour
         if (!hasBouncedYet)
         {
             originalHitDirection = hitDirection;
-            
             CheckForTNTPowerUpSpawn();
+            CheckForLandMinePowerUpSpawn();
         }
 
         // Check if there is side spin. IF so, change the original direction to account for the side spin
@@ -1269,14 +1274,26 @@ public class GolfBallTopDown : NetworkBehaviour
         //CmdTellServerToStartNexPlayersTurn();
         EndOfTurnTasks();
     }
-    void EndOfTurnTasks()
+    // will likely need to change this to an await/async whatever to let the TNT blow up and stuff?
+    async void EndOfTurnTasks()
     {
+        // Spawn a rock checks
         MyPlayer.SpawnRockFromPowerUp();
+
+        // TNT checks
         if (this.PlantedTNTThisTurn)
-        { 
-            // call await task to have the TNT blow up and launch any nearby balls
+        {
+            await BlowUpTNT();
         }
         this.PlantedTNTThisTurn = false;
+        // Landmine checks
+        if (this.PlantedLandMine)
+        { 
+            // call await task to have the LandMine blow up and launch any nearby balls
+        }
+        this.PlantedLandMine = false;
+
+        // End the turn
         CmdTellServerToStartNexPlayersTurn();
     }
     [ServerRpc]
@@ -2040,10 +2057,29 @@ public class GolfBallTopDown : NetworkBehaviour
         SetBallInTube(false);
     }
     #endregion
+    #region LandMine
+    void CheckForLandMinePowerUpSpawn()
+    {
+        Debug.Log("CheckForLandMinePowerUpSpawn()");
+        if (MyPlayer.UsedPowerupThisTurn && MyPlayer.UsedPowerUpType == "landmine" && !this.PlantedLandMine)
+        {
+            MyPlayer.SpawnTNTFromPowerUp();
+            this.PlantedLandMine = true;
+        }
+        //Debug.Break();
+    }
+
+    void BlowUpLandMine()
+    {
+        Debug.Log("BlowUpLandMine: ");
+        LandMineScriptInSide.BlowUpLandMine(this);
+        Debug.Break();
+    }
+    #endregion
     #region TNT
     void CheckForTNTPowerUpSpawn()
     {
-        Debug.Log("CheckForTNTPowerUp()");
+        Debug.Log("CheckForTNTPowerUpSpawn()");
         if (MyPlayer.UsedPowerupThisTurn && MyPlayer.UsedPowerUpType == "tnt" && !this.PlantedTNTThisTurn)
         {
             MyPlayer.SpawnTNTFromPowerUp();
@@ -2051,12 +2087,26 @@ public class GolfBallTopDown : NetworkBehaviour
         }
         //Debug.Break();
     }
-
-    void BlowUpTNT()
+    // this will likely need to be changed to a task or something?
+    public async Task BlowUpTNT()
     {
         Debug.Log("BlowUpTNT: ");
-        TNTScriptInSide.BlowUpTNT(this);
-        Debug.Break();
+        // Focus camera on the tnt object
+        this._waitingForTNTToBlowUp = true;
+        StartCoroutine(WaitingForTNT());
+        while (this._waitingForTNTToBlowUp)
+        {
+            await Task.Yield();
+        }
+        // Start animation to blow up TNT
+
+    }
+    IEnumerator WaitingForTNT()
+    {
+        Debug.Log("WaitingForTNT: starting");
+        yield return new WaitForSeconds(5f);
+        this._waitingForTNTToBlowUp = false;
+        Debug.Log("WaitingForTNT: ending");
     }
     #endregion
 

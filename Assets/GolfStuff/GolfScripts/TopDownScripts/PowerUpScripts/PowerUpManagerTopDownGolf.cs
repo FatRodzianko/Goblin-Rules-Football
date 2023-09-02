@@ -245,7 +245,8 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
     [Server]
     public void SpawnTNTFromPowerUp(Vector3 tntPosition, GolfPlayerTopDown playerThatSpawnedTNT)
     {
-        Vector3 spawnPosition = GetValidSpawnPosition(tntPosition);
+        //Vector3 spawnPosition = GetValidSpawnPosition(tntPosition);
+        Vector3 spawnPosition = tntPosition; // it shouldn't matter where the TNT spawns since it will blow up at the end of the player's turn. It shouldn't be able to block anything?
 
         GameObject spawnedObject = Instantiate(_tntPowerUpPrefab, spawnPosition, Quaternion.identity);
         TNTScript spawnedObjectTNTScript = spawnedObject.GetComponent<TNTScript>();
