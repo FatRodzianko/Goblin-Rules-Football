@@ -354,6 +354,9 @@ x spinning hoop targets
 - - - air patrol? Little planes that fly in a circle and if a ball is hit through their "area" in the sky, the planes shoot the ball down? (cause the ball to land a few feet below the planes)
 - - - - - - the "area" would be similar to the hoop ring? and how collisions for that work?
 - Get rid of all the "CmdTellServerPlayerHoleEndedCompleted" functions and the "_tellPlayerHoleEnded" type variables. Only one message is ever sent to players at a time. Can reuse just one bool and and reuse functions that just send messages. Just one "message from server" function that then tells the player which task to actually start? Instead of all this bullshit where I have 4 different things that are functionally all the same 
+- Add favor penalties for using certain clubs on certain terrains
+- - - anything but the putter on the green
+- - - driver on the fairway
 
 
 0.2708333

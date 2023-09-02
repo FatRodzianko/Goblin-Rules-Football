@@ -93,6 +93,10 @@ public class GolfBallTopDown : NetworkBehaviour
     [Header("TNT Stuff")]
     public bool PlantedTNTThisTurn = false;
     bool _waitingForTNTToBlowUp = false;
+    public TNTScript TNTPlantedByMe = null;
+    bool _ballWasBlownUp = false;
+    public TNTScript TNTThatBlewMeUp = null;
+    [SerializeField] float _maxDistanceToGetBlownUp = 20f;
 
     [Header("LandMine Stuff")]
     public bool InsideLandMineCircle = false;
@@ -1198,15 +1202,28 @@ public class GolfBallTopDown : NetworkBehaviour
         SoundManager.instance.PlaySound(_ballSounds.BallInHole, 1.0f);
         //GameplayManagerTopDownGolf.instance.PlayersBallInHole();
 
-        if (IsHitByTornado)
-        {
-            ResetTornadoStuff();
-            // check to see if ball is out of bounds or in water to make sure that is handled appropriately. Also, check if the ball is in the hole? Prompt each player sequentially? If possible?
-            // Maybe tell the Tornado object to make a call to GameplayManager with a list of GolfPlayers that need to be told. GameplayManager makes calls to "await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3)" which it should be able to do sequentially because it is a task?
+        //if (IsHitByTornado)
+        //{
+        //    ResetTornadoStuff();
+        //    // check to see if ball is out of bounds or in water to make sure that is handled appropriately. Also, check if the ball is in the hole? Prompt each player sequentially? If possible?
+        //    // Maybe tell the Tornado object to make a call to GameplayManager with a list of GolfPlayers that need to be told. GameplayManager makes calls to "await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3)" which it should be able to do sequentially because it is a task?
 
+        //    return;
+        //}
+        //if (_ballWasBlownUp)
+        //{
+        //    ResetTNTThatBlewMeUp();
+        //    return;
+        //}
+        if (MyTornado || TNTThatBlewMeUp)
+        {
+            Debug.Log("ResetBallAndPlayerAfterBallStoppedRolling: " + MyPlayer.PlayerName + " was either blown up by TNT or hit by a tornado");
+            if (MyTornado)
+                ResetTornadoStuff();
+            if (TNTThatBlewMeUp)
+                ResetTNTThatBlewMeUp();
             return;
         }
-
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
         //CmdTellServerToStartNexPlayersTurn();
         EndOfTurnTasks();
@@ -1258,12 +1275,26 @@ public class GolfBallTopDown : NetworkBehaviour
         //TellPlayerGroundTypeTheyLandedOn();
         MyPlayer.SetDistanceToHoleForPlayer();
         SetPlayerUsingRocket(false);
-        if (IsHitByTornado)
-        {
-            ResetTornadoStuff();
-            // check to see if ball is out of bounds or in water to make sure that is handled appropriately. Also, check if the ball is in the hole? Prompt each player sequentially? If possible?
-            // Maybe tell the Tornado object to make a call to GameplayManager with a list of GolfPlayers that need to be told. GameplayManager makes calls to "await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3)" which it should be able to do sequentially because it is a task?
+        //if (IsHitByTornado)
+        //{
+        //    ResetTornadoStuff();
+        //    // check to see if ball is out of bounds or in water to make sure that is handled appropriately. Also, check if the ball is in the hole? Prompt each player sequentially? If possible?
+        //    // Maybe tell the Tornado object to make a call to GameplayManager with a list of GolfPlayers that need to be told. GameplayManager makes calls to "await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3)" which it should be able to do sequentially because it is a task?
 
+        //    return;
+        //}
+        //if (_ballWasBlownUp)
+        //{
+        //    ResetTNTThatBlewMeUp();
+        //    return;
+        //}
+        if (MyTornado || TNTThatBlewMeUp)
+        {
+            Debug.Log("ResetBallAndPlayerAfterBallStoppedRolling: " + MyPlayer.PlayerName + " was either blown up by TNT or hit by a tornado");
+            if (MyTornado)
+                ResetTornadoStuff();
+            if(TNTThatBlewMeUp)
+                ResetTNTThatBlewMeUp();
             return;
         }
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
@@ -1834,6 +1865,16 @@ public class GolfBallTopDown : NetworkBehaviour
             IsHitByTornado = false;
             return;
         }
+        if (_ballWasBlownUp)
+        {
+            _ballWasBlownUp = false;
+            ResetTNTThatBlewMeUp();
+
+            // only get the statue favor if the player who planted the TNT was also blown up. all other balls are unaffected by favor?
+            // on second though, leaving in the favor calculation for all players. Part of the strategy for using TNT?
+            //if(!this.PlantedTNTThisTurn)
+            //    return;
+        }
         RaycastHit2D[] hits = Physics2D.CircleCastAll(this.transform.position, pixelUnit, Vector2.zero, 0f, _defaultLayerMask);
         if (hits.Length <= 0)
             return;
@@ -2092,8 +2133,12 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         Debug.Log("BlowUpTNT: ");
         // Focus camera on the tnt object
+
+
         this._waitingForTNTToBlowUp = true;
-        StartCoroutine(WaitingForTNT());
+        CmdBlowUpTNT(TNTPlantedByMe.ObjectId);
+
+        //StartCoroutine(WaitingForTNT());
         while (this._waitingForTNTToBlowUp)
         {
             await Task.Yield();
@@ -2101,12 +2146,75 @@ public class GolfBallTopDown : NetworkBehaviour
         // Start animation to blow up TNT
 
     }
+    [ServerRpc]
+    void CmdBlowUpTNT(int tntID)
+    {
+        Debug.Log("CmdBlowUpTNT: for TNT ID: " + tntID.ToString());
+        InstanceFinder.ServerManager.Objects.Spawned[tntID].transform.GetComponent<TNTScript>().BlowUpTNT(this);
+    }
     IEnumerator WaitingForTNT()
     {
         Debug.Log("WaitingForTNT: starting");
         yield return new WaitForSeconds(5f);
         this._waitingForTNTToBlowUp = false;
         Debug.Log("WaitingForTNT: ending");
+    }
+    [TargetRpc]
+    public void RpcAllBallsBlownUp(NetworkConnection conn)
+    {
+        Debug.Log("RpcAllBallsBlownUp: ");
+        TNTPlantedByMe = null;
+        this._waitingForTNTToBlowUp = false;
+    }
+    void ResetTNTThatBlewMeUp()
+    {
+        if (!this.IsOwner || !TNTThatBlewMeUp)
+            return;
+        //IsHitByTornado = false;
+        //MyTornado.BallCompletedTornadoHit(this);
+        Debug.Log("ResetTNTThatBlewMeUp: ");
+        CmdTellTNTBallDoneBeingBlownUp(TNTThatBlewMeUp);
+        TNTThatBlewMeUp = null;
+    }
+    [ServerRpc]
+    void CmdTellTNTBallDoneBeingBlownUp(TNTScript tntScript)
+    {
+        if (!tntScript)
+            return;
+        tntScript.BallDoneBeingBlownUp(this);
+    }
+    [TargetRpc]
+    public void RpcLaunchBallFromTNT(NetworkConnection conn, float distFromTNT, TNTScript tnt)
+    {
+        Debug.Log("RpcLaunchBallFromTNT: distance from tnt: " + distFromTNT);
+        TNTThatBlewMeUp = tnt;
+        _ballWasBlownUp = true;
+        Vector2 directionFromTNT = (this.transform.position - tnt.transform.position).normalized;
+        LaunchBallFromTNT(distFromTNT, directionFromTNT, tnt);
+    }
+    void LaunchBallFromTNT(float distFromTNT, Vector2 directionFromTNT, TNTScript tnt)
+    {
+        Debug.Log("LaunchBallFromTNT: distance from tnt: " + distFromTNT.ToString() + " direction from TNT: " + directionFromTNT.ToString());
+        // reset before hitting the ball again?
+        hitBallCount = 0f;
+        if (isHit)
+        {
+            isHit = false;
+        }
+
+        if (isBouncing)
+            isBouncing = false;
+        if (isRolling)
+            isRolling = false;
+
+        float tntLaunchDistance = GetTNTLaunchDistance(distFromTNT, tnt.BlastRadius);
+        float tntLaunchAngle = UnityEngine.Random.Range(10f, 40f);
+
+        HitBall(tntLaunchDistance, tntLaunchAngle, 0f, directionFromTNT, 0f);
+    }
+    float GetTNTLaunchDistance(float distFromTNT, float maxDistanceFrom)
+    {
+        return _maxDistanceToGetBlownUp * ((maxDistanceFrom - distFromTNT) / maxDistanceFrom);
     }
     #endregion
 

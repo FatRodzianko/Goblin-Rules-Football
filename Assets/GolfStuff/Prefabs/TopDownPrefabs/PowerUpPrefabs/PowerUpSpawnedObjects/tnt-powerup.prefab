@@ -144,9 +144,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5989471935717597338}
   - component: {fileID: 5989471935717597339}
+  - component: {fileID: 8705462688887826533}
   - component: {fileID: 2749274148255648493}
   - component: {fileID: 1435828339553014942}
-  - component: {fileID: 8705462688887826533}
   - component: {fileID: 304913389237957452}
   m_Layer: 0
   m_Name: tnt-powerup
@@ -223,6 +223,32 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!114 &8705462688887826533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5989471935717597336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9fff0bd2ea4cd444ab0ba77944ba07e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 2749274148255648493}
+  _networkObjectCache: {fileID: 2749274148255648493}
+  PlayerConnectionID: -99
+  _myAnimator: {fileID: 304913389237957452}
+  _explosionAnim: tnt-explosion
+  _golfBallLayer:
+    serializedVersion: 2
+    m_Bits: 536870912
+  BlastRadius: 5
+  WaitingOnBlownUpBalls: 0
+  BallsBlownUp: []
+  BallsBlownUpThatStopped: []
+  _golfBallThatStartedExplosion: {fileID: 0}
 --- !u!114 &2749274148255648493
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,8 +265,8 @@ MonoBehaviour:
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
   _networkBehaviours:
-  - {fileID: 1435828339553014942}
   - {fileID: 8705462688887826533}
+  - {fileID: 1435828339553014942}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -266,7 +292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 0
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 2749274148255648493}
   _networkObjectCache: {fileID: 2749274148255648493}
   _synchronizeParent: 0
@@ -295,25 +321,6 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
---- !u!114 &8705462688887826533
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5989471935717597336}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9fff0bd2ea4cd444ab0ba77944ba07e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 1
-  _addedNetworkObject: {fileID: 2749274148255648493}
-  _networkObjectCache: {fileID: 2749274148255648493}
-  PlayerConnectionID: -99
-  WaitingOnBlownUpBalls: 0
-  BallsBlownUp: []
-  BallsBlownUpThatStopped: []
 --- !u!95 &304913389237957452
 Animator:
   serializedVersion: 4

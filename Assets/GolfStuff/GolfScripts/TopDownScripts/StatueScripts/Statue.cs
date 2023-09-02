@@ -89,7 +89,7 @@ public class Statue : NetworkBehaviour
         //    return UnityEngine.Random.Range(3f, 7.5f);
         //else
         //    return UnityEngine.Random.Range(8f, 12.5f);
-        return UnityEngine.Random.Range(7.5f, 12.5f);
+        return UnityEngine.Random.Range(7.5f, 10.5f);
     }
     int GetRingSegments(float radius)
     {
