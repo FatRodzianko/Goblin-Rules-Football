@@ -667,6 +667,9 @@ public class GolfBallTopDown : NetworkBehaviour
             }
         }
 
+        // Get the ground material the ball will be bouncing off of. Will effect number of bounces and stuff
+        bounceContactGroundMaterial = GetGroundMaterial();
+
         if (!hasBouncedYet)
         {
             originalHitDirection = hitDirection;
@@ -690,8 +693,8 @@ public class GolfBallTopDown : NetworkBehaviour
         }
 
 
-        // Get the ground material the ball will be bouncing off of. Will effect number of bounces and stuff
-        bounceContactGroundMaterial = GetGroundMaterial();
+        //// Get the ground material the ball will be bouncing off of. Will effect number of bounces and stuff
+        //bounceContactGroundMaterial = GetGroundMaterial();
 
         // Check if the ball will keep bouncing or not
         if (KeepBouncing(hitHeight, bounceContactGroundMaterial))
@@ -2140,7 +2143,7 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         Debug.Log("BlowUpLandMine: ");
         LandMineScriptInSide.BlowUpLandMine(this);
-        Debug.Break();
+        //Debug.Break();
     }
     #endregion
     #region TNT
@@ -2149,6 +2152,10 @@ public class GolfBallTopDown : NetworkBehaviour
         Debug.Log("CheckForTNTPowerUpSpawn()");
         if (MyPlayer.UsedPowerupThisTurn && MyPlayer.UsedPowerUpType == "tnt" && !this.PlantedTNTThisTurn)
         {
+            // don't plant tnt in the water
+            if (bounceContactGroundMaterial.Contains("water"))
+                return;
+
             MyPlayer.SpawnTNTFromPowerUp();
             this.PlantedTNTThisTurn = true;
         }
@@ -2162,11 +2169,26 @@ public class GolfBallTopDown : NetworkBehaviour
 
 
         this._waitingForTNTToBlowUp = true;
-        CmdBlowUpTNT(TNTPlantedByMe.ObjectId);
+
+        // this is to compensate for delay from the server setting the TNT object. Should only be relevant when landing in sand?
+        bool waitingForTNTObjectToBeSet = false;
+        if (TNTPlantedByMe)
+            CmdBlowUpTNT(TNTPlantedByMe.ObjectId);
+        else 
+            waitingForTNTObjectToBeSet = true;
 
         //StartCoroutine(WaitingForTNT());
         while (this._waitingForTNTToBlowUp)
         {
+            // check to see if the TNT object has been set yet, if the player was waiting
+            if (waitingForTNTObjectToBeSet)
+            {
+                if (TNTPlantedByMe)
+                {
+                    CmdBlowUpTNT(TNTPlantedByMe.ObjectId);
+                    waitingForTNTObjectToBeSet = false;
+                }
+            }
             await Task.Yield();
         }
         // Start animation to blow up TNT
@@ -2234,6 +2256,9 @@ public class GolfBallTopDown : NetworkBehaviour
         _ballWasBlownUp = true;
         Vector2 directionFromTNT = (this.transform.position - tnt.transform.position).normalized;
         LaunchBallFromTNT(distFromTNT, directionFromTNT, tnt);
+        
+        /// Testing!!!
+        //LaunchBallTowardHole();
     }
     void LaunchBallFromTNT(float distFromTNT, Vector2 directionFromTNT, TNTScript tnt)
     {
@@ -2250,14 +2275,42 @@ public class GolfBallTopDown : NetworkBehaviour
         if (isRolling)
             isRolling = false;
 
-        float tntLaunchDistance = GetTNTLaunchDistance(distFromTNT, tnt.BlastRadius);
+        // Check if the direction is 0? Should only happen when they plant TNT and land in sand
+        if (directionFromTNT == Vector2.zero)
+        {
+            float x = UnityEngine.Random.Range(0f, 1f);
+            float y = UnityEngine.Random.Range(0f, 1f);
+            directionFromTNT = new Vector2(x, y).normalized;
+        }
+
+        float tntLaunchDistance = GetTNTLaunchDistance(distFromTNT, tnt.BlastRadius + this.MyColliderRadius);
         float tntLaunchAngle = UnityEngine.Random.Range(10f, 40f);
 
         HitBall(tntLaunchDistance, tntLaunchAngle, 0f, directionFromTNT, 0f);
     }
     float GetTNTLaunchDistance(float distFromTNT, float maxDistanceFrom)
     {
-        return _maxDistanceToGetBlownUp * ((maxDistanceFrom - distFromTNT) / maxDistanceFrom);
+        return 1f + (_maxDistanceToGetBlownUp * ((maxDistanceFrom - distFromTNT) / maxDistanceFrom));
+    }
+    void LaunchBallTowardHole()
+    {
+        Vector3 holePos = GameplayManagerTopDownGolf.instance.HolePositions[0];
+        Vector2 dirToHole = (holePos - this.transform.position).normalized;
+        hitBallCount = 0f;
+        if (isHit)
+        {
+            isHit = false;
+        }
+
+        if (isBouncing)
+            isBouncing = false;
+        if (isRolling)
+            isRolling = false;
+
+        float tntLaunchDistance = Vector2.Distance(holePos, this.transform.position);
+        float tntLaunchAngle = UnityEngine.Random.Range(20f, 40f);
+
+        HitBall(tntLaunchDistance, tntLaunchAngle, 0f, dirToHole, 0f);
     }
     #endregion
 

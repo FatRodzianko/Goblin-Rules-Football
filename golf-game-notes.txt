@@ -352,8 +352,8 @@ x spinning hoop targets
 - - - - - - - - x should be a lot simpler? Maybe?
 - - - - - - - - x have the EndOfTurnTasks function on the golfball handle await/asyncs. If the player planted TNT, have the EndOfTurnTasks call and await the TNT blow up task?
 - - - - - x try to test what happens when a TNT explosion launches a ball into water or out of bounds. Does the player who DID NOT plant the TNT get the penaly? Do they get moved? Likewise for the player that DID plant the TNT
-- - - - - - test what happens if the TNT launches all balls into the hole? Will it go to the next hole?
-- - - - - - - - manually set the LaunchBall thing to have all balls launch into the hole. Get direction to hole, distance, and then hit off that?
+- - - - - x test what happens if the TNT launches all balls into the hole? Will it go to the next hole?
+- - - - - - - x manually set the LaunchBall thing to have all balls launch into the hole. Get direction to hole, distance, and then hit off that?
 - - - air patrol? Little planes that fly in a circle and if a ball is hit through their "area" in the sky, the planes shoot the ball down? (cause the ball to land a few feet below the planes)
 - - - - - - the "area" would be similar to the hoop ring? and how collisions for that work?
 - Get rid of all the "CmdTellServerPlayerHoleEndedCompleted" functions and the "_tellPlayerHoleEnded" type variables. Only one message is ever sent to players at a time. Can reuse just one bool and and reuse functions that just send messages. Just one "message from server" function that then tells the player which task to actually start? Instead of all this bullshit where I have 4 different things that are functionally all the same 

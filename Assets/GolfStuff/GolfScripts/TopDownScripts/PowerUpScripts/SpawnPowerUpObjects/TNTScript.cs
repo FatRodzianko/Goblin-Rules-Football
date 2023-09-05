@@ -89,7 +89,7 @@ public class TNTScript : NetworkBehaviour
         RaycastHit2D[] balls = Physics2D.CircleCastAll(this.transform.position, BlastRadius, Vector2.zero, 0f, _golfBallLayer);
         if (balls.Length == 0)
             return;
-
+        Vector3 myPos = this.transform.position;
         foreach (RaycastHit2D hit in balls)
         {
             try
@@ -97,6 +97,10 @@ public class TNTScript : NetworkBehaviour
                 GolfBallTopDown ball = hit.transform.GetComponent<GolfBallTopDown>();
                 if (BallsBlownUp.Contains(ball))
                     continue;
+                
+                //if (Vector2.Distance(ball.transform.position, myPos) >= BlastRadius)
+                //    continue;
+                
                 Debug.Log("GetBallsWithinBlastRadius: adding " + ball.MyPlayer.PlayerName + "'s ball to get blown up");
                 BallsBlownUp.Add(ball);
             }
@@ -136,6 +140,9 @@ public class TNTScript : NetworkBehaviour
     [Server]
     void LaunchBallsInBlastRadius()
     {
+        // Testing!!!
+        WindManager.instance.WindPower = 0;
+
         Debug.Log("LaunchBallsInBlastRadius: ");
         Vector3 myPos = this.transform.position;
         WaitingOnBlownUpBalls = true;

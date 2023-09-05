@@ -110,10 +110,6 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
     [Server]
     string GetPowerUpType()
     {
-        // testing!!!
-        return "tnt";
-
-
         var random = new System.Random();
         int index = random.Next(PowerUpTypeToSpriteMapping.Count);
         return PowerUpTypeToSpriteMapping[index].powerUpType;
