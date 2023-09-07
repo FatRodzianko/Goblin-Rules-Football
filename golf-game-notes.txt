@@ -311,16 +311,16 @@ x spinning hoop targets
 - - - - - - - x will need to make sure it isn't done twice, though
 - - - - - x have base collider be a circle as well as the hoop sprite collider?
 - mario pipe/tunnel things
-- - - small pipes on the course. If a player hits their ball into it, they go through the tunnel and out the other side
-- - - end pipe will be near the hole. Plops the player near the hole
-- - - put the pipes in non-ideal locations. If a player misses it, they're kind of stuck?
-- - - multiple pipes per hole: make them color coded? or multiple entries and one exit?
-- - - should be somewhat of a challenge. The player has to "pong" the ball" in, and if they miss, they bounce off the rim?
-- - - tubes "A" and "B" that have to be paired
-- - - - - - tile map manager checks to make sure there are at least two tubes before saving. If not, don't save the tubes
-- - - - - - when the tubes are spawned:
-- - - - - - - - - spawn tube A, then tube B
-- - - - - - - - - make sure each tube has a reference to the other tube, it's "pair" that it sends the ball too
+- - x small pipes on the course. If a player hits their ball into it, they go through the tunnel and out the other side
+- - x end pipe will be near the hole. Plops the player near the hole
+- - x put the pipes in non-ideal locations. If a player misses it, they're kind of stuck?
+- - x multiple pipes per hole: make them color coded? or multiple entries and one exit?
+- - x should be somewhat of a challenge. The player has to "pong" the ball" in, and if they miss, they bounce off the rim?
+- - x tubes "A" and "B" that have to be paired
+- - - - - x tile map manager checks to make sure there are at least two tubes before saving. If not, don't save the tubes
+- - - - - x when the tubes are spawned:
+- - - - - - - - x spawn tube A, then tube B
+- - - - - - - - x make sure each tube has a reference to the other tube, it's "pair" that it sends the ball too
 - - - when a ball bounces off the top of a tube/obstacle, maybe give it some extra "juice"/distance to the bounce? Right now, seems easy to get stuck bouncing off the top continuously
 - - - - - - possible that is caused by the spin I'm putting on the ball while testing also. Still, maybe make it bounce further off the top of objects? couldn't hurt?
 - Rock power up
@@ -357,9 +357,14 @@ x spinning hoop targets
 - - - air patrol? Little planes that fly in a circle and if a ball is hit through their "area" in the sky, the planes shoot the ball down? (cause the ball to land a few feet below the planes)
 - - - - - - the "area" would be similar to the hoop ring? and how collisions for that work?
 - Get rid of all the "CmdTellServerPlayerHoleEndedCompleted" functions and the "_tellPlayerHoleEnded" type variables. Only one message is ever sent to players at a time. Can reuse just one bool and and reuse functions that just send messages. Just one "message from server" function that then tells the player which task to actually start? Instead of all this bullshit where I have 4 different things that are functionally all the same 
-- Add favor penalties for using certain clubs on certain terrains
-- - - anything but the putter on the green
-- - - driver on the fairway
+x Add favor penalties for using certain clubs on certain terrains
+- - x anything but the putter on the green
+- - x driver on the fairway
+x limit tee off challenges to only specific clubs
+- cancellation tokens for all the "tasks" so they don't run after the game has ended or whatever
+- - - pass cancellation token to Task functions
+- - - when an object is destroyed, make sure the object's cancellation token is destroyed
+- - - https://hackernoon.com/the-complete-asynchronous-programming-primer-for-unity-development
 
 
 0.2708333

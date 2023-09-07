@@ -10,6 +10,7 @@ using FishNet.Object;
 using FishNet.Connection;
 using FishNet;
 using UnityEngine.UI;
+using System.Threading;
 
 public class GameplayManagerTopDownGolf : NetworkBehaviour
 {
@@ -25,6 +26,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] public ScriptableCourse TeeOffChallenges;
     [SerializeField] public ScriptableHole SelectedChallenge;
     [SerializeField] List<GolfPlayerTopDown> _playerOrderFromChallenege = new List<GolfPlayerTopDown>();
+    [SerializeField] [SyncVar] public string TeeOffChallengeClubType;
 
     [Header("Current Hole Information")]
     public Vector3 TeeOffPosition;
@@ -73,6 +75,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] TextMeshProUGUI _playerNameText;
     [SerializeField] TextMeshProUGUI _numberOfStrokesText;
     [SerializeField] TextMeshProUGUI _terrainTypeText;
+    [SerializeField] TextMeshProUGUI _terrainPenaltyText;
     TextInfo titleCase = new CultureInfo("en-US", false).TextInfo;
     [SerializeField] Canvas _loadingHoleCanvas;
     [SerializeField] Canvas _holeInfoCanvas;
@@ -103,10 +106,15 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [Header("Game Phase")] // this should probably be changed to an enum or something at some point? Or switch to a "finite state machine?"
     [SyncVar] public bool IsTeeOffChallenge = false;
 
+    [Header("Tasks")]
+    [SerializeField] CancellationTokenSource _cancellationTokenSource;
+
     private void Awake()
     {
 
         MakeInstance();
+
+        _cancellationTokenSource = new CancellationTokenSource();
 
         QualitySettings.vSyncCount = 1;
 
@@ -115,7 +123,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             _tileMapManager = GameObject.FindGameObjectWithTag("TileMapManager").GetComponent<TileMapManager>();
         GolfPlayersServer.OnChange += GolfPlayersServer_OnChange;
     }
-
+    private void OnDestroy()
+    {
+        // Cancel the token when the object is destroyed
+        _cancellationTokenSource.Cancel();
+    }
     private void GolfPlayersServer_OnChange(SyncListOperation op, int index, GolfPlayerTopDown oldItem, GolfPlayerTopDown newItem, bool asServer)
     {
         //throw new System.NotImplementedException();
@@ -705,6 +717,12 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             _terrainTypeText.text = "";
         else
             _terrainTypeText.text = titleCase.ToTitleCase(player.GetTerrainTypeFromBall());
+        if (player != LocalGolfPlayer)
+            UpdateTerrainPenaltyText(false);
+    }
+    public void UpdateTerrainPenaltyText(bool enable)
+    {
+        _terrainPenaltyText.gameObject.SetActive(enable);
     }
     void UpdatePowerUpUIForCurrentPlayer(GolfPlayerTopDown player)
     {
@@ -1369,6 +1387,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         _playerOrderFromChallenege.Clear();
         CurrentCourse = TeeOffChallenges;
         CurrentHoleIndex = GetChallenegeIndex(TeeOffChallenges);
+        this.TeeOffChallengeClubType = CurrentCourse.HolesInCourse[CurrentHoleIndex].ClubToUse;
         StartFirstHole();
     }
     ScriptableHole GetChallenge(ScriptableCourse challenges)
@@ -1389,7 +1408,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         // Prompt player about their distance to the hole
         //await ball.MyPlayer.ServerTellPlayerHowFarTheyAreFromHoleForChallenege(5, ball.MyPlayer.DistanceToHole);
-        await ball.MyPlayer.ServerSendMessagetoPlayer(5f, "DistanceFromHoleOnChallenege", ball.MyPlayer.DistanceToHole);
+
+        // Get new cancellation token for tasks?
+        CancellationToken token = _cancellationTokenSource.Token;
+
+        await ball.MyPlayer.ServerSendMessagetoPlayer(5f, "DistanceFromHoleOnChallenege", token, ball.MyPlayer.DistanceToHole);
 
         // check to see if there are any players remaining to take their challenege shot. If they have all taken their shot, then calculate player order and move on to the game...
         if (GolfPlayersInTeeOffOrder.Count <= 0)
@@ -1397,7 +1420,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             Debug.Log("NextPlayerForChallenege: All players have teed off. Will calculate who is furthest away from the hole beep boop.");
             _playerOrderFromChallenege.AddRange(OrderPlayersFromTeeOffChallenge());
             // Tell players who will hit first
-            await _playerOrderFromChallenege[0].ServerSendMessagetoPlayer(5f, "PlayerClosest");
+            await _playerOrderFromChallenege[0].ServerSendMessagetoPlayer(5f, "PlayerClosest", token);
             //DebugOutPlayerOrder();
             ClearPlayerWeatherFavorForFirstHole();
             ResetPlayerScoresForNewHole();

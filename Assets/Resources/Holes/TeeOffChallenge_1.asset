@@ -7097,5 +7097,6 @@ MonoBehaviour:
   TeeOffAimPoint: {x: 75.5, y: 75.5, z: 0}
   Statues: []
   BalloonPowerUps: []
+  Tubes: []
   IsTeeOffChallenge: 0
-  ClubToUse: 
+  ClubToUse: iron

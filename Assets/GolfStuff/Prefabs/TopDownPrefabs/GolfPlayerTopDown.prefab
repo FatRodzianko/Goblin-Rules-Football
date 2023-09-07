@@ -1053,6 +1053,8 @@ MonoBehaviour:
   PromptedForMulligan: 0
   _ballStartPosition: {x: 0, y: 0, z: 0}
   _isMulliganRoutineRunning: 0
+  BrokeGoodWeatherStatue: 0
+  BrokeBadWeatherStatue: 0
   _windUIHolder: {fileID: 8772944465458510233}
   myCamera: {fileID: 0}
   _vCam: {fileID: 0}
@@ -1106,6 +1108,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 5665735165111769197}
   StrokesForCurrentHole: 0
   TotalStrokesForCourse: 0
+  _timeLastStrokeRemoved: 0
 --- !u!114 &5665735165111769197
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1125,9 +1128,8 @@ MonoBehaviour:
   - {fileID: 7513493645420276422}
   - {fileID: 2653947506407809911}
   - {fileID: 1368494483326148317}
-  - {fileID: 0}
-  - {fileID: 0}
   - {fileID: 3891610743640057217}
+  - {fileID: 5853080995522655165}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -1607,7 +1609,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c8ed46118065fb4fa1b5f0e146cd886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 5
+  _componentIndexCache: 3
   _addedNetworkObject: {fileID: 5665735165111769197}
   _networkObjectCache: {fileID: 5665735165111769197}
   _animator: {fileID: 8337812199374243185}
@@ -1638,7 +1640,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 3
+  _componentIndexCache: 4
   _addedNetworkObject: {fileID: 5665735165111769197}
   _networkObjectCache: {fileID: 5665735165111769197}
   IgnoredParameters: []

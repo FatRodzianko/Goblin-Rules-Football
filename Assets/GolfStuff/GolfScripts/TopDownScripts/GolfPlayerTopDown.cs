@@ -11,6 +11,7 @@ using FishNet.Object.Synchronizing;
 using FishNet;
 using TMPro;
 using UnityEngine.UI;
+using System.Threading;
 //using Mirror;
 
 public class GolfPlayerTopDown : NetworkBehaviour
@@ -80,7 +81,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SyncVar] public bool HasPlayerTeedOff = false;
     public bool PromptedForLightning = false;
     public bool PlayerStruckByLightning = false;
-    
+
 
     [Header("Hit Meter Objects")]
     [SerializeField] GameObject _hitMeterObject;
@@ -158,7 +159,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     Vector2 _rocketMove = Vector2.zero;
     float _rocketBoost = 5f;
     [SerializeField] bool _canUseRocketPower = false;
-    
+
 
     [Header("Mulligan Stuff")]
     [SyncVar(OnChange = nameof(SyncPlayerMulligan))] public bool PlayerMulligan = false;
@@ -470,7 +471,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             }
             return;
         }
-        
+
         // actions player can do while it is their "turn" aka after their turn as started and before they hit the ball
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -674,7 +675,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // allow player to move the ball when they use the rocket power up?
         if (this.IsOwner && this.MyBall.isHit)
         {
-            if(!this.UsedPowerupThisTurn || this.UsedPowerUpType != "rocket")
+            if (!this.UsedPowerupThisTurn || this.UsedPowerUpType != "rocket")
                 return;
             if (!this._canUseRocketPower)
             {
@@ -688,7 +689,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 MyBall.SetPlayerUsingRocket(false);
                 return;
             }
-            this.MyBall.MoveBallWithRocketPowerUp(_rocketMove.normalized,_rocketBoost);
+            this.MyBall.MoveBallWithRocketPowerUp(_rocketMove.normalized, _rocketBoost);
         }
     }
     [ServerRpc]
@@ -872,6 +873,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //_currentClubIndex = FindAppropriateClubToStart(distToHole);
         _currentClubIndex = FindAppropriateClubToStart(distToAimPoint);
         CurrentClub = _myClubs[_currentClubIndex];
+        GameplayManagerTopDownGolf.instance.UpdateTerrainPenaltyText(IsThereATerrainFavorPenalty(MyBall.bounceContactGroundMaterial, CurrentClub.ClubType));
+
+
         // Update the Club UI stuff
         SetSelectedClubUI(CurrentClub);
         if (this.IsOwner)
@@ -970,7 +974,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             //    Debug.Log("GetHitStatsFromClub: Player aim direction is MORE than 15 degrees away from aim point");
             //}
 
-            if(IsPlayerAimingAtAimPoint(ballPos, GameplayManagerTopDownGolf.instance.TeeOffAimPoint))
+            if (IsPlayerAimingAtAimPoint(ballPos, GameplayManagerTopDownGolf.instance.TeeOffAimPoint))
             {
                 float distanceToAimPoint = Vector2.Distance(MyBall.transform.position, GameplayManagerTopDownGolf.instance.TeeOffAimPoint);
                 if (MaxDistanceFromClub > distanceToAimPoint)
@@ -1166,7 +1170,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             iconXPosition = TargetDistanceXPosForPlayer;
             PerfectPowerSubmission();
-        }   
+        }
 
         ActivateSubmissionIcon(_hitMeterPowerSubmissionIcon, iconXPosition);
         HitPowerSubmitted = GetHitPowerFromXPosition(iconXPosition, MaxDistanceFromClub);
@@ -1230,7 +1234,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             iconXPosition = _centerAccuracyPosition;
             PerfectAccuracySubmission();
         }
-            
+
         ActivateSubmissionIcon(_hitMeterAccuracySubmissionIcon, iconXPosition);
 
         float accuracyDistance = GetAccuracyDistance(iconXPosition, _centerAccuracyPosition);
@@ -1330,6 +1334,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
             playerTeeOffSound = true;
 
         }
+        else
+        {
+            CheckTerrainFavorPenalty(MyBall.bounceContactGroundMaterial, CurrentClub.ClubType);
+        }
 
         this.PlayerScore.PlayerHitBall();
         //GameplayManagerTopDownGolf.instance.ResetCurrentPlayer();
@@ -1393,7 +1401,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
         //SpawnPowerUpObjects();
         CmdRemoveUsedPowerUps();
-        
+
     }
     [ServerRpc]
     void CmdPlaySoundForClients(string soundName, float soundVolume)
@@ -1531,6 +1539,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             UpdateTopSpin(hitTopSpin / _myClubs[oldIndex].MaxBackSpin);
         UpdateLeftRightSpin(hitLeftOrRightspin / _myClubs[oldIndex].MaxSideSpin);
 
+        GameplayManagerTopDownGolf.instance.UpdateTerrainPenaltyText(IsThereATerrainFavorPenalty(MyBall.bounceContactGroundMaterial, CurrentClub.ClubType));
+
         if (this.IsOwner)
             CmdTellClientsSelectedClub(_currentClubIndex);
     }
@@ -1609,6 +1619,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     bool CanClubBeUsedOnCurrentGround(ClubTopDown club)
     {
+        if (GameplayManagerTopDownGolf.instance.IsTeeOffChallenge)
+        {
+            if (club.ClubType != GameplayManagerTopDownGolf.instance.TeeOffChallengeClubType)
+                return false;
+        }
         if (MyBall.bounceContactGroundMaterial.Contains("rough"))
         {
             if (club.ClubType == "putter")
@@ -1626,6 +1641,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     int GetFirstClubThatCanHitOnThisGround()
     {
         int firstIndex = 0;
+
+        if (GameplayManagerTopDownGolf.instance.IsTeeOffChallenge)
+        {
+            return GetClubIndexForTeeOffChallenege(GameplayManagerTopDownGolf.instance.TeeOffChallengeClubType);
+        }
 
         for (int i = 0; i < _myClubs.Length; i++)
         {
@@ -1819,6 +1839,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
         int bestClubIndex = 0;
         bool firstCheckDone = false;
 
+        if (GameplayManagerTopDownGolf.instance.IsTeeOffChallenge)
+        {
+            return GetClubIndexForTeeOffChallenege(GameplayManagerTopDownGolf.instance.TeeOffChallengeClubType);
+        }
+
+
         for (int i = 0; i < _myClubs.Length; i++)
         {
             if (CanClubBeUsedOnCurrentGround(_myClubs[i]))
@@ -1866,6 +1892,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         Debug.Log("FindAppropriateClubToStart: Returning club index of: " + bestClubIndex.ToString() + " which maps to: " + _myClubs[bestClubIndex].ClubName);
         return bestClubIndex;
+    }
+    int GetClubIndexForTeeOffChallenege(string clubType)
+    {
+        Debug.Log("GetClubIndexForTeeOffChallenege: for type: " + clubType);
+        for (int i = 0; i < _myClubs.Length; i++)
+        {
+            if (_myClubs[i].ClubType == clubType)
+                return i;
+        }
+        return 0;
     }
     // Get distance from the ball to the hole
     float GetDistanceToHole(GameObject closestHole, Vector3 ballPos)
@@ -2326,7 +2362,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             //_golfAnimator.PlayerStruckByLightningForClients();
             return;
         }
-            
+
         PlayerStruckByLightning = true;
         _golfAnimator.PlayerStruckByLightning();
         //PlayerUIMessage("struck by lightning");
@@ -2498,6 +2534,37 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public void ResetBrokenBadStatueEffect()
     {
         this.BrokeBadWeatherStatue = false;
+    }
+    void CheckTerrainFavorPenalty(string terrainType, string clubType)
+    {
+        Debug.Log("CheckTerrainFavorPenalty: club: " + clubType + " on terrain: " + terrainType);
+        CmdCheckTerrainFavorPenalty(terrainType, clubType);
+    }
+    [ServerRpc]
+    void CmdCheckTerrainFavorPenalty(string terrainType, string clubType)
+    {
+        Debug.Log("CmdCheckTerrainFavorPenalty: on server: club: " + clubType + " on terrain: " + terrainType);
+        if (IsThereATerrainFavorPenalty(terrainType, clubType))
+        {
+            this.FavorWeather = CapWeatherFavor(FavorWeather - 1);
+        }
+    }
+    bool IsThereATerrainFavorPenalty(string terrainType, string clubType)
+    {
+        if (!this.HasPlayerTeedOff)
+            return false;
+        if (terrainType == "green" && clubType != "putter")
+        {
+            Debug.Log("IsThereATerrainFavorPenalty: not putter on green");
+            return true;
+        }
+        if (terrainType == "fairway" && clubType == "driver")
+        {
+            Debug.Log("IsThereATerrainFavorPenalty: driver on fairway");
+            return true;
+        }
+
+        return false;
     }
     [Server]
     int CapWeatherFavor(int newFavor)
@@ -3046,7 +3113,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     #endregion
     #region Server Messages To Players
     [Server]
-    public async Task ServerSendMessagetoPlayer(float duration, string messageType, float distance = 0f)
+    public async Task ServerSendMessagetoPlayer(float duration, string messageType, CancellationToken token, float distance = 0f)
     {
         _messageSentToPlayer = true;
         float end = Time.time + (duration * 2);
@@ -3057,6 +3124,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
         while (_messageSentToPlayer)
         {
             //Debug.Log("ServerTellPlayerGroundTheyLandedOn: Task.Yield time is: " + Time.time.ToString());
+
+            // check if the cancellation token was cancelled
+            if (token.IsCancellationRequested)
+                return;
             await Task.Yield();
             if (Time.time >= end)
                 _messageSentToPlayer = false;
