@@ -39,8 +39,8 @@ public class DrawTrajectoryTopDown : MonoBehaviour
 
         if (trajectoryPoints.Length < 2)
             return;
-        /*if(clubType != "putter")
-            Debug.Log("UpdateTrajectory: Trajectory points: " + trajectoryPoints[0].ToString() + " : " + trajectoryPoints[1].ToString() + " : " + trajectoryPoints[2].ToString() + " club type is: " + clubType + " and hit distance is: " + hitDistance.ToString());*/
+        //if(clubType != "putter")
+        //    Debug.Log("UpdateTrajectory: Trajectory points: " + trajectoryPoints[0].ToString() + " : " + trajectoryPoints[1].ToString() + " : " + trajectoryPoints[2].ToString() + " club type is: " + clubType + " and hit distance is: " + hitDistance.ToString());
         _linePoints.Clear();
         _lineShadowPoints.Clear();
 

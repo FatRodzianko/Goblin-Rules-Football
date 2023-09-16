@@ -365,7 +365,11 @@ x limit tee off challenges to only specific clubs
 - - - pass cancellation token to Task functions
 - - - when an object is destroyed, make sure the object's cancellation token is destroyed
 - - - https://hackernoon.com/the-complete-asynchronous-programming-primer-for-unity-development
+- replace "if (!this.IsOwner) { return; }" checks with "[Client(Logging = LoggingType.Off, RequireOwnership = true)]" attributes above the functions/methods instead?
+- change accuracy powerup so you always get perfect accuracy no matter what?
 
+### fog shader graph
+- - - https://www.youtube.com/watch?v=LDxApLRIOy4
 
 0.2708333
 0.28125

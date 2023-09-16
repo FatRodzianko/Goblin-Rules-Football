@@ -1,0 +1,5 @@
+### Golf Controls and control scheme/phases to make in the input manager
+x UI navigation at start of game
+- - - mouse/keyboard
+- - - just copied the UI Action map from DefaultInputActions thing from the Input System package 
+

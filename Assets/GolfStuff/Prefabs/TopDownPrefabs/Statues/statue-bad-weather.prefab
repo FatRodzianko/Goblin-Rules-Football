@@ -356,6 +356,14 @@ MonoBehaviour:
   _myBalloon: {fileID: 0}
   _twoColliders: 0
   _crateCollider: 0
+  _isSpinningHoop: 0
+  _spinningHoopScript: {fileID: 0}
+  _isTube: 0
+  _tubeScript: {fileID: 0}
+  _ballInTube: 0
+  _isLandMine: 0
+  _isLandMineInnerCircle: 0
+  _landMineScript: {fileID: 0}
 --- !u!1 &2370977878139627932
 GameObject:
   m_ObjectHideFlags: 0
@@ -410,7 +418,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: eef9506a0ddbb7447879f9b5bb6c7c09, type: 2}
+  - {fileID: 2100000, guid: d6f30c349e6809e4aa5454709d049fdb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -1,0 +1,158 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8242093619301733081
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8242093619301733083}
+  - component: {fileID: 8242093619301733080}
+  - component: {fileID: 6875112187249593470}
+  - component: {fileID: 331123447}
+  m_Layer: 0
+  m_Name: GameplayManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8242093619301733083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8242093619301733081}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8242093619301733080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8242093619301733081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58c74adb0217a434181413003df424d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 6875112187249593470}
+  _networkObjectCache: {fileID: 6875112187249593470}
+  CurrentCourse: {fileID: 11400000, guid: f8ed099443d7d0e4cb1143f45263a104, type: 2}
+  CurrentHoleInCourse: {fileID: 0}
+  CurrentHoleIndex: 0
+  CourseToPlay: {fileID: 0}
+  TeeOffChallenges: {fileID: 0}
+  SelectedChallenge: {fileID: 0}
+  _playerOrderFromChallenege: []
+  TeeOffChallengeClubType: 
+  TeeOffPosition: {x: 0, y: 0, z: 0}
+  CurrentHoleName: 
+  CurrentHolePar: 0
+  HolePositions: []
+  HoleHoleObjects: []
+  TeeOffAimPoint: {x: 0, y: 0, z: 0}
+  _lastNewHoleTime: 0
+  CurrentTurnNumber: 0
+  LastTurnWithWeatherChange: 0
+  _tileMapManager: {fileID: 0}
+  LocalGolfPlayer: {fileID: 0}
+  GolfPlayers: []
+  GolfPlayersInTeeOffOrder: []
+  GolfPlayersOutOfCommission: []
+  _numberOfPlayersTeedOff: 0
+  _teeOffOrder: 0
+  _numberOfPlayersInHole: 0
+  _lastBallInHoleTime: 0
+  _haveAllPlayersTeedOff: 0
+  CurrentPlayer: {fileID: 0}
+  CurrentPlayerNetId: 0
+  _playerScoreBoard: {fileID: 0}
+  _lightningManager: {fileID: 0}
+  AveragePlayerWeatherFavor: 0
+  _cameraViewHole: {fileID: 0}
+  _cameraBoundingBox: {fileID: 0}
+  _holeNumberText: {fileID: 0}
+  _parText: {fileID: 0}
+  _playerNameText: {fileID: 0}
+  _numberOfStrokesText: {fileID: 0}
+  _terrainTypeText: {fileID: 0}
+  _terrainPenaltyText: {fileID: 0}
+  _loadingHoleCanvas: {fileID: 0}
+  _holeInfoCanvas: {fileID: 0}
+  _powerUpMessageText: {fileID: 0}
+  _powerUpDisplayHolder: {fileID: 0}
+  _powerUpImage: {fileID: 0}
+  _powerUpInstructionsText: {fileID: 0}
+  PlayerHasSkippedTurn: 0
+  TurnOrderForLightningSkips: []
+  TurnsSinceSkip: 0
+  SkipsInARow: 0
+  _skipLightningCheck: 0
+  TimeSinceLastSkip: 0
+  TimeSinceLastTurnStart: 0
+  _tellingPlayersStormWillPass: 0
+  StatesOnServer: []
+  IsTeeOffChallenge: 0
+--- !u!114 &6875112187249593470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8242093619301733081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  _networkBehaviours:
+  - {fileID: 8242093619301733080}
+  <ParentNetworkObject>k__BackingField: {fileID: 0}
+  <ChildNetworkObjects>k__BackingField: []
+  _isNetworked: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  <PrefabId>k__BackingField: 4
+  <SpawnableCollectionId>k__BackingField: 0
+  _scenePathHash: 1727917535
+  <SceneId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 8321511996279241685
+  _sceneNetworkObjects:
+  - {fileID: 6875112187249593470}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+--- !u!114 &331123447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8242093619301733081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _overrideType: 3
+  _updateHostVisibility: 1
+  _observerConditions: []

@@ -1,0 +1,142 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5172241719810091111
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5172241719810091110}
+  - component: {fileID: 5172241719810091105}
+  - component: {fileID: 5172241719810091104}
+  - component: {fileID: 5172241719810091107}
+  m_Layer: 0
+  m_Name: LightningManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5172241719810091110
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5172241719810091111}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.32, y: 0.14, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5172241719810091105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5172241719810091111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2bf0b9bc379041bab48d8fb20f4b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 5172241719810091104}
+  _networkObjectCache: {fileID: 5172241719810091104}
+  _lightningLight: {fileID: 0}
+  _lightningFlashing: 0
+  IsThereLightning: 0
+  _lightRainMin: 20
+  _lightRainMax: 45
+  _medRainMin: 10
+  _medRainMax: 30
+  _heavyRainMin: 5
+  _heavyRainMax: 15
+  _cooldownMin: 0
+  _cooldownMax: 0
+  _lightningStormThisTurnAlready: 0
+  _startLightningOdds: 0
+  _lightRainOddsToStart: 0.9
+  _medRainOddsToStart: 0.75
+  _heavyRainOddsToStart: 0.5
+  _stopLightningOdds: 0
+  _lightRainOddsToStop: 0.7
+  _medRainOddsToStop: 0.85
+  _heavyRainOddsToStop: 0.98
+  DistanceFromPlayer: 0
+  _lightIntensity: 0
+  _maxDistanceFromPlayer: 1.5
+  _minLightIntensity: 0.25
+  _maxLightIntensity: 1
+  LightIntensityMax: 1.5
+  _minLightningMove: 0
+  _maxLightningMove: 0
+  _minLightRainLightningMove: 0.05
+  _maxLightRainLightningMove: 0.15
+  _minMedRainLightningMove: 0.1
+  _maxMedRainLightningMove: 0.2
+  _minHeavyRainLightningMove: 0.15
+  _maxHeavyRainLightningMove: 0.3
+  _wasPlayerStruck: 0
+  _playerThatWasStruckNetId: 0
+  _playerThatWasStruck: {fileID: 0}
+  _thunderPlayerStruck: thunder-struck-player
+  _thunderNear: thunder-near
+  _thunderMed: thunder-medium
+  _thunderFarAway: thunder-very-far
+  _thunderSubtitle: {fileID: 0}
+--- !u!114 &5172241719810091104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5172241719810091111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  _networkBehaviours:
+  - {fileID: 5172241719810091105}
+  <ParentNetworkObject>k__BackingField: {fileID: 0}
+  <ChildNetworkObjects>k__BackingField: []
+  _isNetworked: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  <PrefabId>k__BackingField: 1
+  <SpawnableCollectionId>k__BackingField: 0
+  _scenePathHash: 1727917535
+  <SceneId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 18289844899468748503
+  _sceneNetworkObjects:
+  - {fileID: 0}
+  - {fileID: 5172241719810091104}
+  - {fileID: 0}
+  - {fileID: 0}
+--- !u!114 &5172241719810091107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5172241719810091111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _overrideType: 3
+  _updateHostVisibility: 1
+  _observerConditions: []

@@ -10,6 +10,11 @@ public class SpinIcon : MonoBehaviour
     [SerializeField] LayerMask _spinIconLayerMask;
     public float _maxDistanceFromCenter;
 
+    [Header("Icon Movement Stuff")]
+    [SerializeField] float _moveRate = 2f;
+    [SerializeField] Vector2 _moveSpinDirection = Vector2.zero;
+    [SerializeField] bool _moveIcon = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,11 +24,24 @@ public class SpinIcon : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (!_moveIcon)
+            return;
+        if (_moveSpinDirection == Vector2.zero)
+            return;
+        if (_myPlayer.DirectionAndDistanceChosen)
+            return;
+        MoveSpinIcon();
+    }
+    void MoveSpinIcon()
+    {
+        _selectionIconObject.transform.localPosition = Vector2.ClampMagnitude(((Vector2)_selectionIconObject.transform.localPosition + _moveSpinDirection * _moveRate * Time.deltaTime), _maxDistanceFromCenter);
+        _myPlayer.UpdateHitSpinForPlayer(AdjustVectorForSpin(_selectionIconObject.transform.localPosition));
     }
     private void OnMouseDown()
     {
         if (!_myPlayer.IsOwner)
+            return;
+        if (_myPlayer.DirectionAndDistanceChosen)
             return;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         _selectionIconObject.transform.position = new Vector3(mousePos.x, mousePos.y, 0f);
@@ -32,6 +50,8 @@ public class SpinIcon : MonoBehaviour
     private void OnMouseDrag()
     {
         if (!_myPlayer.IsOwner)
+            return;
+        if (_myPlayer.DirectionAndDistanceChosen)
             return;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
@@ -55,6 +75,8 @@ public class SpinIcon : MonoBehaviour
     {
         if (!_myPlayer.IsOwner)
             return;
+        if (_myPlayer.DirectionAndDistanceChosen)
+            return;
         if (Input.GetMouseButtonDown(1))
             ResetIconPosition();
     }
@@ -76,4 +98,16 @@ public class SpinIcon : MonoBehaviour
         }
         return spin;
     }
+    public void UpdateSpinDirection(Vector2 dir)
+    {
+        
+        _moveSpinDirection = dir;
+        _moveIcon = true;
+    }
+    public void ResetSpinDirection()
+    {
+        _moveSpinDirection = Vector2.zero;
+        _moveIcon = false;
+    }
+
 }

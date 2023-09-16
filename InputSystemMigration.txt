@@ -1,0 +1,68 @@
+### Golf Controls and control scheme/phases to make in the input manager
+x UI navigation at start of game
+- - - mouse/keyboard
+- - - just copied the UI Action map from DefaultInputActions thing from the Input System package 
+
+"Player Prompt Actions"
+x Player Prompted to start turn
+- - x space to normally start turn
+- - - - - - "A" / button south on gamepad?
+- - x backspace to skip turn if there is lightning or whatever
+- - - - - - "B" / button east on gamepad?
+
+"Aiming Actions"
+x Aiming / Setting up shot
+- - - w/a/s/d or arrow keys to move trajectory icon
+- - - left stick / dpad on gamepad?
+- - - - - - turn on: 
+- - - - - - - - - start of player's turn
+- - - - - - - - - player cancels aim before moving the hit icon / hits ctrl
+- - - - - - - - - player used mulligan (this might just call StartPlayersTurn? Need to look into...)
+- - - - - - turn off:
+- - - - - - - - - player submits hit / starts moving the hit icon
+x Spin
+- - x mouse on the spin icon to change spin
+- - x right click to reset
+- - x for gamepad, use the right stick?
+x Change Clubs
+- - - just the "1" key on keyboard for right now
+- - - right bumper on gamepad?
+x zoom out
+- - - tilde/tick
+- - - "y" / button north?
+x zoom out aim
+- - - middle mouse
+- - - left stick still for gamepad, but make it move faster?
+x Short/Long Putt
+- - - shift on keyboard
+- - - right trigger?
+- Use PowerUp
+- - - "P" on the keyboard
+- - - left trigger on gamepad?
+x Submit aim
+- - - space / button south
+
+"Hitting Actions"
+x Cancel / re-do aim
+- - - left control
+- - - right bumper? b?
+x Start hit / move hit icon
+- - - spacebar
+- - - button south
+x Submit distance
+- - - spacebar
+- - - button south
+x Submit Accuracy
+- - - spacebar
+- - - button south
+- - - - - - combine these two submissions to one action? OR keep them separated so they can be turned on/off? Might fix issue where player can submit hit after shanking and cause a game crash?
+
+"After Hit Actions"
+x Use Mulligan
+- - - "p"
+- - - left trigger?
+x Skip mulligan / don't use mulligan
+- - - spacebar
+- - - "a" / button south
+- continue after struck by lightning
+- - - spacebar / gamepad south
