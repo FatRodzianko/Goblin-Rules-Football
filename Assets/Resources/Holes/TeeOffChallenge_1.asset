@@ -7093,7 +7093,7 @@ MonoBehaviour:
   - {x: 105, y: -30}
   - {x: -30, y: -30}
   ZoomedOutPos: {x: 42.1, y: 36.5, z: 0}
-  CameraZoomValue: 9
+  CameraZoomValue: 6
   TeeOffAimPoint: {x: 75.5, y: 75.5, z: 0}
   Statues: []
   BalloonPowerUps: []

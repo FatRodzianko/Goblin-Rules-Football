@@ -265,6 +265,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     void LoadNewHoleServer(int index)
     {
         Debug.Log("LoadNewHoleServer: loading index: " + index.ToString() + ". Total number of courses: " + CurrentCourse.HolesInCourse.Length.ToString());
+        if (_cameraViewHole.IsCameraZoomedOut)
+        {
+            _cameraViewHole.ZoomOutCamera();
+            LocalGolfPlayer.ResetEnableZoomOutAim(false);
+        }
+            
+
         CurrentHoleIndex = index;
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[CurrentHoleIndex];
         // tell all clients to load the next hole and to then update all the client side stuff
@@ -310,6 +317,12 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         CurrentHoleInCourse = CurrentCourse.HolesInCourse[index];
         if (PlayerScoreBoard.instance.IsScoreBoardOpen)
             PlayerScoreBoard.instance.CloseScoreBoard();
+        if (_cameraViewHole.IsCameraZoomedOut)
+        {
+            _cameraViewHole.ZoomOutCamera();
+            LocalGolfPlayer.ResetEnableZoomOutAim(false);
+        }
+            
         LoadNewHole(index);
         GetCameraBoundingBox(CurrentHoleInCourse.PolygonPoints, true);
         TellPlayersToGetCameraBoundingBox();

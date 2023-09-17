@@ -36,7 +36,7 @@ x zoom out aim
 x Short/Long Putt
 - - - shift on keyboard
 - - - right trigger?
-- Use PowerUp
+x Use PowerUp
 - - - "P" on the keyboard
 - - - left trigger on gamepad?
 x Submit aim
@@ -64,5 +64,10 @@ x Use Mulligan
 x Skip mulligan / don't use mulligan
 - - - spacebar
 - - - "a" / button south
-- continue after struck by lightning
+x continue after struck by lightning
 - - - spacebar / gamepad south
+
+"Misc. Actions"
+x look at scoreboard
+- - - tab on keyboard
+- - - select on gamepad?

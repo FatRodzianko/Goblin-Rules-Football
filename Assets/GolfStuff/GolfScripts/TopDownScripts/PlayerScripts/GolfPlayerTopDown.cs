@@ -265,6 +265,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
             _cameraViewHole = _vCam.GetComponent<CameraViewHole>();
 
     }
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        if (this.IsOwner)
+        {
+            UnsubscribeToControls();
+        }
+    }
     void SyncIsGameLeader(bool prev, bool next, bool asServer)
     {
         if (asServer)
@@ -427,11 +435,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            PlayerScoreBoard.instance.OpenScoreBoard();
+            //PlayerScoreBoard.instance.OpenScoreBoard();
         }
         if (Input.GetKeyUp(KeyCode.Tab))
         {
-            PlayerScoreBoard.instance.CloseScoreBoard();
+            //PlayerScoreBoard.instance.CloseScoreBoard();
         }
         if (MyBall.isHit || MyBall.isBouncing || MyBall.isRolling)
             return;
@@ -489,29 +497,29 @@ public class GolfPlayerTopDown : NetworkBehaviour
             Debug.Log("Player (the owner) pressed space");
             if (this.PlayerStruckByLightning)
             {
-                Debug.Log("Player pressed space: this.PlayerStruckByLightning");
-                _golfAnimator.ResetGolfAnimator();
-                EnablePlayerSprite(false);
-                CmdDisableSpriteForLightningStrike();
-                this.EnablePlayerCanvas(false);
-                CmdEnablePlayerCanvasForOtherClients(false);
-                //this.IsPlayersTurn = false;
-                CmdEndPlayersTurn();
+                //Debug.Log("Player pressed space: this.PlayerStruckByLightning");
+                //_golfAnimator.ResetGolfAnimator();
+                //EnablePlayerSprite(false);
+                //CmdDisableSpriteForLightningStrike();
+                //this.EnablePlayerCanvas(false);
+                //CmdEnablePlayerCanvasForOtherClients(false);
+                ////this.IsPlayersTurn = false;
+                //CmdEndPlayersTurn();
 
-                previousHitDistance = 0;
+                //previousHitDistance = 0;
 
-                ActivateHitUIObjects(false);
-                CmdTellPlayersToActivateHitUIObjects(false);
-                AttachUIToNewParent(this.transform);
-                CmdTellPlayersToAttachUIToSelf();
-                //AttachPlayerToCamera(false, myCamera.transform);
-                //UpdateCameraFollowTarget(MyBall.MyBallObject);
-                EnableOrDisableLineObjects(false);
-                CmdTellPlayersToEnableOrDisableLineObjects(false);
-                this.PlayerStruckByLightning = false;
-                Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " has acknowledged they were struck by lightning! Moving on to next turn by calling: GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this). Time: " + Time.time);
-                //GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
-                CmdTellServerPlayerWasStruckByLightning();
+                //ActivateHitUIObjects(false);
+                //CmdTellPlayersToActivateHitUIObjects(false);
+                //AttachUIToNewParent(this.transform);
+                //CmdTellPlayersToAttachUIToSelf();
+                ////AttachPlayerToCamera(false, myCamera.transform);
+                ////UpdateCameraFollowTarget(MyBall.MyBallObject);
+                //EnableOrDisableLineObjects(false);
+                //CmdTellPlayersToEnableOrDisableLineObjects(false);
+                //this.PlayerStruckByLightning = false;
+                //Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " has acknowledged they were struck by lightning! Moving on to next turn by calling: GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this). Time: " + Time.time);
+                ////GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
+                //CmdTellServerPlayerWasStruckByLightning();
                 return;
             }
             if (!DirectionAndDistanceChosen && !_moveHitMeterIcon)
@@ -1142,7 +1150,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
         // Make sure the camera isn't zoomed out?
         if (_cameraViewHole.IsCameraZoomedOut)
+        {
             _cameraViewHole.ZoomOutCamera();
+            EnableZoomOutAim(_cameraViewHole.IsCameraZoomedOut);
+        }
+            
 
         // IsPlayersTurn will be set by the game manager in a real game. This is just a place holder for now.
         //this.IsPlayersTurn = false;
@@ -1163,7 +1175,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
         // Make sure the camera isn't zoomed out?
         if (_cameraViewHole.IsCameraZoomedOut)
+        {
             _cameraViewHole.ZoomOutCamera();
+            EnableZoomOutAim(_cameraViewHole.IsCameraZoomedOut);
+        }
     }
     void ResetIconPositions()
     {
@@ -2374,6 +2389,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (_cameraViewHole.IsCameraZoomedOut)
+        {
+            _cameraViewHole.ZoomOutCamera();
+            EnableZoomOutAim(_cameraViewHole.IsCameraZoomedOut);
+        }
         ResetForNewHole(holeIndex);
     }
     public void ResetForNewHole(int holeIndex)
@@ -2445,6 +2465,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //PlayerUIMessage("struck by lightning");
         //EnablePlayerCanvas(true);
         PlayerScore.StrokePenalty(10);
+        EnableAcknowledgePlayerLightningStrike(true);
     }
     public void StruckByLightningOver()
     {
@@ -3298,6 +3319,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // Prompt Player Controls
         //InputManagerGolf.Controls.PromptPlayer.Continue.performed += _ => PromptPlayerContinue();
         //InputManagerGolf.Controls.PromptPlayer.Skip.performed += _ => PromptPlayerSkip();
+        EnableViewScoreBoard(true);
+        EnableZoomOut(true);
+    }
+    void UnsubscribeToControls()
+    {
+        EnableViewScoreBoard(false);
+        EnableZoomOut(false);
     }
     #region Start Player Turn
     [TargetRpc]
@@ -3306,6 +3334,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
         Debug.Log("RpcEnablePromptPlayerToStartTurn: player: " + this.PlayerName + ":" + enable.ToString());
 
         EnablePromptPlayerToStartTurn(enable);
+        if (_cameraViewHole.IsCameraZoomedOut)
+        {
+            _cameraViewHole.ZoomOutCamera();
+            EnableZoomOutAim(_cameraViewHole.IsCameraZoomedOut);
+        }
     }
     void EnablePromptPlayerToStartTurn(bool enable)
     {
@@ -3339,6 +3372,54 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // disable prompt controls?
         EnablePromptPlayerToStartTurn(false);
         EnablePromptPlayerSkipForLightning(false);
+    }
+    void EnableAcknowledgePlayerLightningStrike(bool enable)
+    {
+        if (!this.IsOwner)
+            return;
+        Debug.Log("EnableAcknowledgePlayerLightningStrike: player: " + this.PlayerName + ":" + enable.ToString());
+        if (enable)
+        {
+            InputManagerGolf.Controls.PromptPlayer.Continue.Enable();
+            InputManagerGolf.Controls.PromptPlayer.Continue.performed += AcknowledgePlayerLightningStrike;
+        }
+        else 
+        {
+            InputManagerGolf.Controls.PromptPlayer.Continue.Disable();
+            InputManagerGolf.Controls.PromptPlayer.Continue.performed -= AcknowledgePlayerLightningStrike;
+        }
+    }
+    void AcknowledgePlayerLightningStrike(InputAction.CallbackContext context)
+    {
+        if (!this.IsOwner)
+            return;
+        if (!this.PlayerStruckByLightning)
+            return;
+        Debug.Log("AcknowledgePlayerLightningStrike: PlayerStruckByLightning: " + this.PlayerStruckByLightning.ToString());
+        _golfAnimator.ResetGolfAnimator();
+        EnablePlayerSprite(false);
+        CmdDisableSpriteForLightningStrike();
+        this.EnablePlayerCanvas(false);
+        CmdEnablePlayerCanvasForOtherClients(false);
+        //this.IsPlayersTurn = false;
+        CmdEndPlayersTurn();
+
+        previousHitDistance = 0;
+
+        ActivateHitUIObjects(false);
+        CmdTellPlayersToActivateHitUIObjects(false);
+        AttachUIToNewParent(this.transform);
+        CmdTellPlayersToAttachUIToSelf();
+        //AttachPlayerToCamera(false, myCamera.transform);
+        //UpdateCameraFollowTarget(MyBall.MyBallObject);
+        EnableOrDisableLineObjects(false);
+        CmdTellPlayersToEnableOrDisableLineObjects(false);
+        this.PlayerStruckByLightning = false;
+        Debug.Log("GolfPlayerTopDown: AcknowledgePlayerLightningStrike: Player: " + this.PlayerName + " has acknowledged they were struck by lightning! Moving on to next turn by calling: GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this). Time: " + Time.time);
+        //GameplayManagerTopDownGolf.instance.PlayerWasStruckByLightning(this);
+        CmdTellServerPlayerWasStruckByLightning();
+        EnableAcknowledgePlayerLightningStrike(false);
+        return;
     }
     #endregion
     #region Skip For Lightning
@@ -3380,6 +3461,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // disable prompt controls?
         EnablePromptPlayerToStartTurn(false);
         EnablePromptPlayerSkipForLightning(false);
+
     }
     #endregion
     #region Aiming Actions
@@ -3406,8 +3488,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             InputManagerGolf.Controls.AimingActions.ChangeClub.Enable();
             InputManagerGolf.Controls.AimingActions.ChangeClub.performed += ChangeClubButtonPressed;
             //ZoomOut
-            InputManagerGolf.Controls.AimingActions.ZoomOut.Enable();
-            InputManagerGolf.Controls.AimingActions.ZoomOut.performed += ZoomOutPressed;
+            //InputManagerGolf.Controls.AimingActions.ZoomOut.Enable();
+            //InputManagerGolf.Controls.AimingActions.ZoomOut.performed += ZoomOutPressed;
             //ZoomOutAim ? maybe only enable/disable that when toggling between the zoom outs?
             //ShortPutt
             InputManagerGolf.Controls.AimingActions.ShortPutt.Enable();
@@ -3436,8 +3518,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             InputManagerGolf.Controls.AimingActions.ChangeClub.Disable();
             InputManagerGolf.Controls.AimingActions.ChangeClub.performed -= ChangeClubButtonPressed;
             //ZoomOut
-            InputManagerGolf.Controls.AimingActions.ZoomOut.Disable();
-            InputManagerGolf.Controls.AimingActions.ZoomOut.performed -= ZoomOutPressed;
+            //InputManagerGolf.Controls.AimingActions.ZoomOut.Disable();
+            //InputManagerGolf.Controls.AimingActions.ZoomOut.performed -= ZoomOutPressed;
             //ZoomOutAim ? maybe only enable/disable that when toggling between the zoom outs?
             //ShortPutt
             InputManagerGolf.Controls.AimingActions.ShortPutt.Disable();
@@ -3481,7 +3563,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
         EnableAimingActions(false);
 
         if (_cameraViewHole.IsCameraZoomedOut)
+        {
             _cameraViewHole.ZoomOutCamera();
+            EnableZoomOutAim(_cameraViewHole.IsCameraZoomedOut);
+        }
         UpdateCameraFollowTarget(MyBall.MyBallObject);
         CmdSetCameraOnMyBallForOtherPlayers();
         GameplayManagerTopDownGolf.instance.PowerUpHideInstructions();
@@ -3510,11 +3595,15 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         Debug.Log("ZoomOutPressed: ");
 
-        if (DirectionAndDistanceChosen)
+        if (DirectionAndDistanceChosen && this.IsPlayersTurn)
             return;
 
         _cameraViewHole.ZoomOutCamera();
         EnableZoomOutAim(_cameraViewHole.IsCameraZoomedOut);
+    }
+    public void ResetEnableZoomOutAim(bool enable)
+    {
+        EnableZoomOutAim(enable);
     }
     void EnableZoomOutAim(bool enable)
     {
@@ -3809,6 +3898,50 @@ public class GolfPlayerTopDown : NetworkBehaviour
         Debug.Log("SkipMulliganPressed: ");
         this.SkipMulligan();
         EnableSkipMulligan(false);
+    }
+    #endregion
+    #region Misc Actions
+    void EnableViewScoreBoard(bool enable)
+    {
+        if (!this.IsOwner)
+            return;
+        Debug.Log("EnableViewScores: " + enable.ToString());
+        if (enable)
+        {
+            InputManagerGolf.Controls.Misc.ViewScoreBoard.Enable();
+            InputManagerGolf.Controls.Misc.ViewScoreBoard.performed += OpenScoreBoard;
+            InputManagerGolf.Controls.Misc.ViewScoreBoard.canceled += CloseScoreBoard;
+        }
+        else
+        {
+            InputManagerGolf.Controls.Misc.ViewScoreBoard.Disable();
+            InputManagerGolf.Controls.Misc.ViewScoreBoard.performed -= OpenScoreBoard;
+            InputManagerGolf.Controls.Misc.ViewScoreBoard.canceled -= CloseScoreBoard;
+        }
+    }
+    void OpenScoreBoard(InputAction.CallbackContext context)
+    {
+        PlayerScoreBoard.instance.OpenScoreBoard();
+    }
+    void CloseScoreBoard(InputAction.CallbackContext context)
+    {
+        PlayerScoreBoard.instance.CloseScoreBoard();
+    }
+    void EnableZoomOut(bool enable)
+    {
+        if (!this.IsOwner)
+            return;
+        Debug.Log("EnableZoomOut: " + enable.ToString());
+        if (enable)
+        {
+            InputManagerGolf.Controls.AimingActions.ZoomOut.Enable();
+            InputManagerGolf.Controls.AimingActions.ZoomOut.performed += ZoomOutPressed;
+        }
+        else
+        {
+            InputManagerGolf.Controls.AimingActions.ZoomOut.Disable();
+            InputManagerGolf.Controls.AimingActions.ZoomOut.performed -= ZoomOutPressed;
+        }
     }
     #endregion
     #endregion

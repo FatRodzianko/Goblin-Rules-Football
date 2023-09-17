@@ -81,7 +81,7 @@ public class PlayerScoreBoard : MonoBehaviour
     }
     void SortScoreBoardList()
     {
-        PlayerScoreItems = PlayerScoreItems.OrderBy(x => x.PlayerScoreScript.StrokesForCurrentHole).ToList();
+        PlayerScoreItems = PlayerScoreItems.OrderBy(x => x.PlayerScoreScript.TotalStrokesForCourse).ToList();
     }
     public void UpdatePlayerScoreBoardItemForNewStroke(GolfPlayerTopDown player, int strokes)
     {

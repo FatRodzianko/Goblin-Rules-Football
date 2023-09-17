@@ -1213,6 +1213,45 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Misc"",
+            ""id"": ""7365af3d-e717-4276-8cda-8b3f2b52ea4c"",
+            ""actions"": [
+                {
+                    ""name"": ""ViewScoreBoard"",
+                    ""type"": ""Button"",
+                    ""id"": ""165ef1fd-2028-474f-bd1d-ab4737e8d3dd"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""e1d45c6c-4d7c-4458-9b00-6f6d74b48471"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ViewScoreBoard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""19de1c6c-0736-49b4-a22b-b457f475e78e"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ViewScoreBoard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -1251,6 +1290,9 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
         // PowerUps
         m_PowerUps = asset.FindActionMap("PowerUps", throwIfNotFound: true);
         m_PowerUps_UsePowerUp = m_PowerUps.FindAction("UsePowerUp", throwIfNotFound: true);
+        // Misc
+        m_Misc = asset.FindActionMap("Misc", throwIfNotFound: true);
+        m_Misc_ViewScoreBoard = m_Misc.FindAction("ViewScoreBoard", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1623,6 +1665,39 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
         }
     }
     public PowerUpsActions @PowerUps => new PowerUpsActions(this);
+
+    // Misc
+    private readonly InputActionMap m_Misc;
+    private IMiscActions m_MiscActionsCallbackInterface;
+    private readonly InputAction m_Misc_ViewScoreBoard;
+    public struct MiscActions
+    {
+        private @GolfControls m_Wrapper;
+        public MiscActions(@GolfControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @ViewScoreBoard => m_Wrapper.m_Misc_ViewScoreBoard;
+        public InputActionMap Get() { return m_Wrapper.m_Misc; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(MiscActions set) { return set.Get(); }
+        public void SetCallbacks(IMiscActions instance)
+        {
+            if (m_Wrapper.m_MiscActionsCallbackInterface != null)
+            {
+                @ViewScoreBoard.started -= m_Wrapper.m_MiscActionsCallbackInterface.OnViewScoreBoard;
+                @ViewScoreBoard.performed -= m_Wrapper.m_MiscActionsCallbackInterface.OnViewScoreBoard;
+                @ViewScoreBoard.canceled -= m_Wrapper.m_MiscActionsCallbackInterface.OnViewScoreBoard;
+            }
+            m_Wrapper.m_MiscActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @ViewScoreBoard.started += instance.OnViewScoreBoard;
+                @ViewScoreBoard.performed += instance.OnViewScoreBoard;
+                @ViewScoreBoard.canceled += instance.OnViewScoreBoard;
+            }
+        }
+    }
+    public MiscActions @Misc => new MiscActions(this);
     public interface IUIActions
     {
         void OnNavigate(InputAction.CallbackContext context);
@@ -1661,5 +1736,9 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
     public interface IPowerUpsActions
     {
         void OnUsePowerUp(InputAction.CallbackContext context);
+    }
+    public interface IMiscActions
+    {
+        void OnViewScoreBoard(InputAction.CallbackContext context);
     }
 }
