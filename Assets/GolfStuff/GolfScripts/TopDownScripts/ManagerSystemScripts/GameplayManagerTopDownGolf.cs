@@ -1419,6 +1419,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         System.Random random = new System.Random();
         int index = random.Next(0, challenges.HolesInCourse.Length);
+        Debug.Log("GetChallenegeIndex: " + index.ToString());
         return index;
     }
     public async void NextPlayerForChallenege(GolfBallTopDown ball)

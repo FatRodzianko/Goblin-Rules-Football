@@ -15,3 +15,6 @@ MonoBehaviour:
   CourseName: TeeOffChallenges
   HolesInCourse:
   - {fileID: 11400000, guid: ffc0b3a7739638a4c8a4664783663e62, type: 2}
+  - {fileID: 11400000, guid: 6a6cf5b98eb1b5f4c81368058b8c214f, type: 2}
+  - {fileID: 11400000, guid: 78e07102f152c334693669bc5b3fed5f, type: 2}
+  - {fileID: 11400000, guid: 61c9b55884923fd42adab70caa1dc65b, type: 2}

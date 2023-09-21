@@ -7098,5 +7098,5 @@ MonoBehaviour:
   Statues: []
   BalloonPowerUps: []
   Tubes: []
-  IsTeeOffChallenge: 0
+  IsTeeOffChallenge: 1
   ClubToUse: iron
