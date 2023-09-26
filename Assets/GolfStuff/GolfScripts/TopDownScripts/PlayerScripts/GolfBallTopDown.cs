@@ -48,6 +48,7 @@ public class GolfBallTopDown : NetworkBehaviour
     public Vector3[] hitBallPonts = new Vector3[3];
     public float hitBallCount = 0f;
     public float hitBallModifer = 0.5f; // changes based on the max height of the hit/arc?
+    public float _rocketHitBallModifier = 1.0f;
 
     [Header("Trajectory Info")]
     public float maxHeight;
@@ -209,7 +210,7 @@ public class GolfBallTopDown : NetworkBehaviour
         // Move ball along its trajectory?
         if (hitBallCount < 1.0f)
         {
-            hitBallCount += hitBallModifer * Time.fixedDeltaTime;
+            hitBallCount += hitBallModifer * Time.fixedDeltaTime * _rocketHitBallModifier;
             timeInAir += Time.fixedDeltaTime;
             Vector3 m1 = Vector3.Lerp(hitBallPonts[0], hitBallPonts[1], hitBallCount);
             Vector3 m2 = Vector3.Lerp(hitBallPonts[1], hitBallPonts[2], hitBallCount);
@@ -2023,6 +2024,14 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         this.PlayerUsingRocket = enable;
         RocketParticleEffect(enable);
+        if (enable)
+        {
+            _rocketHitBallModifier = 0.5f;
+        }
+        else
+        {
+            _rocketHitBallModifier = 1.0f;
+        }
     }
     void RocketParticleEffect(bool enable)
     {   

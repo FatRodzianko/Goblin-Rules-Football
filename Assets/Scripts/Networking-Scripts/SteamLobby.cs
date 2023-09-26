@@ -24,6 +24,8 @@ public class SteamLobby : MonoBehaviour
 
     private const string HostAddressKey = "HostAddress";
 
+    public bool JoiningMirror = false;
+
     private NetworkManager networkManager;
 
     struct LobbyMetaData
@@ -89,6 +91,8 @@ public class SteamLobby : MonoBehaviour
 
     private void OnLobbyCreated(LobbyCreated_t callback)
     {
+        if (!JoiningMirror)
+            return;
         Debug.Log("OnLobbyCreated");
         if (callback.m_eResult != EResult.k_EResultOK)
         {
@@ -130,18 +134,25 @@ public class SteamLobby : MonoBehaviour
             new CSteamID(callback.m_ulSteamIDLobby),
             "GameName",
             "GRF");
+        SteamMatchmaking.SetLobbyData(
+            new CSteamID(callback.m_ulSteamIDLobby),
+            "GameMode",
+            "Football");
 
     }
 
     private void OnGameLobbyJoinRequested(GameLobbyJoinRequested_t callback)
     {
+        if (!JoiningMirror)
+            return;
         Debug.Log("OnGameLobbyJoinRequested");
         SteamMatchmaking.JoinLobby(callback.m_steamIDLobby);
     }
 
     private void OnLobbyEntered(LobbyEnter_t callback)
     {
-
+        if (!JoiningMirror)
+            return;
         current_lobbyID = callback.m_ulSteamIDLobby;
         Debug.Log("OnLobbyEntered for lobby with id: " + current_lobbyID.ToString());
         if (NetworkServer.active) { return; }

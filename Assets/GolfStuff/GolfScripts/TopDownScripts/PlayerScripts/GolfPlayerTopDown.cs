@@ -204,6 +204,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
     [Header("controls")]
     [SerializeField] public bool PromptPlayerControls = false;
+    [SerializeField] bool _aimingActionsEnabled = false;
 
     private void Awake()
     {
@@ -715,8 +716,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 MyBall.SetPlayerUsingRocket(false);
                 return;
             }
-            _rocketMove.x = Input.GetAxisRaw("Horizontal");
-            _rocketMove.y = Input.GetAxisRaw("Vertical");
+            //_rocketMove.x = Input.GetAxisRaw("Horizontal");
+            //_rocketMove.y = Input.GetAxisRaw("Vertical");
             if (_rocketMove == Vector2.zero)
             {
                 MyBall.SetPlayerUsingRocket(false);
@@ -965,6 +966,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         PlayerChooseDirectionAndDistance(false);
         //EnableAimPositionControls(true);
         EnableAimingActions(true);
+        EnableRocketControls(false);
         UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
 
         PlayerScoreBoard.instance.UpdatePlayerScoreBoardItemPlayerFavor(this);
@@ -1376,6 +1378,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // If the hit is perfectly accurate, don't adjust the direction from where the player aimed
         if (accuracyDistance == 0)
             return direction;
+        if (this.UsedPowerupThisTurn && this.UsedPowerUpType == "accuracy")
+        {
+            Debug.Log("ModifyHitDirectionFromAccuracy: Player used accuracy power up. Return perfect accuracy by returning the original direction?");
+            return direction;
+        }
+
 
         accuracyDistance *= -2.5f;
         // Punish innaccurate putts more than regular hits?
@@ -1456,6 +1464,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 }
 
             }
+            if (this._canUseRocketPower)
+                EnableRocketControls(true);
+            else
+                EnableRocketControls(false);
         }
         else
         {
@@ -2875,10 +2887,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void RpcRocketPowerUpEffect(NetworkConnection conn, bool enable)
     {
         this._canUseRocketPower = enable;
+        if (!enable)
+            EnableRocketControls(false);
     }
     public void SetCanUseRocket(bool enable)
     {
         this._canUseRocketPower = enable;
+        if (!enable)
+            EnableRocketControls(false);
     }
     [ServerRpc]
     void CmdRemoveUsedPowerUps()
@@ -3251,6 +3267,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
             case "DistanceFromHoleOnChallenege":
                 TellPlayerHowFarTheyWereFromHole(distance);
                 break;
+            case "stroke limit":
+                TellPlayerTheyHitTheStrokeLimit();
+                break;
         }
 
         while (Time.time < end)
@@ -3278,6 +3297,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
             this.PlayerUIMessage("challenege:" + distance.ToString("0.00"));
             this.EnablePlayerCanvas(true);
         }
+    }
+    void TellPlayerTheyHitTheStrokeLimit()
+    {
+        this.PlayerUIMessage("stroke limit");
+        this.EnablePlayerCanvas(true);
     }
     [ServerRpc]
     void CmdServerSendMessagetoPlayerCompleted()
@@ -3470,6 +3494,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         if (!this.IsOwner)
             return;
         Debug.Log("EnableAimingActions: player: " + this.PlayerName + ":" + enable.ToString());
+        _aimingActionsEnabled = enable;
         if (enable)
         {
             //InputManagerGolf.Controls.AimingActions.Enable();
@@ -3713,6 +3738,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         PlayerChooseDirectionAndDistance(false);
         //EnableAimPositionControls(true);
         EnableAimingActions(true);
+        EnableRocketControls(false);
         UpdateCameraFollowTarget(_landingTargetSprite.gameObject);
         GameplayManagerTopDownGolf.instance.PowerUpShowInstructions(this);
         
@@ -3942,6 +3968,52 @@ public class GolfPlayerTopDown : NetworkBehaviour
             InputManagerGolf.Controls.AimingActions.ZoomOut.Disable();
             InputManagerGolf.Controls.AimingActions.ZoomOut.performed -= ZoomOutPressed;
         }
+    }
+    #endregion
+    #region Rocket Controls
+    void EnableRocketControls(bool enable)
+    {
+        if (!this.IsOwner)
+            return;
+        Debug.Log("EnableRocketControls: " + enable.ToString());
+        if (enable)
+        {
+            InputManagerGolf.Controls.AimingActions.AimPosition.Enable();
+            InputManagerGolf.Controls.AimingActions.AimPosition.performed += ChangeRocketMove;
+            InputManagerGolf.Controls.AimingActions.AimPosition.canceled += ResetRocketMove;
+        }
+        else
+        {
+            if(!_aimingActionsEnabled)
+                InputManagerGolf.Controls.AimingActions.AimPosition.Disable();
+            InputManagerGolf.Controls.AimingActions.AimPosition.performed -= ChangeRocketMove;
+            InputManagerGolf.Controls.AimingActions.AimPosition.canceled -= ResetRocketMove;
+            _rocketMove = Vector2.zero;
+        }
+    }
+    void ChangeRocketMove(InputAction.CallbackContext context)
+    {
+        if (!this.IsOwner)
+            return;
+        if (!this.UsedPowerupThisTurn || this.UsedPowerUpType != "rocket")
+        {
+            return;
+        }   
+        if (!this._canUseRocketPower)
+        {
+            return;
+        }
+
+        _rocketMove = context.ReadValue<Vector2>();
+
+        //Debug.Log("ChangeAimPosition: Player: " + this.PlayerName + " and move aim in direction of: " + _previousAimMovement.ToString());
+
+    }
+    void ResetRocketMove(InputAction.CallbackContext context)
+    {
+        if (!this.IsOwner)
+            return;
+        _rocketMove = Vector2.zero;
     }
     #endregion
     #endregion

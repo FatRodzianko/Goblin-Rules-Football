@@ -19,9 +19,9 @@ MonoBehaviour:
     width: 2560
     height: 1357
   m_ShowMode: 4
-  m_Title: Inspector
+  m_Title: Hierarchy
   m_RootView: {fileID: 2}
-  m_MinSize: {x: 875, y: 300}
+  m_MinSize: {x: 875, y: 371}
   m_MaxSize: {x: 10000, y: 10000}
   m_Maximized: 1
 --- !u!114 &2
@@ -119,7 +119,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 27
+  controlID: 105
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: SceneView
+  m_Name: GameView
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -217,13 +217,13 @@ MonoBehaviour:
     height: 864
   m_MinSize: {x: 202, y: 221}
   m_MaxSize: {x: 4002, y: 4021}
-  m_ActualView: {fileID: 14}
+  m_ActualView: {fileID: 12}
   m_Panes:
   - {fileID: 14}
   - {fileID: 12}
   - {fileID: 15}
-  m_Selected: 0
-  m_LastSelected: 1
+  m_Selected: 1
+  m_LastSelected: 0
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -251,9 +251,9 @@ MonoBehaviour:
   - {fileID: 17}
   - {fileID: 18}
   - {fileID: 19}
-  - {fileID: 20}
   - {fileID: 21}
   - {fileID: 22}
+  - {fileID: 20}
   m_Selected: 0
   m_LastSelected: 1
 --- !u!114 &11
@@ -275,8 +275,8 @@ MonoBehaviour:
     y: 0
     width: 539
     height: 1307
-  m_MinSize: {x: 276, y: 71}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 23}
   m_Panes:
   - {fileID: 23}
@@ -344,7 +344,7 @@ MonoBehaviour:
     m_HSlider: 0
     m_VSlider: 0
     m_IgnoreScrollWheelUntilClicked: 0
-    m_EnableMouseInput: 0
+    m_EnableMouseInput: 1
     m_EnableSliderZoomHorizontal: 0
     m_EnableSliderZoomVertical: 0
     m_UniformScale: 1
@@ -406,9 +406,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: a0720000
-      m_LastClickedID: 0
-      m_ExpandedIDs: 2c71f8ffd271f8ffd476f8ff10a9f8ffb6a9f8ffb8aef8ffa008f9ff4609f9ff480ef9ffc2c1f9ff68c2f9ff6ac7f9ffa018faff4619faff461efaffc872faff6e73faff7678faff32c4faffd8c4faffe0c9faffc212fbff6813fbff7018fbffac6efbff526ffbff5074fbff88acfbff2eadfbff36b2fbffba00fcff6001fcff6806fcff6a43fcff1044fcff1649fcff6ab9fcff10bafcff16bffcffa8c1fcff06f3fcffacf3fcffaaf8fcff6054fdff0655fdff0c5afdff8a8cfdff308dfdff2e92fdff4eb9fdfff4b9fdfff2befdfff0c1fdffa450ffff4a51ffff5056ffff84c3ffff00c4ffff00c9ffff0afbffff826f00000c70000008370100d0ef01005ef001008e0702005a190200242b02002c4102005c5302002465020012670200e27602009e8e0200fca602008aa70200
+      m_SelectedIDs: f0e10e00
+      m_LastClickedID: 975344
+      m_ExpandedIDs: 6871f4ff4cadf4ff18cef4ffbcf1f4ff180af5ff960af5ff640ff5ffe210f5ff5c11f5ff4a12f5ff5c12f5ff601ef5ff2246f5ff7265f5ff7289f5ff6c96f5ffaac7f5ff0e2ff6ff5abcf6ffe0dff6ffe806f7ff9027f7ff3668f7ffb468f7ff7e6df7fffa6ef7ff746ff7ff6270f7ff7470f7ff787cf7ff96b0f7ff14b1f7ffe2b5f7ff60b7f7ffdab7f7ffc8b8f7ffdab8f7ffdec4f7fffef3f8ff08f4f8ff12f4f8ffbaf6f8ff7081f9ff1a7afaff1898fafff29cfaff50b8faff8acbfaff866ffbff2870fbff6076fbffda76fbffc877fbffda77fbffde83fbffce9dfbff2cbffbff60ddfbffd256fcff586dfcfffa6dfcff3274fcffac74fcff9a75fcffac75fcffb081fcff029efcff62b4fcff04b5fcff3cbbfcffb6bbfcffa4bcfcffb6bcfcffbac8fcff7836fdff2051fdff2a51fdff3451fdffc4a1fdff22b5fdff6a45feff6e45feff6246feff8646feffc246feff8648feff9648feff4e88feff7a18ffff3a39ffffdc39ffff1440ffff8e40ffff7c41ffff8e41ffff1648ffffb072ffff5273ffff8879ffff027afffff07affff027bffff8a81ffff86abffff28acffff6cb2fffff4b2fffff0b3ffff10b4ffffa6baffff0afbfffff4ffffffeebe0100cabf010066c201000cc4010012c60100aacd010018ce0100eccf010038d0010076d00100086d0200826d0200c4960200189b0200749c0200f69c0200e29e02006ca0030062d1070020d2070072d2070034d30700dad607006cd7070078d70700fed70700e4920c00f0e10e00
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -679,9 +679,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 46.803543, y: -22.699125, z: -5.0469155}
+    m_Target: {x: 215.8694, y: -33.118626, z: 2.5641086}
     speed: 2
-    m_Value: {x: 46.803543, y: -22.699125, z: -5.0469155}
+    m_Value: {x: 215.8694, y: -33.118626, z: 2.5641086}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -732,9 +732,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 23.640789
+    m_Target: 73.309494
     speed: 2
-    m_Value: 23.640789
+    m_Value: 73.309494
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -1510,22 +1510,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Resources/Courses
+    - Assets/Scenes
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Resources/Courses
+  - Assets/Scenes
   m_LastFoldersGridSize: 16
   m_LastProjectPath: C:\Users\murph\Desktop\Unity-gamedev-stuff\Goblin-Rules-Football\Goblin-Rules-Football
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 420}
-    m_SelectedIDs: 60cf0000
-    m_LastClickedID: 53088
-    m_ExpandedIDs: 00000000aa810000ac810000ae810000b0810000b281000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 559}
+    m_SelectedIDs: 1adb0000
+    m_LastClickedID: 56090
+    m_ExpandedIDs: 000000003e95000040950000429500004495000046950000489500004a9500004c9500004e95000050950000529500005495000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1553,7 +1553,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000aa810000ac810000ae810000b0810000b2810000
+    m_ExpandedIDs: 000000003e95000040950000429500004495000046950000489500004a9500004c9500004e950000509500005295000054950000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1581,7 +1581,7 @@ MonoBehaviour:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: c6230000fac30000ce740000887f0000b6c40000f6bc00006ccd0000a68f0000da8f0000126b000094710000746b000042d40000026c0000006c0000686b00006c670000be6c0000c06c0000a2f100004af00000266f000000000000c0870000dcfd0000b698000080830000e66e0000446f0000548b0000e07a00001e7b0000127b0000da4301001af3000078c900007aca0000146e00007cc9000030ca0000a2ca000028cb000044cb000090be00000a72000006760000047600000e7600001076000076ce0000bcd7000024d90000bc7a00003a760000387600009694000088b50000ae7a0000fed2000064aa00008c0d0100567600004e76000052760000d86e0000ae74000080cd00005a5c01003e8e0000208f0000a47b0000
+    m_ExpandedInstanceIDs: c6230000fac30000ce740000887f0000b6c40000f6bc00006ccd0000a68f0000da8f0000126b000094710000746b000042d40000026c0000006c0000686b00006c670000be6c0000c06c0000a2f100004af00000266f000000000000c0870000dcfd0000b698000080830000e66e0000446f0000548b0000e07a00001e7b0000127b0000da4301001af3000078c900007aca0000146e00007cc9000030ca0000a2ca000028cb000044cb000090be00000a72000006760000047600000e7600001076000076ce0000bcd7000024d90000bc7a00003a760000387600009694000088b50000ae7a0000fed2000064aa00008c0d0100567600004e76000052760000d86e0000ae74000080cd00005a5c01003e8e0000208f0000a47b0000dc7b0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1772,14 +1772,14 @@ MonoBehaviour:
       e31: 0
       e32: 0
       e33: 1
-    - e00: 1
+    - e00: 0.5391559
       e01: 0
       e02: 0
-      e03: 0
+      e03: 314.3431
       e10: 0
-      e11: 1
+      e11: 0.5391559
       e12: 0
-      e13: 0
+      e13: 36.851913
       e20: 0
       e21: 0
       e22: 1
@@ -1805,9 +1805,9 @@ MonoBehaviour:
       e32: 0
       e33: 1
   m_PreviewAnimator: {fileID: 0}
-  m_AnimatorController: {fileID: 9100000, guid: d333a14728a044f47af9345d444272f6, type: 2}
+  m_AnimatorController: {fileID: 9100000, guid: bce3798c3cf69ad439be8591acfaa030, type: 2}
   m_BreadCrumbs:
-  - m_Target: {fileID: -8306956524873978658, guid: d333a14728a044f47af9345d444272f6, type: 2}
+  - m_Target: {fileID: 5360464717878077823, guid: bce3798c3cf69ad439be8591acfaa030, type: 2}
     m_ScrollPosition: {x: 0, y: 0}
   stateMachineGraph: {fileID: 0}
   stateMachineGraphGUI: {fileID: 0}
@@ -1967,7 +1967,7 @@ MonoBehaviour:
       oldMaxSizes: 
       oldSplitSize: 0
     m_HorizontalSplitter:
-      ID: 1739
+      ID: 39
       splitterInitialOffset: 0
       currentActiveSplitter: -1
       realSizes:
@@ -2026,7 +2026,7 @@ MonoBehaviour:
     m_SaveData: []
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 73660
+  m_LastSelectedObjectID: 853434
 --- !u!114 &21
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -2889,8 +2889,8 @@ MonoBehaviour:
     m_SaveData: []
   m_ActionMapsTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 8dc07242
-    m_LastClickedID: 1114816653
+    m_SelectedIDs: dd1fb545
+    m_LastClickedID: 1169498077
     m_ExpandedIDs: 00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -2911,9 +2911,9 @@ MonoBehaviour:
     m_SearchString: 
   m_ActionsTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 5f2469cb
-    m_LastClickedID: -882301857
-    m_ExpandedIDs: 0956d5b15f2469cba9c8faecbeae000008a3c90436bb0d096ff80911ee6f041c0dc9a4208dc07242dd1fb54509877d478d205c4a92c7b262
+    m_SelectedIDs: 924156dd
+    m_LastClickedID: -581549678
+    m_ExpandedIDs: 0956d5b15f2469cb742093dccbad5ce2a9c8faecbeae000008a3c90436bb0d096ff80911ee6f041c0dc9a4208dc07242dd1fb54509877d478d205c4a92c7b262f5b4e076
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -3305,35 +3305,8 @@ MonoBehaviour:
       \"processors\": \"\",\n                    \"groups\": \"\",\n                   
       \"action\": \"AimPosition\",\n                    \"isComposite\": false,\n                   
       \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"arrow_keys\",\n                    \"id\": \"1b982595-ccf9-483c-9d81-3187f792263d\",\n                   
+      \"name\": \"dpad\",\n                    \"id\": \"fb77dfbd-5d8b-421a-b3f3-ea4d550c9f5e\",\n                   
       \"path\": \"2DVector\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"\",\n                   
-      \"action\": \"AimPosition\",\n                    \"isComposite\": true,\n                   
-      \"isPartOfComposite\": false\n                },\n                {\n                   
-      \"name\": \"up\",\n                    \"id\": \"fce6133d-cb47-4984-a483-299ebf5775a9\",\n                   
-      \"path\": \"<Keyboard>/upArrow\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"\",\n                   
-      \"action\": \"AimPosition\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"down\",\n                    \"id\": \"f3efd829-25f3-41a8-83b2-fa95397c485f\",\n                   
-      \"path\": \"<Keyboard>/downArrow\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"\",\n                    \"action\": \"AimPosition\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": true\n               
-      },\n                {\n                    \"name\": \"left\",\n                   
-      \"id\": \"2ad6fbc3-6eb6-4c3e-8b70-d97fcdbc754a\",\n                    \"path\":
-      \"<Keyboard>/leftArrow\",\n                    \"interactions\": \"\",\n                   
-      \"processors\": \"\",\n                    \"groups\": \"\",\n                   
-      \"action\": \"AimPosition\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                },\n                {\n                   
-      \"name\": \"right\",\n                    \"id\": \"b9a4d40a-afc5-46dc-b2de-249ce7de848c\",\n                   
-      \"path\": \"<Keyboard>/rightArrow\",\n                    \"interactions\":
-      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
-      \"\",\n                    \"action\": \"AimPosition\",\n                   
-      \"isComposite\": false,\n                    \"isPartOfComposite\": true\n               
-      },\n                {\n                    \"name\": \"dpad\",\n                   
-      \"id\": \"fb77dfbd-5d8b-421a-b3f3-ea4d550c9f5e\",\n                    \"path\":
-      \"2DVector\",\n                    \"interactions\": \"\",\n                   
       \"processors\": \"\",\n                    \"groups\": \"\",\n                   
       \"action\": \"AimPosition\",\n                    \"isComposite\": true,\n                   
       \"isPartOfComposite\": false\n                },\n                {\n                   
@@ -3439,6 +3412,11 @@ MonoBehaviour:
       \"processors\": \"\",\n                    \"groups\": \"\",\n                   
       \"action\": \"ResetSpin\",\n                    \"isComposite\": false,\n                   
       \"isPartOfComposite\": false\n                },\n                {\n                   
+      \"name\": \"\",\n                    \"id\": \"b1347e69-da13-4108-b4c0-b7f93b006483\",\n                   
+      \"path\": \"<Keyboard>/delete\",\n                    \"interactions\": \"\",\n                   
+      \"processors\": \"\",\n                    \"groups\": \"\",\n                   
+      \"action\": \"ResetSpin\",\n                    \"isComposite\": false,\n                   
+      \"isPartOfComposite\": false\n                },\n                {\n                   
       \"name\": \"rightstick\",\n                    \"id\": \"8e79d2ef-e64a-430a-8eff-850ae066aa25\",\n                   
       \"path\": \"2DVector\",\n                    \"interactions\": \"\",\n                   
       \"processors\": \"\",\n                    \"groups\": \"\",\n                   
@@ -3465,9 +3443,36 @@ MonoBehaviour:
       \"<Gamepad>/rightStick/right\",\n                    \"interactions\": \"\",\n                   
       \"processors\": \"\",\n                    \"groups\": \"\",\n                   
       \"action\": \"SpinPosition\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": true\n                }\n            ]\n        },\n       
-      {\n            \"name\": \"HittingActions\",\n            \"id\": \"a90ee806-d603-4dc6-990e-81e694938006\",\n           
-      \"actions\": [\n                {\n                    \"name\": \"CancelHit\",\n                   
+      \"isPartOfComposite\": true\n                },\n                {\n                   
+      \"name\": \"arrowkeys\",\n                    \"id\": \"7246d4e7-ea6c-41d4-bbd8-0d35c5527f70\",\n                   
+      \"path\": \"2DVector\",\n                    \"interactions\": \"\",\n                   
+      \"processors\": \"\",\n                    \"groups\": \"\",\n                   
+      \"action\": \"SpinPosition\",\n                    \"isComposite\": true,\n                   
+      \"isPartOfComposite\": false\n                },\n                {\n                   
+      \"name\": \"up\",\n                    \"id\": \"9092e064-aabd-41b7-9765-b69928ef8de0\",\n                   
+      \"path\": \"<Keyboard>/upArrow\",\n                    \"interactions\": \"\",\n                   
+      \"processors\": \"\",\n                    \"groups\": \"\",\n                   
+      \"action\": \"SpinPosition\",\n                    \"isComposite\": false,\n                   
+      \"isPartOfComposite\": true\n                },\n                {\n                   
+      \"name\": \"down\",\n                    \"id\": \"a7463d36-cb9e-4f0f-b1e0-ef420e7e7874\",\n                   
+      \"path\": \"<Keyboard>/downArrow\",\n                    \"interactions\":
+      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
+      \"\",\n                    \"action\": \"SpinPosition\",\n                   
+      \"isComposite\": false,\n                    \"isPartOfComposite\": true\n               
+      },\n                {\n                    \"name\": \"left\",\n                   
+      \"id\": \"29817fc8-f9cb-465b-a608-0489a1b62baf\",\n                    \"path\":
+      \"<Keyboard>/leftArrow\",\n                    \"interactions\": \"\",\n                   
+      \"processors\": \"\",\n                    \"groups\": \"\",\n                   
+      \"action\": \"SpinPosition\",\n                    \"isComposite\": false,\n                   
+      \"isPartOfComposite\": true\n                },\n                {\n                   
+      \"name\": \"right\",\n                    \"id\": \"6453faac-0568-4d5f-a2b7-d169811f7e34\",\n                   
+      \"path\": \"<Keyboard>/rightArrow\",\n                    \"interactions\":
+      \"\",\n                    \"processors\": \"\",\n                    \"groups\":
+      \"\",\n                    \"action\": \"SpinPosition\",\n                   
+      \"isComposite\": false,\n                    \"isPartOfComposite\": true\n               
+      }\n            ]\n        },\n        {\n            \"name\": \"HittingActions\",\n           
+      \"id\": \"a90ee806-d603-4dc6-990e-81e694938006\",\n            \"actions\":
+      [\n                {\n                    \"name\": \"CancelHit\",\n                   
       \"type\": \"Button\",\n                    \"id\": \"d89c871b-7efc-4e08-b0d8-5aa6a1596dc0\",\n                   
       \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
       \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               

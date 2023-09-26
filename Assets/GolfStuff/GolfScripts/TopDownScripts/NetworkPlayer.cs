@@ -5,8 +5,10 @@ using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using FishNet.Managing;
 using TMPro;
 using UnityEngine.UI;
+using Steamworks;
 
 public class NetworkPlayer : NetworkBehaviour
 {
@@ -16,6 +18,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     [Header("Color Picker Stuff")]
     [SerializeField] [SyncVar] Color _ballColor = Color.white;
+    [SerializeField] BallColorPicker _ballColorPicker;
 
     [Header("UI Stuff")]
     [SerializeField] GameObject _playerUICanvas;
@@ -25,10 +28,14 @@ public class NetworkPlayer : NetworkBehaviour
     [SerializeField] Button _submitPlayerNameButton;
     [SerializeField] TextMeshProUGUI _welcomeText;
     [SerializeField] GameObject _uiHolder;
+    [SerializeField] TextMeshProUGUI _lobbyNameText;
 
     [Header("Player Status")]
     [SerializeField] [SyncVar(OnChange = nameof(SyncIsReady))] public bool IsReady = false;
     [SerializeField] [SyncVar(OnChange = nameof(SyncPlayerName))] public string PlayerName;
+
+    [Header("Networking stuff?")]
+    [SerializeField] NetworkManager _networkManager;
 
     // Start is called before the first frame update
     void Start()
@@ -40,11 +47,23 @@ public class NetworkPlayer : NetworkBehaviour
     {
         
     }
+    private void OnDestroy()
+    {
+        if (_networkManager != null)
+            _networkManager.SceneManager.OnClientLoadedStartScenes -= SceneManager_OnClientLoadedStartScenes;
+    }
     public override void OnStartServer()
     {
         base.OnStartServer();
+        
+        
+        if (!_networkManager)
+        {
+            _networkManager = GameObject.FindGameObjectWithTag("GolfNetworkManager").GetComponent<NetworkManager>();
+        }
         GameplayManagerTopDownGolf.instance.AddNetworkPlayer(this);
         CheckIfHostCanStartGame();
+
     }
     public override void OnStopServer()
     {
@@ -61,17 +80,42 @@ public class NetworkPlayer : NetworkBehaviour
             _readyButton.gameObject.SetActive(false);
             _playerNameInput.gameObject.SetActive(false);
             _submitPlayerNameButton.gameObject.SetActive(false);
+            _welcomeText.gameObject.SetActive(false);
+
+            gameObject.tag = "NetworkPlayer";
         }
         else
         {
             Debug.Log("OnStartClient: ACTIVATING player canvas for player with id: " + this.ObjectId);
             _playerUICanvas.SetActive(true);
             _readyButton.gameObject.SetActive(true);
-            _playerNameInput.gameObject.SetActive(true);
-            _submitPlayerNameButton.gameObject.SetActive(true);
+            _playerNameInput.gameObject.SetActive(false);
+            _submitPlayerNameButton.gameObject.SetActive(false);
+            if (!_networkManager)
+            {
+                _networkManager = GameObject.FindGameObjectWithTag("GolfNetworkManager").GetComponent<NetworkManager>();
+            }
+
+            gameObject.name = "LocalNetworkPlayer";
+            gameObject.tag = "LocalNetworkPlayer";
+
+            SetPlayerName();
+            _ballColorPicker.GetPlayerPrefValues();
         }
-        _welcomeText.gameObject.SetActive(false);
+        
         _startGameButton.gameObject.SetActive(false);
+    }
+    private void SceneManager_OnClientLoadedStartScenes(NetworkConnection conn, bool asServer)
+    {
+        Debug.Log("NetworkPlayer: SceneManager_OnClientLoadedStartScenes: as server: " + asServer.ToString());
+        SetLobbyNameText(GolfSteamLobby.instance.CurrentLobbyName);
+    }
+    void SetLobbyNameText(string lobbyName)
+    {
+        if (string.IsNullOrEmpty(lobbyName))
+            return;
+        _lobbyNameText.text = lobbyName;
+        _lobbyNameText.gameObject.SetActive(true);
     }
     public void PlayerReadyUp()
     {
@@ -254,6 +298,12 @@ public class NetworkPlayer : NetworkBehaviour
 
         CmdSetPlayerName(name);
     }
+    void SetPlayerName()
+    {
+        if (!this.IsOwner)
+            return;
+        CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
+    }
     [ServerRpc]
     void CmdSetPlayerName(string newName)
     {
@@ -277,18 +327,22 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        _welcomeText.text = "Welcome " + next + "!";
         _welcomeText.gameObject.SetActive(true);
-        _welcomeText.text = next;
+        
     }
     public void UpdateBallColorValue(Color newColor)
     {
+        Debug.Log("UpdateBallColorValue: Is owner? " + this.IsOwner.ToString());
         if (!this.IsOwner)
             return;
+        Debug.Log("UpdateBallColorValue: " + newColor.ToString());
         CmdUpdateBallColorValue(newColor);
     }
     [ServerRpc]
     void CmdUpdateBallColorValue(Color newColor)
     {
+        Debug.Log("CmdUpdateBallColorValue: " + newColor.ToString());
         this._ballColor = newColor;
     }
 

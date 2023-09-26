@@ -11,7 +11,12 @@ using Steamworks;
 public class TitleScreenManager : MonoBehaviour
 {
     public static TitleScreenManager instance;
+
+    [Header("Network Managers")]
     [SerializeField] private NetworkManagerGRF networkManager;
+    [SerializeField] private GameObject _fishNetNetworkManager;
+
+
     [SerializeField] EventSystem eventSystem;
 
     [Header("Panels")]
@@ -88,6 +93,17 @@ public class TitleScreenManager : MonoBehaviour
     public bool didPlayerNameTheLobby = false;
     public List<GameObject> listOfLobbyListItems = new List<GameObject>();
 
+    [Header("Golf Stuff?")]
+    [SerializeField] Button _switchToGolfButton;
+    [SerializeField] Button _switchToFootballButton;
+    [SerializeField] TextMeshProUGUI _titleText;
+    [SerializeField] Color _footballBackgroundColor;
+    [SerializeField] Color _golfBackgroundColor;
+
+    [Header("Golf/Football Menus")]
+    [SerializeField] GameObject _footballCanvas;
+    [SerializeField] GameObject _golfCanvas;
+
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
     {
@@ -106,6 +122,7 @@ public class TitleScreenManager : MonoBehaviour
         MakeInstance();
         ReturnToMainMenu();
     }
+
     void MakeInstance()
     {
         if (instance == null)
@@ -464,6 +481,7 @@ public class TitleScreenManager : MonoBehaviour
 
                             newLobbyListItemScript.lobbySteamId = (CSteamID)lobbyIDS[i].m_SteamID;
                             newLobbyListItemScript.lobbyName = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "name");
+                            newLobbyListItemScript.GameMode = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "GameMode");
                             newLobbyListItemScript.numberOfPlayers = SteamMatchmaking.GetNumLobbyMembers((CSteamID)lobbyIDS[i].m_SteamID);
                             newLobbyListItemScript.maxNumberOfPlayers = SteamMatchmaking.GetLobbyMemberLimit((CSteamID)lobbyIDS[i].m_SteamID);
                             newLobbyListItemScript.SetLobbyItemValues();
@@ -483,6 +501,7 @@ public class TitleScreenManager : MonoBehaviour
 
                         newLobbyListItemScript.lobbySteamId = (CSteamID)lobbyIDS[i].m_SteamID;
                         newLobbyListItemScript.lobbyName = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "name");
+                        newLobbyListItemScript.GameMode = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "GameMode");
                         newLobbyListItemScript.numberOfPlayers = SteamMatchmaking.GetNumLobbyMembers((CSteamID)lobbyIDS[i].m_SteamID);
                         newLobbyListItemScript.maxNumberOfPlayers = SteamMatchmaking.GetLobbyMemberLimit((CSteamID)lobbyIDS[i].m_SteamID);
                         newLobbyListItemScript.SetLobbyItemValues();
@@ -565,12 +584,41 @@ public class TitleScreenManager : MonoBehaviour
             Game.minPlayers = 2;
         }
         SetGameSettings(false);
+
+        GolfSteamLobby.instance.JoiningFishNet = false;
+        SteamLobby.instance.JoiningMirror = true;
+        
         SteamLobby.instance.CreateNewLobby(newLobbyType);
     }
     public void ResetGameServerSettings()
     {
         Game.ResetWaitingForPlayersToLoadStuff();
         Game.ClearLobbyAndGamePlayerList();
+    }
+    public void SwitchToGolfMode()
+    {
+        //_switchToGolfButton.gameObject.SetActive(false);
+        //_switchToFootballButton.gameObject.SetActive(true);
+        _footballCanvas.SetActive(false);
+        _golfCanvas.SetActive(true);
+        //_titleText.text = "GOBLIN RULES GOLF";
+        Camera.main.backgroundColor = _golfBackgroundColor;
+    }
+    public void SwitchToFootballMode()
+    {
+        //_switchToGolfButton.gameObject.SetActive(true);
+        //_switchToFootballButton.gameObject.SetActive(false);
+        _golfCanvas.SetActive(false);
+        _footballCanvas.SetActive(true);        
+        //_titleText.text = "GOBLIN RULES FOOTBALL";
+        Camera.main.backgroundColor = _footballBackgroundColor;
+    }
+    public void CreateNewGolfLobby()
+    {
+        Debug.Log("CreateNewGolfLobby: ");
+        SteamLobby.instance.JoiningMirror = false;
+        GolfSteamLobby.instance.JoiningFishNet = true;
+        GolfSteamLobby.instance.CreateLobby();
     }
 
 }

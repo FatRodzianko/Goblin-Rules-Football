@@ -26,20 +26,23 @@ public class NetworkingTestHUD : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _canvas.SetActive(true);
-        _networkManager = FindObjectOfType<NetworkManager>();
-        if (_networkManager == null)
-        {
-            Debug.LogError("NetworkManager not found, HUD will not function.");
-            return;
-        }
+        //start old
+        //_canvas.SetActive(true);
+        //_networkManager = FindObjectOfType<NetworkManager>();
+        //if (_networkManager == null)
+        //{
+        //    Debug.LogError("NetworkManager not found, HUD will not function.");
+        //    return;
+        //}
 
-        // Events to update the connection state
-        _networkManager.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
-        _networkManager.ClientManager.OnClientConnectionState += ClientManager_OnClientConnectionState;
+        //// Events to update the connection state
+        //_networkManager.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
+        //_networkManager.ClientManager.OnClientConnectionState += ClientManager_OnClientConnectionState;
 
 
-        _disconnectButton.gameObject.SetActive(false);
+        //_disconnectButton.gameObject.SetActive(false);
+        //end old
+        //
     }
 
     // Update is called once per frame
@@ -52,6 +55,7 @@ public class NetworkingTestHUD : MonoBehaviour
         if (_networkManager == null)
             return;
 
+
         if (_serverState != LocalConnectionState.Stopped)
             _networkManager.ServerManager.StopConnection(true);
         else
@@ -62,6 +66,7 @@ public class NetworkingTestHUD : MonoBehaviour
             _networkManager.ClientManager.StopConnection();
         else
             _networkManager.ClientManager.StartConnection("localhost");
+
 
     }
 

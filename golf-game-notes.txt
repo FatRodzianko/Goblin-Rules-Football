@@ -366,7 +366,33 @@ x limit tee off challenges to only specific clubs
 - - - when an object is destroyed, make sure the object's cancellation token is destroyed
 - - - https://hackernoon.com/the-complete-asynchronous-programming-primer-for-unity-development
 - replace "if (!this.IsOwner) { return; }" checks with "[Client(Logging = LoggingType.Off, RequireOwnership = true)]" attributes above the functions/methods instead?
-- change accuracy powerup so you always get perfect accuracy no matter what?
+x change accuracy powerup so you always get perfect accuracy no matter what?
+x have the ball travel its trajectory at half speed if rocket is in use?
+x Use the "AimPosition" control scheme to aim the ball when using a rocket?
+- - x will need to enable/disable it appropriately?
+- - - - - x enable it when the player hits the ball BUT ONLY if they used the rocket power
+- - - - - x disable it whenever _canUseRocketPower is set to false
+- - - - - - probably horrendously broken ???
+- "Lobby Menu" when player's first join game
+- - - list of players and their ready status (and ball color?)
+- - - ready up, exit game, buttons
+- - - host gets a start game button when all players are readied up
+- add esc menu and way to exit out of golf multiplayer game back to main menu
+- ability to "configure" a golf game
+- - - powerups on/off
+- - - weather statues on/off
+- - - rain controlled by favor, completely random, or off entirely
+- - - wind controlled by favor, completely random, or off entirely
+- - - pick what course to play?
+- - - - - - maybe create a 3 hole "mini golf" course so there are at least two different ones?
+- - - stroke limit? And if so, number of strokes
+- fix the fog on statues? On my laptop it looks really weird. Square artifacts or something that look messed up
+
+### Fishnet / steamworks tutorial stuff:
+- https://www.youtube.com/watch?v=U4ATkct6fh4
+- https://www.youtube.com/watch?v=-Du_8_NZRWM
+- https://www.youtube.com/watch?v=Y95VK4s_hYU
+- https://www.youtube.com/watch?v=ZSMpGmKtJio
 
 ### fog shader graph
 - - - https://www.youtube.com/watch?v=LDxApLRIOy4

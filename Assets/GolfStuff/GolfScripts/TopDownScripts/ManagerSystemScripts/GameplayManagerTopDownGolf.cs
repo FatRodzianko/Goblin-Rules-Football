@@ -106,6 +106,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [Header("Game Phase")] // this should probably be changed to an enum or something at some point? Or switch to a "finite state machine?"
     [SyncVar] public bool IsTeeOffChallenge = false;
 
+    [SerializeField]
+    [SyncVar] public bool IsThereAStrokeLimit = false;
+    [SyncVar] public int StrokeLimitNumber = 0;
+
     [Header("Tasks")]
     [SerializeField] CancellationTokenSource _cancellationTokenSource;
 
@@ -151,6 +155,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // set the ownership to the server?
         Debug.Log("OnStartServer: On GameplayManager: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHost.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
         ClearSyncLists();
+
+
+        // hardcoding these values for now but they should be set by multiplayer game config in the future?
+        this.IsThereAStrokeLimit = true;
+        this.StrokeLimitNumber = 12;
     }
     public override void OnStopServer()
     {
@@ -512,6 +521,18 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             //await ball.MyPlayer.TellPlayerGroundTheyLandedOn(3);
             await ball.MyPlayer.ServerTellPlayerGroundTheyLandedOn(3);
             Debug.Log("StartNextPlayersTurn: Returning from TellPlayerGroundTheyLandedOn at time: " + Time.time.ToString());
+            // Check if player is over stroke limit
+            if (IsThereAStrokeLimit)
+            {
+                Debug.Log("StartNextPlayersTurn: IsThereAStrokeLimit: "+ IsThereAStrokeLimit.ToString() + ". Checking if player is over the stroke limit. Current player strokes: " + ball.MyPlayer.PlayerScore.StrokesForCurrentHole.ToString());
+                if (IsPlayerOverStrokeLimit(ball.MyPlayer))
+                {
+                    PlayerOutOfCommission(ball.MyPlayer);
+                    // Get new cancellation token for tasks?
+                    CancellationToken token = _cancellationTokenSource.Token;
+                    await ball.MyPlayer.ServerSendMessagetoPlayer(5f, "stroke limit", token);
+                }
+            }
         }
 
 
@@ -529,12 +550,33 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (playerSkippingForLightning)
         {
             Debug.Log("GameplayManagerTopDownGolf: StartNextPlayersTurn: Player: " + ball.MyPlayer.PlayerName + " skipping for next turn due to lightning.");
+
+            // check if the lightning skip puts the player over the stroke limit. If there are no other players remaining after that, move to the next hole?
+            if (IsThereAStrokeLimit)
+            {
+                Debug.Log("StartNextPlayersTurn: under playerSkippingForLightning check: IsThereAStrokeLimit: " + IsThereAStrokeLimit.ToString() + ". Checking if player " + ball.MyPlayer.PlayerName + " is over the stroke limit. Current player strokes: " + ball.MyPlayer.PlayerScore.StrokesForCurrentHole.ToString());
+                if (IsPlayerOverStrokeLimit(ball.MyPlayer))
+                {
+                    PlayerOutOfCommission(ball.MyPlayer);
+                    SkipsInARow -= 1; // reduce the number of skips by one so if there is only one other player remaining after this, and they didn't also skip, they will still be asked to skip to skip the lightning storm?
+                    // Get new cancellation token for tasks?
+                    CancellationToken token = _cancellationTokenSource.Token;
+                    await ball.MyPlayer.ServerSendMessagetoPlayer(5f, "stroke limit", token);
+                    
+                }
+                if (_numberOfPlayersInHole >= GolfPlayers.Count)
+                {
+                    EndStormFromStrokeLimit();
+                    AllPlayersInHoleOrIncapacitated(ball);
+                    return;
+                }
+            }
             SkipsInARow++; // track number of times players have skipped lightning in a row
             // Skip the current player's turn. Find the next player up based on tee off order, or distance to hole. If no other players are left, then this player stays as current player
-            if (_numberOfPlayersInHole == GolfPlayers.Count - 1)
+            if (_numberOfPlayersInHole == GolfPlayers.Count - 1 && !GolfPlayersOutOfCommission.Contains(ball.MyPlayer))
             {
                 // If the only player who hasn't made it in the hole is this player, they stay as the current player
-                Debug.Log("StartNextPlayersTurn: Skip For Lighning next player will be: Player: " + ball.MyPlayer.PlayerName + " because they are the only player not in the hole.");
+                Debug.Log("StartNextPlayersTurn: Skip For Lighning next player will be: Player: " + ball.MyPlayer.PlayerName + " because they are the only player not in the hole. Number of players in hole: " + _numberOfPlayersInHole.ToString() + " remaining golf players: " + GolfPlayers.Count);
                 CurrentPlayer = ball.MyPlayer;
             }
             else
@@ -1264,6 +1306,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         SkipsInARow = 0;
     }
+    void EndStormFromStrokeLimit()
+    {
+        Debug.Log("EndStormFromStrokeLimit: ");
+        _lightningManager.EndStorm();
+        ResetLightningSkipInfo();
+        SkipsInARow = 0;
+    }
     public void SaveStatues(List<GameObject> statuesSpawned)
     {
         StatesOnServer.Clear();
@@ -1494,6 +1543,12 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         CurrentHoleIndex = -1;
         WindManager.instance.SetInitialWindForNewHole();
         NextHole();
+    }
+    #endregion
+    #region Stroke Limit Stuff
+    bool IsPlayerOverStrokeLimit(GolfPlayerTopDown player)
+    {
+        return player.PlayerScore.StrokesForCurrentHole >= this.StrokeLimitNumber;
     }
     #endregion
 }

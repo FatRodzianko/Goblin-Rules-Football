@@ -21,6 +21,8 @@ public class PlayerUIMessage : MonoBehaviour
     [SerializeField] const string _usingMulliganOwner = "Using mulligan. Setting the ball back to where you started...";
     [SerializeField] const string _usingMulliganClients = " is using their mulligan!";
     [SerializeField] const string _playerClosestToHole = " won the challenge and will hit first!";
+    [SerializeField] const string _strokeLimitOwner = "You hit the stroke limit... Try to hit the ball in fewer than ";
+    [SerializeField] const string _strokeLimitClient = " hit the stroke limit!";
 
     // Start is called before the first frame update
     void Start()
@@ -114,6 +116,17 @@ public class PlayerUIMessage : MonoBehaviour
         else if (message == "PlayerClosest")
         {
             _playerMessageText.text = _myPlayer.PlayerName + _playerClosestToHole;
+        }
+        else if (message == "stroke limit")
+        {
+            if (_myPlayer.IsOwner)
+            {
+                _playerMessageText.text = _strokeLimitOwner + GameplayManagerTopDownGolf.instance.StrokeLimitNumber.ToString() + " strokes.";
+            }
+            else
+            {
+                _playerMessageText.text = _myPlayer.PlayerName + _strokeLimitClient;
+            }
         }
         else
         {
