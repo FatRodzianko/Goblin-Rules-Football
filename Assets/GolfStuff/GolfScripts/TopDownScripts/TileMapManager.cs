@@ -409,7 +409,10 @@ public class TileMapManager : MonoBehaviour
 
         // Make sure that the DirectionTileManager saves all its sloped tile positions. This will only be called if not in the editor but in game??? Don't know if the below works or not...
         if (Application.isPlaying)
+        {
+            Debug.Log("LoadMap: Application.isPlaying is true. Calling GetTilesWithSlopes()...");
             DirectionTileManager.instance.GetTilesWithSlopes();
+        }
 
 
         // Spawn the holes
@@ -517,6 +520,7 @@ public class TileMapManager : MonoBehaviour
     }
     public void SetTileOnTileMap(Tilemap map, List<SavedTile> savedTiles)
     {
+        Debug.Log("SetTileOnTileMap: map type: " + map.name + " and tiles to set: " + savedTiles.Count.ToString());
         if (savedTiles.Count <= 0)
             return;
         foreach (SavedTile savedTile in savedTiles)

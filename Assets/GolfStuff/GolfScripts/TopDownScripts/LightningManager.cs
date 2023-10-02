@@ -211,6 +211,10 @@ public class LightningManager : NetworkBehaviour
 
         Debug.Log("CheckIfLightningStartsThisTurn: Checking for lightning at new turn. Is there lightning now? " + IsThereLightning.ToString());
         // if this check is for a new hole, reset the _lightningStormThisTurnAlready value so lightning storms can start again on the new hole
+        if (RainManager.instance.GameRainMode == RainManager.RainMode.NoRain)
+        {
+            return;
+        }
         if (forNewhole)
             _lightningStormThisTurnAlready = false;
 

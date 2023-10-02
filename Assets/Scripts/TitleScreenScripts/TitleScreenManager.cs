@@ -58,6 +58,17 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private Toggle multiplayerMercyRuleToggle;
     [SerializeField] private TMP_InputField multiplayerMercyRuleInputField;
 
+    [Header("Golf MultiplayerGameOptions")]
+    [SerializeField] private TMP_InputField _golfMultiplayerLobbyNameInputField;
+    [SerializeField] private TMP_InputField _golfNumberOfPlayersInputField;
+    [SerializeField] private Toggle _golfFriendsOnlyToggle;
+    [SerializeField] private Toggle _golfPowerUpsToggle;
+    [SerializeField] private Toggle _spawnWeatherStatueToggle;
+    [SerializeField] private Toggle _strokeLimitToggle;
+    [SerializeField] private TMP_InputField _strokeLimitInputField;
+    [SerializeField] private TMP_Dropdown _rainModeDropDown;
+    [SerializeField] private TMP_Dropdown _windModeDropDown;
+
 
     [Header("Game Option Values")]
     public string lobbyName;
@@ -68,7 +79,14 @@ public class TitleScreenManager : MonoBehaviour
     public bool spawnObstaclesEnabled;
     public bool mercyRuleEnabled;
     public int mercyRulePointDifferential;
-
+    
+    [Header("Golf Game Option Values")]
+    public string GolfLobbyName;
+    public bool GolfFriendsOnly = false;
+    public bool GolfPowerUpsEnabled = true;
+    public bool SpawnStatuesEnabled = true;
+    public bool StrokeLimitEnabled = false;
+    public int StrokeLimitNumber = 12;
 
     private const string PlayerPrefsNameKey = "PlayerName";
 
@@ -135,6 +153,7 @@ public class TitleScreenManager : MonoBehaviour
     {
         if (Time.timeScale != 1f)
             Time.timeScale = 1f;
+        _rainModeDropDown.onValueChanged.AddListener(delegate { RainModeDropdownValueChanged(_rainModeDropDown); });
     }
 
     // Update is called once per frame
@@ -618,7 +637,27 @@ public class TitleScreenManager : MonoBehaviour
         Debug.Log("CreateNewGolfLobby: ");
         SteamLobby.instance.JoiningMirror = false;
         GolfSteamLobby.instance.JoiningFishNet = true;
-        GolfSteamLobby.instance.CreateLobby();
+        int numberOfPlayers = 1;
+        if (String.IsNullOrWhiteSpace(_golfNumberOfPlayersInputField.text))
+        {
+            //Game.secondsPerHalf = 60;
+            numberOfPlayers = 10;
+        }
+        else
+        {
+            int.TryParse(_golfNumberOfPlayersInputField.text, out numberOfPlayers);
+        }
+        int strokeLimitValue = 0;
+        if (!String.IsNullOrEmpty(_strokeLimitInputField.text))
+        { 
+            int.TryParse(_strokeLimitInputField.text, out strokeLimitValue);
+        }
+        Debug.Log("CreateNewGolfLobby: Rain Mode will be: " + _rainModeDropDown.options[_rainModeDropDown.value].text + " Wind Mode will be: " + _windModeDropDown.options[_windModeDropDown.value].text);
+        GolfSteamLobby.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text);
+    }
+    private void RainModeDropdownValueChanged(TMP_Dropdown change)
+    {
+        //Debug.Log(_rainModeDropDown.options[_rainModeDropDown.value].text);
     }
 
 }

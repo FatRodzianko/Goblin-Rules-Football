@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: GolfCourses
+  m_EditorClassIdentifier: 
+  m_GroupName: GolfCourses
+  m_Data:
+    m_SerializedData: []
+  m_GUID: ac53588047718dc4bbbfb8fcf5673c4d
+  m_SerializeEntries:
+  - m_GUID: 0de78215564c4a647b4d3a8026292151
+    m_Address: Assets/GolfStuff/GolfCourses/Forest.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 79aed7ec2c7ae8f42a97300aee2aa423
+    m_Address: Assets/GolfStuff/GolfCourses/TeeOffChallenges.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: e8a619e01a4baaa40acce5ee1a596f22, type: 2}
+    - {fileID: 11400000, guid: fc7dfc89c430d4540b1d99b361038863, type: 2}

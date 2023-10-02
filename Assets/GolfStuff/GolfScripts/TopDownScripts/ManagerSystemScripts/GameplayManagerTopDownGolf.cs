@@ -11,6 +11,8 @@ using FishNet.Connection;
 using FishNet;
 using UnityEngine.UI;
 using System.Threading;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class GameplayManagerTopDownGolf : NetworkBehaviour
 {
@@ -106,9 +108,11 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [Header("Game Phase")] // this should probably be changed to an enum or something at some point? Or switch to a "finite state machine?"
     [SyncVar] public bool IsTeeOffChallenge = false;
 
-    [SerializeField]
+    [Header("Game Settings")]
     [SyncVar] public bool IsThereAStrokeLimit = false;
     [SyncVar] public int StrokeLimitNumber = 0;
+    [SyncVar] public bool PowerUpsEnabled = true;
+    [SyncVar] public bool WeatherStatuesEnabled = true;
 
     [Header("Tasks")]
     [SerializeField] CancellationTokenSource _cancellationTokenSource;
@@ -158,8 +162,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
 
         // hardcoding these values for now but they should be set by multiplayer game config in the future?
-        this.IsThereAStrokeLimit = true;
-        this.StrokeLimitNumber = 12;
+        GetGameSettings();
     }
     public override void OnStopServer()
     {
@@ -221,13 +224,35 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         */
 
         // This is for now with a hardcoded current course. Will need to update for when host can choose course that is then synced to other players
-        PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CurrentCourse);
+
+        // Just use Resources.Load<ScriptableCourse> instead? will insure that the player has it loaded before other calls or whatever?
+        // otherwise would need to change RpcLoadNewHoleOnClient and whatever to an await/async so it first awaits loading the course/hole, then does all the other stuff?
+        // // maybe break the RpcLoadNewHoleOnClient into two parts: First, check to see if the course needs to be loaded or not. If so, load the addressable. Then do the "new hole stuff". If the course is loaded, just do the new hole stuff right away?
+
+        //AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
+        //loadCourse.Completed += LoadCourseHandle;
+        AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
+        CourseToPlay = loadCourse.WaitForCompletion();
+        //CourseToPlay = Resources.Load<ScriptableCourse>($"Courses/Forest");
+        PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CourseToPlay);
+        //PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CurrentCourse);
+
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+    [Server]
+    void GetGameSettings()
+    {
+        this.PowerUpsEnabled = GolfSteamLobby.instance.PowerUpsEnabled;
+        this.WeatherStatuesEnabled = GolfSteamLobby.instance.WeatherStatuesEnabled;
+        this.IsThereAStrokeLimit = GolfSteamLobby.instance.StrokeLimitEnabled;
+        this.StrokeLimitNumber = GolfSteamLobby.instance.StrokeLimitNumber;
+        RainManager.instance.SetGameRainMode(GolfSteamLobby.instance.GameRainMode);
+        WindManager.instance.SetGameWindMode(GolfSteamLobby.instance.GameWindMode);
     }
     [Server]
     void ResetPlayerScoresForNewHole()
@@ -347,8 +372,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
         if (IsServer)
         {
-            StatueSpawner.instance.SpawnStatuesOnServer(CurrentHoleInCourse.Statues);
-            PowerUpManagerTopDownGolf.instance.SpawnBallonsForNewHole(CurrentHoleInCourse.BalloonPowerUps);
+            if(this.WeatherStatuesEnabled)
+                StatueSpawner.instance.SpawnStatuesOnServer(CurrentHoleInCourse.Statues);
+            if(this.PowerUpsEnabled)
+                PowerUpManagerTopDownGolf.instance.SpawnBallonsForNewHole(CurrentHoleInCourse.BalloonPowerUps);
         }
     }
     public void UpdateTeeOffPositionForNewHole(Vector3 newPosition)
@@ -889,6 +916,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // Get the average weather favor of all players?
         AveragePlayerWeatherFavor = GetAveragePlayerFavor();
         // Set the new wind for the next turn
+
         WindManager.instance.UpdateWindForNewTurn(this.CurrentPlayer);
         WindManager.instance.UpdateWindDirectionForNewTurn();
         // Set new weather for the next turn
@@ -1136,6 +1164,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // check for tee off challenge
         if (GolfPlayers.Count <= 1)
         {
+            CurrentCourse = CourseToPlay;
             StartFirstHole();
         }
         else

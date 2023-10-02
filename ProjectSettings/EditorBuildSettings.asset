@@ -26,4 +26,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LobbySceneGolf.unity
     guid: cc999acf97c8e4f4f85998e4315b824a
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: a265c689373d2da4da73e6a6b4e9c9c3, type: 2}

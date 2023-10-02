@@ -71,7 +71,6 @@ public class StatueSpawner : NetworkBehaviour
             
         }
         GameplayManagerTopDownGolf.instance.SaveStatues(spawnedStatues);
-
     }
     GameObject GetStatuePrefab(string statueType)
     {

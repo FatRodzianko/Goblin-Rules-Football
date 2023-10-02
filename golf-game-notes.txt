@@ -394,6 +394,9 @@ x Use the "AimPosition" control scheme to aim the ball when using a rocket?
 - https://www.youtube.com/watch?v=Y95VK4s_hYU
 - https://www.youtube.com/watch?v=ZSMpGmKtJio
 
+### Addressables
+- https://www.youtube.com/watch?v=C6i_JiRoIfk&list=PLfPlpvCmFmyj7O4oc32zkMn3OOWmXcuF2
+
 ### fog shader graph
 - - - https://www.youtube.com/watch?v=LDxApLRIOy4
 

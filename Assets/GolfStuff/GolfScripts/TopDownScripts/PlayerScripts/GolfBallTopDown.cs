@@ -501,9 +501,9 @@ public class GolfBallTopDown : NetworkBehaviour
         // Adjust the trajectory based on side spin. The trajectory should "curve" if there is side spin
         if (launchLeftOrRightSpin != 0)
         {
-            Debug.Log("CalculateHitTrajectory: hitLeftOrRightSpin is not 0. It is: " + launchLeftOrRightSpin.ToString());
+            //Debug.Log("CalculateHitTrajectory: hitLeftOrRightSpin is not 0. It is: " + launchLeftOrRightSpin.ToString());
             Vector2 sideSpinShift = ShiftTrajectoryForSideSpin(launchLeftOrRightSpin, trajectoryPoints[0], trajectoryPoints[1], movementDirection, trajectoryPoints[1].z);
-            Debug.Log("CalculateHitTrajectory: hitLeftOrRightSpin is not 0. the shift will be: " + sideSpinShift.ToString() + " from the original point of: " + trajectoryPoints[1].ToString());
+            //Debug.Log("CalculateHitTrajectory: hitLeftOrRightSpin is not 0. the shift will be: " + sideSpinShift.ToString() + " from the original point of: " + trajectoryPoints[1].ToString());
             trajectoryPoints[1].x = sideSpinShift.x;
             trajectoryPoints[1].y = sideSpinShift.y;
         }
@@ -1173,7 +1173,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
         Vector2 newDir = (rollDirection * speedMetersPerSecond * Time.fixedDeltaTime) + (slopeDirection * slopeSpeedModifier * Time.fixedDeltaTime);
         //Vector2 newDir = (rollDirection * speedMetersPerSecond * Time.fixedDeltaTime) + (slopeDirection * slopeSpeedModifier);
-        //Debug.Log("GetRollDirection: initial roll direction: " + rollDirection.ToString() + " slope direction: " + slopeDirection.ToString() + " new direction: " + newDir.ToString() + " new direction normalized: " + newDir.normalized.ToString());
+        Debug.Log("GetRollDirection: initial roll direction: " + rollDirection.ToString() + " slope direction: " + slopeDirection.ToString() + " new direction: " + newDir.ToString() + " new direction normalized: " + newDir.normalized.ToString());
         return newDir.normalized;
         //return newDir;
     }
@@ -1555,6 +1555,8 @@ public class GolfBallTopDown : NetworkBehaviour
         float softBounceModifier = GetSoftBounceModifier(softBounce);
 
         float currentHeight = this.transform.position.z;
+        if (currentHeight < this.pixelUnit)
+            currentHeight = this.pixelUnit;
         //float midPointHeight = GetObstacleBounceHeight(currentHeight, hitBallCount, softBounceModifier);
         float midPointHeight = GetObstacleBounceHeight(currentHeight, hitBallCount, bounceModifier);
         //float obstacleBounceDistance = GetObstacleBounceDistance(launchDistance, hitBallCount, softBounceModifier);

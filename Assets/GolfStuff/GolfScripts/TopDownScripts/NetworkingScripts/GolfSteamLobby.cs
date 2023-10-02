@@ -24,8 +24,20 @@ public class GolfSteamLobby : MonoBehaviour
     public bool JoiningFishNet;
 
     [Header("Golf Game Settings")]
-    public bool IsThereAStrokeLimit = false;
-    public int StrokeLimitNumber = 0;
+    [SerializeField] public string LobbyName;
+    [SerializeField] public int NumberOfPlayers = 1;
+    public int MinNumberOfPlayers = 1;
+    public int MaxNumberOfPlayers = 10;
+    [SerializeField] public bool FriendsOnly;
+    [SerializeField] public bool PowerUpsEnabled;
+    [SerializeField] public bool WeatherStatuesEnabled;
+    [SerializeField] public bool StrokeLimitEnabled;
+    [SerializeField] public int StrokeLimitNumber;
+    int _strokeLimitMin = 6;
+    [SerializeField] int _strokeLimitDefault = 12;
+    [SerializeField] public RainManager.RainMode GameRainMode = RainManager.RainMode.ControlledByPlayerFavor;
+    [SerializeField] public WindManager.WindMode GameWindMode = WindManager.WindMode.ControlledByPlayerFavor;
+
     public string CourseName;
 
     private void Awake()
@@ -45,6 +57,7 @@ public class GolfSteamLobby : MonoBehaviour
         LobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
         JoinRequest = Callback<GameLobbyJoinRequested_t>.Create(OnJoinRequest);
         LobbyEntered = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
+        
     }
 
     // Update is called once per frame
@@ -52,10 +65,85 @@ public class GolfSteamLobby : MonoBehaviour
     {
 
     }
-    public void CreateLobby()
+    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode)
     {
-        Debug.Log("GolfSteamLobby: CreateLobby: ");
-        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, 10);
+        Debug.Log("GolfSteamLobby: CreateLobby: number of players: " + numberOfPlayers.ToString());
+
+        ResetGameSettingsToDefault();
+        // set the lobby name
+        if (string.IsNullOrEmpty(lobbyName))
+        {
+            string steamUserName = SteamFriends.GetPersonaName().ToString();
+            if (steamUserName.Length > 12)
+                steamUserName = steamUserName.Substring(0, 12);
+            LobbyName = steamUserName + "'s lobby";
+        }
+        else
+        {
+            LobbyName = lobbyName;
+        }
+
+        // set the number of players for a lobby
+        if (numberOfPlayers < MinNumberOfPlayers)
+            numberOfPlayers = MinNumberOfPlayers;
+        else if (numberOfPlayers > MaxNumberOfPlayers)
+            numberOfPlayers = MaxNumberOfPlayers;
+        NumberOfPlayers = numberOfPlayers;
+
+        ELobbyType newLobbyType = ELobbyType.k_ELobbyTypePublic; 
+        if (friendsOnly)
+        {
+            Debug.Log("GolfSteamLobby: CreateLobby: friendsOnlyToggle is on. Making lobby friends only.");
+            newLobbyType = ELobbyType.k_ELobbyTypeFriendsOnly;
+        }
+
+        this.PowerUpsEnabled = powerUpsEnabled;
+        this.WeatherStatuesEnabled = spawnStatues;
+        this.StrokeLimitEnabled = strokeLimitEnabled;
+        this.StrokeLimitNumber = Mathf.Abs(strokeLimitNumber);
+        this.GameRainMode = GetRainMode(rainMode);
+        this.GameWindMode = GetWindMode(windMode);
+
+        // If the player enabled the stroke limit but didn't enter a value, make sure the default value is set
+        if (this.StrokeLimitEnabled && this.StrokeLimitNumber <= 0)
+        {
+            this.StrokeLimitNumber = _strokeLimitDefault;
+        }
+        else if (this.StrokeLimitEnabled && this.StrokeLimitNumber < _strokeLimitMin && this.StrokeLimitNumber > 0)
+        {
+            this.StrokeLimitNumber = _strokeLimitMin;
+        }
+
+        SteamMatchmaking.CreateLobby(newLobbyType, numberOfPlayers);
+    }
+    void ResetGameSettingsToDefault()
+    {
+        this.PowerUpsEnabled = true;
+        this.WeatherStatuesEnabled = true;
+        this.StrokeLimitEnabled = false;
+        this.StrokeLimitNumber = 10;
+    }
+    RainManager.RainMode GetRainMode(string rainModeText)
+    {
+        if (string.IsNullOrEmpty(rainModeText))
+            return RainManager.RainMode.ControlledByPlayerFavor;
+        else if (rainModeText == "Random")
+            return RainManager.RainMode.Random;
+        else if (rainModeText == "No Rain")
+            return RainManager.RainMode.NoRain;
+        else
+            return RainManager.RainMode.ControlledByPlayerFavor;
+    }
+    WindManager.WindMode GetWindMode(string windModeText)
+    {
+        if (string.IsNullOrEmpty(windModeText))
+            return WindManager.WindMode.ControlledByPlayerFavor;
+        else if (windModeText == "Random")
+            return WindManager.WindMode.Random;
+        else if (windModeText == "No Wind")
+            return WindManager.WindMode.NoWind;
+        else
+            return WindManager.WindMode.ControlledByPlayerFavor;
     }
     public void JoinLobby(CSteamID lobbyID)
     {
@@ -69,13 +157,15 @@ public class GolfSteamLobby : MonoBehaviour
         Debug.Log("GolfSteamLobby: OnLobbyCreated: " + callback.m_eResult.ToString());
         if (callback.m_eResult != EResult.k_EResultOK)
             return;
+
         CurrentLobbyID = callback.m_ulSteamIDLobby;
         CurrentLobbyName = SteamMatchmaking.GetLobbyData(new CSteamID(CurrentLobbyID), "name");
         //_lobbyNumber.text = CurrentLobbyID.ToString();
         Debug.Log("GolfSteamLobby: OnLobbyCreated: Lobby ID" + CurrentLobbyID.ToString());
         Debug.Log("GolfSteamLobby: OnLobbyCreated: Current Steam UseR: " + SteamUser.GetSteamID().ToString());
         SteamMatchmaking.SetLobbyData(new CSteamID(CurrentLobbyID), "HostAddress", SteamUser.GetSteamID().ToString());
-        SteamMatchmaking.SetLobbyData(new CSteamID(CurrentLobbyID), "name", SteamFriends.GetPersonaName().ToString() + "'s lobby");
+        //SteamMatchmaking.SetLobbyData(new CSteamID(CurrentLobbyID), "name", SteamFriends.GetPersonaName().ToString() + "'s lobby");
+        SteamMatchmaking.SetLobbyData(new CSteamID(CurrentLobbyID), "name", this.LobbyName);
         SteamMatchmaking.SetLobbyData(
             new CSteamID(callback.m_ulSteamIDLobby),
             "GameName",
@@ -84,6 +174,9 @@ public class GolfSteamLobby : MonoBehaviour
             new CSteamID(callback.m_ulSteamIDLobby),
             "GameMode",
             "Golf");
+
+        
+
         _fishySteamWorks.SetClientAddress(SteamUser.GetSteamID().ToString());
         // start connection as the server
         

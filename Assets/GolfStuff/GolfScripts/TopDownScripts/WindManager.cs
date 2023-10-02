@@ -12,6 +12,15 @@ public class WindManager : NetworkBehaviour
 {
     public static WindManager instance;
 
+    public enum WindMode
+    {
+        ControlledByPlayerFavor,
+        Random,
+        NoWind,
+
+    }
+    [SerializeField] public WindMode GameWindMode = WindMode.ControlledByPlayerFavor;
+
     [SyncVar] public Vector2 WindDirection = Vector2.zero;
     private Vector2 _windDirection = Vector2.zero;
     [SerializeField] [SyncVar] public int WindPower = 0; // WindPower for the player's turn that uses player FavorWeather to set its value relative to BaseWindPower. Negative favor = higher wind power. Positive favor = lower wind power
@@ -127,12 +136,26 @@ public class WindManager : NetworkBehaviour
         //WindPower = GetNewWindPower(_windPower);
 
         // begin new way with weather favor
+
+        if (this.GameWindMode == WindMode.NoWind)
+        {
+            BaseWindPower = 0;
+            return;
+        }
+            
+
         SetBaseWindPower();
         SetPlayerWindPower(currentPlayer);
     }
     public void SetInitialWindForNewHole()
     {
         // This will eventually pull from player set settings for low/medium/severe wind conditions but for now just make it random
+        if (GameWindMode == WindMode.NoWind)
+        {
+            BaseWindPower = 0;
+            WindPower = 0;
+            return;
+        }
 
         // Get how severe the wind will be
         WindSeverity = GetWindSeverity();
@@ -145,6 +168,11 @@ public class WindManager : NetworkBehaviour
     }
     public void SetInitialWindDirection()
     {
+        if (GameWindMode == WindMode.NoWind)
+        {
+            WindDirection = Vector2.right;
+            return;
+        }
         // set the x value of the wind
         int negOrPos = UnityEngine.Random.Range(0, 2) * 2 - 1;
         int x = (int)UnityEngine.Random.Range(0, 2) * negOrPos;
@@ -166,6 +194,12 @@ public class WindManager : NetworkBehaviour
     }
     public void SetRandomWindPowerForChallenegeShot()
     {
+        if (GameWindMode == WindMode.NoWind)
+        {
+            BaseWindPower = 0;
+            WindPower = 0;
+            return;
+        }
         int newPower = UnityEngine.Random.Range(3, 6);
         BaseWindPower = newPower;
         WindPower = newPower;
@@ -225,6 +259,8 @@ public class WindManager : NetworkBehaviour
     void SetBaseWindPower()
     {
         Debug.Log("SetBaseWindPower: ");
+
+
         float averagePlayerFavor = GameplayManagerTopDownGolf.instance.AveragePlayerWeatherFavor;
         if (averagePlayerFavor >= -1 && averagePlayerFavor <= 1)
         {
@@ -275,6 +311,12 @@ public class WindManager : NetworkBehaviour
     {
         // For these update functions for wind/rain, will probably have a game setting for players that's something like "Can Wind/Rain Change? Yes/No" to either allow this or not
         Debug.Log("UpdateWindDirectionForNewTurn");
+        if (this.GameWindMode == WindMode.NoWind)
+        {
+            WindDirection = Vector2.right;
+            return;
+        }
+
         if (UnityEngine.Random.Range(0f, 1f) < 0.75f)
             return;
 
@@ -436,6 +478,12 @@ public class WindManager : NetworkBehaviour
     [Server]
     public void CheckIfTornadoWillSpawn(bool newHole = false)
     {
+        if (this.GameWindMode == WindMode.NoWind)
+        {
+            if (IsThereATorndao)
+                DestroyTornadoObjects();
+            return;
+        }
         if (newHole)
         {
             if (IsThereATorndao)
@@ -467,6 +515,8 @@ public class WindManager : NetworkBehaviour
     }
     void SpawnTornadoForBrokenStatue(GolfPlayerTopDown targetPlayer)
     {
+        if (this.GameWindMode == WindMode.NoWind)
+            return;
         Vector3 spawnPos = GetTornadoSpawnPosition(targetPlayer);
 
         _tornadoObject = Instantiate(_tornadoPrefab, spawnPos, Quaternion.identity);
@@ -709,6 +759,10 @@ public class WindManager : NetworkBehaviour
     {
         Debug.Log("PlayerBrokeGoodStatue:");
         DestroyTornadoObjects();
+    }
+    public void SetGameWindMode(WindMode gameMode)
+    {
+        this.GameWindMode = gameMode;
     }
 
 }

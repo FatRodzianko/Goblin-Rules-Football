@@ -45,7 +45,7 @@ public class LobbyMenu : MonoBehaviour
     {
         Debug.Log("LobbyMenu: CreateLobby: ");
         GolfSteamLobby.instance.JoiningFishNet = true;
-        GolfSteamLobby.instance.CreateLobby();
+        //GolfSteamLobby.instance.CreateLobby(10);
         EnableLobbyMenu(false);
     }
     public void JoinLobby()

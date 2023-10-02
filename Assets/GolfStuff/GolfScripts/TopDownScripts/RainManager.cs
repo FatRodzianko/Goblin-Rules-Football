@@ -11,7 +11,16 @@ public class RainManager : NetworkBehaviour
 {
     public static RainManager instance;
 
+    public enum RainMode
+    {
+        ControlledByPlayerFavor,
+        Random,
+        NoRain,
+
+    }
+
     [Header("Rain state")]
+    [SerializeField] public RainMode GameRainMode;
     public bool IsRaining = false;
     [SyncVar] public string RainState; // player's rain state. Based on the BaseRainState value and the player's weather favor
     public List<string> RainStates = new List<string> { "clear", "light rain", "med rain", "heavy rain" };
@@ -276,6 +285,11 @@ public class RainManager : NetworkBehaviour
     public void UpdateWeatherForNewTurn(GolfPlayerTopDown currentPlayer)
     {
         // Get the BaseRainState for the game before calculating what the rain state is for the player
+        if (this.GameRainMode == RainMode.NoRain)
+        {
+            BaseRainState = "clear";
+            return;
+        }
         SetBaseRainState();
         SetPlayerRainState(currentPlayer);
         ModifyRainStateByPowerUp(currentPlayer);
@@ -709,5 +723,9 @@ public class RainManager : NetworkBehaviour
         else if (RainState == "med rain")
             RainState = "heavy rain";
 
+    }
+    public void SetGameRainMode(RainMode rainMode)
+    {
+        this.GameRainMode = rainMode;
     }
 }
