@@ -13,13 +13,10 @@ public class LobbyManagerGolf : MonoBehaviour
     public static LobbyManagerGolf instance;
     [SerializeField] EventSystem eventSystem;
 
-    [Header("Lobby UI Elements")]
-    [SerializeField] private TextMeshProUGUI LobbyNameText;
-    [SerializeField] private GameObject ContentPanel;
-    [SerializeField] private GameObject PlayerListItemPrefab;
-    [SerializeField] private GameObject PlayerListItem3v3Prefab;
-    [SerializeField] private Button ReadyUpButton;
-    [SerializeField] private Button StartGameButton;
+    [Header("Lobby Player List UI")]
+    [SerializeField] GameObject _lobbyPlayersPanel;
+    [SerializeField] GameObject _lobbyListContent;
+    [SerializeField] List<GolfPlayerListItem> _lobbyPlayerListItems = new List<GolfPlayerListItem>();
 
     private void Awake()
     {
@@ -42,5 +39,25 @@ public class LobbyManagerGolf : MonoBehaviour
     void Update()
     {
         
+    }
+    public void AddLobbyPlayerListItem(GameObject newPlayerListItem)
+    {
+        GolfPlayerListItem playerListItem = newPlayerListItem.GetComponent<GolfPlayerListItem>();
+        if (!_lobbyPlayerListItems.Contains(playerListItem))
+            _lobbyPlayerListItems.Add(playerListItem);
+        newPlayerListItem.transform.parent = this._lobbyListContent.transform;
+        newPlayerListItem.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
+    }
+    public void RemoveLobbyPlayerListItem(GameObject newPlayerListItem)
+    {
+        GolfPlayerListItem playerListItem = newPlayerListItem.GetComponent<GolfPlayerListItem>();
+        if (_lobbyPlayerListItems.Contains(playerListItem))
+            _lobbyPlayerListItems.Remove(playerListItem);
+
+        Destroy(newPlayerListItem);
+    }
+    public void HideUIStuff()
+    {
+        _lobbyPlayersPanel.SetActive(false);
     }
 }

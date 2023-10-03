@@ -2540,7 +2540,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &5908400996155293802
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2710,6 +2710,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 383208058805492564}
   _golfPlayerPrefab: {fileID: 3144715486186738516, guid: 62bba22d42e2b7f4bbc08c4ba8186523, type: 3}
   _golfPlayerScript: {fileID: 0}
+  PlayerSteamID: 0
   _ballColor: {r: 1, g: 1, b: 1, a: 1}
   _ballColorPicker: {fileID: 8514042572030176941}
   _playerUICanvas: {fileID: 1101217417568372103}
@@ -2720,6 +2721,9 @@ MonoBehaviour:
   _welcomeText: {fileID: 4826194254026877951}
   _uiHolder: {fileID: 4604932769632255250}
   _lobbyNameText: {fileID: 6834172275669595029}
+  _lobbyPlayerListItemPrefab: {fileID: 7566048167208569167, guid: cba0a4deb55d35d4b908ff69159f45a4, type: 3}
+  _myLobbyPlayerListObject: {fileID: 0}
+  _myLobbyPlayerListScript: {fileID: 0}
   IsReady: 0
   PlayerName: 
   _networkManager: {fileID: 0}

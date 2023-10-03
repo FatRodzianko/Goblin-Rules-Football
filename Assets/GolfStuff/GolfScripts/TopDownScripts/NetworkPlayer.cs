@@ -15,9 +15,10 @@ public class NetworkPlayer : NetworkBehaviour
     [Header("Golf Player Stuff")]
     [SerializeField] GameObject _golfPlayerPrefab;
     [SerializeField] GolfPlayerTopDown _golfPlayerScript;
+    [SerializeField] [SyncVar(OnChange = nameof(SyncPlayerSteamID))] public ulong PlayerSteamID;
 
     [Header("Color Picker Stuff")]
-    [SerializeField] [SyncVar] Color _ballColor = Color.white;
+    [SerializeField] [SyncVar(OnChange = nameof(SyncBallColor))] Color _ballColor = Color.white;
     [SerializeField] BallColorPicker _ballColorPicker;
 
     [Header("UI Stuff")]
@@ -29,6 +30,13 @@ public class NetworkPlayer : NetworkBehaviour
     [SerializeField] TextMeshProUGUI _welcomeText;
     [SerializeField] GameObject _uiHolder;
     [SerializeField] TextMeshProUGUI _lobbyNameText;
+
+
+
+    [Header("Player List Item")]
+    [SerializeField] GameObject _lobbyPlayerListItemPrefab;
+    [SerializeField] GameObject _myLobbyPlayerListObject;
+    [SerializeField] GolfPlayerListItem _myLobbyPlayerListScript;
 
     [Header("Player Status")]
     [SerializeField] [SyncVar(OnChange = nameof(SyncIsReady))] public bool IsReady = false;
@@ -91,6 +99,7 @@ public class NetworkPlayer : NetworkBehaviour
             _readyButton.gameObject.SetActive(true);
             _playerNameInput.gameObject.SetActive(false);
             _submitPlayerNameButton.gameObject.SetActive(false);
+            
             if (!_networkManager)
             {
                 _networkManager = GameObject.FindGameObjectWithTag("GolfNetworkManager").GetComponent<NetworkManager>();
@@ -101,9 +110,16 @@ public class NetworkPlayer : NetworkBehaviour
 
             SetPlayerName();
             _ballColorPicker.GetPlayerPrefValues();
+            SetPlayerSteamID();
         }
         
         _startGameButton.gameObject.SetActive(false);
+        SpawnLobbyPlayerListItem();
+    }
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        LobbyManagerGolf.instance.RemoveLobbyPlayerListItem(_myLobbyPlayerListObject);
     }
     private void SceneManager_OnClientLoadedStartScenes(NetworkConnection conn, bool asServer)
     {
@@ -144,6 +160,9 @@ public class NetworkPlayer : NetworkBehaviour
     }
     void SyncIsReady(bool prev, bool next, bool asServer)
     {
+        if (asServer)
+            return;
+        _myLobbyPlayerListScript.UpdatePlayerItemReadyStatus(next);
         if (!this.IsOwner)
             return;
 
@@ -278,6 +297,7 @@ public class NetworkPlayer : NetworkBehaviour
         if (!this.IsOwner)
             return;
         _playerUICanvas.SetActive(false);
+        LobbyManagerGolf.instance.HideUIStuff();
         GameObject networkingTestHudObject = GameObject.FindGameObjectWithTag("NetworkingTestHud");
         if (networkingTestHudObject)
             networkingTestHudObject.SetActive(false);
@@ -317,6 +337,17 @@ public class NetworkPlayer : NetworkBehaviour
 
         this.PlayerName = name;
     }
+    void SetPlayerSteamID()
+    {
+        if (!this.IsOwner)
+            return;
+        CmdSetSteamID(SteamUser.GetSteamID().m_SteamID);
+    }
+    [ServerRpc]
+    void CmdSetSteamID(ulong id)
+    {
+        this.PlayerSteamID = id;
+    }
     string RandomPlayerName()
     {
         int rand = UnityEngine.Random.Range(0, 100);
@@ -325,6 +356,9 @@ public class NetworkPlayer : NetworkBehaviour
     }
     void SyncPlayerName(string prev, string next, bool asServer)
     {
+        if (asServer)
+            return;
+        _myLobbyPlayerListScript.UpdatePlayerName(next);
         if (!this.IsOwner)
             return;
         _welcomeText.text = "Welcome " + next + "!";
@@ -344,6 +378,47 @@ public class NetworkPlayer : NetworkBehaviour
     {
         Debug.Log("CmdUpdateBallColorValue: " + newColor.ToString());
         this._ballColor = newColor;
+    }
+    void SpawnLobbyPlayerListItem()
+    {
+        Debug.Log("SpawnLobbyPlayerListItem: ");
+        _myLobbyPlayerListObject = Instantiate(_lobbyPlayerListItemPrefab);
+        _myLobbyPlayerListScript = _myLobbyPlayerListObject.GetComponent<GolfPlayerListItem>();
+        _myLobbyPlayerListScript.PlayerName = this.PlayerName;
+        _myLobbyPlayerListScript.ConnectionId = this.ObjectId;
+        _myLobbyPlayerListScript.UpdatePlayerItemReadyStatus(this.IsReady);
+
+        LobbyManagerGolf.instance.AddLobbyPlayerListItem(_myLobbyPlayerListObject);
+
+    }
+    
+    void SyncPlayerSteamID(ulong prev, ulong next, bool asServer)
+    {
+        if (asServer)
+            return;
+
+        if (_myLobbyPlayerListScript)
+        {
+            _myLobbyPlayerListScript.playerSteamId = next;
+            _myLobbyPlayerListScript.GetPlayerAvatar();
+        }
+        else
+        {
+            StartCoroutine(DelayForSteamIDSync(next));
+        }
+    }
+    IEnumerator DelayForSteamIDSync(ulong newID)
+    {
+        yield return new WaitForSeconds(0.5f);
+        _myLobbyPlayerListScript.playerSteamId = newID;
+        _myLobbyPlayerListScript.GetPlayerAvatar();
+    }
+    void SyncBallColor(Color prev, Color next, bool asServer)
+    {
+        if (asServer)
+            return;
+
+        _myLobbyPlayerListScript.UpdateColorIcon(next);
     }
 
 }

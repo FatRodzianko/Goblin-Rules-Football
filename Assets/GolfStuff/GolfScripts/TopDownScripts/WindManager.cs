@@ -133,22 +133,30 @@ public class WindManager : NetworkBehaviour
     public void UpdateWindForNewTurn(GolfPlayerTopDown currentPlayer)
     {
         // old way before weather favor
-        //WindPower = GetNewWindPower(_windPower);
+        //
 
         // begin new way with weather favor
-
+        Debug.Log("UpdateWindForNewTurn: Wind Mode: " + this.GameWindMode.ToString());
         if (this.GameWindMode == WindMode.NoWind)
         {
             BaseWindPower = 0;
             return;
         }
-            
+        if (this.GameWindMode == WindMode.Random)
+        {
+            int newWindPower = Mathf.Clamp(GetNewWindPower(_windPower), 0, 25);
+
+            Debug.Log("UpdateWindForNewTurn: Random new wind power: " + newWindPower.ToString() + " based on old wind power of: " + _windPower.ToString());
+            WindPower = newWindPower;
+            return;
+        }
 
         SetBaseWindPower();
         SetPlayerWindPower(currentPlayer);
     }
     public void SetInitialWindForNewHole()
     {
+        Debug.Log("SetInitialWindForNewHole: ");
         // This will eventually pull from player set settings for low/medium/severe wind conditions but for now just make it random
         if (GameWindMode == WindMode.NoWind)
         {
@@ -226,10 +234,12 @@ public class WindManager : NetworkBehaviour
     }
     int GetInitialWindSpeedFromSeverity(string severity)
     {
-        if (severity == "none")
-            return 0;
-        else
-            return UnityEngine.Random.Range(1, 6);
+        //if (severity == "none")
+        //    return 0;
+        //else
+        //    return UnityEngine.Random.Range(2, 6);
+
+        return UnityEngine.Random.Range(2, 6);
 
         //else if (severity == "low")
         //    return UnityEngine.Random.Range(1, 5);
@@ -246,6 +256,10 @@ public class WindManager : NetworkBehaviour
         float range = currentWindPower * 0.25f;
         if (range < 1)
             range = 1;
+        range += 1;
+
+        range = Mathf.Ceil(range);
+
         float minRange = currentWindPower - range;
         if (minRange < 0)
             minRange = 0;
