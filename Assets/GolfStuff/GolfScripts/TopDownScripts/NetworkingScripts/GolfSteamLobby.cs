@@ -5,6 +5,7 @@ using FishNet.Managing;
 using FishNet.Managing.Scened;
 using Steamworks;
 using TMPro;
+using System;
 
 public class GolfSteamLobby : MonoBehaviour
 {
@@ -174,8 +175,12 @@ public class GolfSteamLobby : MonoBehaviour
             new CSteamID(callback.m_ulSteamIDLobby),
             "GameMode",
             "Golf");
+        SteamMatchmaking.SetLobbyData(
+            new CSteamID(callback.m_ulSteamIDLobby),
+            "GameStatus",
+            "Lobby");
 
-        
+
 
         _fishySteamWorks.SetClientAddress(SteamUser.GetSteamID().ToString());
         // start connection as the server
@@ -207,10 +212,38 @@ public class GolfSteamLobby : MonoBehaviour
 
         _fishySteamWorks.SetClientAddress(SteamMatchmaking.GetLobbyData(new CSteamID(CurrentLobbyID), "HostAddress"));
         // start connection as the client
+
+        string lobbyGameStatus = SteamMatchmaking.GetLobbyData(new CSteamID(CurrentLobbyID), "GameStatus");
+        Debug.Log("GolfSteamLobby: OnLobbyEntered: game status: " + lobbyGameStatus);
+        if (!lobbyGameStatus.Equals("Lobby"))
+            return;
         SceneLoadData sld = new SceneLoadData("Golf-prototype-topdown");
         sld.ReplaceScenes = ReplaceOption.All;
         FishNet.InstanceFinder.SceneManager.LoadGlobalScenes(sld);
 
         _fishySteamWorks.StartConnection(false);
+    }
+    public void LeaveLobby()
+    {
+        try
+        {
+            if (CurrentLobbyID == 0)
+                return;
+            SteamMatchmaking.LeaveLobby((CSteamID)CurrentLobbyID);
+            CurrentLobbyID = 0;
+        }
+        catch (Exception e)
+        {
+            Debug.Log("GolfSteamLobby: LeaveLobby: failed to leave lobby? Error: " + e);
+        }
+        
+    }
+    public void SetGameStatusToInGame()
+    {
+        Debug.Log("SetGameStatusToInGame: for lobby ID: " + CurrentLobbyID.ToString());
+        SteamMatchmaking.SetLobbyData(
+            new CSteamID(CurrentLobbyID),
+            "GameStatus",
+            "InGame");
     }
 }

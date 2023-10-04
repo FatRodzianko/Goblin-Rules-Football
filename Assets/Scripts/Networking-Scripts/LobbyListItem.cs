@@ -36,9 +36,17 @@ public class LobbyListItem : MonoBehaviour
     }
     public void JoinLobby()
     {
-        Debug.Log("JoinLobby: Player selected to join lobby with steam id of: " + lobbySteamId.ToString());
+        string lobbyStatus = SteamMatchmaking.GetLobbyData(lobbySteamId, "GameStatus");
+        Debug.Log("JoinLobby: Player selected to join lobby with steam id of: " + lobbySteamId.ToString() + " and a status of: " + lobbyStatus);
         TitleScreenManager.instance.ResetGameServerSettings();
-        if (this.GameMode == "Football")
+        
+        if (!SteamMatchmaking.GetLobbyData(lobbySteamId, "GameStatus").Equals("Lobby"))
+        {
+            Debug.Log("JoinLobby: GameStatus not set to \"Lobby\"");
+            Destroy(this.gameObject);
+            return;
+        }
+        else if (this.GameMode == "Football")
         {
             GolfSteamLobby.instance.JoiningFishNet = false;
             SteamLobby.instance.JoiningMirror = true;

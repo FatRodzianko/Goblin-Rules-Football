@@ -10,6 +10,7 @@ public class SoundManager : MonoBehaviour
     public AudioMixer audioMixer;
     public AudioMixerGroup mixerGroup;
     public Sound[] sounds;
+    [SerializeField] string _titleMusicClip;
     //[SerializeField] AudioSource audioSource;
     private void Awake()
     {
@@ -68,5 +69,21 @@ public class SoundManager : MonoBehaviour
         if (s == null)
             return 0f;
         return s.clip.length;
+    }
+    public void TurnMusicOff()
+    {
+        StopSound(_titleMusicClip);
+    }
+    public void TurnMusicOn()
+    {
+        PlaySound(_titleMusicClip, 0.75f);
+    }
+    public bool IsMusicPlaying()
+    {
+        Sound s = Array.Find(sounds, sound => sound.name == _titleMusicClip);
+        if (s == null)
+            return false;
+        Debug.Log("IsMusicPlaying: " + _titleMusicClip + " " + s.source.isPlaying.ToString());
+        return s.source.isPlaying;
     }
 }

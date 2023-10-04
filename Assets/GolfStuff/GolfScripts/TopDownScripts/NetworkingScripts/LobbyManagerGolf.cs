@@ -50,11 +50,19 @@ public class LobbyManagerGolf : MonoBehaviour
     }
     public void RemoveLobbyPlayerListItem(GameObject newPlayerListItem)
     {
-        GolfPlayerListItem playerListItem = newPlayerListItem.GetComponent<GolfPlayerListItem>();
-        if (_lobbyPlayerListItems.Contains(playerListItem))
-            _lobbyPlayerListItems.Remove(playerListItem);
+        try
+        {
+            GolfPlayerListItem playerListItem = newPlayerListItem.GetComponent<GolfPlayerListItem>();
+            if (_lobbyPlayerListItems.Contains(playerListItem))
+                _lobbyPlayerListItems.Remove(playerListItem);
 
-        Destroy(newPlayerListItem);
+            Destroy(newPlayerListItem);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("RemoveLobbyPlayerListItem: error removing object from list??? Error: " + e);
+        }
+        
     }
     public void HideUIStuff()
     {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,7 @@ using UnityEngine.InputSystem.Utilities;
 public class RebindSaveLoad : MonoBehaviour
 {
     public InputActionAsset actions;
+    public InputActionAsset GolfActions;
     public bool isKeyboardControls;
     public const string rebindKeyboard = "rebindKeyboard";
     public const string rebindGamepad = "rebindGamepad";
@@ -15,28 +17,45 @@ public class RebindSaveLoad : MonoBehaviour
     public void Start()
     {
         LoadBindings();
+        LoadGolfBindings();
     }
     public void OnEnable()
     {
         Debug.Log("RebindSaveLoad: OnEnable");
-        var rebinds = PlayerPrefs.GetString("rebinds");
-        if (!string.IsNullOrEmpty(rebinds))
+        try
         {
-            //actions.LoadFromJson(rebinds);
-            actions.LoadBindingOverridesFromJson(rebinds);
-            Debug.Log("RebindSaveLoad: LoadBindings: loaded from json string! Json string: " + rebinds);
+            var rebinds = PlayerPrefs.GetString("rebinds");
+            if (!string.IsNullOrEmpty(rebinds))
+            {
+                //actions.LoadFromJson(rebinds);
+                actions.LoadBindingOverridesFromJson(rebinds);
+                Debug.Log("RebindSaveLoad: LoadBindings: loaded from json string! Json string: " + rebinds);
+            }
         }
+        catch (Exception e)
+        {
+            Debug.Log("RebindSaveLoad: OnEnable: error " + e);
+        }
+        
     }
     public void OnDisable()
     {
         Debug.Log("RebindSaveLoad: OnDisable");
         //var rebinds = actions.ToJson();
-        var rebinds = actions.SaveBindingOverridesAsJson();
-        if (!string.IsNullOrEmpty(rebinds))
+        try
         {
-            PlayerPrefs.SetString("rebinds", rebinds);
-            Debug.Log("RebindSaveLoad: SaveBindings: json string: " + rebinds);
+            var rebinds = actions.SaveBindingOverridesAsJson();
+            if (!string.IsNullOrEmpty(rebinds))
+            {
+                PlayerPrefs.SetString("rebinds", rebinds);
+                Debug.Log("RebindSaveLoad: SaveBindings: json string: " + rebinds);
+            }
         }
+        catch (Exception e)
+        {
+            Debug.Log("RebindSaveLoad: OnDisable: error " + e);
+        }
+        
     }
     public void SaveBindings()
     {
@@ -61,5 +80,29 @@ public class RebindSaveLoad : MonoBehaviour
             Debug.Log("RebindSaveLoad: LoadBindings: loaded from json string!");
         }
             
+    }
+    public void SaveGolfBindings()
+    {
+        Debug.Log("RebindSaveLoad: SaveGolfBindings");
+        //var rebinds = actions.ToJson();
+        var rebinds = GolfActions.SaveBindingOverridesAsJson();
+
+        if (!string.IsNullOrEmpty(rebinds))
+        {
+            PlayerPrefs.SetString("golf-rebinds", rebinds);
+            Debug.Log("RebindSaveLoad: SaveGolfBindings: json string: " + rebinds);
+        }
+    }
+    public void LoadGolfBindings()
+    {
+        Debug.Log("RebindSaveLoad: LoadGolfBindings");
+        var rebinds = PlayerPrefs.GetString("golf-rebinds");
+        if (!string.IsNullOrEmpty(rebinds))
+        {
+            //actions.LoadFromJson(rebinds);
+            GolfActions.LoadBindingOverridesFromJson(rebinds);
+            Debug.Log("RebindSaveLoad: LoadGolfBindings: loaded from json string!");
+        }
+
     }
 }

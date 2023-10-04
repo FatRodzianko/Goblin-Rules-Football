@@ -9,6 +9,8 @@ using FishNet.Managing;
 using TMPro;
 using UnityEngine.UI;
 using Steamworks;
+using FishNet.Managing.Scened;
+using UnityEngine.SceneManagement;
 
 public class NetworkPlayer : NetworkBehaviour
 {
@@ -120,6 +122,15 @@ public class NetworkPlayer : NetworkBehaviour
     {
         base.OnStopClient();
         LobbyManagerGolf.instance.RemoveLobbyPlayerListItem(_myLobbyPlayerListObject);
+        if (!this.IsOwner)
+            return;
+
+        //SceneLoadData sld = new SceneLoadData("TitleScreen");
+        //sld.ReplaceScenes = ReplaceOption.All;
+        //FishNet.InstanceFinder.SceneManager.LoadGlobalScenes(sld);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("TitleScreen");
+        GolfSteamLobby.instance.LeaveLobby();
+
     }
     private void SceneManager_OnClientLoadedStartScenes(NetworkConnection conn, bool asServer)
     {
@@ -259,6 +270,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (!this.IsHost)
             return;
+        GolfSteamLobby.instance.SetGameStatusToInGame();
         SpawnGolfPlayerObjectsForEachPlayer();
         GameplayManagerTopDownGolf.instance.HostStartGame(base.Owner);
     }
@@ -420,5 +432,24 @@ public class NetworkPlayer : NetworkBehaviour
 
         _myLobbyPlayerListScript.UpdateColorIcon(next);
     }
+    public void OnClick_Disconnect()
+    {
+        if (base.IsServer)
+        {
+            _networkManager.ServerManager.StopConnection(true);
+            GolfSteamLobby.instance.LeaveLobby();
+        }
 
+
+        if (base.IsClient)
+        {
+            _networkManager.ClientManager.StopConnection();
+            GolfSteamLobby.instance.LeaveLobby();
+        }
+            
+    }
+    public void PlayerClickedDisconnect()
+    {
+        OnClick_Disconnect();
+    }
 }

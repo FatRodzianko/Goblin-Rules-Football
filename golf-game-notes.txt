@@ -373,20 +373,23 @@ x Use the "AimPosition" control scheme to aim the ball when using a rocket?
 - - - - - x enable it when the player hits the ball BUT ONLY if they used the rocket power
 - - - - - x disable it whenever _canUseRocketPower is set to false
 - - - - - - probably horrendously broken ???
-- "Lobby Menu" when player's first join game
-- - - list of players and their ready status (and ball color?)
-- - - ready up, exit game, buttons
-- - - host gets a start game button when all players are readied up
+x "Lobby Menu" when player's first join game
+- - x list of players and their ready status (and ball color?)
+- - x ready up, exit game, buttons
+- - x host gets a start game button when all players are readied up
 - add esc menu and way to exit out of golf multiplayer game back to main menu
-- ability to "configure" a golf game
-- - - powerups on/off
-- - - weather statues on/off
-- - - rain controlled by favor, completely random, or off entirely
-- - - wind controlled by favor, completely random, or off entirely
+x ability to "configure" a golf game
+- - x powerups on/off
+- - x weather statues on/off
+- - x rain controlled by favor, completely random, or off entirely
+- - x wind controlled by favor, completely random, or off entirely
 - - - pick what course to play?
 - - - - - - maybe create a 3 hole "mini golf" course so there are at least two different ones?
-- - - stroke limit? And if so, number of strokes
+- - x stroke limit? And if so, number of strokes
 - fix the fog on statues? On my laptop it looks really weird. Square artifacts or something that look messed up
+- rebinding issue with reseting to default for golf:
+- - - Check duplicates checks "ResetAllBindings.instance.actionMapsToCheck" which is only the football bindings
+- - - - - - add some sort of check to see if it is golf/football check. Have it pull the correct actionmaps for the type
 
 ### Fishnet / steamworks tutorial stuff:
 - https://www.youtube.com/watch?v=U4ATkct6fh4

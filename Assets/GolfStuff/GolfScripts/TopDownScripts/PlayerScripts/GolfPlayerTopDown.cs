@@ -3345,11 +3345,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //InputManagerGolf.Controls.PromptPlayer.Skip.performed += _ => PromptPlayerSkip();
         EnableViewScoreBoard(true);
         EnableZoomOut(true);
+        EnableEscapeMenu(true);
     }
     void UnsubscribeToControls()
     {
         EnableViewScoreBoard(false);
         EnableZoomOut(false);
+        EnableEscapeMenu(false);
     }
     #region Start Player Turn
     [TargetRpc]
@@ -3968,6 +3970,30 @@ public class GolfPlayerTopDown : NetworkBehaviour
             InputManagerGolf.Controls.AimingActions.ZoomOut.Disable();
             InputManagerGolf.Controls.AimingActions.ZoomOut.performed -= ZoomOutPressed;
         }
+    }
+    void EnableEscapeMenu(bool enable)
+    {
+        if (!this.IsOwner)
+            return;
+        Debug.Log("EnableEscapeMenu: " + enable.ToString());
+        if (enable)
+        {
+            InputManagerGolf.Controls.Misc.EscMenu.Enable();
+            InputManagerGolf.Controls.Misc.EscMenu.performed += OpenEscMenu;
+;
+        }
+        else
+        {
+            InputManagerGolf.Controls.Misc.EscMenu.Disable();
+            InputManagerGolf.Controls.Misc.EscMenu.performed -= OpenEscMenu;
+        }
+    }
+    void OpenEscMenu(InputAction.CallbackContext context)
+    {
+        if (!this.IsOwner)
+            return;
+        Debug.Log("OpenEscMenu: ");
+        GolfEscMenuManager.instance.OpenOrCloseEscMenu();
     }
     #endregion
     #region Rocket Controls

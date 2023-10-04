@@ -1147,6 +1147,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             GolfPlayersServer.Remove(player);
         if (GolfPlayers.Contains(player))
             GolfPlayers.Remove(player);
+        if (GolfPlayersInTeeOffOrder.Contains(player))
+            GolfPlayersInTeeOffOrder.Remove(player);
+        if (GolfPlayersOutOfCommission.Contains(player))
+            GolfPlayersOutOfCommission.Remove(player);
     }
     [Server]
     public void HostStartGame(NetworkConnection conn)

@@ -138,6 +138,10 @@ public class SteamLobby : MonoBehaviour
             new CSteamID(callback.m_ulSteamIDLobby),
             "GameMode",
             "Football");
+        SteamMatchmaking.SetLobbyData(
+            new CSteamID(callback.m_ulSteamIDLobby),
+            "GameStatus",
+            "Lobby");
 
     }
 

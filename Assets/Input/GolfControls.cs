@@ -1237,6 +1237,15 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EscMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""f53f442a-1f08-41e9-8d86-8e743b0e6ee1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1259,6 +1268,28 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ViewScoreBoard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3d6bb19d-a7c1-4ff1-89f0-98d0401b6851"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EscMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b298a5ea-4c26-4e7b-89a7-a32b0f2958e5"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EscMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1304,6 +1335,7 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
         // Misc
         m_Misc = asset.FindActionMap("Misc", throwIfNotFound: true);
         m_Misc_ViewScoreBoard = m_Misc.FindAction("ViewScoreBoard", throwIfNotFound: true);
+        m_Misc_EscMenu = m_Misc.FindAction("EscMenu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1681,11 +1713,13 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Misc;
     private IMiscActions m_MiscActionsCallbackInterface;
     private readonly InputAction m_Misc_ViewScoreBoard;
+    private readonly InputAction m_Misc_EscMenu;
     public struct MiscActions
     {
         private @GolfControls m_Wrapper;
         public MiscActions(@GolfControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @ViewScoreBoard => m_Wrapper.m_Misc_ViewScoreBoard;
+        public InputAction @EscMenu => m_Wrapper.m_Misc_EscMenu;
         public InputActionMap Get() { return m_Wrapper.m_Misc; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1698,6 +1732,9 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                 @ViewScoreBoard.started -= m_Wrapper.m_MiscActionsCallbackInterface.OnViewScoreBoard;
                 @ViewScoreBoard.performed -= m_Wrapper.m_MiscActionsCallbackInterface.OnViewScoreBoard;
                 @ViewScoreBoard.canceled -= m_Wrapper.m_MiscActionsCallbackInterface.OnViewScoreBoard;
+                @EscMenu.started -= m_Wrapper.m_MiscActionsCallbackInterface.OnEscMenu;
+                @EscMenu.performed -= m_Wrapper.m_MiscActionsCallbackInterface.OnEscMenu;
+                @EscMenu.canceled -= m_Wrapper.m_MiscActionsCallbackInterface.OnEscMenu;
             }
             m_Wrapper.m_MiscActionsCallbackInterface = instance;
             if (instance != null)
@@ -1705,6 +1742,9 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                 @ViewScoreBoard.started += instance.OnViewScoreBoard;
                 @ViewScoreBoard.performed += instance.OnViewScoreBoard;
                 @ViewScoreBoard.canceled += instance.OnViewScoreBoard;
+                @EscMenu.started += instance.OnEscMenu;
+                @EscMenu.performed += instance.OnEscMenu;
+                @EscMenu.canceled += instance.OnEscMenu;
             }
         }
     }
@@ -1751,5 +1791,6 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
     public interface IMiscActions
     {
         void OnViewScoreBoard(InputAction.CallbackContext context);
+        void OnEscMenu(InputAction.CallbackContext context);
     }
 }

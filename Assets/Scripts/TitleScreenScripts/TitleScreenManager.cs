@@ -122,6 +122,13 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] GameObject _footballCanvas;
     [SerializeField] GameObject _golfCanvas;
 
+    [Header("Music UI")]
+    [SerializeField] TextMeshProUGUI _turnMusicOnOffButtonText;
+    [SerializeField] Image _turnMusicOnOffImage;
+    [SerializeField] Sprite _musicOffSprite;
+    [SerializeField] Sprite _musicOnSprite;
+    [SerializeField] public bool IsMusicOn = false;
+
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
     {
@@ -154,6 +161,9 @@ public class TitleScreenManager : MonoBehaviour
         if (Time.timeScale != 1f)
             Time.timeScale = 1f;
         _rainModeDropDown.onValueChanged.AddListener(delegate { RainModeDropdownValueChanged(_rainModeDropDown); });
+        if (listOfLobbyListItems.Count > 0)
+            DestroyOldLobbyListItems();
+        IsMusicAlreadyPlaying();
     }
 
     // Update is called once per frame
@@ -488,7 +498,7 @@ public class TitleScreenManager : MonoBehaviour
                 Debug.Log("Lobby " + i + " :: " + SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "name") + " number of players: " + SteamMatchmaking.GetNumLobbyMembers((CSteamID)lobbyIDS[i].m_SteamID).ToString() + " max players: " + SteamMatchmaking.GetLobbyMemberLimit((CSteamID)lobbyIDS[i].m_SteamID).ToString());
 
                 //if(true)
-                if (SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "GameName").Equals("GRF"))
+                if (SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "GameName").Equals("GRF") && SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "GameStatus").Equals("Lobby"))
                 {
                     if (didPlayerSearchForLobbies)
                     {
@@ -658,6 +668,41 @@ public class TitleScreenManager : MonoBehaviour
     private void RainModeDropdownValueChanged(TMP_Dropdown change)
     {
         //Debug.Log(_rainModeDropDown.options[_rainModeDropDown.value].text);
+    }
+    public void TurnMusicOnOrOff()
+    {
+        if (IsMusicOn)
+        {
+            _turnMusicOnOffButtonText.text = "Turn Music On";
+            _turnMusicOnOffImage.sprite = _musicOnSprite;
+            SoundManager.instance.TurnMusicOff();
+            IsMusicOn = false;
+        }
+        else
+        {
+            _turnMusicOnOffButtonText.text = "Turn Music Off";
+            _turnMusicOnOffImage.sprite = _musicOffSprite;
+            SoundManager.instance.TurnMusicOn();
+            IsMusicOn = true;
+        }
+    }
+    void IsMusicAlreadyPlaying()
+    {
+        bool isMusicPlaying = SoundManager.instance.IsMusicPlaying();
+        Debug.Log("IsMusicAlreadyPlaying: " + isMusicPlaying.ToString());
+        if (isMusicPlaying)
+        {
+            _turnMusicOnOffButtonText.text = "Turn Music Off";
+            _turnMusicOnOffImage.sprite = _musicOffSprite;
+            IsMusicOn = true;
+        }
+        else
+        {
+            _turnMusicOnOffButtonText.text = "Turn Music On";
+            _turnMusicOnOffImage.sprite = _musicOnSprite;
+            SoundManager.instance.TurnMusicOff();
+            IsMusicOn = false;
+        }
     }
 
 }

@@ -9,6 +9,7 @@ public class QuitToDesktopButton : MonoBehaviour
     [SerializeField] Selectable multiplayerSelectable;
     [SerializeField] Selectable settingsSelectable;
     [SerializeField] Selectable hostGameSelectable;
+    [SerializeField] Selectable hostGolfGameSelectable;
     [SerializeField] Selectable joinGameSelectable;
     [SerializeField] Selectable controlsGameSelectable;
     [SerializeField] Selectable tutorialGameSelectable;
@@ -49,6 +50,9 @@ public class QuitToDesktopButton : MonoBehaviour
                 break;
             case "hostgame":
                 newNav.selectOnUp = hostGameSelectable;
+                break;
+            case "golfgame":
+                newNav.selectOnUp = hostGolfGameSelectable;
                 break;
             case "joingame":
                 newNav.selectOnUp = joinGameSelectable;
