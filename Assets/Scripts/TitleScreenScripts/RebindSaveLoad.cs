@@ -36,7 +36,15 @@ public class RebindSaveLoad : MonoBehaviour
         {
             Debug.Log("RebindSaveLoad: OnEnable: error " + e);
         }
-        
+        try
+        {
+            LoadGolfBindings();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("RebindSaveLoad: OnEnable: Golf Actions: error " + e);
+        }
+
     }
     public void OnDisable()
     {
@@ -55,7 +63,15 @@ public class RebindSaveLoad : MonoBehaviour
         {
             Debug.Log("RebindSaveLoad: OnDisable: error " + e);
         }
-        
+        try
+        {
+            SaveGolfBindings();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("RebindSaveLoad: OnDisable: Golf Actions: error " + e);
+        }
+
     }
     public void SaveBindings()
     {
@@ -91,6 +107,11 @@ public class RebindSaveLoad : MonoBehaviour
         {
             PlayerPrefs.SetString("golf-rebinds", rebinds);
             Debug.Log("RebindSaveLoad: SaveGolfBindings: json string: " + rebinds);
+        }
+        else
+        {
+            PlayerPrefs.DeleteKey("golf-rebinds");
+            Debug.Log("RebindSaveLoad: SaveGolfBindings as an empty string?: json string: " + rebinds);
         }
     }
     public void LoadGolfBindings()

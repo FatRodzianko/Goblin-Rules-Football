@@ -3388,6 +3388,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (GameplayManagerTopDownGolf.instance.CurrentPlayer != this)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
+            
         Debug.Log("PlayerStartTurn: Player: " + this.PlayerName + " will start their turn after pressing space! Time: " + Time.time);
         this.EnablePlayerCanvas(false);
         // Begin old way of starting turn
@@ -3403,6 +3409,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+
         Debug.Log("EnableAcknowledgePlayerLightningStrike: player: " + this.PlayerName + ":" + enable.ToString());
         if (enable)
         {
@@ -3421,6 +3428,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (!this.PlayerStruckByLightning)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         Debug.Log("AcknowledgePlayerLightningStrike: PlayerStruckByLightning: " + this.PlayerStruckByLightning.ToString());
         _golfAnimator.ResetGolfAnimator();
         EnablePlayerSprite(false);
@@ -3477,7 +3489,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (GameplayManagerTopDownGolf.instance.CurrentPlayer != this)
             return;
-
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         Debug.Log("PlayerSkipForLightning: Player: " + this.PlayerName + " is skipping their turn due to lightning. At time of: " + Time.time.ToString() + " and last skip was: " + GameplayManagerTopDownGolf.instance.TimeSinceLastSkip.ToString());
         this.EnablePlayerCanvas(false);
         PlayerScore.StrokePenalty(1);
@@ -3499,6 +3515,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
         _aimingActionsEnabled = enable;
         if (enable)
         {
+            // disable UI controls?
+            //if(!GolfEscMenuManager.instance.IsMenuOpen)
+            //    InputManagerGolf.Controls.UI.Disable();
+
             //InputManagerGolf.Controls.AimingActions.Enable();
             //AimPosition
             InputManagerGolf.Controls.AimingActions.AimPosition.Enable();
@@ -3562,7 +3582,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (GameplayManagerTopDownGolf.instance.CurrentPlayer != this)
             return;
-        
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("ChangeAimPosition: EscMenuOpen. Do not take action!");
+            return;
+        }
+        Debug.Log("ChangeAimPosition: ");
         _previousAimMovement = context.ReadValue<Vector2>();
         
         //Debug.Log("ChangeAimPosition: Player: " + this.PlayerName + " and move aim in direction of: " + _previousAimMovement.ToString());
@@ -3578,12 +3603,17 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         Debug.Log("Player pressed space: DirectionAndDistanceChosen: " + DirectionAndDistanceChosen .ToString() + " && _moveHitMeterIcon: " + _moveHitMeterIcon.ToString());
         if (DirectionAndDistanceChosen)
             return;
         if (_moveHitMeterIcon)
             return;
-
+        
         PlayerChooseDirectionAndDistance(true);
         //EnableAimPositionControls(false);
         // disable aiming controls
@@ -3608,6 +3638,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         if (DirectionAndDistanceChosen)
             return;
         if (_moveHitMeterIcon)
@@ -3620,6 +3655,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         Debug.Log("ZoomOutPressed: ");
 
         if (DirectionAndDistanceChosen && this.IsPlayersTurn)
@@ -3656,6 +3696,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (!_cameraViewHole.IsCameraZoomedOut)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         Debug.Log("ZoomOutAim: ");
 
         Vector3 mouseScreenPos = Input.mousePosition;
@@ -3679,6 +3724,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (DirectionAndDistanceChosen)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         Debug.Log("ResetSpinPressed: ");
         _spinIcon.ResetIconPosition();
     }
@@ -3688,6 +3738,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (DirectionAndDistanceChosen)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         //Debug.Log("ChangeSpinMovement: ");
         //Debug.Log("ChangeSpinMovement: Player: " + this.PlayerName + " and move aim in direction of: " + context.ReadValue<Vector2>().ToString());
         _spinIcon.UpdateSpinDirection(context.ReadValue<Vector2>());
@@ -3705,6 +3760,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         if (DirectionAndDistanceChosen)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         Debug.Log("ShortPuttButtonPressed: ");
 
         SetPutterDistance(CurrentClub, true);
@@ -3715,6 +3775,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+
         Debug.Log("EnableCancelHit: " + enable.ToString());
         if (enable)
         {
@@ -3731,6 +3792,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         Debug.Log("CancelHit: ");
         if (_moveHitMeterIcon)
             return;
@@ -3771,6 +3837,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         Debug.Log("StartHitButtonPerformed: ");
         //DirectionAndDistanceChosen && !_moveHitMeterIcon && !_golfAnimator.IsSwinging
         if (!DirectionAndDistanceChosen)
@@ -3809,6 +3880,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         if (!_moveHitMeterIcon)
             return;
         if (_powerSubmitted)
@@ -3825,6 +3901,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         if (!_moveHitMeterIcon)
             return;
         if (!_powerSubmitted)
@@ -3868,6 +3949,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         if (!this.HasPowerUp)
             return;
         if (this.UsedPowerupThisTurn)
@@ -3915,6 +4001,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         if (!this.HasPowerUp)
             return;
         if (this.UsedPowerupThisTurn)
@@ -4021,6 +4112,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
         if (!this.UsedPowerupThisTurn || this.UsedPowerUpType != "rocket")
         {
             return;

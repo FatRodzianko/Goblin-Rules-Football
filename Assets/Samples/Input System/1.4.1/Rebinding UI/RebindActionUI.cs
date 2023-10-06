@@ -403,9 +403,20 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             InputBinding newBinding = action.bindings[bindingIndex];
             Debug.Log("CheckDuplicateBindings: allCompositeParts is: " + allCompositeParts.ToString() + " action is: " + newBinding.action.ToString() + " action map is: " + action.actionMap.ToString() + " new binding effective path is: " + newBinding.effectivePath.ToString() + " new binding group/control sheme is: " + newBinding.groups.ToString());
             //string oldBindingPath = null;
-
+            List<InputActionMap> mapsToCheckForDups = new List<InputActionMap>();
+            if (action.actionMap.ToString().ToLower().Contains("golf"))
+                mapsToCheckForDups = ResetAllBindings.instance.golfActionMapsToCheck;
+            else
+                mapsToCheckForDups = ResetAllBindings.instance.actionMapsToCheck;
+            if (mapsToCheckForDups.Count == 0)
+            {
+                Debug.Log("CheckDuplicateBindings: mapsToCheckForDups length is 0?");
+                return false;
+            }
+                
             // Check through each action map in ResetAllBindings list of action maps?
-            foreach (InputActionMap map in ResetAllBindings.instance.actionMapsToCheck)
+            //foreach (InputActionMap map in ResetAllBindings.instance.actionMapsToCheck)
+            foreach (InputActionMap map in mapsToCheckForDups)
             {
                 bool breakLoop = false;
                 foreach (InputBinding binding in map.bindings)

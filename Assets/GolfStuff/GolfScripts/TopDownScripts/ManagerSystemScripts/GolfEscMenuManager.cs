@@ -17,7 +17,6 @@ public class GolfEscMenuManager : MonoBehaviour
         MakeInstance();
         IsMenuOpen = false;
         _escMenuPanel.SetActive(false);
-        IsMenuOpen = false;
     }
     void MakeInstance()
     {
@@ -40,11 +39,13 @@ public class GolfEscMenuManager : MonoBehaviour
     {
         if (IsMenuOpen)
         {
+            InputManagerGolf.Controls.UI.Disable();
             _escMenuPanel.SetActive(false);
             IsMenuOpen = false;
         }
         else
         {
+            InputManagerGolf.Controls.UI.Enable();
             _escMenuPanel.SetActive(true);
             IsMenuOpen = true;
         }
@@ -54,6 +55,7 @@ public class GolfEscMenuManager : MonoBehaviour
         if (!_localNetworkPlayer)
             _localNetworkPlayer = GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>();
         // have players confirm disconnect/quit before actually doing it? A pop up that says "Are you sure?" or whatever
+        InputManagerGolf.Controls.UI.Disable();
         _localNetworkPlayer.PlayerClickedDisconnect();
     }
     public void ExitGame()
@@ -61,6 +63,7 @@ public class GolfEscMenuManager : MonoBehaviour
         if (!_localNetworkPlayer)
             _localNetworkPlayer = GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>();
         // have players confirm disconnect/quit before actually doing it? A pop up that says "Are you sure?" or whatever
+        InputManagerGolf.Controls.UI.Disable();
         _localNetworkPlayer.PlayerClickedDisconnect();
         // have players confirm disconnect/quit before actually doing it? A pop up that says "Are you sure?" or whatever
         Application.Quit();

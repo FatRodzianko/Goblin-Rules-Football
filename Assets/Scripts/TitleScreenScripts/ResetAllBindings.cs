@@ -7,10 +7,19 @@ public class ResetAllBindings : MonoBehaviour
 {
     public static ResetAllBindings instance;
     [SerializeField] InputActionAsset inputActions;
+    
     public InputActionMap playerActionMap;
     public InputActionMap qeSwitchingActionMap;
     public InputActionMap powerUpsActionMap;
+    [Header("Golf Action Maps")]
+    [SerializeField] InputActionAsset golfInputActions;
+    public InputActionMap GolfPromptPlayerActionMap;
+    public InputActionMap GolfAimingActionsActionMap;
+    public InputActionMap GolfHittingActionsActionMap;
+    public InputActionMap GolfPowerUpsActionMap;
+    public InputActionMap GolfMiscActionMap;
     public List<InputActionMap> actionMapsToCheck = new List<InputActionMap>();
+    public List<InputActionMap> golfActionMapsToCheck = new List<InputActionMap>();
 
     private void Awake()
     {
@@ -70,6 +79,49 @@ public class ResetAllBindings : MonoBehaviour
                 }
             }   
         }
+        foreach (InputActionMap golfMap in golfInputActions.actionMaps)
+        {
+            if (golfMap.name.Equals("PromptPlayer"))
+            {
+                if (!golfActionMapsToCheck.Contains(golfMap))
+                {
+                    GolfPromptPlayerActionMap = golfMap;
+                    golfActionMapsToCheck.Add(golfMap);
+                }
+            }
+            else if (golfMap.name.Equals("AimingActions"))
+            {
+                if (!golfActionMapsToCheck.Contains(golfMap))
+                {
+                    GolfAimingActionsActionMap = golfMap;
+                    golfActionMapsToCheck.Add(golfMap);
+                }
+            }
+            else if (golfMap.name.Equals("HittingActions"))
+            {
+                if (!golfActionMapsToCheck.Contains(golfMap))
+                {
+                    GolfHittingActionsActionMap = golfMap;
+                    golfActionMapsToCheck.Add(golfMap);
+                }
+            }
+            else if (golfMap.name.Equals("PowerUps"))
+            {
+                if (!golfActionMapsToCheck.Contains(golfMap))
+                {
+                    GolfPowerUpsActionMap = golfMap;
+                    golfActionMapsToCheck.Add(golfMap);
+                }
+            }
+            else if (golfMap.name.Equals("Misc"))
+            {
+                if (!golfActionMapsToCheck.Contains(golfMap))
+                {
+                    GolfMiscActionMap = golfMap;
+                    golfActionMapsToCheck.Add(golfMap);
+                }
+            }
+        }
         ShowEachActionMapBinding();
     }
     void ShowEachActionMapBinding()
@@ -94,6 +146,15 @@ public class ResetAllBindings : MonoBehaviour
             map.RemoveAllBindingOverrides();
         }
         PlayerPrefs.DeleteKey("rebinds");
+    }
+    public void ResetGolfBindings(bool isKeyboardControls)
+    {
+        var rebinds = PlayerPrefs.GetString("golf-rebinds");
+        foreach (InputActionMap map in golfInputActions.actionMaps)
+        {
+            map.RemoveAllBindingOverrides();
+        }
+        PlayerPrefs.DeleteKey("golf-rebinds");
     }
 }
 
