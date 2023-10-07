@@ -4728,6 +4728,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7983715474653844599, guid: 07050ffc93c372f4e84575d2f966833c, type: 3}
+      propertyPath: _tickRate
+      value: 125
+      objectReference: {fileID: 0}
+    - target: {fileID: 7983715474653844599, guid: 07050ffc93c372f4e84575d2f966833c, type: 3}
+      propertyPath: _timingType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7983715474653844599, guid: 07050ffc93c372f4e84575d2f966833c, type: 3}
+      propertyPath: _allowTickDropping
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7983715474653844590, guid: 07050ffc93c372f4e84575d2f966833c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 07050ffc93c372f4e84575d2f966833c, type: 3}

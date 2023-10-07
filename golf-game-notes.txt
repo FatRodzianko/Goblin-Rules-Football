@@ -387,9 +387,12 @@ x ability to "configure" a golf game
 - - - - - - maybe create a 3 hole "mini golf" course so there are at least two different ones?
 - - x stroke limit? And if so, number of strokes
 - fix the fog on statues? On my laptop it looks really weird. Square artifacts or something that look messed up
-- rebinding issue with reseting to default for golf:
-- - - Check duplicates checks "ResetAllBindings.instance.actionMapsToCheck" which is only the football bindings
-- - - - - - add some sort of check to see if it is golf/football check. Have it pull the correct actionmaps for the type
+x rebinding issue with reseting to default for golf:
+- - x Check duplicates checks "ResetAllBindings.instance.actionMapsToCheck" which is only the football bindings
+- - - - - x add some sort of check to see if it is golf/football check. Have it pull the correct actionmaps for the type
+- Add a second camera for the golf UI
+- - - then change the "follow the golf ball script" to just set the follow/target thing on the main camera instead of using my script to follow. Should hopefully remove the jittering when watching other players?
+- - - short tutorial video: https://www.youtube.com/watch?v=uOeIByY8r3M
 
 ### Fishnet / steamworks tutorial stuff:
 - https://www.youtube.com/watch?v=U4ATkct6fh4

@@ -71,6 +71,7 @@ public class TubeScript : MonoBehaviour
 
         //Get Movement stuff?
 
+        //_ballDestination = (CompanionTube.transform.position + new Vector3(0f, 0.25f, golfBallScript.transform.position.z)); // set the ball's destination to be the position of the middle of the tube sprite with the correct Z value for the ball height
         _ballDestination = (CompanionTube.transform.position + new Vector3(0f, 0.25f, golfBallScript.transform.position.z)); // set the ball's destination to be the position of the middle of the tube sprite with the correct Z value for the ball height
         _ballMovementDirection = (_ballDestination - _ballStartingPoint).normalized;
         _ballDistanceToTravel = Vector2.Distance(_ballStartingPoint, _ballDestination);

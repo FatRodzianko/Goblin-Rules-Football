@@ -44,12 +44,14 @@ public class CameraViewHole : MonoBehaviour
             _vCam.m_Lens.OrthographicSize /= _cameraZoomValue;
             _pixelPerfect.enabled = true;
             _cameraFollowScript.enabled = true;
+            //_cameraFollowScript.FollowTargetAgain();
             //_outOfBoundsBorderLine.enabled = false;
-            
+
         }
         else
         {
             //_vCam.m_Lens.OrthographicSize *= 9f;
+            //_cameraFollowScript.StopFollowingTarget();
             _vCam.m_Lens.OrthographicSize *= _cameraZoomValue;
             _pixelPerfect.enabled = false;
             _cameraFollowScript.enabled = false;

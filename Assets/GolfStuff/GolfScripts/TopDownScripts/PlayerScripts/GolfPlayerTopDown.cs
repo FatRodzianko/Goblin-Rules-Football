@@ -942,7 +942,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
         // Update the Club UI stuff
         SetSelectedClubUI(CurrentClub);
         if (this.IsOwner)
+        {
+            //MyBall.UpdateBallZHeightLocally(0);
             CmdTellClientsSelectedClub(_currentClubIndex);
+        }
+            
         // update the club stats?
         GetNewClubAttributes(CurrentClub);
 
@@ -1818,6 +1822,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void UpdateCameraFollowTarget(GameObject objectToFollow)
     {
         cameraFollowScript.followTarget = objectToFollow;
+        //cameraFollowScript.UpdateCameraFollow(objectToFollow.transform);
     }
     [ServerRpc]
     void CmdTellPlayersToAttachUIToSelf()

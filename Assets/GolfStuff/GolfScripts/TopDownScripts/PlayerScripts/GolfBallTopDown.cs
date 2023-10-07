@@ -154,11 +154,13 @@ public class GolfBallTopDown : NetworkBehaviour
 
             }
         }
+        else
+        {
+            OwnerUpdateTasks();
+        }
     }
-    private void FixedUpdate()
+    void OwnerUpdateTasks()
     {
-        if (!base.IsOwner)
-            return;
         if (isHit || isBouncing)
         {
             MoveBallOnTrajectory();
@@ -166,13 +168,83 @@ public class GolfBallTopDown : NetworkBehaviour
             // update other players and stuff
             //CmdUpdateBallSpriteForHeightForOtherPlayers();
 
+            //if (!trail.enabled && !this.PlayerUsingRocket)
+            //{
+            //    trail.enabled = true;
+            //    CmdEnableTrailForOtherPlayers(true);
+            //}
+
+
+        }
+        else if (isRolling)
+        {
+            return;
+        }
+        else
+        {
+            if (trail.enabled)
+                trail.enabled = false;
+
+            //CmdEnableTrailForOtherPlayers(false);
+        }
+    }
+    private void FixedUpdate()
+    {
+        if (!base.IsOwner)
+            return;
+        //if (isHit || isBouncing)
+        //{
+        //    MoveBallOnTrajectory();
+        //    UpdateBallSpriteForHeight();
+        //    // update other players and stuff
+        //    //CmdUpdateBallSpriteForHeightForOtherPlayers();
+
+        //    if (!trail.enabled && !this.PlayerUsingRocket)
+        //    {
+        //        trail.enabled = true;
+        //        CmdEnableTrailForOtherPlayers(true);
+        //    }
+
+
+        //}
+        //else if (isRolling)
+        //{
+        //    //Debug.Log("IsRolling: Roll direction before slope: " + movementDirection.ToString());
+        //    movementDirection = GetRollDirection(movementDirection, groundSlopeDirection);
+        //    //Debug.Log("IsRolling: Roll direction AFTER slope: " + movementDirection.ToString());
+        //    //movementDirection = CalculateWindShiftForPutts(movementDirection);
+        //    //Debug.Log("IsRolling: Roll direction AFTER WIND: " + movementDirection.ToString());
+        //    RollBall(speedMetersPerSecond, movementDirection);
+
+        //    if (!trail.enabled && !this.PlayerUsingRocket)
+        //    {
+        //        trail.enabled = true;
+        //        CmdEnableTrailForOtherPlayers(true);
+        //    }
+
+
+        //    isRolling = WillBallRoll();
+        //    if (!isRolling)
+        //    {
+        //        ResetBallAndPlayerAfterBallStoppedRolling();
+        //    }
+
+        //}
+        //else
+        //{
+        //    if (trail.enabled)
+        //        trail.enabled = false;
+
+        //    CmdEnableTrailForOtherPlayers(false);
+        //}
+        if (isHit || isBouncing)
+        {
+
             if (!trail.enabled && !this.PlayerUsingRocket)
             {
                 trail.enabled = true;
                 CmdEnableTrailForOtherPlayers(true);
             }
-
-            
         }
         else if (isRolling)
         {
@@ -195,7 +267,6 @@ public class GolfBallTopDown : NetworkBehaviour
             {
                 ResetBallAndPlayerAfterBallStoppedRolling();
             }
-
         }
         else
         {
@@ -210,7 +281,8 @@ public class GolfBallTopDown : NetworkBehaviour
         // Move ball along its trajectory?
         if (hitBallCount < 1.0f)
         {
-            hitBallCount += hitBallModifer * Time.fixedDeltaTime * _rocketHitBallModifier;
+            //hitBallCount += hitBallModifer * Time.fixedDeltaTime * _rocketHitBallModifier;
+            hitBallCount += hitBallModifer * Time.deltaTime * _rocketHitBallModifier;
             timeInAir += Time.fixedDeltaTime;
             Vector3 m1 = Vector3.Lerp(hitBallPonts[0], hitBallPonts[1], hitBallCount);
             Vector3 m2 = Vector3.Lerp(hitBallPonts[1], hitBallPonts[2], hitBallCount);
@@ -486,7 +558,7 @@ public class GolfBallTopDown : NetworkBehaviour
             var rightAngle = 90f * Mathf.Deg2Rad;
             // https://math.stackexchange.com/questions/2532397/calculate-height-of-triangle-given-angle-and-base
             controlZ = ((launchDistance / 2) * Mathf.Sin(rightAngle) * Mathf.Sin(hitAngleRad)) / Mathf.Sin(oppositeHitAngleRad);
-            
+
             if (MyPlayer.UsedPowerupThisTurn && MyPlayer.UsedPowerUpType == "higher")
             {
                 controlZ *= 2f;
@@ -494,7 +566,7 @@ public class GolfBallTopDown : NetworkBehaviour
         }
         // Save the maximum height of the flight path
         //maxHeight = controlZ;
-        
+
         controlZ *= 2; // double the controlZ value because the height of the flight path is always controlZ / 2
         trajectoryPoints[1] = new Vector3(controlX, controlY, controlZ);
 
@@ -1039,7 +1111,7 @@ public class GolfBallTopDown : NetworkBehaviour
             willBallRoll = false;
             return willBallRoll;
         }
-            
+
 
         // Need to update this so if a ball rolls back down a hill, it doesn't stop rolling when the speed goes from 0 at its apex to then increase again when rolls down, this doesn't stop it from rolling down?
         // probably need to do something like, get current direction of the ball and the direction of the slope. If the angle between the two is greater than 180, continue to roll down?
@@ -1105,14 +1177,17 @@ public class GolfBallTopDown : NetworkBehaviour
 
         Vector2 rollVector = rollDirection * rollSpeed;
         Vector2 slopeVector = groundSlopeDirection * slopeSpeedModifier;
-        Vector3 currentPos = this.transform.position;
+        //Vector3 currentPos = this.transform.position;
+        Vector3 currentPos = rb.position;
         //Vector3 nextPos = rb.position + rollDirection * rollSpeed * Time.fixedDeltaTime;
-        Vector3 nextPos = rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 0.5f)) * Time.fixedDeltaTime;
+        //Vector3 nextPos = rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 0.5f)) * Time.fixedDeltaTime;
+        Vector3 nextPos = rb.position + ((rollDirection * rollSpeed) + (groundSlopeDirection * slopeSpeedModifier * 0.5f)) * Time.deltaTime;
         //Debug.Log("RollBall: current position is: " + currentPos.ToString("0.00000000") + " and the next position will be: " + nextPos.ToString("0.00000000"));
         //this.rb.MovePosition(rb.position + rollDirection * rollSpeed * Time.fixedDeltaTime);
         //this.rb.MovePosition(rb.position + rollVector + slopeVector);
         //speedMetersPerSecond -= GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.fixedDeltaTime;
-        float realSpeed = CalculateCurrentSpeed(currentPos, nextPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.fixedDeltaTime);
+        //float realSpeed = CalculateCurrentSpeed(currentPos, nextPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.fixedDeltaTime);
+        float realSpeed = CalculateCurrentSpeed(currentPos, nextPos) - (GetGroundRollSpeedModifier(bounceContactGroundMaterial) * Time.deltaTime);
         //Debug.Log("RollBall: current position is: " + currentPos.ToString("0.00000000") + " and the next position will be: " + nextPos.ToString("0.00000000") + " the speed per seconds WILL BE: " + realSpeed.ToString("0.00000000") + " and the speed previously WAS: " + speedMetersPerSecond.ToString("0.00000000"));
         this.rb.MovePosition(nextPos);
         if (groundSlopeDirection != Vector2.zero && rollDirection == groundSlopeDirection && realSpeed < 0.5f && realSpeed > 0.05f)
@@ -1297,7 +1372,7 @@ public class GolfBallTopDown : NetworkBehaviour
             Debug.Log("ResetBallAndPlayerAfterBallStoppedRolling: " + MyPlayer.PlayerName + " was either blown up by TNT or hit by a tornado");
             if (MyTornado)
                 ResetTornadoStuff();
-            if(TNTThatBlewMeUp)
+            if (TNTThatBlewMeUp)
                 ResetTNTThatBlewMeUp();
             return;
         }
@@ -1323,7 +1398,7 @@ public class GolfBallTopDown : NetworkBehaviour
         this.PlantedTNTThisTurn = false;
         // Landmine checks
         if (this.PlantedLandMine)
-        { 
+        {
             // call await task to have the LandMine blow up and launch any nearby balls
         }
         this.PlantedLandMine = false;
@@ -1438,7 +1513,7 @@ public class GolfBallTopDown : NetworkBehaviour
         if (DoesBallHitObject(obstalceUnityUnits, ballUnityUnits))
         {
             Debug.Log("HitEnvironmentObstacle: ball is not high enough to clear environmnet obstalce. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString() + " bounce modifier: " + bounceModifier.ToString() + " using rocket? " + this.PlayerUsingRocket.ToString());
-            
+
             // Player can no longer use rocket if it hits an obstacle?
             MyPlayer.SetCanUseRocket(false);
 
@@ -1561,7 +1636,7 @@ public class GolfBallTopDown : NetworkBehaviour
         float midPointHeight = GetObstacleBounceHeight(currentHeight, hitBallCount, bounceModifier);
         //float obstacleBounceDistance = GetObstacleBounceDistance(launchDistance, hitBallCount, softBounceModifier);
         float obstacleBounceDistance = GetObstacleBounceDistance(launchDistance, hitBallCount, bounceModifier);
-        
+
         // need a check for if the bounce distance is short enough, the ball just stops? Otherwise it just bounces forever?
         if (obstacleBounceDistance <= 0.1f)
         {
@@ -1815,7 +1890,7 @@ public class GolfBallTopDown : NetworkBehaviour
         if (this.IsOwner)
             MyPlayer.SetDistanceToHoleForPlayer();
         bounceContactGroundMaterial = GetGroundMaterial();
-        
+
         //MyPlayer.EnablePlayerCanvas(false);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
@@ -2010,8 +2085,8 @@ public class GolfBallTopDown : NetworkBehaviour
             //this.PlayerUsingRocket = false;
             SetPlayerUsingRocket(false);
             return;
-        }   
-        
+        }
+
         Vector3 totalMovement = movementVector * rocketBoost * Time.fixedDeltaTime;
 
         Debug.Log("MoveBallWithRocketPowerUp: Original trajectory points: " + this.hitBallPonts[1].ToString() + ":" + this.hitBallPonts[2].ToString());
@@ -2036,7 +2111,7 @@ public class GolfBallTopDown : NetworkBehaviour
         }
     }
     void RocketParticleEffect(bool enable)
-    {   
+    {
         if (enable)
         {
             this._rocketParticle.gameObject.SetActive(enable);
@@ -2045,7 +2120,7 @@ public class GolfBallTopDown : NetworkBehaviour
                 _rocketParticle.Play();
                 trail.enabled = false;
                 CmdEnableRocketParticleForOtherPlayers(enable);
-            }   
+            }
         }
         else
         {
@@ -2067,7 +2142,7 @@ public class GolfBallTopDown : NetworkBehaviour
     void RpcEnableRocketParticleForOtherPlayers(bool enable)
     {
         Debug.Log("RpcEnableRocketParticleForOtherPlayers: " + enable.ToString());
-       
+
         if (enable)
         {
             this._rocketParticle.gameObject.SetActive(enable);
@@ -2185,7 +2260,7 @@ public class GolfBallTopDown : NetworkBehaviour
         bool waitingForTNTObjectToBeSet = false;
         if (TNTPlantedByMe)
             CmdBlowUpTNT(TNTPlantedByMe.ObjectId);
-        else 
+        else
             waitingForTNTObjectToBeSet = true;
 
         //StartCoroutine(WaitingForTNT());
@@ -2246,7 +2321,7 @@ public class GolfBallTopDown : NetworkBehaviour
             {
                 MoveBallOutOfWater(true);
             }
-            
+
         }
 
         CmdTellTNTBallDoneBeingBlownUp(TNTThatBlewMeUp);
@@ -2267,7 +2342,7 @@ public class GolfBallTopDown : NetworkBehaviour
         _ballWasBlownUp = true;
         Vector2 directionFromTNT = (this.transform.position - tnt.transform.position).normalized;
         LaunchBallFromTNT(distFromTNT, directionFromTNT, tnt);
-        
+
         /// Testing!!!
         //LaunchBallTowardHole();
     }

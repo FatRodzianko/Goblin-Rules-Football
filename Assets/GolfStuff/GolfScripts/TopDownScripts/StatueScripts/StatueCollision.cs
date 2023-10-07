@@ -36,6 +36,7 @@ public class StatueCollision : MonoBehaviour
             return;
 
         // Get the height of the ball:
+        //float ballZ = golfBallScript.transform.position.z;
         float ballZ = golfBallScript.transform.position.z;
         float ballHeightInUnityUnits = golfBallScript.GetBallHeightYValue(ballZ);
 

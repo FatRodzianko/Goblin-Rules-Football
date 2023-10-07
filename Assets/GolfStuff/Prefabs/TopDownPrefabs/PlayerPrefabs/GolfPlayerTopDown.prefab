@@ -509,7 +509,7 @@ GameObject:
   m_Component:
   - component: {fileID: 401272157811218532}
   - component: {fileID: 6132738090251598389}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: club-image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -593,7 +593,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7729032297261108562}
   - component: {fileID: 8757087352194737499}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: putt-distance-text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -811,7 +811,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6472048583493079170}
   - component: {fileID: 8273735977940502099}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: AdjustedDistanceIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1068,6 +1068,7 @@ MonoBehaviour:
   _startGameButton: {fileID: 2118601439084773887}
   _ballSounds: {fileID: 11400000, guid: b32cc943f2db3b64a987f96b00abadc9, type: 2}
   PromptPlayerControls: 0
+  _aimingActionsEnabled: 0
 --- !u!114 &3662651631311076367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1138,7 +1139,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 13
+  <PrefabId>k__BackingField: 14
   <SpawnableCollectionId>k__BackingField: 0
   _scenePathHash: 0
   <SceneId>k__BackingField: 0
@@ -1210,7 +1211,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3378799590774017071}
   - component: {fileID: 6413153885379100794}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: spin-text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1417,7 +1418,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7025953749021180226}
   - component: {fileID: 6066109474476061749}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: spin-selection-icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1832,7 +1833,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7357528832651502962}
   - component: {fileID: 2674208606246010458}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PowerSubmissionIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1918,7 +1919,7 @@ GameObject:
   - component: {fileID: 6077135028097797255}
   - component: {fileID: 3534602882940739184}
   - component: {fileID: 6756458908731000656}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: spin-ball-icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2041,7 +2042,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1427359746002268329}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ClubSelectionHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2076,7 +2077,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4272623787185623438}
   - component: {fileID: 1724216585419281965}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: hit-meter-moving-icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2160,7 +2161,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1320032019902729026}
   - component: {fileID: 2215619226062313041}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: AccuracySubmissionIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2244,7 +2245,7 @@ GameObject:
   m_Component:
   - component: {fileID: 107069269644790584}
   - component: {fileID: 6143583604513910543}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: hit-meter-background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2332,7 +2333,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5275749645952224537}
   - component: {fileID: 3468775293004664226}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: club-text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2652,6 +2653,14 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+    - target: {fileID: 2327823321300248644, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2464130888122015485, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 2758344589765690725, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -2660,6 +2669,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+    - target: {fileID: 4761355952293461639, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5784903690860004753, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
       propertyPath: m_RootOrder
       value: 8
@@ -2708,9 +2721,17 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+    - target: {fileID: 8213289562177141478, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8706885257563699752, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
       propertyPath: m_Name
       value: WindIconHolder
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706885257563699752, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8706885257563699752, guid: 9b9f1d98f99080d469c09378fae935d4, type: 3}
       propertyPath: m_IsActive
