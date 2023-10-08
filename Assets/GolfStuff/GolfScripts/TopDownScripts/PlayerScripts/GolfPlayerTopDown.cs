@@ -160,7 +160,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SyncVar(OnChange = nameof(SyncPowerUpDistanceModifier))] public float PowerUpDistanceModifier = 1.0f;
     [SyncVar] public float PowerUpAccuracyModifier = 1.0f;
     Vector2 _rocketMove = Vector2.zero;
-    float _rocketBoost = 5f;
+    float _rocketBoost = 10f;
     [SerializeField] bool _canUseRocketPower = false;
 
 

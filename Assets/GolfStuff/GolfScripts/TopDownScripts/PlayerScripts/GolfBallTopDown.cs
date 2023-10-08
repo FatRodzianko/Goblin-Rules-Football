@@ -2087,7 +2087,25 @@ public class GolfBallTopDown : NetworkBehaviour
             return;
         }
 
-        Vector3 totalMovement = movementVector * rocketBoost * Time.fixedDeltaTime;
+        //Vector3 adjustedMovementVector = Vector3.zero;
+        //if (movementVector == Vector3.down)
+        //{
+        //    adjustedMovementVector = -this.movementDirection;
+        //}
+        //else if (movementVector == Vector3.up)
+        //{
+        //    adjustedMovementVector = this.movementDirection;
+        //}
+        //Vector3 totalMovement = movementVector * rocketBoost * Time.fixedDeltaTime;
+        float angle = Vector2.Angle(movementVector, Vector2.up);
+        if (movementVector.x > 0)
+            angle += 180;
+        var rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        
+        Vector3 totalMovement = (rotation * this.movementDirection).normalized * rocketBoost * Time.fixedDeltaTime;
+        //Vector3 totalMovement = (movementVector * (this.movementDirection)).normalized * rocketBoost * Time.fixedDeltaTime;
+        Debug.Log("MoveBallWithRocketPowerUp: Angle from movementVector to this.movementDirection: " + Vector2.Angle(movementVector, this.movementDirection).ToString() + " Angle from this.movementDirection to movementVector: " + Vector2.Angle(this.movementDirection, movementVector).ToString());
+        Debug.Log("MoveBallWithRocketPowerUp: Angle from movementVector to Vector2.up: " + Vector2.Angle(movementVector, Vector2.up).ToString() + " Angle from Vector2.up to movementVector: " + Vector2.Angle(Vector2.up, movementVector).ToString());
 
         Debug.Log("MoveBallWithRocketPowerUp: Original trajectory points: " + this.hitBallPonts[1].ToString() + ":" + this.hitBallPonts[2].ToString());
         this.hitBallPonts[1] += (totalMovement / 2);
