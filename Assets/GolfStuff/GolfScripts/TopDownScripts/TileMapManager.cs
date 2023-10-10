@@ -21,6 +21,8 @@ public class TileMapManager : MonoBehaviour
     [SerializeField] private string _courseName;
     [SerializeField] private int _holePar;
     [SerializeField] private float _cameraZoomValue;
+    [SerializeField] private string _clubToUse;
+    [SerializeField] private bool _isTeeOffChallenge;
 
     [Header("Prefabs for Objects like holes/tee ball things")]
     [SerializeField] GameObject _holePrefab;
@@ -103,6 +105,10 @@ public class TileMapManager : MonoBehaviour
         // Find the Tee Off Aim Point and save it
         GameObject aimPoint = GameObject.FindGameObjectWithTag("GolfAimPoint");
         newHole.TeeOffAimPoint = aimPoint.transform.position;
+
+        if (!string.IsNullOrEmpty(_clubToUse))
+            newHole.ClubToUse = _clubToUse;
+        newHole.IsTeeOffChallenge = this._isTeeOffChallenge;
 
         // Save the statues for the hole
         newHole.Statues = SaveAllStatues(GameObject.FindGameObjectsWithTag("Statue")).ToList();
@@ -375,6 +381,12 @@ public class TileMapManager : MonoBehaviour
         {
             SpawnBalloonPowerUpsForEditor(hole.BalloonPowerUps);
         }
+        if (!string.IsNullOrEmpty(hole.ClubToUse))
+            this._clubToUse = hole.ClubToUse;
+        else
+            this._clubToUse = "";
+
+        this._isTeeOffChallenge = hole.IsTeeOffChallenge;
 
         this.LoadMap(hole);
     }

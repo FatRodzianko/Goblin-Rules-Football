@@ -377,7 +377,7 @@ x "Lobby Menu" when player's first join game
 - - x list of players and their ready status (and ball color?)
 - - x ready up, exit game, buttons
 - - x host gets a start game button when all players are readied up
-- add esc menu and way to exit out of golf multiplayer game back to main menu
+x add esc menu and way to exit out of golf multiplayer game back to main menu
 x ability to "configure" a golf game
 - - x powerups on/off
 - - x weather statues on/off
@@ -390,9 +390,10 @@ x ability to "configure" a golf game
 x rebinding issue with reseting to default for golf:
 - - x Check duplicates checks "ResetAllBindings.instance.actionMapsToCheck" which is only the football bindings
 - - - - - x add some sort of check to see if it is golf/football check. Have it pull the correct actionmaps for the type
-- Add a second camera for the golf UI
-- - - then change the "follow the golf ball script" to just set the follow/target thing on the main camera instead of using my script to follow. Should hopefully remove the jittering when watching other players?
-- - - short tutorial video: https://www.youtube.com/watch?v=uOeIByY8r3M
+x Add a second camera for the golf UI
+- - x then change the "follow the golf ball script" to just set the follow/target thing on the main camera instead of using my script to follow. Should hopefully remove the jittering when watching other players?
+- - x short tutorial video: https://www.youtube.com/watch?v=uOeIByY8r3M
+- - - doesn't work with cinemachine and pixel perfect cameras...
 
 ### Fishnet / steamworks tutorial stuff:
 - https://www.youtube.com/watch?v=U4ATkct6fh4

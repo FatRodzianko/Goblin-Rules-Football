@@ -1166,17 +1166,17 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         RpcSetGolfPlayersLocally(GolfPlayers);
         _playerOrderFromChallenege.Clear();
         // check for tee off challenge
-        if (GolfPlayers.Count <= 1)
-        {
-            CurrentCourse = CourseToPlay;
-            StartFirstHole();
-        }
-        else
-        {
-            StartTeeOffChallenge();
-        }
+        //if (GolfPlayers.Count <= 1)
+        //{
+        //    CurrentCourse = CourseToPlay;
+        //    StartFirstHole();
+        //}
+        //else
+        //{
+        //    StartTeeOffChallenge();
+        //}
 
-        //StartTeeOffChallenge();
+        StartTeeOffChallenge();
     }
     [Server]
     void StartFirstHole()
