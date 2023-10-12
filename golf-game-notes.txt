@@ -323,7 +323,7 @@ x spinning hoop targets
 - - - - - - - - x make sure each tube has a reference to the other tube, it's "pair" that it sends the ball too
 - - - when a ball bounces off the top of a tube/obstacle, maybe give it some extra "juice"/distance to the bounce? Right now, seems easy to get stuck bouncing off the top continuously
 - - - - - - possible that is caused by the spin I'm putting on the ball while testing also. Still, maybe make it bounce further off the top of objects? couldn't hurt?
-- Rock power up
+x Rock power up
 - - x leave behind a small rock obstacle after you hit. Idea is to do it on putting green to block other players' shots
 - - x would need to make sure that it can't completely block a hole. collision check where it is placed?
 - - - - x when it spawns, check distance to the nearest hole. If the distance is within a certain threshold to the hole move the object
@@ -332,7 +332,7 @@ x spinning hoop targets
 - - - - - - - - x move the object in the opposite direction from it and the hole that will be at least the "minimum distance" away from the hole
 - - - - - - - - - Find equation to find point given distance, direction, and starting point (the hole)? Shouldn't be that hard?
 - - - - - - - - x make sure not to place the rock until after the players hit?
-- - - - - - - - - also make sure that if the spawned object is "on top" of a ball, that ball gets moved?
+- - - - - - - - x also make sure that if the spawned object is "on top" of a ball, that ball gets moved?
 - other powerups that a player "Drops"
 - - - Tree that can be a blocker on fairways and stuff
 - - - a bomb: player hits their ball, and a bomb is placed where they first bounce. Bomb has a radius when planted. Any other player that hits their ball into the bomb radius causes the bomb to go off and send them in a random direction (similar to tornado)
