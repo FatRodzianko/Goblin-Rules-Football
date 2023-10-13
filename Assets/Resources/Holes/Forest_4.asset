@@ -19,8 +19,8 @@ MonoBehaviour:
   - {x: 400.5, y: -19.5, z: 0}
   TeeOffLocation: {x: -0.5, y: 0.5, z: 0}
   TeeMarkerPositions:
-  - {x: -0.5, y: 3.5, z: 0}
   - {x: -0.5, y: -2.5, z: 0}
+  - {x: -0.5, y: 3.5, z: 0}
   GreenTiles:
   - TilePos: {x: 397, y: -27, z: 0}
     MyTile: {fileID: 11400000, guid: 1cf3791605288a74a8eff5cf52e5c0c3, type: 2}
@@ -21420,37 +21420,37 @@ MonoBehaviour:
   CameraZoomValue: 10
   TeeOffAimPoint: {x: 205.25, y: -10.75, z: 0}
   Statues:
-  - StatuePosition: {x: 197.5, y: -10.5, z: 0}
+  - StatuePosition: {x: 198.5, y: -25.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
-  - StatuePosition: {x: 105.5, y: -9.5, z: 0}
-    StatueType: good-weather
-    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
-  - StatuePosition: {x: 198.5, y: -25.5, z: 0}
+  - StatuePosition: {x: 197.5, y: -10.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
   - StatuePosition: {x: 218.5, y: -5.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
-  - StatuePosition: {x: 283.5, y: -29.5, z: 0}
-    StatueType: good-weather
-    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
-  - StatuePosition: {x: 368.7, y: -18.4, z: 0}
+  - StatuePosition: {x: 105.5, y: -9.5, z: 0}
     StatueType: good-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
   - StatuePosition: {x: 259.5, y: -6.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
+  - StatuePosition: {x: 368.7, y: -18.4, z: 0}
+    StatueType: good-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
+  - StatuePosition: {x: 283.5, y: -29.5, z: 0}
+    StatueType: good-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
   BalloonPowerUps:
   - BalloonPosition: {x: 248.5, y: -74.5, z: 0}
     BalloonHeight: med
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   Tubes:
-  - TubePosition: {x: 27.5, y: -22.5, z: 0}
-    IsPrimaryTube: 1
-    TubeScriptableObstacle: {fileID: 11400000, guid: c609b74f5b25db04abf8f7bc30c3db9e, type: 2}
   - TubePosition: {x: 378.5, y: -6.5, z: 0}
     IsPrimaryTube: 0
+    TubeScriptableObstacle: {fileID: 11400000, guid: c609b74f5b25db04abf8f7bc30c3db9e, type: 2}
+  - TubePosition: {x: 27.5, y: -22.5, z: 0}
+    IsPrimaryTube: 1
     TubeScriptableObstacle: {fileID: 11400000, guid: c609b74f5b25db04abf8f7bc30c3db9e, type: 2}
   IsTeeOffChallenge: 0
   ClubToUse: 

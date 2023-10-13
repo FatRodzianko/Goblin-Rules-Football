@@ -290,7 +290,7 @@ public class GolfBallTopDown : NetworkBehaviour
             Vector3 oldPos = this.transform.position;
 
             fallDirection = newPos - oldPos;
-            speedMetersPerSecond = CalculateCurrentSpeed(oldPos, newPos);
+            speedMetersPerSecond = CalculateCurrentSpeed(oldPos, newPos, false);
             //Debug.Log("Hit/Bouncing: speedMetersPerSecond: " + speedMetersPerSecond.ToString());
 
             this.transform.position = newPos;
@@ -430,12 +430,15 @@ public class GolfBallTopDown : NetworkBehaviour
 
         trail.endWidth = pixelUnit;
     }
-    float CalculateCurrentSpeed(Vector2 start, Vector2 end)
+    float CalculateCurrentSpeed(Vector2 start, Vector2 end, bool fixedTime = true)
     {
         float currentSpeed = 0f;
         // Get the distance travelled in last fixed update, then divid by fixed update to get meters/second?
         float dist = Vector2.Distance(start, end);
-        currentSpeed = dist / Time.fixedDeltaTime;
+        float timeValue = Time.fixedDeltaTime;
+        if (!fixedTime)
+            timeValue = Time.deltaTime;
+        currentSpeed = dist / timeValue;
         //Debug.Log("CalculateCurrentSpeed: current speed: " + currentSpeed.ToString());
         return currentSpeed;
     }

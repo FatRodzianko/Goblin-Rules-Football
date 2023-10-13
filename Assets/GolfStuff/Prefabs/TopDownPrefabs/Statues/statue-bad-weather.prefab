@@ -82,7 +82,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_Sprite: {fileID: 21300000, guid: 949341255e2c50f4db50e0722c521cf3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 56fe603e4d177874d98eb118cf97e68a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -109,9 +109,9 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 5434865612403811146}
   _networkObjectCache: {fileID: 5434865612403811146}
   _myRenderer: {fileID: 2370977877022451248}
-  _mySprite: {fileID: 21300000, guid: 949341255e2c50f4db50e0722c521cf3, type: 3}
+  _mySprite: {fileID: 21300000, guid: 56fe603e4d177874d98eb118cf97e68a, type: 3}
   _statueAnimator: {fileID: 3432858679223941275}
-  _crackedSprite: {fileID: 21300000, guid: 1d43c6152f0e9644592eb250d593b717, type: 3}
+  _crackedSprite: {fileID: 21300000, guid: aa815de9495137a4097109e3cdd36d20, type: 3}
   StatueType: bad-weather
   HeightInUnityUnits: 3.375
   _brokenHeight: 0.25
