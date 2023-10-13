@@ -1395,7 +1395,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
             accuracyDistance *= 2.5f;
         // Also punish driver hits?
         if (CurrentClub.ClubType == "driver")
-            accuracyDistance *= 1.5f;
+        { 
+            if(this.HasPlayerTeedOff)
+                accuracyDistance *= 2.5f;
+            else
+                accuracyDistance *= 1.5f;
+        }
+            
 
         // Adjust the accuracy distance based on player's weather favor
         float newAccuracyDistance = accuracyDistance * this.AccuracyFavorModifier * this.PowerUpAccuracyModifier;
