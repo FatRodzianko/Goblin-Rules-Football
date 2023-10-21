@@ -408,7 +408,15 @@ x shorten first fairway by just a hair
 x sand trap halfway through last fairway?
 x fix balloons in hole 4 that have a height of "medium" instead of "med"
 - - x also check balloons in hole 5...
-- ok make the hole further away again...
+x ok make the hole further away again...
+
+### Next 3 par hole
+- hole is only about ~135 yards away
+- - - incentivize hitting conservatively with iron but allow for hole in one with driver
+- good statue in front of hole, bad statue behind hole
+- easy to bounce out of bounds? or into water?
+- hill/"boob" surrounding the hole, but with at least 1 square in all directions of free space around the hole
+- - - make the hill "zig zag" with diaganol arrows of varying strengths?
 
 ### Fishnet / steamworks tutorial stuff:
 - https://www.youtube.com/watch?v=U4ATkct6fh4
