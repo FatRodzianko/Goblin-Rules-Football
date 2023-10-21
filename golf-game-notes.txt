@@ -398,6 +398,18 @@ x make it so driver has an even greater accuracy penalty when hitting off fairwa
 - - x check if player has teed off already if they are using the driver. If not, increase driver inaccuracy penalty?
 - MAke the power up balloons even bigger. Like twice as big. They are still too hard to hit imo
 
+### hole six notes:
+x make hole slightly closer
+x extend water out from the third fairway, down toward second fairway
+x move the first spinning hope toward the left so it can be hit a bit easier
+- - - move it back right just a few spaces...
+x shift fairway near hole so it is pointing from the hole toward the third fairway more
+x shorten first fairway by just a hair
+x sand trap halfway through last fairway?
+x fix balloons in hole 4 that have a height of "medium" instead of "med"
+- - x also check balloons in hole 5...
+- ok make the hole further away again...
+
 ### Fishnet / steamworks tutorial stuff:
 - https://www.youtube.com/watch?v=U4ATkct6fh4
 - https://www.youtube.com/watch?v=-Du_8_NZRWM

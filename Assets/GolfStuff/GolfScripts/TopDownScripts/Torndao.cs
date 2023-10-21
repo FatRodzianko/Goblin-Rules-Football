@@ -282,7 +282,9 @@ public class Torndao : NetworkBehaviour
         //float max = 15f * (this.TornadoStrength / 2f);
         if (this._playerTarget)
         {
-            float distToTarget = Vector2.Distance(this.transform.position, _playerTarget.transform.position);
+            Vector3 tornadoPos = this.transform.position;
+            float distToTarget = Vector2.Distance(tornadoPos, _playerTarget.MyBall.transform.position);
+            Debug.Log("DistanceToMoveTornadoThisTurn: Distance to target is: " + distToTarget.ToString() + " from tornado position: " + tornadoPos.ToString() + " to player position: " + _playerTarget.MyBall.transform.position.ToString());
             min = 0.75f * distToTarget;
             max = 1.20f * distToTarget;
         }

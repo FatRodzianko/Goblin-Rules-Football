@@ -1826,6 +1826,7 @@ public class GolfBallTopDown : NetworkBehaviour
         {
             for (int i = 0; i < hits.Length; i++)
             {
+                
                 RaycastHit2D hit = hits[i];
                 GroundTopDown ground = hit.transform.GetComponent<GroundTopDown>();
                 if (ground.groundType.Contains("water") || ground.groundType.Equals("deep rough background"))

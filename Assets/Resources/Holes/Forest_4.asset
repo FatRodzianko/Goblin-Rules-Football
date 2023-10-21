@@ -22011,7 +22011,7 @@ MonoBehaviour:
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: 381.5, y: -19.5, z: 0}
-    BalloonHeight: medium
+    BalloonHeight: med
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: 388.5, y: -28.5, z: 0}
     BalloonHeight: low
