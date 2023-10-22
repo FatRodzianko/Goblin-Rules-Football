@@ -38,8 +38,14 @@ public class GolfSteamLobby : MonoBehaviour
     [SerializeField] int _strokeLimitDefault = 12;
     [SerializeField] public RainManager.RainMode GameRainMode = RainManager.RainMode.ControlledByPlayerFavor;
     [SerializeField] public WindManager.WindMode GameWindMode = WindManager.WindMode.ControlledByPlayerFavor;
+    [SerializeField] public string CourseHoleSelection;
 
-    public string CourseName;
+    [Header("Golf Course Settings")]
+    [SerializeField] public string CourseName;
+    [SerializeField] public string CourseHolesToPlay;
+    [SerializeField] public List<int> CustomHolesToPlay = new List<int>();
+
+
 
     private void Awake()
     {
@@ -66,7 +72,7 @@ public class GolfSteamLobby : MonoBehaviour
     {
 
     }
-    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode)
+    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode, string courseHoleSelection, List<int> customHolesSelected)
     {
         Debug.Log("GolfSteamLobby: CreateLobby: number of players: " + numberOfPlayers.ToString());
 
@@ -104,6 +110,25 @@ public class GolfSteamLobby : MonoBehaviour
         this.StrokeLimitNumber = Mathf.Abs(strokeLimitNumber);
         this.GameRainMode = GetRainMode(rainMode);
         this.GameWindMode = GetWindMode(windMode);
+
+        if (string.IsNullOrEmpty(courseHoleSelection))
+            this.CourseHoleSelection = "First 3 (holes 1-3)";
+        else
+            this.CourseHoleSelection = courseHoleSelection;
+
+        this.CustomHolesToPlay.Clear();
+        if (courseHoleSelection.StartsWith("Custom"))
+        {
+            if (customHolesSelected.Count > 0)
+            {
+                this.CustomHolesToPlay.AddRange(customHolesSelected);
+
+            }
+            else
+            {
+                this.CourseHoleSelection = "First 3 (holes 1-3)";
+            }
+        }
 
         // If the player enabled the stroke limit but didn't enter a value, make sure the default value is set
         if (this.StrokeLimitEnabled && this.StrokeLimitNumber <= 0)

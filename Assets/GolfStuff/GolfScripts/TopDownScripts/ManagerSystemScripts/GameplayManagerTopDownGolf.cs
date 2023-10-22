@@ -23,6 +23,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] public ScriptableHole CurrentHoleInCourse;
     [SerializeField] [SyncVar] public int CurrentHoleIndex;
     [SerializeField] public ScriptableCourse CourseToPlay;
+    [SerializeField] [SyncVar] public string CourseHolesToPlay;
+    [SerializeField] public List<int> CustomHolesSelectedToPlay = new List<int>();
 
     [Header("TeeOffChallenge Info:")]
     [SerializeField] public ScriptableCourse TeeOffChallenges;
@@ -163,6 +165,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         // hardcoding these values for now but they should be set by multiplayer game config in the future?
         GetGameSettings();
+        RpcTellClientsToLoadCourse(this.CourseHolesToPlay, this.CustomHolesSelectedToPlay);
     }
     public override void OnStopServer()
     {
@@ -231,10 +234,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         //AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
         //loadCourse.Completed += LoadCourseHandle;
-        AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
-        CourseToPlay = loadCourse.WaitForCompletion();
-        //CourseToPlay = Resources.Load<ScriptableCourse>($"Courses/Forest");
-        PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CourseToPlay);
+        //AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
+        //CourseToPlay = loadCourse.WaitForCompletion();
+        ////CourseToPlay = Resources.Load<ScriptableCourse>($"Courses/Forest");
+        //PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CourseToPlay);
         //PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CurrentCourse);
 
     }
@@ -253,7 +256,54 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         this.StrokeLimitNumber = GolfSteamLobby.instance.StrokeLimitNumber;
         RainManager.instance.SetGameRainMode(GolfSteamLobby.instance.GameRainMode);
         WindManager.instance.SetGameWindMode(GolfSteamLobby.instance.GameWindMode);
+        this.CourseHolesToPlay = GolfSteamLobby.instance.CourseHoleSelection;
+        this.CustomHolesSelectedToPlay.Clear();
+        this.CustomHolesSelectedToPlay.AddRange(GolfSteamLobby.instance.CustomHolesToPlay);
     }
+    [ObserversRpc(BufferLast = true)]
+    void RpcTellClientsToLoadCourse(string courseName, List<int> customHoles)
+    {
+        Debug.Log("RpcTellClientsToLoadCourse: " + courseName.ToString() + " custome holes length: " + customHoles.Count.ToString());
+        AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
+        ScriptableCourse course = loadCourse.WaitForCompletion();
+        CourseToPlay = ScriptableObject.CreateInstance<ScriptableCourse>();
+        CourseToPlay.CourseName = course.CourseName;
+        if (courseName == "Middle 3 (holes 4-6)")
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: Middle 3 (holes 4-6)");
+            List <ScriptableHole> holes = new List<ScriptableHole>()
+            {
+                course.HolesInCourse[3],
+                course.HolesInCourse[4],
+                course.HolesInCourse[5],
+            };
+            CourseToPlay.HolesInCourse = holes.ToArray();
+
+        }
+        else if (courseName.StartsWith("Custom"))
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: custom. number of holes selecteD: " + customHoles.Count.ToString());
+            List<ScriptableHole> holes = new List<ScriptableHole>();
+            foreach (int courseNumber in customHoles)
+            {
+                holes.Add(course.HolesInCourse[courseNumber - 1]);
+            }
+            CourseToPlay.HolesInCourse = holes.ToArray();
+        }
+        else
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: First 3 (holes 1-3)");
+            List<ScriptableHole> holes = new List<ScriptableHole>()
+            {
+                course.HolesInCourse[0],
+                course.HolesInCourse[1],
+                course.HolesInCourse[2],
+            };
+            CourseToPlay.HolesInCourse = holes.ToArray();
+        }
+        PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CourseToPlay);
+    }
+
     [Server]
     void ResetPlayerScoresForNewHole()
     {

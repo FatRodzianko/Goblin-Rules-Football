@@ -68,6 +68,16 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private TMP_InputField _strokeLimitInputField;
     [SerializeField] private TMP_Dropdown _rainModeDropDown;
     [SerializeField] private TMP_Dropdown _windModeDropDown;
+    [SerializeField] private TMP_Dropdown _courseHoleSelectionDropdown;
+
+    [Header("Golf Custom Hole Selection")]
+    [SerializeField] GameObject _selectCustomHolesPanel;
+    [SerializeField] private Toggle _customeSelectHole1Toggle;
+    [SerializeField] private Toggle _customeSelectHole2Toggle;
+    [SerializeField] private Toggle _customeSelectHole3Toggle;
+    [SerializeField] private Toggle _customeSelectHole4Toggle;
+    [SerializeField] private Toggle _customeSelectHole5Toggle;
+    [SerializeField] private Toggle _customeSelectHole6Toggle;
 
 
     [Header("Game Option Values")]
@@ -180,6 +190,7 @@ public class TitleScreenManager : MonoBehaviour
         returnToMainMenu.gameObject.SetActive(false);
         CreateGameInfoPanel.SetActive(false);
         eventSystem.SetSelectedGameObject(startGameButton, new BaseEventData(eventSystem));
+        _selectCustomHolesPanel.SetActive(false);
     }
     public void StartGame()
     {
@@ -662,8 +673,13 @@ public class TitleScreenManager : MonoBehaviour
         { 
             int.TryParse(_strokeLimitInputField.text, out strokeLimitValue);
         }
+        List<int> customeHoleSelection = new List<int>();
+        if (_courseHoleSelectionDropdown.options[_courseHoleSelectionDropdown.value].text.StartsWith("Custom"))
+        {
+            customeHoleSelection.AddRange(GetCustomHoleSelection());
+        }
         Debug.Log("CreateNewGolfLobby: Rain Mode will be: " + _rainModeDropDown.options[_rainModeDropDown.value].text + " Wind Mode will be: " + _windModeDropDown.options[_windModeDropDown.value].text);
-        GolfSteamLobby.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text);
+        GolfSteamLobby.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text, _courseHoleSelectionDropdown.options[_courseHoleSelectionDropdown.value].text, customeHoleSelection);
     }
     private void RainModeDropdownValueChanged(TMP_Dropdown change)
     {
@@ -704,5 +720,31 @@ public class TitleScreenManager : MonoBehaviour
             IsMusicOn = false;
         }
     }
+    List<int> GetCustomHoleSelection()
+    {
+        List<int> selectedHoles = new List<int>();
 
+        if (_customeSelectHole1Toggle.isOn)
+            selectedHoles.Add(1);
+        if (_customeSelectHole2Toggle.isOn)
+            selectedHoles.Add(2);
+        if (_customeSelectHole3Toggle.isOn)
+            selectedHoles.Add(3);
+        if (_customeSelectHole4Toggle.isOn)
+            selectedHoles.Add(4);
+        if (_customeSelectHole5Toggle.isOn)
+            selectedHoles.Add(5);
+        if (_customeSelectHole6Toggle.isOn)
+            selectedHoles.Add(6);
+
+        return selectedHoles;
+    }
+    public void OpenSelectCustomHolesPanel()
+    {
+        this._selectCustomHolesPanel.SetActive(true);
+    }
+    public void CloseSelectCustomHolesPanel()
+    {
+        this._selectCustomHolesPanel.SetActive(false);
+    }
 }
