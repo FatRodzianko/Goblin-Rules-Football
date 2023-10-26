@@ -16,7 +16,19 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 6551b3e54e55d414fa9d09a73e6291f0
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 80680e5e6d5ce1a4eb5a7b60074514ef
+    m_Address: Assets/SFX/Music/frail-noise-again.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 100636e6268fdfe4e811ef544983b3ec
+    m_Address: Assets/SFX/Music/unsuitable-turn-40-bar_final_bass-boosted-3.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 12ba931491c88254a9432805f222928e
+    m_Address: Assets/SFX/Music/fertile-cable-worm.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

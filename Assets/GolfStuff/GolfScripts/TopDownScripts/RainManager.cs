@@ -109,6 +109,14 @@ public class RainManager : NetworkBehaviour
         base.OnStartClient();
         GetRainSoundForHole();
     }
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        if (!string.IsNullOrWhiteSpace(_rainSoundForHole))
+            SoundManager.instance.StopSound(_rainSoundForHole);
+        if (!string.IsNullOrWhiteSpace(_clearSoundForHole))
+            SoundManager.instance.StopSound(_clearSoundForHole);
+    }
     void MakeInstance()
     {
         if (instance == null)

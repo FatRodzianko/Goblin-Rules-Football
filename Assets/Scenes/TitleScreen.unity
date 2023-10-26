@@ -131110,6 +131110,155 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ce42c7261c914b74fa6ef48b87ff20c7, type: 3}
+--- !u!1001 &7413306808868002290
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: audioMixer
+      value: 
+      objectReference: {fileID: 24100000, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: mixerGroup
+      value: 
+      objectReference: {fileID: 3654047802629225012, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[0].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 100636e6268fdfe4e811ef544983b3ec, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[0].name
+      value: unsuitable-turn
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[1].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 12ba931491c88254a9432805f222928e, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[1].name
+      value: fertile-cable-worm
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[2].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 80680e5e6d5ce1a4eb5a7b60074514ef, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[2].name
+      value: frail-noise-again
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[3].clip
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[3].name
+      value: music-frail-noise
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[0].pitch
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[1].pitch
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[2].pitch
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[3].pitch
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[0].volume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[1].volume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[2].volume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[3].volume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[0].ClipAddress
+      value: Assets/SFX/Music/unsuitable-turn-40-bar_final_bass-boosted-3.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[1].ClipAddress
+      value: Assets/SFX/Music/fertile-cable-worm.wav
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[2].ClipAddress
+      value: Assets/SFX/Music/frail-noise-again.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[3].ClipAddress
+      value: Assets/SFX/Music/frail-noise-again.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_RootOrder
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8141983585143860193, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: m_Name
+      value: MusicManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 477c67288e902794d87bae625a25372c, type: 3}
 --- !u!1001 &7463286939220927499
 PrefabInstance:
   m_ObjectHideFlags: 0
