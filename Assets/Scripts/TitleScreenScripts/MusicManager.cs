@@ -14,6 +14,7 @@ public class MusicManager : MonoBehaviour
     public AudioMixerGroup mixerGroup;
     public SongClip[] songs;
     public int SongIdex = 0;
+    [SerializeField] AudioSource _source;
 
 
     //[SerializeField] AudioSource audioSource;
@@ -21,18 +22,19 @@ public class MusicManager : MonoBehaviour
     {
         DontDestroyOnLoad(this.gameObject);
         MakeInstance();
+        if (!this._source)
+            this._source = GetComponent<AudioSource>();
+        //foreach (SongClip s in songs)
+        //{
+        //    s.source = gameObject.AddComponent<AudioSource>();
+        //    _source.clip = s.clip;
+        //    _source.outputAudioMixerGroup = mixerGroup;
+        //    _source.volume = s.volume;
+        //    _source.pitch = s.pitch;
+        //    _source.playOnAwake = false;
+        //    _source.loop = s.isLooping;
 
-        foreach (SongClip s in songs)
-        {
-            s.source = gameObject.AddComponent<AudioSource>();
-            s.source.clip = s.clip;
-            s.source.outputAudioMixerGroup = mixerGroup;
-            s.source.volume = s.volume;
-            s.source.pitch = s.pitch;
-            s.source.playOnAwake = false;
-            s.source.loop = s.isLooping;
-
-        }
+        //}
     }
     void MakeInstance()
     {
@@ -46,7 +48,7 @@ public class MusicManager : MonoBehaviour
     {
         //this.PlaySong("music-frail-noise", 1f);
         ShuffleSongList();
-        //PlaySong(1f);
+        PlaySong(1f);
     }
     void ShuffleSongList()
     {
@@ -80,26 +82,26 @@ public class MusicManager : MonoBehaviour
         }
             
         //Debug.Log("PlaySound: " + name);
-        if (!s.source.enabled)
-            s.source.enabled = true;
-        s.source.volume = volume;
+        if (!_source.enabled)
+            _source.enabled = true;
+        _source.volume = volume;
 
 
         //AsyncOperationHandle<AudioClip> loadSong = Addressables.LoadAssetAsync<AudioClip>(s.ClipAddress);
         //s.songAddressable = loadSong;
         //s.clip = loadSong.WaitForCompletion();
         s.clip.LoadAudioData();
-        s.source.clip = s.clip;
+        _source.clip = s.clip;
         
-        s.source.PlayOneShot(s.clip, volume);
+        _source.PlayOneShot(s.clip, volume);
 
-        StartCoroutine(WaitForSongEnd(s.source,SongIdex));
+        StartCoroutine(WaitForSongEnd(SongIdex));
         SongIdex++;
         
         //if (s.isLooping)
-        //    s.source.Play();
+        //    _source.Play();
         //else
-        //    s.source.PlayOneShot(s.clip, volume);
+        //    _source.PlayOneShot(s.clip, volume);
     }
 
     void ReleaseSong(int index)
@@ -108,15 +110,15 @@ public class MusicManager : MonoBehaviour
         SongClip s = songs[index];
         if (s == null)
             return;
-        if (s.source.isPlaying)
-            s.source.Stop();
+        if (_source.isPlaying)
+            _source.Stop();
         s.clip.UnloadAudioData();
         //Addressables.Release(s.songAddressable);
         PlaySong(1.0f);
     }
-    IEnumerator WaitForSongEnd(AudioSource audioSource, int index)
+    IEnumerator WaitForSongEnd(int index)
     {
-        yield return new WaitUntil(() => !audioSource.isPlaying && (audioSource.time == 0f));
+        yield return new WaitUntil(() => !_source.isPlaying && (_source.time == 0f));
         Debug.Log("WaitForSongEnd: Music Ended.");
         ReleaseSong(index);
     }

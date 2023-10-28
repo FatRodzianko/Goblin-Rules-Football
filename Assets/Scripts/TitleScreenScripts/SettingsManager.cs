@@ -14,17 +14,32 @@ public class SettingsManager : MonoBehaviour
     private const string fullScreenPlayerPrefKey = "FullScreen";
     private const string gamepadUIPlayerPrefKey = "GamepadUI";
     private const string crtScreenEffectPrefKey = "CRT";
+    private const string _gameSFXVolumePrefKEy = "GameSFXVolume";
+    private const string _musicVolumePrefKEy = "MusicVolume";
+
 
     public AudioMixer audioMixer;
+    public AudioMixerGroup _gameSFXMixer;
+    public AudioMixerGroup _musicMixer;
     public Dropdown resolutionDropdown;
-    public Slider volumeSlider;
+    
     public Toggle fillScreenToggle;
     public Toggle gamepadUIToggle;
     int currentScreenWidth;
     int currentScreenHeight;
-    float currentVolume;
+    
     Resolution[] resolutions;
     public Toggle crtScreenEffectToggle;
+
+    [Header("Volume Slider Stuff")]
+    public Slider volumeSlider;
+    [SerializeField] float currentVolume;
+    [SerializeField] Slider _gameSFXSlider;
+    [SerializeField] float _gameSFXVolume;
+    [SerializeField] float _defaultGameSFXVolume = -21f;
+    [SerializeField] Slider _musicSlider;
+    [SerializeField] float _musicVolume;
+    [SerializeField] float _defaultMusicVolume = -21f;
 
     private void Start()
     {
@@ -36,20 +51,47 @@ public class SettingsManager : MonoBehaviour
 
     }
 
-    public void SetVolume(float volume)
+    public void SetVolume(float volume, string audioGroup)
     {
-        Debug.Log("SetVolume: " + volume.ToString());
+        Debug.Log("SetVolume: " + volume.ToString() + " for audio group: " + audioGroup);
+        if (String.IsNullOrEmpty(audioGroup))
+            audioGroup = "volume";
         if (volume >= -35 && volume <= 5)
-            audioMixer.SetFloat("volume", volume);
+        {
+            audioMixer.SetFloat(audioGroup, volume);
+        }   
         else
         {
             volume = 0f;
-            audioMixer.SetFloat("volume", volume);
+            audioMixer.SetFloat(audioGroup, volume);
         }
-        currentVolume = volume;
-        volumeSlider.value = volume;
-        if (volumeSlider.gameObject.activeInHierarchy)
-            SoundManager.instance.PlaySound("bottle-break", 1.0f);
+        //currentVolume = volume;
+        //volumeSlider.value = volume;
+        //if (volumeSlider.gameObject.activeInHierarchy)
+        //    SoundManager.instance.PlaySound("bottle-break", 1.0f);
+        SetVolumeSliderPosition(volume, audioGroup);
+    }
+    void SetVolumeSliderPosition(float newVolume, string audioGroup)
+    {
+        if (audioGroup == "volume")
+        {
+            currentVolume = newVolume;
+            volumeSlider.value = newVolume;
+            if (volumeSlider.gameObject.activeInHierarchy)
+                SoundManager.instance.PlaySound("bottle-break", 1.0f);
+        }
+        else if (audioGroup == "gameSFXVolume")
+        {
+            _gameSFXVolume = newVolume;
+            _gameSFXSlider.value = newVolume;
+            if (_gameSFXSlider.gameObject.activeInHierarchy)
+                SoundManager.instance.PlaySound("bottle-break", 1.0f);
+        }
+        else if (audioGroup == "musicVolume")
+        {
+            _musicVolume = newVolume;
+            _musicSlider.value = newVolume;
+        }
     }
     public void SetFullscreen(bool isFullScreen)
     {
@@ -228,7 +270,11 @@ public class SettingsManager : MonoBehaviour
     public void SaveSettings()
     {
         Debug.Log("Saving Settings");
+        // Audio values
         PlayerPrefs.SetFloat(volumePlayerPrefKey, currentVolume);
+        PlayerPrefs.SetFloat(_gameSFXVolumePrefKEy, _gameSFXVolume);
+        PlayerPrefs.SetFloat(_musicVolumePrefKEy, _musicVolume);
+
         int fullScreenBool = Convert.ToInt32(fillScreenToggle.isOn);
         if (fullScreenBool == 1 || fullScreenBool == 0)
             PlayerPrefs.SetInt(fullScreenPlayerPrefKey, fullScreenBool);
@@ -279,6 +325,46 @@ public class SettingsManager : MonoBehaviour
             audioMixer.SetFloat("volume", setVolume);
             currentVolume = setVolume;
             volumeSlider.value = setVolume;
+
+        }
+        if (PlayerPrefs.HasKey(_gameSFXVolumePrefKEy))
+        {
+            //SetVolume(PlayerPrefs.GetFloat(_gameSFXVolumePrefKEy));
+            float setVolume = PlayerPrefs.GetFloat(_gameSFXVolumePrefKEy);
+            if (setVolume >= -35 && setVolume <= 5)
+                audioMixer.SetFloat("gameSFXVolume", setVolume);
+            else
+                setVolume = _defaultGameSFXVolume;
+            _gameSFXVolume = setVolume;
+            _gameSFXSlider.value = setVolume;
+        }
+        else
+        {
+            //SetVolume(0);
+            float setVolume = _defaultGameSFXVolume;
+            audioMixer.SetFloat("gameSFXVolume", setVolume);
+            _gameSFXVolume = setVolume;
+            _gameSFXSlider.value = setVolume;
+
+        }
+        if (PlayerPrefs.HasKey(_musicVolumePrefKEy))
+        {
+            //SetVolume(PlayerPrefs.GetFloat(_musicVolumePrefKEy));
+            float setVolume = PlayerPrefs.GetFloat(_musicVolumePrefKEy);
+            if (setVolume >= -35 && setVolume <= 5)
+                audioMixer.SetFloat("musicVolume", setVolume);
+            else
+                setVolume = _defaultMusicVolume;
+            _musicVolume = setVolume;
+            _musicSlider.value = setVolume;
+        }
+        else
+        {
+            //SetVolume(0);
+            float setVolume = _defaultMusicVolume;
+            audioMixer.SetFloat("musicVolume", setVolume);
+            _musicVolume = setVolume;
+            _musicSlider.value = setVolume;
 
         }
         if (PlayerPrefs.HasKey(fullScreenPlayerPrefKey))

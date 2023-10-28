@@ -9,6 +9,7 @@ public class SliderOnEndSlide : MonoBehaviour, IPointerUpHandler,IDeselectHandle
 {
     [SerializeField] SettingsManager settingsManager;
     float newSliderValue = 0f;
+    [SerializeField] string _audioGroup;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,7 +30,7 @@ public class SliderOnEndSlide : MonoBehaviour, IPointerUpHandler,IDeselectHandle
             settingsManager = GameObject.FindGameObjectWithTag("SettingsManager").GetComponent<SettingsManager>();
         }
         newSliderValue = this.gameObject.GetComponent<Slider>().value;
-        settingsManager.SetVolume(this.gameObject.GetComponent<Slider>().value);
+        settingsManager.SetVolume(this.gameObject.GetComponent<Slider>().value, _audioGroup);
     }
     public void OnDeselect(BaseEventData data)
     {
@@ -38,7 +39,7 @@ public class SliderOnEndSlide : MonoBehaviour, IPointerUpHandler,IDeselectHandle
         {
             Debug.Log("OnDeselect: Need to update slider value: Current value: " + this.gameObject.GetComponent<Slider>().value.ToString() + " Old value: " + newSliderValue);
             newSliderValue = this.gameObject.GetComponent<Slider>().value;
-            settingsManager.SetVolume(this.gameObject.GetComponent<Slider>().value);
+            settingsManager.SetVolume(this.gameObject.GetComponent<Slider>().value, _audioGroup);
         }
     }
 }

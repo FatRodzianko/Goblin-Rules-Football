@@ -15,8 +15,5 @@ public class SongClip
     [Range(0.1f, 3f)]
     public float pitch;
     public bool isLooping;
-    public AsyncOperationHandle<AudioClip> songAddressable;
-
-    public AudioSource source;
 
 }
