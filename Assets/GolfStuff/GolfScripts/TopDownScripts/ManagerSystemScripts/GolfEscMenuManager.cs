@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 
 public class GolfEscMenuManager : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class GolfEscMenuManager : MonoBehaviour
 
     [Header("UI Components")]
     [SerializeField] GameObject _escMenuPanel;
+    [SerializeField] Button _turnMusicOnOffButton;
     // Start is called before the first frame update
     private void Awake()
     {
@@ -46,8 +49,20 @@ public class GolfEscMenuManager : MonoBehaviour
         else
         {
             InputManagerGolf.Controls.UI.Enable();
+            SetMusicOnOffButtonText();
             _escMenuPanel.SetActive(true);
             IsMenuOpen = true;
+        }
+    }
+    void SetMusicOnOffButtonText()
+    {
+        if (MusicManager.instance.IsMusicPlaying())
+        {
+            _turnMusicOnOffButton.GetComponentInChildren<TextMeshProUGUI>().text = "Turn Music Off";
+        }
+        else
+        {
+            _turnMusicOnOffButton.GetComponentInChildren<TextMeshProUGUI>().text = "Turn Music On";
         }
     }
     public void OnClick_Disconnect()
@@ -67,5 +82,20 @@ public class GolfEscMenuManager : MonoBehaviour
         _localNetworkPlayer.PlayerClickedDisconnect();
         // have players confirm disconnect/quit before actually doing it? A pop up that says "Are you sure?" or whatever
         Application.Quit();
+    }
+    public void TurnMusicOnOff()
+    {
+        if (MusicManager.instance.IsMusicPlaying())
+        {
+            MusicManager.instance.TurnMusicOff();
+            _turnMusicOnOffButton.GetComponentInChildren<TextMeshProUGUI>().text = "Turn Music On";
+        }
+
+        else
+        {
+            MusicManager.instance.TurnMusicOn();
+            _turnMusicOnOffButton.GetComponentInChildren<TextMeshProUGUI>().text = "Turn Music Off";
+        }
+            
     }
 }

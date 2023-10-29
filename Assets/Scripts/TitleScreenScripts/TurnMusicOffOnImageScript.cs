@@ -17,6 +17,7 @@ public class TurnMusicOffOnImageScript : MonoBehaviour
     }
     private void OnMouseDown()
     {
+        Debug.Log("TurnMusicOffOnImageScript: OnMouseDown");
         TitleScreenManager.instance.TurnMusicOnOrOff();
     }
 }

@@ -687,24 +687,28 @@ public class TitleScreenManager : MonoBehaviour
     }
     public void TurnMusicOnOrOff()
     {
+
         if (IsMusicOn)
         {
             _turnMusicOnOffButtonText.text = "Turn Music On";
             _turnMusicOnOffImage.sprite = _musicOnSprite;
-            SoundManager.instance.TurnMusicOff();
+            //SoundManager.instance.TurnMusicOff();
+            MusicManager.instance.TurnMusicOff();
             IsMusicOn = false;
         }
         else
         {
             _turnMusicOnOffButtonText.text = "Turn Music Off";
             _turnMusicOnOffImage.sprite = _musicOffSprite;
-            SoundManager.instance.TurnMusicOn();
+            //SoundManager.instance.TurnMusicOn();
+            MusicManager.instance.TurnMusicOn();
             IsMusicOn = true;
         }
     }
     void IsMusicAlreadyPlaying()
     {
-        bool isMusicPlaying = SoundManager.instance.IsMusicPlaying();
+        //bool isMusicPlaying = SoundManager.instance.IsMusicPlaying();
+        bool isMusicPlaying = MusicManager.instance.IsMusicPlaying();
         Debug.Log("IsMusicAlreadyPlaying: " + isMusicPlaying.ToString());
         if (isMusicPlaying)
         {
@@ -716,7 +720,8 @@ public class TitleScreenManager : MonoBehaviour
         {
             _turnMusicOnOffButtonText.text = "Turn Music On";
             _turnMusicOnOffImage.sprite = _musicOnSprite;
-            SoundManager.instance.TurnMusicOff();
+            //SoundManager.instance.TurnMusicOff();
+            MusicManager.instance.TurnMusicOff();
             IsMusicOn = false;
         }
     }

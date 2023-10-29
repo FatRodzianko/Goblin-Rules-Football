@@ -397,6 +397,9 @@ x Add a second camera for the golf UI
 x make it so driver has an even greater accuracy penalty when hitting off fairway
 - - x check if player has teed off already if they are using the driver. If not, increase driver inaccuracy penalty?
 - MAke the power up balloons even bigger. Like twice as big. They are still too hard to hit imo
+- Remove the "height cap" of hit balls? 
+- - - Or at least the cap of their displayed height? It should be fine to keep the shadow moving further down
+
 
 ### hole six notes:
 x make hole slightly closer

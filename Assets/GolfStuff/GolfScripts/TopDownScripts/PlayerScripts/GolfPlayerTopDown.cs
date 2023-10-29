@@ -2076,7 +2076,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public void EnablePlayerCanvas(bool enable)
     {
         Debug.Log("EnablePlayerCanvas: " + enable + " for player: " + this.PlayerName);
-        _playerCanvas.gameObject.SetActive(enable);
+        try
+        {
+            _playerCanvas.gameObject.SetActive(enable);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("EnablePlayerCanvas: error: " + e);
+        }
     }
     [TargetRpc]
     public void RpcPlayerUIMessage(NetworkConnection conn, string message)

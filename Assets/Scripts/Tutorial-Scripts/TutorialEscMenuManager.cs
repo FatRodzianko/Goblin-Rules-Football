@@ -19,6 +19,7 @@ public class TutorialEscMenuManager : MonoBehaviour
     [SerializeField] private Button PauseGameButton;
     [SerializeField] private GameObject backToGameButton;
     [SerializeField] GameObject FirstButton;
+    [SerializeField] private Button _turnMusicOnOffButton;
 
     [Header("Escape Menu Options")]
     public bool isEscMenuOpen = false;
@@ -87,6 +88,7 @@ public class TutorialEscMenuManager : MonoBehaviour
     {
         Debug.Log("OpenEscMenu");
         GameplayerActiveControls(false);
+        SetMusicOnOffButtonText();
         EscMenuCanvas.SetActive(true);
         EscMenuPanel.SetActive(true);
         EscMenuPanelButtonHolder.SetActive(true);
@@ -225,5 +227,31 @@ public class TutorialEscMenuManager : MonoBehaviour
     {
         Debug.Log("ResetSettingsMenu");
         settingsMenuPanel.GetComponent<ImageAnimation>().ResetMenu();
+    }
+    void SetMusicOnOffButtonText()
+    {
+        if (MusicManager.instance.IsMusicPlaying())
+        {
+            _turnMusicOnOffButton.GetComponentInChildren<TextMeshProUGUI>().text = "Turn Music Off";
+        }
+        else
+        {
+            _turnMusicOnOffButton.GetComponentInChildren<TextMeshProUGUI>().text = "Turn Music On";
+        }
+    }
+    public void TurnMusicOnOff()
+    {
+        if (MusicManager.instance.IsMusicPlaying())
+        {
+            MusicManager.instance.TurnMusicOff();
+            _turnMusicOnOffButton.GetComponentInChildren<TextMeshProUGUI>().text = "Turn Music On";
+        }
+
+        else
+        {
+            MusicManager.instance.TurnMusicOn();
+            _turnMusicOnOffButton.GetComponentInChildren<TextMeshProUGUI>().text = "Turn Music Off";
+        }
+
     }
 }
