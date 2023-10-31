@@ -45,10 +45,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1095e1a725ca94facfa74e1d436624, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioMixer: {fileID: 0}
-  mixerGroup: {fileID: 0}
-  clips: []
-  _source: {fileID: 0}
+  audioMixer: {fileID: 24100000, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
+  mixerGroup: {fileID: 3654047802629225012, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
+  clips:
+  - name: weather-rain-01
+    clip: {fileID: 8300000, guid: 40c125333324eb445a6a67f3429499f9, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: weather-rain-02
+    clip: {fileID: 8300000, guid: d8c4b1938c27f6746a420f981390ab4b, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: weather-clear-01
+    clip: {fileID: 8300000, guid: c64389c64338af94681efe1125dd8236, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: weather-clear-02
+    clip: {fileID: 8300000, guid: 56c2f3e9a675b9a4b8b1a7688342102f, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: weather-clear-03
+    clip: {fileID: 8300000, guid: 71b74835209be1c438c528040c691571, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  _source: {fileID: 5158285278098578191}
 --- !u!82 &5158285278098578191
 AudioSource:
   m_ObjectHideFlags: 0
@@ -58,9 +83,9 @@ AudioSource:
   m_GameObject: {fileID: 2996127498535494399}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 3654047802629225012, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0

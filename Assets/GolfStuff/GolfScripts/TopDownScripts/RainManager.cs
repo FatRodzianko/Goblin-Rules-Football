@@ -107,15 +107,19 @@ public class RainManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        GetRainSoundForHole();
+        if (string.IsNullOrEmpty(_clearSoundForHole))
+        {
+            GetRainSoundForHole();
+        }
     }
     public override void OnStopClient()
     {
         base.OnStopClient();
-        if (!string.IsNullOrWhiteSpace(_rainSoundForHole))
-            SoundManager.instance.StopSound(_rainSoundForHole);
-        if (!string.IsNullOrWhiteSpace(_clearSoundForHole))
-            SoundManager.instance.StopSound(_clearSoundForHole);
+        //if (!string.IsNullOrWhiteSpace(_rainSoundForHole))
+        //    SoundManager.instance.StopSound(_rainSoundForHole);
+        //if (!string.IsNullOrWhiteSpace(_clearSoundForHole))
+        //    SoundManager.instance.StopSound(_clearSoundForHole);
+        //BackgroundSoundManager.instance.StopSound();
     }
     void MakeInstance()
     {
@@ -126,11 +130,13 @@ public class RainManager : NetworkBehaviour
     }
     public void GetRainSoundForHole()
     {
+        Debug.Log("GetRainSoundForHole: ");
         var rng = new System.Random();
-        if(!string.IsNullOrWhiteSpace(_rainSoundForHole))
-            SoundManager.instance.StopSound(_rainSoundForHole);
-        if (!string.IsNullOrWhiteSpace(_clearSoundForHole))
-            SoundManager.instance.StopSound(_clearSoundForHole);
+        //if(!string.IsNullOrWhiteSpace(_rainSoundForHole))
+        //    SoundManager.instance.StopSound(_rainSoundForHole);
+        //if (!string.IsNullOrWhiteSpace(_clearSoundForHole))
+        //    SoundManager.instance.StopSound(_clearSoundForHole);
+        //BackgroundSoundManager.instance.StopSound();
         _rainSoundForHole = _rainSounds[rng.Next(_rainSounds.Length)];
         _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
 
@@ -247,11 +253,15 @@ public class RainManager : NetworkBehaviour
             RainBounceModifier = _noRainBounceModifier;
             RainHitModifier = _noRainHitModifier;
 
-            SoundManager.instance.StopSound(_clearSoundForHole);
-            var rng = new System.Random();
-            _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
-            SoundManager.instance.StopSound(_rainSoundForHole);
-            SoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
+            //SoundManager.instance.StopSound(_clearSoundForHole);
+            if (string.IsNullOrEmpty(_clearSoundForHole))
+            {
+                var rng = new System.Random();
+                _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
+            }
+            //SoundManager.instance.StopSound(_rainSoundForHole);
+            //SoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
+            BackgroundSoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
 
             _globalLight.intensity = 1.0f;
         }
@@ -603,43 +613,52 @@ public class RainManager : NetworkBehaviour
         if (state == "clear")
         {
 
-            SoundManager.instance.StopSound(_clearSoundForHole);
-            var rng = new System.Random();
-            _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
-            SoundManager.instance.StopSound(_rainSoundForHole);
-            SoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
+            //SoundManager.instance.StopSound(_clearSoundForHole);
+            if (string.IsNullOrEmpty(_clearSoundForHole))
+            {
+                var rng = new System.Random();
+                _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
+            }
+            
+            //SoundManager.instance.StopSound(_rainSoundForHole);
+            //SoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
+            BackgroundSoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
 
         }
         else if (state == "light rain")
         {
 
-            SoundManager.instance.StopSound(_clearSoundForHole);
-            SoundManager.instance.PlaySound(_rainSoundForHole, 0.75f);
+            //SoundManager.instance.StopSound(_clearSoundForHole);
+            //SoundManager.instance.PlaySound(_rainSoundForHole, 0.75f);
+            BackgroundSoundManager.instance.PlaySound(_rainSoundForHole, 0.75f);
 
 
         }
         else if (state == "med rain")
         {
-            SoundManager.instance.StopSound(_clearSoundForHole);
-            SoundManager.instance.PlaySound(_rainSoundForHole, 0.95f);
-
+            //SoundManager.instance.StopSound(_clearSoundForHole);
+            //SoundManager.instance.PlaySound(_rainSoundForHole, 0.95f);
+            BackgroundSoundManager.instance.PlaySound(_rainSoundForHole, 0.95f);
         }
         else if (state == "heavy rain")
         {
 
 
-            SoundManager.instance.StopSound(_clearSoundForHole);
-            SoundManager.instance.PlaySound(_rainSoundForHole, 1.15f);
-
+            //SoundManager.instance.StopSound(_clearSoundForHole);
+            //SoundManager.instance.PlaySound(_rainSoundForHole, 1.15f);
+            BackgroundSoundManager.instance.PlaySound(_rainSoundForHole, 1.15f);
         }
         else
         {
-            SoundManager.instance.StopSound(_clearSoundForHole);
-            var rng = new System.Random();
-            _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
-            SoundManager.instance.StopSound(_rainSoundForHole);
-            SoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
-
+            //SoundManager.instance.StopSound(_clearSoundForHole);
+            if (string.IsNullOrEmpty(_clearSoundForHole))
+            {
+                var rng = new System.Random();
+                _clearSoundForHole = _clearSounds[rng.Next(_clearSounds.Length)];
+            }
+            //SoundManager.instance.StopSound(_rainSoundForHole);
+            //SoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
+            BackgroundSoundManager.instance.PlaySound(_clearSoundForHole, 1.0f);
         }
     }
     void PlayClearSound()
