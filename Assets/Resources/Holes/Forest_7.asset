@@ -16470,25 +16470,15 @@ MonoBehaviour:
   SavedObstacles:
   - ObstaclePos: {x: -2.1000001, y: -155.36, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 241.82, y: 88.64, z: 0}
+  - ObstaclePos: {x: 73.82, y: -103.36, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: ffe9e1047a6c73c43a711b78583be9e3, type: 2}
-  - ObstaclePos: {x: -2.1000001, y: -151.36, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: -2.1000001, y: -146.36, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 2.34, y: -155.36, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 6.98, y: -155.36, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 2.34, y: -151.36, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 2.34, y: -146.36, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 6.98, y: -151.36, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 6.98, y: -146.36, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 15.940001, y: -149.56, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 15.940001, y: -145.56, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
@@ -16498,31 +16488,31 @@ MonoBehaviour:
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 25.02, y: -145.56, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 15.940001, y: -140.56, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 25.02, y: -149.56, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 20.380001, y: -145.56, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 25.02, y: -140.56, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 4.0799994, y: -126.66, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 13.159999, y: -135.66, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 13.159999, y: -126.66, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 4.0799994, y: -135.66, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 4.0799994, y: -131.66, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 8.5199995, y: -135.66, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 8.5199995, y: -126.66, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
-  - ObstaclePos: {x: 13.159999, y: -131.66, z: 0}
-    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 8.5199995, y: -131.66, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 0.82, y: -103.36, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: ffe9e1047a6c73c43a711b78583be9e3, type: 2}
+  - ObstaclePos: {x: 12.599999, y: -131.66, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 101.32, y: -37.96, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 96.39, y: -35, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 89.22, y: -32.63, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 81.06, y: -32.37, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 105.14, y: -41.97, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 108.36, y: -49.010002, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 109.82, y: -55.86, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   CameraBoundingBoxPos: {x: 0, y: 0, z: 0}
   PolygonPoints:
@@ -16534,15 +16524,42 @@ MonoBehaviour:
   CameraZoomValue: 6.5
   TeeOffAimPoint: {x: 85.5, y: -55.5, z: 0}
   Statues:
-  - StatuePosition: {x: 188.5, y: -128.5, z: 0}
+  - StatuePosition: {x: 96.5, y: -45.25, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
-  - StatuePosition: {x: 11.5, y: -75.5, z: 0}
+  - StatuePosition: {x: 40.5, y: -92.5, z: 0}
+    StatueType: good-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
+  - StatuePosition: {x: 91.5, y: -73.5, z: 0}
+    StatueType: bad-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
+  - StatuePosition: {x: 54.5, y: -62.5, z: 0}
+    StatueType: bad-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
+  - StatuePosition: {x: 68.5, y: -46.5, z: 0}
+    StatueType: bad-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
+  - StatuePosition: {x: 60.5, y: -80.5, z: 0}
     StatueType: good-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
   BalloonPowerUps:
-  - BalloonPosition: {x: 274.5, y: 87.5, z: 0}
+  - BalloonPosition: {x: 46, y: -118.9, z: 0}
     BalloonHeight: med
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 20.2, y: -98, z: 0}
+    BalloonHeight: med
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 56.5, y: -69.86, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 87.5, y: -40.5, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 65.5, y: -91.5, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 70, y: -70.5, z: 0}
+    BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   Tubes: []
   IsTeeOffChallenge: 0
