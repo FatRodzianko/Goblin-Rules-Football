@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4690552690983110126
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 806231575579506453}
+  - component: {fileID: 8166354678133470489}
+  - component: {fileID: 4192860940069482486}
+  m_Layer: 27
+  m_Name: solid-obstacle
+  m_TagString: GolfEnvironmentObstacle
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &806231575579506453
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4690552690983110126}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8166354678133470489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4690552690983110126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d5b10ad901f7fb4d992bb6c969ea6e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myScriptableObject: {fileID: 11400000, guid: 3f512659797c65948aefa686d048aff9, type: 2}
+  HeightInUnityUnits: 8.5
+  _isHoleFlag: 0
+  SoftBounce: 0
+  _minHeightForSoftBounce: 0
+  StartHeight: 0
+  _myCollider: {fileID: 4192860940069482486}
+  _bounceModifier: 1
+  _gradualBounceModifier: 0
+  _immediateBounceModifier: 1
+  _minHeightForImmediateBounceModifier: 1
+  _minBounceModifier: 0.35
+  _maxBounceModifier: 1
+  _ballSounds: {fileID: 0}
+  _softBounceSoundType: 
+  _hardBounceSoundType: 
+  _isStatue: 0
+  _myStatue: {fileID: 0}
+  _isBalloon: 0
+  _myBalloon: {fileID: 0}
+  _twoColliders: 0
+  _crateCollider: 0
+  _isSpinningHoop: 0
+  _spinningHoopScript: {fileID: 0}
+  _isTube: 0
+  _tubeScript: {fileID: 0}
+  _ballInTube: 0
+  _isLandMine: 0
+  _isLandMineInnerCircle: 0
+  _landMineScript: {fileID: 0}
+--- !u!60 &4192860940069482486
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4690552690983110126}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 4.6918254, y: 3.2258325}
+      - {x: -0.4789691, y: 1.4019217}
+      - {x: -3.2392473, y: -1.8153911}
+      - {x: -4.293292, y: -5.9066005}
+      - {x: -2.8019571, y: -7.9685}
+      - {x: -1.100388, y: -7.754904}
+      - {x: -2.6877394, y: -4.896661}
+      - {x: -2.051827, y: -2.4369938}
+      - {x: -1.4226675, y: -1.3489814}
+      - {x: 0.38287187, y: 0.34830534}
+      - {x: 3.6070316, y: 1.6679354}
+      - {x: 6.549274, y: 2.400692}
+      - {x: 8.539709, y: 2.2149532}
+      - {x: 7.2976627, y: 3.4823189}
