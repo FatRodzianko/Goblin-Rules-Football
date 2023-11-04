@@ -29,6 +29,14 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/fertile-cable-worm.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: f71bdcef604c1dc4a95cfd90960386c3
+    m_Address: Assets/SFX/Music/synthwave-more-synth.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 7a4c61294a2a9be4da8560aedc53993f
+    m_Address: Assets/SFX/Music/first-song.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

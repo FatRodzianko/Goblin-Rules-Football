@@ -408,7 +408,10 @@ x make it so driver has an even greater accuracy penalty when hitting off fairwa
 - - - - - - https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fzxxld48pxpw11.png
 - - - - - - https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0ujXT_Og3gTB-_dg-eI2ScX5ZmI4fXF0ToAzACY8MpSHyxRBgbQMFBJTMI70D1mj1CRg&usqp=CAU
 - - - - - - https://i.pinimg.com/1200x/ee/42/ae/ee42ae332060afaab9dad6b636fc1ef0.jpg
-- add "first song" to the playlist, along with synthwave-take-2 after lowering the chord volume and eqing and stuff
+x add "first song" to the playlist, along with synthwave-take-2 after lowering the chord volume and eqing and stuff
+- create swing animation for up/down swing
+- - - will unfortunately require two animations, one for hitting up/north and another for hitting down/south. One shows the player's back (up), the other the player's chest/face (down)
+- - - - - - will be hard...
 
 
 ### hole six notes:
