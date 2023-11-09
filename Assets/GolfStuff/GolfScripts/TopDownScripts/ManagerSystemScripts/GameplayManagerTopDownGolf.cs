@@ -271,7 +271,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (courseName == "Middle 3 (holes 4-6)")
         {
             Debug.Log("RpcTellClientsToLoadCourse: Loading: Middle 3 (holes 4-6)");
-            List <ScriptableHole> holes = new List<ScriptableHole>()
+            List<ScriptableHole> holes = new List<ScriptableHole>()
             {
                 course.HolesInCourse[3],
                 course.HolesInCourse[4],
@@ -279,6 +279,23 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             };
             CourseToPlay.HolesInCourse = holes.ToArray();
 
+        }
+        else if (courseName == "Back 3 (holes 7-9)")
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: Back 3 (holes 7-9)");
+            List<ScriptableHole> holes = new List<ScriptableHole>()
+            {
+                course.HolesInCourse[6],
+                course.HolesInCourse[7],
+                course.HolesInCourse[8],
+            };
+            CourseToPlay.HolesInCourse = holes.ToArray();
+        }
+        else if (courseName == "All Nine Holes")
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: All Nine Holes");
+
+            CourseToPlay.HolesInCourse = course.HolesInCourse;
         }
         else if (courseName.StartsWith("Custom"))
         {
@@ -292,7 +309,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         }
         else
         {
-            Debug.Log("RpcTellClientsToLoadCourse: Loading: First 3 (holes 1-3)");
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: Front 3 (holes 1-3)");
             List<ScriptableHole> holes = new List<ScriptableHole>()
             {
                 course.HolesInCourse[0],

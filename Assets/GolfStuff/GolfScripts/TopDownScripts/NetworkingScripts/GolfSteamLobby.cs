@@ -112,7 +112,7 @@ public class GolfSteamLobby : MonoBehaviour
         this.GameWindMode = GetWindMode(windMode);
 
         if (string.IsNullOrEmpty(courseHoleSelection))
-            this.CourseHoleSelection = "First 3 (holes 1-3)";
+            this.CourseHoleSelection = "Front 3 (holes 1-3)";
         else
             this.CourseHoleSelection = courseHoleSelection;
 
@@ -126,7 +126,7 @@ public class GolfSteamLobby : MonoBehaviour
             }
             else
             {
-                this.CourseHoleSelection = "First 3 (holes 1-3)";
+                this.CourseHoleSelection = "Front 3 (holes 1-3)";
             }
         }
 

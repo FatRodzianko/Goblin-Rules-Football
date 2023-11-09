@@ -78,6 +78,9 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private Toggle _customeSelectHole4Toggle;
     [SerializeField] private Toggle _customeSelectHole5Toggle;
     [SerializeField] private Toggle _customeSelectHole6Toggle;
+    [SerializeField] private Toggle _customeSelectHole7Toggle;
+    [SerializeField] private Toggle _customeSelectHole8Toggle;
+    [SerializeField] private Toggle _customeSelectHole9Toggle;
 
 
     [Header("Game Option Values")]
@@ -741,6 +744,12 @@ public class TitleScreenManager : MonoBehaviour
             selectedHoles.Add(5);
         if (_customeSelectHole6Toggle.isOn)
             selectedHoles.Add(6);
+        if (_customeSelectHole7Toggle.isOn)
+            selectedHoles.Add(7);
+        if (_customeSelectHole8Toggle.isOn)
+            selectedHoles.Add(8);
+        if (_customeSelectHole9Toggle.isOn)
+            selectedHoles.Add(9);
 
         return selectedHoles;
     }
