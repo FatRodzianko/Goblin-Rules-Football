@@ -33,6 +33,7 @@ public class ScriptableHole : ScriptableObject
     // "Hit points" for the player to aim at when their turn starts. Have a few of the "intended route"
     [Header("Course Aim Points")]
     public Vector3 TeeOffAimPoint;
+    public Vector3[] CourseAimPoints;
     //public Vector3[] 
     [Header("Statue Positions")]
     //public Vector3[] BadStatuePositions;

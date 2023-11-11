@@ -37,6 +37,10 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/first-song.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 0497ccf6bcef9b24bb8abb78f3d8aa82
+    m_Address: Assets/SFX/Music/ill-fated-stew.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

@@ -58657,61 +58657,44 @@ MonoBehaviour:
   ZoomedOutPos: {x: 168, y: -77, z: 0}
   CameraZoomValue: 10
   TeeOffAimPoint: {x: 186.5, y: -70.5, z: 0}
+  CourseAimPoints: []
   Statues:
-  - StatuePosition: {x: 192.5, y: -63.5, z: 0}
-    StatueType: bad-weather
-    StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
-  - StatuePosition: {x: 86.5, y: -1.5, z: 0}
+  - StatuePosition: {x: -7.5, y: 25.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
   - StatuePosition: {x: -42.5, y: 4.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
-  - StatuePosition: {x: -41.5, y: -16.5, z: 0}
-    StatueType: good-weather
-    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
-  - StatuePosition: {x: -7.5, y: 25.5, z: 0}
+  - StatuePosition: {x: 86.5, y: -1.5, z: 0}
+    StatueType: bad-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
+  - StatuePosition: {x: 192.5, y: -63.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
   - StatuePosition: {x: 98.5, y: -96.5, z: 0}
     StatueType: good-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
-  - StatuePosition: {x: 233.5, y: -98.5, z: 0}
-    StatueType: good-weather
-    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
   - StatuePosition: {x: 131.5, y: -2.5, z: 0}
     StatueType: bad-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
+  - StatuePosition: {x: -41.5, y: -16.5, z: 0}
+    StatueType: good-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
+  - StatuePosition: {x: 233.5, y: -98.5, z: 0}
+    StatueType: good-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
   - StatuePosition: {x: 3.5, y: -81.5, z: 0}
     StatueType: good-weather
     StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
   BalloonPowerUps:
-  - BalloonPosition: {x: -10.5, y: -80.2, z: 0}
-    BalloonHeight: low
-    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
-  - BalloonPosition: {x: 102.1, y: -88.7, z: 0}
-    BalloonHeight: low
-    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
-  - BalloonPosition: {x: 78.3, y: -1.2, z: 0}
-    BalloonHeight: low
-    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
-  - BalloonPosition: {x: 6.1, y: 17.8, z: 0}
-    BalloonHeight: low
-    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
-  - BalloonPosition: {x: 24.4, y: -94.2, z: 0}
-    BalloonHeight: low
-    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
-  - BalloonPosition: {x: 229.9, y: -106.9, z: 0}
-    BalloonHeight: med
-    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
-  - BalloonPosition: {x: 248.9, y: -106.7, z: 0}
+  - BalloonPosition: {x: 176.8, y: -39.2, z: 0}
     BalloonHeight: med
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: -35.8, y: -6.5, z: 0}
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
-  - BalloonPosition: {x: 176.8, y: -39.2, z: 0}
-    BalloonHeight: med
+  - BalloonPosition: {x: 219.67, y: -92.07, z: 0}
+    BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: 92.1, y: -105.1, z: 0}
     BalloonHeight: low
@@ -58719,19 +58702,43 @@ MonoBehaviour:
   - BalloonPosition: {x: 195.76, y: -83.46, z: 0}
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
-  - BalloonPosition: {x: 219.67, y: -92.07, z: 0}
+  - BalloonPosition: {x: 78.3, y: -1.2, z: 0}
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 102.1, y: -88.7, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 248.9, y: -106.7, z: 0}
+    BalloonHeight: med
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: 117.2, y: -2, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: -42.6, y: -28.6, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 24.4, y: -94.2, z: 0}
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: 116.4, y: -89.6, z: 0}
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 229.9, y: -106.9, z: 0}
+    BalloonHeight: med
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 6.1, y: 17.8, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   - BalloonPosition: {x: 8.2, y: -78, z: 0}
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
-  - BalloonPosition: {x: -42.6, y: -28.6, z: 0}
+  - BalloonPosition: {x: -10.5, y: -80.2, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 350.3, y: -151.5, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  - BalloonPosition: {x: 330.7, y: -145.8, z: 0}
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   Tubes: []
