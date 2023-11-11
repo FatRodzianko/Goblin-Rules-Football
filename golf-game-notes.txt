@@ -401,6 +401,7 @@ x make it so driver has an even greater accuracy penalty when hitting off fairwa
 - - - Or at least the cap of their displayed height? It should be fine to keep the shadow moving further down
 - have multiple "aim points" that a player can cycle through? Can be good for 5 par holes especially?
 - - - finalize hole 8 first then work on that?
+- - - make it so that the aim direction changes, and the game only checks if the current hit distance would be out of bound. If it is, checks to see how far it is to the out of bounds line and then sets the aim point there? maybe minus a few pixel units???
 - A more "solid" obstacle like a wall? 
 - - - something that can block off a large area but only be one object, unlike trees where you need a ton of them...
 - - - brick wall: https://assets.nintendo.com/image/upload/ar_16:9,b_auto:border,c_lpad/b_white/f_auto/q_auto/dpr_2.0/c_scale,w_400/ncom/software/switch/70010000025688/5cee4204dbfdf8aa60020360ab8ee8857884cc388a353c2b7ff7f8ac2ea3f1b3

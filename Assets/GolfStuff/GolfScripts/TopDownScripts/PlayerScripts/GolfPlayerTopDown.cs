@@ -84,6 +84,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SyncVar] public bool HasPlayerTeedOff = false;
     public bool PromptedForLightning = false;
     public bool PlayerStruckByLightning = false;
+    [SerializeField] int _currentAimPointIndex = 0;
 
 
     [Header("Hit Meter Objects")]
@@ -925,6 +926,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             else
             {
                 aimTarget = GameplayManagerTopDownGolf.instance.TeeOffAimPoint;
+                SetCurrentAimPoint(0);
             }
 
         }
@@ -3170,6 +3172,86 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         return isInBounds;
     }
+    void PrevOrNextAimPoint(bool next)
+    {
+        Debug.Log("PrevOrNextAimPoint: Current index: " + this._currentAimPointIndex.ToString() + " next aim point? " + next.ToString() + " how many course aimpoints?: " + GameplayManagerTopDownGolf.instance.CourseAimPoints.Count.ToString());
+        if (GameplayManagerTopDownGolf.instance.CourseAimPoints.Count <= 0)
+            return;
+        if (next)
+            this._currentAimPointIndex++;
+        else
+            this._currentAimPointIndex--;
+
+        if (this._currentAimPointIndex >= GameplayManagerTopDownGolf.instance.CourseAimPoints.Count)
+        {
+            this._currentAimPointIndex = 0;
+        }
+        else if (this._currentAimPointIndex <= 0)
+        {
+            this._currentAimPointIndex = GameplayManagerTopDownGolf.instance.CourseAimPoints.Count - 1;
+        }
+        ChangeAimToNewIndex(this._currentAimPointIndex);
+    }
+    void ChangeAimToNewIndex(int newIndex)
+    {
+        Debug.Log("ChangeAimToNewIndex: " + newIndex.ToString());
+        if (GameplayManagerTopDownGolf.instance.CourseAimPoints.Count <= 0)
+        {
+            return;
+        }
+
+        if (newIndex >= GameplayManagerTopDownGolf.instance.CourseAimPoints.Count)
+        {
+            newIndex = GameplayManagerTopDownGolf.instance.CourseAimPoints.Count - 1;
+        }
+        else if (newIndex < 0)
+        {
+            newIndex = 0;
+        }
+
+        if (this._currentAimPointIndex != newIndex)
+            SetCurrentAimPoint(newIndex);
+
+        Vector3 currentBallPosition = this.MyBall.transform.position;
+
+        // Get direction to Aim Index
+        Vector2 directionToAimIndex = (GameplayManagerTopDownGolf.instance.CourseAimPoints[newIndex] - currentBallPosition).normalized;
+        float inboundsDistance = GetDistanceToStayInBounds(currentBallPosition, directionToAimIndex, this.hitDistance);
+
+        // Get distance to Aim Index
+        float distanceToAimIndex = Vector2.Distance(GameplayManagerTopDownGolf.instance.CourseAimPoints[newIndex], currentBallPosition);
+        if (distanceToAimIndex < this.hitDistance)
+        {
+            this.hitDistance = distanceToAimIndex;
+        }
+        else if (distanceToAimIndex > this.hitDistance)
+        {
+            if (distanceToAimIndex > MaxDistanceFromClub)
+                this.hitDistance = MaxDistanceFromClub;
+            else
+                this.hitDistance = distanceToAimIndex;
+        }
+        //this.hitDistance = inboundsDistance;
+        this.hitDirection = directionToAimIndex;
+        UpdatePositionOfAdjustedDistanceIcon(hitDistance);
+    }
+    float GetDistanceToStayInBounds(Vector3 currentPosition, Vector2 direction, float distance)
+    {
+        Debug.Log("GetDistanceToStayInBounds: currentPosition: " + currentPosition.ToString() + " direction: " + direction.ToString() + " is in bounds! distance: " + distance.ToString());
+        if (!_cameraBoundingBox)
+            GetCameraBoundingBox();
+        Vector3 newAimPosition = currentPosition + (Vector3)(direction * distance);
+        if (_cameraBoundingBox.OverlapPoint(newAimPosition))
+        {
+            Debug.Log("GetDistanceToStayInBounds: New aim position of: " + newAimPosition.ToString() + " is in bounds! returning distance of: " + distance.ToString());
+            return distance;
+        }
+        Vector3 inboundsPos =  GetNearestPointInBounds(currentPosition, newAimPosition, direction);
+        float newDistance = Vector2.Distance(currentPosition, inboundsPos);
+        Debug.Log("GetDistanceToStayInBounds: New aim position of: " + newAimPosition.ToString() + " is NOT bounds! returning distance of: " + newDistance.ToString());
+        return newDistance;
+
+    }
     #region Tee Off Challenge
     [Server]
     public async Task ServerTellPlayerHowFarTheyAreFromHoleForChallenege(float duration, float distance)
@@ -3352,6 +3434,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         
         MyBall.LaunchBallOutOfTube(dist, dir);
+    }
+    #endregion
+    #region Aim Point Stuff
+    void SetCurrentAimPoint(int aimPointIndex)
+    {
+        this._currentAimPointIndex = aimPointIndex;
+        // code to update the UI for which aimpoint is selected?
     }
     #endregion
     #region Controls / InputManager stuff
@@ -3562,6 +3651,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
             //SubmitAim
             InputManagerGolf.Controls.AimingActions.SubmitAim.Enable();
             InputManagerGolf.Controls.AimingActions.SubmitAim.performed += SubmitAim;
+
+            // Aim Point controls
+            InputManagerGolf.Controls.AimingActions.PreviousAimPoint.Enable();
+            InputManagerGolf.Controls.AimingActions.PreviousAimPoint.performed += PreviousAimPointPressed;
+
+            // Aim Point controls
+            InputManagerGolf.Controls.AimingActions.NextAimPoint.Enable();
+            InputManagerGolf.Controls.AimingActions.NextAimPoint.performed += NextAimPointPressed;
         }
         else
         {
@@ -3786,6 +3883,34 @@ public class GolfPlayerTopDown : NetworkBehaviour
         Debug.Log("ShortPuttButtonPressed: ");
 
         SetPutterDistance(CurrentClub, true);
+    }
+    void PreviousAimPointPressed(InputAction.CallbackContext context)
+    {
+        if (!this.IsOwner)
+            return;
+        if (DirectionAndDistanceChosen)
+            return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
+        Debug.Log("PreviousAimPointPressed: ");
+        PrevOrNextAimPoint(false);
+    }
+    void NextAimPointPressed(InputAction.CallbackContext context)
+    {
+        if (!this.IsOwner)
+            return;
+        if (DirectionAndDistanceChosen)
+            return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
+        Debug.Log("NextAimPointPressed: ");
+        PrevOrNextAimPoint(true);
     }
     #endregion
     #region Hitting Actions

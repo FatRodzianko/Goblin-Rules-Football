@@ -13,6 +13,7 @@ using UnityEngine.UI;
 using System.Threading;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using System;
 
 public class GameplayManagerTopDownGolf : NetworkBehaviour
 {
@@ -39,6 +40,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     public List<Vector3> HolePositions;
     public List<GameObject> HoleHoleObjects = new List<GameObject>();
     public Vector3 TeeOffAimPoint;
+    public List<Vector3> CourseAimPoints = new List<Vector3>();
     [SerializeField] float _lastNewHoleTime = 0f;
     public int CurrentTurnNumber = 0;
     public int LastTurnWithWeatherChange = 0;
@@ -430,7 +432,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //// Set the Hole Positions for the new hole
         HolePositions = CurrentHoleInCourse.HolePositions;
         //// Set the Course aim points for players to use
-        TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
+        //TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
+        SetAimPoints();
         //// Set the new tee off location
         UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
         //// Set the Camera Zoomed Out position
@@ -936,7 +939,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // Set the Hole Positions for the new hole
         HolePositions = CurrentHoleInCourse.HolePositions;
         // Set the Course aim points for players to use
-        TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
+        //TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
+        SetAimPoints();
         // Set the new tee off location
         UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
         // Set the Camera Zoomed Out position
@@ -1267,7 +1271,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         HolePositions = CurrentHoleInCourse.HolePositions;
         //// Set the Course aim points for players to use
-        TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
+        //TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
+        SetAimPoints();
         //// Set the new tee off location
         UpdateTeeOffPositionForNewHole(CurrentHoleInCourse.TeeOffLocation);
         //// Set the Camera Zoomed Out position
@@ -1546,6 +1551,18 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         {
             player.ResetFavorWeatherForNewGame();
         }
+    }
+    void SetAimPoints()
+    { 
+        this.TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
+
+        this.CourseAimPoints.Clear();
+
+        if (CurrentHoleInCourse.CourseAimPoints.Length > 0)
+        {
+            this.CourseAimPoints.AddRange(CurrentHoleInCourse.CourseAimPoints.ToList());
+        }
+
     }
     #region Tee Off Challenge
     void StartTeeOffChallenge()

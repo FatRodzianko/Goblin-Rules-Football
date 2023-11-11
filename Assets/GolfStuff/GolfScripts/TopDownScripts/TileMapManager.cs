@@ -104,7 +104,8 @@ public class TileMapManager : MonoBehaviour
 
         // Find the Tee Off Aim Point and save it
         GameObject aimPoint = GameObject.FindGameObjectWithTag("GolfAimPoint");
-        newHole.TeeOffAimPoint = aimPoint.transform.position;
+        //newHole.TeeOffAimPoint = aimPoint.transform.position;
+        FindHoleAimPoints(newHole);
 
         if (!string.IsNullOrEmpty(_clubToUse))
             newHole.ClubToUse = _clubToUse;
@@ -246,6 +247,34 @@ public class TileMapManager : MonoBehaviour
             }
         }
     }
+    void FindHoleAimPoints(ScriptableHole hole)
+    {
+        GameObject[] aimPoints = GameObject.FindGameObjectsWithTag("GolfAimPoint");
+        if (aimPoints.Length <= 0)
+        {
+            Debug.LogError("FindHoleAimPoints: no golf aim points found. Cannot continue?");
+            return;
+        }
+
+        // Add all the aim point scripts to a list
+        List<GolfAimPointScript> aimPointScripts = new List<GolfAimPointScript>();
+        for (int i = 0; i < aimPoints.Length; i++)
+        {
+            aimPointScripts.Add(aimPoints[i].GetComponent<GolfAimPointScript>());
+        }
+        aimPointScripts.Sort((x, y) => x.AimPointIndex.CompareTo(y.AimPointIndex));
+        List<Vector3> aimPointPositions = new List<Vector3>();
+        foreach (GolfAimPointScript script in aimPointScripts)
+        {
+            Debug.Log("FindHoleAimPoints: Golf aim point index: " + script.AimPointIndex.ToString() + ":" + script.transform.position);
+            aimPointPositions.Add(script.transform.position);
+        }
+        hole.CourseAimPoints = aimPointPositions.ToArray();
+        hole.TeeOffAimPoint = aimPointPositions[0];
+        ////sort list by the saved "aim point index" value
+        //GolfAimPointScript[] aimPointArray = aimPointScripts.OrderByDescending(x => x.AimPointIndex).ToArray();
+        //hole.TeeOffAimPoint = aimPointArray[0].transform.position;
+    }
     public void ClearMapFromEditor()
     {
         var hole = Resources.Load<ScriptableHole>($"Holes/{_courseName}_{_holeIndex}");
@@ -338,6 +367,15 @@ public class TileMapManager : MonoBehaviour
         {
             Debug.Log("ClearMap: Could not find/delete tube objects. Error: " + e);
         }
+        try
+        {
+            GameObject[] aimPoints = GameObject.FindGameObjectsWithTag("GolfAimPoint");
+            DeleteObjects(aimPoints);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("ClearMap: Could not find/delete aim point objects. Error: " + e);
+        }
         // Delete Statue objects, but only from the editor. In game, the server will destroy the statue objects as they are all networked objects, and need to be networked objects to sync the animations and do other networkbehavior stuff
 #if UNITY_EDITOR
         try
@@ -368,7 +406,21 @@ public class TileMapManager : MonoBehaviour
         // See if map markers such as tee off position or zoom out position exist in the scene. Then set their position to the saved position
         SetPositionOfMapMarker(hole.TeeOffLocation, "teeOffPosition", _teeOffPosition);
         SetPositionOfMapMarker(hole.ZoomedOutPos, "ZoomedOutPosition", _zoomedOutPosition);
-        SetPositionOfMapMarker(hole.TeeOffAimPoint, "GolfAimPoint", _golfAimPoint);
+        if (hole.CourseAimPoints.Length > 0)
+        {
+            for (int i = 0; i < hole.CourseAimPoints.Length; i++)
+            {
+                Debug.Log("LoadMapFromEditor: Spawning golf aim point: " + i.ToString() + ":" + hole.CourseAimPoints[i].ToString());
+                //SetPositionOfMapMarker(hole.CourseAimPoints[i], "GolfAimPoint", _golfAimPoint);
+                GameObject newAimPoint = Instantiate(_golfAimPoint, hole.CourseAimPoints[i], Quaternion.identity);
+                newAimPoint.GetComponent<GolfAimPointScript>().AimPointIndex = i;
+            }
+        }
+        else
+        {
+            SetPositionOfMapMarker(hole.TeeOffAimPoint, "GolfAimPoint", _golfAimPoint);
+        }
+        
         // Set the camera zoom value in the editor to the saved value from the hole
         this._cameraZoomValue = hole.CameraZoomValue;
 

@@ -58648,6 +58648,60 @@ MonoBehaviour:
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   - ObstaclePos: {x: 115.29, y: -13.929999, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 174.81001, y: -74.770004, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 174.55, y: -77.020004, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 187.87001, y: -63.96, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 189.34001, y: -63.8, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 183.91, y: -65.47, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 181.87001, y: -66.93, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 179.94, y: -68.55, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 178.06001, y: -70.38, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 176.34001, y: -72.16, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 175.03001, y: -73.73, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 174.72, y: -75.92, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 186.63, y: -64.37, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 59.45, y: -8.23, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 174.95001, y: -78.44, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 175.28001, y: -80.03, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 110.159996, y: -78.73, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 112.13, y: -74, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 116.08, y: -77.47, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 116.32, y: -72.020004, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 120.93, y: -70.22, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 123.56, y: -74.590004, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 126.79, y: -69.14, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 129.78001, y: -73.75, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 133.49, y: -69.62, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 139.53001, y: -74.71, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 134.8, y: -73.270004, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 119.22, y: -75.46, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   CameraBoundingBoxPos: {x: 0, y: 0, z: 0}
   PolygonPoints:
   - {x: -55, y: 32}
@@ -58657,7 +58711,12 @@ MonoBehaviour:
   ZoomedOutPos: {x: 168, y: -77, z: 0}
   CameraZoomValue: 10
   TeeOffAimPoint: {x: 186.5, y: -70.5, z: 0}
-  CourseAimPoints: []
+  CourseAimPoints:
+  - {x: 186.5, y: -70.5, z: 0}
+  - {x: 104.5, y: -93.5, z: 0}
+  - {x: 11.5, y: -85.5, z: 0}
+  - {x: 123.5, y: -2, z: 0}
+  - {x: -24.5, y: 13.5, z: 0}
   Statues:
   - StatuePosition: {x: -7.5, y: 25.5, z: 0}
     StatueType: bad-weather

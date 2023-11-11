@@ -662,6 +662,69 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "NextAimPoint",
+                    "type": "Button",
+                    "id": "0f5f530e-db53-4def-b276-69280e610f3d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PreviousAimPoint",
+                    "type": "Button",
+                    "id": "737b4bae-c604-4890-bd8a-d8493ff5152d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AimPoint1",
+                    "type": "Button",
+                    "id": "8db616ef-80b9-4e8c-a568-69da60bb64ee",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AimPoint2",
+                    "type": "Button",
+                    "id": "5cbe9061-e04a-4f43-a04c-a8f299029fe9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AimPoint3",
+                    "type": "Button",
+                    "id": "014e063f-4831-456d-ba10-95116ec97327",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AimtPoint4",
+                    "type": "Button",
+                    "id": "057f2b75-e053-4ced-81b5-f48f9a4291e5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AimtPoint5",
+                    "type": "Button",
+                    "id": "7ad94914-cfc0-4613-8ef0-9d52a297629f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -833,7 +896,7 @@
                 {
                     "name": "",
                     "id": "25f26f6b-39a3-49af-b069-1fbf1bdd4f82",
-                    "path": "<Keyboard>/1",
+                    "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -1060,6 +1123,83 @@
                     "action": "SpinPosition",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "19e989e6-4073-4d36-ab86-89663f528465",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "NextAimPoint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2185ff46-7225-4987-bb1a-d88b114c8c35",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PreviousAimPoint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "67e42dc2-ad73-40a9-926d-d453fcdef6e4",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AimPoint1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a499b387-b3b1-4e42-9775-d2d35ba027c1",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AimPoint2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5e9f8f78-9651-4172-907e-a7f2fe36fad6",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AimPoint3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8f43cd08-2e35-4401-a629-35ca5292e161",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AimtPoint4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7bef9587-d2be-4c38-bee1-7e895b86a09f",
+                    "path": "<Keyboard>/5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AimtPoint5",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
