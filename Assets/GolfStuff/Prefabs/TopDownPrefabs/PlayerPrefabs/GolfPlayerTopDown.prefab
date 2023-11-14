@@ -996,6 +996,7 @@ MonoBehaviour:
   HasPlayerTeedOff: 0
   PromptedForLightning: 0
   PlayerStruckByLightning: 0
+  _currentAimPointIndex: 0
   _hitMeterObject: {fileID: 7163028177395403728}
   _hitMeterMovingIcon: {fileID: 6270932585342972451}
   _hitMeterPowerSubmissionIcon: {fileID: 5009623720184125964}

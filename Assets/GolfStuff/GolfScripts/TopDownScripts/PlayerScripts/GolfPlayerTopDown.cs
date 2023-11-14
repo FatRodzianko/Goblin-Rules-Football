@@ -930,6 +930,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
             }
 
         }
+        else
+        { 
+            if(GameplayManagerTopDownGolf.instance.CourseAimPoints.Count > 0)
+                SetCurrentAimPoint(GameplayManagerTopDownGolf.instance.CourseAimPoints.Count - 1);
+        }
         // Get the distance to the hole
         float distToHole = GetDistanceToHole(closestHole, ballPos);
         float distToAimPoint = Vector2.Distance(aimTarget, ballPos);
@@ -3186,7 +3191,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             this._currentAimPointIndex = 0;
         }
-        else if (this._currentAimPointIndex <= 0)
+        else if (this._currentAimPointIndex < 0)
         {
             this._currentAimPointIndex = GameplayManagerTopDownGolf.instance.CourseAimPoints.Count - 1;
         }
@@ -3209,9 +3214,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
             newIndex = 0;
         }
 
-        if (this._currentAimPointIndex != newIndex)
-            SetCurrentAimPoint(newIndex);
-
+        //if (this._currentAimPointIndex != newIndex)
+        //    SetCurrentAimPoint(newIndex);
+        SetCurrentAimPoint(newIndex);
         Vector3 currentBallPosition = this.MyBall.transform.position;
 
         // Get direction to Aim Index
@@ -3441,6 +3446,21 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         this._currentAimPointIndex = aimPointIndex;
         // code to update the UI for which aimpoint is selected?
+        if (this.IsOwner)
+        {
+            GameplayManagerTopDownGolf.instance.UpdateCurrentAimPointUI(aimPointIndex);
+            this.CmdSetCurrentAimPoint(aimPointIndex);
+        }
+    }
+    [ServerRpc]
+    void CmdSetCurrentAimPoint(int aimPointIndex)
+    {
+        this.RpcSetCurrentAimPoint(aimPointIndex);
+    }
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcSetCurrentAimPoint(int aimPointIndex)
+    {
+        GameplayManagerTopDownGolf.instance.UpdateCurrentAimPointUI(aimPointIndex);
     }
     #endregion
     #region Controls / InputManager stuff

@@ -88,6 +88,16 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     //[SerializeField] GameObject _currentplayerui;
     //[SerializeField] TextMeshProUGUI _currentplayeruiText;
 
+    [Header("Aim Point UI")]
+    [SerializeField] GameObject _aimPointText;
+    [SerializeField] TextMeshProUGUI[] _aimPointNumbers;
+    [SerializeField] GameObject _aimPointPanel;
+    //[SerializeField] TextMeshProUGUI _aimPointNumber1;
+    //[SerializeField] TextMeshProUGUI _aimPointNumber2;
+    //[SerializeField] TextMeshProUGUI _aimPointNumber3;
+    //[SerializeField] TextMeshProUGUI _aimPointNumber4;
+    //[SerializeField] TextMeshProUGUI _aimPointNumber5;
+
     [Header("Power Up UI Stuff")]
     [SerializeField] TextMeshProUGUI _powerUpMessageText;
     [SerializeField] GameObject _powerUpDisplayHolder;
@@ -1557,12 +1567,58 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         this.TeeOffAimPoint = CurrentHoleInCourse.TeeOffAimPoint;
 
         this.CourseAimPoints.Clear();
+        if (!CurrentHoleInCourse)
+        {
+            HideAimPointUI();
+            return;
+        }
 
         if (CurrentHoleInCourse.CourseAimPoints.Length > 0)
         {
             this.CourseAimPoints.AddRange(CurrentHoleInCourse.CourseAimPoints.ToList());
+            _aimPointText.SetActive(true);
+            for (int i = 0; i < _aimPointNumbers.Length; i++)
+            {
+                if (i < CurrentHoleInCourse.CourseAimPoints.Length)
+                {
+                    _aimPointNumbers[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    _aimPointNumbers[i].gameObject.SetActive(false);
+                }
+            }
+            _aimPointPanel.SetActive(true);
+        }
+        else
+        {
+            HideAimPointUI();
         }
 
+    }
+    void HideAimPointUI()
+    {
+        _aimPointText.SetActive(false);
+        for (int i = 0; i < _aimPointNumbers.Length; i++)
+        {
+            _aimPointNumbers[i].gameObject.SetActive(false);
+        }
+        _aimPointPanel.SetActive(false);
+    }
+    public void UpdateCurrentAimPointUI(int aimPointIndex)
+    {
+        if (CurrentHoleInCourse.CourseAimPoints.Length <= 0)
+            return;
+        if (aimPointIndex >= CurrentHoleInCourse.CourseAimPoints.Length)
+            return;
+
+        for (int i = 0; i < _aimPointNumbers.Length; i++)
+        {
+            if (i == aimPointIndex)
+                _aimPointNumbers[i].color = Color.yellow;
+            else
+                _aimPointNumbers[i].color = Color.white;
+        }
     }
     #region Tee Off Challenge
     void StartTeeOffChallenge()
