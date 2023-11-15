@@ -14,6 +14,10 @@ public class CameraViewHole : MonoBehaviour
     [SerializeField] Vector3 _zoomedOutPos;
     [SerializeField] float _cameraZoomValue = 9f;
 
+    [Header("Course aim points")]
+    [SerializeField] GameObject _aimPointMarkerHolder;
+    [SerializeField] GameObject[] _aimPointMarkerObjects;
+
     private void Awake()
     {
         if (!_vCam)
@@ -46,6 +50,7 @@ public class CameraViewHole : MonoBehaviour
             _cameraFollowScript.enabled = true;
             //_cameraFollowScript.FollowTargetAgain();
             //_outOfBoundsBorderLine.enabled = false;
+            _aimPointMarkerHolder.SetActive(false);
 
         }
         else
@@ -57,6 +62,8 @@ public class CameraViewHole : MonoBehaviour
             _cameraFollowScript.enabled = false;
             _outOfBoundsBorderLine.enabled = true;
             _vCam.transform.position = new Vector3(_zoomedOutPos.x, _zoomedOutPos.y, _vCam.transform.position.z);
+            if(GameplayManagerTopDownGolf.instance.CourseAimPoints.Count > 0)
+                _aimPointMarkerHolder.SetActive(true);
         }
         IsCameraZoomedOut = !IsCameraZoomedOut;
     }
@@ -87,5 +94,29 @@ public class CameraViewHole : MonoBehaviour
         _outOfBoundsBorderLine.positionCount = points.Length + 1;
         _outOfBoundsBorderLine.SetPositions(positions);
         _outOfBoundsBorderLine.enabled = true;
+    }
+    public void SetAimPointMarkers(List<Vector3> positions, float zoomValue)
+    {
+        //if (positions.Length == 0)
+        //{
+
+        //    return;
+        //}
+        Debug.Log("SetAimPointMarkers: for " + positions.Count.ToString() + " postions with a scale/zoom value of: " + zoomValue.ToString());
+        _aimPointMarkerHolder.SetActive(false);
+        for (int i = 0; i < _aimPointMarkerObjects.Length; i++)
+        {
+            if (i < positions.Count)
+            {
+                _aimPointMarkerObjects[i].SetActive(true);
+                _aimPointMarkerObjects[i].transform.position = positions[i];
+                _aimPointMarkerObjects[i].transform.localScale = new Vector3(zoomValue, zoomValue, 1f);
+            }
+            else
+            {
+                _aimPointMarkerObjects[i].SetActive(false);
+            }
+            
+        }
     }
 }

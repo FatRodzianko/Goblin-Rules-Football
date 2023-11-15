@@ -705,12 +705,12 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""AimPoint1"",
-                    ""type"": ""Button"",
+                    ""type"": ""Value"",
                     ""id"": ""8db616ef-80b9-4e8c-a568-69da60bb64ee"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": ""Integer"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""AimPoint2"",
@@ -731,7 +731,7 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""AimtPoint4"",
+                    ""name"": ""AimPoint4"",
                     ""type"": ""Button"",
                     ""id"": ""057f2b75-e053-4ced-81b5-f48f9a4291e5"",
                     ""expectedControlType"": ""Button"",
@@ -740,7 +740,7 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""AimtPoint5"",
+                    ""name"": ""AimPoint5"",
                     ""type"": ""Button"",
                     ""id"": ""7ad94914-cfc0-4613-8ef0-9d52a297629f"",
                     ""expectedControlType"": ""Button"",
@@ -798,61 +798,6 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                     ""name"": ""right"",
                     ""id"": ""2a1149d6-02fb-4365-babf-8a95b95256db"",
                     ""path"": ""<Keyboard>/d"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""AimPosition"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""dpad"",
-                    ""id"": ""fb77dfbd-5d8b-421a-b3f3-ea4d550c9f5e"",
-                    ""path"": ""2DVector"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""AimPosition"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""up"",
-                    ""id"": ""20600d9f-ef36-4906-829c-e06d8a25efed"",
-                    ""path"": ""<Gamepad>/dpad/up"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""AimPosition"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""down"",
-                    ""id"": ""e60a99f8-c268-446d-929a-6bd2f6e194ea"",
-                    ""path"": ""<Gamepad>/dpad/down"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""AimPosition"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""left"",
-                    ""id"": ""cc8765da-ace9-4612-acbc-538f3e51ba5a"",
-                    ""path"": ""<Gamepad>/dpad/left"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""AimPosition"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""right"",
-                    ""id"": ""b9b80876-5bbb-4f0a-9775-9096648ee045"",
-                    ""path"": ""<Gamepad>/dpad/right"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -1159,8 +1104,30 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""e8e032d8-56f8-437b-8e69-26a5c3494c78"",
+                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""NextAimPoint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""2185ff46-7225-4987-bb1a-d88b114c8c35"",
                     ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PreviousAimPoint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""99b58c4a-791d-490a-99a4-4ce21412728a"",
+                    ""path"": ""<Gamepad>/dpad/left"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -1208,7 +1175,7 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""AimtPoint4"",
+                    ""action"": ""AimPoint4"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1219,7 +1186,7 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""AimtPoint5"",
+                    ""action"": ""AimPoint5"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1469,8 +1436,8 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
         m_AimingActions_AimPoint1 = m_AimingActions.FindAction("AimPoint1", throwIfNotFound: true);
         m_AimingActions_AimPoint2 = m_AimingActions.FindAction("AimPoint2", throwIfNotFound: true);
         m_AimingActions_AimPoint3 = m_AimingActions.FindAction("AimPoint3", throwIfNotFound: true);
-        m_AimingActions_AimtPoint4 = m_AimingActions.FindAction("AimtPoint4", throwIfNotFound: true);
-        m_AimingActions_AimtPoint5 = m_AimingActions.FindAction("AimtPoint5", throwIfNotFound: true);
+        m_AimingActions_AimPoint4 = m_AimingActions.FindAction("AimPoint4", throwIfNotFound: true);
+        m_AimingActions_AimPoint5 = m_AimingActions.FindAction("AimPoint5", throwIfNotFound: true);
         // HittingActions
         m_HittingActions = asset.FindActionMap("HittingActions", throwIfNotFound: true);
         m_HittingActions_CancelHit = m_HittingActions.FindAction("CancelHit", throwIfNotFound: true);
@@ -1701,8 +1668,8 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
     private readonly InputAction m_AimingActions_AimPoint1;
     private readonly InputAction m_AimingActions_AimPoint2;
     private readonly InputAction m_AimingActions_AimPoint3;
-    private readonly InputAction m_AimingActions_AimtPoint4;
-    private readonly InputAction m_AimingActions_AimtPoint5;
+    private readonly InputAction m_AimingActions_AimPoint4;
+    private readonly InputAction m_AimingActions_AimPoint5;
     public struct AimingActionsActions
     {
         private @GolfControls m_Wrapper;
@@ -1720,8 +1687,8 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
         public InputAction @AimPoint1 => m_Wrapper.m_AimingActions_AimPoint1;
         public InputAction @AimPoint2 => m_Wrapper.m_AimingActions_AimPoint2;
         public InputAction @AimPoint3 => m_Wrapper.m_AimingActions_AimPoint3;
-        public InputAction @AimtPoint4 => m_Wrapper.m_AimingActions_AimtPoint4;
-        public InputAction @AimtPoint5 => m_Wrapper.m_AimingActions_AimtPoint5;
+        public InputAction @AimPoint4 => m_Wrapper.m_AimingActions_AimPoint4;
+        public InputAction @AimPoint5 => m_Wrapper.m_AimingActions_AimPoint5;
         public InputActionMap Get() { return m_Wrapper.m_AimingActions; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1770,12 +1737,12 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                 @AimPoint3.started -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimPoint3;
                 @AimPoint3.performed -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimPoint3;
                 @AimPoint3.canceled -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimPoint3;
-                @AimtPoint4.started -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimtPoint4;
-                @AimtPoint4.performed -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimtPoint4;
-                @AimtPoint4.canceled -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimtPoint4;
-                @AimtPoint5.started -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimtPoint5;
-                @AimtPoint5.performed -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimtPoint5;
-                @AimtPoint5.canceled -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimtPoint5;
+                @AimPoint4.started -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimPoint4;
+                @AimPoint4.performed -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimPoint4;
+                @AimPoint4.canceled -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimPoint4;
+                @AimPoint5.started -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimPoint5;
+                @AimPoint5.performed -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimPoint5;
+                @AimPoint5.canceled -= m_Wrapper.m_AimingActionsActionsCallbackInterface.OnAimPoint5;
             }
             m_Wrapper.m_AimingActionsActionsCallbackInterface = instance;
             if (instance != null)
@@ -1819,12 +1786,12 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
                 @AimPoint3.started += instance.OnAimPoint3;
                 @AimPoint3.performed += instance.OnAimPoint3;
                 @AimPoint3.canceled += instance.OnAimPoint3;
-                @AimtPoint4.started += instance.OnAimtPoint4;
-                @AimtPoint4.performed += instance.OnAimtPoint4;
-                @AimtPoint4.canceled += instance.OnAimtPoint4;
-                @AimtPoint5.started += instance.OnAimtPoint5;
-                @AimtPoint5.performed += instance.OnAimtPoint5;
-                @AimtPoint5.canceled += instance.OnAimtPoint5;
+                @AimPoint4.started += instance.OnAimPoint4;
+                @AimPoint4.performed += instance.OnAimPoint4;
+                @AimPoint4.canceled += instance.OnAimPoint4;
+                @AimPoint5.started += instance.OnAimPoint5;
+                @AimPoint5.performed += instance.OnAimPoint5;
+                @AimPoint5.canceled += instance.OnAimPoint5;
             }
         }
     }
@@ -1985,8 +1952,8 @@ public partial class @GolfControls : IInputActionCollection2, IDisposable
         void OnAimPoint1(InputAction.CallbackContext context);
         void OnAimPoint2(InputAction.CallbackContext context);
         void OnAimPoint3(InputAction.CallbackContext context);
-        void OnAimtPoint4(InputAction.CallbackContext context);
-        void OnAimtPoint5(InputAction.CallbackContext context);
+        void OnAimPoint4(InputAction.CallbackContext context);
+        void OnAimPoint5(InputAction.CallbackContext context);
     }
     public interface IHittingActionsActions
     {

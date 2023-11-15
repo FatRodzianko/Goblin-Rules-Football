@@ -3675,10 +3675,19 @@ public class GolfPlayerTopDown : NetworkBehaviour
             // Aim Point controls
             InputManagerGolf.Controls.AimingActions.PreviousAimPoint.Enable();
             InputManagerGolf.Controls.AimingActions.PreviousAimPoint.performed += PreviousAimPointPressed;
-
-            // Aim Point controls
             InputManagerGolf.Controls.AimingActions.NextAimPoint.Enable();
             InputManagerGolf.Controls.AimingActions.NextAimPoint.performed += NextAimPointPressed;
+            // aim point shortcuts
+            InputManagerGolf.Controls.AimingActions.AimPoint1.Enable();
+            InputManagerGolf.Controls.AimingActions.AimPoint1.performed += AimPointShortCutPressed;
+            InputManagerGolf.Controls.AimingActions.AimPoint2.Enable();
+            InputManagerGolf.Controls.AimingActions.AimPoint2.performed += AimPointShortCutPressed;
+            InputManagerGolf.Controls.AimingActions.AimPoint3.Enable();
+            InputManagerGolf.Controls.AimingActions.AimPoint3.performed += AimPointShortCutPressed;
+            InputManagerGolf.Controls.AimingActions.AimPoint4.Enable();
+            InputManagerGolf.Controls.AimingActions.AimPoint4.performed += AimPointShortCutPressed;
+            InputManagerGolf.Controls.AimingActions.AimPoint5.Enable();
+            InputManagerGolf.Controls.AimingActions.AimPoint5.performed += AimPointShortCutPressed;
         }
         else
         {
@@ -3709,6 +3718,22 @@ public class GolfPlayerTopDown : NetworkBehaviour
             //SubmitAim
             InputManagerGolf.Controls.AimingActions.SubmitAim.Disable();
             InputManagerGolf.Controls.AimingActions.SubmitAim.performed -= SubmitAim;
+            // Aim Point controls
+            InputManagerGolf.Controls.AimingActions.PreviousAimPoint.Disable();
+            InputManagerGolf.Controls.AimingActions.PreviousAimPoint.performed -= PreviousAimPointPressed;
+            InputManagerGolf.Controls.AimingActions.NextAimPoint.Disable();
+            InputManagerGolf.Controls.AimingActions.NextAimPoint.performed -= NextAimPointPressed;
+            // aim point shortcuts
+            InputManagerGolf.Controls.AimingActions.AimPoint1.Disable();
+            InputManagerGolf.Controls.AimingActions.AimPoint1.performed -= AimPointShortCutPressed;
+            InputManagerGolf.Controls.AimingActions.AimPoint2.Disable();
+            InputManagerGolf.Controls.AimingActions.AimPoint2.performed -= AimPointShortCutPressed;
+            InputManagerGolf.Controls.AimingActions.AimPoint3.Disable();
+            InputManagerGolf.Controls.AimingActions.AimPoint3.performed -= AimPointShortCutPressed;
+            InputManagerGolf.Controls.AimingActions.AimPoint4.Disable();
+            InputManagerGolf.Controls.AimingActions.AimPoint4.performed -= AimPointShortCutPressed;
+            InputManagerGolf.Controls.AimingActions.AimPoint5.Disable();
+            InputManagerGolf.Controls.AimingActions.AimPoint5.performed -= AimPointShortCutPressed;
         }
     }
     void ChangeAimPosition(InputAction.CallbackContext context)
@@ -3931,6 +3956,23 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         Debug.Log("NextAimPointPressed: ");
         PrevOrNextAimPoint(true);
+    }
+    void AimPointShortCutPressed(InputAction.CallbackContext context)
+    {
+        if (!this.IsOwner)
+            return;
+        if (DirectionAndDistanceChosen)
+            return;
+        if (GolfEscMenuManager.instance.IsMenuOpen)
+        {
+            Debug.Log("EscMenuOpen. Do not take action!");
+            return;
+        }
+        Debug.Log("AimPointShortCutPressed: " + context.action.name);
+        int indexValue = Int32.Parse(context.action.name[context.action.name.Length - 1].ToString());
+        indexValue--;
+        //PrevOrNextAimPoint(true);
+        ChangeAimToNewIndex(indexValue);
     }
     #endregion
     #region Hitting Actions

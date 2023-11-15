@@ -1594,6 +1594,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         {
             HideAimPointUI();
         }
+        _cameraViewHole.SetAimPointMarkers(this.CourseAimPoints, CurrentHoleInCourse.CameraZoomValue);
 
     }
     void HideAimPointUI()

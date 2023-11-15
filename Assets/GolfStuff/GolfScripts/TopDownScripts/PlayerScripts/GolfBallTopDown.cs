@@ -1257,7 +1257,7 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     public void BallRolledIntoHole(HoleTopDown holeRolledInto)
     {
-        if (this.speedMetersPerSecond < 3.0f)
+        if (this.speedMetersPerSecond < 2.0f) // used to be 3???
         {
             Debug.Log("BallRolledIntoHole: current speed of the ball: " + this.speedMetersPerSecond.ToString() + " which is slow enough to fall into hole");
             //BallInHole();
