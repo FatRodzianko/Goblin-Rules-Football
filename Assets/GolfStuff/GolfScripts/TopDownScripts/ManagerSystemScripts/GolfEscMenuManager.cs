@@ -10,16 +10,19 @@ public class GolfEscMenuManager : MonoBehaviour
     NetworkPlayer _localNetworkPlayer;
 
     public bool IsMenuOpen = false;
+    public bool IsSettingsMenuOpen = false;
 
     [Header("UI Components")]
-    [SerializeField] GameObject _escMenuPanel;
+    [SerializeField] GameObject _escMenuCanvas;
     [SerializeField] Button _turnMusicOnOffButton;
+    [SerializeField] GameObject _escMenuBasePanel;
+    [SerializeField] GameObject _settingsPanel;
     // Start is called before the first frame update
     private void Awake()
     {
         MakeInstance();
         IsMenuOpen = false;
-        _escMenuPanel.SetActive(false);
+        _escMenuCanvas.SetActive(false);
     }
     void MakeInstance()
     {
@@ -42,16 +45,29 @@ public class GolfEscMenuManager : MonoBehaviour
     {
         if (IsMenuOpen)
         {
-            InputManagerGolf.Controls.UI.Disable();
-            _escMenuPanel.SetActive(false);
-            IsMenuOpen = false;
+            if (IsSettingsMenuOpen) // close Settings Panel with Esc key, and go back to the base Esc Menu
+            {
+                _settingsPanel.SetActive(false);
+                IsSettingsMenuOpen = false;
+                _escMenuBasePanel.SetActive(true);
+            }
+            else
+            {
+                InputManagerGolf.Controls.UI.Disable();
+                _escMenuCanvas.SetActive(false);
+                IsMenuOpen = false;
+            }
+            
         }
         else
         {
             InputManagerGolf.Controls.UI.Enable();
             SetMusicOnOffButtonText();
-            _escMenuPanel.SetActive(true);
+            _escMenuCanvas.SetActive(true);
             IsMenuOpen = true;
+            _escMenuBasePanel.SetActive(true);
+            _settingsPanel.SetActive(false);
+            IsSettingsMenuOpen = false;
         }
     }
     void SetMusicOnOffButtonText()
@@ -97,5 +113,26 @@ public class GolfEscMenuManager : MonoBehaviour
             _turnMusicOnOffButton.GetComponentInChildren<TextMeshProUGUI>().text = "Turn Music Off";
         }
             
+    }
+    public void ReturnToGameButtonPressed()
+    {
+        OpenOrCloseEscMenu();
+    }
+    public void SettingsButtonPressed()
+    {
+        if (IsSettingsMenuOpen)
+        {
+            OpenOrCloseEscMenu();
+        }
+        else
+        {
+            OpenSettingsMenu();
+        }
+    }
+    void OpenSettingsMenu()
+    {
+        _escMenuBasePanel.SetActive(false);
+        _settingsPanel.SetActive(true);
+        IsSettingsMenuOpen = true;
     }
 }

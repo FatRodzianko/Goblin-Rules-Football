@@ -39,7 +39,7 @@ public class PlayerUIMessage : MonoBehaviour
     {
         if (message == "start turn")
         {
-            _playerMessageText.text = _myPlayer.PlayerName + " " + _startTurn;
+            _playerMessageText.text = _myPlayer.PlayerName + " " + _startTurn; 
         }
         else if (message == "water")
         {

@@ -405,9 +405,17 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             //string oldBindingPath = null;
             List<InputActionMap> mapsToCheckForDups = new List<InputActionMap>();
             if (action.actionMap.ToString().ToLower().Contains("golf"))
+            {
+                Debug.Log("CheckDuplicateBindings: checking GOLF action map for duplicates.");
+
                 mapsToCheckForDups = ResetAllBindings.instance.golfActionMapsToCheck;
+            }
             else
+            {
+                Debug.Log("CheckDuplicateBindings: checking FOOTBALL action map for duplicates.");
                 mapsToCheckForDups = ResetAllBindings.instance.actionMapsToCheck;
+            }
+                
             if (mapsToCheckForDups.Count == 0)
             {
                 Debug.Log("CheckDuplicateBindings: mapsToCheckForDups length is 0?");
@@ -432,10 +440,11 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
                         //InputAction dupAction = playerControlsReference.FindAction(binding.action);
                         //int dupBindingIndex = dupAction.GetBindingIndex(binding);
                         InputAction dupAction = this.GetComponent<StoreControls>().PlayerControls.FindAction(binding.action);
+                        Debug.Log("CheckDuplicateBindings: Getting dupBindingIndex. The binding group is: " + binding.groups + " and the binding path is: " + binding.path);
                         int dupBindingIndex = dupAction.GetBindingIndex(binding.groups, binding.path);
 
                         Debug.Log("CheckDuplicateBindings: Duplicate binding found. new binding path: " + newBinding.effectivePath.ToString() + " duplicate effective path: " + binding.effectivePath.ToString() + " duplicate action is: " + binding.action.ToString() + " new binding PATH is: " + newBinding.path.ToString() + " is new binding a composite: " + newBinding.isComposite.ToString());
-                        Debug.Log("CheckDuplicateBindings: new action: " + action.ToString() + " new binding index: " + bindingIndex + " duplicate action: " + dupAction.ToString() + " duplicate binding index: " + dupBindingIndex.ToString() + " does the duplicate have overrides? " + binding.hasOverrides.ToString() + " is duplicate action a composite: " + dupAction.bindings[dupBindingIndex].isComposite.ToString() + ":" + binding.isComposite);
+                        //Debug.Log("CheckDuplicateBindings: new action: " + action.ToString() + " new binding index: " + bindingIndex + " duplicate action: " + dupAction.ToString() + " duplicate binding index: " + dupBindingIndex.ToString() + " does the duplicate have overrides? " + binding.hasOverrides.ToString() + " is duplicate action a composite: " + dupAction.bindings[dupBindingIndex].isComposite.ToString() + ":" + binding.isComposite);
                         //PerformInteractiveRebind(dupAction, dupBindingIndex, false);
 
                         // Check for what value the duplicate binding will be swapped to
@@ -540,7 +549,27 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             bool pathAlreadyExists = false;
             InputBinding bindingtoCheck = actionToCheck.bindings[indexToCheck];
 
-            foreach (InputActionMap map in ResetAllBindings.instance.actionMapsToCheck)
+            List<InputActionMap> mapsToCheckForDups = new List<InputActionMap>();
+
+            if (actionToCheck.actionMap.ToString().ToLower().Contains("golf"))
+            {
+                Debug.Log("CheckIfPathExistsInActions: checking GOLF action map for duplicates.");
+
+                mapsToCheckForDups = ResetAllBindings.instance.golfActionMapsToCheck;
+            }
+            else
+            {
+                Debug.Log("CheckIfPathExistsInActions: checking FOOTBALL action map for duplicates.");
+                mapsToCheckForDups = ResetAllBindings.instance.actionMapsToCheck;
+            }
+
+            if (mapsToCheckForDups.Count == 0)
+            {
+                Debug.Log("CheckIfPathExistsInActions: mapsToCheckForDups length is 0?");
+            }
+
+            //foreach (InputActionMap map in ResetAllBindings.instance.actionMapsToCheck)
+            foreach (InputActionMap map in mapsToCheckForDups)
             {
                 foreach (InputBinding binding in map.bindings)
                 {
@@ -570,8 +599,28 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             InputBinding bindingToReturn = bindingToCheck;
             //InputBinding bindingtoCheck = actionToCheck.bindings[indexToCheck];
             InputAction actionToCheck = this.GetComponent<StoreControls>().PlayerControls.FindAction(bindingToCheck.action);
+            List<InputActionMap> mapsToCheckForDups = new List<InputActionMap>();
 
-            foreach (InputActionMap map in ResetAllBindings.instance.actionMapsToCheck)
+            if (actionToCheck.actionMap.ToString().ToLower().Contains("golf"))
+            {
+                Debug.Log("CheckWhatActionIsUsingPath: checking GOLF action map for duplicates.");
+
+                mapsToCheckForDups = ResetAllBindings.instance.golfActionMapsToCheck;
+            }
+            else
+            {
+                Debug.Log("CheckWhatActionIsUsingPath: checking FOOTBALL action map for duplicates.");
+                mapsToCheckForDups = ResetAllBindings.instance.actionMapsToCheck;
+            }
+
+            if (mapsToCheckForDups.Count == 0)
+            {
+                Debug.Log("CheckWhatActionIsUsingPath: mapsToCheckForDups length is 0?");
+            }
+
+
+            //foreach (InputActionMap map in ResetAllBindings.instance.actionMapsToCheck)
+            foreach (InputActionMap map in mapsToCheckForDups)
             {
                 bool breakLoop = false;
                 foreach (InputBinding binding in map.bindings)

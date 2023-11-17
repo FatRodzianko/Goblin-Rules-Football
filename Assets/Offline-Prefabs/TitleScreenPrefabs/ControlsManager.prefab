@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6037899156450315508}
   - component: {fileID: 8751981026887381411}
+  - component: {fileID: 245898484}
+  - component: {fileID: 245898486}
   m_Layer: 0
   m_Name: ControlsManager
   m_TagString: Untagged
@@ -27,6 +29,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1392.858, y: 884.8578, z: -362.2177}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -43,3 +46,82 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71fe31e374dbdd64790dbbdb53747191, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &245898484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8218038488133583504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7784ff56c493247408ce27021b03499b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actions: {fileID: -944628639613478452, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
+  GolfActions: {fileID: -944628639613478452, guid: 0a476b405033ead4ebf974dbd6a16c58, type: 3}
+  isKeyboardControls: 0
+--- !u!114 &245898486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8218038488133583504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e552adb281624d040ae38e7059b608a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputActions: {fileID: -944628639613478452, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
+  playerActionMap:
+    m_Name: Player
+    m_Id: 51fca1a5-ef98-4627-b56b-709838193904
+    m_Asset: {fileID: 0}
+    m_Actions: []
+    m_Bindings: []
+  qeSwitchingActionMap:
+    m_Name: Qe Switching
+    m_Id: 639a64ef-f8c0-4f0f-9a00-bc339f7ae6b9
+    m_Asset: {fileID: 0}
+    m_Actions: []
+    m_Bindings: []
+  powerUpsActionMap:
+    m_Name: Power Ups
+    m_Id: 340944f5-d3a5-45a1-a606-d6343b644168
+    m_Asset: {fileID: 0}
+    m_Actions: []
+    m_Bindings: []
+  golfInputActions: {fileID: -944628639613478452, guid: 0a476b405033ead4ebf974dbd6a16c58, type: 3}
+  GolfPromptPlayerActionMap:
+    m_Name: Golf Prompt Player
+    m_Id: 20967876-a574-4fdf-b321-4b443502a103
+    m_Asset: {fileID: 0}
+    m_Actions: []
+    m_Bindings: []
+  GolfAimingActionsActionMap:
+    m_Name: Golf Aiming Actions
+    m_Id: 743a0ee6-2c61-41fb-b067-f05dd81e42b2
+    m_Asset: {fileID: 0}
+    m_Actions: []
+    m_Bindings: []
+  GolfHittingActionsActionMap:
+    m_Name: Golf Hitting Actions
+    m_Id: ff312657-386d-4cb7-81ee-33833e0414de
+    m_Asset: {fileID: 0}
+    m_Actions: []
+    m_Bindings: []
+  GolfPowerUpsActionMap:
+    m_Name: Golf Power Ups
+    m_Id: ba727ded-1dcb-46d9-a036-05e08da0f556
+    m_Asset: {fileID: 0}
+    m_Actions: []
+    m_Bindings: []
+  GolfMiscActionMap:
+    m_Name: Golf Misc
+    m_Id: fdc06a07-a634-437e-8b0f-1dfbcf6a8b60
+    m_Asset: {fileID: 0}
+    m_Actions: []
+    m_Bindings: []
+  actionMapsToCheck: []
+  golfActionMapsToCheck: []

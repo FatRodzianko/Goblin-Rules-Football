@@ -32,7 +32,7 @@ public class LobbyManagerGolf : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        _lobbyPlayersPanel.SetActive(true);
     }
 
     // Update is called once per frame
