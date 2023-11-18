@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerUIMessage : MonoBehaviour
 {
@@ -9,14 +11,14 @@ public class PlayerUIMessage : MonoBehaviour
     [SerializeField] GolfPlayerScore _golfPlayerScore;
     [SerializeField] TextMeshProUGUI _playerMessageText;
     [Header("Player UI Message Texts")]
-    [SerializeField] const string _startTurn = "Press Space to Start Turn";
+    //[SerializeField] const string _startTurn = "Press Space to Start Turn";
     [SerializeField] const string _water = "Water...\n+1 Stroke Penalty";
     [SerializeField] const string _outOfBounds = "Out of bounds...\n+1 Stroke Penalty";
-    [SerializeField] const string _lightningOnTurn = "Lightning in area.\n\nPress Backspace to skip 1 turn with +1 penalty.\n\nPress Space to start turn now.";
-    [SerializeField] const string _struckByLightning = "You've been struck by lightning!\n\n+10 stroke penalty and you're out of commission until next turn!\n\nSpace to continue...";
+    //[SerializeField] const string _lightningOnTurn = "Lightning in area.\n\nPress Backspace to skip 1 turn with +1 penalty.\n\nPress Space to start turn now.";
+    //[SerializeField] const string _struckByLightning = "You've been struck by lightning!\n\n+10 stroke penalty and you're out of commission until next turn!\n\nSpace to continue...";
     [SerializeField] const string _otherPlayerStruckByLightning = " has been struck by lightning!\n\nThey receive a +10 stroke penalty and are out of commission until next turn!";
     [SerializeField] const string _stormPassed = "All players have agreed to let the storm pass until there is no more lightning.";
-    [SerializeField] const string _mulliganOwner = "You have a mulligan power up. Press \"p\" if you want to use it now. Press space to continue to next turn.\n";
+    //[SerializeField] const string _mulliganOwner = "You have a mulligan power up. Press \"p\" if you want to use it now. Press space to continue to next turn.\n";
     [SerializeField] const string _mulliganClients = " is deciding if they want to use their mulligan...";
     [SerializeField] const string _usingMulliganOwner = "Using mulligan. Setting the ball back to where you started...";
     [SerializeField] const string _usingMulliganClients = " is using their mulligan!";
@@ -39,7 +41,10 @@ public class PlayerUIMessage : MonoBehaviour
     {
         if (message == "start turn")
         {
-            _playerMessageText.text = _myPlayer.PlayerName + " " + _startTurn; 
+            //_playerMessageText.text = _myPlayer.PlayerName + " " + _startTurn;
+            
+
+            _playerMessageText.text = _myPlayer.PlayerName + " Press " + GetActionBindingName(InputManagerGolf.Controls.PromptPlayer.Continue) + " to Start Turn";
         }
         else if (message == "water")
         {
@@ -72,7 +77,7 @@ public class PlayerUIMessage : MonoBehaviour
         else if (message == "struck by lightning")
         {
             if (_myPlayer.IsOwner)
-                _playerMessageText.text = _myPlayer.PlayerName + " " + _struckByLightning;
+                _playerMessageText.text = _myPlayer.PlayerName + " " + "You've been struck by lightning!\n\n+10 stroke penalty and you're out of commission until next turn!\n\n"+ GetActionBindingName(InputManagerGolf.Controls.PromptPlayer.Continue) +" to continue...";
             else
                 _playerMessageText.text = _myPlayer.PlayerName + " " + _otherPlayerStruckByLightning;
         }
@@ -85,7 +90,7 @@ public class PlayerUIMessage : MonoBehaviour
             if (_myPlayer.IsOwner)
             {
                 string[] mulliganMessage = message.Split(" ");
-                _playerMessageText.text = _mulliganOwner + mulliganMessage[1].ToString() + " seconds remaining...";
+                _playerMessageText.text = "You have a mulligan power up. Press \"" + GetActionBindingName(InputManagerGolf.Controls.PowerUps.UsePowerUp) + "\" if you want to use it now. Press " + GetActionBindingName(InputManagerGolf.Controls.PromptPlayer.Continue) + " to continue to next turn.\n" + mulliganMessage[1].ToString() + " seconds remaining...";
             }
 
             else
@@ -203,7 +208,15 @@ public class PlayerUIMessage : MonoBehaviour
     }
     void LightningOnTurn()
     {
-        _playerMessageText.text = _myPlayer.PlayerName + " " + _lightningOnTurn;
+        _playerMessageText.text = _myPlayer.PlayerName + " " + "Lightning in area.\n\nPress " + GetActionBindingName(InputManagerGolf.Controls.PromptPlayer.Skip) + " to skip 1 turn with +1 penalty.\n\nPress " + GetActionBindingName(InputManagerGolf.Controls.PromptPlayer.Continue) + " to start turn now.";
         _myPlayer.LightningOnTurn();
+    }
+    string GetActionBindingName(InputAction action)
+    {
+        string bindingGroup = "Keyboard and Mouse";
+        if(GamepadUIManager.instance.gamepadUI)
+            bindingGroup = "GamePad";
+
+        return action.GetBindingDisplayString(0, bindingGroup);
     }
 }
