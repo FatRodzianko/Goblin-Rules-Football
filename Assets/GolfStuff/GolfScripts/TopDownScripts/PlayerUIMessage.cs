@@ -163,6 +163,28 @@ public class PlayerUIMessage : MonoBehaviour
         else if (playersScore < holePar - 2)
             ballInHoleMessage += "ALBATROSS!";
 
+        if (GameplayManagerTopDownGolf.instance.ParFavorPenalty)
+        {
+            int parScoreDifference = holePar - playersScore;
+            if (parScoreDifference > 0)
+            {
+                ballInHoleMessage += "\nGAIN " + parScoreDifference.ToString() + " favor for shooting under par!";
+            }
+            else if (parScoreDifference < 0)
+            {
+                ballInHoleMessage += "\nLOSE " + parScoreDifference.ToString() + " favor for shooting over par!";
+            }
+            else
+            {
+                ballInHoleMessage += "\n No change in favor for shooting par. Cool...";
+            }
+            if (_myPlayer.IsOwner)
+            {
+                _myPlayer.GivePlayerParFavorPenalty(parScoreDifference);
+            }
+
+        }
+
         return ballInHoleMessage;
     }
     void DisplayGroundType(string groundType)

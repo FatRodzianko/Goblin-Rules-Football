@@ -69,6 +69,7 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private TMP_Dropdown _rainModeDropDown;
     [SerializeField] private TMP_Dropdown _windModeDropDown;
     [SerializeField] private TMP_Dropdown _courseHoleSelectionDropdown;
+    [SerializeField] private Toggle _golfParPenaltyFavorToggle;
 
     [Header("Golf Custom Hole Selection")]
     [SerializeField] GameObject _selectCustomHolesPanel;
@@ -682,7 +683,7 @@ public class TitleScreenManager : MonoBehaviour
             customeHoleSelection.AddRange(GetCustomHoleSelection());
         }
         Debug.Log("CreateNewGolfLobby: Rain Mode will be: " + _rainModeDropDown.options[_rainModeDropDown.value].text + " Wind Mode will be: " + _windModeDropDown.options[_windModeDropDown.value].text);
-        GolfSteamLobby.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text, _courseHoleSelectionDropdown.options[_courseHoleSelectionDropdown.value].text, customeHoleSelection);
+        GolfSteamLobby.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text, _courseHoleSelectionDropdown.options[_courseHoleSelectionDropdown.value].text, customeHoleSelection, _golfParPenaltyFavorToggle.isOn);
     }
     private void RainModeDropdownValueChanged(TMP_Dropdown change)
     {

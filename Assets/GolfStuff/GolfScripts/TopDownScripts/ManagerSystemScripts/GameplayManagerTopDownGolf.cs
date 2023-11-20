@@ -127,6 +127,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SyncVar] public int StrokeLimitNumber = 0;
     [SyncVar] public bool PowerUpsEnabled = true;
     [SyncVar] public bool WeatherStatuesEnabled = true;
+    [SyncVar] public bool ParFavorPenalty = false;
 
     [Header("Tasks")]
     [SerializeField] CancellationTokenSource _cancellationTokenSource;
@@ -264,6 +265,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         this.PowerUpsEnabled = GolfSteamLobby.instance.PowerUpsEnabled;
         this.WeatherStatuesEnabled = GolfSteamLobby.instance.WeatherStatuesEnabled;
+        this.ParFavorPenalty = GolfSteamLobby.instance.ParFavorPenalty;
         this.IsThereAStrokeLimit = GolfSteamLobby.instance.StrokeLimitEnabled;
         this.StrokeLimitNumber = GolfSteamLobby.instance.StrokeLimitNumber;
         RainManager.instance.SetGameRainMode(GolfSteamLobby.instance.GameRainMode);
@@ -1232,6 +1234,15 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             GolfPlayersInTeeOffOrder.Remove(player);
         if (GolfPlayersOutOfCommission.Contains(player))
             GolfPlayersOutOfCommission.Remove(player);
+    }
+    [Server]
+    public void CheckIfPlayerWhoLeftHadBallInHole(GolfPlayerTopDown player)
+    {
+        if (player.MyBall.IsInHole)
+        {
+            if (this._numberOfPlayersInHole > 0)
+                this._numberOfPlayersInHole--;
+        }
     }
     [Server]
     public void HostStartGame(NetworkConnection conn)

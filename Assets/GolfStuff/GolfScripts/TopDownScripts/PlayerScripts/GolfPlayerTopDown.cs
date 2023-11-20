@@ -235,6 +235,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         base.OnStopServer();
         if (base.IsServer)
         {
+            GameplayManagerTopDownGolf.instance.CheckIfPlayerWhoLeftHadBallInHole(this);
             GameplayManagerTopDownGolf.instance.RemoveGolfPlayer(this);
             //GameplayManagerTopDownGolf.instance.RemoveOwnerFromHost();
         }
@@ -3256,6 +3257,20 @@ public class GolfPlayerTopDown : NetworkBehaviour
         Debug.Log("GetDistanceToStayInBounds: New aim position of: " + newAimPosition.ToString() + " is NOT bounds! returning distance of: " + newDistance.ToString());
         return newDistance;
 
+    }
+    public void GivePlayerParFavorPenalty(int parScoreDifference)
+    {
+        if (!this.IsOwner)
+            return;
+        CmdGivePlayerParFavorPenalty(parScoreDifference);
+    }
+    [ServerRpc]
+    void CmdGivePlayerParFavorPenalty(int parScoreDifference)
+    {
+        if (!GameplayManagerTopDownGolf.instance.ParFavorPenalty)
+            return;
+
+        this.FavorWeather = CapWeatherFavor(this.FavorWeather + parScoreDifference);
     }
     #region Tee Off Challenge
     [Server]

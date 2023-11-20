@@ -45,6 +45,14 @@
 - - - - - - last player standing "wins"
 - - - - - - - - - maybe also do eliminations at certain stages, like fall guys. Every other round players are eliminated based on total stunt score?
 
+### Misc. Game Ideas
+- "Reverse Pokemon"
+- - - youre a monster. Game starts in kind of an idealic setting - adventure through a bucolic country side. Searching for lost treasure
+- - - - - - right when you get the treasure (or whatever the task may be) you get ripped into a battle against another monster
+- - - - - - voice of someone commanding you to perform a specific attack
+- - - back in country side, only have a hazy memory of the battle. Blood on your arm or something. Someone asks how you got it. you say you were fighting a monster. They laugh and say what a gret imagination you have
+- - - fill in rest of story where you have to disocver source of the system that keeps you in stasis and fight to break out. Creating an RPG style party and working together inside and outside of the pokeball stasis
+
 
 ### Remaining tasks
 (x) Punch animations while goblins are running

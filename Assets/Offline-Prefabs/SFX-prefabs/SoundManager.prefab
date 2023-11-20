@@ -371,36 +371,6 @@ MonoBehaviour:
     pitch: 1
     isLooping: 0
     source: {fileID: 0}
-  - name: weather-clear-01
-    clip: {fileID: 8300000, guid: c64389c64338af94681efe1125dd8236, type: 3}
-    volume: 1
-    pitch: 1
-    isLooping: 1
-    source: {fileID: 0}
-  - name: weather-clear-02
-    clip: {fileID: 8300000, guid: 56c2f3e9a675b9a4b8b1a7688342102f, type: 3}
-    volume: 1
-    pitch: 1
-    isLooping: 1
-    source: {fileID: 0}
-  - name: weather-clear-03
-    clip: {fileID: 8300000, guid: 71b74835209be1c438c528040c691571, type: 3}
-    volume: 1
-    pitch: 1
-    isLooping: 1
-    source: {fileID: 0}
-  - name: weather-rain-01
-    clip: {fileID: 8300000, guid: 40c125333324eb445a6a67f3429499f9, type: 3}
-    volume: 1
-    pitch: 1
-    isLooping: 1
-    source: {fileID: 0}
-  - name: weather-rain-02
-    clip: {fileID: 8300000, guid: d8c4b1938c27f6746a420f981390ab4b, type: 3}
-    volume: 1
-    pitch: 1
-    isLooping: 1
-    source: {fileID: 0}
   - name: golfball-bounce-fairway
     clip: {fileID: 8300000, guid: b7afff268bf3d1b4da3657e6f854446e, type: 3}
     volume: 1
@@ -449,3 +419,28 @@ MonoBehaviour:
     pitch: 1
     isLooping: 0
     source: {fileID: 0}
+  - name: music-frail-noise
+    clip: {fileID: 8300000, guid: 80680e5e6d5ce1a4eb5a7b60074514ef, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: player-perfect-power-submission
+    clip: {fileID: 8300000, guid: 38c8e54010273f64bbf5265192400ddc, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: player-perfect-accuracy-submission
+    clip: {fileID: 8300000, guid: a37d3ad20b13cf047b698a2b3ceb37bb, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  - name: player-both-perfect-submissions
+    clip: {fileID: 8300000, guid: f830633a4bb7a21468222b2159ea284e, type: 3}
+    volume: 1
+    pitch: 1
+    isLooping: 0
+    source: {fileID: 0}
+  _titleMusicClip: music-frail-noise

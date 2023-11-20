@@ -417,7 +417,18 @@ x add "first song" to the playlist, along with synthwave-take-2 after lowering t
 - add a "controls" menu to the golf esc menu
 - - - at the very least should display controls. Doesn't necessarily need to support rebinding (for now)
 - - x idealy would just add all of the settings/control options to the golf escape menu. Might be annoying... but should be easy enough to copy/paste from football's escape menu?
-- player prompts that say things like "press space" or whatever should try and pull the key binding and display that?
+x player prompts that say things like "press space" or whatever should try and pull the key binding and display that?
+- music can't be turned off in the current build. It just skips to the next song
+- - x also when music is playing the perfect hit sounds don't play?
+- - - - - x this issue was caused by the SoundManager in TitleScreen not having those perfect submission sounds. added now
+- - - music thing isn't an issue in new build?
+x issue where if a player leaves after they have their ball in the hole, the "ballsInHole" number stays the same but the count for ServerGolfPlayers will be decremented by 1
+- - x make sure OnDisconnect for a player checks if their ball is in the hole, and if so, decrease ballsInHole by 1?
+- - - - - - did this but haven't actually tested it???
+- - - or just instead of keeping a tally, just loop through all the balls, check if they're in the hole, add those up, and compare count to number of ServerGolfPlayers
+- - - - - - adds more logic to run but also the count will always be <10 so it's not a lot to begin with... and it's only run between turns, not every frame or anything
+- how to convert a DLC in steamworks to a soundstrack:
+- - - https://partner.steamgames.com/doc/store/application/soundtrackapp#conversion
 
 
 ### hole six notes:

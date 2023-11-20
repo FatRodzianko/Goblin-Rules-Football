@@ -39,6 +39,7 @@ public class GolfSteamLobby : MonoBehaviour
     [SerializeField] public RainManager.RainMode GameRainMode = RainManager.RainMode.ControlledByPlayerFavor;
     [SerializeField] public WindManager.WindMode GameWindMode = WindManager.WindMode.ControlledByPlayerFavor;
     [SerializeField] public string CourseHoleSelection;
+    [SerializeField] public bool ParFavorPenalty = false;
 
     [Header("Golf Course Settings")]
     [SerializeField] public string CourseName;
@@ -72,7 +73,7 @@ public class GolfSteamLobby : MonoBehaviour
     {
 
     }
-    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode, string courseHoleSelection, List<int> customHolesSelected)
+    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode, string courseHoleSelection, List<int> customHolesSelected, bool parFavorPenalty)
     {
         Debug.Log("GolfSteamLobby: CreateLobby: number of players: " + numberOfPlayers.ToString());
 
@@ -139,6 +140,7 @@ public class GolfSteamLobby : MonoBehaviour
         {
             this.StrokeLimitNumber = _strokeLimitMin;
         }
+        this.ParFavorPenalty = parFavorPenalty;
 
         SteamMatchmaking.CreateLobby(newLobbyType, numberOfPlayers);
     }
