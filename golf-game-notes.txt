@@ -414,6 +414,8 @@ x add "first song" to the playlist, along with synthwave-take-2 after lowering t
 - create swing animation for up/down swing
 - - - will unfortunately require two animations, one for hitting up/north and another for hitting down/south. One shows the player's back (up), the other the player's chest/face (down)
 - - - - - - will be hard...
+- - - when using the up/down swing animations, need to set the player sprite's y value to either +0.01 to be "behind" the ball and -0.01 to be "in front" of the ball
+- - - - - - then switch back to y:0.0f when using the sideways swing?
 - add a "controls" menu to the golf esc menu
 - - - at the very least should display controls. Doesn't necessarily need to support rebinding (for now)
 - - x idealy would just add all of the settings/control options to the golf escape menu. Might be annoying... but should be easy enough to copy/paste from football's escape menu?
