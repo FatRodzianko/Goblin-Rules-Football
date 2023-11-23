@@ -52,6 +52,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public bool IsShanked = false;
     [SyncVar] public bool IsShankedSynced = false;
     Vector2 _previousAimMovement = Vector2.zero;
+    [SerializeField] Vector2 _normalizedDirection = new Vector2(1f, 1f).normalized;
 
     [Header("Trajectory Drawing Stuff")]
     [SerializeField] DrawTrajectoryTopDown drawTrajectoryTopDown;
@@ -266,6 +267,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
             cameraFollowScript = _vCam.GetComponent<CameraFollowScript>();
         if (!_cameraViewHole)
             _cameraViewHole = _vCam.GetComponent<CameraViewHole>();
+
+        _normalizedDirection = _normalizedDirection.normalized;
 
     }
     public override void OnStopClient()
@@ -796,6 +799,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             //Debug.Log("ChangeHitDirection: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000"));            
         }
+        //UpdateSpriteDirectionFromHitDirection(hitDirection);
 
         // old way?
         //hitDirection += perpendicular * Time.deltaTime * turnRate;
@@ -846,6 +850,22 @@ public class GolfPlayerTopDown : NetworkBehaviour
         else
         {
             //Debug.Log("ChangeDirectionFromMouseClick: new point is NOT COLLIDING the camera bounding box at point: " + newTargetPos.ToString("0.00000") + ". Will try and adjust distance to stay in bounds?");            
+        }
+    }
+    void UpdateSpriteDirectionFromHitDirection(Vector2 newDir)
+    {
+        Debug.Log("UpdateSpriteDirectionFromHitDirection: " + newDir.ToString());
+        if (newDir.y >= _normalizedDirection.y)
+        {
+            this._golfAnimator.SetGolferDirection("up");
+        }
+        else if (newDir.y <= -_normalizedDirection.y)
+        {
+            this._golfAnimator.SetGolferDirection("down");
+        }
+        else
+        {
+            this._golfAnimator.SetGolferDirection("sideways");
         }
     }
     void UpdateAimMovement()

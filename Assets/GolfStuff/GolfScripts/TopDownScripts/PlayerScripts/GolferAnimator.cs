@@ -16,6 +16,7 @@ public class GolferAnimator : NetworkBehaviour
     [SerializeField] string _pauseOnLightningStrike;
     [SerializeField] string _struckSkeleton;
     [SerializeField] string _swingStruckByLightning;
+    [SerializeField] string _struckByLightningTrigger;
 
     [Header("Player Sprite")]
     [SerializeField] SpriteRenderer _spriteRenderer;
@@ -34,6 +35,18 @@ public class GolferAnimator : NetworkBehaviour
     [SerializeField] GameObject _lightningBoltObject;
     LightningManager _lightningManager;
 
+    [Header("Golfer Direction")]
+    [SerializeField] Vector2 _normalizedDir = new Vector2(1f, 1f).normalized;
+    [SerializeField] Vector3 _hitUpTransformPosition = new Vector3(0f, -0.01f, 0f);
+    [SerializeField] Vector3 _hitDownTransformPosition = new Vector3(0f, 0.01f, 0f);
+    [SerializeField] string _golferDirection = "sideways";
+    [SerializeField] string _sidewaysIdle;
+    [SerializeField] string _upIdle;
+    [SerializeField] string _downIdle;
+    [SerializeField] string _sidewaysStruckByLightning;
+    [SerializeField] string _upStruckByLightning;
+    [SerializeField] string _downStruckByLightning;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -41,6 +54,7 @@ public class GolferAnimator : NetworkBehaviour
             _myPlayer = this.transform.parent.GetComponent<GolfPlayerTopDown>();
         if(!_spriteRenderer)
             _spriteRenderer = this.GetComponent<SpriteRenderer>();
+        _normalizedDir = _normalizedDir.normalized;
     }
     private void Start()
     {
@@ -82,8 +96,22 @@ public class GolferAnimator : NetworkBehaviour
         //_animator.Play(_frontSwing);
         //_networkAnimator.Play(_frontSwing);
         //_networkAnimator.Animator.Play(_frontSwing);
-        _networkAnimator.SetTrigger("front swing");
-        Debug.Log("StartSwing: _networkAnimator.SetTrigger(\"front swing\");");
+        if (this._golferDirection == "up")
+        {
+            _networkAnimator.SetTrigger("swing-up");
+            Debug.Log("StartSwing: _networkAnimator.SetTrigger(\"swing-up\");");
+        }
+        else if (this._golferDirection == "down")
+        {
+            _networkAnimator.SetTrigger("swing-down");
+            Debug.Log("StartSwing: _networkAnimator.SetTrigger(\"swing-down\");");
+        }
+        else
+        {
+            _networkAnimator.SetTrigger("front swing");
+            Debug.Log("StartSwing: _networkAnimator.SetTrigger(\"front swing\");");
+        }
+        
     }
     public void HitBall()
     {
@@ -98,10 +126,22 @@ public class GolferAnimator : NetworkBehaviour
     }
     public void UpdateSpriteDirection(Vector2 hitDirection)
     {
-        if (hitDirection.x < 0)
-            _spriteRenderer.flipX = true;
+        if (hitDirection.y >= this._normalizedDir.y)
+        {
+            SetGolferDirection("up");
+        }
+        else if (hitDirection.y <= -this._normalizedDir.y)
+        {
+            SetGolferDirection("down");
+        }
         else
-            _spriteRenderer.flipX = false;
+        {
+            SetGolferDirection("sideways");
+            if (hitDirection.x < 0)
+                _spriteRenderer.flipX = true;
+            else
+                _spriteRenderer.flipX = false;
+        }
     }
     public void LightningStrikeForHit()
     {
@@ -123,7 +163,22 @@ public class GolferAnimator : NetworkBehaviour
         //_networkAnimator.SetTrigger("StruckSkeleton");
 
         //_networkAnimator.Play(_swingStruckByLightning);
-        _networkAnimator.SetTrigger("struck by lightning");
+        //_networkAnimator.SetTrigger("struck by lightning");
+        if (this._golferDirection == "up")
+        {
+            _networkAnimator.SetTrigger(this._upStruckByLightning);
+            Debug.Log("PlayerStruckByLightning: _networkAnimator.SetTrigger(this._upStruckByLightning);");
+        }
+        else if (this._golferDirection == "down")
+        {
+            _networkAnimator.SetTrigger(this._downStruckByLightning);
+            Debug.Log("PlayerStruckByLightning: _networkAnimator.SetTrigger(this._downStruckByLightning);");
+        }
+        else
+        {
+            _networkAnimator.SetTrigger(this._sidewaysStruckByLightning);
+            Debug.Log("PlayerStruckByLightning: _networkAnimator.SetTrigger(this._sidewaysStruckByLightning);");
+        }
         //_animator.enabled = false;
 
     }
@@ -195,5 +250,32 @@ public class GolferAnimator : NetworkBehaviour
     public void ThunderForLightningStrike()
     {
         _lightningManager.PlayThunderClip(true, 0f);
+    }
+    public void SetGolferDirection(string newDirection)
+    {
+        //Debug.Log("SetGolferDirection: " + newDirection);
+        if (this._golferDirection == newDirection)
+            return;
+        this._golferDirection = newDirection;
+        if (newDirection == "up")
+        {
+            this._idle = this._upIdle;
+            this._struckByLightningTrigger = this._upStruckByLightning;
+            _spriteRenderer.flipX = false;
+            this.transform.localPosition = _hitUpTransformPosition;
+        }
+        else if (newDirection == "down")
+        {
+            this._idle = this._downIdle;
+            this._struckByLightningTrigger = this._downStruckByLightning;
+            _spriteRenderer.flipX = false;
+            this.transform.localPosition = _hitDownTransformPosition;
+        }
+        else
+        {
+            this._idle = _sidewaysIdle;
+            this._struckByLightningTrigger = this._sidewaysStruckByLightning;
+            this.transform.localPosition = Vector3.zero;
+        }
     }
 }

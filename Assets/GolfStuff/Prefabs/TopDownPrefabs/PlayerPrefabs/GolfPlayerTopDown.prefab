@@ -973,6 +973,7 @@ MonoBehaviour:
   hitLeftOrRightspin: 0
   IsShanked: 0
   IsShankedSynced: 0
+  _normalizedDirection: {x: 0.70710677, y: 0.70710677}
   drawTrajectoryTopDown: {fileID: 3662651631311076367}
   _landingTargetSprite: {fileID: 4478594324651228388}
   _landingTargetCollider: {fileID: 169311651467970805}
@@ -1623,6 +1624,7 @@ MonoBehaviour:
   _pauseOnLightningStrike: golfer-pause-on-lightning-strike
   _struckSkeleton: golfer-struck-skeleton
   _swingStruckByLightning: golfer-grenadier-swing-struck-by-lightning
+  _struckByLightningTrigger: struck by lightning
   _spriteRenderer: {fileID: 3106487267619827375}
   IsSwinging: 0
   IsDyingFromLightning: 0
@@ -1631,6 +1633,16 @@ MonoBehaviour:
   _struckByLightningFullSwingFlashOn: {fileID: 21300000, guid: 87533ef9bb06beb479f0b1d17426d073, type: 3}
   _struckByLightningFullSwingFlashOff: {fileID: 21300000, guid: ff0ec44b0db04d742aba42a0b62ac359, type: 3}
   _lightningBoltObject: {fileID: 8989263272828289160}
+  _normalizedDir: {x: 0.70710677, y: 0.70710677}
+  _hitUpTransformPosition: {x: 0, y: -0.01, z: 0}
+  _hitDownTransformPosition: {x: 0, y: 0.01, z: 0}
+  _golferDirection: sideways
+  _sidewaysIdle: golfer-grenadier-idle
+  _upIdle: golfer-grenadier-idle-up
+  _downIdle: golfer-grenadier-idle-down
+  _sidewaysStruckByLightning: struck by lightning
+  _upStruckByLightning: struck-by-lightning-up
+  _downStruckByLightning: struck-by-lightning-down
 --- !u!114 &5853080995522655165
 MonoBehaviour:
   m_ObjectHideFlags: 0
