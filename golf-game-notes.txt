@@ -397,8 +397,8 @@ x Add a second camera for the golf UI
 x make it so driver has an even greater accuracy penalty when hitting off fairway
 - - x check if player has teed off already if they are using the driver. If not, increase driver inaccuracy penalty?
 - MAke the power up balloons even bigger. Like twice as big. They are still too hard to hit imo
-- Remove the "height cap" of hit balls? 
-- - - Or at least the cap of their displayed height? It should be fine to keep the shadow moving further down
+x Remove the "height cap" of hit balls? 
+- - x Or at least the cap of their displayed height? It should be fine to keep the shadow moving further down
 x have multiple "aim points" that a player can cycle through? Can be good for 5 par holes especially?
 - - x finalize hole 8 first then work on that?
 - - - make it so that the aim direction changes, and the game only checks if the current hit distance would be out of bound. If it is, checks to see how far it is to the out of bounds line and then sets the aim point there? maybe minus a few pixel units???
@@ -411,26 +411,31 @@ x have multiple "aim points" that a player can cycle through? Can be good for 5 
 - - - - - - https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0ujXT_Og3gTB-_dg-eI2ScX5ZmI4fXF0ToAzACY8MpSHyxRBgbQMFBJTMI70D1mj1CRg&usqp=CAU
 - - - - - - https://i.pinimg.com/1200x/ee/42/ae/ee42ae332060afaab9dad6b636fc1ef0.jpg
 x add "first song" to the playlist, along with synthwave-take-2 after lowering the chord volume and eqing and stuff
-- create swing animation for up/down swing
-- - - will unfortunately require two animations, one for hitting up/north and another for hitting down/south. One shows the player's back (up), the other the player's chest/face (down)
-- - - - - - will be hard...
-- - - when using the up/down swing animations, need to set the player sprite's y value to either +0.01 to be "behind" the ball and -0.01 to be "in front" of the ball
-- - - - - - then switch back to y:0.0f when using the sideways swing?
+x create swing animation for up/down swing
+- - x will unfortunately require two animations, one for hitting up/north and another for hitting down/south. One shows the player's back (up), the other the player's chest/face (down)
+- - - - - x will be hard...
+- - x when using the up/down swing animations, need to set the player sprite's y value to either +0.01 to be "behind" the ball and -0.01 to be "in front" of the ball
+- - - - - x then switch back to y:0.0f when using the sideways swing?
 - add a "controls" menu to the golf esc menu
 - - - at the very least should display controls. Doesn't necessarily need to support rebinding (for now)
 - - x idealy would just add all of the settings/control options to the golf escape menu. Might be annoying... but should be easy enough to copy/paste from football's escape menu?
 x player prompts that say things like "press space" or whatever should try and pull the key binding and display that?
-- music can't be turned off in the current build. It just skips to the next song
+x music can't be turned off in the current build. It just skips to the next song
 - - x also when music is playing the perfect hit sounds don't play?
 - - - - - x this issue was caused by the SoundManager in TitleScreen not having those perfect submission sounds. added now
-- - - music thing isn't an issue in new build?
+- - x music thing isn't an issue in new build?
 x issue where if a player leaves after they have their ball in the hole, the "ballsInHole" number stays the same but the count for ServerGolfPlayers will be decremented by 1
 - - x make sure OnDisconnect for a player checks if their ball is in the hole, and if so, decrease ballsInHole by 1?
 - - - - - - did this but haven't actually tested it???
 - - - or just instead of keeping a tally, just loop through all the balls, check if they're in the hole, add those up, and compare count to number of ServerGolfPlayers
 - - - - - - adds more logic to run but also the count will always be <10 so it's not a lot to begin with... and it's only run between turns, not every frame or anything
-- how to convert a DLC in steamworks to a soundstrack:
-- - - https://partner.steamgames.com/doc/store/application/soundtrackapp#conversion
+x how to convert a DLC in steamworks to a soundstrack:
+- - x https://partner.steamgames.com/doc/store/application/soundtrackapp#conversion
+- prevent flag/hole from being hidden behind player
+- - - add SpriteCollision to player sprite
+- - - Create a PlayerSpriteCollision script
+- - - - - - OnTriggerEnter2D - if the spriteCollision has a parent object, and that parent object has the tag "golfHole," then make the player sprite semi transparent
+- - - - - - OnTriggerExit2D - set player sprite back to normal transparency
 
 
 ### hole six notes:

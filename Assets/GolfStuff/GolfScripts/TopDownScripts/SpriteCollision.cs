@@ -8,6 +8,10 @@ public class SpriteCollision : MonoBehaviour
     [SerializeField] int _defaultOrderInLayer;
     [SerializeField] Collider2D _myCollider;
     [SerializeField] public SpriteMask MySpriteMask;
+
+    [Header("Sprite Colors")]
+    [SerializeField] Color _noTransparency = new Color(1f, 1f, 1f, 1f);
+    [SerializeField] Color _transparent = new Color(1f, 1f, 1f, 0.5f);
     // Start is called before the first frame update
     void Start()
     {
@@ -22,10 +26,27 @@ public class SpriteCollision : MonoBehaviour
     {
         
     }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "GolfBallSprite")
+        {
+            if (collision.transform.parent.position.y > this.transform.position.y)
+            {
+                this.MySpriteRenderer.color = _transparent;
+            }
+        }
+    }
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (MySpriteRenderer.sortingOrder != _defaultOrderInLayer)
             MySpriteRenderer.sortingOrder = _defaultOrderInLayer;
+
+        if (collision.tag == "GolfBallSprite")
+        {
+
+            this.MySpriteRenderer.color = _noTransparency;
+            
+        }
 
         // Find any objects overlapping this renderer. If they are below it, reset their order in layer as well? Only if they aren't set to the default alrady? Would need to be "recursive" for each object?
     }

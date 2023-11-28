@@ -403,8 +403,10 @@ public class GolfBallTopDown : NetworkBehaviour
             ballObjectY -= mod;
             /*if (ballObjectY > 5.25f)
                 ballObjectY = 5.25f;*/
-            if (ballObjectY > 12f)
-                ballObjectY = 12f;
+
+            // old way had a cap on ball height. Removing it?
+            //if (ballObjectY > 12f)
+            //    ballObjectY = 12f;
         }
 
         return ballObjectY;
