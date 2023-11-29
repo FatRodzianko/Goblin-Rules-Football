@@ -12,6 +12,12 @@ public class SpriteCollision : MonoBehaviour
     [Header("Sprite Colors")]
     [SerializeField] Color _noTransparency = new Color(1f, 1f, 1f, 1f);
     [SerializeField] Color _transparent = new Color(1f, 1f, 1f, 0.5f);
+
+    [Header("Transparency routine stuff?")]
+    private bool _fadeInTransparencyRoutineRunning = false;
+    private bool _fadeOutTransparencyRoutineRunning = false;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,7 +38,8 @@ public class SpriteCollision : MonoBehaviour
         {
             if (collision.transform.parent.position.y > this.transform.position.y)
             {
-                this.MySpriteRenderer.color = _transparent;
+                //this.MySpriteRenderer.color = _transparent;
+                StartCoroutine(FadeInTransparency());
             }
         }
     }
@@ -43,12 +50,54 @@ public class SpriteCollision : MonoBehaviour
 
         if (collision.tag == "GolfBallSprite")
         {
-
-            this.MySpriteRenderer.color = _noTransparency;
-            
+            //this.MySpriteRenderer.color = _noTransparency;
+            StartCoroutine(FadeOutTransparency());
         }
 
         // Find any objects overlapping this renderer. If they are below it, reset their order in layer as well? Only if they aren't set to the default alrady? Would need to be "recursive" for each object?
+    }
+    IEnumerator FadeInTransparency()
+    {
+        _fadeOutTransparencyRoutineRunning = false;
+        _fadeInTransparencyRoutineRunning = true;
+        while (_fadeInTransparencyRoutineRunning)
+        {
+            Color currentColor = this.MySpriteRenderer.color;
+            currentColor.a -= 0.1f;
+
+            if (currentColor.a <= _transparent.a)
+            {
+                this.MySpriteRenderer.color = _transparent;
+                _fadeInTransparencyRoutineRunning = false;
+            }
+                
+            this.MySpriteRenderer.color = currentColor;
+            yield return new WaitForSeconds(0.1f);
+        }
+        yield break;
+
+
+    }
+    IEnumerator FadeOutTransparency()
+    {
+        _fadeInTransparencyRoutineRunning = false;
+        _fadeOutTransparencyRoutineRunning = true;
+        while (_fadeOutTransparencyRoutineRunning)
+        {
+            Color currentColor = this.MySpriteRenderer.color;
+            currentColor.a += 0.1f;
+
+            if (currentColor.a >= _noTransparency.a)
+            {
+                this.MySpriteRenderer.color = _noTransparency;
+                _fadeOutTransparencyRoutineRunning = false;
+            }
+            this.MySpriteRenderer.color = currentColor;
+            yield return new WaitForSeconds(0.1f);
+        }
+        yield break;
+
+
     }
     public void UpdateSpriteOrderInLayer(int newOrderInLayer)
     {

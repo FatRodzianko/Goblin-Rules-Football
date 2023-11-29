@@ -56,7 +56,16 @@ public class BallSpriteCollision : MonoBehaviour
     {
         try
         {
-            IncreaseSortingLayer(collision);
+            if (_golfBallTopDown.isHit || _golfBallTopDown.isBouncing || _golfBallTopDown.isRolling)
+            {
+                IncreaseSortingLayer(collision);
+            }   
+            else
+            {
+                SpriteCollision spriteCollision = collision.GetComponent<SpriteCollision>();
+                if(spriteCollision.MySpriteMask.enabled)
+                    spriteCollision.MySpriteMask.enabled = false;
+            }
             /*SpriteRenderer collisionRenderer = collision.GetComponent<SpriteRenderer>();
             if (collisionRenderer.sortingLayerID == _spriteRenderer.sortingLayerID)
             {
@@ -104,7 +113,12 @@ public class BallSpriteCollision : MonoBehaviour
             return;
         if (_golfBallTopDown.BallInTube)
             return;
+        
+
         SpriteCollision spriteCollision = collision.GetComponent<SpriteCollision>();
+
+        
+        
         SpriteRenderer collisionRenderer = spriteCollision.MySpriteRenderer;
         if (collisionRenderer.sortingLayerID == _spriteRenderer.sortingLayerID)
         {
@@ -128,7 +142,9 @@ public class BallSpriteCollision : MonoBehaviour
                 //_spriteRenderer.sortingOrder = collisionRenderer.sortingOrder;
                 //Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Ball Sprite should be BEHIND sprite collision. Setting sprite mask to true for: " + collision.gameObject.name);
                 Debug.Log("BallSpriteCollision: IncreaseSortingLayer: Setting sprite mask to TRUE for: " + collision.gameObject.name);
+                
                 spriteCollision.MySpriteMask.enabled = true;
+
 
             }
         }
