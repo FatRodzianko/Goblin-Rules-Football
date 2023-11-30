@@ -36,7 +36,7 @@ public class SpriteCollision : MonoBehaviour
     {
         if (collision.tag == "GolfBallSprite")
         {
-            if (collision.transform.parent.position.y > this.transform.position.y)
+            if (collision.transform.parent.position.y > this.transform.position.y && this.gameObject.activeInHierarchy)
             {
                 //this.MySpriteRenderer.color = _transparent;
                 StartCoroutine(FadeInTransparency());
@@ -48,7 +48,7 @@ public class SpriteCollision : MonoBehaviour
         if (MySpriteRenderer.sortingOrder != _defaultOrderInLayer)
             MySpriteRenderer.sortingOrder = _defaultOrderInLayer;
 
-        if (collision.tag == "GolfBallSprite")
+        if (collision.tag == "GolfBallSprite" && this.gameObject.activeInHierarchy)
         {
             //this.MySpriteRenderer.color = _noTransparency;
             StartCoroutine(FadeOutTransparency());

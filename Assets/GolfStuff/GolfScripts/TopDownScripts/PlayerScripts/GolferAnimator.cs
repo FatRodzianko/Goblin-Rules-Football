@@ -47,6 +47,9 @@ public class GolferAnimator : NetworkBehaviour
     [SerializeField] string _upStruckByLightning;
     [SerializeField] string _downStruckByLightning;
 
+    [Header("Sprite Collider Stuff")]
+    [SerializeField] PlayerSpriteCollision _playerSpriteCollision;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -277,5 +280,6 @@ public class GolferAnimator : NetworkBehaviour
             this._struckByLightningTrigger = this._sidewaysStruckByLightning;
             this.transform.localPosition = Vector3.zero;
         }
+        _playerSpriteCollision.SetColliderOffsetAndPosition(this._golferDirection);
     }
 }

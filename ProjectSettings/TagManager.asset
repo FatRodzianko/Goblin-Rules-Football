@@ -59,6 +59,7 @@ TagManager:
   - GolfNetworkManager
   - NetworkPlayer
   - LocalNetworkPlayer
+  - GolfPlayerSprite
   layers:
   - Default
   - TransparentFX

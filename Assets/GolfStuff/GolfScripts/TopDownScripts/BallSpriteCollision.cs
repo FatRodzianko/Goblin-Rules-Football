@@ -30,6 +30,8 @@ public class BallSpriteCollision : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        //if (collision.tag == "GolfPlayerSprite")
+        //    return;
         try
         {
             IncreaseSortingLayer(collision);
@@ -54,6 +56,8 @@ public class BallSpriteCollision : MonoBehaviour
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
+        //if (collision.tag == "GolfPlayerSprite")
+        //    return;
         try
         {
             if (_golfBallTopDown.isHit || _golfBallTopDown.isBouncing || _golfBallTopDown.isRolling)
@@ -87,6 +91,8 @@ public class BallSpriteCollision : MonoBehaviour
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
+        //if (collision.tag == "GolfPlayerSprite")
+        //    return;
         try
         {
             SpriteCollision spriteCollision = collision.GetComponent<SpriteCollision>();

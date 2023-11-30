@@ -436,6 +436,7 @@ x how to convert a DLC in steamworks to a soundstrack:
 - - - Create a PlayerSpriteCollision script
 - - - - - - OnTriggerEnter2D - if the spriteCollision has a parent object, and that parent object has the tag "golfHole," then make the player sprite semi transparent
 - - - - - - OnTriggerExit2D - set player sprite back to normal transparency
+- - - changed it so it is the player's aiming target that is the trigger: if the target is behind the player sprite, the player becomes transparent. If not, it stays solid
 
 
 ### hole six notes:
