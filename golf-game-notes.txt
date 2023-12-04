@@ -410,6 +410,8 @@ x have multiple "aim points" that a player can cycle through? Can be good for 5 
 - - - - - - https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fzxxld48pxpw11.png
 - - - - - - https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0ujXT_Og3gTB-_dg-eI2ScX5ZmI4fXF0ToAzACY8MpSHyxRBgbQMFBJTMI70D1mj1CRg&usqp=CAU
 - - - - - - https://i.pinimg.com/1200x/ee/42/ae/ee42ae332060afaab9dad6b636fc1ef0.jpg
+- - - wall has been made. In order for it to render correctly, will need to "slice" the wall into parts
+- - - - - - every 16 pixels? Maybe use Tilemap to set it ? Or just have each slice as its own game object?
 x add "first song" to the playlist, along with synthwave-take-2 after lowering the chord volume and eqing and stuff
 x create swing animation for up/down swing
 - - x will unfortunately require two animations, one for hitting up/north and another for hitting down/south. One shows the player's back (up), the other the player's chest/face (down)
@@ -431,12 +433,19 @@ x issue where if a player leaves after they have their ball in the hole, the "ba
 - - - - - - adds more logic to run but also the count will always be <10 so it's not a lot to begin with... and it's only run between turns, not every frame or anything
 x how to convert a DLC in steamworks to a soundstrack:
 - - x https://partner.steamgames.com/doc/store/application/soundtrackapp#conversion
-- prevent flag/hole from being hidden behind player
+x prevent flag/hole from being hidden behind player
 - - - add SpriteCollision to player sprite
 - - - Create a PlayerSpriteCollision script
 - - - - - - OnTriggerEnter2D - if the spriteCollision has a parent object, and that parent object has the tag "golfHole," then make the player sprite semi transparent
 - - - - - - OnTriggerExit2D - set player sprite back to normal transparency
-- - - changed it so it is the player's aiming target that is the trigger: if the target is behind the player sprite, the player becomes transparent. If not, it stays solid
+- - x changed it so it is the player's aiming target that is the trigger: if the target is behind the player sprite, the player becomes transparent. If not, it stays solid
+- minigolf mode
+- - - putter only
+- - - always on the green for ground type
+- - - will need to create "borders" that are like low walls to keep the player in bounds
+- - - - - - make them simple "wood" walls"
+- - - - - - ball will need to bounce off them
+- - - - - - need to test if this should be done through the tilemap, or as individual gameobjects that are "obstacles"?
 
 
 ### hole six notes:

@@ -14,7 +14,7 @@ using System.IO;
 
 public class TileMapManager : MonoBehaviour
 {
-    [SerializeField] private Tilemap _greenMap, _fairwayMap, _roughMap, _deepRoughMap, _sandTrapMap, _waterTrapMap, _edgesMap, _directionTilesMap;
+    [SerializeField] private Tilemap _greenMap, _fairwayMap, _roughMap, _deepRoughMap, _sandTrapMap, _waterTrapMap, _edgesMap, _directionTilesMap, _miniGolfWalls;
     [SerializeField] private List<Tilemap> _allMaps = new List<Tilemap>();
     [SerializeField] private Tile _nullTile;
     [SerializeField] private int _holeIndex;
@@ -64,6 +64,7 @@ public class TileMapManager : MonoBehaviour
         newHole.WaterTrapTiles = GetTilesFromMap(_waterTrapMap).ToList();
         newHole.EdgesTiles = GetTilesFromMap(_edgesMap).ToList();
         newHole.DirectionTiles = GetTilesFromMap(_directionTilesMap).ToList();
+        newHole.MiniGolfWallTiles = GetTilesFromMap(_miniGolfWalls).ToList();
 
         // Find all the holes and save their locations
         GameObject[] holes = GameObject.FindGameObjectsWithTag("golfHole");
@@ -311,6 +312,7 @@ public class TileMapManager : MonoBehaviour
         _waterTrapMap.ClearAllTiles();
         _edgesMap.ClearAllTiles();
         _directionTilesMap.ClearAllTiles();
+        _miniGolfWalls.ClearAllTiles();
 
         // Delete all hole objects
         try
@@ -470,6 +472,7 @@ public class TileMapManager : MonoBehaviour
         SetTileOnTileMap(_waterTrapMap, hole.WaterTrapTiles);
         SetTileOnTileMap(_edgesMap, hole.EdgesTiles);
         SetTileOnTileMap(_directionTilesMap, hole.DirectionTiles);
+        SetTileOnTileMap(_miniGolfWalls, hole.MiniGolfWallTiles);
 
         // Make sure that the DirectionTileManager saves all its sloped tile positions. This will only be called if not in the editor but in game??? Don't know if the below works or not...
         if (Application.isPlaying)

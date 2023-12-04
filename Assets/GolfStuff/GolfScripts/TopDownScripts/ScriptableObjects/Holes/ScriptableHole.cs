@@ -22,6 +22,7 @@ public class ScriptableHole : ScriptableObject
     public List<SavedTile> WaterTrapTiles;
     public List<SavedTile> EdgesTiles;
     public List<SavedTile> DirectionTiles;
+    public List<SavedTile> MiniGolfWallTiles;
     [Header("Saved Obstacles")]
     public List<SavedObstacle> SavedObstacles;
     [Header("Camera and Bounding Box")]
