@@ -1548,6 +1548,12 @@ public class GolfBallTopDown : NetworkBehaviour
             Debug.Log("HitEnvironmentObstacle: ball CLEARS the obstacle and will keep flying. Ball height: " + ballUnityUnits.ToString() + " enviornment obstacle height: " + obstalceUnityUnits.ToString());
         }
     }
+    public void BallHitMiniGolfWall(Vector2 collisionNormal, Vector2 ballPos)
+    {
+        BounceBallOffMiniGolfWall(collisionNormal, ballPos);
+        this.BouncedOffObstacle = true;
+        StartCoroutine(BouncedOffObstacleCoolDown());
+    }
     [TargetRpc]
     public void RpcHitByTornado(NetworkConnection conn, float obstalceUnityUnits, float ballUnityUnits, int tornadoStrength, Torndao tornado)
     {
@@ -1754,7 +1760,7 @@ public class GolfBallTopDown : NetworkBehaviour
         //Vector3 newDir = Vector2.Reflect(oldDir, (centerOfObstacle - ballPos).normalized);
         Vector3 newDir = GetBounceDirection(movementDirection, collisionPoint, ballPos);
         // instead of calculating the "normal" above as the direction from the ball to the center of the collider, it should be from the ball's center point to the "closet point" returned by the collider? or maybe not? idk, seems to be working well enough? Might require everything to be a circle collider though?
-        Debug.Log("BounceOffTheObstacleRolling: calculated movement direction: " + movementDirection.ToString() + " from a normal direction (perpendicular to the collision) of: " + (ballPos - collisionPoint).normalized.ToString("0.000000") + " using Vector2.reflect: " + newDir.ToString());
+        Debug.Log("BounceOffTheObstacleRolling: calculated movement direction: " + movementDirection.ToString("0.000000") + " from a normal direction (perpendicular to the collision) of: " + (ballPos - collisionPoint).normalized.ToString("0.000000") + " using Vector2.reflect: " + newDir.ToString("0.000000"));
         //movementDirection = GetBounceDirection(movementDirection,collisionPoint,ballPos);
         movementDirection = newDir;
     }
@@ -1762,9 +1768,21 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         return Vector2.Reflect(movementDirection.normalized, (ballPos - collisionPoint).normalized);
     }
+    void BounceBallOffMiniGolfWall(Vector2 collisionNormal, Vector2 ballPos, float bounceModifier = 1.0f)
+    {
+        Debug.Log("BounceBallOffMiniGolfWall: ballPos: " + ballPos.ToString()  + " and a collision normal of: " + collisionNormal.ToString());
+        Vector2 oldDir = movementDirection;
+
+        speedMetersPerSecond *= (0.8f * bounceModifier);
+
+        Vector2 newDir = Vector2.Reflect(oldDir, collisionNormal).normalized;
+
+        Debug.Log("BounceBallOffMiniGolfWall: old movement direction: " + movementDirection.ToString("0.000000") + " new movement direction: " + newDir.ToString("0.000000"));
+        movementDirection = newDir;
+    }
     IEnumerator BouncedOffObstacleCoolDown()
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.15f);
         this.BouncedOffObstacle = false;
     }
     Vector2 CalculateWindShiftForPutts(Vector2 oldDir)

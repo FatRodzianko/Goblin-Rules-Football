@@ -22,6 +22,8 @@ public class MiniGolfWalls : MonoBehaviour
         if (collision.transform.tag == "golfBall")
         {
             Vector2 collisionPoint = collision.contacts[0].point;
+            Vector2 collisionNormal = collision.contacts[0].normal;
+
             GolfBallTopDown golfBallScript = collision.transform.GetComponent<GolfBallTopDown>();
 
             if (!golfBallScript.isRolling)
@@ -31,10 +33,10 @@ public class MiniGolfWalls : MonoBehaviour
             
             Vector3 ballPos = golfBallScript.transform.position;
 
-            Debug.Log("MiniGolfWalls: OnCollisionEnter2D: ball position: " + ballPos.ToString() + " contact point: " + collisionPoint.ToString());
-            Debug.Break();
+            Debug.Log("MiniGolfWalls: OnCollisionEnter2D: ball position: " + ballPos.ToString("0.000000") + " contact point: " + collisionPoint.ToString("0.000000") + " collision normal: " + collisionNormal.ToString("0.000000"));
 
-            golfBallScript.HitEnvironmentObstacle(0.1f, 0f, false, collisionPoint, ballPos);
+            //golfBallScript.HitEnvironmentObstacle(0.1f, 0f, false, collisionPoint, ballPos);
+            golfBallScript.BallHitMiniGolfWall(collisionNormal, ballPos);
         }
     }
 }

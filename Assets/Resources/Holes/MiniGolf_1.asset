@@ -22,10 +22,78 @@ MonoBehaviour:
   - {x: 2.5, y: 3.5, z: 0}
   - {x: -3.5, y: -2.5, z: 0}
   GreenTiles:
+  - TilePos: {x: -3, y: -10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: -10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: -10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: -10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: -9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: -9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: -9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: -9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: -9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: -9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: -9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: -9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: -8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: -8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: -8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: -8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: -8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: -8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: -8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: -8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: -7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: -7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: -7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: -7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: -7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: -7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: -7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: -7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: -6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: -6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: -6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: -3, y: -6, z: 0}
-    MyTile: {fileID: 11400000, guid: 69b2f82f6ffb2cf4b8790f823b5205c7, type: 2}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: -2, y: -6, z: 0}
-    MyTile: {fileID: 11400000, guid: 098f5ec52dd352349b3949d35f337e12, type: 2}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: -6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: -6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: -6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: 3, y: -6, z: 0}
     MyTile: {fileID: 11400000, guid: 1cf3791605288a74a8eff5cf52e5c0c3, type: 2}
   - TilePos: {x: 4, y: -6, z: 0}
@@ -38,22 +106,24 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: e47ac09a7c809ae4bb531290dbe81c39, type: 2}
   - TilePos: {x: 8, y: -6, z: 0}
     MyTile: {fileID: 11400000, guid: 5e1f3ac0d1182844d948d0d87ddc6408, type: 2}
+  - TilePos: {x: -6, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: -5, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: 1cf3791605288a74a8eff5cf52e5c0c3, type: 2}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: -4, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: 56e87ef2ba82acf4aac9aac967593ecf, type: 2}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: -3, y: -5, z: 0}
     MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: -2, y: -5, z: 0}
     MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: -1, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: db694b14ac878d54797bc6354f69e583, type: 2}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: 0, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: e47ac09a7c809ae4bb531290dbe81c39, type: 2}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: 1, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: e47ac09a7c809ae4bb531290dbe81c39, type: 2}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: 2, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: 56e87ef2ba82acf4aac9aac967593ecf, type: 2}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: 3, y: -5, z: 0}
     MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: 4, y: -5, z: 0}
@@ -69,7 +139,7 @@ MonoBehaviour:
   - TilePos: {x: 9, y: -5, z: 0}
     MyTile: {fileID: 11400000, guid: eb490a46e53ae934e8e0bbcd253cdf40, type: 2}
   - TilePos: {x: -6, y: -4, z: 0}
-    MyTile: {fileID: 11400000, guid: b5b1858a9ec755f41876d88c8ee16e34, type: 2}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: -5, y: -4, z: 0}
     MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: -4, y: -4, z: 0}
@@ -100,6 +170,10 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: 9, y: -4, z: 0}
     MyTile: {fileID: 11400000, guid: 9c8d5031f37e87544896dc88e1957113, type: 2}
+  - TilePos: {x: -15, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 69b2f82f6ffb2cf4b8790f823b5205c7, type: 2}
+  - TilePos: {x: -14, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 098f5ec52dd352349b3949d35f337e12, type: 2}
   - TilePos: {x: -6, y: -3, z: 0}
     MyTile: {fileID: 11400000, guid: aa24d1c5d161d694095d557dff0c5a03, type: 2}
   - TilePos: {x: -5, y: -3, z: 0}
@@ -133,6 +207,14 @@ MonoBehaviour:
   - TilePos: {x: 9, y: -3, z: 0}
     MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: 10, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 098f5ec52dd352349b3949d35f337e12, type: 2}
+  - TilePos: {x: -16, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 69b2f82f6ffb2cf4b8790f823b5205c7, type: 2}
+  - TilePos: {x: -15, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: -2, z: 0}
     MyTile: {fileID: 11400000, guid: 098f5ec52dd352349b3949d35f337e12, type: 2}
   - TilePos: {x: -6, y: -2, z: 0}
     MyTile: {fileID: 11400000, guid: aa24d1c5d161d694095d557dff0c5a03, type: 2}
@@ -168,6 +250,14 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: 10, y: -2, z: 0}
     MyTile: {fileID: 11400000, guid: 5ccd5bcf75f2e774e86c9c9e97965672, type: 2}
+  - TilePos: {x: -16, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 2dd36822e0541bc46ad83c19b99482fa, type: 2}
+  - TilePos: {x: -15, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 5ccd5bcf75f2e774e86c9c9e97965672, type: 2}
   - TilePos: {x: -6, y: -1, z: 0}
     MyTile: {fileID: 11400000, guid: 2e14917d196801d4dbc44ac0e3b04dd1, type: 2}
   - TilePos: {x: -5, y: -1, z: 0}
@@ -200,6 +290,10 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   - TilePos: {x: 9, y: -1, z: 0}
     MyTile: {fileID: 11400000, guid: e1e4a7e651ec04d468999eea077a8b4e, type: 2}
+  - TilePos: {x: -15, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 2dd36822e0541bc46ad83c19b99482fa, type: 2}
+  - TilePos: {x: -14, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 5ccd5bcf75f2e774e86c9c9e97965672, type: 2}
   - TilePos: {x: -7, y: 0, z: 0}
     MyTile: {fileID: 11400000, guid: 69b2f82f6ffb2cf4b8790f823b5205c7, type: 2}
   - TilePos: {x: -6, y: 0, z: 0}
@@ -372,20 +466,40 @@ MonoBehaviour:
   EdgesTiles: []
   DirectionTiles: []
   MiniGolfWallTiles:
-  - TilePos: {x: -3, y: -7, z: 0}
-    MyTile: {fileID: 11400000, guid: 9a27e1f52cac5244d8e452f40560c7e2, type: 2}
-  - TilePos: {x: -2, y: -7, z: 0}
-    MyTile: {fileID: 11400000, guid: d206e6d0214ec60428001773d5654731, type: 2}
+  - TilePos: {x: -5, y: -10, z: 0}
+    MyTile: {fileID: 11400000, guid: f05510ecc7d1b6948807960aa64a9c94, type: 2}
+  - TilePos: {x: -4, y: -10, z: 0}
+    MyTile: {fileID: 11400000, guid: 866c759f48aa704419866f8b767d886f, type: 2}
+  - TilePos: {x: -3, y: -10, z: 0}
+    MyTile: {fileID: 11400000, guid: 866c759f48aa704419866f8b767d886f, type: 2}
+  - TilePos: {x: -2, y: -10, z: 0}
+    MyTile: {fileID: 11400000, guid: 866c759f48aa704419866f8b767d886f, type: 2}
+  - TilePos: {x: -1, y: -10, z: 0}
+    MyTile: {fileID: 11400000, guid: 866c759f48aa704419866f8b767d886f, type: 2}
+  - TilePos: {x: 0, y: -10, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b47efdc6e1ffec45922aa4e67448167, type: 2}
+  - TilePos: {x: -6, y: -9, z: 0}
+    MyTile: {fileID: 11400000, guid: 71745ddc81a91764baca18c244e4930a, type: 2}
+  - TilePos: {x: 1, y: -9, z: 0}
+    MyTile: {fileID: 11400000, guid: 9aeb4c8aeec940e499b1d3e83d9ef607, type: 2}
+  - TilePos: {x: -6, y: -8, z: 0}
+    MyTile: {fileID: 11400000, guid: 100666f754c4ba046a27b1e4df0428da, type: 2}
+  - TilePos: {x: 1, y: -8, z: 0}
+    MyTile: {fileID: 11400000, guid: e097cca6a5655174cbc8ac0763e060b9, type: 2}
+  - TilePos: {x: -6, y: -7, z: 0}
+    MyTile: {fileID: 11400000, guid: 100666f754c4ba046a27b1e4df0428da, type: 2}
+  - TilePos: {x: 1, y: -7, z: 0}
+    MyTile: {fileID: 11400000, guid: e097cca6a5655174cbc8ac0763e060b9, type: 2}
+  - TilePos: {x: -6, y: -6, z: 0}
+    MyTile: {fileID: 11400000, guid: 100666f754c4ba046a27b1e4df0428da, type: 2}
   - TilePos: {x: -4, y: -6, z: 0}
-    MyTile: {fileID: 11400000, guid: 1f8a887b678879043b8746c861d69851, type: 2}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
   - TilePos: {x: -3, y: -6, z: 0}
-    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
-  - TilePos: {x: -2, y: -6, z: 0}
-    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
-  - TilePos: {x: -1, y: -6, z: 0}
-    MyTile: {fileID: 11400000, guid: 370944c736ec6d147bd1382569492a25, type: 2}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: 1, y: -6, z: 0}
+    MyTile: {fileID: 11400000, guid: f35a8732cdfcf204e9aba3b54d44ce64, type: 2}
   - TilePos: {x: 2, y: -6, z: 0}
-    MyTile: {fileID: 11400000, guid: 1f8a887b678879043b8746c861d69851, type: 2}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
   - TilePos: {x: 3, y: -6, z: 0}
     MyTile: {fileID: 11400000, guid: f05510ecc7d1b6948807960aa64a9c94, type: 2}
   - TilePos: {x: 4, y: -6, z: 0}
@@ -401,35 +515,47 @@ MonoBehaviour:
   - TilePos: {x: 9, y: -6, z: 0}
     MyTile: {fileID: 11400000, guid: 594ef0f0605dfe1419043aefdd78e426, type: 2}
   - TilePos: {x: -6, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: 8fe1efbd5408b0a408f0e409deeb2488, type: 2}
-  - TilePos: {x: -5, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: f05510ecc7d1b6948807960aa64a9c94, type: 2}
+    MyTile: {fileID: 11400000, guid: 100666f754c4ba046a27b1e4df0428da, type: 2}
   - TilePos: {x: -4, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: c9bbd883e285b95488530f0068f57f1e, type: 2}
-  - TilePos: {x: -1, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: b781d93f8d0d9f54b98904b7e7a67de9, type: 2}
-  - TilePos: {x: 0, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: 866c759f48aa704419866f8b767d886f, type: 2}
-  - TilePos: {x: 1, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: 866c759f48aa704419866f8b767d886f, type: 2}
-  - TilePos: {x: 2, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: c9bbd883e285b95488530f0068f57f1e, type: 2}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: -3, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
   - TilePos: {x: 9, y: -5, z: 0}
     MyTile: {fileID: 11400000, guid: 9aeb4c8aeec940e499b1d3e83d9ef607, type: 2}
   - TilePos: {x: -6, y: -4, z: 0}
-    MyTile: {fileID: 11400000, guid: 71745ddc81a91764baca18c244e4930a, type: 2}
+    MyTile: {fileID: 11400000, guid: 100666f754c4ba046a27b1e4df0428da, type: 2}
+  - TilePos: {x: 3, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 9a27e1f52cac5244d8e452f40560c7e2, type: 2}
+  - TilePos: {x: 4, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: d206e6d0214ec60428001773d5654731, type: 2}
   - TilePos: {x: 9, y: -4, z: 0}
     MyTile: {fileID: 11400000, guid: f35a8732cdfcf204e9aba3b54d44ce64, type: 2}
   - TilePos: {x: 10, y: -4, z: 0}
     MyTile: {fileID: 11400000, guid: 98d500ab9a5d8114582a710b3346507c, type: 2}
   - TilePos: {x: -6, y: -3, z: 0}
     MyTile: {fileID: 11400000, guid: 100666f754c4ba046a27b1e4df0428da, type: 2}
+  - TilePos: {x: 2, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 9a27e1f52cac5244d8e452f40560c7e2, type: 2}
+  - TilePos: {x: 3, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: 4, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: 5, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: d206e6d0214ec60428001773d5654731, type: 2}
   - TilePos: {x: 10, y: -3, z: 0}
     MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
   - TilePos: {x: 11, y: -3, z: 0}
     MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
   - TilePos: {x: -6, y: -2, z: 0}
     MyTile: {fileID: 11400000, guid: 100666f754c4ba046a27b1e4df0428da, type: 2}
+  - TilePos: {x: 1, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 979b1da922d6119459b8aed44bd4c851, type: 2}
+  - TilePos: {x: 2, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: 5, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: 6, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
   - TilePos: {x: 10, y: -2, z: 0}
     MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
   - TilePos: {x: 11, y: -2, z: 0}
@@ -438,6 +564,14 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: 6fa8d1dc9a4e9da4e94f7f19e3e577b5, type: 2}
   - TilePos: {x: -6, y: -1, z: 0}
     MyTile: {fileID: 11400000, guid: d350b5ee9be93fb40a6581947d8972d5, type: 2}
+  - TilePos: {x: 1, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 0cb41e6948c866a4c806da3e8f5a4dda, type: 2}
+  - TilePos: {x: 2, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: 5, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: 6, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: c5e1e7f4ef41c7b4db3f449bdb14b9ca, type: 2}
   - TilePos: {x: 9, y: -1, z: 0}
     MyTile: {fileID: 11400000, guid: ba7c1ee16c1e3fd4486fa0bb6302b9c3, type: 2}
   - TilePos: {x: 10, y: -1, z: 0}
@@ -446,12 +580,24 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: 979b1da922d6119459b8aed44bd4c851, type: 2}
   - TilePos: {x: -7, y: 0, z: 0}
     MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: 2, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 49ae238c960b9514a81fa0bb638e09e7, type: 2}
+  - TilePos: {x: 3, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: 4, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: 5, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 771f3cc2f72b8ee42a02d384ab834b9a, type: 2}
   - TilePos: {x: 9, y: 0, z: 0}
     MyTile: {fileID: 11400000, guid: e097cca6a5655174cbc8ac0763e060b9, type: 2}
   - TilePos: {x: -8, y: 1, z: 0}
     MyTile: {fileID: 11400000, guid: 0cb41e6948c866a4c806da3e8f5a4dda, type: 2}
   - TilePos: {x: -7, y: 1, z: 0}
     MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: 3, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 49ae238c960b9514a81fa0bb638e09e7, type: 2}
+  - TilePos: {x: 4, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 771f3cc2f72b8ee42a02d384ab834b9a, type: 2}
   - TilePos: {x: 9, y: 1, z: 0}
     MyTile: {fileID: 11400000, guid: e097cca6a5655174cbc8ac0763e060b9, type: 2}
   - TilePos: {x: -7, y: 2, z: 0}

@@ -1281,8 +1281,6 @@ public class GolfPlayerTopDown : NetworkBehaviour
         Debug.Log("SetHitPowerValue");
         float iconXPosition = GetMovingIconXPosition();
 
-        // FOR TESTING
-        PerfectPowerSubmission();
 
         // Check if player was close to their target? If they are close enough, give it to them!        
         if (IsCloseEnoughToTargetPosition(TargetDistanceXPosForPlayer, iconXPosition))
@@ -1348,8 +1346,6 @@ public class GolfPlayerTopDown : NetworkBehaviour
         Debug.Log("SetHitAccuracyValue");
         float iconXPosition = GetMovingIconXPosition();
 
-        // FOR TESTING
-        PerfectAccuracySubmission();
 
         if (IsCloseEnoughToTargetPosition(_centerAccuracyPosition, iconXPosition))
         {
