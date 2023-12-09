@@ -163,6 +163,8 @@ public class DrawTrajectoryTopDown : MonoBehaviour
 
         for (int i = 0; i < obstaclesHit.Length; i++)
         {
+            if (obstaclesHit[i].transform.tag == "MiniGolfWall")
+                continue;
             // Get the height of the ball based on the collision point of the raycasthit2d
             float ballHeightAtCollision = HeightOfBallAtCollisionPoint(prevPos, newPos, obstaclesHit[i].point);
             float ballHeightInUnityUnits = ball.GetBallHeightYValue(ballHeightAtCollision);
