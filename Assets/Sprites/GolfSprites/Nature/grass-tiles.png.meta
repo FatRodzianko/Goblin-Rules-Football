@@ -108,7 +108,7 @@ TextureImporter:
       name: grass-tiles_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 1
         y: 416
         width: 16
         height: 16
@@ -13962,7 +13962,10 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      physicsShape: []
+      physicsShape:
+      - - {x: 2, y: -8}
+        - {x: 8, y: -8}
+        - {x: 8, y: 3}
       tessellationDetail: 0
       bones: []
       spriteID: 3838953b600f8664388b396e986af15d
@@ -13983,7 +13986,10 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      physicsShape: []
+      physicsShape:
+      - - {x: -8, y: -8}
+        - {x: -3, y: -8}
+        - {x: -8, y: 1}
       tessellationDetail: 0
       bones: []
       spriteID: faee1c417b3b02e47b58e8cb5aa6c760
@@ -14581,8 +14587,8 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape:
-      - - {x: -8, y: 8}
-        - {x: -8, y: -8}
+      - - {x: 2, y: 8}
+        - {x: -6, y: -8}
         - {x: 0, y: -8}
         - {x: 8, y: 8}
       tessellationDetail: 0
@@ -14608,8 +14614,8 @@ TextureImporter:
       physicsShape:
       - - {x: -8, y: 8}
         - {x: 0, y: -8}
-        - {x: 8, y: -8}
-        - {x: 8, y: 8}
+        - {x: 6, y: -8}
+        - {x: -3, y: 8}
       tessellationDetail: 0
       bones: []
       spriteID: e18c0f5ce17dd8f4f83d4bc3821c74bc
@@ -14693,7 +14699,10 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      physicsShape: []
+      physicsShape:
+      - - {x: -4, y: -8}
+        - {x: 8, y: -8}
+        - {x: 8, y: -2}
       tessellationDetail: 0
       bones: []
       spriteID: 2fb6b1d890e386247bc97c3f21b8fec5
@@ -15194,7 +15203,10 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      physicsShape: []
+      physicsShape:
+      - - {x: 2, y: -8}
+        - {x: 8, y: -8}
+        - {x: 8, y: 4}
       tessellationDetail: 0
       bones: []
       spriteID: d01a31be9282fac4ea55463cff684bbe
@@ -15217,7 +15229,8 @@ TextureImporter:
       outline: []
       physicsShape:
       - - {x: 0, y: 8}
-        - {x: -8, y: 8}
+        - {x: -6, y: 8}
+        - {x: -8, y: 4}
         - {x: -8, y: -8}
       tessellationDetail: 0
       bones: []
@@ -15242,7 +15255,8 @@ TextureImporter:
       physicsShape:
       - - {x: 0, y: 8}
         - {x: 8, y: -8}
-        - {x: 8, y: 8}
+        - {x: 8, y: 4}
+        - {x: 6, y: 8}
       tessellationDetail: 0
       bones: []
       spriteID: 8fd661467fcec9c4d86f3ddc383a740d
@@ -15263,7 +15277,10 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      physicsShape: []
+      physicsShape:
+      - - {x: -2, y: -8}
+        - {x: -8, y: 4}
+        - {x: -8, y: -8}
       tessellationDetail: 0
       bones: []
       spriteID: 8949402262980a74f9c836e0a0d2924b
@@ -15284,7 +15301,10 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      physicsShape: []
+      physicsShape:
+      - - {x: -3, y: -8}
+        - {x: 8, y: -8}
+        - {x: 8, y: -2}
       tessellationDetail: 0
       bones: []
       spriteID: b48f83dfd4a4cec40a732ee75e91805d
@@ -15306,11 +15326,11 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape:
-      - - {x: -8, y: 8}
+      - - {x: -8, y: -2}
         - {x: -8, y: -8}
         - {x: -8, y: -8}
         - {x: 8, y: 0}
-        - {x: 8, y: 8}
+        - {x: 8, y: 6}
       tessellationDetail: 0
       bones: []
       spriteID: e07513c23a2ec5d4289dafdfefbdb76f
@@ -15332,7 +15352,8 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape:
-      - - {x: -8, y: 8}
+      - - {x: -4, y: 8}
+        - {x: -8, y: 6}
         - {x: -8, y: 0}
         - {x: 8, y: 8}
       tessellationDetail: 0
@@ -15358,7 +15379,8 @@ TextureImporter:
       physicsShape:
       - - {x: -8, y: 8}
         - {x: 8, y: 0}
-        - {x: 8, y: 8}
+        - {x: 8, y: 6}
+        - {x: 4, y: 8}
       tessellationDetail: 0
       bones: []
       spriteID: ed929413feb68704c93146b69ea7d00b
@@ -15829,7 +15851,10 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      physicsShape: []
+      physicsShape:
+      - - {x: 2, y: 8}
+        - {x: 8, y: -3}
+        - {x: 8, y: 8}
       tessellationDetail: 0
       bones: []
       spriteID: d3693b8c78ea0f845b3ce65441a84014
@@ -15852,7 +15877,8 @@ TextureImporter:
       outline: []
       physicsShape:
       - - {x: -8, y: 8}
-        - {x: -8, y: -8}
+        - {x: -8, y: -3}
+        - {x: -6, y: -8}
         - {x: 0, y: -8}
       tessellationDetail: 0
       bones: []
@@ -15876,7 +15902,8 @@ TextureImporter:
       outline: []
       physicsShape:
       - - {x: 0, y: -8}
-        - {x: 8, y: -8}
+        - {x: 6, y: -8}
+        - {x: 8, y: -3}
         - {x: 8, y: 8}
       tessellationDetail: 0
       bones: []
@@ -15898,7 +15925,10 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      physicsShape: []
+      physicsShape:
+      - - {x: -2, y: 8}
+        - {x: -8, y: 8}
+        - {x: -8, y: -3}
       tessellationDetail: 0
       bones: []
       spriteID: 78fbc7928085e094d8ec27ce2fe79c87
@@ -16478,8 +16508,8 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape:
-      - - {x: -8, y: 8}
-        - {x: -8, y: -8}
+      - - {x: -6, y: 8}
+        - {x: 2, y: -8}
         - {x: 8, y: -8}
         - {x: 0, y: 8}
       tessellationDetail: 0
@@ -16505,8 +16535,8 @@ TextureImporter:
       physicsShape:
       - - {x: 0, y: 8}
         - {x: -8, y: -8}
-        - {x: 8, y: -8}
-        - {x: 8, y: 8}
+        - {x: -2, y: -8}
+        - {x: 6, y: 8}
       tessellationDetail: 0
       bones: []
       spriteID: c90f075205515c14a87a8fdd34a0d417
@@ -17316,8 +17346,8 @@ TextureImporter:
       grass-tiles_187: -1551232769
       grass-tiles_671: 1587909903
       grass-tiles_455: -1183022443
-      grass-tiles_587: -393021151
       grass-tiles_426: -796609565
+      grass-tiles_587: -393021151
       grass-tiles_298: 1830734038
       grass-tiles_691: 1099226854
       grass-tiles_340: 1116830948
