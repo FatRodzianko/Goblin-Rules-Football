@@ -858,11 +858,11 @@ MonoBehaviour:
   - TilePos: {x: -4, y: 15, z: 0}
     MyTile: {fileID: 11400000, guid: 4fa80d7147dda34439de9b82bc1b3547, type: 2}
   - TilePos: {x: -3, y: 15, z: 0}
-    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+    MyTile: {fileID: 11400000, guid: a30817fe81cc75041ac255ea30bacc97, type: 2}
   - TilePos: {x: -2, y: 15, z: 0}
     MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
   - TilePos: {x: -1, y: 15, z: 0}
-    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+    MyTile: {fileID: 11400000, guid: 7da63985f92972949b6283a197e51322, type: 2}
   - TilePos: {x: 0, y: 15, z: 0}
     MyTile: {fileID: 11400000, guid: af705da60f4bbac48b221480b3c7a357, type: 2}
   - TilePos: {x: -4, y: 16, z: 0}

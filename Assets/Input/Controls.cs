@@ -1100,6 +1100,15 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ScrollWhell"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""cd49aedd-4e9d-4324-a8e7-b8b289a53d24"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1388,6 +1397,17 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0c088cd2-238c-4e95-ac1e-372e41d42bca"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""ScrollWhell"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1618,6 +1638,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_UI_MiddleClick = m_UI.FindAction("MiddleClick", throwIfNotFound: true);
         m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
         m_UI_Submit = m_UI.FindAction("Submit", throwIfNotFound: true);
+        m_UI_ScrollWhell = m_UI.FindAction("ScrollWhell", throwIfNotFound: true);
         // EscMenu
         m_EscMenu = asset.FindActionMap("EscMenu", throwIfNotFound: true);
         m_EscMenu_EscMenu = m_EscMenu.FindAction("EscMenu", throwIfNotFound: true);
@@ -2113,6 +2134,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_MiddleClick;
     private readonly InputAction m_UI_RightClick;
     private readonly InputAction m_UI_Submit;
+    private readonly InputAction m_UI_ScrollWhell;
     public struct UIActions
     {
         private @Controls m_Wrapper;
@@ -2123,6 +2145,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         public InputAction @MiddleClick => m_Wrapper.m_UI_MiddleClick;
         public InputAction @RightClick => m_Wrapper.m_UI_RightClick;
         public InputAction @Submit => m_Wrapper.m_UI_Submit;
+        public InputAction @ScrollWhell => m_Wrapper.m_UI_ScrollWhell;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -2150,6 +2173,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Submit.started -= m_Wrapper.m_UIActionsCallbackInterface.OnSubmit;
                 @Submit.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnSubmit;
                 @Submit.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnSubmit;
+                @ScrollWhell.started -= m_Wrapper.m_UIActionsCallbackInterface.OnScrollWhell;
+                @ScrollWhell.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnScrollWhell;
+                @ScrollWhell.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnScrollWhell;
             }
             m_Wrapper.m_UIActionsCallbackInterface = instance;
             if (instance != null)
@@ -2172,6 +2198,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Submit.started += instance.OnSubmit;
                 @Submit.performed += instance.OnSubmit;
                 @Submit.canceled += instance.OnSubmit;
+                @ScrollWhell.started += instance.OnScrollWhell;
+                @ScrollWhell.performed += instance.OnScrollWhell;
+                @ScrollWhell.canceled += instance.OnScrollWhell;
             }
         }
     }
@@ -2320,6 +2349,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         void OnMiddleClick(InputAction.CallbackContext context);
         void OnRightClick(InputAction.CallbackContext context);
         void OnSubmit(InputAction.CallbackContext context);
+        void OnScrollWhell(InputAction.CallbackContext context);
     }
     public interface IEscMenuActions
     {

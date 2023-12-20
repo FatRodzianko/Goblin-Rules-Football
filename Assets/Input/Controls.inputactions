@@ -1078,6 +1078,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ScrollWhell",
+                    "type": "PassThrough",
+                    "id": "cd49aedd-4e9d-4324-a8e7-b8b289a53d24",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1366,6 +1375,17 @@
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "0c088cd2-238c-4e95-ac1e-372e41d42bca",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "ScrollWhell",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
