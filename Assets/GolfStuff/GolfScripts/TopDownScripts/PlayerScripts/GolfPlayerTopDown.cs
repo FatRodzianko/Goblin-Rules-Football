@@ -1643,8 +1643,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         // Make sure the ground material for the ball is up-to-date so you select the right clubS? May only be necessary for testing right now...
         UpdateBallGroundMaterial();
+
         int oldIndex = _currentClubIndex;
         _currentClubIndex++;
+
         if (_currentClubIndex >= _myClubs.Length)
             _currentClubIndex = 0;
         if (!CanClubBeUsedOnCurrentGround(_myClubs[_currentClubIndex]))
@@ -1698,7 +1700,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
         float dist = club.MaxHitDistance;
 
         // Modify the max distance of the club based on the player's distance favor modifer, but not for putters
-        if (club.ClubType != "putter")
+        // but do add the distance modifiers if it is minigolf?
+        if (club.ClubType != "putter" || GameplayManagerTopDownGolf.instance.CurrentHoleInCourse.IsMiniGolf)
         {
             //dist *= this.DistanceFavorModifier;
             //float newDist = dist * this.DistanceFavorModifier;
@@ -1754,6 +1757,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     bool CanClubBeUsedOnCurrentGround(ClubTopDown club)
     {
+        if (GameplayManagerTopDownGolf.instance.CurrentHoleInCourse.IsMiniGolf)
+        {
+            if (club.ClubType != "putter")
+                return false;
+        }
         if (GameplayManagerTopDownGolf.instance.IsTeeOffChallenge)
         {
             if (club.ClubType != GameplayManagerTopDownGolf.instance.TeeOffChallengeClubType)
@@ -1777,10 +1785,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         int firstIndex = 0;
 
+        // always return a putter for minigolf
+        if (GameplayManagerTopDownGolf.instance.CurrentHoleInCourse.IsMiniGolf)
+        {
+            return GetClubIndexForTeeOffChallenege("putter");
+        }
         if (GameplayManagerTopDownGolf.instance.IsTeeOffChallenge)
         {
             return GetClubIndexForTeeOffChallenege(GameplayManagerTopDownGolf.instance.TeeOffChallengeClubType);
         }
+
 
         for (int i = 0; i < _myClubs.Length; i++)
         {

@@ -23,6 +23,8 @@ public class TileMapManager : MonoBehaviour
     [SerializeField] private float _cameraZoomValue;
     [SerializeField] private string _clubToUse;
     [SerializeField] private bool _isTeeOffChallenge;
+    [Header("MiniGolf Stuff")]
+    public bool IsMiniGolf = false;
 
     [Header("Prefabs for Objects like holes/tee ball things")]
     [SerializeField] GameObject _holePrefab;
@@ -111,6 +113,7 @@ public class TileMapManager : MonoBehaviour
         if (!string.IsNullOrEmpty(_clubToUse))
             newHole.ClubToUse = _clubToUse;
         newHole.IsTeeOffChallenge = this._isTeeOffChallenge;
+        newHole.IsMiniGolf = this.IsMiniGolf;
 
         // Save the statues for the hole
         newHole.Statues = SaveAllStatues(GameObject.FindGameObjectsWithTag("Statue")).ToList();
@@ -441,6 +444,7 @@ public class TileMapManager : MonoBehaviour
             this._clubToUse = "";
 
         this._isTeeOffChallenge = hole.IsTeeOffChallenge;
+        this.IsMiniGolf = hole.IsMiniGolf;
 
         this.LoadMap(hole);
     }

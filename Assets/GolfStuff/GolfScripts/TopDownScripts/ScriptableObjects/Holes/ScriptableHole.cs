@@ -45,7 +45,10 @@ public class ScriptableHole : ScriptableObject
 
     [Header("Tee Off Challenge Stuff")]
     public bool IsTeeOffChallenge = false;
-    public string ClubToUse = ""; 
+    public string ClubToUse = "";
+
+    [Header("MiniGolf Stuff")]
+    public bool IsMiniGolf = false;
 
 }
 [Serializable]

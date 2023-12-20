@@ -45,6 +45,10 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/ill-fated-stew-2.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: f9abd5584669696489758632d6de5098
+    m_Address: Assets/GolfStuff/GolfCourses/MiniGolf.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:
