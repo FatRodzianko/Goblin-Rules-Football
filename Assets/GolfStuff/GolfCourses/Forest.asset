@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b45ee6b98ca05149badb35431e89665, type: 3}
   m_Name: Forest
   m_EditorClassIdentifier: 
+  id: 0de78215564c4a647b4d3a8026292151
   CourseName: Forest
   HolesInCourse:
   - {fileID: 11400000, guid: a87a1099d535fc8458827d42ca136c40, type: 2}
@@ -23,3 +24,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5b5f5aea1eb11ae41b33a4f14260bcc1, type: 2}
   - {fileID: 11400000, guid: 39659faafb21321498193e9ccc91118d, type: 2}
   - {fileID: 11400000, guid: 7065d0bafbf6b3f46b51bb3f8d978ee6, type: 2}
+  AddressablePath: Assets/GolfStuff/GolfCourses/Forest.asset

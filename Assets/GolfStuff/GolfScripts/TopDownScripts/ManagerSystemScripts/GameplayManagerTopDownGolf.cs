@@ -20,12 +20,15 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     public static GameplayManagerTopDownGolf instance;
 
     [Header("Course Information")]
+    [SerializeField] AvailableCourses _availableCourses;
     [SerializeField] public ScriptableCourse CurrentCourse;
     [SerializeField] public ScriptableHole CurrentHoleInCourse;
     [SerializeField] [SyncVar] public int CurrentHoleIndex;
     [SerializeField] public ScriptableCourse CourseToPlay;
     [SerializeField] [SyncVar] public string CourseHolesToPlay;
     [SerializeField] public List<int> CustomHolesSelectedToPlay = new List<int>();
+    //[SerializeField] [SyncVar(OnChange = nameof(SyncSelectedCourseId))] public string SelectedCourseId;
+    [SerializeField] [SyncVar] public string SelectedCourseId;
 
     [Header("TeeOffChallenge Info:")]
     [SerializeField] public ScriptableCourse TeeOffChallenges;
@@ -178,7 +181,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         // hardcoding these values for now but they should be set by multiplayer game config in the future?
         GetGameSettings();
-        RpcTellClientsToLoadCourse(this.CourseHolesToPlay, this.CustomHolesSelectedToPlay);
+        RpcTellClientsToLoadCourse(this.SelectedCourseId, this.CourseHolesToPlay, this.CustomHolesSelectedToPlay);
     }
     public override void OnStopServer()
     {
@@ -270,16 +273,25 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         this.StrokeLimitNumber = GolfSteamLobby.instance.StrokeLimitNumber;
         RainManager.instance.SetGameRainMode(GolfSteamLobby.instance.GameRainMode);
         WindManager.instance.SetGameWindMode(GolfSteamLobby.instance.GameWindMode);
+        this.SelectedCourseId = GolfSteamLobby.instance.SelectedCourseID;
+        Debug.Log("GetGameSettings: this.SelectedCourseId: " + this.SelectedCourseId+ " GolfSteamLobby.instance.SelectedCourseId: " + GolfSteamLobby.instance.SelectedCourseId);
         this.CourseHolesToPlay = GolfSteamLobby.instance.CourseHoleSelection;
+        
         this.CustomHolesSelectedToPlay.Clear();
         this.CustomHolesSelectedToPlay.AddRange(GolfSteamLobby.instance.CustomHolesToPlay);
     }
     [ObserversRpc(BufferLast = true)]
-    void RpcTellClientsToLoadCourse(string courseName, List<int> customHoles)
+    void RpcTellClientsToLoadCourse(string courseID, string courseName, List<int> customHoles)
     {
-        Debug.Log("RpcTellClientsToLoadCourse: " + courseName.ToString() + " custome holes length: " + customHoles.Count.ToString());
-        AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
+        Debug.Log("RpcTellClientsToLoadCourse: " + courseName.ToString() + " custome holes length: " + customHoles.Count.ToString() + " course id is: " + courseID);
+
+        // Get the addressable path of a course based on the courseId provided by the server?
+        string addressablePath = _availableCourses.Courses.Find(x => x.id == courseID).id;
+
+        //AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
+        AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>(addressablePath);
         ScriptableCourse course = loadCourse.WaitForCompletion();
+
         CourseToPlay = ScriptableObject.CreateInstance<ScriptableCourse>();
         CourseToPlay.CourseName = course.CourseName;
         if (courseName == "Middle 3 (holes 4-6)")
@@ -1632,6 +1644,19 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
                 _aimPointNumbers[i].color = Color.white;
         }
     }
+    #region course selection?
+    //void SyncSelectedCourseId(string prev, string next, bool asServer)
+    //{
+    //    if (IsLocalPlayerHost())
+    //    {
+    //        //_currentplayerui.SetActive(true);
+    //        //_currentplayeruiText.text = CurrentPlayer.PlayerName + ":" + next.ToString();
+    //        return;
+    //    }
+
+    //    Debug.Log("SyncSelectedCourseId: " + next.ToString());
+    //}
+    #endregion
     #region Tee Off Challenge
     void StartTeeOffChallenge()
     {

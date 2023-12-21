@@ -49,6 +49,10 @@ MonoBehaviour:
     m_Address: Assets/GolfStuff/GolfCourses/MiniGolf.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 83d00bb733777f64ebde5255c493e813
+    m_Address: Assets/GolfStuff/GolfCourses/AvailableCourses.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

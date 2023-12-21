@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b45ee6b98ca05149badb35431e89665, type: 3}
   m_Name: MiniGolf
   m_EditorClassIdentifier: 
+  id: f9abd5584669696489758632d6de5098
   CourseName: MiniGolf
   HolesInCourse:
   - {fileID: 11400000, guid: 6ba945daf55e6bc44bd56a1504361e55, type: 2}
   - {fileID: 11400000, guid: 1254ccf780930e64b8953cc011b8ce8a, type: 2}
   - {fileID: 11400000, guid: eace32cbc6035a14d915434ad1d5d962, type: 2}
+  AddressablePath: Assets/GolfStuff/GolfCourses/MiniGolf.asset

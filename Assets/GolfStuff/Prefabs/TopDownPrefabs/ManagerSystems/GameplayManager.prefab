@@ -49,10 +49,14 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 6875112187249593470}
   _networkObjectCache: {fileID: 6875112187249593470}
+  _availableCourses: {fileID: 11400000, guid: 83d00bb733777f64ebde5255c493e813, type: 2}
   CurrentCourse: {fileID: 11400000, guid: f8ed099443d7d0e4cb1143f45263a104, type: 2}
   CurrentHoleInCourse: {fileID: 0}
   CurrentHoleIndex: 0
   CourseToPlay: {fileID: 0}
+  CourseHolesToPlay: 
+  CustomHolesSelectedToPlay: 
+  SelectedCourseId: 
   TeeOffChallenges: {fileID: 0}
   SelectedChallenge: {fileID: 0}
   _playerOrderFromChallenege: []
@@ -63,6 +67,7 @@ MonoBehaviour:
   HolePositions: []
   HoleHoleObjects: []
   TeeOffAimPoint: {x: 0, y: 0, z: 0}
+  CourseAimPoints: []
   _lastNewHoleTime: 0
   CurrentTurnNumber: 0
   LastTurnWithWeatherChange: 0
@@ -91,6 +96,9 @@ MonoBehaviour:
   _terrainPenaltyText: {fileID: 0}
   _loadingHoleCanvas: {fileID: 0}
   _holeInfoCanvas: {fileID: 0}
+  _aimPointText: {fileID: 0}
+  _aimPointNumbers: []
+  _aimPointPanel: {fileID: 0}
   _powerUpMessageText: {fileID: 0}
   _powerUpDisplayHolder: {fileID: 0}
   _powerUpImage: {fileID: 0}
@@ -105,6 +113,11 @@ MonoBehaviour:
   _tellingPlayersStormWillPass: 0
   StatesOnServer: []
   IsTeeOffChallenge: 0
+  IsThereAStrokeLimit: 0
+  StrokeLimitNumber: 0
+  PowerUpsEnabled: 1
+  WeatherStatuesEnabled: 1
+  ParFavorPenalty: 0
 --- !u!114 &6875112187249593470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -129,9 +142,9 @@ MonoBehaviour:
   _initializeOrder: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 4
+  <PrefabId>k__BackingField: 9
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 1727917535
+  _scenePathHash: 0
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 8321511996279241685
   _sceneNetworkObjects:

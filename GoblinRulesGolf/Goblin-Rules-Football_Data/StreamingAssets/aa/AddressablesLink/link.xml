@@ -1,5 +1,6 @@
 <linker>
   <assembly fullname="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="AvailableCourses" preserve="all" />
     <type fullname="BalloonAnimator" preserve="all" />
     <type fullname="BalloonPowerUp" preserve="all" />
     <type fullname="BalloonSpriteCollision" preserve="all" />

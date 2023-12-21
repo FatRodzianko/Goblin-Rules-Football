@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b45ee6b98ca05149badb35431e89665, type: 3}
   m_Name: TeeOffChallenges
   m_EditorClassIdentifier: 
+  id: 79aed7ec2c7ae8f42a97300aee2aa423
   CourseName: TeeOffChallenges
   HolesInCourse:
   - {fileID: 11400000, guid: ffc0b3a7739638a4c8a4664783663e62, type: 2}
   - {fileID: 11400000, guid: 6a6cf5b98eb1b5f4c81368058b8c214f, type: 2}
   - {fileID: 11400000, guid: 78e07102f152c334693669bc5b3fed5f, type: 2}
   - {fileID: 11400000, guid: 61c9b55884923fd42adab70caa1dc65b, type: 2}
+  AddressablePath: Assets/GolfStuff/GolfCourses/TeeOffChallenges.asset

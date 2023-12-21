@@ -59,6 +59,9 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private TMP_InputField multiplayerMercyRuleInputField;
 
     [Header("Golf MultiplayerGameOptions")]
+    [SerializeField] private AvailableCourses _availableCourses;
+    [SerializeField] private int _selectedCourseIndex;
+    [SerializeField] private string _selectedCourseId;
     [SerializeField] private TMP_InputField _golfMultiplayerLobbyNameInputField;
     [SerializeField] private TMP_InputField _golfNumberOfPlayersInputField;
     [SerializeField] private Toggle _golfFriendsOnlyToggle;
@@ -68,11 +71,13 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private TMP_InputField _strokeLimitInputField;
     [SerializeField] private TMP_Dropdown _rainModeDropDown;
     [SerializeField] private TMP_Dropdown _windModeDropDown;
+    [SerializeField] private TMP_Dropdown _selectCourseDropdown;
     [SerializeField] private TMP_Dropdown _courseHoleSelectionDropdown;
     [SerializeField] private Toggle _golfParPenaltyFavorToggle;
 
     [Header("Golf Custom Hole Selection")]
     [SerializeField] GameObject _selectCustomHolesPanel;
+    [SerializeField] private Toggle[] _allToggles;
     [SerializeField] private Toggle _customeSelectHole1Toggle;
     [SerializeField] private Toggle _customeSelectHole2Toggle;
     [SerializeField] private Toggle _customeSelectHole3Toggle;
@@ -82,6 +87,13 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private Toggle _customeSelectHole7Toggle;
     [SerializeField] private Toggle _customeSelectHole8Toggle;
     [SerializeField] private Toggle _customeSelectHole9Toggle;
+
+    [Header("Golf Hole Selection Strings")]
+    [SerializeField] private string _front3;
+    [SerializeField] private string _middle3;
+    [SerializeField] private string _back3;
+    [SerializeField] private string _allNine;
+    [SerializeField] private string _custom;
 
 
     [Header("Game Option Values")]
@@ -178,6 +190,10 @@ public class TitleScreenManager : MonoBehaviour
         if (listOfLobbyListItems.Count > 0)
             DestroyOldLobbyListItems();
         IsMusicAlreadyPlaying();
+        if (_availableCourses && _selectCourseDropdown)
+        {
+            UpdateAvailableCourses();
+        }
     }
 
     // Update is called once per frame
@@ -683,7 +699,7 @@ public class TitleScreenManager : MonoBehaviour
             customeHoleSelection.AddRange(GetCustomHoleSelection());
         }
         Debug.Log("CreateNewGolfLobby: Rain Mode will be: " + _rainModeDropDown.options[_rainModeDropDown.value].text + " Wind Mode will be: " + _windModeDropDown.options[_windModeDropDown.value].text);
-        GolfSteamLobby.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text, _courseHoleSelectionDropdown.options[_courseHoleSelectionDropdown.value].text, customeHoleSelection, _golfParPenaltyFavorToggle.isOn);
+        GolfSteamLobby.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text, _courseHoleSelectionDropdown.options[_courseHoleSelectionDropdown.value].text, customeHoleSelection, _golfParPenaltyFavorToggle.isOn, this._selectedCourseId);
     }
     private void RainModeDropdownValueChanged(TMP_Dropdown change)
     {
@@ -762,4 +778,77 @@ public class TitleScreenManager : MonoBehaviour
     {
         this._selectCustomHolesPanel.SetActive(false);
     }
+    void UpdateAvailableCourses()
+    {
+        _selectCourseDropdown.ClearOptions();
+        List<string> courseOptions = new List<string>();
+        foreach (ScriptableCourse course in _availableCourses.Courses)
+        {
+            courseOptions.Add(course.CourseName);
+        }
+        if (courseOptions.Count > 0)
+            _selectCourseDropdown.AddOptions(courseOptions);
+
+        CourseSelected(0);
+    }
+    public void CourseSelected(int index)
+    {
+        Debug.Log("CourseSelected: new index: " + index.ToString() + " old index: " + _selectedCourseIndex.ToString());
+        _selectedCourseIndex = index;
+        _selectCourseDropdown.value = _selectedCourseIndex;
+        UpdateCourseHoleOptions(_selectedCourseIndex);
+    }
+    void UpdateCourseHoleOptions(int index)
+    {
+        if (_availableCourses.Courses.Count <= 0)
+            return;
+        ScriptableCourse course = _availableCourses.Courses[index];
+
+        // set the selected course id? From each courses unique identifier?
+        if (course.id == this._selectedCourseId)
+            return;
+        this._selectedCourseId = course.id;
+
+        List<string> courseHoleOptions = new List<string>();
+
+        if (course.HolesInCourse.Length >= 3)
+        {
+            courseHoleOptions.Add(_front3);
+        }
+        if (course.HolesInCourse.Length >= 6)
+        {
+            courseHoleOptions.Add(_middle3);
+        }
+        if (course.HolesInCourse.Length >= 9)
+        {
+            courseHoleOptions.Add(_back3);
+            courseHoleOptions.Add(_allNine);
+        }
+
+        courseHoleOptions.Add(_custom);
+
+        _courseHoleSelectionDropdown.ClearOptions();
+        _courseHoleSelectionDropdown.AddOptions(courseHoleOptions);
+        //UpdateCustomHoleToggles(course.HolesInCourse.Length);
+        UpdateCustomHoleToggles(course.id);
+    }
+    void UpdateCustomHoleToggles(string courseId)
+    {
+        ScriptableCourse course = _availableCourses.Courses.Find(x => x.id == courseId);
+        int numberOfHolesInCourse = course.HolesInCourse.Length;
+
+        for (int i = 0; i < _allToggles.Length; i++)
+        {
+            if (i < numberOfHolesInCourse)
+            {
+                _allToggles[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                _allToggles[i].isOn = false;
+                _allToggles[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
 }

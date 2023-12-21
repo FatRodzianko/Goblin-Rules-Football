@@ -38,10 +38,12 @@ public class GolfSteamLobby : MonoBehaviour
     [SerializeField] int _strokeLimitDefault = 12;
     [SerializeField] public RainManager.RainMode GameRainMode = RainManager.RainMode.ControlledByPlayerFavor;
     [SerializeField] public WindManager.WindMode GameWindMode = WindManager.WindMode.ControlledByPlayerFavor;
+    [SerializeField] public string SelectedCourseID;
     [SerializeField] public string CourseHoleSelection;
     [SerializeField] public bool ParFavorPenalty = false;
 
     [Header("Golf Course Settings")]
+    [SerializeField] public string SelectedCourseId;
     [SerializeField] public string CourseName;
     [SerializeField] public string CourseHolesToPlay;
     [SerializeField] public List<int> CustomHolesToPlay = new List<int>();
@@ -73,9 +75,9 @@ public class GolfSteamLobby : MonoBehaviour
     {
 
     }
-    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode, string courseHoleSelection, List<int> customHolesSelected, bool parFavorPenalty)
+    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode, string courseHoleSelection, List<int> customHolesSelected, bool parFavorPenalty, string selectedCourseId)
     {
-        Debug.Log("GolfSteamLobby: CreateLobby: number of players: " + numberOfPlayers.ToString());
+        Debug.Log("GolfSteamLobby: CreateLobby: number of players: " + numberOfPlayers.ToString() + " selected course id: " + selectedCourseId);
 
         ResetGameSettingsToDefault();
         // set the lobby name
@@ -111,6 +113,9 @@ public class GolfSteamLobby : MonoBehaviour
         this.StrokeLimitNumber = Mathf.Abs(strokeLimitNumber);
         this.GameRainMode = GetRainMode(rainMode);
         this.GameWindMode = GetWindMode(windMode);
+
+        this.SelectedCourseID = selectedCourseId;
+        Debug.Log("GolfSteamLobby: CreateLobby: this.SelectedCourseID: " + this.SelectedCourseID);
 
         if (string.IsNullOrEmpty(courseHoleSelection))
             this.CourseHoleSelection = "Front 3 (holes 1-3)";
