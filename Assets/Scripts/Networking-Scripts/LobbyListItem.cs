@@ -10,6 +10,7 @@ public class LobbyListItem : MonoBehaviour
     public CSteamID lobbySteamId;
     public string lobbyName;
     public string GameMode;
+    public string GolfCourseName;
     public int numberOfPlayers;
     public int maxNumberOfPlayers;
 
@@ -31,7 +32,13 @@ public class LobbyListItem : MonoBehaviour
     public void SetLobbyItemValues()
     {
         LobbyNameText.text = lobbyName;
-        _gameModeText.text = "| Mode: " + GameMode + " |";
+        //_gameModeText.text = "| Mode: " + GameMode + " |";
+        _gameModeText.text = "| Mode: " + GameMode;
+        if (!string.IsNullOrEmpty(GolfCourseName))
+        {
+            _gameModeText.text += ": " + GolfCourseName;
+        }
+        _gameModeText.text += " |";
         NumerOfPlayersText.text = "Number of Players: " + numberOfPlayers.ToString() + "/" + maxNumberOfPlayers.ToString();
     }
     public void JoinLobby()

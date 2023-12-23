@@ -440,12 +440,17 @@ x prevent flag/hole from being hidden behind player
 - - - - - - OnTriggerExit2D - set player sprite back to normal transparency
 - - x changed it so it is the player's aiming target that is the trigger: if the target is behind the player sprite, the player becomes transparent. If not, it stays solid
 - minigolf mode
-- - - putter only
+- - x putter only
 - - - always on the green for ground type
-- - - will need to create "borders" that are like low walls to keep the player in bounds
-- - - - - - make them simple "wood" walls"
-- - - - - - ball will need to bounce off them
-- - - - - - need to test if this should be done through the tilemap, or as individual gameobjects that are "obstacles"?
+- - x will need to create "borders" that are like low walls to keep the player in bounds
+- - - - - x make them simple "wood" walls"
+- - - - - x ball will need to bounce off them
+- - - - - x need to test if this should be done through the tilemap, or as individual gameobjects that are "obstacles"?
+- option to turn off tee off challenge?
+- - - maybe no challenge before minigolf? or only do a putter one if it is minigolf?
+- add the course name to golf lobbies:
+- - - so it will say something like "Game Mode: Golf:Forest" or whatever
+- - - have the course name set as an attribute to the steam lobby - in case I ever make custom maps, players would see it's a map they don't own before joining?
 
 
 ### hole six notes:

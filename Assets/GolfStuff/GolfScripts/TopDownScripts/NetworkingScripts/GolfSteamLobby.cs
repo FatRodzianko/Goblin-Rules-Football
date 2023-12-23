@@ -75,7 +75,7 @@ public class GolfSteamLobby : MonoBehaviour
     {
 
     }
-    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode, string courseHoleSelection, List<int> customHolesSelected, bool parFavorPenalty, string selectedCourseId)
+    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode, string courseHoleSelection, List<int> customHolesSelected, bool parFavorPenalty, string selectedCourseId, string selectedCourseName)
     {
         Debug.Log("GolfSteamLobby: CreateLobby: number of players: " + numberOfPlayers.ToString() + " selected course id: " + selectedCourseId);
 
@@ -147,6 +147,8 @@ public class GolfSteamLobby : MonoBehaviour
         }
         this.ParFavorPenalty = parFavorPenalty;
 
+        this.CourseName = selectedCourseName;
+
         SteamMatchmaking.CreateLobby(newLobbyType, numberOfPlayers);
     }
     void ResetGameSettingsToDefault()
@@ -207,6 +209,10 @@ public class GolfSteamLobby : MonoBehaviour
             new CSteamID(callback.m_ulSteamIDLobby),
             "GameMode",
             "Golf");
+        SteamMatchmaking.SetLobbyData(
+            new CSteamID(callback.m_ulSteamIDLobby),
+            "CourseName",
+            this.CourseName);
         SteamMatchmaking.SetLobbyData(
             new CSteamID(callback.m_ulSteamIDLobby),
             "GameStatus",

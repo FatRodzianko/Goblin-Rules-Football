@@ -62,6 +62,7 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private AvailableCourses _availableCourses;
     [SerializeField] private int _selectedCourseIndex;
     [SerializeField] private string _selectedCourseId;
+    [SerializeField] private string _selectedCourseName;
     [SerializeField] private TMP_InputField _golfMultiplayerLobbyNameInputField;
     [SerializeField] private TMP_InputField _golfNumberOfPlayersInputField;
     [SerializeField] private Toggle _golfFriendsOnlyToggle;
@@ -542,6 +543,7 @@ public class TitleScreenManager : MonoBehaviour
                             newLobbyListItemScript.lobbySteamId = (CSteamID)lobbyIDS[i].m_SteamID;
                             newLobbyListItemScript.lobbyName = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "name");
                             newLobbyListItemScript.GameMode = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "GameMode");
+                            newLobbyListItemScript.GolfCourseName = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "CourseName");
                             newLobbyListItemScript.numberOfPlayers = SteamMatchmaking.GetNumLobbyMembers((CSteamID)lobbyIDS[i].m_SteamID);
                             newLobbyListItemScript.maxNumberOfPlayers = SteamMatchmaking.GetLobbyMemberLimit((CSteamID)lobbyIDS[i].m_SteamID);
                             newLobbyListItemScript.SetLobbyItemValues();
@@ -562,6 +564,7 @@ public class TitleScreenManager : MonoBehaviour
                         newLobbyListItemScript.lobbySteamId = (CSteamID)lobbyIDS[i].m_SteamID;
                         newLobbyListItemScript.lobbyName = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "name");
                         newLobbyListItemScript.GameMode = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "GameMode");
+                        newLobbyListItemScript.GolfCourseName = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDS[i].m_SteamID, "CourseName");
                         newLobbyListItemScript.numberOfPlayers = SteamMatchmaking.GetNumLobbyMembers((CSteamID)lobbyIDS[i].m_SteamID);
                         newLobbyListItemScript.maxNumberOfPlayers = SteamMatchmaking.GetLobbyMemberLimit((CSteamID)lobbyIDS[i].m_SteamID);
                         newLobbyListItemScript.SetLobbyItemValues();
@@ -699,7 +702,7 @@ public class TitleScreenManager : MonoBehaviour
             customeHoleSelection.AddRange(GetCustomHoleSelection());
         }
         Debug.Log("CreateNewGolfLobby: Rain Mode will be: " + _rainModeDropDown.options[_rainModeDropDown.value].text + " Wind Mode will be: " + _windModeDropDown.options[_windModeDropDown.value].text);
-        GolfSteamLobby.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text, _courseHoleSelectionDropdown.options[_courseHoleSelectionDropdown.value].text, customeHoleSelection, _golfParPenaltyFavorToggle.isOn, this._selectedCourseId);
+        GolfSteamLobby.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text, _courseHoleSelectionDropdown.options[_courseHoleSelectionDropdown.value].text, customeHoleSelection, _golfParPenaltyFavorToggle.isOn, this._selectedCourseId, this._selectedCourseName);
     }
     private void RainModeDropdownValueChanged(TMP_Dropdown change)
     {
@@ -808,7 +811,7 @@ public class TitleScreenManager : MonoBehaviour
         if (course.id == this._selectedCourseId)
             return;
         this._selectedCourseId = course.id;
-
+        this._selectedCourseName = course.CourseName;
         List<string> courseHoleOptions = new List<string>();
 
         if (course.HolesInCourse.Length >= 3)
