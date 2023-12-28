@@ -1,0 +1,2881 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a182c034469f29e46a81c4968ccc3694, type: 3}
+  m_Name: MiniGolf_4
+  m_EditorClassIdentifier: 
+  HoleIndex: 4
+  CourseName: MiniGolf
+  HolePar: 3
+  HolePositions:
+  - {x: -2, y: 23, z: 0}
+  TeeOffLocation: {x: -2, y: -0.5, z: 0}
+  TeeMarkerPositions:
+  - {x: -6, y: -0.5, z: 0}
+  - {x: 2, y: -0.5, z: 0}
+  GreenTiles:
+  - TilePos: {x: -15, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -15, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -14, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -13, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -12, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -11, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -10, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -9, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -8, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -7, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -6, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -5, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -4, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -3, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -2, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: -1, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 0, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 1, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 2, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 3, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 4, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 5, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 6, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 7, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 8, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 9, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  - TilePos: {x: 10, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
+  FairwayTiles: []
+  RoughTiles: []
+  DeepRoughTiles: []
+  SandTrapTiles: []
+  WaterTrapTiles: []
+  EdgesTiles: []
+  DirectionTiles:
+  - TilePos: {x: -11, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -9, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: -8, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: -6, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 1, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 3, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: 4, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: 6, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -11, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -9, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: -8, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: -6, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 1, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 3, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: 4, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: 6, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -11, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -9, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: -8, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: -6, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 1, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 3, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: 4, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: 6, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -11, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 6, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -15, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -14, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -13, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -12, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -11, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: 6, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: 7, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: 8, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: 9, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: 10, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -15, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -14, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 9, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 10, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -15, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -14, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 9, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 10, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -15, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -14, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 9, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 10, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -15, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -14, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -4, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -3, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -2, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -1, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 9, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 10, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -15, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -14, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -4, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -3, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -2, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -1, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: 9, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 10, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -15, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -14, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -10, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -9, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -5, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 0, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 4, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 5, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 9, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 10, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -15, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -14, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -10, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -9, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -5, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 0, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 4, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 5, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 9, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 10, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -15, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -14, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -12, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -11, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -5, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 0, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 6, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: 7, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: 9, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 10, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -13, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 2c0c74f0268c3a8419a6fec6f03ecf03, type: 2}
+  - TilePos: {x: -10, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -5, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 0, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 5, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 8, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: cd780a9511ae41243b8603828d55031d, type: 2}
+  - TilePos: {x: -13, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 2c0c74f0268c3a8419a6fec6f03ecf03, type: 2}
+  - TilePos: {x: -10, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 5, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 8, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: cd780a9511ae41243b8603828d55031d, type: 2}
+  - TilePos: {x: -13, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -12, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -10, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -3, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 7da63985f92972949b6283a197e51322, type: 2}
+  - TilePos: {x: -2, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: a30817fe81cc75041ac255ea30bacc97, type: 2}
+  - TilePos: {x: 5, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 7, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 8, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -13, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -12, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -10, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -3, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -2, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 5, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 7, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 8, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -15, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -14, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -13, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -11, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -3, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 7da63985f92972949b6283a197e51322, type: 2}
+  - TilePos: {x: -2, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: a30817fe81cc75041ac255ea30bacc97, type: 2}
+  - TilePos: {x: 6, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 8, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: 9, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: 10, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 7a68b8dcaf560bf4d9048a6501e4e6dd, type: 2}
+  - TilePos: {x: -11, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -3, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -2, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 6, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -15, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -14, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -13, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -11, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -3, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -2, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 6, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 8, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 9, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 10, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -15, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -14, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -13, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -11, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -3, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -2, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 6, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 8, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 9, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 10, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -15, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -14, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -13, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -11, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -3, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -2, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 6, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 8, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 9, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 10, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -15, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -14, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -13, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -11, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -3, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -2, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 6, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 8, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 9, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 10, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -15, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -14, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -13, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -11, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -3, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -2, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 6, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 8, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 9, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 10, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -15, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -14, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -13, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -11, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -3, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -2, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 6, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 8, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 9, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 10, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -15, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -14, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -13, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -11, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 6, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 8, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 9, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 10, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -15, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -14, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -13, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -11, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: -9, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -8, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: -7, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -6, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: 1, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: 2, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 3, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: 4, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 6, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  - TilePos: {x: 8, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 9, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: 10, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  - TilePos: {x: -9, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -8, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: -7, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -6, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: 1, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: 2, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 3, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: 4, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -4, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: f9ea3af1b45a74645b37d39360aee763, type: 2}
+  - TilePos: {x: -3, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 63dd553052186da43a5459097f36e248, type: 2}
+  - TilePos: {x: -2, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 63dd553052186da43a5459097f36e248, type: 2}
+  - TilePos: {x: -1, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 421dd5d27ed951e41a78b9402ef7c09c, type: 2}
+  - TilePos: {x: -11, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -10, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -9, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: -8, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -7, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -4, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: -1, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: 2, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 3, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 4, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: 5, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 6, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -11, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -10, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -9, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: -8, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -7, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 2, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 3, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 4, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: 5, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 6, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: -11, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -10, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -9, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: efe1b8fdbd52ae14e9754a1587264581, type: 2}
+  - TilePos: {x: -8, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: -7, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 2882afc351996e34aac110f66efef9f1, type: 2}
+  - TilePos: {x: 2, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 3, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 4, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b64d17ac30262d41a4328502dc8fc34, type: 2}
+  - TilePos: {x: 5, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  - TilePos: {x: 6, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 0c96b44a54a9504459df0d2ebf81891a, type: 2}
+  MiniGolfWallTiles:
+  - TilePos: {x: -16, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: d475621156378bb4a892b870c276320a, type: 2}
+  - TilePos: {x: -15, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -14, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -13, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -12, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -11, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -10, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -9, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -8, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -7, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -6, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -5, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -4, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -3, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -2, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -1, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 0, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 1, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 2, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 3, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 4, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 5, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 6, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 7, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 8, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 9, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 10, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 11, y: -5, z: 0}
+    MyTile: {fileID: 11400000, guid: b68d0308eb038be46bd2f4945e646cf0, type: 2}
+  - TilePos: {x: -16, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -13, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 979b1da922d6119459b8aed44bd4c851, type: 2}
+  - TilePos: {x: -12, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: -7, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 1874f9ef4ec0e154faed462be8c4271d, type: 2}
+  - TilePos: {x: -6, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 71d378da7efc4f84c8c5c6107cdb9cc7, type: 2}
+  - TilePos: {x: -5, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 9ae225b0a83e73844a8143737e081498, type: 2}
+  - TilePos: {x: 0, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: fd7dd555e2991be44a5af35cf2cb11d1, type: 2}
+  - TilePos: {x: 1, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 700ec735ca3a86642a8faf91b92268cd, type: 2}
+  - TilePos: {x: 2, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: fb770c8d923513b4fb168fbd674b1f67, type: 2}
+  - TilePos: {x: 7, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: 8, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: 11, y: -4, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -14, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 979b1da922d6119459b8aed44bd4c851, type: 2}
+  - TilePos: {x: -13, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: -5, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 1874f9ef4ec0e154faed462be8c4271d, type: 2}
+  - TilePos: {x: -4, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 71d378da7efc4f84c8c5c6107cdb9cc7, type: 2}
+  - TilePos: {x: -3, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 9ae225b0a83e73844a8143737e081498, type: 2}
+  - TilePos: {x: -2, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: fd7dd555e2991be44a5af35cf2cb11d1, type: 2}
+  - TilePos: {x: -1, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 700ec735ca3a86642a8faf91b92268cd, type: 2}
+  - TilePos: {x: 0, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: fb770c8d923513b4fb168fbd674b1f67, type: 2}
+  - TilePos: {x: 8, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: 9, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: 11, y: -3, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -15, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 979b1da922d6119459b8aed44bd4c851, type: 2}
+  - TilePos: {x: -14, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: -3, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: fdb3013590d21684a91eb2a2dde9e22f, type: 2}
+  - TilePos: {x: -2, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: d5e8cd3502605ae45a9ecbd49a73f614, type: 2}
+  - TilePos: {x: 9, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: 10, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: 11, y: -2, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -15, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: 10, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: 11, y: -1, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 11, y: 0, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 11, y: 1, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 11, y: 2, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 11, y: 3, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 11, y: 4, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -13, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 979b1da922d6119459b8aed44bd4c851, type: 2}
+  - TilePos: {x: -12, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: -11, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 481c3011431f96b458c4c2eae1a5b4dd, type: 2}
+  - TilePos: {x: 6, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 7f9062c81b9a81440b421830999d3b9c, type: 2}
+  - TilePos: {x: 7, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 8, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: 11, y: 5, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -13, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -12, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 9a27e1f52cac5244d8e452f40560c7e2, type: 2}
+  - TilePos: {x: -11, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: -3, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: -2, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: 6, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: 7, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: 8, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 11, y: 6, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -13, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: fe87e3d72ff511d46a0586e6c4cda1b1, type: 2}
+  - TilePos: {x: -12, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: -4, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: -3, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 771f3cc2f72b8ee42a02d384ab834b9a, type: 2}
+  - TilePos: {x: -2, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 49ae238c960b9514a81fa0bb638e09e7, type: 2}
+  - TilePos: {x: -1, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: 7, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: 8, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: aae1b62f4ae887943bf7ef8589b3659e, type: 2}
+  - TilePos: {x: 11, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -15, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: -4, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: -3, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: d206e6d0214ec60428001773d5654731, type: 2}
+  - TilePos: {x: -2, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: 9a27e1f52cac5244d8e452f40560c7e2, type: 2}
+  - TilePos: {x: -1, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: 11, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -15, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: -14, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: -3, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: -2, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: 10, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: 11, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -14, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: -13, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: -6, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: fd7dd555e2991be44a5af35cf2cb11d1, type: 2}
+  - TilePos: {x: -5, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 700ec735ca3a86642a8faf91b92268cd, type: 2}
+  - TilePos: {x: -4, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 6246a73435d211b4da3c4c76610b5bd4, type: 2}
+  - TilePos: {x: -1, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 68313fff96d5ab047a2e1665f0ceb164, type: 2}
+  - TilePos: {x: 0, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 71d378da7efc4f84c8c5c6107cdb9cc7, type: 2}
+  - TilePos: {x: 1, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 9ae225b0a83e73844a8143737e081498, type: 2}
+  - TilePos: {x: 9, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: 10, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 771f3cc2f72b8ee42a02d384ab834b9a, type: 2}
+  - TilePos: {x: 11, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 68313fff96d5ab047a2e1665f0ceb164, type: 2}
+  - TilePos: {x: 19, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 20, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: -16, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -14, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: -13, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: c5e1e7f4ef41c7b4db3f449bdb14b9ca, type: 2}
+  - TilePos: {x: -8, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: fd7dd555e2991be44a5af35cf2cb11d1, type: 2}
+  - TilePos: {x: -7, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 700ec735ca3a86642a8faf91b92268cd, type: 2}
+  - TilePos: {x: -6, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: d5e8cd3502605ae45a9ecbd49a73f614, type: 2}
+  - TilePos: {x: -4, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -1, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 1, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: fdb3013590d21684a91eb2a2dde9e22f, type: 2}
+  - TilePos: {x: 2, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 71d378da7efc4f84c8c5c6107cdb9cc7, type: 2}
+  - TilePos: {x: 3, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 9ae225b0a83e73844a8143737e081498, type: 2}
+  - TilePos: {x: 9, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: 10, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: 11, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 20, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: 49ae238c960b9514a81fa0bb638e09e7, type: 2}
+  - TilePos: {x: 21, y: 11, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: -16, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -15, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: -14, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: c5e1e7f4ef41c7b4db3f449bdb14b9ca, type: 2}
+  - TilePos: {x: -10, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: fd7dd555e2991be44a5af35cf2cb11d1, type: 2}
+  - TilePos: {x: -9, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 700ec735ca3a86642a8faf91b92268cd, type: 2}
+  - TilePos: {x: -8, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: d5e8cd3502605ae45a9ecbd49a73f614, type: 2}
+  - TilePos: {x: -4, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -1, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 3, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: fdb3013590d21684a91eb2a2dde9e22f, type: 2}
+  - TilePos: {x: 4, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 71d378da7efc4f84c8c5c6107cdb9cc7, type: 2}
+  - TilePos: {x: 5, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 9ae225b0a83e73844a8143737e081498, type: 2}
+  - TilePos: {x: 10, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: 11, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 21, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: 49ae238c960b9514a81fa0bb638e09e7, type: 2}
+  - TilePos: {x: 22, y: 12, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: -16, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -15, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: c5e1e7f4ef41c7b4db3f449bdb14b9ca, type: 2}
+  - TilePos: {x: -10, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 7ae973743f1b5b145a924792c0e95d6c, type: 2}
+  - TilePos: {x: -9, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -8, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -7, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -6, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -5, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -4, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 771f3cc2f72b8ee42a02d384ab834b9a, type: 2}
+  - TilePos: {x: -1, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 0cb41e6948c866a4c806da3e8f5a4dda, type: 2}
+  - TilePos: {x: 0, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 1, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 2, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 3, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 4, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 5, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: bc0fa3560d533174e832bb3b44475a98, type: 2}
+  - TilePos: {x: 11, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 22, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: 49ae238c960b9514a81fa0bb638e09e7, type: 2}
+  - TilePos: {x: 23, y: 13, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: -16, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -8, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 1f8a887b678879043b8746c861d69851, type: 2}
+  - TilePos: {x: -7, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: 11, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 23, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 49ae238c960b9514a81fa0bb638e09e7, type: 2}
+  - TilePos: {x: 24, y: 14, z: 0}
+    MyTile: {fileID: 11400000, guid: 6246a73435d211b4da3c4c76610b5bd4, type: 2}
+  - TilePos: {x: -16, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -10, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 8fe1efbd5408b0a408f0e409deeb2488, type: 2}
+  - TilePos: {x: -9, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: f05510ecc7d1b6948807960aa64a9c94, type: 2}
+  - TilePos: {x: -8, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: c9bbd883e285b95488530f0068f57f1e, type: 2}
+  - TilePos: {x: -7, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 11, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 24, y: 15, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -10, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 1874f9ef4ec0e154faed462be8c4271d, type: 2}
+  - TilePos: {x: -9, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -8, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -7, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: c5e1e7f4ef41c7b4db3f449bdb14b9ca, type: 2}
+  - TilePos: {x: 11, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 23, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: 9a27e1f52cac5244d8e452f40560c7e2, type: 2}
+  - TilePos: {x: 24, y: 16, z: 0}
+    MyTile: {fileID: 11400000, guid: aae1b62f4ae887943bf7ef8589b3659e, type: 2}
+  - TilePos: {x: -16, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 11, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 22, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: 9a27e1f52cac5244d8e452f40560c7e2, type: 2}
+  - TilePos: {x: 23, y: 17, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: -16, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 11, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 21, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: 9a27e1f52cac5244d8e452f40560c7e2, type: 2}
+  - TilePos: {x: 22, y: 18, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: -16, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 11, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 20, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: 9a27e1f52cac5244d8e452f40560c7e2, type: 2}
+  - TilePos: {x: 21, y: 19, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: -16, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 11, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 18, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: fe87e3d72ff511d46a0586e6c4cda1b1, type: 2}
+  - TilePos: {x: 19, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: 337fbbe3dae65684d89cc4a2b83495d8, type: 2}
+  - TilePos: {x: 20, y: 20, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: -16, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: 11, y: 21, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -12, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 979b1da922d6119459b8aed44bd4c851, type: 2}
+  - TilePos: {x: -11, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: 6, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: 979b1da922d6119459b8aed44bd4c851, type: 2}
+  - TilePos: {x: 7, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: d206e6d0214ec60428001773d5654731, type: 2}
+  - TilePos: {x: 11, y: 22, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -12, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -11, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 5f76fab5fcce6314aa2cce40e1614479, type: 2}
+  - TilePos: {x: -10, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 158ac0d4cb420474ba08271b3664bf9e, type: 2}
+  - TilePos: {x: 5, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: 979b1da922d6119459b8aed44bd4c851, type: 2}
+  - TilePos: {x: 6, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: da1b8f8ca42332441a2adb5b9337b028, type: 2}
+  - TilePos: {x: 7, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: 11, y: 23, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -15, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: -12, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 49ae238c960b9514a81fa0bb638e09e7, type: 2}
+  - TilePos: {x: -11, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -10, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: c5e1e7f4ef41c7b4db3f449bdb14b9ca, type: 2}
+  - TilePos: {x: 5, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 0cb41e6948c866a4c806da3e8f5a4dda, type: 2}
+  - TilePos: {x: 6, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 7, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: c5e1e7f4ef41c7b4db3f449bdb14b9ca, type: 2}
+  - TilePos: {x: 10, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: 11, y: 24, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -15, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 0cb41e6948c866a4c806da3e8f5a4dda, type: 2}
+  - TilePos: {x: -14, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: -3, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 1f8a887b678879043b8746c861d69851, type: 2}
+  - TilePos: {x: -2, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: 370944c736ec6d147bd1382569492a25, type: 2}
+  - TilePos: {x: 9, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: 10, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: c5e1e7f4ef41c7b4db3f449bdb14b9ca, type: 2}
+  - TilePos: {x: 11, y: 25, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -14, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 0cb41e6948c866a4c806da3e8f5a4dda, type: 2}
+  - TilePos: {x: -13, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: -5, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 8fe1efbd5408b0a408f0e409deeb2488, type: 2}
+  - TilePos: {x: -4, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: f05510ecc7d1b6948807960aa64a9c94, type: 2}
+  - TilePos: {x: -3, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: c9bbd883e285b95488530f0068f57f1e, type: 2}
+  - TilePos: {x: -2, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: b781d93f8d0d9f54b98904b7e7a67de9, type: 2}
+  - TilePos: {x: -1, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b47efdc6e1ffec45922aa4e67448167, type: 2}
+  - TilePos: {x: 0, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: 370944c736ec6d147bd1382569492a25, type: 2}
+  - TilePos: {x: 8, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: 9, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: c5e1e7f4ef41c7b4db3f449bdb14b9ca, type: 2}
+  - TilePos: {x: 11, y: 26, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
+  - TilePos: {x: -13, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 0cb41e6948c866a4c806da3e8f5a4dda, type: 2}
+  - TilePos: {x: -12, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: ea87420104ecd264a903dd05ee2b10b0, type: 2}
+  - TilePos: {x: -7, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 8fe1efbd5408b0a408f0e409deeb2488, type: 2}
+  - TilePos: {x: -6, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: f05510ecc7d1b6948807960aa64a9c94, type: 2}
+  - TilePos: {x: -5, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: c9bbd883e285b95488530f0068f57f1e, type: 2}
+  - TilePos: {x: 0, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: b781d93f8d0d9f54b98904b7e7a67de9, type: 2}
+  - TilePos: {x: 1, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 2b47efdc6e1ffec45922aa4e67448167, type: 2}
+  - TilePos: {x: 2, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: 594ef0f0605dfe1419043aefdd78e426, type: 2}
+  - TilePos: {x: 7, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: a95a384c4ab062049a2fe51c1dcb364b, type: 2}
+  - TilePos: {x: 8, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: c5e1e7f4ef41c7b4db3f449bdb14b9ca, type: 2}
+  - TilePos: {x: 11, y: 27, z: 0}
+    MyTile: {fileID: 11400000, guid: eb196ad45351b1e478a49d261b244547, type: 2}
+  - TilePos: {x: -16, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: cdd216219b04f5c4e82f38923abaa0c6, type: 2}
+  - TilePos: {x: -15, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -14, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -13, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -12, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -11, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -10, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -9, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -8, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -7, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -6, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -5, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -4, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -3, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -2, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: -1, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 0, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 1, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 2, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 3, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 4, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 5, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 6, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 7, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 8, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 9, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 10, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 2afabf389fad6b749b1e2c901b573218, type: 2}
+  - TilePos: {x: 11, y: 28, z: 0}
+    MyTile: {fileID: 11400000, guid: 9cf26062d0a2ec143aa7cb830c7daf24, type: 2}
+  SavedObstacles:
+  - ObstaclePos: {x: -18.31, y: 10.64, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  - ObstaclePos: {x: 142.82, y: -35.36, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: ffe9e1047a6c73c43a711b78583be9e3, type: 2}
+  - ObstaclePos: {x: 13.88, y: 10.64, z: 0}
+    ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
+  CameraBoundingBoxPos: {x: 0, y: 0, z: 0}
+  PolygonPoints:
+  - {x: -50, y: 50}
+  - {x: -50, y: -50}
+  - {x: 50, y: -50}
+  - {x: 50, y: 50}
+  ZoomedOutPos: {x: -1.5, y: 13.5, z: 0}
+  CameraZoomValue: 3
+  TeeOffAimPoint: {x: -2, y: 23, z: 0}
+  CourseAimPoints:
+  - {x: -2, y: 23, z: 0}
+  Statues:
+  - StatuePosition: {x: 109.5, y: -80.5, z: 0}
+    StatueType: bad-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 2c4ea043c2a44c342ad33e683dc4333c, type: 2}
+  - StatuePosition: {x: 82.5, y: -63.5, z: 0}
+    StatueType: good-weather
+    StatueScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
+  BalloonPowerUps:
+  - BalloonPosition: {x: 72.5, y: -48.5, z: 0}
+    BalloonHeight: low
+    BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
+  Tubes: []
+  IsTeeOffChallenge: 0
+  ClubToUse: 
+  IsMiniGolf: 1
