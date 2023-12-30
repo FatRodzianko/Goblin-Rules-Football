@@ -1265,6 +1265,11 @@ public class GolfBallTopDown : NetworkBehaviour
             //BallInHole();
             //IsInHole = true;
             float timeDelay = TimeBeforeSinkInHole(speedMetersPerSecond, holeRolledInto);
+            
+            // Originally these bools were set in BallInHole after a delay. Moving to here because there was a timing issue where the ball went into the hole, but the player's turn ended before the DelayForBallInHole complated.
+            LocalIsInHole = true;
+            CmdSetBallInHoleOnServer(true);
+
             StartCoroutine(DelayBeforeFallInHole(timeDelay));
         }
         else
@@ -1279,8 +1284,11 @@ public class GolfBallTopDown : NetworkBehaviour
         myShadow.GetComponent<SpriteRenderer>().enabled = false;
         MyBallObject.GetComponent<SpriteRenderer>().enabled = false;
         //this.IsInHole = true;
-        LocalIsInHole = true;
-        CmdSetBallInHoleOnServer(true);
+
+        // Moved these bools to BallRolledIntoHole because there was a timing issue where the ball went into the hole, but the player's turn ended before the DelayForBallInHole complated.
+        //LocalIsInHole = true;
+        //CmdSetBallInHoleOnServer(true);
+
         ResetBallMovementBools();
         //TellPlayerBallIsInHole();
         SoundManager.instance.PlaySound(_ballSounds.BallInHole, 1.0f);
