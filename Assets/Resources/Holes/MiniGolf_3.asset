@@ -1143,10 +1143,10 @@ MonoBehaviour:
     ObstacleScriptableObject: {fileID: 11400000, guid: ffe9e1047a6c73c43a711b78583be9e3, type: 2}
   CameraBoundingBoxPos: {x: 0, y: 0, z: 0}
   PolygonPoints:
-  - {x: -50, y: 50}
-  - {x: -50, y: -50}
-  - {x: 50, y: -50}
-  - {x: 50, y: 50}
+  - {x: -35, y: 20}
+  - {x: -35, y: -30}
+  - {x: 25, y: -30}
+  - {x: 25, y: 20}
   ZoomedOutPos: {x: -8.5, y: -7, z: 0}
   CameraZoomValue: 3
   TeeOffAimPoint: {x: -8.5, y: -7, z: 0}

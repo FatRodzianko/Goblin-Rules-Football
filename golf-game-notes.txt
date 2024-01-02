@@ -439,7 +439,7 @@ x prevent flag/hole from being hidden behind player
 - - - - - - OnTriggerEnter2D - if the spriteCollision has a parent object, and that parent object has the tag "golfHole," then make the player sprite semi transparent
 - - - - - - OnTriggerExit2D - set player sprite back to normal transparency
 - - x changed it so it is the player's aiming target that is the trigger: if the target is behind the player sprite, the player becomes transparent. If not, it stays solid
-- minigolf mode
+x minigolf mode
 - - x putter only
 - - - always on the green for ground type
 - - x will need to create "borders" that are like low walls to keep the player in bounds
@@ -449,8 +449,8 @@ x prevent flag/hole from being hidden behind player
 - option to turn off tee off challenge?
 - - - maybe no challenge before minigolf? or only do a putter one if it is minigolf?
 - add the course name to golf lobbies:
-- - - so it will say something like "Game Mode: Golf:Forest" or whatever
-- - - have the course name set as an attribute to the steam lobby - in case I ever make custom maps, players would see it's a map they don't own before joining?
+- - x so it will say something like "Game Mode: Golf:Forest" or whatever
+- - x have the course name set as an attribute to the steam lobby - in case I ever make custom maps, players would see it's a map they don't own before joining?
 
 
 ### hole six notes:

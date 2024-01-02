@@ -81,6 +81,8 @@ public class GolfBallTopDown : NetworkBehaviour
     [Header("Rolling")]
     public bool isRolling = false;
     public bool HitApexOfHill = false;
+    [SerializeField] Vector2 _lastKnownPosition = Vector2.zero;
+    [SerializeField] int _stuckWhileRollingCount = 0;
 
     [Header("Ball State")]
     public bool LocalIsInHole = false;
@@ -467,6 +469,9 @@ public class GolfBallTopDown : NetworkBehaviour
                 GetBounces(launchDistance, launchAngle, launchTopSpin, movementDirection, maxHeight, launchLeftOrRightSpin);
             }
         }
+
+        if (_stuckWhileRollingCount > 0)
+            _stuckWhileRollingCount = 0;
     }
     public void ResetPosition()
     {
@@ -1121,7 +1126,27 @@ public class GolfBallTopDown : NetworkBehaviour
         // Need to update this so if a ball rolls back down a hill, it doesn't stop rolling when the speed goes from 0 at its apex to then increase again when rolls down, this doesn't stop it from rolling down?
         // probably need to do something like, get current direction of the ball and the direction of the slope. If the angle between the two is greater than 180, continue to roll down?
         if (speedMetersPerSecond > 0.05f)
+        {
+            Vector2 currentPos = this.transform.position;
+            if (currentPos == _lastKnownPosition)
+            {
+                _stuckWhileRollingCount++;
+                if (_stuckWhileRollingCount > 5)
+                {
+                    Debug.Log("WillBallRoll: current ball position: " + currentPos.ToString("0.00000") + " last known position: " + _lastKnownPosition.ToString("0.00000") + " and stuck count: " + _stuckWhileRollingCount.ToString());
+                    _stuckWhileRollingCount = 0;
+                    willBallRoll = false;
+                    return willBallRoll;
+                }
+            }
+            else
+            {
+                _stuckWhileRollingCount = 0;
+                _lastKnownPosition = currentPos;                
+            }
             willBallRoll = true;
+        }
+            
         else
         {
             if (groundSlopeDirection == Vector2.zero)
@@ -1292,6 +1317,7 @@ public class GolfBallTopDown : NetworkBehaviour
         ResetBallMovementBools();
         //TellPlayerBallIsInHole();
         SoundManager.instance.PlaySound(_ballSounds.BallInHole, 1.0f);
+        CmdSoundForClients(_ballSounds.BallInHole);
         //GameplayManagerTopDownGolf.instance.PlayersBallInHole();
 
         //if (IsHitByTornado)
@@ -1350,6 +1376,8 @@ public class GolfBallTopDown : NetworkBehaviour
         {
             isHit = false;
         }
+        if (_stuckWhileRollingCount > 0)
+            _stuckWhileRollingCount = 0;
         if (this.IsOwner)
             CmdTellClientsBallIsMoving(false);
 
@@ -1362,6 +1390,8 @@ public class GolfBallTopDown : NetworkBehaviour
         if (!this.IsOwner)
             return;
         Debug.Log("ResetBallAndPlayerAfterBallStoppedRolling: for player: " + MyPlayer.PlayerName);
+        
+
         //MyPlayer.EnableOrDisableLineObjects(true);
         MyPlayer.ResetPreviousHitValues();
         //TellPlayerGroundTypeTheyLandedOn();
@@ -1390,6 +1420,12 @@ public class GolfBallTopDown : NetworkBehaviour
             return;
         }
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
+
+        if (_stuckWhileRollingCount > 0)
+            _stuckWhileRollingCount = 0;
+        if (HitApexOfHill)
+            HitApexOfHill = false;
+
         CmdTellClientsBallIsMoving(false);
 
         //prompt player for mulligan here?
@@ -1561,6 +1597,7 @@ public class GolfBallTopDown : NetworkBehaviour
         BounceBallOffMiniGolfWall(collisionNormal, ballPos);
         this.BouncedOffObstacle = true;
         StartCoroutine(BouncedOffObstacleCoolDown());
+        ResetBouncingInfo(false);
     }
     [TargetRpc]
     public void RpcHitByTornado(NetworkConnection conn, float obstalceUnityUnits, float ballUnityUnits, int tornadoStrength, Torndao tornado)
@@ -2081,7 +2118,7 @@ public class GolfBallTopDown : NetworkBehaviour
         {
             myShadow.GetComponent<SpriteRenderer>().enabled = false;
             MyBallObject.GetComponent<SpriteRenderer>().enabled = false;
-            SoundManager.instance.PlaySound(_ballSounds.BallInHole, 1.0f);
+            //SoundManager.instance.PlaySound(_ballSounds.BallInHole, 1.0f);
         }
         else
         {

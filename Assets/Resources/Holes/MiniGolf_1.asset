@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HoleIndex: 1
   CourseName: MiniGolf
-  HolePar: 3
+  HolePar: 2
   HolePositions:
   - {x: 13.5, y: -12, z: 0}
   TeeOffLocation: {x: -1.5, y: -0.5, z: 0}
@@ -725,7 +725,7 @@ MonoBehaviour:
   - {x: -50, y: -50}
   - {x: 50, y: -50}
   - {x: 50, y: 50}
-  ZoomedOutPos: {x: 8, y: -6, z: 0}
+  ZoomedOutPos: {x: 8, y: -1, z: 0}
   CameraZoomValue: 4
   TeeOffAimPoint: {x: 13.5, y: -12, z: 0}
   CourseAimPoints:

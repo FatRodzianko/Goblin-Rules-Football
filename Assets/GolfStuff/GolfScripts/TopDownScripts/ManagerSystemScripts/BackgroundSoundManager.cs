@@ -65,7 +65,8 @@ public class BackgroundSoundManager : MonoBehaviour
 
         _source.clip = clipToPlay.clip;
 
-        _source.PlayOneShot(clipToPlay.clip, volume);
+        //_source.PlayOneShot(clipToPlay.clip, volume);
+        _source.Play();
 
     }
     public void StopSound()
