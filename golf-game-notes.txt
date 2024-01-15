@@ -448,9 +448,18 @@ x minigolf mode
 - - - - - x need to test if this should be done through the tilemap, or as individual gameobjects that are "obstacles"?
 - option to turn off tee off challenge?
 - - - maybe no challenge before minigolf? or only do a putter one if it is minigolf?
-- add the course name to golf lobbies:
+x add the course name to golf lobbies:
 - - x so it will say something like "Game Mode: Golf:Forest" or whatever
 - - x have the course name set as an attribute to the steam lobby - in case I ever make custom maps, players would see it's a map they don't own before joining?
+- Add holes/pipes to minigolf
+- - - they'll be in pairs, similar to the tubes in regular golf
+- - - - - - probably have tilemap manager find them specifically and pair them up, just like for the tubes?
+- - - when the ball exits the pipe, the ball's new hit movement should be somewhat effected by their previous movement direction
+- - - - - - something like:
+- - - - - - - - - newMovementDirection = ((previousMovementDirection*0.1) * PipeExitDirection)
+- - - - - - - - - may want to check the previousMovementDirection before the above calulation. See if it is "backward" from the pipe direction
+- - - - - - - - - - - - aka is it more than 90 degrees from PipeExitDirection. If so, flip it / rotate 180? I think that works out...
+
 
 
 ### hole six notes:

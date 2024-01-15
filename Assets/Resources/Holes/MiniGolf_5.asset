@@ -1227,8 +1227,9 @@ MonoBehaviour:
   - {x: 30, y: 30}
   ZoomedOutPos: {x: 0, y: 0, z: 0}
   CameraZoomValue: 2.5
-  TeeOffAimPoint: {x: -6.5, y: 0, z: 0}
+  TeeOffAimPoint: {x: 11, y: 0, z: 0}
   CourseAimPoints:
+  - {x: 11, y: 0, z: 0}
   - {x: -6.5, y: 0, z: 0}
   Statues:
   - StatuePosition: {x: 109.5, y: -80.5, z: 0}
