@@ -120,6 +120,11 @@ public class TileMapManager : MonoBehaviour
         newHole.BalloonPowerUps = SaveAllBalloonPowerUps(GameObject.FindGameObjectsWithTag("BalloonPowerUp")).ToList();
         newHole.Tubes = SaveAllTubes(GameObject.FindGameObjectsWithTag("TubeGolf")).ToList();
 
+        if (this.IsMiniGolf)
+        {
+            newHole.MiniGolfPipes = SaveAllMiniGolfPipes(GameObject.FindGameObjectsWithTag("MiniGolfPipe")).ToList();
+        }
+
         // Save the scriptable object to a file
 #if UNITY_EDITOR
         ScriptableObjectUtility.SaveHoleToFile(newHole);
@@ -247,6 +252,44 @@ public class TileMapManager : MonoBehaviour
                     TubePosition = tubesToSave[i].transform.position,
                     IsPrimaryTube = tubesToSave[i].GetComponent<TubeScript>().IsPrimaryTube,
                     TubeScriptableObstacle = tubesToSave[i].GetComponent<EnvironmentObstacleTopDown>().myScriptableObject
+                };
+            }
+        }
+        IEnumerable<SavedMiniGolfPipe> SaveAllMiniGolfPipes(GameObject[] pipesToSave)
+        {
+            Debug.Log("SaveAllMiniGolfPipes: pipesToSave: " + pipesToSave.Length.ToString());
+            if (pipesToSave.Length < 2)
+            {
+                Debug.Log("pipesToSave: There needs to be at least 2 pipes to save. " + pipesToSave.Length.ToString());
+                yield break;
+            }
+
+            for (int i = 0; i < pipesToSave.Length; i++)
+            {
+                if (pipesToSave[i].GetComponent<PipeMiniGolfScript>() == null)
+                    continue;
+
+                PipeMiniGolfScript pipeScript = pipesToSave[i].GetComponent<PipeMiniGolfScript>();
+                if (!pipeScript.IsEntryPipe)
+                {
+                    Debug.Log("pipesToSave: Is this an entry pipe?: " + pipeScript.IsEntryPipe.ToString() + " Skipping...");
+                    continue;
+                }
+
+
+                if (!pipeScript.MyExitPipe)
+                {
+                    Debug.Log("pipesToSave: MyExitPipe does not exist. Skipping...");
+                    continue;
+                }
+                    
+
+                yield return new SavedMiniGolfPipe()
+                {
+                    EntryPipePosition = pipeScript.gameObject.transform.position,
+                    ExitPipePosition = pipeScript.MyExitPipe.transform.position,
+                    MiniGolfPipeScriptableObstacle = pipeScript.myScriptableObject,
+                    MiniGolfExitPipeScriptableObstacle = pipeScript.MyExitPipe.myScriptableObject
                 };
             }
         }
@@ -380,6 +423,15 @@ public class TileMapManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.Log("ClearMap: Could not find/delete aim point objects. Error: " + e);
+        }
+        try
+        {
+            GameObject[] miniGolfPipes = GameObject.FindGameObjectsWithTag("MiniGolfPipe");
+            DeleteObjects(miniGolfPipes);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("ClearMap: Could not find/delete minigolf pipe objects. Error: " + e);
         }
         // Delete Statue objects, but only from the editor. In game, the server will destroy the statue objects as they are all networked objects, and need to be networked objects to sync the animations and do other networkbehavior stuff
 #if UNITY_EDITOR
@@ -524,6 +576,18 @@ public class TileMapManager : MonoBehaviour
         }
         // Spawn the tube objects and make sure to set their companion tube values and the IsPrimary value
         SpawnTubeObjects(hole.Tubes);
+        if (hole.IsMiniGolf)
+        {
+            try
+            {
+                SpawnMiniGolfPipes(hole.MiniGolfPipes);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("LoadMap: Error spawning minigolf pipes. Error: " + e);
+            }
+            
+        }
         // Spawn the camera bounding box and add it to the camera
         GameObject boundingBox = Instantiate(_cameraBoundingBox, hole.CameraBoundingBoxPos, Quaternion.identity);
         PolygonCollider2D polygonCollider = boundingBox.GetComponent<PolygonCollider2D>();
@@ -569,6 +633,17 @@ public class TileMapManager : MonoBehaviour
 
         tube1.CompanionTube = tube2;
         tube2.CompanionTube = tube1;
+    }
+    void SpawnMiniGolfPipes(List<SavedMiniGolfPipe> miniGolfPipes)
+    {
+        if (miniGolfPipes.Count < 1)
+            return;
+        for (int i = 0; i < miniGolfPipes.Count; i++)
+        {
+            GameObject entryHole = Instantiate(miniGolfPipes[i].MiniGolfPipeScriptableObstacle.ObstaclePrefab, miniGolfPipes[i].EntryPipePosition, Quaternion.identity);
+            GameObject exitPipe = Instantiate(miniGolfPipes[i].MiniGolfExitPipeScriptableObstacle.ObstaclePrefab, miniGolfPipes[i].ExitPipePosition, Quaternion.identity);
+            entryHole.GetComponent<PipeMiniGolfScript>().SetExitPipe(exitPipe.GetComponent<PipeMiniGolfScript>());
+        }
     }
     public async Task LoadMapAsTask(ScriptableHole hole)
     {

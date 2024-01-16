@@ -42,6 +42,7 @@ public class ScriptableHole : ScriptableObject
     public List<SavedStatue> Statues;
     public List<SavedBalloonPowerUp> BalloonPowerUps;
     public List<SavedTube> Tubes;
+    public List<SavedMiniGolfPipe> MiniGolfPipes;
 
     [Header("Tee Off Challenge Stuff")]
     public bool IsTeeOffChallenge = false;
@@ -83,4 +84,12 @@ public class SavedTube
     public Vector3 TubePosition;
     public bool IsPrimaryTube;
     public ScriptableObstacle TubeScriptableObstacle;
+}
+[Serializable]
+public class SavedMiniGolfPipe
+{
+    public Vector3 EntryPipePosition;
+    public Vector3 ExitPipePosition;
+    public ScriptableObstacle MiniGolfPipeScriptableObstacle;
+    public ScriptableObstacle MiniGolfExitPipeScriptableObstacle;
 }

@@ -19,8 +19,8 @@ MonoBehaviour:
   - {x: 40.5, y: -4.5, z: 0}
   TeeOffLocation: {x: -5.5, y: -4.5, z: 0}
   TeeMarkerPositions:
-  - {x: -5.5, y: -1.5, z: 0}
   - {x: -5.5, y: -7.25, z: 0}
+  - {x: -5.5, y: -1.5, z: 0}
   GreenTiles:
   - TilePos: {x: -10, y: -11, z: 0}
     MyTile: {fileID: 11400000, guid: da2211bf2dcf7214e80e016bdbfd2432, type: 2}
@@ -1120,8 +1120,6 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: -11, y: -9, z: 0}
     MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
-  - TilePos: {x: 3, y: -9, z: 0}
-    MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 9, y: -9, z: 0}
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 30, y: -9, z: 0}
@@ -1130,8 +1128,6 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: -11, y: -8, z: 0}
     MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
-  - TilePos: {x: 3, y: -8, z: 0}
-    MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 9, y: -8, z: 0}
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 30, y: -8, z: 0}
@@ -1140,8 +1136,6 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: -11, y: -7, z: 0}
     MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
-  - TilePos: {x: 3, y: -7, z: 0}
-    MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 9, y: -7, z: 0}
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 30, y: -7, z: 0}
@@ -1150,8 +1144,6 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: -11, y: -6, z: 0}
     MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
-  - TilePos: {x: 3, y: -6, z: 0}
-    MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 9, y: -6, z: 0}
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 30, y: -6, z: 0}
@@ -1160,8 +1152,6 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: -11, y: -5, z: 0}
     MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
-  - TilePos: {x: 3, y: -5, z: 0}
-    MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 9, y: -5, z: 0}
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 30, y: -5, z: 0}
@@ -1170,8 +1160,6 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: -11, y: -4, z: 0}
     MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
-  - TilePos: {x: 3, y: -4, z: 0}
-    MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 9, y: -4, z: 0}
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 30, y: -4, z: 0}
@@ -1180,8 +1168,6 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: -11, y: -3, z: 0}
     MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
-  - TilePos: {x: 3, y: -3, z: 0}
-    MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 9, y: -3, z: 0}
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 30, y: -3, z: 0}
@@ -1190,8 +1176,6 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: -11, y: -2, z: 0}
     MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
-  - TilePos: {x: 3, y: -2, z: 0}
-    MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 9, y: -2, z: 0}
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 30, y: -2, z: 0}
@@ -1200,8 +1184,6 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: -11, y: -1, z: 0}
     MyTile: {fileID: 11400000, guid: 74659aa92053d3b4aa0dc301ab609358, type: 2}
-  - TilePos: {x: 3, y: -1, z: 0}
-    MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 9, y: -1, z: 0}
     MyTile: {fileID: 11400000, guid: f6b3589a1f1226a43b5122b437194570, type: 2}
   - TilePos: {x: 30, y: -1, z: 0}
@@ -1325,6 +1307,11 @@ MonoBehaviour:
   Statues: []
   BalloonPowerUps: []
   Tubes: []
-  IsTeeOffChallenge: 1
-  ClubToUse: putter
+  MiniGolfPipes:
+  - EntryPipePosition: {x: 4, y: -1.5, z: 0}
+    ExitPipePosition: {x: 31.5, y: -1.5, z: 0}
+    MiniGolfPipeScriptableObstacle: {fileID: 11400000, guid: 70709322d50b42643aed5d477c2b74f8, type: 2}
+    MiniGolfExitPipeScriptableObstacle: {fileID: 11400000, guid: 3b8b18f3adb61654bb5cac33afc9ff8f, type: 2}
+  IsTeeOffChallenge: 0
+  ClubToUse: 
   IsMiniGolf: 1

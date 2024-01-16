@@ -103,6 +103,8 @@ MonoBehaviour:
   _defaultOrderInLayer: 3
   _myCollider: {fileID: 0}
   MySpriteMask: {fileID: 0}
+  _noTransparency: {r: 1, g: 1, b: 1, a: 1}
+  _transparent: {r: 1, g: 1, b: 1, a: 0.5}
 --- !u!60 &8234401446905003976
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -357,6 +359,7 @@ MonoBehaviour:
   _isHoleFlag: 1
   SoftBounce: 1
   _minHeightForSoftBounce: 0
+  StartHeight: 0
   _myCollider: {fileID: 0}
   _bounceModifier: 1
   _gradualBounceModifier: 1
@@ -364,8 +367,23 @@ MonoBehaviour:
   _minHeightForImmediateBounceModifier: 0
   _minBounceModifier: 0.85
   _maxBounceModifier: 0.3
-  _softBounceSound: 
-  _hardBounceSound: 
+  _ballSounds: {fileID: 0}
+  _softBounceSoundType: 
+  _hardBounceSoundType: 
+  _isStatue: 0
+  _myStatue: {fileID: 0}
+  _isBalloon: 0
+  _myBalloon: {fileID: 0}
+  _twoColliders: 0
+  _crateCollider: 0
+  _isSpinningHoop: 0
+  _spinningHoopScript: {fileID: 0}
+  _isTube: 0
+  _tubeScript: {fileID: 0}
+  _ballInTube: 0
+  _isLandMine: 0
+  _isLandMineInnerCircle: 0
+  _landMineScript: {fileID: 0}
 --- !u!1 &6388697565226876959
 GameObject:
   m_ObjectHideFlags: 0
