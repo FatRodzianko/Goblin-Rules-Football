@@ -25,14 +25,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 411310913693086750}
-  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 31.5, y: -1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 116643554603254989}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &411310913693086749
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -74,10 +75,10 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 4
-  m_Sprite: {fileID: 21300000, guid: b8546d92404b7ad46bc2eb094e803296, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 586eb66b4d99de04bac0d4dabfc2fe02, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
-  m_FlipY: 0
+  m_FlipY: 1
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
@@ -99,15 +100,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PipeCollider: {fileID: 0}
   IsEntryPipe: 0
-  myScriptableObject: {fileID: 0}
+  myScriptableObject: {fileID: 11400000, guid: a4c7925b0f0fb7048ace4ffd4117bb52, type: 2}
   MyExitPipe: {fileID: 0}
-  ExitPipePrefab: {fileID: 0}
   ExitPipePosition: {x: 0, y: 0, z: 0}
   ExitPipeDirection: {x: 0, y: 0, z: 0}
+  ExitPointReferenceObject: {fileID: 8154883610747266229}
   ExitPipeExitPoint: {x: 0, y: 0, z: 0}
   ExitPipeIsOffset: 0
-  ExitPipeSpriteIndex: 0
-  ExitPipeSprites: []
   _ballSpeedOnEntry: 1
   _ballMovementDirectionOnEntry: {x: 0, y: 0}
   _moveBall: 0
@@ -119,3 +118,34 @@ MonoBehaviour:
   _ballDistanceToTravel: 0
   _timeSinceMovementStarted: 0
   _maxTravelTime: 4.5
+--- !u!1 &8154883610747266229
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 116643554603254989}
+  m_Layer: 0
+  m_Name: PipeExitPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &116643554603254989
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8154883610747266229}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.3125, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 411310913693086748}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

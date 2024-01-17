@@ -13,6 +13,7 @@ public class PipeMiniGolfScript : MonoBehaviour
     [Header("Exit Pipe Stuff")]
     [SerializeField] public Vector3 ExitPipePosition;
     [SerializeField] public Vector3 ExitPipeDirection;
+    [SerializeField] public GameObject ExitPointReferenceObject;
     [SerializeField] public Vector3 ExitPipeExitPoint =  Vector3.zero;
     [SerializeField] public bool ExitPipeIsOffset = false;
 
@@ -33,11 +34,16 @@ public class PipeMiniGolfScript : MonoBehaviour
     [SerializeField] float _maxTravelTime = 4.5f;
     float _movePercentage = 0f;
     float _distanceTraveled = 0f;
+    private void Awake()
+    {
+        
+        
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -51,6 +57,7 @@ public class PipeMiniGolfScript : MonoBehaviour
             MyExitPipe = exitPipe;
 
         ExitPipePosition = exitPipe.transform.position;
+        ExitPipeExitPoint = exitPipe.transform.GetChild(0).position;
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -62,5 +69,8 @@ public class PipeMiniGolfScript : MonoBehaviour
         Debug.Log("PipeMiniGolfScript: OnTriggerEnter2D: This object's name is: " + this.name);
 
         GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
+
+        if (!golfBallScript.IsOwner)
+            return;
     }
 }

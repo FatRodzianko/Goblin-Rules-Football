@@ -1312,6 +1312,18 @@ MonoBehaviour:
     ExitPipePosition: {x: 31.5, y: -1.5, z: 0}
     MiniGolfPipeScriptableObstacle: {fileID: 11400000, guid: 70709322d50b42643aed5d477c2b74f8, type: 2}
     MiniGolfExitPipeScriptableObstacle: {fileID: 11400000, guid: 3b8b18f3adb61654bb5cac33afc9ff8f, type: 2}
+  - EntryPipePosition: {x: 4, y: -4.5, z: 0}
+    ExitPipePosition: {x: 49.5, y: -7.5, z: 0}
+    MiniGolfPipeScriptableObstacle: {fileID: 11400000, guid: 70709322d50b42643aed5d477c2b74f8, type: 2}
+    MiniGolfExitPipeScriptableObstacle: {fileID: 11400000, guid: ffafda714b4d031499f7c1f83e2e0c0e, type: 2}
+  - EntryPipePosition: {x: 4, y: -7.5, z: 0}
+    ExitPipePosition: {x: 40.5, y: 1.5, z: 0}
+    MiniGolfPipeScriptableObstacle: {fileID: 11400000, guid: 70709322d50b42643aed5d477c2b74f8, type: 2}
+    MiniGolfExitPipeScriptableObstacle: {fileID: 11400000, guid: 8fd38948f6526f64cb570263f66a8fef, type: 2}
+  - EntryPipePosition: {x: 4, y: -9.5, z: 0}
+    ExitPipePosition: {x: 35.5, y: -10.5, z: 0}
+    MiniGolfPipeScriptableObstacle: {fileID: 11400000, guid: 70709322d50b42643aed5d477c2b74f8, type: 2}
+    MiniGolfExitPipeScriptableObstacle: {fileID: 11400000, guid: a4c7925b0f0fb7048ace4ffd4117bb52, type: 2}
   IsTeeOffChallenge: 0
   ClubToUse: 
   IsMiniGolf: 1
