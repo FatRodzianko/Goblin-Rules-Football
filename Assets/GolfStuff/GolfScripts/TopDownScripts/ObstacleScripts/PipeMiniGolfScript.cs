@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class PipeMiniGolfScript : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PipeMiniGolfScript : MonoBehaviour
     [SerializeField] public bool IsEntryPipe;
     [SerializeField] public ScriptableObstacle myScriptableObject;
     [SerializeField] public PipeMiniGolfScript MyExitPipe;
+    [SerializeField] float _myCircleRadius;
 
     [Header("Exit Pipe Stuff")]
     [SerializeField] public Vector3 ExitPipePosition;
@@ -66,11 +68,23 @@ public class PipeMiniGolfScript : MonoBehaviour
         if (collision.tag != "golfBall")
             return;
 
-        Debug.Log("PipeMiniGolfScript: OnTriggerEnter2D: This object's name is: " + this.name);
+        Debug.Log("PipeMiniGolfScript: OnTriggerEnter2D: This object's name is: " + this.name + " collisions name is: " + collision.transform.name) ;
 
         GolfBallTopDown golfBallScript = collision.GetComponent<GolfBallTopDown>();
 
         if (!golfBallScript.IsOwner)
             return;
+
+        golfBallScript.ResetBallInfo(false);
+        golfBallScript.EnableOrDisableBallSpriteRenderer(false);
+        golfBallScript.SetBallInTube(true);
+        StartCoroutine(DelayBeforeMoveBall(golfBallScript,golfBallScript.TimeBeforeSinkInHole(golfBallScript.speedMetersPerSecond, _myCircleRadius)));
+    }
+    IEnumerator DelayBeforeMoveBall(GolfBallTopDown golfBallScript, float delayTime)
+    {
+        _moveBall = true;
+        yield return new WaitForSeconds(delayTime);
+        
+        golfBallScript.transform.DOMove(ExitPipeExitPoint, 3f);
     }
 }

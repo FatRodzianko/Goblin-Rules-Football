@@ -453,6 +453,10 @@ public class GolfBallTopDown : NetworkBehaviour
         SetPlayerUsingRocket(false);
         MyPlayer.SetCanUseRocket(false);
 
+        //testing?
+        this.isRolling = false;
+        //testing?
+
         hitBallCount = 0f;
         timeInAir = 0f;
         myShadow.transform.localPosition = Vector3.zero;
@@ -1289,7 +1293,7 @@ public class GolfBallTopDown : NetworkBehaviour
             Debug.Log("BallRolledIntoHole: current speed of the ball: " + this.speedMetersPerSecond.ToString() + " which is slow enough to fall into hole");
             //BallInHole();
             //IsInHole = true;
-            float timeDelay = TimeBeforeSinkInHole(speedMetersPerSecond, holeRolledInto);
+            float timeDelay = TimeBeforeSinkInHole(speedMetersPerSecond, holeRolledInto.MyCircleRadius);
             
             // Originally these bools were set in BallInHole after a delay. Moving to here because there was a timing issue where the ball went into the hole, but the player's turn ended before the DelayForBallInHole complated.
             LocalIsInHole = true;
@@ -1355,10 +1359,14 @@ public class GolfBallTopDown : NetworkBehaviour
             GameplayManagerTopDownGolf.instance.PlayersBallInHole();
         }
     }
-    float TimeBeforeSinkInHole(float movementSpeed, HoleTopDown holeRolledInto)
+    //float TimeBeforeSinkInHole(float movementSpeed, HoleTopDown holeRolledInto)
+    public float TimeBeforeSinkInHole(float movementSpeed, float circleRadius)
     {
-        float dist = this.myCollider.radius + holeRolledInto.MyCircleRadius;
+        //float dist = this.myCollider.radius + holeRolledInto.MyCircleRadius;
+        float dist = this.myCollider.radius + circleRadius;
         float timeBeforeBounce = dist / movementSpeed;
+        if (timeBeforeBounce > 2f)
+            timeBeforeBounce = 2f;
         return timeBeforeBounce;
     }
     IEnumerator DelayBeforeFallInHole(float delayTime)

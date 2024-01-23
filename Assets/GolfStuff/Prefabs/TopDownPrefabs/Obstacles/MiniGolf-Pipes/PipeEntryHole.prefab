@@ -135,13 +135,12 @@ MonoBehaviour:
   IsEntryPipe: 1
   myScriptableObject: {fileID: 11400000, guid: 70709322d50b42643aed5d477c2b74f8, type: 2}
   MyExitPipe: {fileID: 0}
-  ExitPipePrefab: {fileID: 0}
+  _myCircleRadius: 0.21875
   ExitPipePosition: {x: 0, y: 0, z: 0}
   ExitPipeDirection: {x: 0, y: 0, z: 0}
-  ExitPipeExitOffset: {x: 0, y: 0, z: 0}
+  ExitPointReferenceObject: {fileID: 0}
+  ExitPipeExitPoint: {x: 0, y: 0, z: 0}
   ExitPipeIsOffset: 0
-  ExitPipeSpriteIndex: 0
-  ExitPipeSprites: []
   _ballSpeedOnEntry: 1
   _ballMovementDirectionOnEntry: {x: 0, y: 0}
   _moveBall: 0

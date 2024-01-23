@@ -459,7 +459,9 @@ x add the course name to golf lobbies:
 - - - - - - - - - newMovementDirection = ((previousMovementDirection*0.1) * PipeExitDirection)
 - - - - - - - - - may want to check the previousMovementDirection before the above calulation. See if it is "backward" from the pipe direction
 - - - - - - - - - - - - aka is it more than 90 degrees from PipeExitDirection. If so, flip it / rotate 180? I think that works out...
-
+- - - create a "spline" or path object for ball to move along? Need to figure out how to make the spline and move an object along it first...
+- Fix all the "await" async functions in GameplayManagerTopDownGolf so they use the token? Otherwise can cause crashes if player exits game while one is running?
+- - - pass the _cancellationTokenSource.Token to all await functions being called?
 
 
 ### hole six notes:
