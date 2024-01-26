@@ -102,8 +102,9 @@ MonoBehaviour:
   IsEntryPipe: 0
   myScriptableObject: {fileID: 11400000, guid: a4c7925b0f0fb7048ace4ffd4117bb52, type: 2}
   MyExitPipe: {fileID: 0}
+  _myCircleRadius: 0
   ExitPipePosition: {x: 0, y: 0, z: 0}
-  ExitPipeDirection: {x: 0, y: 0, z: 0}
+  ExitPipeDirection: {x: 0, y: 1, z: 0}
   ExitPointReferenceObject: {fileID: 8154883610747266229}
   ExitPipeExitPoint: {x: 0, y: 0, z: 0}
   ExitPipeIsOffset: 0

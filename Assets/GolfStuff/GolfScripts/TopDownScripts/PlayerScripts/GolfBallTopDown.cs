@@ -466,6 +466,8 @@ public class GolfBallTopDown : NetworkBehaviour
             // first, check if the ball hits directly into the hole
             if (DidBallLandInHole())
             {
+                LocalIsInHole = true;
+                CmdSetBallInHoleOnServer(true);
                 BallInHole();
             }
             else
@@ -1146,11 +1148,15 @@ public class GolfBallTopDown : NetworkBehaviour
             else
             {
                 _stuckWhileRollingCount = 0;
-                _lastKnownPosition = currentPos;                
+                _lastKnownPosition = currentPos;
             }
             willBallRoll = true;
         }
-            
+        else if (this.BallInTube)
+        {
+            Debug.Log("WillBallRoll: Ball in tube? " + this.BallInTube.ToString() + " and ball speed: " + this.speedMetersPerSecond.ToString());
+            willBallRoll = true;
+        }
         else
         {
             if (groundSlopeDirection == Vector2.zero)
@@ -1265,6 +1271,25 @@ public class GolfBallTopDown : NetworkBehaviour
 
 
     }
+    public void ChangeBallDirectionToCenterOfHole(Vector2 newDir)
+    {
+        if (!this.IsOwner)
+            return;
+        this.movementDirection = newDir;
+    }
+    public void BallExitMiniGolfPipe(Vector2 exitDirection, float exitSpeed)
+    {
+        Debug.Log("BallExitMiniGolfPipe: exit direction: " + exitDirection.ToString() + " speed: " + exitSpeed.ToString());
+        movementDirection = exitDirection.normalized;
+        speedMetersPerSecond = exitSpeed;
+
+        isRolling = WillBallRoll();
+        if (!isRolling)
+        {
+            ResetBallAndPlayerAfterBallStoppedRolling();
+        }
+
+    }
     public float GetPuttSpeed(float distanceToPutt)
     {
         float puttSpeed = 0f;
@@ -1304,7 +1329,7 @@ public class GolfBallTopDown : NetworkBehaviour
         else
         {
             Debug.Log("BallRolledIntoHole: current speed of the ball: " + this.speedMetersPerSecond.ToString() + " which is TOO FAST. Ball will bounce into the hole");
-            BounceOutOfHole(holeRolledInto);
+            BounceOutOfHole(holeRolledInto.MyCircleRadius, holeRolledInto.SpriteRadius);
         }
     }
     void BallInHole()
@@ -1537,23 +1562,33 @@ public class GolfBallTopDown : NetworkBehaviour
     bool DidBallLandInHole()
     {
         bool landInHole = false;
+        Vector3 ballPos = this.transform.position;
+        if (ballPos.z > 0.1)
+        {
+            Debug.Log("DidBallLandInHole: Ball is not on the ground, so it can't be in the hole yet? Ball position: " + ballPos.ToString());
+            return landInHole;
+        }
 
-        RaycastHit2D[] hit2Ds = Physics2D.CircleCastAll(this.transform.position, this.GetComponent<CircleCollider2D>().radius / 2, Vector2.zero, 0f, _golfHoleLayerMask);
+        RaycastHit2D[] hit2Ds = Physics2D.CircleCastAll(ballPos, this.GetComponent<CircleCollider2D>().radius / 2, Vector2.zero, 0f, _golfHoleLayerMask);
         if (hit2Ds.Length > 0)
             landInHole = true;
-        Debug.Log("DidBallLandInHole: " + landInHole.ToString() + " at position: " + this.transform.position.ToString());
+        Debug.Log("DidBallLandInHole: " + landInHole.ToString() + " at position: " + ballPos.ToString());
         // maybe play a "boom shackalacka sound clip (recorded from myself saying it and modified in audacity) if it is a dunk shot? Would need to pass "HasBouncedYet" or whatever I called that variable so I can check that?
         return landInHole;
     }
-    void BounceOutOfHole(HoleTopDown holeRolledInto)
+    //void BounceOutOfHole(HoleTopDown holeRolledInto)
+    public void BounceOutOfHole(float holeCircleRadius, float holeSpriteRadius)
     {
         Debug.Log("BounceOutOfHole");
-        float timeBeforeBounce = TimeBeforeBounce(speedMetersPerSecond, holeRolledInto);
+        //float timeBeforeBounce = TimeBeforeBounce(speedMetersPerSecond, holeRolledInto.MyCircleRadius, holeRolledInto.SpriteRadius);
+        float timeBeforeBounce = TimeBeforeBounce(speedMetersPerSecond, holeCircleRadius, holeSpriteRadius);
         StartCoroutine(DelayBeforeBounceOutOfHole(timeBeforeBounce));
     }
-    float TimeBeforeBounce(float movementSpeed, HoleTopDown holeRolledInto)
+    //float TimeBeforeBounce(float movementSpeed, HoleTopDown holeRolledInto, float holeCircleRadius, float holeSpriteRadius)
+    float TimeBeforeBounce(float movementSpeed, float holeCircleRadius, float holeSpriteRadius)
     {
-        float dist = this.myCollider.radius + holeRolledInto.MyCircleRadius + holeRolledInto.SpriteRadius;
+        //float dist = this.myCollider.radius + holeRolledInto.MyCircleRadius + holeRolledInto.SpriteRadius;
+        float dist = this.myCollider.radius + holeCircleRadius + holeSpriteRadius;
         float timeBeforeBounce = dist / movementSpeed;
         return timeBeforeBounce;
     }
@@ -1562,6 +1597,10 @@ public class GolfBallTopDown : NetworkBehaviour
         yield return new WaitForSeconds(delayTime);
         ResetBallMovementBools();
         this.HitBall(speedMetersPerSecond / 2, 50f, 0f, movementDirection, 0f);
+
+        // to prevent the ball from bouncing off the flag right away???
+        this.BouncedOffObstacle = true;
+        StartCoroutine(BouncedOffObstacleCoolDown());
     }
     //public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector3 collisionPoint, Vector3 centerOfObstacle, Vector3 extentOfObstacle)
     public void HitEnvironmentObstacle(float obstalceUnityUnits, float ballUnityUnits, bool isHoleFlag, Vector2 collisionPoint, Vector2 ballPos, bool softBounce = false, float bounceModifier = 1.0f, string bounceSoundType = null, bool bounceOffTop = false)

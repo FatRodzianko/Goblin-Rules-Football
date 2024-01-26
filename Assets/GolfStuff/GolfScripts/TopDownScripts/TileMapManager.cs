@@ -11,6 +11,7 @@ using System;
 using Cinemachine;
 using System.Threading.Tasks;
 using System.IO;
+using PathCreation;
 
 public class TileMapManager : MonoBehaviour
 {
@@ -282,17 +283,34 @@ public class TileMapManager : MonoBehaviour
                     Debug.Log("pipesToSave: MyExitPipe does not exist. Skipping...");
                     continue;
                 }
-                    
+
 
                 yield return new SavedMiniGolfPipe()
                 {
                     EntryPipePosition = pipeScript.gameObject.transform.position,
                     ExitPipePosition = pipeScript.MyExitPipe.transform.position,
                     MiniGolfPipeScriptableObstacle = pipeScript.myScriptableObject,
-                    MiniGolfExitPipeScriptableObstacle = pipeScript.MyExitPipe.myScriptableObject
+                    MiniGolfExitPipeScriptableObstacle = pipeScript.MyExitPipe.myScriptableObject,
+                    //PathPoints = pipeScript.MyPath.path.localPoints
+                    PathPoints = GetPipePathPoints(pipeScript)
                 };
             }
         }
+    }
+    Vector3[] GetPipePathPoints(PipeMiniGolfScript pipeScript)
+    {
+        List<Vector3> pipePathPoints = new List<Vector3>();
+
+        //pipePathPoints.Add(pipeScript.gameObject.transform.position);
+        if (pipeScript.WayPointHolder.childCount > 0)
+        {
+            for (int i = 0; i < pipeScript.WayPointHolder.childCount; i++)
+            {
+                pipePathPoints.Add(pipeScript.WayPointHolder.GetChild(i).position);
+            }
+        }
+        pipePathPoints.Add(pipeScript.MyExitPipe.transform.position);
+        return pipePathPoints.ToArray();
     }
     void FindHoleAimPoints(ScriptableHole hole)
     {
@@ -642,7 +660,19 @@ public class TileMapManager : MonoBehaviour
         {
             GameObject entryHole = Instantiate(miniGolfPipes[i].MiniGolfPipeScriptableObstacle.ObstaclePrefab, miniGolfPipes[i].EntryPipePosition, Quaternion.identity);
             GameObject exitPipe = Instantiate(miniGolfPipes[i].MiniGolfExitPipeScriptableObstacle.ObstaclePrefab, miniGolfPipes[i].ExitPipePosition, Quaternion.identity);
-            entryHole.GetComponent<PipeMiniGolfScript>().SetExitPipe(exitPipe.GetComponent<PipeMiniGolfScript>());
+
+            PipeMiniGolfScript entryPipeScript = entryHole.GetComponent<PipeMiniGolfScript>();
+            entryPipeScript.SetExitPipe(exitPipe.GetComponent<PipeMiniGolfScript>());
+            entryPipeScript.SetPipePathWayPoints(miniGolfPipes[i].PathPoints);
+
+
+            //Vector3[] newPathPoints = miniGolfPipes[i].PathPoints;
+            //newPathPoints[0] = Vector3.zero;
+            //newPathPoints[newPathPoints.Length - 1] = entryHole.transform.InverseTransformPoint(entryPipeScript.ExitPipeExitPoint);
+
+            //entryPipeScript.MyPath.bezierPath = new BezierPath(miniGolfPipes[i].PathPoints, false, PathSpace.xy);
+            //entryPipeScript.MyPath.bezierPath = new BezierPath(miniGolfPipes[i].PathPoints, false, PathSpace.xy);
+            //entryPipeScript.MyPath.bezierPath.AutoControlLength = 0f;
         }
     }
     public async Task LoadMapAsTask(ScriptableHole hole)

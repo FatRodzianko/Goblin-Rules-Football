@@ -102,8 +102,9 @@ MonoBehaviour:
   IsEntryPipe: 0
   myScriptableObject: {fileID: 11400000, guid: 8fd38948f6526f64cb570263f66a8fef, type: 2}
   MyExitPipe: {fileID: 0}
+  _myCircleRadius: 0
   ExitPipePosition: {x: 0, y: 0, z: 0}
-  ExitPipeDirection: {x: 0, y: 0, z: 0}
+  ExitPipeDirection: {x: 0, y: -1, z: 0}
   ExitPointReferenceObject: {fileID: 7298841874408124581}
   ExitPipeExitPoint: {x: 0, y: 0, z: 0}
   ExitPipeIsOffset: 0
@@ -142,7 +143,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7298841874408124581}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.12, z: 0}
+  m_LocalPosition: {x: 0, y: 0.3125, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
