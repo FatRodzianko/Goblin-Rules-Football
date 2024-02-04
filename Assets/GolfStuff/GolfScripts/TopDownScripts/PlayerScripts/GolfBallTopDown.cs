@@ -1281,6 +1281,19 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         Debug.Log("BallExitMiniGolfPipe: exit direction: " + exitDirection.ToString() + " speed: " + exitSpeed.ToString());
         movementDirection = exitDirection.normalized;
+
+
+        float exitDistance = GetPipeExitDistanceFromExitSpeed(exitSpeed);
+        if (RainManager.instance.IsRaining)
+        {
+            
+            exitDistance *= RainManager.instance.RainHitModifier;
+            
+        }
+        exitSpeed = GetPuttSpeed(exitDistance);
+
+        Debug.Log("BallExitMiniGolfPipe: exit speed after GetPuttSpeed: " + exitSpeed.ToString() + " with an exit distance of " + exitDistance.ToString());
+
         speedMetersPerSecond = exitSpeed;
 
         isRolling = WillBallRoll();
@@ -1289,6 +1302,13 @@ public class GolfBallTopDown : NetworkBehaviour
             ResetBallAndPlayerAfterBallStoppedRolling();
         }
 
+    }
+    float GetPipeExitDistanceFromExitSpeed(float exitSpeed)
+    {
+        if (exitSpeed == 0)
+            return 0f;
+
+        return exitSpeed * exitSpeed;
     }
     public float GetPuttSpeed(float distanceToPutt)
     {
@@ -1313,7 +1333,7 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     public void BallRolledIntoHole(HoleTopDown holeRolledInto)
     {
-        if (this.speedMetersPerSecond < 1.5f) // used to be 3???
+        if (this.speedMetersPerSecond < 1.65f) // used to be 3???
         {
             Debug.Log("BallRolledIntoHole: current speed of the ball: " + this.speedMetersPerSecond.ToString() + " which is slow enough to fall into hole");
             //BallInHole();
@@ -1596,7 +1616,13 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         yield return new WaitForSeconds(delayTime);
         ResetBallMovementBools();
-        this.HitBall(speedMetersPerSecond / 2, 50f, 0f, movementDirection, 0f);
+
+        float distanceOutOfHole = speedMetersPerSecond / 2;
+
+        if (distanceOutOfHole > 0.15f)
+            distanceOutOfHole = 0.15f;
+        //this.HitBall(speedMetersPerSecond / 2, 50f, 0f, movementDirection, 0f);
+        this.HitBall(distanceOutOfHole, 50f, 0f, movementDirection, 0f);
 
         // to prevent the ball from bouncing off the flag right away???
         this.BouncedOffObstacle = true;

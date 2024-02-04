@@ -96,12 +96,20 @@ public class PipeMiniGolfScript : MonoBehaviour
             //    continue;
 
             // get the distance between points and add t hem up
+            //Debug.Log("SetPipePathWayPoints: _ballDistanceToTravel BEFORE new waypoint: " + _ballDistanceToTravel.ToString());
             if (i == 0)
             {
+                //Debug.Log("SetPipePathWayPoints: distance between waypoints: " + Vector2.Distance(newWayPoints[i], this.transform.position).ToString());
                 _ballDistanceToTravel = Vector2.Distance(newWayPoints[i], this.transform.position);
             }
             else
+            {
                 _ballDistanceToTravel += Vector2.Distance(newWayPoints[i], newWayPoints[i - 1]);
+                //Debug.Log("SetPipePathWayPoints: distance between waypoints: " + Vector2.Distance(newWayPoints[i], newWayPoints[i - 1]).ToString());
+            }
+                
+
+            //Debug.Log("SetPipePathWayPoints: _ballDistanceToTravel AFTER new waypoint: " + _ballDistanceToTravel.ToString());
 
             // don't spawn a waypoint for the final point, since it will just be the pipe exit point
             if (i == newWayPoints.Length - 1)
@@ -170,7 +178,7 @@ public class PipeMiniGolfScript : MonoBehaviour
         _timeInTube = GetTimeToTravelInTube(_ballSpeedOnEntry, _ballExitSpeed, _ballAcceleration);
 
         //golfBallScript.transform.DOMove(ExitPipeExitPoint, _timeInTube).SetEase(Ease.InCubic).OnComplete(() => BallExitPipe(golfBallScript));
-        golfBallScript.transform.DOPath(_wayPoints,_timeInTube,PathType.Linear,PathMode.TopDown2D).SetEase(Ease.InCubic).OnComplete(() => BallExitPipe(golfBallScript));
+        golfBallScript.transform.DOPath(_wayPoints,_timeInTube,PathType.Linear,PathMode.TopDown2D).SetEase(Ease.InSine).OnComplete(() => BallExitPipe(golfBallScript));
         _distanceTraveled = 0f;
         //_moveBall = true;
     }
