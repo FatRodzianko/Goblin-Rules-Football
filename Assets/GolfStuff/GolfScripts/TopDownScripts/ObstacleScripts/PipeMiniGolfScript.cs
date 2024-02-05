@@ -21,6 +21,7 @@ public class PipeMiniGolfScript : MonoBehaviour
     [SerializeField] public GameObject ExitPointReferenceObject;
     [SerializeField] public Vector3 ExitPipeExitPoint =  Vector3.zero;
     [SerializeField] public bool ExitPipeIsOffset = false;
+    [SerializeField] public float ExitSpeedAddition = 2f;
 
     [Header("Pipe Path Stuff")]
     //[SerializeField] public PathCreator MyPath;
@@ -32,6 +33,7 @@ public class PipeMiniGolfScript : MonoBehaviour
     [Header("Ball Entry State")]
     [SerializeField] float _ballSpeedOnEntry = 1.0f;
     [SerializeField] Vector2 _ballMovementDirectionOnEntry = Vector2.zero;
+    [SerializeField] float _ballAngleToHoleOnEntry;
 
     [Header("Ball Exit State")]
     [SerializeField] float _ballExitSpeed = 0f;
@@ -82,7 +84,7 @@ public class PipeMiniGolfScript : MonoBehaviour
 
         ExitPipePosition = exitPipe.transform.position;
         ExitPipeExitPoint = exitPipe.transform.GetChild(0).position;
-        ExitPipeDirection = exitPipe.ExitPipeDirection;
+        ExitPipeDirection = exitPipe.ExitPipeDirection.normalized;
         //_distanceTraveled = Vector2.Distance(this.transform.position, ExitPipePosition);
         //_ballDistanceToTravel = Vector2.Distance(this.transform.position, ExitPipePosition);
     }
@@ -120,6 +122,16 @@ public class PipeMiniGolfScript : MonoBehaviour
             newObject.transform.parent = WayPointHolder;
         }
     }
+    public void SetExitSpeedAddition(float newExitSpeed)
+    {
+        if (newExitSpeed == 0)
+        {
+            this.ExitSpeedAddition = 1f;
+            return;
+        }
+
+        this.ExitSpeedAddition = Mathf.Abs(newExitSpeed);
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!this.IsEntryPipe)
@@ -150,6 +162,12 @@ public class PipeMiniGolfScript : MonoBehaviour
             golfBallScript.BounceOutOfHole(this.PipeCollider.radius, this._mySpriteRadius);
             return;
         }
+        //this._ballAngleToHoleOnEntry = GetAngleOfShotIntoHole(golfBallScript.MyPlayer.transform.position, golfBallScript.transform.position, this.transform.position);
+        Vector3 ballPos = golfBallScript.transform.position;
+
+        //this._ballAngleToHoleOnEntry = GetAngleOfShotIntoHole(golfBallScript.movementDirection, this.PipeCollider.ClosestPoint(ballPos), ballPos, this.transform.position);
+        this._ballAngleToHoleOnEntry = GetAngleOfShotIntoHole(golfBallScript.movementDirection, this.PipeCollider.ClosestPoint(ballPos));
+
         this._ballToMove = golfBallScript;
         this._ballMovementDirectionOnEntry = golfBallScript.movementDirection;
 
@@ -159,9 +177,12 @@ public class PipeMiniGolfScript : MonoBehaviour
     {
         
         Debug.Log("DelayBeforeMoveBall: delay time: " + delayTime.ToString());
-
+        // Save balls current movement direction
+        Vector2 ballDir = golfBallScript.movementDirection;
+        Vector2 dirToCenterOfHole = (this.transform.position - golfBallScript.transform.position).normalized;
         //set ball movement so it moves toward the center of hole?
-        golfBallScript.ChangeBallDirectionToCenterOfHole((this.transform.position - golfBallScript.transform.position).normalized);
+        //golfBallScript.ChangeBallDirectionToCenterOfHole((this.transform.position - golfBallScript.transform.position).normalized);
+        golfBallScript.ChangeBallDirectionToCenterOfHole(dirToCenterOfHole);
 
         // Set the ball as in the tube
         golfBallScript.SetBallInTube(true);
@@ -171,11 +192,15 @@ public class PipeMiniGolfScript : MonoBehaviour
 
         golfBallScript.ResetBallInfo(false);
         golfBallScript.EnableOrDisableBallSpriteRenderer(false);
-        
 
-        _ballExitSpeed = GetExitFinalVelocity(_ballSpeedOnEntry, this._ballAcceleration, this._ballDistanceToTravel);
-        _differenceInStartAndEndSpeed = _ballExitSpeed - _ballSpeedOnEntry;
-        _timeInTube = GetTimeToTravelInTube(_ballSpeedOnEntry, _ballExitSpeed, _ballAcceleration);
+        // old method for exit based on distance in tube and all that
+        //_ballExitSpeed = GetExitFinalVelocity(_ballSpeedOnEntry, this._ballAcceleration, this._ballDistanceToTravel);
+        //_differenceInStartAndEndSpeed = _ballExitSpeed - _ballSpeedOnEntry;
+        //_timeInTube = GetTimeToTravelInTube(_ballSpeedOnEntry, _ballExitSpeed, _ballAcceleration);
+
+        _ballExitSpeed = GetExitSpeed(_ballSpeedOnEntry);
+        float acceleration = GetAccelerationRateFromVelocityAndDistance(_ballSpeedOnEntry, _ballExitSpeed, _ballDistanceToTravel);
+        _timeInTube = GetTimeToTravelInTube(_ballSpeedOnEntry, _ballExitSpeed, acceleration);
 
         //golfBallScript.transform.DOMove(ExitPipeExitPoint, _timeInTube).SetEase(Ease.InCubic).OnComplete(() => BallExitPipe(golfBallScript));
         golfBallScript.transform.DOPath(_wayPoints,_timeInTube,PathType.Linear,PathMode.TopDown2D).SetEase(Ease.InSine).OnComplete(() => BallExitPipe(golfBallScript));
@@ -188,14 +213,17 @@ public class PipeMiniGolfScript : MonoBehaviour
         golfBallScript.EnableOrDisableBallSpriteRenderer(true);
         golfBallScript.SetBallInTube(false);
         //golfBallScript.BallExitMiniGolfPipe(this.ExitPipeDirection, GetExitSpeed(this._ballSpeedOnEntry));
-        golfBallScript.BallExitMiniGolfPipe(this.ExitPipeDirection, _ballExitSpeed);
+        Vector2 adjustedExitDirection = GetAdjustedExitDirectionFromEntryAngle(this.ExitPipeDirection, this._ballAngleToHoleOnEntry);
+        //golfBallScript.BallExitMiniGolfPipe(this.ExitPipeDirection, _ballExitSpeed);
+        golfBallScript.BallExitMiniGolfPipe(adjustedExitDirection, _ballExitSpeed);
         _moveBall = false;
     }
     float GetExitSpeed(float entrySpeed)
     {
         float exitSpeed = entrySpeed;
 
-        exitSpeed += (0.1f * _ballDistanceToTravel);
+        //exitSpeed += (0.1f * _ballDistanceToTravel);
+        exitSpeed += ExitSpeedAddition;
 
         return exitSpeed;
     }
@@ -211,5 +239,54 @@ public class PipeMiniGolfScript : MonoBehaviour
         float timeToTravel = (finalVelocity - initialVelocity) / acceleration;
         Debug.Log("GetTimeToTravelInTube: initial velocity: " + initialVelocity.ToString() + " final velocity: " + finalVelocity.ToString() + " acceleration: " + acceleration.ToString() + " time to travel: " + timeToTravel.ToString());
         return timeToTravel;
+    }
+    float GetAccelerationRateFromVelocityAndDistance(float initialVelocity, float finalVelocity, float distance)
+    {
+        if (distance == 0)
+            return 0f;
+        float acceleration = (Mathf.Pow(finalVelocity, 2) - Mathf.Pow(initialVelocity, 2)) / (2f * distance);
+        Debug.Log("GetAccelerationRateFromVelocityAndDistance: acceleration: " + acceleration.ToString() + " initialVelocity: " + initialVelocity.ToString() + " finalVelocity: " + finalVelocity.ToString() + " distance: " + distance.ToString());
+        return acceleration;
+    }
+    //float GetAngleOfShotIntoHole(Vector3 playerPos, Vector3 ballPos, Vector3 holePos)
+    //float GetAngleOfShotIntoHole(Vector2 ballDir, Vector2 contactPoint, Vector3 ballPos, Vector3 holePos)
+    float GetAngleOfShotIntoHole(Vector2 ballDirection, Vector2 contactPoint)
+    {
+        // first try
+        //if (playerBallVector == Vector2.zero || playerHoleVector == Vector2.zero)
+        //    return 0f;
+
+        // old based on player position
+        //Vector2 playerBallVector = (ballPos - playerPos).normalized;
+        //Vector2 playerHoleVector = (holePos - playerPos).normalized;
+
+        //float shotAngle = Vector2.Angle(playerHoleVector, playerBallVector);
+
+        //Debug.Log("GetAngleOfShotIntoHole: shot angle: " + shotAngle.ToString() + " playerPos: " + playerPos.ToString() + " ballPos: " + ballPos.ToString() + " holePos: " + holePos.ToString());
+
+        // second version
+        //Vector2 directionFromHoleToPoint = (contactPoint - (Vector2)holePos).normalized;
+        //Vector2 directionFromBallToPoint = (contactPoint - (Vector2)ballPos).normalized;
+
+        //float shotAngle = Vector2.Angle(directionFromHoleToPoint, directionFromBallToPoint);
+        //Debug.Log("GetAngleOfShotIntoHole: shot angle: " + shotAngle.ToString() + " contact point: " + contactPoint.ToString() + " ballPos: " + ballPos.ToString() + " holePos: " + holePos.ToString());
+
+        // third version
+        //Vector2 directionFromHoleToContactPoint = (contactPoint - (Vector2)this.transform.position).normalized;
+        Vector2 dirFromContactToHole = ((Vector2)PipeCollider.bounds.center - contactPoint).normalized;
+        float shotAngle = Vector2.Angle(dirFromContactToHole, ballDirection);
+        Debug.Log("GetAngleOfShotIntoHole: shot angle: " + shotAngle.ToString() + " contact point: " + contactPoint.ToString() + " ball direction: " + ballDirection.ToString() + " dirFromContactToHole: " + dirFromContactToHole.ToString());
+        return shotAngle;
+    }
+    Vector2 GetAdjustedExitDirectionFromEntryAngle(Vector2 exitDir, float entryAngle)
+    {
+        if (entryAngle == 0)
+            return exitDir;
+
+        var rotation = Quaternion.AngleAxis((entryAngle / 20), Vector3.forward);
+        Vector2 newDir = (rotation * exitDir).normalized;
+        Debug.Log("GetAdjustedExitDirectionFromEntryAngle: new direction: " + newDir.ToString() + " original direction: " + exitDir.ToString() + " entry angle: " + entryAngle.ToString());
+
+        return newDir;
     }
 }

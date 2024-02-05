@@ -451,15 +451,18 @@ x minigolf mode
 x add the course name to golf lobbies:
 - - x so it will say something like "Game Mode: Golf:Forest" or whatever
 - - x have the course name set as an attribute to the steam lobby - in case I ever make custom maps, players would see it's a map they don't own before joining?
-- Add holes/pipes to minigolf
-- - - they'll be in pairs, similar to the tubes in regular golf
+x Add holes/pipes to minigolf
+- - x they'll be in pairs, similar to the tubes in regular golf
 - - - - - - probably have tilemap manager find them specifically and pair them up, just like for the tubes?
 - - - when the ball exits the pipe, the ball's new hit movement should be somewhat effected by their previous movement direction
 - - - - - - something like:
 - - - - - - - - - newMovementDirection = ((previousMovementDirection*0.1) * PipeExitDirection)
 - - - - - - - - - may want to check the previousMovementDirection before the above calulation. See if it is "backward" from the pipe direction
 - - - - - - - - - - - - aka is it more than 90 degrees from PipeExitDirection. If so, flip it / rotate 180? I think that works out...
-- - - create a "spline" or path object for ball to move along? Need to figure out how to make the spline and move an object along it first...
+- - - - - - new idea for this: Check how "accurate" the player's hit was to the center of the hole. 
+- - - - - - - - - - - - Make two lines, one from player to ball, other from player to hole. Compare angle
+- - - - - - - - - - - - Cause the ball's exit direction to "drift" depending on how accurate the hit was (closer to angle between two lines being zero the less "drift" there would be)
+- - x create a "spline" or path object for ball to move along? Need to figure out how to make the spline and move an object along it first...
 - Fix all the "await" async functions in GameplayManagerTopDownGolf so they use the token? Otherwise can cause crashes if player exits game while one is running?
 - - - pass the _cancellationTokenSource.Token to all await functions being called?
 

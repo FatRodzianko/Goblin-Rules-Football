@@ -291,6 +291,7 @@ public class TileMapManager : MonoBehaviour
                     ExitPipePosition = pipeScript.MyExitPipe.transform.position,
                     MiniGolfPipeScriptableObstacle = pipeScript.myScriptableObject,
                     MiniGolfExitPipeScriptableObstacle = pipeScript.MyExitPipe.myScriptableObject,
+                    ExitSpeedAddition = pipeScript.ExitSpeedAddition,
                     //PathPoints = pipeScript.MyPath.path.localPoints
                     PathPoints = GetPipePathPoints(pipeScript)
                 };
@@ -309,7 +310,7 @@ public class TileMapManager : MonoBehaviour
                 pipePathPoints.Add(pipeScript.WayPointHolder.GetChild(i).position);
             }
         }
-        pipePathPoints.Add(pipeScript.MyExitPipe.transform.position);
+        pipePathPoints.Add(pipeScript.MyExitPipe.ExitPointReferenceObject.transform.position);
         return pipePathPoints.ToArray();
     }
     void FindHoleAimPoints(ScriptableHole hole)
@@ -664,6 +665,7 @@ public class TileMapManager : MonoBehaviour
             PipeMiniGolfScript entryPipeScript = entryHole.GetComponent<PipeMiniGolfScript>();
             entryPipeScript.SetExitPipe(exitPipe.GetComponent<PipeMiniGolfScript>());
             entryPipeScript.SetPipePathWayPoints(miniGolfPipes[i].PathPoints);
+            entryPipeScript.SetExitSpeedAddition(miniGolfPipes[i].ExitSpeedAddition);
 
 
             //Vector3[] newPathPoints = miniGolfPipes[i].PathPoints;

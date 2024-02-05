@@ -92,5 +92,6 @@ public class SavedMiniGolfPipe
     public Vector3 ExitPipePosition;
     public ScriptableObstacle MiniGolfPipeScriptableObstacle;
     public ScriptableObstacle MiniGolfExitPipeScriptableObstacle;
+    public float ExitSpeedAddition;
     public Vector3[] PathPoints;
 }
