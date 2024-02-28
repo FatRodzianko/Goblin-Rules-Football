@@ -43,6 +43,7 @@ public class GolfBallTopDown : NetworkBehaviour
     [SerializeField] [SyncVar(OnChange = nameof(SyncClientMovingBall))] bool _clientMovingBall = false;
     public bool PlayerUsingRocket = false;
     public bool BallInTube = false;
+    public bool BallOnPipeEntryHole = false;
 
     [Header("Hit Ball Info")]
     public Vector3[] hitBallPonts = new Vector3[3];
@@ -1131,6 +1132,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
         // Need to update this so if a ball rolls back down a hill, it doesn't stop rolling when the speed goes from 0 at its apex to then increase again when rolls down, this doesn't stop it from rolling down?
         // probably need to do something like, get current direction of the ball and the direction of the slope. If the angle between the two is greater than 180, continue to roll down?
+        //if (speedMetersPerSecond > 0.05f)
         if (speedMetersPerSecond > 0.05f)
         {
             Vector2 currentPos = this.transform.position;
@@ -1150,6 +1152,11 @@ public class GolfBallTopDown : NetworkBehaviour
                 _stuckWhileRollingCount = 0;
                 _lastKnownPosition = currentPos;
             }
+            willBallRoll = true;
+        }
+        else if (this.BallOnPipeEntryHole && speedMetersPerSecond > 0f)
+        {
+            Debug.Log("WillBallRoll: Ball on top of Minigolf Entry Pipe? " + this.BallOnPipeEntryHole.ToString() + " and ball speed: " + this.speedMetersPerSecond.ToString());
             willBallRoll = true;
         }
         else if (this.BallInTube)
@@ -1327,7 +1334,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
         Vector2 newDir = (rollDirection * speedMetersPerSecond * Time.fixedDeltaTime) + (slopeDirection * slopeSpeedModifier * Time.fixedDeltaTime);
         //Vector2 newDir = (rollDirection * speedMetersPerSecond * Time.fixedDeltaTime) + (slopeDirection * slopeSpeedModifier);
-        Debug.Log("GetRollDirection: initial roll direction: " + rollDirection.ToString() + " slope direction: " + slopeDirection.ToString() + " new direction: " + newDir.ToString() + " new direction normalized: " + newDir.normalized.ToString());
+        //Debug.Log("GetRollDirection: initial roll direction: " + rollDirection.ToString() + " slope direction: " + slopeDirection.ToString() + " new direction: " + newDir.ToString() + " new direction normalized: " + newDir.normalized.ToString());
         return newDir.normalized;
         //return newDir;
     }
@@ -1617,11 +1624,12 @@ public class GolfBallTopDown : NetworkBehaviour
         yield return new WaitForSeconds(delayTime);
         ResetBallMovementBools();
 
-        float distanceOutOfHole = speedMetersPerSecond / 2;
+        float distanceOutOfHole = speedMetersPerSecond / 2.5f;
 
-        if (distanceOutOfHole > 0.15f)
-            distanceOutOfHole = 0.15f;
+        if (distanceOutOfHole < 0.25f)
+            distanceOutOfHole = 0.25f;
         //this.HitBall(speedMetersPerSecond / 2, 50f, 0f, movementDirection, 0f);
+        Debug.Log("DelayBeforeBounceOutOfHole: bounce distance of: " + distanceOutOfHole.ToString());
         this.HitBall(distanceOutOfHole, 50f, 0f, movementDirection, 0f);
 
         // to prevent the ball from bouncing off the flag right away???

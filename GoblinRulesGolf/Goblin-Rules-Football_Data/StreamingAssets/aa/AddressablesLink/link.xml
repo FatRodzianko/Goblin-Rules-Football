@@ -5,6 +5,8 @@
     <type fullname="BalloonPowerUp" preserve="all" />
     <type fullname="BalloonSpriteCollision" preserve="all" />
     <type fullname="EnvironmentObstacleTopDown" preserve="all" />
+    <type fullname="PipeMiniGolfScript" preserve="all" />
+    <type fullname="PipeMiniGolfSecondaryCollider" preserve="all" />
     <type fullname="ScriptableCourse" preserve="all" />
     <type fullname="ScriptableHole" preserve="all" />
     <type fullname="ScriptableObstacle" preserve="all" />
@@ -14,6 +16,7 @@
     <type fullname="StatueAnimator" preserve="all" />
     <type fullname="TubeScript" preserve="all" />
     <type fullname="SavedBalloonPowerUp" preserve="nothing" serialized="true" />
+    <type fullname="SavedMiniGolfPipe" preserve="nothing" serialized="true" />
     <type fullname="SavedObstacle" preserve="nothing" serialized="true" />
     <type fullname="SavedStatue" preserve="nothing" serialized="true" />
     <type fullname="SavedTile" preserve="nothing" serialized="true" />

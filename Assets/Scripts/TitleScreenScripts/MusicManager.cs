@@ -18,6 +18,12 @@ public class MusicManager : MonoBehaviour
     IEnumerator _waitForSongEndRoutine;
     bool _isWaitForSongEndRoutineRunning = false;
 
+    public delegate void ChangeNowPlayingSong(string nowPlayingSongTitle);
+    public event ChangeNowPlayingSong NowPlayingSongChanged;
+
+    public delegate void IsMusicOn(bool isMusicOn);
+    public event IsMusicOn MusicTurnedOn;
+
 
     //[SerializeField] AudioSource audioSource;
     private void Awake()
@@ -37,6 +43,10 @@ public class MusicManager : MonoBehaviour
         //    _source.loop = s.isLooping;
 
         //}
+
+        // Now Playing Events?
+        MusicTurnedOn = MusicTurnedOnFunction;
+        NowPlayingSongChanged = NowPlayingSongChangedFunction;
     }
     void MakeInstance()
     {
@@ -87,12 +97,14 @@ public class MusicManager : MonoBehaviour
         {
             Debug.Log("TurnMusicOff: Could not get clip from index. Error: " + e);
         }
-        
+        MusicTurnedOn(false);
+
     }
     public void TurnMusicOn()
     {
         //PlaySound(_titleMusicClip, 0.75f);
         PlayPlayList(false);
+        MusicTurnedOn(true);
     }
     public bool IsMusicPlaying()
     {
@@ -147,6 +159,8 @@ public class MusicManager : MonoBehaviour
         
         _source.PlayOneShot(s.clip, volume);
 
+        NowPlayingSongChanged(s.name);
+
         _waitForSongEndRoutine = WaitForSongEnd(SongIdex);
         StartCoroutine(_waitForSongEndRoutine);
         SongIdex++;
@@ -176,5 +190,27 @@ public class MusicManager : MonoBehaviour
         Debug.Log("WaitForSongEnd: Music Ended.");
         ReleaseSong(index);
         _isWaitForSongEndRoutineRunning = false;
+    }
+    void MusicTurnedOnFunction(bool isMusicOn)
+    {
+        Debug.Log("MusicTurnedOnFunction: " + isMusicOn.ToString());
+    }
+    void NowPlayingSongChangedFunction(string nowPlayingSongTitle)
+    {
+        Debug.Log("NowPlayingSongChangedFunction: " + nowPlayingSongTitle);
+    }
+    public string GetCurrentSongTitle()
+    {
+        if (!this.IsMusicPlaying())
+            return "";
+
+        int index = 0;
+        if (SongIdex > 0)
+            index = SongIdex;
+        if (index > songs.Length)
+            index = songs.Length;
+
+        SongClip s = songs[index-1];
+        return s.name;
     }
 }

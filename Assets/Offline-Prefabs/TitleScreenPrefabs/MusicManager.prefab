@@ -48,9 +48,9 @@ MonoBehaviour:
   audioMixer: {fileID: 24100000, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
   mixerGroup: {fileID: -9069800408082282386, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
   songs:
-  - name: unsuitable-turn
-    clip: {fileID: 8300000, guid: 100636e6268fdfe4e811ef544983b3ec, type: 3}
-    ClipAddress: Assets/SFX/Music/unsuitable-turn-40-bar_final_bass-boosted-3.mp3
+  - name: frail-noise-again
+    clip: {fileID: 8300000, guid: 80680e5e6d5ce1a4eb5a7b60074514ef, type: 3}
+    ClipAddress: Assets/SFX/Music/frail-noise-again.mp3
     volume: 1
     pitch: 1
     isLooping: 0
@@ -60,9 +60,39 @@ MonoBehaviour:
     volume: 1
     pitch: 1
     isLooping: 0
-  - name: frail-noise-again
-    clip: {fileID: 8300000, guid: 80680e5e6d5ce1a4eb5a7b60074514ef, type: 3}
-    ClipAddress: Assets/SFX/Music/frail-noise-again.mp3
+  - name: handy-question
+    clip: {fileID: 8300000, guid: 11ae4b6c20be0a945a7efdb5ab5d102d, type: 3}
+    ClipAddress: Assets/SFX/Music/ill-fated-stew-2.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: unsuitable-turn
+    clip: {fileID: 8300000, guid: 100636e6268fdfe4e811ef544983b3ec, type: 3}
+    ClipAddress: Assets/SFX/Music/unsuitable-turn-40-bar_final_bass-boosted-3.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: illegal-toothpaste
+    clip: {fileID: 8300000, guid: 6bb9c184051462f4187d1c6833741296, type: 3}
+    ClipAddress: Assets/SFX/Music/illegal-toothpaste_2-pole-chord.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: first-song
+    clip: {fileID: 8300000, guid: 7a4c61294a2a9be4da8560aedc53993f, type: 3}
+    ClipAddress: Assets/SFX/Music/first-song.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: synthwave
+    clip: {fileID: 8300000, guid: f71bdcef604c1dc4a95cfd90960386c3, type: 3}
+    ClipAddress: Assets/SFX/Music/synthwave-more-synth.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: ill-fated-stew
+    clip: {fileID: 8300000, guid: 67536d73a3cc6fc42bbe8c3a0b6b30fc, type: 3}
+    ClipAddress: Assets/SFX/Music/ill-fated-stew-2.mp3
     volume: 1
     pitch: 1
     isLooping: 0
@@ -79,7 +109,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -9069800408082282386, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0

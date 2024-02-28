@@ -162,6 +162,16 @@ public class PipeMiniGolfScript : MonoBehaviour
             golfBallScript.BounceOutOfHole(this.PipeCollider.radius, this._mySpriteRadius);
             return;
         }
+
+
+        //if (this._ballSpeedOnEntry == 0f)
+        //{
+        //    Debug.Log("PipeMiniGolfScript: OnTriggerEnter2D: ball has entered hole but with no speed? Ball speed: " + this._ballSpeedOnEntry.ToString());
+        //    golfBallScript.speedMetersPerSecond = 0.015f;
+        //    this._ballSpeedOnEntry = 0.015f;
+        //}
+
+
         //this._ballAngleToHoleOnEntry = GetAngleOfShotIntoHole(golfBallScript.MyPlayer.transform.position, golfBallScript.transform.position, this.transform.position);
         Vector3 ballPos = golfBallScript.transform.position;
 
@@ -184,7 +194,7 @@ public class PipeMiniGolfScript : MonoBehaviour
         //golfBallScript.ChangeBallDirectionToCenterOfHole((this.transform.position - golfBallScript.transform.position).normalized);
         golfBallScript.ChangeBallDirectionToCenterOfHole(dirToCenterOfHole);
 
-        // Set the ball as in the tube
+        //// Set the ball as in the tube
         golfBallScript.SetBallInTube(true);
 
 

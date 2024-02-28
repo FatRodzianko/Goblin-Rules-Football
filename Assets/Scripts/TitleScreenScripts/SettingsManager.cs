@@ -120,6 +120,7 @@ public class SettingsManager : MonoBehaviour
             {
                 resolutionList.Add(resolution);
             }
+
             //Debug.Log("GetResolutions: Found resolution of " + resolution.ToString());
             if (resolution.height > maxHeight)
                 maxHeight = resolution.height;
@@ -158,6 +159,7 @@ public class SettingsManager : MonoBehaviour
         int index = 0;
         int currentResolutionIndex = 0;
         Resolution newRes = new Resolution();
+
         if (maxHeight >= 720)
         {
             option = "1280x720";
@@ -174,6 +176,8 @@ public class SettingsManager : MonoBehaviour
             }
             index++;
         }
+        
+
         if (maxHeight >= 900)
         {
             option = "1600x900";
@@ -222,6 +226,9 @@ public class SettingsManager : MonoBehaviour
             }
             index++;
         }
+
+        
+
         if (resolutionList.Count > 0)
         {
             resolutions = resolutionList.ToArray();
@@ -242,7 +249,7 @@ public class SettingsManager : MonoBehaviour
     public void SetResolution(int width, int height, bool fullScreen)
     {
         Debug.Log("SetResolution: " + width.ToString() + "x" + height.ToString() + " " + fullScreen.ToString());
-        if (width > 0 && height > 0 && (width / height) == (1920 / 1080))
+        if (width > 0 && height > 0 && ((width / height) == (1920 / 1080)))
         {
             if(fullScreen)
                 Screen.SetResolution(width, height, FullScreenMode.FullScreenWindow);

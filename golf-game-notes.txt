@@ -462,6 +462,9 @@ x Add holes/pipes to minigolf
 - - - - - - new idea for this: Check how "accurate" the player's hit was to the center of the hole. 
 - - - - - - - - - - - - Make two lines, one from player to ball, other from player to hole. Compare angle
 - - - - - - - - - - - - Cause the ball's exit direction to "drift" depending on how accurate the hit was (closer to angle between two lines being zero the less "drift" there would be)
+- - - - - - the above penalizes you for being closer to the hole since player distance to hole would greatly affect the entry angle. Different idea:
+- - - - - - - - - - - - get "point of contact" when the ball enters hole collider with collider.ClosestPoint()
+- - - - - - - - - - - - Get the "normal" of that point from the hole's collider
 - - x create a "spline" or path object for ball to move along? Need to figure out how to make the spline and move an object along it first...
 - Fix all the "await" async functions in GameplayManagerTopDownGolf so they use the token? Otherwise can cause crashes if player exits game while one is running?
 - - - pass the _cancellationTokenSource.Token to all await functions being called?

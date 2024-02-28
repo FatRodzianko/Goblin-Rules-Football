@@ -1809,12 +1809,12 @@ MonoBehaviour:
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
   CameraBoundingBoxPos: {x: 0, y: 0, z: 0}
   PolygonPoints:
-  - {x: -25, y: 15}
-  - {x: 75, y: 15}
-  - {x: 75, y: -40}
-  - {x: -25, y: -40}
-  ZoomedOutPos: {x: 18, y: -4.5, z: 0}
-  CameraZoomValue: 2.5
+  - {x: -25, y: 20}
+  - {x: 55, y: 20}
+  - {x: 55, y: -30}
+  - {x: -25, y: -30}
+  ZoomedOutPos: {x: 15, y: -4.5, z: 0}
+  CameraZoomValue: 1.5
   TeeOffAimPoint: {x: 28.5, y: -4.5, z: 0}
   CourseAimPoints:
   - {x: 28.5, y: -4.5, z: 0}
@@ -1831,7 +1831,7 @@ MonoBehaviour:
     - {x: 17, y: -9.5, z: 0}
     - {x: 17, y: -14.5, z: 0}
     - {x: 23.5, y: -14.5, z: 0}
-    - {x: 23.5, y: -10.5, z: 0}
+    - {x: 23.5, y: -10.8125, z: 0}
   - EntryPipePosition: {x: 7, y: -6.5, z: 0}
     ExitPipePosition: {x: 28.5, y: 2.5, z: 0}
     MiniGolfPipeScriptableObstacle: {fileID: 11400000, guid: 70709322d50b42643aed5d477c2b74f8, type: 2}
@@ -1841,7 +1841,7 @@ MonoBehaviour:
     - {x: 17, y: -6.5, z: 0}
     - {x: 17, y: 4, z: 0}
     - {x: 28.5, y: 4, z: 0}
-    - {x: 28.5, y: 2.5, z: 0}
+    - {x: 28.5, y: 2.8125, z: 0}
   - EntryPipePosition: {x: 7, y: -2.5, z: 0}
     ExitPipePosition: {x: 37.5, y: -7.5, z: 0}
     MiniGolfPipeScriptableObstacle: {fileID: 11400000, guid: 70709322d50b42643aed5d477c2b74f8, type: 2}
@@ -1852,14 +1852,14 @@ MonoBehaviour:
     - {x: 17, y: -12.5, z: 0}
     - {x: 39.5, y: -12.5, z: 0}
     - {x: 39.5, y: -7.5, z: 0}
-    - {x: 37.5, y: -7.5, z: 0}
+    - {x: 37.8125, y: -7.5, z: 0}
   - EntryPipePosition: {x: 7, y: 0.5, z: 0}
     ExitPipePosition: {x: 19.5, y: -1.5, z: 0}
     MiniGolfPipeScriptableObstacle: {fileID: 11400000, guid: 70709322d50b42643aed5d477c2b74f8, type: 2}
     MiniGolfExitPipeScriptableObstacle: {fileID: 11400000, guid: 3b8b18f3adb61654bb5cac33afc9ff8f, type: 2}
     ExitSpeedAddition: 2.25
     PathPoints:
-    - {x: 19.5, y: -1.5, z: 0}
+    - {x: 19.1875, y: -1.5, z: 0}
   IsTeeOffChallenge: 0
   ClubToUse: 
   IsMiniGolf: 1

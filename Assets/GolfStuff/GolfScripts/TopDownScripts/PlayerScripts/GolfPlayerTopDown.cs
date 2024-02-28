@@ -1333,6 +1333,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     float GetHitPowerFromXPosition(float xPos, float maxHitDistance)
     {
+        // for testing only
+        //return maxHitDistance * 0.94f;
+        //return maxHitDistance;
+
+
         float hitPowerFromXPosition = 0f;
 
         float distFromZero = _centerAccuracyPosition - xPos;
@@ -1407,7 +1412,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     Vector2 ModifyHitDirectionFromAccuracy(Vector2 direction, float accuracyDistance)
     {
+        //for testing only
         //return direction;
+        
+        
         Vector2 newDir = Vector2.zero;
 
         // If the hit is perfectly accurate, don't adjust the direction from where the player aimed
