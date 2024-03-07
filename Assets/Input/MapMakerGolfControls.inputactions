@@ -1,0 +1,74 @@
+{
+    "name": "MapMakerGolfControls",
+    "maps": [
+        {
+            "name": "MapMaker",
+            "id": "64abbbfe-8a59-40b7-8633-542527ede40c",
+            "actions": [
+                {
+                    "name": "MouseLeftClick",
+                    "type": "Button",
+                    "id": "49ec14cf-8c6c-4450-adee-f2a2fd645e66",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MouseRightClick",
+                    "type": "Button",
+                    "id": "d6dc4b55-f5b1-41b2-b8cb-6ad2a8778bc4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MousePosition",
+                    "type": "Value",
+                    "id": "5286a9b1-b427-4f89-a1ff-d7c1214856c3",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "2f715056-bda0-4a7f-8ed4-acf551dcb8b1",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MouseLeftClick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4b3c4179-aee6-49b4-859d-df73d4828a56",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MouseRightClick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b83b4ecb-d9bb-425d-8f7e-bbd06e88f1b7",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MousePosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

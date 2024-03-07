@@ -1,0 +1,59 @@
+### new game idea for after (at least trying to) finishing the level editor
+
+# Gameplay Idea
+- combination of CardConquest and that HeroCard game/slay the spire?
+- - - Goblin units that you command on a hex grid
+- - - You have a "hand" of cards that you play during battles
+- - - Player and enemy AI
+- - - - - - potentially make multiplayer?
+- - - - - - - - - a "versus" mode where one player is trying to stop the other from advancing through the game / playing in stead of the CPU player
+- - - - - - - - - 3 person teams? Just increase map size and enemy unit amount?
+- - - You are escorting a bomb you must protect from enemies
+- - - - - - win a level by killing all enemy units or capturing the enemy "base"/stronghold? on the level
+- - - reach "check points" where you drop off a bomb to explode
+- - - - - - will be a "boss" battle of sorts
+- - - - - - - - - four bosses? Maybe five
+- - - if all your units die, you lose. Start over?
+- - - - - - maybe have player chose to start over or at last checkpoint
+- - - if enemy captures your bomb, you lose
+- - - - - - can attach bomb to units to make escorting easier
+- - - - - - but if that unit is killed, the bomb is captured
+- - - At the beginning of each turn, get new cards
+- - - - - - maybe show player 2 cards, they choose one
+- - - - - - - - - cards are random per level?
+- - - - - - then player can remove a certain number of cards. The "power" of the discarded cards can go toward a currency, that is spent on new cards?
+- - - - - - - - - currency doesn't carry over though, use it or lose it?
+- - - - - - - - - maybe can also use discarded card power to buy power ups?
+- - - the "checkpoints" are where boss battles will be
+- - - - - - player needs to drop bomb off at boss camp/outpost
+- - - - - - boss music!
+- - - - - - bosses are like a siege or something? Player is trying to take a "castle" type structure
+- - - - - - - - - hexes are marked as fortications
+- - - - - - - - - player can take them one by one, or go through to the "heart" of the outpost and immediately defeat them
+- - - - - - center of outpost will have the boss unit
+- - - - - - - - - special character. Extra strong. Will have some unique abilities like more attack/whatever, special modifiers in battles, stuff like that
+- - - - - - - - - - - - new sprite for each...
+- - - - - - - - - Boss idea: bomb thrower
+- - - - - - - - - - - - throws bombs towards your units, especially focused on the unit with the bomb (or just at the bomb if you aren't carrying it)
+- - - - - - - - - - - - bombs take 2 turns to exploded: damage anything in a 1 tile radius from the bombs tile
+- - - - - - - - - - - - - - - if your bomb/bombcarrier is in an explosion radius, your bomb detonates and you lose!
+- - - - - - - - - - - - bombs that take 3 turns, explosion radius of 2?
+- - - when a boss is defeated, choose between two upgrades?
+- - - - - - each upgrade randomly chosen? Or have an option to have "set" upgrades?
+- - - player must kill the final boss to beat the game or "run"
+- - - new run+?
+- - - - - - give player's option to due more runs if they beat one, make it substantially harder?
+- - - - - - only way to carry over to next game?
+- - - maybe after a player makes a run, they can keep 1 power up or 1 card to carry over to next run?
+- - - - - - way to "upgrade" in some sense between runs, making subsequent runs easier?
+- - - - - - get more units, cards, better starting cards, greater hand size to start, etc?
+- - - - - - maybe the way you upgrade is the collective value of the deck you built
+- - - - - - - - - use that value to buy permenant upgrades, like discussed above?
+- procedurally generate each new "level"?
+- - - also have the enemy squad generated new for each level
+- - - and the enemy's hand
+# Lore?
+- team of sapper goblins escorting bomb through mines
+- - - need to proect the bomb from attackers
+- - - if enemy captures your bomb, you lose
+- - - 

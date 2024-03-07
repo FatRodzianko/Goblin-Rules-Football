@@ -532,3 +532,8 @@ x Deactivate player sprite if it is not their turn. Reactivate when their turn s
 
 distance calculator
 https://www.calculatorsoup.com/calculators/geometry-plane/distance-two-points.php
+
+### Map maker stuff:
+https://www.youtube.com/playlist?list=PLJBcv4t1EiSz-wA35-dWpcI98pNiyK6an
+- Have something loop through all the scripttable objects in "GroundTileScriptables" to auto create the UI
+- - - create a new button/"item" for each scriptable object, add to the correct UI category based on tile "type."
