@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public enum GroundTileType { 
+    None,
     Green,
     Fairway,
     Rough,
@@ -15,12 +16,19 @@ public enum GroundTileType {
     MiniGolfWalls
 }
 
+public enum PlaceType { 
+    Single,
+    Line,
+    Rectangle
+}
+
 [CreateAssetMenu (fileName = "MapMaker", menuName = "MapMakerObjects/Create Tile")]
 public class MapMakerGroundTileBase : ScriptableObject
 {
     [SerializeField] GroundTileType _groundTileType;
     [SerializeField] TileBase _tileBase;
     [SerializeField] Tile _tile;
+    [SerializeField] PlaceType _placeType;
 
     public TileBase TileBase
     {
@@ -41,6 +49,13 @@ public class MapMakerGroundTileBase : ScriptableObject
         get
         {
             return _tile;
+        }
+    }
+    public PlaceType PlaceType
+    {
+        get 
+        {
+            return _placeType;
         }
     }
 }

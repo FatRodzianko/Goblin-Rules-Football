@@ -33,7 +33,7 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                     ""id"": ""49ec14cf-8c6c-4450-adee-f2a2fd645e66"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Tap,SlowTap"",
                     ""initialStateCheck"": false
                 },
                 {

@@ -15,3 +15,4 @@ MonoBehaviour:
   _groundTileType: 0
   _tileBase: {fileID: 11400000, guid: 5ccd5bcf75f2e774e86c9c9e97965672, type: 2}
   _tile: {fileID: 11400000, guid: 5ccd5bcf75f2e774e86c9c9e97965672, type: 2}
+  _placeType: 1
