@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Fairway_Angle_NE
   m_EditorClassIdentifier: 
   _groundTileType: 1
+  _mapMakerTileType: {fileID: 11400000, guid: b71ed686fdb9f9f4695c2300982f228b, type: 2}
   _tileBase: {fileID: 11400000, guid: eabaff4cb15edb04b94e0b6d277b8fc1, type: 2}
   _tile: {fileID: 11400000, guid: eabaff4cb15edb04b94e0b6d277b8fc1, type: 2}
-  _placeType: 1
+  _placeType: 2

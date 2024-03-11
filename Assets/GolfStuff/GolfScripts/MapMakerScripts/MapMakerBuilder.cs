@@ -111,7 +111,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
             if (_holdActive)
             {
-                Debug.Log("UpdateGridPosition: calling HandleDrawing with _holdActive as true");
+                //Debug.Log("UpdateGridPosition: calling HandleDrawing with _holdActive as true");
                 HandleDrawing();
             }
         }
@@ -186,6 +186,16 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         SelectedObject = obj;
     }
+    private Tilemap _tilemap
+    {
+        get {
+            if (_selectedObject != null && _selectedObject.MapMakerTileType != null && _selectedObject.MapMakerTileType.Tilemap != null)
+            {
+                return _selectedObject.MapMakerTileType.Tilemap;
+            }
+            return _greenMap;
+        }
+    }
     void UpdatePreview()
     {
         //Remove old tile if exisiting
@@ -237,14 +247,20 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         // TODO: automatically select the correct tilemap
         //if (!_selectedObject)
         //    return;
-        if (_selectedObject.GroundTileType == GroundTileType.Green)
-        {
-            _greenMap.SetTile(_currentGridPosition, _selectedTileBase);
-        }
-        else if (_selectedObject.GroundTileType == GroundTileType.Fairway)
-        {
-            _fairwayMap.SetTile(_currentGridPosition, _selectedTileBase);
-        }
+
+        // OLD BEGIN
+        //if (_selectedObject.GroundTileType == GroundTileType.Green)
+        //{
+        //    _greenMap.SetTile(_currentGridPosition, _selectedTileBase);
+        //}
+        //else if (_selectedObject.GroundTileType == GroundTileType.Fairway)
+        //{
+        //    _fairwayMap.SetTile(_currentGridPosition, _selectedTileBase);
+        //}
+        // OLD END
+
+        _tilemap.SetTile(_currentGridPosition, _selectedTileBase);
+
     }
     void RectangleRenderer()
     {
@@ -291,10 +307,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         if (!_selectedObject)
             return;
-        if (_selectedObject.GroundTileType == GroundTileType.Green)
-            DrawBounds(_greenMap);
-        else if (_selectedObject.GroundTileType == GroundTileType.Fairway)
-            DrawBounds(_fairwayMap);
+        //if (_selectedObject.GroundTileType == GroundTileType.Green)
+        //    DrawBounds(_greenMap);
+        //else if (_selectedObject.GroundTileType == GroundTileType.Fairway)
+        //    DrawBounds(_fairwayMap);
+        DrawBounds(_tilemap);
     }
     void DrawBounds(Tilemap map)
     {
@@ -331,10 +348,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         if (!_selectedObject)
             return;
-        if (_selectedObject.GroundTileType == GroundTileType.Green)
-            DrawLine(_greenMap);
-        else if (_selectedObject.GroundTileType == GroundTileType.Fairway)
-            DrawLine(_fairwayMap);
+        //if (_selectedObject.GroundTileType == GroundTileType.Green)
+        //    DrawLine(_greenMap);
+        //else if (_selectedObject.GroundTileType == GroundTileType.Fairway)
+        //    DrawLine(_fairwayMap);
+        DrawLine(_tilemap);
     }
     // all code from here? https://github.com/Unity-Technologies/2d-extras/blob/master/Editor/Brushes/LineBrush/LineBrush.cs
     /// <summary>

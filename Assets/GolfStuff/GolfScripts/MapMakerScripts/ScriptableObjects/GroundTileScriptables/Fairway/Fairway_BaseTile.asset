@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Fairway_BaseTile
   m_EditorClassIdentifier: 
   _groundTileType: 1
+  _mapMakerTileType: {fileID: 11400000, guid: b71ed686fdb9f9f4695c2300982f228b, type: 2}
   _tileBase: {fileID: 11400000, guid: 7402d2173b1d57247bd2e6b4f9d4b813, type: 2}
   _tile: {fileID: 11400000, guid: 7402d2173b1d57247bd2e6b4f9d4b813, type: 2}
-  _placeType: 2
+  _placeType: 3

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Green_Angle_NE
   m_EditorClassIdentifier: 
   _groundTileType: 0
+  _mapMakerTileType: {fileID: 11400000, guid: 27cd04cd3af13244cbc51448174fdc9d, type: 2}
   _tileBase: {fileID: 11400000, guid: 5ccd5bcf75f2e774e86c9c9e97965672, type: 2}
   _tile: {fileID: 11400000, guid: 5ccd5bcf75f2e774e86c9c9e97965672, type: 2}
-  _placeType: 1
+  _placeType: 2

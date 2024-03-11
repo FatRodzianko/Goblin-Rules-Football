@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public enum GroundTileType { 
-    None,
     Green,
     Fairway,
     Rough,
@@ -17,6 +16,7 @@ public enum GroundTileType {
 }
 
 public enum PlaceType { 
+    None,
     Single,
     Line,
     Rectangle
@@ -26,6 +26,7 @@ public enum PlaceType {
 public class MapMakerGroundTileBase : ScriptableObject
 {
     [SerializeField] GroundTileType _groundTileType;
+    [SerializeField] MapMakerTileTypes _mapMakerTileType;
     [SerializeField] TileBase _tileBase;
     [SerializeField] Tile _tile;
     [SerializeField] PlaceType _placeType;
@@ -44,6 +45,13 @@ public class MapMakerGroundTileBase : ScriptableObject
             return _groundTileType;
         }
     }
+    public MapMakerTileTypes MapMakerTileType
+    {
+        get
+        {
+            return _mapMakerTileType;
+        }
+    }
     public Tile Tile
     {
         get
@@ -55,7 +63,7 @@ public class MapMakerGroundTileBase : ScriptableObject
     {
         get 
         {
-            return _placeType;
+            return _placeType == PlaceType.None ? _mapMakerTileType.PlaceType : _placeType ;
         }
     }
 }

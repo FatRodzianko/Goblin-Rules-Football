@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Green_BaseTile
   m_EditorClassIdentifier: 
   _groundTileType: 0
+  _mapMakerTileType: {fileID: 11400000, guid: 27cd04cd3af13244cbc51448174fdc9d, type: 2}
   _tileBase: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   _tile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
-  _placeType: 0
+  _placeType: 1
