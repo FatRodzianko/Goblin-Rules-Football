@@ -27,6 +27,7 @@ public class MapMakerGroundTileBase : ScriptableObject
 {
     [SerializeField] GroundTileType _groundTileType;
     [SerializeField] MapMakerTileTypes _mapMakerTileType;
+    [SerializeField] UITileTypes _uiTileType;
     [SerializeField] TileBase _tileBase;
     [SerializeField] Tile _tile;
     [SerializeField] PlaceType _placeType;
@@ -50,6 +51,13 @@ public class MapMakerGroundTileBase : ScriptableObject
         get
         {
             return _mapMakerTileType;
+        }
+    }
+    public UITileTypes UITileType
+    {
+        get
+        {
+            return _uiTileType;
         }
     }
     public Tile Tile

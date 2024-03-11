@@ -177,7 +177,15 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             _selectedTileBase = _selectedObject != null ? _selectedObject.TileBase : null;
 
             if (_selectedObject)
+            {
                 UpdateGridPosition(_mousePos);
+                //_previewMap.GetComponent<TilemapRenderer>().sortingOrder = _selectedObject.MapMakerTileType.SortingOrder;
+            }
+            else
+            {
+                //_previewMap.GetComponent<TilemapRenderer>().sortingOrder = 0;
+            }
+                
 
             UpdatePreview();
         }
