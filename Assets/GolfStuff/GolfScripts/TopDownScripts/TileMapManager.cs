@@ -69,6 +69,9 @@ public class TileMapManager : MonoBehaviour
         newHole.DirectionTiles = GetTilesFromMap(_directionTilesMap).ToList();
         newHole.MiniGolfWallTiles = GetTilesFromMap(_miniGolfWalls).ToList();
 
+        // Just a test to try saving to json???
+        //FileHandler.SaveToJSON<SavedTile>(newHole.GreenTiles, "test-json.json");
+
         // Find all the holes and save their locations
         GameObject[] holes = GameObject.FindGameObjectsWithTag("golfHole");
         if (holes.Length <= 0)

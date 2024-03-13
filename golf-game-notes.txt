@@ -540,3 +540,18 @@ https://www.youtube.com/playlist?list=PLJBcv4t1EiSz-wA35-dWpcI98pNiyK6an
 - saving the tile maps in OnSave (SaveHandler):
 - - - adjust to how "GetTilesFromMap" works in TileMapManager to get all tiles with a tile on them?
 - - - - - - would use map.cellBounds.allPositionsWithin to get the map bounds, then iterate through. Use "map.HasTile(pos)" to check if there is a tile to save
+- Flow for the "full" map maker:
+- - - User selects what "course" they will be making a hole for:
+- - - - - - Script will load all custome holes from the persistent data share, get the course name, add it to list
+- - - - - - option to make a new course - player provides name
+- - - - - - Course is loaded, or created if a new course
+- - - Once course is selected, user selects the hole number to create/edit
+- - - - - - Drop down list of all holes for the course, by hole number
+- - - - - - - - - script will loop through each hole by GUID or something
+- - - - - - if user selects an already existing hole, it is loaded
+- - - - - - - - - tiles and objects all loaded
+- - - - - - if user selects to make a new hole, new hole json/file is created
+- - - Player then has option to "save" their hole
+- - - - - - ability to save "incomplete" holes - ones that don't have all requirements or something (like a hole)
+- - - - - - - - - have a field in ScriptableHole that is marked as "finalized" or something. Player can only "play" a hole if it is finalized
+- - - - - - - - - - - - when TileScreenManager or whatever is presenting user with list of available holes, skip ones that are not marked as final

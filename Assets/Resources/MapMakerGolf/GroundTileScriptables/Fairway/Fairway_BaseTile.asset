@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e30e2e33d2aeeb4ba4c9fd422d9d1b9, type: 3}
   m_Name: Fairway_BaseTile
   m_EditorClassIdentifier: 
+  Guid: 9b7db6df565b76441a80320e8b059f78
   _groundTileType: 1
   _mapMakerTileType: {fileID: 11400000, guid: b71ed686fdb9f9f4695c2300982f228b, type: 2}
   _uiTileType: {fileID: 11400000, guid: c8863beacaaa2f24a8d83454bb429fd0, type: 2}

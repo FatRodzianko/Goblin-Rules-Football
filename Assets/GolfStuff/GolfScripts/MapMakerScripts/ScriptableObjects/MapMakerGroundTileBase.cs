@@ -25,6 +25,7 @@ public enum PlaceType {
 [CreateAssetMenu (fileName = "MapMaker", menuName = "MapMakerObjects/Create Tile")]
 public class MapMakerGroundTileBase : ScriptableObject
 {
+    [ScriptableObjectId] public string Guid;
     [SerializeField] GroundTileType _groundTileType;
     [SerializeField] MapMakerTileTypes _mapMakerTileType;
     [SerializeField] UITileTypes _uiTileType;

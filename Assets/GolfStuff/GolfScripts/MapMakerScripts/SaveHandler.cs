@@ -7,6 +7,11 @@ using System;
 public class SaveHandler : MonoBehaviour
 {
     Dictionary<string, Tilemap> _tileMaps = new Dictionary<string, Tilemap>();
+
+    // Dictionaries to map MapMakerGroundTileBase objects to a tile object (saving), and then mapping that tile object to a GUID (loading)
+    Dictionary<TileBase, MapMakerGroundTileBase> _tileBaseToMapMakerObject = new Dictionary<TileBase, MapMakerGroundTileBase>();
+    Dictionary<string, TileBase> _guidToTileBase = new Dictionary<string, TileBase>();
+
     [SerializeField] BoundsInt _bounds;
     [SerializeField] string _filename = "tilemapData.json";
     [SerializeField] List<Tilemap> _allMaps = new List<Tilemap>();
@@ -14,6 +19,7 @@ public class SaveHandler : MonoBehaviour
     private void Start()
     {
         InitTilemaps();
+        InitTileReferences();
     }
     void InitTilemaps()
     {
@@ -30,6 +36,22 @@ public class SaveHandler : MonoBehaviour
         foreach (Tilemap map in _allMaps)
         {
             _tileMaps.Add(map.name, map);
+        }
+    }
+    void InitTileReferences()
+    {
+        MapMakerGroundTileBase[] mapMakerTiles = Resources.LoadAll<MapMakerGroundTileBase>("MapMakerGolf/GroundTileScriptables");
+        foreach (MapMakerGroundTileBase tile in mapMakerTiles)
+        {
+            if (_tileBaseToMapMakerObject.ContainsKey(tile.TileBase))
+            {
+                Debug.LogError("InitTileReferences: Tilebase: " + tile.TileBase.name + " is already in use by: " + _tileBaseToMapMakerObject[tile.TileBase].name);
+                continue;
+            }
+            Debug.Log("InitTileReferences: tile Guid: " + tile.Guid);
+            _tileBaseToMapMakerObject.Add(tile.TileBase, tile);
+            _guidToTileBase.Add(tile.Guid, tile.TileBase);
+
         }
     }
     public void OnSave()
@@ -51,9 +73,10 @@ public class SaveHandler : MonoBehaviour
                     Vector3Int pos = new Vector3Int(x, y, 0);
                     TileBase tile = mapObj.Value.GetTile(pos);
 
-                    if (tile != null)
+                    if (tile != null && _tileBaseToMapMakerObject.ContainsKey(tile))
                     {
-                        TileInfo ti = new TileInfo(tile, pos);
+                        string guid = _tileBaseToMapMakerObject[tile].Guid;
+                        TileInfo ti = new TileInfo(pos, guid);
                         mapData.tiles.Add(ti);
                     }
                 }
@@ -83,10 +106,18 @@ public class SaveHandler : MonoBehaviour
 
             if (mapData.tiles != null && mapData.tiles.Count > 0)
             {
+                //old way before asset database
                 foreach (TileInfo tile in mapData.tiles)
                 {
-                    map.SetTile(tile.position, tile.tile);
+                    if (!_guidToTileBase.ContainsKey(tile.GuidForTile))
+                    {
+                        Debug.LogError("OnLoad: Could not find GUID: '" + tile.GuidForTile + " in _guidToTileBase dictionary. Skipping...");
+                        continue;
+                    }
+
+                    map.SetTile(tile.position, _guidToTileBase[tile.GuidForTile]);
                 }
+
             }
         }
     }
@@ -102,12 +133,12 @@ public class TilemapData
 [Serializable]
 public class TileInfo
 {
-    public TileBase tile;
+    public string GuidForTile;
     public Vector3Int position;
 
-    public TileInfo(TileBase tile, Vector3Int pos)
+    public TileInfo(Vector3Int pos, string guid)
     {
-        this.tile = tile;
         position = pos;
+        GuidForTile = guid;
     }
 }
