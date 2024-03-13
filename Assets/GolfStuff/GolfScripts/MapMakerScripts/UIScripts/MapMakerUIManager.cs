@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Tilemaps;
 
-public class MapMakerUIManager : SingletonInstance<MapMakerUIManager>
+public class MapMakerUIManager : MonoBehaviour
 {
     [Header("Scriptables")]
     [SerializeField] List<MapMakerGroundTileBase> _green;

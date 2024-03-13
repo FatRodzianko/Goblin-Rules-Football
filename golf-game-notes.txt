@@ -537,3 +537,6 @@ https://www.calculatorsoup.com/calculators/geometry-plane/distance-two-points.ph
 https://www.youtube.com/playlist?list=PLJBcv4t1EiSz-wA35-dWpcI98pNiyK6an
 - Have something loop through all the scripttable objects in "GroundTileScriptables" to auto create the UI
 - - - create a new button/"item" for each scriptable object, add to the correct UI category based on tile "type."
+- saving the tile maps in OnSave (SaveHandler):
+- - - adjust to how "GetTilesFromMap" works in TileMapManager to get all tiles with a tile on them?
+- - - - - - would use map.cellBounds.allPositionsWithin to get the map bounds, then iterate through. Use "map.HasTile(pos)" to check if there is a tile to save
