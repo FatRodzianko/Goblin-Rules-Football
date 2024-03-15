@@ -24,6 +24,8 @@ public class MusicManager : MonoBehaviour
     public delegate void IsMusicOn(bool isMusicOn);
     public event IsMusicOn MusicTurnedOn;
 
+    float _timeLastTurnedOff = 0f;
+
 
     //[SerializeField] AudioSource audioSource;
     private void Awake()
@@ -98,11 +100,13 @@ public class MusicManager : MonoBehaviour
             Debug.Log("TurnMusicOff: Could not get clip from index. Error: " + e);
         }
         MusicTurnedOn(false);
-
+        _timeLastTurnedOff = Time.time;
     }
     public void TurnMusicOn()
     {
         //PlaySound(_titleMusicClip, 0.75f);
+        if (Time.time <= _timeLastTurnedOff + 0.15f)
+            return;
         PlayPlayList(false);
         MusicTurnedOn(true);
     }

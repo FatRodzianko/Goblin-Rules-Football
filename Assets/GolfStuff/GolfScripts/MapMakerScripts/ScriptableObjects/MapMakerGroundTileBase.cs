@@ -12,7 +12,8 @@ public enum GroundTileType {
     Water,
     Edges,
     DirectionTiles,
-    MiniGolfWalls
+    MiniGolfWalls,
+    Tool
 }
 
 public enum PlaceType { 

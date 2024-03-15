@@ -186,6 +186,7 @@ GameObject:
   - component: {fileID: 4516528999549409107}
   - component: {fileID: 4516528999549409111}
   - component: {fileID: 6129244854345006434}
+  - component: {fileID: 1299336360275862293}
   m_Layer: 5
   m_Name: MapMakerCanvas
   m_TagString: Untagged
@@ -307,6 +308,7 @@ MonoBehaviour:
   _uiTileTypes:
   - {fileID: 11400000, guid: cab1aecbdcce20141ae4d3bba34fc6da, type: 2}
   - {fileID: 11400000, guid: c8863beacaaa2f24a8d83454bb429fd0, type: 2}
+  - {fileID: 11400000, guid: 22d2297cf53786043ae532b3a4cef836, type: 2}
   _groundTileTypeHolder: {fileID: 4516529001227566640}
 --- !u!114 &6129244854345006434
 MonoBehaviour:
@@ -324,7 +326,27 @@ MonoBehaviour:
     m_Position: {x: 0, y: 0, z: 0}
     m_Size: {x: 0, y: 0, z: 0}
   _filename: tilemapData.json
-  _allMaps: []
+  _allMaps:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+--- !u!114 &1299336360275862293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4516528999549409106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9549eb5d6027cc5468f0515de0e97f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4516529001057922894
 GameObject:
   m_ObjectHideFlags: 0

@@ -220,7 +220,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         {
             case PlaceType.Single:
             default:
-                DrawItem();
+                //DrawItem();
+                DrawItem(_tilemap, _currentGridPosition, _selectedTileBase);
                 break;
             case PlaceType.Line:
                 //LineRenderer();
@@ -250,7 +251,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         }
 
     }
-    void DrawItem()
+    void DrawItem(Tilemap map, Vector3Int position, TileBase tileBase)
     {
         // TODO: automatically select the correct tilemap
         //if (!_selectedObject)
@@ -267,7 +268,16 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         //}
         // OLD END
 
-        _tilemap.SetTile(_currentGridPosition, _selectedTileBase);
+        //_tilemap.SetTile(_currentGridPosition, _selectedTileBase);
+
+        if (_selectedObject.GetType() == typeof(MapMakerTool))
+        {
+            MapMakerTool tool = (MapMakerTool)_selectedObject;
+            tool.Use(_currentGridPosition);
+            return;
+        }
+        
+        map.SetTile(position, tileBase);
 
     }
     void RectangleRenderer()
@@ -327,7 +337,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         {
             for (int y = _rectangleBounds.yMin; y <= _rectangleBounds.yMax; y++)
             {
-                map.SetTile(new Vector3Int(x, y, 0), _selectedTileBase);
+                //map.SetTile(new Vector3Int(x, y, 0), _selectedTileBase);
+                DrawItem(map, new Vector3Int(x, y, 0), _selectedTileBase);
             }
         }
     }
@@ -337,7 +348,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         {
             foreach (Vector2Int linePoint in _linePoints)
             {
-                map.SetTile((Vector3Int)linePoint, _selectedTileBase);
+                //map.SetTile((Vector3Int)linePoint, _selectedTileBase);
+                DrawItem(map, (Vector3Int)linePoint, _selectedTileBase);
             }
         }
     }
