@@ -13,6 +13,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
     // Tile maps?
     [SerializeField] Tilemap _previewMap, _greenMap, _fairwayMap;
+    [SerializeField] TileMapReferenceHolder _tileMapReferenceHolder;
 
     // Selected objects?
     [SerializeField] MapMakerGroundTileBase _selectedObject;
@@ -208,8 +209,25 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         //Remove old tile if exisiting
         _previewMap.SetTile(_previousGridPosition, null);
+
+        if (_selectedObject != null && _selectedObject.GetType() != typeof(MapMakerTool) && IsPlacementForbidden(_currentGridPosition))
+            return;
         //Set Current tile
         _previewMap.SetTile(_currentGridPosition, _selectedTileBase);
+    }
+    bool IsPlacementForbidden(Vector3Int position)
+    {
+        if (_tileMapReferenceHolder.ForbiddenPlacingWithMaps.Contains(_tilemap))
+        {
+            return false;
+        }
+        else
+        {
+            return _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Any(map =>
+            {
+                return map.HasTile(position);
+            });
+        }
     }
     void HandleDrawing()
     {
@@ -277,7 +295,15 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         }
         else
         {
-            map.SetTile(position, tileBase);
+            if (_selectedObject.GetType() == typeof(MapMakerTool))
+            {
+                map.SetTile(position, tileBase);
+            }
+            else if (!IsPlacementForbidden(position))
+            {
+                map.SetTile(position, tileBase);
+            }
+            
         }
         
         
