@@ -270,14 +270,17 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         //_tilemap.SetTile(_currentGridPosition, _selectedTileBase);
 
-        if (_selectedObject.GetType() == typeof(MapMakerTool))
+        if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerTool))
         {
             MapMakerTool tool = (MapMakerTool)_selectedObject;
-            tool.Use(_currentGridPosition);
-            return;
+            tool.Use(position);
+        }
+        else
+        {
+            map.SetTile(position, tileBase);
         }
         
-        map.SetTile(position, tileBase);
+        
 
     }
     void RectangleRenderer()
@@ -333,6 +336,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     }
     void DrawBounds(Tilemap map)
     {
+        //Debug.Log("DrawBounds: " + map.name + " bounds: " + _rectangleBounds.xMin + ":" + _rectangleBounds.xMax + " x " + _rectangleBounds.yMin + ":" + _rectangleBounds.yMax);
         for (int x = _rectangleBounds.xMin; x <= _rectangleBounds.xMax; x++)
         {
             for (int y = _rectangleBounds.yMin; y <= _rectangleBounds.yMax; y++)

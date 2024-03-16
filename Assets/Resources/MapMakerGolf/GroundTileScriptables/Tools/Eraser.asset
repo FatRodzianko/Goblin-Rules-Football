@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Guid: ea7fe2bd3efc4734e9ecb3baa7c3c90b
   _groundTileType: 9
-  _mapMakerTileType: {fileID: 11400000, guid: 27cd04cd3af13244cbc51448174fdc9d, type: 2}
+  _mapMakerTileType: {fileID: 11400000, guid: edaa6cb56ea27a343b92fa856ebece25, type: 2}
   _uiTileType: {fileID: 11400000, guid: 22d2297cf53786043ae532b3a4cef836, type: 2}
   _tileBase: {fileID: 11400000, guid: 77a79cac63359cf44b445381700cb805, type: 2}
   _tile: {fileID: 11400000, guid: 77a79cac63359cf44b445381700cb805, type: 2}
-  _placeType: 1
+  _placeType: 3
   _toolType: 1

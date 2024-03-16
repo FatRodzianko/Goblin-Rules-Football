@@ -14,12 +14,16 @@ public class SaveHandler : MonoBehaviour
 
     [SerializeField] BoundsInt _bounds;
     [SerializeField] string _filename = "tilemapData.json";
-    [SerializeField] List<Tilemap> _allMaps = new List<Tilemap>();
+    //[SerializeField] List<Tilemap> _allMaps = new List<Tilemap>();
+    [SerializeField] TileMapReferenceHolder _tileMapReferenceHolder;
 
     private void Start()
     {
         InitTilemaps();
         InitTileReferences();
+
+        if (!_tileMapReferenceHolder)
+            _tileMapReferenceHolder = this.transform.GetComponent<TileMapReferenceHolder>();
     }
     void InitTilemaps()
     {
@@ -33,7 +37,7 @@ public class SaveHandler : MonoBehaviour
         //    _tileMaps.Add(map.name, map);
         //}
 
-        foreach (Tilemap map in _allMaps)
+        foreach (Tilemap map in _tileMapReferenceHolder.AllMaps)
         {
             _tileMaps.Add(map.name, map);
         }

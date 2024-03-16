@@ -555,3 +555,7 @@ https://www.youtube.com/playlist?list=PLJBcv4t1EiSz-wA35-dWpcI98pNiyK6an
 - - - - - - ability to save "incomplete" holes - ones that don't have all requirements or something (like a hole)
 - - - - - - - - - have a field in ScriptableHole that is marked as "finalized" or something. Player can only "play" a hole if it is finalized
 - - - - - - - - - - - - when TileScreenManager or whatever is presenting user with list of available holes, skip ones that are not marked as final
+- For tilemap erasing:
+- - - I want it so you only erase from the tilemap you have selected from dropdown OR you can erase from all tilemaps
+- - - Track what tilemap the user is currently using. When the user selects a green tile for example, automatically set the "current tilemap" to be Green
+- - - - - - when using a tool like the eraser, the user can select which one they want to erase from

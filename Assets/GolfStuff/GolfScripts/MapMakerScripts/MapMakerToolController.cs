@@ -6,8 +6,7 @@ using UnityEngine.Tilemaps;
 public class MapMakerToolController : MonoBehaviour
 {
     public static MapMakerToolController instance;
-
-    [SerializeField] List<Tilemap> _tileMaps = new List<Tilemap>();
+    [SerializeField] TileMapReferenceHolder _tileMapReferenceHolder;
 
     private void Awake()
     {
@@ -20,10 +19,18 @@ public class MapMakerToolController : MonoBehaviour
         else
             Destroy(gameObject);
     }
+    private void Start()
+    {
+        if (!_tileMapReferenceHolder)
+            _tileMapReferenceHolder = this.transform.GetComponent<TileMapReferenceHolder>();
+    }
     public void Eraser(Vector3Int position)
     {
-        Debug.Log("MapMakerToolController: Eraser");
+        Debug.Log("MapMakerToolController: Eraser: " + position);
 
-
+        foreach (Tilemap map in _tileMapReferenceHolder.AllMaps)
+        {
+            map.SetTile(position, null);
+        }
     }
 }
