@@ -559,3 +559,9 @@ https://www.youtube.com/playlist?list=PLJBcv4t1EiSz-wA35-dWpcI98pNiyK6an
 - - - I want it so you only erase from the tilemap you have selected from dropdown OR you can erase from all tilemaps
 - - - Track what tilemap the user is currently using. When the user selects a green tile for example, automatically set the "current tilemap" to be Green
 - - - - - - when using a tool like the eraser, the user can select which one they want to erase from
+- Ability to set the "drawing type"
+- - - single, line, rectangle, fill (later?)
+- - - should effect the eraser as well
+- Obstacles
+- - - create map maker obstacle scriptable object that inherits from MapMakerGroundTileBase
+- - - - - - new scriptable has reference to the ScriptableObstacle

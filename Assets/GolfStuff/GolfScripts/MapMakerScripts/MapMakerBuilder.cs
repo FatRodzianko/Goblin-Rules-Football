@@ -37,6 +37,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     // Drawing a line stuff?
     [SerializeField] List<Vector2Int> _linePoints = new List<Vector2Int>();
 
+    // Displaying Obstacles
+    [SerializeField] GameObject _obstaclePreview;
+
     protected override void Awake()
     {
         base.Awake();
@@ -194,6 +197,19 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     public void ObjectSelected(MapMakerGroundTileBase obj)
     {
         SelectedObject = obj;
+        if (obj.GetType() == typeof(MapMakerObstacle))
+        {
+            if (_obstaclePreview != null)
+                Destroy(_obstaclePreview);
+
+            MapMakerObstacle obstacle = (MapMakerObstacle)obj;
+            _obstaclePreview = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, _currentGridPosition, Quaternion.identity);
+        }
+        else
+        {
+            if (_obstaclePreview != null)
+                Destroy(_obstaclePreview);
+        }
     }
     private Tilemap _tilemap
     {
@@ -210,10 +226,23 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         //Remove old tile if exisiting
         _previewMap.SetTile(_previousGridPosition, null);
 
-        if (_selectedObject != null && _selectedObject.GetType() != typeof(MapMakerTool) && IsPlacementForbidden(_currentGridPosition))
-            return;
+
+        if (_selectedObject != null && _selectedObject.GetType() != typeof(MapMakerTool))
+        {
+            if (IsPlacementForbidden(_currentGridPosition))
+                return;
+
+            else if (_obstaclePreview != null && _selectedObject.GetType() == typeof(MapMakerObstacle))
+            {
+                _obstaclePreview.transform.position = _currentGridPosition;
+            }
+        }
+            
         //Set Current tile
         _previewMap.SetTile(_currentGridPosition, _selectedTileBase);
+
+        // update obstacle preview
+        
     }
     bool IsPlacementForbidden(Vector3Int position)
     {

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbafefafd3278a7458a0e14c45675d17, type: 3}
+  m_Name: Tree
+  m_EditorClassIdentifier: 
+  Guid: f3fd8b0094b5a424ca56a7b527604ff9
+  _groundTileType: 0
+  _mapMakerTileType: {fileID: 11400000, guid: 5a6081b9d180a8540b1ce3b7fb561b4f, type: 2}
+  _uiTileType: {fileID: 11400000, guid: d8bd43f18c3babc4c9d549c4d11dff79, type: 2}
+  _tileBase: {fileID: 11400000, guid: be95ebca349bad8418575c40f992e589, type: 2}
+  _tile: {fileID: 11400000, guid: be95ebca349bad8418575c40f992e589, type: 2}
+  _placeType: 1
+  ScriptableObstacle: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}

@@ -310,6 +310,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: cab1aecbdcce20141ae4d3bba34fc6da, type: 2}
   - {fileID: 11400000, guid: c8863beacaaa2f24a8d83454bb429fd0, type: 2}
   - {fileID: 11400000, guid: 22d2297cf53786043ae532b3a4cef836, type: 2}
+  - {fileID: 11400000, guid: 548e4a14607dc5c4493451790e7d9810, type: 2}
+  - {fileID: 11400000, guid: d8bd43f18c3babc4c9d549c4d11dff79, type: 2}
   _groundTileTypeHolder: {fileID: 4516529001227566640}
 --- !u!114 &6129244854345006434
 MonoBehaviour:
@@ -327,15 +329,7 @@ MonoBehaviour:
     m_Position: {x: 0, y: 0, z: 0}
     m_Size: {x: 0, y: 0, z: 0}
   _filename: tilemapData.json
-  _allMaps:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  _tileMapReferenceHolder: {fileID: 0}
 --- !u!114 &1299336360275862293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,7 +342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9549eb5d6027cc5468f0515de0e97f88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tileMaps: []
+  _tileMapReferenceHolder: {fileID: 0}
 --- !u!114 &8294246174729175879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -362,6 +356,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AllMaps: []
+  ForbiddenPlacingWithMaps: []
 --- !u!1 &4516529001057922894
 GameObject:
   m_ObjectHideFlags: 0
