@@ -40,6 +40,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     // Displaying Obstacles
     [SerializeField] GameObject _obstaclePreview;
 
+    // Dictionary of place obstacles with their position being the key
+    Dictionary<Vector3Int, GameObject> _placeObstaclesByPostion = new Dictionary<Vector3Int, GameObject>();
+
     protected override void Awake()
     {
         base.Awake();
@@ -171,6 +174,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         // Unselect any tiles when right clicking?
         SelectedObject = null;
+        if (_obstaclePreview != null)
+            Destroy(_obstaclePreview);
     }
     private MapMakerGroundTileBase SelectedObject
     {
@@ -331,12 +336,40 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             else if (!IsPlacementForbidden(position))
             {
                 map.SetTile(position, tileBase);
+                // Check to see if an obstacle should be spawned here or not
+                if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerObstacle))
+                {
+                    PlaceObstacle(position);
+                }
             }
             
         }
-        
-        
+    }
+    void PlaceObstacle(Vector3Int position)
+    {
+        if (_placeObstaclesByPostion.ContainsKey(position))
+        {
+            Debug.Log("PlaceObstacle: Object has already been placeed at this position: " + position + " : " + _placeObstaclesByPostion[position].name);
+            return;
+        }
+        MapMakerObstacle obj = (MapMakerObstacle)_selectedObject;
+        GameObject gameObject = Instantiate(obj.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
+        _placeObstaclesByPostion.Add(position, gameObject);
 
+        Debug.Log("PlaceObstacle: NEW OBJECT has been placeed at this position: " + position + " : " + _placeObstaclesByPostion[position].name);
+    }
+    public void RemoveObstacle(Vector3Int position)
+    {
+        if (!_placeObstaclesByPostion.ContainsKey(position))
+        {
+            Debug.Log("RemoveObstacle: No obstacle found at: " + position);
+            return;
+        }
+
+        Debug.Log("RemoveObstacle: Removing obstacle: " + _placeObstaclesByPostion[position].name + " found at position: " + position);
+        GameObject objToRemove = _placeObstaclesByPostion[position];
+        Destroy(objToRemove);
+        _placeObstaclesByPostion.Remove(position);
     }
     void RectangleRenderer()
     {

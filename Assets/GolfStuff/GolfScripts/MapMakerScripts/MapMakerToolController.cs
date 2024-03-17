@@ -30,7 +30,18 @@ public class MapMakerToolController : MonoBehaviour
 
         foreach (Tilemap map in _tileMapReferenceHolder.AllMaps)
         {
-            map.SetTile(position, null);
+            if (map.HasTile(position))
+            {
+                map.SetTile(position, null);
+
+                // remove object if it was erased
+                if (map.name == "Object")
+                {
+                    MapMakerBuilder builder = MapMakerBuilder.GetInstance();
+                    builder.RemoveObstacle(position);
+                }
+            }
+            
         }
     }
 }
