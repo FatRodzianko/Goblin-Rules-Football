@@ -9,6 +9,14 @@ public class MapMakerTileTypes : ScriptableObject
     [SerializeField] PlaceType _placeType;
     [SerializeField] int _sortingOrder = 0;
     [SerializeField] Tilemap _tileMap;
+    [SerializeField] List<MapMakerTileTypes> _placementRestrictions;
+
+    public List<MapMakerTileTypes> PlacementRestrictions
+    {
+        get {
+            return _placementRestrictions;
+        }
+    }
 
     public PlaceType PlaceType
     {

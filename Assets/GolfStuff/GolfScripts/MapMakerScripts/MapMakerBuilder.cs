@@ -12,12 +12,13 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     MapMakerGolfControls _playerInput;
 
     // Tile maps?
-    [SerializeField] Tilemap _previewMap, _greenMap, _fairwayMap;
+    [SerializeField] Tilemap _previewMap, _greenMap, _fairwayMap, _currentTileSelectedDisplayMap;
     [SerializeField] TileMapReferenceHolder _tileMapReferenceHolder;
 
     // Selected objects?
     [SerializeField] MapMakerGroundTileBase _selectedObject;
     [SerializeField] TileBase _selectedTileBase;
+    [SerializeField] TileBase _currentSelectedTileIcon;
 
     // mouse position stuff?
     Vector2 _mousePos;
@@ -42,6 +43,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
     // Dictionary of place obstacles with their position being the key
     Dictionary<Vector3Int, GameObject> _placeObstaclesByPostion = new Dictionary<Vector3Int, GameObject>();
+    [SerializeField] Transform _obstacleHolder;
 
     protected override void Awake()
     {
@@ -80,6 +82,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         // right click events
         _playerInput.MapMaker.MouseRightClick.performed -= OnRightClick;
     }
+    private void Start()
+    {
+        if (!_obstacleHolder)
+            _obstacleHolder = GameObject.FindGameObjectWithTag("EnvironmentObstacleHolder").transform;
+    }
     private void Update()
     {
         // everything below this was previously in Update!!!
@@ -112,23 +119,35 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         {
             _previousGridPosition = _currentGridPosition;
             _currentGridPosition = gridPos;
-            // update tile map preview?
-            UpdatePreview();
-            // maybe move to OnMouseMove instead of constantly calling it in update?
 
-            if (_holdActive)
+            if (_selectedObject != null)
             {
-                //Debug.Log("UpdateGridPosition: calling HandleDrawing with _holdActive as true");
-                HandleDrawing();
+                // update tile map preview?
+                UpdatePreview();
+                // maybe move to OnMouseMove instead of constantly calling it in update?
+
+                if (_holdActive)
+                {
+                    //Debug.Log("UpdateGridPosition: calling HandleDrawing with _holdActive as true");
+                    HandleDrawing();
+                }
             }
+            
+
+            UpdateCurrentSelectedTileIcon(_previousGridPosition, _currentGridPosition);
         }
+    }
+    void UpdateCurrentSelectedTileIcon(Vector3Int prevPos, Vector3Int currentPos)
+    {
+        _currentTileSelectedDisplayMap.SetTile(prevPos, null);
+        _currentTileSelectedDisplayMap.SetTile(currentPos, _currentSelectedTileIcon);
     }
     private void OnMouseMove(InputAction.CallbackContext ctx)
     {
         _mousePos = ctx.ReadValue<Vector2>();
 
-        if (!_selectedObject)
-            return;
+        //if (!_selectedObject)
+        //    return;
         
         UpdateGridPosition(_mousePos);
     }
@@ -185,17 +204,17 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             // if selected object is not null, set the selected tile base. If it is null, set selected tile base to null
             _selectedTileBase = _selectedObject != null ? _selectedObject.TileBase : null;
 
-            if (_selectedObject)
-            {
-                UpdateGridPosition(_mousePos);
-                //_previewMap.GetComponent<TilemapRenderer>().sortingOrder = _selectedObject.MapMakerTileType.SortingOrder;
-            }
-            else
-            {
-                //_previewMap.GetComponent<TilemapRenderer>().sortingOrder = 0;
-            }
-                
+            //if (_selectedObject)
+            //{
+            //    UpdateGridPosition(_mousePos);
+            //    //_previewMap.GetComponent<TilemapRenderer>().sortingOrder = _selectedObject.MapMakerTileType.SortingOrder;
+            //}
+            //else
+            //{
+            //    //_previewMap.GetComponent<TilemapRenderer>().sortingOrder = 0;
+            //}
 
+            UpdateGridPosition(_mousePos);
             UpdatePreview();
         }
     }
@@ -235,10 +254,18 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         if (_selectedObject != null && _selectedObject.GetType() != typeof(MapMakerTool))
         {
             if (IsPlacementForbidden(_currentGridPosition))
-                return;
-
-            else if (_obstaclePreview != null && _selectedObject.GetType() == typeof(MapMakerObstacle))
             {
+                if (_obstaclePreview != null)
+                    Destroy(_obstaclePreview);
+                return;
+            }                
+            else if (_selectedObject.GetType() == typeof(MapMakerObstacle))
+            {
+                if (_obstaclePreview == null)
+                {
+                    MapMakerObstacle obstacle = (MapMakerObstacle)_selectedObject;
+                    _obstaclePreview = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, _currentGridPosition, Quaternion.identity);
+                }
                 _obstaclePreview.transform.position = _currentGridPosition;
             }
         }
@@ -251,13 +278,22 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     }
     bool IsPlacementForbidden(Vector3Int position)
     {
+        List<MapMakerTileTypes> restrictedCategories = _selectedObject.PlacementRestrictions;
+        List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
+
+        List<Tilemap> allMaps = _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Concat(restrictedMaps).ToList();
+
         if (_tileMapReferenceHolder.ForbiddenPlacingWithMaps.Contains(_tilemap))
         {
             return false;
         }
         else
         {
-            return _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Any(map =>
+            //return _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Any(map =>
+            //{
+            //    return map.HasTile(position);
+            //});
+            return allMaps.Any(map =>
             {
                 return map.HasTile(position);
             });
@@ -339,26 +375,28 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 // Check to see if an obstacle should be spawned here or not
                 if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerObstacle))
                 {
-                    PlaceObstacle(position);
+                    PlaceObstacle(position, (MapMakerObstacle)_selectedObject);
                 }
             }
             
         }
     }
-    void PlaceObstacle(Vector3Int position)
+    public void PlaceObstacle(Vector3Int position, MapMakerObstacle obstacle)
     {
         if (_placeObstaclesByPostion.ContainsKey(position))
         {
             Debug.Log("PlaceObstacle: Object has already been placeed at this position: " + position + " : " + _placeObstaclesByPostion[position].name);
             return;
         }
-        MapMakerObstacle obj = (MapMakerObstacle)_selectedObject;
-        GameObject gameObject = Instantiate(obj.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
+        //MapMakerObstacle obj = (MapMakerObstacle)_selectedObject;
+        //GameObject gameObject = Instantiate(obj.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
+        GameObject gameObject = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
         _placeObstaclesByPostion.Add(position, gameObject);
+        gameObject.transform.SetParent(_obstacleHolder);
 
         Debug.Log("PlaceObstacle: NEW OBJECT has been placeed at this position: " + position + " : " + _placeObstaclesByPostion[position].name);
     }
-    public void RemoveObstacle(Vector3Int position)
+    public void RemoveObstacle(Vector3Int position, bool removeFromDict = true)
     {
         if (!_placeObstaclesByPostion.ContainsKey(position))
         {
@@ -369,7 +407,20 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         Debug.Log("RemoveObstacle: Removing obstacle: " + _placeObstaclesByPostion[position].name + " found at position: " + position);
         GameObject objToRemove = _placeObstaclesByPostion[position];
         Destroy(objToRemove);
-        _placeObstaclesByPostion.Remove(position);
+
+        if(removeFromDict)
+            _placeObstaclesByPostion.Remove(position);
+    }
+    public void ClearAllObstacles()
+    {
+        if (_placeObstaclesByPostion.Count > 0)
+        {
+            foreach (KeyValuePair<Vector3Int, GameObject> _obstacles in _placeObstaclesByPostion)
+            {
+                RemoveObstacle(_obstacles.Key, false);
+            }
+            _placeObstaclesByPostion.Clear();
+        }
     }
     void RectangleRenderer()
     {

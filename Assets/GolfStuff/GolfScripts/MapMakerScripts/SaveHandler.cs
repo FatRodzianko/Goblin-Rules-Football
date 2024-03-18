@@ -16,6 +16,7 @@ public class SaveHandler : MonoBehaviour
     [SerializeField] string _filename = "tilemapData.json";
     //[SerializeField] List<Tilemap> _allMaps = new List<Tilemap>();
     [SerializeField] TileMapReferenceHolder _tileMapReferenceHolder;
+    [SerializeField] MapMakerBuilder _mapMakerBuilder;
 
     private void Start()
     {
@@ -24,6 +25,8 @@ public class SaveHandler : MonoBehaviour
 
         if (!_tileMapReferenceHolder)
             _tileMapReferenceHolder = this.transform.GetComponent<TileMapReferenceHolder>();
+        if (!_mapMakerBuilder)
+            _mapMakerBuilder = MapMakerBuilder.GetInstance();
     }
     void InitTilemaps()
     {
@@ -107,6 +110,7 @@ public class SaveHandler : MonoBehaviour
             // get tilemap
             var map = _tileMaps[mapData.key];
             map.ClearAllTiles();
+            _mapMakerBuilder.ClearAllObstacles();
 
             if (mapData.tiles != null && mapData.tiles.Count > 0)
             {
@@ -119,7 +123,19 @@ public class SaveHandler : MonoBehaviour
                         continue;
                     }
 
-                    map.SetTile(tile.position, _guidToTileBase[tile.GuidForTile]);
+                    TileBase tileBase = _guidToTileBase[tile.GuidForTile];
+                    //map.SetTile(tile.position, _guidToTileBase[tile.GuidForTile]);
+                    map.SetTile(tile.position, tileBase);
+
+                    // Check if the tile is being placed on the object map. If so, spawn the appropriate object
+                    if (map.name == "Object")
+                    {
+                        MapMakerGroundTileBase groundTileBase = _tileBaseToMapMakerObject[tileBase];
+                        if (groundTileBase.GetType() == typeof(MapMakerObstacle))
+                        {
+                            _mapMakerBuilder.PlaceObstacle(tile.position, (MapMakerObstacle)groundTileBase);
+                        }
+                    }
                 }
 
             }

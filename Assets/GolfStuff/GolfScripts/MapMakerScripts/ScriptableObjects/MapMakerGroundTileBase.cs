@@ -34,6 +34,15 @@ public class MapMakerGroundTileBase : ScriptableObject
     [SerializeField] TileBase _tileBase;
     [SerializeField] Tile _tile;
     [SerializeField] PlaceType _placeType;
+    [SerializeField] bool _usePlacementRestrictions;
+    [SerializeField] List<MapMakerTileTypes> _placementRestrictions;
+
+    public List<MapMakerTileTypes> PlacementRestrictions
+    {
+        get {
+            return _usePlacementRestrictions ? _placementRestrictions : _mapMakerTileType.PlacementRestrictions;
+        }
+    }
 
     public TileBase TileBase
     {
