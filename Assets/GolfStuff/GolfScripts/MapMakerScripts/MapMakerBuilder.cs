@@ -45,11 +45,15 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     Dictionary<Vector3Int, GameObject> _placeObstaclesByPostion = new Dictionary<Vector3Int, GameObject>();
     [SerializeField] Transform _obstacleHolder;
 
+    // History
+    MapMakerHistory _mapMakerHistory;
+
     protected override void Awake()
     {
         base.Awake();
         _playerInput = new MapMakerGolfControls();
         _camera = Camera.main;
+        _mapMakerHistory = MapMakerHistory.GetInstance();
     }
 
     private void OnEnable()
@@ -371,12 +375,24 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             }
             else if (!IsPlacementForbidden(position))
             {
-                map.SetTile(position, tileBase);
+                
                 // Check to see if an obstacle should be spawned here or not
-                if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerObstacle))
+                //if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerObstacle))
+                //{
+                //    PlaceObstacle(position, (MapMakerObstacle)_selectedObject);
+                //}
+                if (map != _previewMap)
                 {
-                    PlaceObstacle(position, (MapMakerObstacle)_selectedObject);
+                    // Add an object to map maker history for undo/redo
+                    _mapMakerHistory.Add(new MapMakerHistoryItem(map, map.GetTile(position), tileBase, position, _selectedObject));
+                    if (_selectedObject.GetType() == typeof(MapMakerObstacle))
+                    {
+                        Debug.Log("DrawItem: Placing obstacle at: " + position.ToString());
+                        PlaceObstacle(position, (MapMakerObstacle)_selectedObject);
+                    }                    
                 }
+
+                map.SetTile(position, tileBase);
             }
             
         }
