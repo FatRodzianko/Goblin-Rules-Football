@@ -14,14 +14,31 @@ public class MapMakerTool : MapMakerGroundTileBase
 {
     [SerializeField] ToolType _toolType;
 
-    public void Use(Vector3Int position)
+
+    //public void Use(Vector3Int position)
+    //{
+    //    MapMakerToolController tc = MapMakerToolController.instance;
+
+    //    switch (_toolType)
+    //    {
+    //        case ToolType.Eraser:
+    //            tc.Eraser(position);
+    //            break;
+    //        default:
+    //            Debug.LogError("MapMakerTool: Tool type was not set.");
+    //            break;
+    //    }
+    //}
+    public void Use(Vector3Int[] positions, out MapMakerHistoryStep historyStep)
     {
         MapMakerToolController tc = MapMakerToolController.instance;
+        historyStep = null;
 
         switch (_toolType)
         {
             case ToolType.Eraser:
-                tc.Eraser(position);
+                tc.Eraser(positions, out MapMakerHistoryStep historyStepEraser);
+                historyStep = historyStepEraser;
                 break;
             default:
                 Debug.LogError("MapMakerTool: Tool type was not set.");

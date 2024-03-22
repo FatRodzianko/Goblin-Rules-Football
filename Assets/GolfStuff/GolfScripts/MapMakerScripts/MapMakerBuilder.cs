@@ -43,6 +43,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
     // Dictionary of place obstacles with their position being the key
     Dictionary<Vector3Int, GameObject> _placeObstaclesByPostion = new Dictionary<Vector3Int, GameObject>();
+    Dictionary<Vector3Int, MapMakerGroundTileBase> _obstalceGroundTileBaseByPosition = new Dictionary<Vector3Int, MapMakerGroundTileBase>();
     [SerializeField] Transform _obstacleHolder;
 
     // History
@@ -343,60 +344,141 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         }
 
     }
+    // OLD DRAW ITEM BEFORE MAKING HISTORY STEPS TO INCLUDE RECTANGLE/LINE AS A SINGLE STEP
+    //void DrawItem(Tilemap map, Vector3Int position, TileBase tileBase)
+    //{
+    //    // TODO: automatically select the correct tilemap
+    //    //if (!_selectedObject)
+    //    //    return;
+
+    //    // OLD BEGIN
+    //    //if (_selectedObject.GroundTileType == GroundTileType.Green)
+    //    //{
+    //    //    _greenMap.SetTile(_currentGridPosition, _selectedTileBase);
+    //    //}
+    //    //else if (_selectedObject.GroundTileType == GroundTileType.Fairway)
+    //    //{
+    //    //    _fairwayMap.SetTile(_currentGridPosition, _selectedTileBase);
+    //    //}
+    //    // OLD END
+
+    //    //_tilemap.SetTile(_currentGridPosition, _selectedTileBase);
+
+    //    if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerTool))
+    //    {
+    //        MapMakerTool tool = (MapMakerTool)_selectedObject;
+    //        tool.Use(position);
+    //    }
+    //    else
+    //    {
+    //        if (_selectedObject.GetType() == typeof(MapMakerTool))
+    //        {
+    //            map.SetTile(position, tileBase);
+    //        }
+    //        else if (!IsPlacementForbidden(position))
+    //        {
+
+    //            // Check to see if an obstacle should be spawned here or not
+    //            //if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerObstacle))
+    //            //{
+    //            //    PlaceObstacle(position, (MapMakerObstacle)_selectedObject);
+    //            //}
+    //            if (map != _previewMap)
+    //            {
+    //                // Add an object to map maker history for undo/redo
+    //                _mapMakerHistory.Add(new MapMakerHistoryItem(map, map.GetTile(position), tileBase, position, _selectedObject));
+    //                if (_selectedObject.GetType() == typeof(MapMakerObstacle))
+    //                {
+    //                    Debug.Log("DrawItem: Placing obstacle at: " + position.ToString());
+    //                    PlaceObstacle(position, (MapMakerObstacle)_selectedObject);
+    //                }                    
+    //            }
+
+    //            map.SetTile(position, tileBase);
+    //        }
+
+    //    }
+    //}
+    // OLD DRAW ITEM BEFORE MAKING HISTORY STEPS TO INCLUDE RECTANGLE/LINE AS A SINGLE STEP
     void DrawItem(Tilemap map, Vector3Int position, TileBase tileBase)
     {
-        // TODO: automatically select the correct tilemap
-        //if (!_selectedObject)
-        //    return;
-
-        // OLD BEGIN
-        //if (_selectedObject.GroundTileType == GroundTileType.Green)
-        //{
-        //    _greenMap.SetTile(_currentGridPosition, _selectedTileBase);
-        //}
-        //else if (_selectedObject.GroundTileType == GroundTileType.Fairway)
-        //{
-        //    _fairwayMap.SetTile(_currentGridPosition, _selectedTileBase);
-        //}
-        // OLD END
-
-        //_tilemap.SetTile(_currentGridPosition, _selectedTileBase);
+        Vector3Int[] positions = new Vector3Int[] { position };
+        DrawItem(map, positions, tileBase);
+    }
+    void DrawItem(Tilemap map, Vector3Int[] positions, TileBase tileBase)
+    {
 
         if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerTool))
         {
             MapMakerTool tool = (MapMakerTool)_selectedObject;
-            tool.Use(position);
+            tool.Use(positions, out MapMakerHistoryStep historyStep);
+
+            if (historyStep != null)
+            {
+                _mapMakerHistory.Add(historyStep);
+            }
         }
         else
         {
-            if (_selectedObject.GetType() == typeof(MapMakerTool))
-            {
-                map.SetTile(position, tileBase);
-            }
-            else if (!IsPlacementForbidden(position))
-            {
-                
-                // Check to see if an obstacle should be spawned here or not
-                //if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerObstacle))
-                //{
-                //    PlaceObstacle(position, (MapMakerObstacle)_selectedObject);
-                //}
-                if (map != _previewMap)
-                {
-                    // Add an object to map maker history for undo/redo
-                    _mapMakerHistory.Add(new MapMakerHistoryItem(map, map.GetTile(position), tileBase, position, _selectedObject));
-                    if (_selectedObject.GetType() == typeof(MapMakerObstacle))
-                    {
-                        Debug.Log("DrawItem: Placing obstacle at: " + position.ToString());
-                        PlaceObstacle(position, (MapMakerObstacle)_selectedObject);
-                    }                    
-                }
+            // Create arrays required for the History Steps
+            TileBase[] previousTiles = new TileBase[positions.Length];
+            TileBase[] newTiles = new TileBase[positions.Length];
+            MapMakerGroundTileBase[] mapMakerTileBases = new MapMakerGroundTileBase[positions.Length];
 
-                map.SetTile(position, tileBase);
+            for (int i = 0; i < positions.Length; i++)
+            {
+                previousTiles[i] = map.GetTile(positions[i]);
+                mapMakerTileBases[i] = _selectedObject;
+
+                if (_selectedObject.GetType() == typeof(MapMakerTool))
+                {
+                    map.SetTile(positions[i], tileBase);
+                }
+                else if (!IsPlacementForbidden(positions[i]))
+                {
+                    newTiles[i] = tileBase;
+                    map.SetTile(positions[i], tileBase);
+
+                    if (_selectedObject.GetType() == typeof(MapMakerObstacle) && map != _previewMap)
+                    {
+                        Debug.Log("DrawItem: Placing obstacle at: " + positions[i].ToString());
+                        PlaceObstacle(positions[i], (MapMakerObstacle)_selectedObject);
+                    }
+                }
+                else
+                {
+                    newTiles[i] = previousTiles[i];
+                }
             }
-            
+
+            if (map != _previewMap)
+            {
+                _mapMakerHistory.Add(new MapMakerHistoryStep(map, previousTiles, newTiles, positions, mapMakerTileBases));
+            }
+            //if (_selectedObject.GetType() == typeof(MapMakerTool))
+            //{
+            //    map.SetTile(position, tileBase);
+            //}
+            //else if (!IsPlacementForbidden(position))
+            //{
+
+            //    if (map != _previewMap)
+            //    {
+            //        // Add an object to map maker history for undo/redo
+            //        _mapMakerHistory.Add(new MapMakerHistoryItem(map, map.GetTile(position), tileBase, position, _selectedObject));
+            //if (_selectedObject.GetType() == typeof(MapMakerObstacle))
+            //{
+            //    Debug.Log("DrawItem: Placing obstacle at: " + position.ToString());
+            //    PlaceObstacle(position, (MapMakerObstacle)_selectedObject);
+            //}
+            //    }
+
+            //    map.SetTile(position, tileBase);
+            //}
+
         }
     }
+    
     public void PlaceObstacle(Vector3Int position, MapMakerObstacle obstacle)
     {
         if (_placeObstaclesByPostion.ContainsKey(position))
@@ -409,6 +491,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         GameObject gameObject = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
         _placeObstaclesByPostion.Add(position, gameObject);
         gameObject.transform.SetParent(_obstacleHolder);
+
+        // Save the MapMakerGroundTileType of the obstacle to save for History Steps and stuff
+        _obstalceGroundTileBaseByPosition.Add(position, obstacle);
 
         Debug.Log("PlaceObstacle: NEW OBJECT has been placeed at this position: " + position + " : " + _placeObstaclesByPostion[position].name);
     }
@@ -424,8 +509,12 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         GameObject objToRemove = _placeObstaclesByPostion[position];
         Destroy(objToRemove);
 
-        if(removeFromDict)
+        if (removeFromDict)
+        {
             _placeObstaclesByPostion.Remove(position);
+            _obstalceGroundTileBaseByPosition.Remove(position);
+        }
+            
     }
     public void ClearAllObstacles()
     {
@@ -436,7 +525,15 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 RemoveObstacle(_obstacles.Key, false);
             }
             _placeObstaclesByPostion.Clear();
+            _obstalceGroundTileBaseByPosition.Clear();
         }
+    }
+    public MapMakerGroundTileBase GetObstacleAtPosition(Vector3Int position)
+    {
+        if (!_obstalceGroundTileBaseByPosition.ContainsKey(position))
+            return null;
+
+        return _obstalceGroundTileBaseByPosition[position];
     }
     void RectangleRenderer()
     {
@@ -492,24 +589,49 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     void DrawBounds(Tilemap map)
     {
         //Debug.Log("DrawBounds: " + map.name + " bounds: " + _rectangleBounds.xMin + ":" + _rectangleBounds.xMax + " x " + _rectangleBounds.yMin + ":" + _rectangleBounds.yMax);
+
+        // List of positions for the History Steps
+        List<Vector3Int> positions = new List<Vector3Int>();
+
         for (int x = _rectangleBounds.xMin; x <= _rectangleBounds.xMax; x++)
         {
             for (int y = _rectangleBounds.yMin; y <= _rectangleBounds.yMax; y++)
             {
                 //map.SetTile(new Vector3Int(x, y, 0), _selectedTileBase);
-                DrawItem(map, new Vector3Int(x, y, 0), _selectedTileBase);
+
+                // OLD before History Steps
+                //DrawItem(map, new Vector3Int(x, y, 0), _selectedTileBase);
+                // OLD before history steps
+
+                // NEW for history steps
+                positions.Add(new Vector3Int(x, y, 0));
             }
         }
+
+        // NEW for history steps
+        DrawItem(map, positions.ToArray(), _selectedTileBase);
+
     }
     void DrawLine(Tilemap map)
     {
         if (_linePoints.Count > 0)
         {
+            // List of positions for the History Steps
+            List<Vector3Int> positions = new List<Vector3Int>();
             foreach (Vector2Int linePoint in _linePoints)
             {
                 //map.SetTile((Vector3Int)linePoint, _selectedTileBase);
-                DrawItem(map, (Vector3Int)linePoint, _selectedTileBase);
+
+                // OLD before History Steps
+                //DrawItem(map, (Vector3Int)linePoint, _selectedTileBase);
+                // OLD before History Steps
+
+                // NEW for history steps
+                positions.Add((Vector3Int)linePoint);
             }
+
+            // NEW for history steps
+            DrawItem(map, positions.ToArray(), _selectedTileBase);
         }
     }
 
