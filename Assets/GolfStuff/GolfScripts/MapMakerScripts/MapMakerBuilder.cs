@@ -49,6 +49,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     // History
     MapMakerHistory _mapMakerHistory;
 
+    // Mapping of Tiles to MapMakerGroundTileBases. Originall in SaveHandler.cs
+    Dictionary<string, Tilemap> _tileMaps = new Dictionary<string, Tilemap>();
+    Dictionary<TileBase, MapMakerGroundTileBase> _tileBaseToMapMakerObject = new Dictionary<TileBase, MapMakerGroundTileBase>();
+    Dictionary<string, TileBase> _guidToTileBase = new Dictionary<string, TileBase>();
+
     protected override void Awake()
     {
         base.Awake();
@@ -91,7 +96,85 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         if (!_obstacleHolder)
             _obstacleHolder = GameObject.FindGameObjectWithTag("EnvironmentObstacleHolder").transform;
+
+        InitTilemaps();
+        InitTileReferences();
     }
+    void InitTilemaps()
+    {
+        foreach (Tilemap map in _tileMapReferenceHolder.AllMaps)
+        {
+            _tileMaps.Add(map.name, map);
+        }
+    }
+    void InitTileReferences()
+    {
+        MapMakerGroundTileBase[] mapMakerTiles = Resources.LoadAll<MapMakerGroundTileBase>("MapMakerGolf/GroundTileScriptables");
+        foreach (MapMakerGroundTileBase tile in mapMakerTiles)
+        {
+            if (_tileBaseToMapMakerObject.ContainsKey(tile.TileBase))
+            {
+                Debug.LogError("InitTileReferences: Tilebase: " + tile.TileBase.name + " is already in use by: " + _tileBaseToMapMakerObject[tile.TileBase].name);
+                continue;
+            }
+            Debug.Log("InitTileReferences: tile Guid: " + tile.Guid);
+            _tileBaseToMapMakerObject.Add(tile.TileBase, tile);
+            _guidToTileBase.Add(tile.Guid, tile.TileBase);
+
+        }
+    }
+    public Dictionary<string, Tilemap> GetTileMapNameToTileMapMapping()
+    {
+        return _tileMaps;
+    }
+    public bool DoesTileMapExistInMapping(string tileMapName)
+    {
+        return _tileMaps.ContainsKey(tileMapName);
+    }
+    public Tilemap GetTileMapFromTileMapName(string tileMapName)
+    {
+        if (string.IsNullOrEmpty(tileMapName))
+            return null;
+        if (!_tileMaps.ContainsKey(tileMapName))
+            return null;
+        return _tileMaps[tileMapName];
+    }
+    public Dictionary<TileBase, MapMakerGroundTileBase> GetTileBaseToMapMakerGroundTileBaseMapping()
+    {
+        return _tileBaseToMapMakerObject;
+    }
+    public bool DoesMapMakerGroundTileBaseExistForTileBaseInMapping(TileBase tileBase)
+    {
+        return _tileBaseToMapMakerObject[tileBase];
+    }
+    public MapMakerGroundTileBase GetMapMakerGroundTileBaseFromTileBase(TileBase tileBase)
+    {
+        if (tileBase == null)
+            return null;
+
+        if (!_tileBaseToMapMakerObject.ContainsKey(tileBase))
+            return null;
+
+        return _tileBaseToMapMakerObject[tileBase];
+    }
+    public Dictionary<string, TileBase> GetGUIDToTileBaseMapping()
+    {
+        return _guidToTileBase;
+    }
+    public bool DoesGUIDExistForTileBaseInMapping(string guid)
+    {
+        return _guidToTileBase.ContainsKey(guid);
+    }
+    public TileBase GetTileBaseFromGUID(string guid)
+    {
+        if (string.IsNullOrEmpty(guid))
+            return null;
+        if (!_guidToTileBase.ContainsKey(guid))
+            return null;
+
+        return _guidToTileBase[guid];
+    }
+    
     private void Update()
     {
         // everything below this was previously in Update!!!
@@ -417,18 +500,22 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             {
                 _mapMakerHistory.Add(historyStep);
             }
-        }
+        } // should have some logic where if the map you are placing on is a "restricted" tilemap, like water or sand, you should delete any non-restricted tile types. Have it call the eraser and create the eraser history step, then draw the water/sand?
         else
         {
             // Create arrays required for the History Steps
             TileBase[] previousTiles = new TileBase[positions.Length];
             TileBase[] newTiles = new TileBase[positions.Length];
-            MapMakerGroundTileBase[] mapMakerTileBases = new MapMakerGroundTileBase[positions.Length];
+            //MapMakerGroundTileBase[] mapMakerTileBases = new MapMakerGroundTileBase[positions.Length];
+            MapMakerGroundTileBase[] prevMapMakerTileBases = new MapMakerGroundTileBase[positions.Length];
+            MapMakerGroundTileBase[] newMapMakerTileBases = new MapMakerGroundTileBase[positions.Length];
 
             for (int i = 0; i < positions.Length; i++)
             {
                 previousTiles[i] = map.GetTile(positions[i]);
-                mapMakerTileBases[i] = _selectedObject;
+                //mapMakerTileBases[i] = _selectedObject;
+                prevMapMakerTileBases[i] = GetMapMakerGroundTileBaseFromTileBase(previousTiles[i]);
+                newMapMakerTileBases[i] = _selectedObject;
 
                 if (_selectedObject.GetType() == typeof(MapMakerTool))
                 {
@@ -453,7 +540,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
             if (map != _previewMap)
             {
-                _mapMakerHistory.Add(new MapMakerHistoryStep(map, previousTiles, newTiles, positions, mapMakerTileBases));
+                //_mapMakerHistory.Add(new MapMakerHistoryStep(map, previousTiles, newTiles, positions, mapMakerTileBases));
+                _mapMakerHistory.Add(new MapMakerHistoryStep(map, previousTiles, newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
             }
             //if (_selectedObject.GetType() == typeof(MapMakerTool))
             //{

@@ -91,16 +91,20 @@ public class MapMakerToolController : MonoBehaviour
                     MapMakerHistoryItem item = null;
                     if (map.HasTile(position))
                     {
-                        MapMakerGroundTileBase mapMakerGroundTileBase = null;
+                        MapMakerBuilder builder = MapMakerBuilder.GetInstance();
+                        //MapMakerGroundTileBase mapMakerGroundTileBase = null;
+                        TileBase prevTileBase = map.GetTile(position);
+                        MapMakerGroundTileBase prevMapMakerGroundTileBase = builder.GetMapMakerGroundTileBaseFromTileBase(prevTileBase);
 
                         if (map.name == "Object")
                         {
-                            MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                            mapMakerGroundTileBase = builder.GetObstacleAtPosition(position);
+                            //MapMakerBuilder builder = MapMakerBuilder.GetInstance();
+                            //mapMakerGroundTileBase = builder.GetObstacleAtPosition(position);
                             builder.RemoveObstacle(position);
                         }
 
-                        item = new MapMakerHistoryItem(map, map.GetTile(position), null, position, mapMakerGroundTileBase);
+                        //item = new MapMakerHistoryItem(map, map.GetTile(position), null, position, mapMakerGroundTileBase);
+                        item = new MapMakerHistoryItem(map, map.GetTile(position), null, position, prevMapMakerGroundTileBase, null);
 
                         // Set the tile to "null" to remove it from the map
                         map.SetTile(position, null);

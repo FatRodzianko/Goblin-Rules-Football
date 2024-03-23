@@ -6,11 +6,11 @@ using System;
 
 public class SaveHandler : MonoBehaviour
 {
-    Dictionary<string, Tilemap> _tileMaps = new Dictionary<string, Tilemap>();
+    //Dictionary<string, Tilemap> _tileMaps = new Dictionary<string, Tilemap>();
 
     // Dictionaries to map MapMakerGroundTileBase objects to a tile object (saving), and then mapping that tile object to a GUID (loading)
-    Dictionary<TileBase, MapMakerGroundTileBase> _tileBaseToMapMakerObject = new Dictionary<TileBase, MapMakerGroundTileBase>();
-    Dictionary<string, TileBase> _guidToTileBase = new Dictionary<string, TileBase>();
+    //Dictionary<TileBase, MapMakerGroundTileBase> _tileBaseToMapMakerObject = new Dictionary<TileBase, MapMakerGroundTileBase>();
+    //Dictionary<string, TileBase> _guidToTileBase = new Dictionary<string, TileBase>();
 
     [SerializeField] BoundsInt _bounds;
     [SerializeField] string _filename = "tilemapData.json";
@@ -20,53 +20,53 @@ public class SaveHandler : MonoBehaviour
 
     private void Start()
     {
-        InitTilemaps();
-        InitTileReferences();
+        //InitTilemaps();
+        //InitTileReferences();
 
         if (!_tileMapReferenceHolder)
             _tileMapReferenceHolder = this.transform.GetComponent<TileMapReferenceHolder>();
         if (!_mapMakerBuilder)
             _mapMakerBuilder = MapMakerBuilder.GetInstance();
     }
-    void InitTilemaps()
-    {
-        // get all tilemaps from the scene
-        //Tilemap[] maps = FindObjectsOfType<Tilemap>();
+    //void InitTilemaps()
+    //{
+    //    // get all tilemaps from the scene
+    //    //Tilemap[] maps = FindObjectsOfType<Tilemap>();
 
-        //foreach (var map in maps)
-        //{
-        //    if (_tileMaps.ContainsKey(map.name))
-        //        return;
-        //    _tileMaps.Add(map.name, map);
-        //}
+    //    //foreach (var map in maps)
+    //    //{
+    //    //    if (_tileMaps.ContainsKey(map.name))
+    //    //        return;
+    //    //    _tileMaps.Add(map.name, map);
+    //    //}
 
-        foreach (Tilemap map in _tileMapReferenceHolder.AllMaps)
-        {
-            _tileMaps.Add(map.name, map);
-        }
-    }
-    void InitTileReferences()
-    {
-        MapMakerGroundTileBase[] mapMakerTiles = Resources.LoadAll<MapMakerGroundTileBase>("MapMakerGolf/GroundTileScriptables");
-        foreach (MapMakerGroundTileBase tile in mapMakerTiles)
-        {
-            if (_tileBaseToMapMakerObject.ContainsKey(tile.TileBase))
-            {
-                Debug.LogError("InitTileReferences: Tilebase: " + tile.TileBase.name + " is already in use by: " + _tileBaseToMapMakerObject[tile.TileBase].name);
-                continue;
-            }
-            Debug.Log("InitTileReferences: tile Guid: " + tile.Guid);
-            _tileBaseToMapMakerObject.Add(tile.TileBase, tile);
-            _guidToTileBase.Add(tile.Guid, tile.TileBase);
+    //    foreach (Tilemap map in _tileMapReferenceHolder.AllMaps)
+    //    {
+    //        _tileMaps.Add(map.name, map);
+    //    }
+    //}
+    //void InitTileReferences()
+    //{
+    //    MapMakerGroundTileBase[] mapMakerTiles = Resources.LoadAll<MapMakerGroundTileBase>("MapMakerGolf/GroundTileScriptables");
+    //    foreach (MapMakerGroundTileBase tile in mapMakerTiles)
+    //    {
+    //        if (_tileBaseToMapMakerObject.ContainsKey(tile.TileBase))
+    //        {
+    //            Debug.LogError("InitTileReferences: Tilebase: " + tile.TileBase.name + " is already in use by: " + _tileBaseToMapMakerObject[tile.TileBase].name);
+    //            continue;
+    //        }
+    //        Debug.Log("InitTileReferences: tile Guid: " + tile.Guid);
+    //        _tileBaseToMapMakerObject.Add(tile.TileBase, tile);
+    //        _guidToTileBase.Add(tile.Guid, tile.TileBase);
 
-        }
-    }
+    //    }
+    //}
     public void OnSave()
     {
         List<TilemapData> data = new List<TilemapData>();
 
         // foreach existing tilemap
-        foreach (var mapObj in _tileMaps)
+        foreach (var mapObj in _mapMakerBuilder.GetTileMapNameToTileMapMapping())
         {
             TilemapData mapData = new TilemapData();
             mapData.key = mapObj.Key;
@@ -80,9 +80,17 @@ public class SaveHandler : MonoBehaviour
                     Vector3Int pos = new Vector3Int(x, y, 0);
                     TileBase tile = mapObj.Value.GetTile(pos);
 
-                    if (tile != null && _tileBaseToMapMakerObject.ContainsKey(tile))
+                    //if (tile != null && _tileBaseToMapMakerObject.ContainsKey(tile))
+                    //{
+                    //    string guid = _tileBaseToMapMakerObject[tile].Guid;
+                    //    TileInfo ti = new TileInfo(pos, guid);
+                    //    mapData.tiles.Add(ti);
+                    //}
+
+                    MapMakerGroundTileBase mapMakerGroundTileBase = _mapMakerBuilder.GetMapMakerGroundTileBaseFromTileBase(tile);
+                    if (tile != null && mapMakerGroundTileBase != null)
                     {
-                        string guid = _tileBaseToMapMakerObject[tile].Guid;
+                        string guid = mapMakerGroundTileBase.Guid;
                         TileInfo ti = new TileInfo(pos, guid);
                         mapData.tiles.Add(ti);
                     }
@@ -101,14 +109,16 @@ public class SaveHandler : MonoBehaviour
 
         foreach (var mapData in data)
         {
-            if (!_tileMaps.ContainsKey(mapData.key))
+            //if (!_tileMaps.ContainsKey(mapData.key))
+            if (!_mapMakerBuilder.DoesTileMapExistInMapping(mapData.key))
             {
                 Debug.LogError("OnLoad: found saved data for tilemap called: '" + ",' but corresponding tilemap does not exist. Skipping...");
                 continue;
             }
 
             // get tilemap
-            var map = _tileMaps[mapData.key];
+            //var map = _tileMaps[mapData.key];
+            var map = _mapMakerBuilder.GetTileMapFromTileMapName(mapData.key);
             map.ClearAllTiles();
             _mapMakerBuilder.ClearAllObstacles();
 
@@ -117,24 +127,30 @@ public class SaveHandler : MonoBehaviour
                 //old way before asset database
                 foreach (TileInfo tile in mapData.tiles)
                 {
-                    if (!_guidToTileBase.ContainsKey(tile.GuidForTile))
+                    //if (!_guidToTileBase.ContainsKey(tile.GuidForTile))
+                    if (!_mapMakerBuilder.DoesGUIDExistForTileBaseInMapping(tile.GuidForTile))
                     {
                         Debug.LogError("OnLoad: Could not find GUID: '" + tile.GuidForTile + " in _guidToTileBase dictionary. Skipping...");
                         continue;
                     }
 
-                    TileBase tileBase = _guidToTileBase[tile.GuidForTile];
+                    //TileBase tileBase = _guidToTileBase[tile.GuidForTile];
+                    TileBase tileBase = _mapMakerBuilder.GetTileBaseFromGUID(tile.GuidForTile);
                     //map.SetTile(tile.position, _guidToTileBase[tile.GuidForTile]);
                     map.SetTile(tile.position, tileBase);
 
                     // Check if the tile is being placed on the object map. If so, spawn the appropriate object
                     if (map.name == "Object")
                     {
-                        MapMakerGroundTileBase groundTileBase = _tileBaseToMapMakerObject[tileBase];
-                        if (groundTileBase.GetType() == typeof(MapMakerObstacle))
+                        if (_mapMakerBuilder.DoesMapMakerGroundTileBaseExistForTileBaseInMapping(tileBase))
                         {
-                            _mapMakerBuilder.PlaceObstacle(tile.position, (MapMakerObstacle)groundTileBase);
+                            MapMakerGroundTileBase groundTileBase = _mapMakerBuilder.GetMapMakerGroundTileBaseFromTileBase(tileBase);
+                            if (groundTileBase.GetType() == typeof(MapMakerObstacle))
+                            {
+                                _mapMakerBuilder.PlaceObstacle(tile.position, (MapMakerObstacle)groundTileBase);
+                            }
                         }
+                        
                     }
                 }
 

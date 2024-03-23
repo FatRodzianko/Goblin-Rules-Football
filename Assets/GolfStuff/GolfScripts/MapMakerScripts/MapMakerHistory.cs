@@ -64,23 +64,25 @@ public class MapMakerHistoryStep
     private MapMakerHistoryItem[] _historyItems;
 
     // constructor with multiple tilemaps, in event a "Step" stretches across multiple tilemaps
-    public MapMakerHistoryStep(Tilemap[] maps, TileBase[] previousTiles, TileBase[] newTiles, Vector3Int[] positions, MapMakerGroundTileBase[] mapMakerTileBases)
+    public MapMakerHistoryStep(Tilemap[] maps, TileBase[] previousTiles, TileBase[] newTiles, Vector3Int[] positions, MapMakerGroundTileBase[] prevMapMakerTileBases, MapMakerGroundTileBase[] newMapMakerTileBases)
     {
         _historyItems = new MapMakerHistoryItem[positions.Length];
 
         for (int i = 0; i < positions.Length; i++)
         {
-            _historyItems[i] = new MapMakerHistoryItem(maps[i], previousTiles[i], newTiles[i], positions[i], mapMakerTileBases[i]);
+            //_historyItems[i] = new MapMakerHistoryItem(maps[i], previousTiles[i], newTiles[i], positions[i], mapMakerTileBases[i]);
+            _historyItems[i] = new MapMakerHistoryItem(maps[i], previousTiles[i], newTiles[i], positions[i], prevMapMakerTileBases[i], newMapMakerTileBases[i]);
         }
     }
     // constructor with only one tilemap. Most drawing should be on just one tilemap... Note: "Tilemap[] maps" from the above constructor becomes Tilemap map to make it a singular tilemap
-    public MapMakerHistoryStep(Tilemap map, TileBase[] previousTiles, TileBase[] newTiles, Vector3Int[] positions, MapMakerGroundTileBase[] mapMakerTileBases)
+    //public MapMakerHistoryStep(Tilemap map, TileBase[] previousTiles, TileBase[] newTiles, Vector3Int[] positions, MapMakerGroundTileBase[] mapMakerTileBases)
+    public MapMakerHistoryStep(Tilemap map, TileBase[] previousTiles, TileBase[] newTiles, Vector3Int[] positions, MapMakerGroundTileBase[] prevMapMakerTileBases, MapMakerGroundTileBase[] newMapMakerTileBases)
     {
         _historyItems = new MapMakerHistoryItem[positions.Length];
 
         for (int i = 0; i < positions.Length; i++)
         {
-            _historyItems[i] = new MapMakerHistoryItem(map, previousTiles[i], newTiles[i], positions[i], mapMakerTileBases[i]);
+            _historyItems[i] = new MapMakerHistoryItem(map, previousTiles[i], newTiles[i], positions[i], prevMapMakerTileBases[i], newMapMakerTileBases[i]);
         }
     }
 
@@ -110,63 +112,109 @@ public class MapMakerHistoryItem
     private Vector3Int _position;
     private TileBase _previousTile;
     private TileBase _newTile;
-    private MapMakerGroundTileBase _mapMakerTileBase;
+    private MapMakerGroundTileBase _previousMapMakerTileBase;
+    private MapMakerGroundTileBase _newMapMakerTileBase;
 
     // change this so it is a "previous" mapMakerTileBase and "new" mapMakerTileBase. For undo, only spawn obstalce if "previous mapMakerTileBase" is an obstacle. For redo, only if the "new mapMakerTileBase" is an obstacle?
-    public MapMakerHistoryItem(Tilemap map, TileBase prevTile, TileBase newTile, Vector3Int pos, MapMakerGroundTileBase mapMakerTileBase)
+    public MapMakerHistoryItem(Tilemap map, TileBase prevTile, TileBase newTile, Vector3Int pos, MapMakerGroundTileBase prevMapMakerTileBase, MapMakerGroundTileBase newMapMakerTileBase)
     {
         this._map = map;
         this._previousTile = prevTile;
         this._newTile = newTile;
         this._position = pos;
-        this._mapMakerTileBase = mapMakerTileBase;
+        this._previousMapMakerTileBase = prevMapMakerTileBase;
+        this._newMapMakerTileBase = newMapMakerTileBase;
     }
 
     public void Undo()
     {
         _map.SetTile(_position, _previousTile);
 
-        if (_mapMakerTileBase == null)
-            return;
-        // remove obstacle if it exists.
-        if (_mapMakerTileBase.GetType() == typeof(MapMakerObstacle))
+        //if (_mapMakerTileBase == null)
+        //    return;
+        //// remove obstacle if it exists.
+        //if (_mapMakerTileBase.GetType() == typeof(MapMakerObstacle))
+        //{
+        //    MapMakerBuilder builder = MapMakerBuilder.GetInstance();
+        //    if (_newTile == null)
+        //    {
+        //        Debug.Log("MapMakerHistoryItem: Undo: _newTile was null. Obstacle was deleted and needs to be respawned?");
+        //        builder.PlaceObstacle(_position, (MapMakerObstacle)_mapMakerTileBase);
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("MapMakerHistoryItem: Undo: _newTile was NOT null. Obstacle will be removed.");
+        //        builder.RemoveObstacle(_position);
+        //    }
+        //}
+
+        // Undo means go back to what the previous tile was. If that tile had an object on it, then _previousMapMakerTileBase should be a MapMakerObstacle. If that is true, respawn the  object
+        if (_previousMapMakerTileBase != null)
         {
-            MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-            if (_newTile == null)
+            if (_previousMapMakerTileBase.GetType() == typeof(MapMakerObstacle))
             {
-                Debug.Log("MapMakerHistoryItem: Undo: _newTile was null. Obstacle was deleted and needs to be respawned?");
-                builder.PlaceObstacle(_position, (MapMakerObstacle)_mapMakerTileBase);
+                MapMakerBuilder builder = MapMakerBuilder.GetInstance();
+                Debug.Log("MapMakerHistoryItem: Undo: _previousMapMakerTileBase was NOT null and was an obstacle. Obstacle was deleted and needs to be respawned?");
+                builder.PlaceObstacle(_position, (MapMakerObstacle)_previousMapMakerTileBase);
             }
-            else
+        }
+        // Undo also means to REMOVE the "new" tile that had been placed at this position. If that new tile had an object on it, _newMapMakerTileBase shoud be a MapMakerObstacle. If that is true, destroy the obstacle
+        if (_newMapMakerTileBase != null)
+        {
+            if (_newMapMakerTileBase.GetType() == typeof(MapMakerObstacle))
             {
-                Debug.Log("MapMakerHistoryItem: Undo: _newTile was NOT null. Obstacle will be removed.");
+                MapMakerBuilder builder = MapMakerBuilder.GetInstance();
+                Debug.Log("MapMakerHistoryItem: Undo: _newMapMakerTileBase was NOT null and was an obstacle. Obstacle will be removed.");
                 builder.RemoveObstacle(_position);
             }
-            
         }
     }
     public void Redo()
     {
         _map.SetTile(_position, _newTile);
 
-        if (_mapMakerTileBase == null)
-            return;
-        // place obstacle if it exists.
-        if (_mapMakerTileBase.GetType() == typeof(MapMakerObstacle))
+        //if (_mapMakerTileBase == null)
+        //    return;
+        //// place obstacle if it exists.
+        //if (_mapMakerTileBase.GetType() == typeof(MapMakerObstacle))
+        //{
+        //    MapMakerBuilder builder = MapMakerBuilder.GetInstance();
+        //    if (_newTile == null)
+        //    {
+        //        Debug.Log("MapMakerHistoryItem: Redo: _newTile was null. Obstacle will be removed.");
+        //        builder.RemoveObstacle(_position);
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("MapMakerHistoryItem: Redo: _newTile was NOT null. Respawning obstacle");
+
+        //        builder.PlaceObstacle(_position, (MapMakerObstacle)_mapMakerTileBase);
+        //    }
+        //}
+
+        // For Redo, you want to perform the "new" action again. You undid it once, and want it to be performed again. If the new tile was an object, _newMapMakerTileBase should be a MapMakerObstacle. If that is true, respawn the obstacle.
+        if (_newMapMakerTileBase != null)
         {
-            MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-            if (_newTile == null)
+            if (_newMapMakerTileBase.GetType() == typeof(MapMakerObstacle))
             {
-                Debug.Log("MapMakerHistoryItem: Redo: _newTile was null. Obstacle will be removed.");
+                MapMakerBuilder builder = MapMakerBuilder.GetInstance();
+                Debug.Log("MapMakerHistoryItem: Redo: _newMapMakerTileBase was NOT null and was an obstacle. Respawning obstacle");
+                builder.PlaceObstacle(_position, (MapMakerObstacle)_newMapMakerTileBase);
+            }   
+        }
+        // Redoing an eraser action can be "tricky" If you erased an obstacle, and then undid it, the obstacle would be spawned back since you undid the erasure. If you then 'redo' the erasing, you want to make sure to remove the obstacle again.
+        // So, check if the _previousMapMakerTileBase was an MapMakerObstacle. If it was, only remove it IF the new tile is "null," which indicates it was erased.
+        // However, You DO NOT want to remove an obstacle if the _previousMapMakerTileBase was an MapMakerObstacle AND the new tile is something other than null, such as the player placed an obstacle, then drew some fairway underneath it.
+        if (_previousMapMakerTileBase != null)
+        {
+            if (_previousMapMakerTileBase.GetType() == typeof(MapMakerObstacle) && _newTile == null)
+            {
+                MapMakerBuilder builder = MapMakerBuilder.GetInstance();
+                Debug.Log("MapMakerHistoryItem: Redo: _previousMapMakerTileBase was NOT null and was an obstacle. _newTile IS null, making the new tile an 'eraser.' Obstacle will be removed.");
                 builder.RemoveObstacle(_position);
             }
-            else
-            {
-                Debug.Log("MapMakerHistoryItem: Redo: _newTile was NOT null. Respawning obstacle");
-                
-                builder.PlaceObstacle(_position, (MapMakerObstacle)_mapMakerTileBase);
-            }
         }
+
     }
 
     public static implicit operator List<object>(MapMakerHistoryItem v)
