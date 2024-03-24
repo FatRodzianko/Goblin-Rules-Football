@@ -13,10 +13,31 @@ public class MapMakerHistory : SingletonInstance<MapMakerHistory>
     List<MapMakerHistoryStep> _history = new List<MapMakerHistoryStep>();
     int _currentIndex = -1;
 
+    public bool CanUndo => _currentIndex >= 0;
+    public bool CanRedo => _currentIndex < (_history.Count - 1);
+
+
+    public delegate void CanUndoChange(bool canUndo);
+    public event CanUndoChange CanUndoChanged;
+
+    public delegate void CanRedoChange(bool canRedo);
+    public event CanRedoChange CanRedoChanged;
 
     protected override void Awake()
     {
         base.Awake();
+
+        CanUndoChanged = CanUndoChangedFunction;
+        CanRedoChanged = CanRedoChangedFunction;
+
+    }
+    void CanUndoChangedFunction(bool canUndo)
+    {
+        Debug.Log("CanUndoChangedFunction: the new weather effect is: " + canUndo);
+    }
+    void CanRedoChangedFunction(bool canRedo)
+    {
+        Debug.Log("CanRedoChangedFunction: the new weather effect is: " + canRedo);
     }
     //void MakeInstance()
     //{
@@ -39,6 +60,7 @@ public class MapMakerHistory : SingletonInstance<MapMakerHistory>
         _history.RemoveRange(_currentIndex + 1, _history.Count - (_currentIndex + 1));
         _history.Add(entry);
         _currentIndex++;
+        SetUndoRedoBools();
     }
     public void UndoStep()
     {
@@ -47,6 +69,7 @@ public class MapMakerHistory : SingletonInstance<MapMakerHistory>
 
         _history[_currentIndex].Undo();
         _currentIndex--;
+        SetUndoRedoBools();
     }
 
     public void RedoStep()
@@ -57,6 +80,12 @@ public class MapMakerHistory : SingletonInstance<MapMakerHistory>
             _currentIndex++;
             _history[_currentIndex].Redo();
         }
+        SetUndoRedoBools();
+    }
+    void SetUndoRedoBools()
+    {
+        CanUndoChanged(this.CanUndo);
+        CanRedoChanged(this.CanRedo);
     }
 }
 public class MapMakerHistoryStep

@@ -16,6 +16,29 @@ public class MapMakerHistoryHandler : MonoBehaviour
         _undoButton.onClick.AddListener(Undo);
 
         _mapMakerHistory = MapMakerHistory.GetInstance();
+        _mapMakerHistory.CanUndoChanged += SetUndoInteractable;
+        _mapMakerHistory.CanRedoChanged += SetRedoInteractable;
+    }
+    private void Start()
+    {
+        
+    }
+    void SetUndoInteractable(bool interactable)
+    {
+        Debug.Log("SetUndoInteractable: " + interactable);
+        SetInteractable(interactable, _undoButton);
+    }
+    void SetRedoInteractable(bool interactable)
+    {
+        Debug.Log("SetRedoInteractable: " + interactable);
+        SetInteractable(interactable, _redoButton);
+    }
+    void SetInteractable(bool interactable, Button button)
+    {
+        if (button.interactable != interactable)
+        {
+            button.interactable = interactable;
+        }
     }
     void Undo()
     {
