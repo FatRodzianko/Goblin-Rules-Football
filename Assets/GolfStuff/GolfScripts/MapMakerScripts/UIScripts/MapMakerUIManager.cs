@@ -100,8 +100,23 @@ public class MapMakerUIManager : MonoBehaviour
 
             // Get the tile's sprite from the TileBase
             Image img = inst.GetComponent<Image>();
-            Tile t = (Tile)groundTileBase.TileBase;
-            img.sprite = t.sprite;
+
+            // Check to see if the tile is a regular TileBase or a Rule sprite
+            if (groundTileBase.TileBase is Tile)
+            {
+                Tile t = (Tile)groundTileBase.TileBase;
+                img.sprite = t.sprite;
+            }
+            else if (groundTileBase.TileBase is RuleTile)
+            {
+                RuleTile rt = (RuleTile)groundTileBase.TileBase;
+                img.sprite = rt.m_DefaultSprite;
+            }
+            else
+            {
+                Debug.LogError("MapMakerUIManager: BuildUI: Unknown type of tile base: " + groundTileBase.TileBase.GetType());
+            }
+            
 
             // Apply BuildingObjectBase to Button handler script thing?
             var script = inst.GetComponent<TileButtonHandler>();
