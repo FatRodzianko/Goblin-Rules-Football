@@ -33,11 +33,11 @@ public class MapMakerHistory : SingletonInstance<MapMakerHistory>
     }
     void CanUndoChangedFunction(bool canUndo)
     {
-        Debug.Log("CanUndoChangedFunction: the new weather effect is: " + canUndo);
+        //Debug.Log("CanUndoChangedFunction: the new weather effect is: " + canUndo);
     }
     void CanRedoChangedFunction(bool canRedo)
     {
-        Debug.Log("CanRedoChangedFunction: the new weather effect is: " + canRedo);
+        //Debug.Log("CanRedoChangedFunction: the new weather effect is: " + canRedo);
     }
     //void MakeInstance()
     //{
@@ -228,7 +228,7 @@ public class MapMakerHistoryItem
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
                 Debug.Log("MapMakerHistoryItem: Redo: _newMapMakerTileBase was NOT null and was an obstacle. Respawning obstacle");
-                builder.PlaceObstacle(_position, (MapMakerObstacle)_newMapMakerTileBase);
+                builder.PlaceObstacle(_position, (MapMakerObstacle)_newMapMakerTileBase, true);
             }   
         }
         // Redoing an eraser action can be "tricky" If you erased an obstacle, and then undid it, the obstacle would be spawned back since you undid the erasure. If you then 'redo' the erasing, you want to make sure to remove the obstacle again.

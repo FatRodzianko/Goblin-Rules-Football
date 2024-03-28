@@ -25,12 +25,12 @@ public class MapMakerHistoryHandler : MonoBehaviour
     }
     void SetUndoInteractable(bool interactable)
     {
-        Debug.Log("SetUndoInteractable: " + interactable);
+        //Debug.Log("SetUndoInteractable: " + interactable);
         SetInteractable(interactable, _undoButton);
     }
     void SetRedoInteractable(bool interactable)
     {
-        Debug.Log("SetRedoInteractable: " + interactable);
+        //Debug.Log("SetRedoInteractable: " + interactable);
         SetInteractable(interactable, _redoButton);
     }
     void SetInteractable(bool interactable, Button button)

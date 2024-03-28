@@ -54,6 +54,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     Dictionary<TileBase, MapMakerGroundTileBase> _tileBaseToMapMakerObject = new Dictionary<TileBase, MapMakerGroundTileBase>();
     Dictionary<string, TileBase> _guidToTileBase = new Dictionary<string, TileBase>();
 
+    // Preview Handling Stuff?
+    PreviewHandler _previewHandler = new PreviewHandler();
+
     protected override void Awake()
     {
         base.Awake();
@@ -201,7 +204,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     void UpdateGridPosition(Vector3 currentPos)
     {
         Vector3 pos = _camera.ScreenToWorldPoint(_mousePos);
-        Vector3Int gridPos = _previewMap.WorldToCell(pos);
+        //Vector3Int gridPos = _previewMap.WorldToCell(pos);
+        Vector3Int gridPos = _tilemap.WorldToCell(pos);
 
         if (gridPos != _currentGridPosition)
         {
@@ -211,13 +215,17 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             if (_selectedObject != null)
             {
                 // update tile map preview?
-                UpdatePreview();
+                //UpdatePreview();
                 // maybe move to OnMouseMove instead of constantly calling it in update?
 
                 if (_holdActive)
                 {
                     //Debug.Log("UpdateGridPosition: calling HandleDrawing with _holdActive as true");
                     HandleDrawing();
+                }
+                else
+                {
+                    UpdatePreview();
                 }
             }
             
@@ -242,45 +250,87 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     private void OnLeftClick(InputAction.CallbackContext ctx)
     {
         //Debug.Log(ctx.interaction + " / " + ctx.phase);
-        if (!_selectedObject)
-            return;
+        //if (!_selectedObject)
+        //    return;
 
-        if (EventSystem.current.IsPointerOverGameObject())
-            return;
+        //if (EventSystem.current.IsPointerOverGameObject())
+        //{
+        //    _previewHandler.ResetPreview();
+        //    _holdActive = false;
+        //    return;
+        //}
 
-        if (ctx.phase == InputActionPhase.Started)
+        if (_selectedObject != null && !EventSystem.current.IsPointerOverGameObject())
         {
-            _holdActive = true;
-
-            if (ctx.interaction is TapInteraction)
+            if (ctx.phase == InputActionPhase.Started)
             {
-                _holdStartPosition = _currentGridPosition;
+                _holdActive = true;
+
+                if (ctx.interaction is TapInteraction)
+                {
+                    _holdStartPosition = _currentGridPosition;
+                }
+
+                HandleDrawing();
             }
-            
-            HandleDrawing();
+            else
+            {
+                // performed or cancelled
+                if (ctx.interaction is SlowTapInteraction || ctx.interaction is TapInteraction && ctx.phase == InputActionPhase.Performed)
+                {
+                    _holdActive = false;
+                    // Draw on release?
+                    HandleDrawRelease();
+                }
+                else if (ctx.interaction is TapInteraction && ctx.phase == InputActionPhase.Performed)
+                {
+                    HandleDrawRelease();
+                }
+
+            }
         }
         else
         {
-            // performed or cancelled
-            if (ctx.interaction is SlowTapInteraction || ctx.interaction is TapInteraction && ctx.phase == InputActionPhase.Performed)
-            {
-                _holdActive = false;
-                // Draw on release?
-                HandleDrawRelease();
-            }
-            else if (ctx.interaction is TapInteraction && ctx.phase == InputActionPhase.Performed)
-            {
-                HandleDrawRelease();
-            }
-                
+            _previewHandler.ResetPreview();
+            _holdActive = false;
         }
+
+
+        //if (ctx.phase == InputActionPhase.Started)
+        //{
+        //    _holdActive = true;
+
+        //    if (ctx.interaction is TapInteraction)
+        //    {
+        //        _holdStartPosition = _currentGridPosition;
+        //    }
+
+        //    HandleDrawing();
+        //}
+        //else
+        //{
+        //    // performed or cancelled
+        //    if (ctx.interaction is SlowTapInteraction || ctx.interaction is TapInteraction && ctx.phase == InputActionPhase.Performed)
+        //    {
+        //        _holdActive = false;
+        //        // Draw on release?
+        //        HandleDrawRelease();
+        //    }
+        //    else if (ctx.interaction is TapInteraction && ctx.phase == InputActionPhase.Performed)
+        //    {
+        //        HandleDrawRelease();
+        //    }
+
+        //}
 
         //HandleDrawing();
     }
     private void OnRightClick(InputAction.CallbackContext ctx)
     {
+        _previewHandler.ResetPreview();
         // Unselect any tiles when right clicking?
         SelectedObject = null;
+        _holdActive = false;
         if (_obstaclePreview != null)
             Destroy(_obstaclePreview);
     }
@@ -303,6 +353,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             //}
 
             UpdateGridPosition(_mousePos);
+
+            // Update the preview?
+            _previewHandler.UpdateTile(_tilemap, _selectedTileBase);
             UpdatePreview();
         }
     }
@@ -330,13 +383,15 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             {
                 return _selectedObject.MapMakerTileType.Tilemap;
             }
-            return _greenMap;
+            //return _greenMap;
+            return _previewMap;
         }
     }
     void UpdatePreview()
     {
-        //Remove old tile if exisiting
-        _previewMap.SetTile(_previousGridPosition, null);
+        // Remove old tile from preview if exisiting
+        //_previewMap.SetTile(_previousGridPosition, null);
+        _previewHandler.ResetPreview(_previousGridPosition);
 
 
         if (_selectedObject != null && _selectedObject.GetType() != typeof(MapMakerTool))
@@ -357,15 +412,21 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 _obstaclePreview.transform.position = _currentGridPosition;
             }
         }
-            
+
         //Set Current tile
-        _previewMap.SetTile(_currentGridPosition, _selectedTileBase);
+        //_previewMap.SetTile(_currentGridPosition, _selectedTileBase);
+        //if (_selectedObject != null)
+        //    _previewHandler.SetPreview(_currentGridPosition, IsPlacementForbidden(_currentGridPosition));
+        _previewHandler.SetPreview(_currentGridPosition, IsPlacementForbidden(_currentGridPosition));
 
         // update obstacle preview
-        
+
     }
     bool IsPlacementForbidden(Vector3Int position)
     {
+        if (_selectedObject == null)
+            return false;
+
         List<MapMakerTileTypes> restrictedCategories = _selectedObject.PlacementRestrictions;
         List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
 
@@ -381,9 +442,18 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             //{
             //    return map.HasTile(position);
             //});
+
+            //return allMaps.Any(map =>
+            //{
+            //    return map.HasTile(position);
+            //});
             return allMaps.Any(map =>
             {
-                return map.HasTile(position);
+                if (map.HasTile(position))
+                {
+                    return map.GetTile(position) != _selectedTileBase;
+                }
+                return false;
             });
         }
     }
@@ -401,10 +471,15 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 break;
             case PlaceType.Line:
                 //LineRenderer();
-                LineRendererTwoElectricBoogaloo();
+                //LineRendererTwoElectricBoogaloo();
+                _linePoints.Clear();
+                _linePoints = DrawRenderer.LineRenderer(_holdStartPosition, _currentGridPosition);
+                DrawLine(_tilemap, true);
                 break;
             case PlaceType.Rectangle:
-                RectangleRenderer();
+                //RectangleRenderer();
+                _rectangleBounds = DrawRenderer.RectangleRenderer(_holdStartPosition, _currentGridPosition);
+                DrawBounds(_tilemap, true);
                 break;
         }
         
@@ -417,12 +492,16 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         switch (_selectedObject.PlaceType)
         {
             case PlaceType.Line:
+                _previewHandler.ResetPreview();
                 SaveLineDrawing();
-                _previewMap.ClearAllTiles();
+                //_previewMap.ClearAllTiles();
+                
                 break;
             case PlaceType.Rectangle:
+                _previewHandler.ResetPreview();
                 SaveBounds();
-                _previewMap.ClearAllTiles();
+                //_previewMap.ClearAllTiles();
+                
                 break;
         }
 
@@ -491,8 +570,12 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     void DrawItem(Tilemap map, Vector3Int[] positions, TileBase tileBase)
     {
 
-        if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerTool))
+        //if (map != _previewMap && _selectedObject.GetType() == typeof(MapMakerTool))
+        if (_selectedObject.GetType() == typeof(MapMakerTool))
         {
+            // new
+            _previewHandler.ResetPreview();
+
             MapMakerTool tool = (MapMakerTool)_selectedObject;
             tool.Use(positions, out MapMakerHistoryStep historyStep);
 
@@ -512,7 +595,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
             for (int i = 0; i < positions.Length; i++)
             {
-                previousTiles[i] = map.GetTile(positions[i]);
+                //previousTiles[i] = map.GetTile(positions[i]);
+                previousTiles[i] = _previewHandler.GetPreviousTile(positions[i]);
                 //mapMakerTileBases[i] = _selectedObject;
                 prevMapMakerTileBases[i] = GetMapMakerGroundTileBaseFromTileBase(previousTiles[i]);
                 newMapMakerTileBases[i] = _selectedObject;
@@ -526,7 +610,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                     newTiles[i] = tileBase;
                     map.SetTile(positions[i], tileBase);
 
-                    if (_selectedObject.GetType() == typeof(MapMakerObstacle) && map != _previewMap)
+                    //if (_selectedObject.GetType() == typeof(MapMakerObstacle) && map != _previewMap)
+                    if (_selectedObject.GetType() == typeof(MapMakerObstacle))
                     {
                         Debug.Log("DrawItem: Placing obstacle at: " + positions[i].ToString());
                         PlaceObstacle(positions[i], (MapMakerObstacle)_selectedObject);
@@ -538,11 +623,13 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 }
             }
 
-            if (map != _previewMap)
-            {
-                //_mapMakerHistory.Add(new MapMakerHistoryStep(map, previousTiles, newTiles, positions, mapMakerTileBases));
-                _mapMakerHistory.Add(new MapMakerHistoryStep(map, previousTiles, newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
-            }
+            //if (map != _previewMap)
+            //{
+            //    //_mapMakerHistory.Add(new MapMakerHistoryStep(map, previousTiles, newTiles, positions, mapMakerTileBases));
+            //    _mapMakerHistory.Add(new MapMakerHistoryStep(map, previousTiles, newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
+            //}
+            _mapMakerHistory.Add(new MapMakerHistoryStep(map, previousTiles, newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
+
             //if (_selectedObject.GetType() == typeof(MapMakerTool))
             //{
             //    map.SetTile(position, tileBase);
@@ -564,16 +651,27 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             //    map.SetTile(position, tileBase);
             //}
 
+            _previewHandler.ClearPreview();
         }
+
+        
+        _previewHandler.SetPreview(_currentGridPosition, IsPlacementForbidden(_currentGridPosition));
     }
-    
-    public void PlaceObstacle(Vector3Int position, MapMakerObstacle obstacle)
+
+    public void PlaceObstacle(Vector3Int position, MapMakerObstacle obstacle, bool checkIsForbidden = false)
     {
         if (_placeObstaclesByPostion.ContainsKey(position))
         {
             Debug.Log("PlaceObstacle: Object has already been placeed at this position: " + position + " : " + _placeObstaclesByPostion[position].name);
             return;
         }
+
+        if (checkIsForbidden)
+        {
+            if (IsPlacementForbidden(position))
+                return;
+        }
+
         //MapMakerObstacle obj = (MapMakerObstacle)_selectedObject;
         //GameObject gameObject = Instantiate(obj.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
         GameObject gameObject = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
@@ -625,44 +723,44 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     }
     void RectangleRenderer()
     {
-        // Render preview of rectangle on the "preview map" then draw the real rectangle on mouse button release
-        _previewMap.ClearAllTiles();
+        //// Render preview of rectangle on the "preview map" then draw the real rectangle on mouse button release
+        //_previewMap.ClearAllTiles();
 
-        // Get the "starting corner" of the rectangle to draw
-        _rectangleBounds.xMin = _currentGridPosition.x < _holdStartPosition.x ? _currentGridPosition.x : _holdStartPosition.x;
-        _rectangleBounds.xMax = _currentGridPosition.x > _holdStartPosition.x ? _currentGridPosition.x : _holdStartPosition.x;
-        _rectangleBounds.yMin = _currentGridPosition.y < _holdStartPosition.y ? _currentGridPosition.y : _holdStartPosition.y;
-        _rectangleBounds.yMax = _currentGridPosition.y > _holdStartPosition.y ? _currentGridPosition.y : _holdStartPosition.y;
+        //// Get the "starting corner" of the rectangle to draw
+        //_rectangleBounds.xMin = _currentGridPosition.x < _holdStartPosition.x ? _currentGridPosition.x : _holdStartPosition.x;
+        //_rectangleBounds.xMax = _currentGridPosition.x > _holdStartPosition.x ? _currentGridPosition.x : _holdStartPosition.x;
+        //_rectangleBounds.yMin = _currentGridPosition.y < _holdStartPosition.y ? _currentGridPosition.y : _holdStartPosition.y;
+        //_rectangleBounds.yMax = _currentGridPosition.y > _holdStartPosition.y ? _currentGridPosition.y : _holdStartPosition.y;
 
-        DrawBounds(_previewMap);
+        //DrawBounds(_previewMap);
     }
     void LineRenderer()
     {
         // render line preview on the preview tilemap. Draw the line on the correct tilemap on mouse button release
 
-        _previewMap.ClearAllTiles();
+        //_previewMap.ClearAllTiles();
 
-        float diffX = Mathf.Abs(_currentGridPosition.x - _holdStartPosition.x);
-        float diffY = Mathf.Abs(_currentGridPosition.y - _holdStartPosition.y);
+        //float diffX = Mathf.Abs(_currentGridPosition.x - _holdStartPosition.x);
+        //float diffY = Mathf.Abs(_currentGridPosition.y - _holdStartPosition.y);
 
-        bool lineIsHorizontal = diffX >= diffY;
+        //bool lineIsHorizontal = diffX >= diffY;
 
-        if (lineIsHorizontal)
-        {
-            _rectangleBounds.xMin = _currentGridPosition.x < _holdStartPosition.x ? _currentGridPosition.x : _holdStartPosition.x;
-            _rectangleBounds.xMax = _currentGridPosition.x > _holdStartPosition.x ? _currentGridPosition.x : _holdStartPosition.x;
-            _rectangleBounds.yMin = _holdStartPosition.y;
-            _rectangleBounds.yMax = _holdStartPosition.y;
-        }
-        else
-        {
-            _rectangleBounds.xMin = _holdStartPosition.x;
-            _rectangleBounds.xMax = _holdStartPosition.x;
-            _rectangleBounds.yMin = _currentGridPosition.y < _holdStartPosition.y ? _currentGridPosition.y : _holdStartPosition.y;
-            _rectangleBounds.yMax = _currentGridPosition.y > _holdStartPosition.y ? _currentGridPosition.y : _holdStartPosition.y;
-        }
+        //if (lineIsHorizontal)
+        //{
+        //    _rectangleBounds.xMin = _currentGridPosition.x < _holdStartPosition.x ? _currentGridPosition.x : _holdStartPosition.x;
+        //    _rectangleBounds.xMax = _currentGridPosition.x > _holdStartPosition.x ? _currentGridPosition.x : _holdStartPosition.x;
+        //    _rectangleBounds.yMin = _holdStartPosition.y;
+        //    _rectangleBounds.yMax = _holdStartPosition.y;
+        //}
+        //else
+        //{
+        //    _rectangleBounds.xMin = _holdStartPosition.x;
+        //    _rectangleBounds.xMax = _holdStartPosition.x;
+        //    _rectangleBounds.yMin = _currentGridPosition.y < _holdStartPosition.y ? _currentGridPosition.y : _holdStartPosition.y;
+        //    _rectangleBounds.yMax = _currentGridPosition.y > _holdStartPosition.y ? _currentGridPosition.y : _holdStartPosition.y;
+        //}
 
-        DrawBounds(_previewMap);
+        //DrawBounds(_previewMap);
     }
     void SaveBounds()
     {
@@ -674,13 +772,13 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         //    DrawBounds(_fairwayMap);
         DrawBounds(_tilemap);
     }
-    void DrawBounds(Tilemap map)
+    void DrawBounds(Tilemap map, bool isPreview = false)
     {
         //Debug.Log("DrawBounds: " + map.name + " bounds: " + _rectangleBounds.xMin + ":" + _rectangleBounds.xMax + " x " + _rectangleBounds.yMin + ":" + _rectangleBounds.yMax);
 
         // List of positions for the History Steps
         List<Vector3Int> positions = new List<Vector3Int>();
-
+        List<bool> isForbidden = new List<bool>();
         for (int x = _rectangleBounds.xMin; x <= _rectangleBounds.xMax; x++)
         {
             for (int y = _rectangleBounds.yMin; y <= _rectangleBounds.yMax; y++)
@@ -692,20 +790,32 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 // OLD before history steps
 
                 // NEW for history steps
-                positions.Add(new Vector3Int(x, y, 0));
+                Vector3Int newPos = new Vector3Int(x, y, 0);
+                positions.Add(newPos);
+                isForbidden.Add(IsPlacementForbidden(newPos));
             }
         }
 
-        // NEW for history steps
-        DrawItem(map, positions.ToArray(), _selectedTileBase);
+        if (isPreview)
+        {
+            _previewHandler.SetPreview(positions.ToArray(), isForbidden.ToArray());
+        }
+        else
+        {
+            // NEW for history steps
+            DrawItem(map, positions.ToArray(), _selectedTileBase);
+        }
+
+        
 
     }
-    void DrawLine(Tilemap map)
+    void DrawLine(Tilemap map, bool isPreview = false)
     {
         if (_linePoints.Count > 0)
         {
             // List of positions for the History Steps
             List<Vector3Int> positions = new List<Vector3Int>();
+            List<bool> isForbidden = new List<bool>();
             foreach (Vector2Int linePoint in _linePoints)
             {
                 //map.SetTile((Vector3Int)linePoint, _selectedTileBase);
@@ -716,22 +826,31 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
                 // NEW for history steps
                 positions.Add((Vector3Int)linePoint);
+                isForbidden.Add(IsPlacementForbidden((Vector3Int)linePoint));
             }
 
-            // NEW for history steps
-            DrawItem(map, positions.ToArray(), _selectedTileBase);
+            if (isPreview)
+            {
+                _previewHandler.SetPreview(positions.ToArray(), isForbidden.ToArray());
+            }
+            else
+            {
+                // NEW for history steps
+                DrawItem(map, positions.ToArray(), _selectedTileBase);
+            }
+            
         }
     }
 
     #region line drawing?
     void LineRendererTwoElectricBoogaloo()
     {
-        _previewMap.ClearAllTiles();
-        _linePoints.Clear();
+        //_previewMap.ClearAllTiles();
+        //_linePoints.Clear();
 
-        _linePoints = GetPointsOnLine((Vector2Int)_holdStartPosition, (Vector2Int)_currentGridPosition, false).ToList();
+        //_linePoints = GetPointsOnLine((Vector2Int)_holdStartPosition, (Vector2Int)_currentGridPosition, false).ToList();
 
-        DrawLine(_previewMap);
+        //DrawLine(_previewMap);
     }
     void SaveLineDrawing()
     {
