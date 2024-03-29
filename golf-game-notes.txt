@@ -565,3 +565,16 @@ https://www.youtube.com/playlist?list=PLJBcv4t1EiSz-wA35-dWpcI98pNiyK6an
 - Obstacles
 - - - create map maker obstacle scriptable object that inherits from MapMakerGroundTileBase
 - - - - - - new scriptable has reference to the ScriptableObstacle
+- Drawing "Modes"
+- - - instead of the individual tile MapMakerGroundTileBase's being single/line/rectangle/whatever, player first selects a drawing mode, then selects the tile to place
+- - - - - - this is how the tilemap editor in unity editor works. Also how paint and whatever else works
+- - - Single (paint brush icon)
+- - - Line (diagonal line icon?)
+- - - Rectangle (some sort of rectangle icon)
+- - - Fill (paint bucket icon)
+- - - - - - Flood fill? https://docs.unity3d.com/ScriptReference/Tilemaps.Tilemap.FloodFill.html
+- - - - - - - - - https://discussions.unity.com/t/flood-fill-algorithm-for-colour-fill-paint-bucket-tool/37555
+- - - - - - - - - https://en.wikipedia.org/w/index.php?title=Flood_fill&oldid=526445808#Alternative_implementations
+- - - - - - - - - https://simpledevcode.wordpress.com/2015/12/29/flood-fill-algorithm-using-c-net/
+- - - - - - - - - tutorials: https://www.youtube.com/watch?v=VuiXOc81UDM
+

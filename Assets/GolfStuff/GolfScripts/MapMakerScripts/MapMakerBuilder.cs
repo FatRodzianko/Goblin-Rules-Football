@@ -481,6 +481,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 _rectangleBounds = DrawRenderer.RectangleRenderer(_holdStartPosition, _currentGridPosition);
                 DrawBounds(_tilemap, true);
                 break;
+            case PlaceType.FloodFill:
+                _previewHandler.ResetPreview();
+                FloodFill();
+                break;
         }
         
     }
@@ -494,15 +498,17 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             case PlaceType.Line:
                 _previewHandler.ResetPreview();
                 SaveLineDrawing();
-                //_previewMap.ClearAllTiles();
-                
+                //_previewMap.ClearAllTiles();                
                 break;
             case PlaceType.Rectangle:
                 _previewHandler.ResetPreview();
                 SaveBounds();
-                //_previewMap.ClearAllTiles();
-                
+                //_previewMap.ClearAllTiles();                
                 break;
+            //case PlaceType.FloodFill:
+            //    _previewHandler.ResetPreview();
+            //    FloodFill();
+            //    break;
         }
 
     }
@@ -775,7 +781,6 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     void DrawBounds(Tilemap map, bool isPreview = false)
     {
         //Debug.Log("DrawBounds: " + map.name + " bounds: " + _rectangleBounds.xMin + ":" + _rectangleBounds.xMax + " x " + _rectangleBounds.yMin + ":" + _rectangleBounds.yMax);
-
         // List of positions for the History Steps
         List<Vector3Int> positions = new List<Vector3Int>();
         List<bool> isForbidden = new List<bool>();
@@ -808,6 +813,84 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         
 
+    }
+    void FloodFill()
+    {
+        
+        if (!_selectedObject)
+            return;
+
+        Debug.Log("FloodFill: " + _tilemap.ToString() + " : " + _currentGridPosition.ToString() + " : " + _selectedTileBase.ToString());
+        
+        //_tilemap.FloodFill(_currentGridPosition, _selectedTileBase);
+        //DrawItem(_tilemap, _currentGridPosition, _selectedTileBase);
+
+
+        List<Vector3Int> fillPoints = GetFloodFillPoints(_tilemap, _currentGridPosition, _selectedTileBase);
+        Debug.Log("FloodFill: Number of fill points: " + fillPoints.Count());
+        //DrawItem(_tilemap, GetFloodFillPoints(_tilemap, _currentGridPosition, _selectedTileBase).ToArray(), _selectedTileBase);
+        DrawItem(_tilemap, fillPoints.ToArray(), _selectedTileBase);
+    }
+    private List<Vector3Int> GetFloodFillPoints(Tilemap map, Vector3Int startPosition, TileBase newTile)
+    {
+        List<Vector3Int> fillPoints = new List<Vector3Int>();
+        //fillPoints.Add(startPosition);
+
+        TileBase targetTile = _tilemap.GetTile(startPosition);
+        if (newTile == targetTile)
+        {
+            Debug.Log("GetFloodFillPoints: User clicked on a tile that matches what they are filling with. Returning just the starting position of: " + startPosition.ToString() +" . Newtile: " + newTile.ToString() + " clicked on tile: " + targetTile.ToString());
+            fillPoints.Add(startPosition);
+            return fillPoints;
+        }
+        if (targetTile == null)
+        {
+            Debug.Log("GetFloodFillPoints: target tile is null");
+        }
+
+        
+        // Get the current tile at startPosition. When going through the algorithm, check if new tiles match the start position. If yes, add it to the list of tiles to be updated
+        // This should allow player to fill "empty space" by replacing all null tiles
+        // If they click on a spot with a specific tile already, the algo will search for all tiles that match that tile, and replace those with the new tile?
+        // If the user clicks on a tile that matches their selected tile, nothing should happen?
+
+        // https://simpledevcode.wordpress.com/2015/12/29/flood-fill-algorithm-using-c-net/
+        // Create a "Stack" of points to iterate through?
+        Stack<Vector3Int> points = new Stack<Vector3Int>();
+        // Add start position to end of stack
+        points.Push(startPosition);
+        // Set the "boundary" of what you will search through to the tilemap's bounds? The get width and height of the bounds
+        BoundsInt bounds = map.cellBounds;
+        //int boundsLength = bounds.xMax - bounds.xMin;
+        //int boundsHeight = bounds.yMax - bounds.yMin;
+
+        Debug.Log("GetFloodFillPoints: using tilemap: " + map.ToString() + " new tile to fill with is: " + newTile.ToString() + " Start position is: " + startPosition.ToString() + " bounds are: " + bounds.ToString());
+        // loop through the tilemap until there are no more points to go through?
+        while (points.Count > 0)
+        {
+            Vector3Int a = points.Pop();
+            // make sure the point is within the bounds of the tilemap?
+            if (a.x < bounds.xMax && a.x > bounds.xMin && a.y < bounds.yMax && a.y > bounds.yMin)
+            {
+                // Get the tile at this point
+                TileBase tileBase = map.GetTile(a);
+
+                // Compare to the targetTile. If they DO match, add this point to fillPoints
+                if (tileBase == targetTile && !fillPoints.Contains(a))
+                {
+                    fillPoints.Add(a);
+
+                    //Add points in North/East/South/West directions of this point to the points stack
+                    points.Push(new Vector3Int(a.x, a.y + 1, 0));
+                    points.Push(new Vector3Int(a.x + 1, a.y, 0));
+                    points.Push(new Vector3Int(a.x, a.y - 1, 0));
+                    points.Push(new Vector3Int(a.x -1, a.y, 0));
+                }
+
+            }
+        }
+
+        return fillPoints;
     }
     void DrawLine(Tilemap map, bool isPreview = false)
     {
@@ -862,6 +945,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         //    DrawLine(_fairwayMap);
         DrawLine(_tilemap);
     }
+    
     // all code from here? https://github.com/Unity-Technologies/2d-extras/blob/master/Editor/Brushes/LineBrush/LineBrush.cs
     /// <summary>
     /// Enumerates all the points between the start and end position which are

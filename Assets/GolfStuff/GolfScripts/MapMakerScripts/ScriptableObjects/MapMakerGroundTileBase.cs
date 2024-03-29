@@ -21,7 +21,8 @@ public enum PlaceType {
     None,
     Single,
     Line,
-    Rectangle
+    Rectangle,
+    FloodFill
 }
 
 [CreateAssetMenu (fileName = "MapMaker", menuName = "MapMakerObjects/Create Tile")]
