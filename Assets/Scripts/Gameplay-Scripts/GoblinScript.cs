@@ -1767,7 +1767,10 @@ public class GoblinScript : NetworkBehaviour
             if (GameplayManager.instance.gamePhase != "kick-after-attempt")
                 TeamManager.instance.FumbleBall(this.serverGamePlayer.isTeamGrey);
         }
-        
+
+
+
+
     }
     [Server]
     public IEnumerator CanGoblinRecoverStamina()

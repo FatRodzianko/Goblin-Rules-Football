@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class StatusBarScript : MonoBehaviour
 {
@@ -21,28 +22,53 @@ public class StatusBarScript : MonoBehaviour
 
     public void HealthBarUpdate(float healthPercentage)
     {
-        Vector3 newHealthBarScale = Vector3.one;
-        newHealthBarScale.x = healthPercentage;
-        healthBar.transform.localScale = newHealthBarScale;
+        try
+        {
+            Vector3 newHealthBarScale = Vector3.one;
+            newHealthBarScale.x = healthPercentage;
+            healthBar.transform.localScale = newHealthBarScale;
+        }
+        catch (Exception e)
+        {
+            Debug.Log("HealthBarUpdate: couldn't update health bar? Error: " + e);
+        }
+        
     }
     public void StaminaBarUpdate(float staminaPercentage)
     {
-        Vector3 newStaminaBarScale = Vector3.one;
-        newStaminaBarScale.x = staminaPercentage;
-        staminaBar.transform.localScale = newStaminaBarScale;
+        try
+        {
+            Vector3 newStaminaBarScale = Vector3.one;
+            newStaminaBarScale.x = staminaPercentage;
+            staminaBar.transform.localScale = newStaminaBarScale;
+        }
+        catch (Exception e)
+        {
+            Debug.Log("StaminaBarUpdate: couldn't update stamina bar? Error: " + e);
+        }
+        
     }
     public void ChangeStaminaBarColor(bool isGoblinFatigued)
     {
-        if (isGoblinFatigued)
+        try
         {
-            staminaBar.GetComponent<SpriteRenderer>().color = Color.yellow;
-            IEnumerator flashStaminaBar = FlashStaminaBar();
-            StartCoroutine(flashStaminaBar);
+            if (isGoblinFatigued)
+            {
+                staminaBar.GetComponent<SpriteRenderer>().color = Color.yellow;
+                IEnumerator flashStaminaBar = FlashStaminaBar();
+                StartCoroutine(flashStaminaBar);
+            }
+            else
+            {
+                staminaBar.GetComponent<SpriteRenderer>().color = Color.white;
+            }
         }
-        else
+        catch (Exception e)
         {
-            staminaBar.GetComponent<SpriteRenderer>().color = Color.white;
+            Debug.Log("ChangeStaminaBarColor: couldn't update stamina bar? Error: " + e);
         }
+
+        
             
     }
     IEnumerator FlashStaminaBar()

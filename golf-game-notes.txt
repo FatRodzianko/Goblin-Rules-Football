@@ -468,6 +468,9 @@ x Add holes/pipes to minigolf
 - - x create a "spline" or path object for ball to move along? Need to figure out how to make the spline and move an object along it first...
 - Fix all the "await" async functions in GameplayManagerTopDownGolf so they use the token? Otherwise can cause crashes if player exits game while one is running?
 - - - pass the _cancellationTokenSource.Token to all await functions being called?
+- Figure out why the target landing bug showed up after the kick after attempt checks?
+- - - check the CmdKickTheBall function to see if it sets isKicking or something else that is now not being set correctly?
+- - - might just be nothing and random quirk it didn't show up before? Seems like the code always had this bug as a possibility
 
 
 ### hole six notes:
