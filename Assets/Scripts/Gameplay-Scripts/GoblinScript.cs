@@ -1746,7 +1746,18 @@ public class GoblinScript : NetworkBehaviour
             trippedTimerRoutine = TripGoblinTimer();
             StartCoroutine(trippedTimerRoutine);
         }
-        
+
+        //Code here for ending kick-after-attempt?
+        if (GameplayManager.instance.gamePhase == "kick-after-attempt" && this.isKickAfterGoblin && !gameFootball.isKicked && doesCharacterHaveBall)
+        {
+            GameplayManager.instance.KickAfterAttemptWasBlocked();
+            RpcKickBlockedStopKickAfterAttempt(this.connectionToClient);
+        }
+        else
+        {
+            TeamManager.instance.KnockedOutOrTripped(this.serverGamePlayer.isTeamGrey, knockedOut);
+        }
+
         if (doesCharacterHaveBall)
         {
             Debug.Log("KnockOutGoblin: Goblin with football was knocked out. Goblin will need to fumble the football.");
@@ -1756,16 +1767,7 @@ public class GoblinScript : NetworkBehaviour
             if (GameplayManager.instance.gamePhase != "kick-after-attempt")
                 TeamManager.instance.FumbleBall(this.serverGamePlayer.isTeamGrey);
         }
-        //Code here for ending kick-after-attempt?
-        if (GameplayManager.instance.gamePhase == "kick-after-attempt" && this.isKickAfterGoblin && !gameFootball.isKicked)
-        {
-            GameplayManager.instance.KickAfterAttemptWasBlocked();
-            RpcKickBlockedStopKickAfterAttempt(this.connectionToClient);
-        }
-        else
-        {
-            TeamManager.instance.KnockedOutOrTripped(this.serverGamePlayer.isTeamGrey, knockedOut);
-        }
+        
     }
     [Server]
     public IEnumerator CanGoblinRecoverStamina()
@@ -2347,6 +2349,13 @@ public class GoblinScript : NetworkBehaviour
     [Command]
     void CmdKickTheFootball()
     {
+        Debug.Log("CmdKickTheFootball()");
+
+        if (this.isGoblinKnockedOut)
+        {
+            Debug.Log("CmdKickTheFootball: this goblin is knocked out on the server. Don't kick? Returning..." );
+            return;
+        }
         HandleHasBall(doesCharacterHaveBall, false);
         Football footballScript = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
         Vector3 newLocalPosition = footballScript.transform.localPosition;
@@ -2710,6 +2719,7 @@ public class GoblinScript : NetworkBehaviour
     [Server]
     void KickAfterGoblinWasRunInto()
     {
+        Debug.Log("KickAfterGoblinWasRunInto()");
         this.KnockOutGoblin(false);
         RpcKickBlockedStopKickAfterAttempt(this.connectionToClient);
     }
@@ -2859,7 +2869,18 @@ public class GoblinScript : NetworkBehaviour
         if (gameFootball.isKicked)
         {
             GameObject footBallLandingSpot = GameObject.FindGameObjectWithTag("footballLandingTarget");
-            positionOfFootball = footBallLandingSpot.transform.position;
+            if (footBallLandingSpot != null)
+            {
+                Debug.Log("MoveTowardFootball: footBallLandingSpot found!");
+                positionOfFootball = footBallLandingSpot.transform.position;
+            }
+            else
+            {
+                Debug.Log("MoveTowardFootball: could not find the football landing spot idk how.");
+                positionOfFootball = gameFootball.transform.position;
+            }
+            
+
             directionToFootball = (positionOfFootball - this.transform.position).normalized;
             
         }
@@ -3942,7 +3963,10 @@ public class GoblinScript : NetworkBehaviour
                 if (gameFootball.isKicked)
                 {
                     GameObject footBallLandingSpot = GameObject.FindGameObjectWithTag("footballLandingTarget");
-                    footballPosition = footBallLandingSpot.transform.position;
+                    if(footBallLandingSpot != null)
+                        footballPosition = footBallLandingSpot.transform.position;
+                    else
+                        footballPosition = gameFootball.transform.position;
                 }
                 else
                 {

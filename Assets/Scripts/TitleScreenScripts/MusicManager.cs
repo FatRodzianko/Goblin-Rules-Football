@@ -16,7 +16,7 @@ public class MusicManager : MonoBehaviour
     public int SongIdex = 0;
     [SerializeField] AudioSource _source;
     IEnumerator _waitForSongEndRoutine;
-    bool _isWaitForSongEndRoutineRunning = false;
+    [SerializeField] bool _isWaitForSongEndRoutineRunning = false;
 
     public delegate void ChangeNowPlayingSong(string nowPlayingSongTitle);
     public event ChangeNowPlayingSong NowPlayingSongChanged;
@@ -26,6 +26,11 @@ public class MusicManager : MonoBehaviour
 
     float _timeLastTurnedOff = 0f;
 
+    [SerializeField] bool _playerTurnedMusicOn = false;
+
+    // Audio Queue?
+    Queue<AudioClip> _clipQueue = new Queue<AudioClip>();
+
 
     //[SerializeField] AudioSource audioSource;
     private void Awake()
@@ -34,17 +39,6 @@ public class MusicManager : MonoBehaviour
         MakeInstance();
         if (!this._source)
             this._source = GetComponent<AudioSource>();
-        //foreach (SongClip s in songs)
-        //{
-        //    s.source = gameObject.AddComponent<AudioSource>();
-        //    _source.clip = s.clip;
-        //    _source.outputAudioMixerGroup = mixerGroup;
-        //    _source.volume = s.volume;
-        //    _source.pitch = s.pitch;
-        //    _source.playOnAwake = false;
-        //    _source.loop = s.isLooping;
-
-        //}
 
         // Now Playing Events?
         MusicTurnedOn = MusicTurnedOnFunction;
@@ -60,9 +54,7 @@ public class MusicManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //this.PlaySong("music-frail-noise", 1f);
-        //ShuffleSongList();
-        //PlaySong(1f);
+
     }
     void ShuffleSongList()
     {
@@ -80,19 +72,27 @@ public class MusicManager : MonoBehaviour
     }
     public void TurnMusicOff()
     {
-        //StopSound(_titleMusicClip);
         if (_isWaitForSongEndRoutineRunning)
+        {
+            Debug.Log("TurnMusicOff: _isWaitForSongEndRoutineRunning was: " + _isWaitForSongEndRoutineRunning.ToString() + " (true) so stopping the routine.");
             StopCoroutine(_waitForSongEndRoutine);
+            _isWaitForSongEndRoutineRunning = false;
+        }
+            
         if (_source.isPlaying)
         {
+            Debug.Log("TurnMusicOff: _source.isPlaying is true. Doing _source.Stop()...");
             _source.Stop();
         }
         try
         {
-            SongClip s = songs[SongIdex - 1];
-            if (s != null)
+            if (songs.Length > 0)
             {
-                s.clip.UnloadAudioData();
+                SongClip s = songs[SongIdex - 1];
+                if (s != null)
+                {
+                    s.clip.UnloadAudioData();
+                }
             }
         }
         catch (Exception e)
@@ -100,20 +100,27 @@ public class MusicManager : MonoBehaviour
             Debug.Log("TurnMusicOff: Could not get clip from index. Error: " + e);
         }
         MusicTurnedOn(false);
+        _playerTurnedMusicOn = false;
         _timeLastTurnedOff = Time.time;
     }
     public void TurnMusicOn()
     {
-        //PlaySound(_titleMusicClip, 0.75f);
         if (Time.time <= _timeLastTurnedOff + 0.15f)
+        {
+            Debug.Log("TurnMusicOn: Too soon after _timeLastTurnedOff. current time: " + Time.time + " _timeLastTurnedOff: " + _timeLastTurnedOff.ToString());
             return;
+        }
+        _playerTurnedMusicOn = true;
         PlayPlayList(false);
         MusicTurnedOn(true);
     }
     public bool IsMusicPlaying()
     {
         if (_source == null)
+        {
+            Debug.Log("IsMusicPlaying: no source for the music? Returning false. Weird...");
             return false;
+        }   
         if (_source.clip == null && _source.isPlaying)
         {
             Debug.Log("IsMusicPlaying: clip is null and is music play?: " + _source.isPlaying.ToString());
@@ -129,11 +136,17 @@ public class MusicManager : MonoBehaviour
         {
             //ShuffleSongList();
         }
+        Debug.Log("PlayPlayList: Calling PlaySong()");
         PlaySong(1f);
     }
     public void PlaySong(float volume)
     {
-        Debug.Log("PlaySong: Song at index: " + this.SongIdex.ToString());
+        Debug.Log("PlaySong: Song at index: " + this.SongIdex.ToString() + " player wants to play a song?: " + _playerTurnedMusicOn.ToString());
+        if (!_playerTurnedMusicOn)
+        {
+            Debug.Log("PlaySong: _playerTurnedMusicOn is: " + _playerTurnedMusicOn.ToString() + " (should be false). Not playing the next song since the player seems to have turned it off and something bad happened?");
+            return;
+        }
         if (SongIdex >= songs.Length)
         {
             Debug.Log("PlaySong: Resetting index to 0?");
@@ -148,52 +161,49 @@ public class MusicManager : MonoBehaviour
             return;
         }
             
-        //Debug.Log("PlaySound: " + name);
         if (!_source.enabled)
             _source.enabled = true;
+
         _source.volume = volume;
-
-
-        //AsyncOperationHandle<AudioClip> loadSong = Addressables.LoadAssetAsync<AudioClip>(s.ClipAddress);
-        //s.songAddressable = loadSong;
-        //s.clip = loadSong.WaitForCompletion();
-
         s.clip.LoadAudioData();
         _source.clip = s.clip;
-        
-        _source.PlayOneShot(s.clip, volume);
+
+        //_source.PlayOneShot(s.clip, volume);
+        _source.Play();
 
         NowPlayingSongChanged(s.name);
 
         _waitForSongEndRoutine = WaitForSongEnd(SongIdex);
         StartCoroutine(_waitForSongEndRoutine);
         SongIdex++;
-        
-        //if (s.isLooping)
-        //    _source.Play();
-        //else
-        //    _source.PlayOneShot(s.clip, volume);
     }
 
     void ReleaseSong(int index)
     {
         Debug.Log("ReleaseSong: " + index.ToString());
-        SongClip s = songs[index];
-        if (s == null)
+        if (songs.Length <= 0)
+        {
+            Debug.Log("ReleaseSong: The songs array has a length of 0? Returning...");
             return;
+        }
         if (_source.isPlaying)
             _source.Stop();
+
+        SongClip s = songs[index];
+        if (s == null)
+            return;        
         s.clip.UnloadAudioData();
-        //Addressables.Release(s.songAddressable);
+        Debug.Log("ReleaseSong: Calling PlaySong()");
         PlaySong(1.0f);
     }
     IEnumerator WaitForSongEnd(int index)
     {
+        Debug.Log("WaitForSongEnd: starting routine for song: " + _source.clip.name + " which has a clip length of: " + _source.clip.length.ToString() + " at index: " + index.ToString());
         _isWaitForSongEndRoutineRunning = true;
         yield return new WaitUntil(() => !_source.isPlaying && (_source.time == 0f));
-        Debug.Log("WaitForSongEnd: Music Ended.");
-        ReleaseSong(index);
+        Debug.Log("WaitForSongEnd: Music Ended for clip: " + _source.clip.name + ".");
         _isWaitForSongEndRoutineRunning = false;
+        ReleaseSong(index);
     }
     void MusicTurnedOnFunction(bool isMusicOn)
     {

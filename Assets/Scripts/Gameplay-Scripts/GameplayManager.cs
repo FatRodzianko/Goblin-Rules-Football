@@ -67,6 +67,7 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] TextMeshProUGUI KickWasNotGoodText;
     [SerializeField] TextMeshProUGUI KickWasBlockedText;
     bool kickAfterRoutineRunning = false;
+    [SerializeField] bool _wasKickGoodOrBadSubmitted = false;
 
     [Header("Xtra Time")]
     [SyncVar] public bool isXtraTime;
@@ -1004,6 +1005,12 @@ public class GameplayManager : NetworkBehaviour
     [Server]
     public void KickAfterWasKickGoodOrBad(bool isKickGood)
     {
+        if (_wasKickGoodOrBadSubmitted)
+        {
+            Debug.Log("KickAfterWasKickGoodOrBad: _wasKickGoodOrBadSubmitted has already been set. Returning... ");
+            return;
+        }
+            
         Debug.Log("KickAfterWasKickGoodOrBad: Was the kick after attempt good? " + isKickGood.ToString());
         bool isScoringPlayerGrey = false;
         if (scoringPlayer.teamName == "Grey")
@@ -1026,6 +1033,8 @@ public class GameplayManager : NetworkBehaviour
                 scoringPlayer.RpcKickAfterAttemptAchievement(scoringPlayer.connectionToClient);
             }
         }
+        _wasKickGoodOrBadSubmitted = true;
+        StartCoroutine(WasKickGoodOrBadSubmittedCooldownRoutine());
         RpcKickAfterWasKickGoodOrBad(isKickGood, isScoringPlayerGrey);
         TeamManager.instance.KickAfterAttempts(scoringPlayer.isTeamGrey, isKickGood);
         if (this.isSinglePlayer && !this.is1v1)
@@ -1033,9 +1042,20 @@ public class GameplayManager : NetworkBehaviour
             AIStopBlockingKickAfter();
         }
     }
+    IEnumerator WasKickGoodOrBadSubmittedCooldownRoutine()
+    {
+        yield return new WaitForSeconds(0.2f);
+        _wasKickGoodOrBadSubmitted = false;
+    }
     [ClientRpc]
     void RpcKickAfterWasKickGoodOrBad(bool isKickGood, bool isScoringPlayerGrey)
     {
+        // in case the kick was good/was blocked thing happen at the same time or one after the other, turn off the kcik was blocked text stuff
+        KickAfterWasKickGoodPanel.SetActive(false);
+        TheKickWasText.gameObject.SetActive(false);
+        KickWasBlockedText.gameObject.SetActive(false);
+        SoundManager.instance.StopSound("kick-blocked");
+
         KickAfterPositionControlsPanel.SetActive(false);
         KickAfterTimerBeforeKickPanel.SetActive(false);
         KickAfterWasKickGoodPanel.SetActive(true);
@@ -1158,6 +1178,11 @@ public class GameplayManager : NetworkBehaviour
     [Server]
     public void KickAfterAttemptWasBlocked()
     {
+        if (_wasKickGoodOrBadSubmitted)
+        {
+            Debug.Log("KickAfterAttemptWasBlocked: _wasKickGoodOrBadSubmitted was already set. Returning...");
+            return;
+        }
         TransitionFromKickAfterAttemptToKickOff();
         DisableKickAfterPositioningControls();
         DisableKickAfterAttemptControls();
@@ -1187,6 +1212,15 @@ public class GameplayManager : NetworkBehaviour
     [ClientRpc]
     void RpcKickAfterAttemptWasBlocked()
     {
+        // incase there is an issue with the kick was blocked/kick was good thing happening at the same time:
+        KickAfterWasKickGoodPanel.SetActive(false);
+        TheKickWasText.gameObject.SetActive(false);
+        KickWasNotGoodText.gameObject.SetActive(false);
+        KickWasNotGoodText.gameObject.SetActive(false);
+        SoundManager.instance.StopSound("kick-its-good");
+        SoundManager.instance.StopSound("kick-no-good");
+
+        // now display the kick was blocked stuff
         KickAfterPositionControlsPanel.SetActive(false);
         KickAfterTimerBeforeKickPanel.SetActive(false);
         KickAfterWasKickGoodPanel.SetActive(true);
