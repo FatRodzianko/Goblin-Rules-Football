@@ -11,6 +11,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 {
     MapMakerGolfControls _playerInput;
 
+    // Drawing mode
+    [SerializeField] PlaceType _currentDrawingMode = PlaceType.Single;
+
     // Tile maps?
     [SerializeField] Tilemap _previewMap, _greenMap, _fairwayMap, _currentTileSelectedDisplayMap;
     [SerializeField] TileMapReferenceHolder _tileMapReferenceHolder;
@@ -56,6 +59,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
     // Preview Handling Stuff?
     PreviewHandler _previewHandler = new PreviewHandler();
+
+    //DrawModeHandler
+    [SerializeField] DrawingModeHandler _drawModeHandler;
+
+    
 
     protected override void Awake()
     {
@@ -333,10 +341,17 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         _holdActive = false;
         if (_obstaclePreview != null)
             Destroy(_obstaclePreview);
+        if (_drawModeHandler != null)
+            _drawModeHandler.ResetToSingle();
     }
     private MapMakerGroundTileBase SelectedObject
     {
         set {
+            if (_selectedObject != value)
+            {
+                if (_drawModeHandler != null)
+                    _drawModeHandler.ResetToSingle();
+            }
             _selectedObject = value;
 
             // if selected object is not null, set the selected tile base. If it is null, set selected tile base to null
@@ -374,6 +389,14 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         {
             if (_obstaclePreview != null)
                 Destroy(_obstaclePreview);
+        }
+    }
+    public void SetCurrentDrawingMode(PlaceType newDrawingMode)
+    {
+        Debug.Log("SetCurrentDrawingMode: current mode: " + _currentDrawingMode.ToString() + " new mode: " + newDrawingMode.ToString());
+        if (_currentDrawingMode != newDrawingMode)
+        {
+            _currentDrawingMode = newDrawingMode;
         }
     }
     private Tilemap _tilemap
@@ -462,7 +485,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         if (!_selectedObject)
             return;
 
-        switch (_selectedObject.PlaceType)
+        //switch (_selectedObject.PlaceType)
+        switch (this._currentDrawingMode)
         {
             case PlaceType.Single:
             default:
@@ -493,7 +517,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         if (!_selectedObject)
             return;
 
-        switch (_selectedObject.PlaceType)
+        //switch (_selectedObject.PlaceType)
+        switch (this._currentDrawingMode)
         {
             case PlaceType.Line:
                 _previewHandler.ResetPreview();
@@ -821,22 +846,49 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             return;
 
         Debug.Log("FloodFill: " + _tilemap.ToString() + " : " + _currentGridPosition.ToString() + " : " + _selectedTileBase.ToString());
-        
+
         //_tilemap.FloodFill(_currentGridPosition, _selectedTileBase);
         //DrawItem(_tilemap, _currentGridPosition, _selectedTileBase);
 
+        // Check to see if the current selected tile type is an eraser. If so, get the tilemap that the eraser wants to erase from to pass to GetFloodFillPoints
+        // If not, then the map used will be the preview map, which is empty. Floodfill will then select all points in the preview map, and send those points to be deleted in Eraser function, causing all tiles in all maps to be deleted
+        List<Tilemap> mapsToFill = new List<Tilemap>();
 
-        List<Vector3Int> fillPoints = GetFloodFillPoints(_tilemap, _currentGridPosition, _selectedTileBase);
-        Debug.Log("FloodFill: Number of fill points: " + fillPoints.Count());
-        //DrawItem(_tilemap, GetFloodFillPoints(_tilemap, _currentGridPosition, _selectedTileBase).ToArray(), _selectedTileBase);
+        // Get all maps for eraser tool
+        if (_selectedObject.GetType() == typeof(MapMakerTool))
+        {
+            mapsToFill.AddRange(GetTileMapThatHasTileAtPoint(_currentGridPosition)) ;
+        }
+        else
+        {
+            mapsToFill.Add(_tilemap);
+        }
+
+        Debug.Log("FloodFill: total number of tilemaps: " + mapsToFill.Count.ToString());
+        // Get all the fill points on each map?
+        List<Vector3Int> fillPoints = new List<Vector3Int>();
+        foreach (Tilemap map in mapsToFill)
+        {
+            fillPoints.AddRange(GetFloodFillPoints(map, _currentGridPosition, _selectedTileBase));
+        }
+        Debug.Log("FloodFill: number of fill points: " + fillPoints.Count());
         DrawItem(_tilemap, fillPoints.ToArray(), _selectedTileBase);
+
+        // OLD
+        ////List<Vector3Int> fillPoints = GetFloodFillPoints(_tilemap, _currentGridPosition, _selectedTileBase);
+        //List<Vector3Int> fillPoints = GetFloodFillPoints(mapToFill, _currentGridPosition, _selectedTileBase);
+        //Debug.Log("FloodFill: Number of fill points: " + fillPoints.Count());
+        ////DrawItem(_tilemap, GetFloodFillPoints(_tilemap, _currentGridPosition, _selectedTileBase).ToArray(), _selectedTileBase);
+        //DrawItem(_tilemap, fillPoints.ToArray(), _selectedTileBase);
+        // OLD
     }
     private List<Vector3Int> GetFloodFillPoints(Tilemap map, Vector3Int startPosition, TileBase newTile)
     {
         List<Vector3Int> fillPoints = new List<Vector3Int>();
         //fillPoints.Add(startPosition);
 
-        TileBase targetTile = _tilemap.GetTile(startPosition);
+        //TileBase targetTile = _tilemap.GetTile(startPosition);
+        TileBase targetTile = map.GetTile(startPosition);
         if (newTile == targetTile)
         {
             Debug.Log("GetFloodFillPoints: User clicked on a tile that matches what they are filling with. Returning just the starting position of: " + startPosition.ToString() +" . Newtile: " + newTile.ToString() + " clicked on tile: " + targetTile.ToString());
@@ -891,6 +943,17 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         }
 
         return fillPoints;
+    }
+    List<Tilemap> GetTileMapThatHasTileAtPoint(Vector3Int position)
+    {
+        List<Tilemap> maps = new List<Tilemap>();
+        maps = _tileMapReferenceHolder.AllMaps.FindAll(map => map.HasTile(position));
+        Debug.Log("GetTileMapThatHasTileAtPoint: Found " + maps.Count + " maps");
+        return maps;
+    }
+    public void SetDrawModeHandler(DrawingModeHandler handler)
+    {
+        this._drawModeHandler = handler;
     }
     void DrawLine(Tilemap map, bool isPreview = false)
     {

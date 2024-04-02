@@ -19,4 +19,7 @@ MonoBehaviour:
   _tileBase: {fileID: 11400000, guid: be95ebca349bad8418575c40f992e589, type: 2}
   _tile: {fileID: 11400000, guid: be95ebca349bad8418575c40f992e589, type: 2}
   _placeType: 1
+  _usePlacementRestrictions: 0
+  _placementRestrictions:
+  - {fileID: 11400000, guid: 6aed32eadc5fd624e9b4a385e003217a, type: 2}
   ScriptableObstacle: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}

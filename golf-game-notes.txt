@@ -468,9 +468,9 @@ x Add holes/pipes to minigolf
 - - x create a "spline" or path object for ball to move along? Need to figure out how to make the spline and move an object along it first...
 - Fix all the "await" async functions in GameplayManagerTopDownGolf so they use the token? Otherwise can cause crashes if player exits game while one is running?
 - - - pass the _cancellationTokenSource.Token to all await functions being called?
-- Figure out why the target landing bug showed up after the kick after attempt checks?
-- - - check the CmdKickTheBall function to see if it sets isKicking or something else that is now not being set correctly?
-- - - might just be nothing and random quirk it didn't show up before? Seems like the code always had this bug as a possibility
+x Figure out why the target landing bug showed up after the kick after attempt checks?
+- - x check the CmdKickTheBall function to see if it sets isKicking or something else that is now not being set correctly?
+- - x might just be nothing and random quirk it didn't show up before? Seems like the code always had this bug as a possibility
 
 
 ### hole six notes:
@@ -486,12 +486,12 @@ x fix balloons in hole 4 that have a height of "medium" instead of "med"
 x ok make the hole further away again...
 
 ### Next 3 par hole
-- hole is only about ~135 yards away
-- - - incentivize hitting conservatively with iron but allow for hole in one with driver
-- good statue in front of hole, bad statue behind hole
-- easy to bounce out of bounds? or into water?
-- hill/"boob" surrounding the hole, but with at least 1 square in all directions of free space around the hole
-- - - make the hill "zig zag" with diaganol arrows of varying strengths?
+x hole is only about ~135 yards away
+- - x incentivize hitting conservatively with iron but allow for hole in one with driver
+x good statue in front of hole, bad statue behind hole
+x easy to bounce out of bounds? or into water?
+x hill/"boob" surrounding the hole, but with at least 1 square in all directions of free space around the hole
+- - x make the hill "zig zag" with diaganol arrows of varying strengths?
 
 ### Fishnet / steamworks tutorial stuff:
 - https://www.youtube.com/watch?v=U4ATkct6fh4
@@ -574,10 +574,53 @@ https://www.youtube.com/playlist?list=PLJBcv4t1EiSz-wA35-dWpcI98pNiyK6an
 - - - Single (paint brush icon)
 - - - Line (diagonal line icon?)
 - - - Rectangle (some sort of rectangle icon)
-- - - Fill (paint bucket icon)
+- - x Fill (paint bucket icon)
 - - - - - - Flood fill? https://docs.unity3d.com/ScriptReference/Tilemaps.Tilemap.FloodFill.html
 - - - - - - - - - https://discussions.unity.com/t/flood-fill-algorithm-for-colour-fill-paint-bucket-tool/37555
 - - - - - - - - - https://en.wikipedia.org/w/index.php?title=Flood_fill&oldid=526445808#Alternative_implementations
 - - - - - - - - - https://simpledevcode.wordpress.com/2015/12/29/flood-fill-algorithm-using-c-net/
 - - - - - - - - - tutorials: https://www.youtube.com/watch?v=VuiXOc81UDM
+- Create "Rule" tiles for each ground type
+- - - copy the current ones (fairway, green) then add the correct tiles for that ground type
+- - - - - - Rough
+- - - - - - Water
+- - - - - - Sand
+- Add other "tile types" that players can add:
+- - - direction tiles
+- - - minigolf walls
+- Add other obstacles/objects/placemakers players can add
+- - - flag/hole
+- - - - - - need the map maker to check that a hole exists before it can be marked as "finalized?"
+- - - tee off location
+- - - tee markers
+- - - - - - maybe have the map maker check if they exist. If they don't, just place them around the tee off location. Player can change where they are if they don't like them
+- - - - - - needs to check that there are two, and only two?
+- - - aim points
+- - - Spinning hoop
+- - - Tubes (not minigolf)
+- - - - - - Map maker needs to check there is a pair for them to be save
+- - - Minigolf pipes
+- - - - - - check there is a pair for them to be saved?
+- - - - - - someway of allowing players to make the path?
+- Add a zoom out/zoom in feature with the mouse scroll wheel and/or with zoom out buttons
+- Ability for the player to hide the tile selection UI?
+- - - downward arrow they can click to minimize, then upward arrow to bring back up
+- keyboard shortcuts?
+- - - "E" for erase?
+- - - "S" for paint brush/single
+- - - "L" for line drawing mode?
+- - - "F" for fill/paint bucket?
+- - - "R" for rectangle
+- - - will need some sort of visual indicator to let the player know what mode they are currently in
+x figure out how to make the rectangle drawing of rule tiles not so laggy - don't think there is a way around this????
+- - - has something to do with whenever you move the mouse when making a rectangle, the preview is cleared, and then redrawn
+- - - figure out a way so it only updates "new" tiles
+- - - - - - if old tile is in bounds, leave it. Don't clear
+- - - - - - if old tile is out of bounds, remove it?
+- give player option to use "auto tiles" (the rule tiles) or "manual tiles
+- - - auto tiles shrinks the UI. Only shows the rule tile for each tilemap
+- - - manual tiles shows all tiles for each tile map individually
+- - - - - - will need a horizontal scroll for this...
+- make the UI for the tiles be a scroll rect that can scroll up/down and left/right
+
 
