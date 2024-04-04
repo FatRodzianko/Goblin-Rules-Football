@@ -73,13 +73,13 @@ public class MapMakerGroundTileBase : ScriptableObject
             return _uiTileType;
         }
     }
-    public Tile Tile
-    {
-        get
-        {
-            return _tile;
-        }
-    }
+    //public Tile Tile
+    //{
+    //    get
+    //    {
+    //        return _tile;
+    //    }
+    //}
     public PlaceType PlaceType
     {
         get 

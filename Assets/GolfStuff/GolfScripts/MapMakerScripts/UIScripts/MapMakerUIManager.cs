@@ -40,26 +40,26 @@ public class MapMakerUIManager : MonoBehaviour
     {
         
     }
-    void LoadGroundTileTypesForUI()
-    {
-        if (_green.Count > 0)
-        {
-            AddItemToUI(_green, _greenItems);
-        }
-        if (_fairway.Count > 0)
-        {
-            AddItemToUI(_fairway, _fairwayItems);
-        }
-    }
-    void AddItemToUI(List<MapMakerGroundTileBase> tiles, GameObject uiHolder)
-    {
-        foreach (MapMakerGroundTileBase tile in tiles)
-        {
-            GameObject newTileItem = Instantiate(_groundTypeItemPrefab, uiHolder.transform);
-            TileButtonHandler newTileItemButtonHandler = newTileItem.GetComponent<TileButtonHandler>();
-            newTileItemButtonHandler.SetGroundTileItem(tile);
-        }
-    }
+    //void LoadGroundTileTypesForUI()
+    //{
+    //    if (_green.Count > 0)
+    //    {
+    //        AddItemToUI(_green, _greenItems);
+    //    }
+    //    if (_fairway.Count > 0)
+    //    {
+    //        AddItemToUI(_fairway, _fairwayItems);
+    //    }
+    //}
+    //void AddItemToUI(List<MapMakerGroundTileBase> tiles, GameObject uiHolder)
+    //{
+    //    foreach (MapMakerGroundTileBase tile in tiles)
+    //    {
+    //        GameObject newTileItem = Instantiate(_groundTypeItemPrefab, uiHolder.transform);
+    //        TileButtonHandler newTileItemButtonHandler = newTileItem.GetComponent<TileButtonHandler>();
+    //        newTileItemButtonHandler.SetGroundTileItem(tile);
+    //    }
+    //}
     void BuildUI()
     {
         foreach (UITileTypes ui in _uiTileTypes)
@@ -104,13 +104,17 @@ public class MapMakerUIManager : MonoBehaviour
             // Check to see if the tile is a regular TileBase or a Rule sprite
             if (groundTileBase.TileBase is Tile)
             {
+                
                 Tile t = (Tile)groundTileBase.TileBase;
                 img.sprite = t.sprite;
+                Debug.Log("BuildUI: groundTileBase.TileBase is Tile: " + groundTileBase.name + " sprite name is: " + t.sprite.name.ToString());
             }
             else if (groundTileBase.TileBase is RuleTile)
             {
+                
                 RuleTile rt = (RuleTile)groundTileBase.TileBase;
                 img.sprite = rt.m_DefaultSprite;
+                Debug.Log("BuildUI: groundTileBase.TileBase is RuleTile: " + groundTileBase.name + " sprite name is: " + rt.m_DefaultSprite.name.ToString());
             }
             else
             {

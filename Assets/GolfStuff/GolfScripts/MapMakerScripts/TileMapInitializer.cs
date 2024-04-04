@@ -50,6 +50,7 @@ public class TileMapInitializer : SingletonInstance<TileMapInitializer>
                 if (child.name == tileTypes.name)
                 {
                     tileTypes.Tilemap = child.GetComponent<Tilemap>();
+                    Debug.Log("AssignTileMaps: tiletype: " + tileTypes.name + " and tilemap: " + tileTypes.Tilemap.name);
                 }
             }
         }

@@ -562,18 +562,18 @@ https://www.youtube.com/playlist?list=PLJBcv4t1EiSz-wA35-dWpcI98pNiyK6an
 - - - I want it so you only erase from the tilemap you have selected from dropdown OR you can erase from all tilemaps
 - - - Track what tilemap the user is currently using. When the user selects a green tile for example, automatically set the "current tilemap" to be Green
 - - - - - - when using a tool like the eraser, the user can select which one they want to erase from
-- Ability to set the "drawing type"
-- - - single, line, rectangle, fill (later?)
-- - - should effect the eraser as well
+x Ability to set the "drawing type"
+- - x single, line, rectangle, fill (later?)
+- - x should effect the eraser as well
 - Obstacles
-- - - create map maker obstacle scriptable object that inherits from MapMakerGroundTileBase
+- - x create map maker obstacle scriptable object that inherits from MapMakerGroundTileBase
 - - - - - - new scriptable has reference to the ScriptableObstacle
-- Drawing "Modes"
-- - - instead of the individual tile MapMakerGroundTileBase's being single/line/rectangle/whatever, player first selects a drawing mode, then selects the tile to place
+x Drawing "Modes"
+- - x instead of the individual tile MapMakerGroundTileBase's being single/line/rectangle/whatever, player first selects a drawing mode, then selects the tile to place
 - - - - - - this is how the tilemap editor in unity editor works. Also how paint and whatever else works
-- - - Single (paint brush icon)
-- - - Line (diagonal line icon?)
-- - - Rectangle (some sort of rectangle icon)
+- - x Single (paint brush icon)
+- - x Line (diagonal line icon?)
+- - x Rectangle (some sort of rectangle icon)
 - - x Fill (paint bucket icon)
 - - - - - - Flood fill? https://docs.unity3d.com/ScriptReference/Tilemaps.Tilemap.FloodFill.html
 - - - - - - - - - https://discussions.unity.com/t/flood-fill-algorithm-for-colour-fill-paint-bucket-tool/37555
@@ -582,9 +582,9 @@ https://www.youtube.com/playlist?list=PLJBcv4t1EiSz-wA35-dWpcI98pNiyK6an
 - - - - - - - - - tutorials: https://www.youtube.com/watch?v=VuiXOc81UDM
 - Create "Rule" tiles for each ground type
 - - - copy the current ones (fairway, green) then add the correct tiles for that ground type
-- - - - - - Rough
-- - - - - - Water
-- - - - - - Sand
+- - - - - x Rough
+- - - - - x Water
+- - - - - x Sand
 - Add other "tile types" that players can add:
 - - - direction tiles
 - - - minigolf walls
@@ -622,5 +622,3 @@ x figure out how to make the rectangle drawing of rule tiles not so laggy - don'
 - - - manual tiles shows all tiles for each tile map individually
 - - - - - - will need a horizontal scroll for this...
 - make the UI for the tiles be a scroll rect that can scroll up/down and left/right
-
-

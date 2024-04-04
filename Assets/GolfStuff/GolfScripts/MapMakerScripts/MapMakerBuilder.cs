@@ -452,33 +452,44 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         List<MapMakerTileTypes> restrictedCategories = _selectedObject.PlacementRestrictions;
         List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
+        Debug.Log("IsPlacementForbidden: length of restrictedMaps maps: " + restrictedMaps.Count() + " length of restrictedCategories: " + restrictedCategories.Count());
 
-        List<Tilemap> allMaps = _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Concat(restrictedMaps).ToList();
-
-        if (_tileMapReferenceHolder.ForbiddenPlacingWithMaps.Contains(_tilemap))
-        {
-            return false;
-        }
-        else
-        {
-            //return _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Any(map =>
-            //{
-            //    return map.HasTile(position);
-            //});
-
-            //return allMaps.Any(map =>
-            //{
-            //    return map.HasTile(position);
-            //});
-            return allMaps.Any(map =>
+        List <Tilemap> allMaps = _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Concat(restrictedMaps).ToList();
+        Debug.Log("IsPlacementForbidden: length of all maps: " + allMaps.Count());
+        return allMaps.Any(map => {
+            if (map.HasTile(position))
             {
-                if (map.HasTile(position))
-                {
-                    return map.GetTile(position) != _selectedTileBase;
-                }
-                return false;
-            });
-        }
+                return map.GetTile(position) != _selectedTileBase;
+            }
+
+            return false;
+        });
+
+        //if (_tileMapReferenceHolder.ForbiddenPlacingWithMaps.Contains(_tilemap))
+        //{
+        //    Debug.Log("IsPlacementForbidden: forbidden?")
+        //    return false;
+        //}
+        //else
+        //{
+        //    //return _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Any(map =>
+        //    //{
+        //    //    return map.HasTile(position);
+        //    //});
+
+        //    //return allMaps.Any(map =>
+        //    //{
+        //    //    return map.HasTile(position);
+        //    //});
+        //    return allMaps.Any(map =>
+        //    {
+        //        if (map.HasTile(position))
+        //        {
+        //            return map.GetTile(position) != _selectedTileBase;
+        //        }
+        //        return false;
+        //    });
+        //}
     }
     void HandleDrawing()
     {

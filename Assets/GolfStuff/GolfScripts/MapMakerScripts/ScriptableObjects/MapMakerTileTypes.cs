@@ -32,6 +32,7 @@ public class MapMakerTileTypes : ScriptableObject
         }
         set
         {
+            Debug.Log("MapMakerTileTypes: setting tilemap to: " + Tilemap + " for: " + this.name);
             _tileMap = value;
         }
     }

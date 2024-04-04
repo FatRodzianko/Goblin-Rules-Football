@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbafefafd3278a7458a0e14c45675d17, type: 3}
+  m_Name: Hole
+  m_EditorClassIdentifier: 
+  Guid: 8865a9ea4b1162145a40ff6ce8f53a6b
+  _groundTileType: 10
+  _mapMakerTileType: {fileID: 11400000, guid: 6a153d21c6c12a5488da645afa295155, type: 2}
+  _uiTileType: {fileID: 11400000, guid: d8bd43f18c3babc4c9d549c4d11dff79, type: 2}
+  _tileBase: {fileID: 11400000, guid: 1e31f51b118bafc46a10d74408f9c1d5, type: 2}
+  _tile: {fileID: 11400000, guid: 1e31f51b118bafc46a10d74408f9c1d5, type: 2}
+  _placeType: 1
+  _usePlacementRestrictions: 1
+  _placementRestrictions:
+  - {fileID: 11400000, guid: b71ed686fdb9f9f4695c2300982f228b, type: 2}
+  - {fileID: 11400000, guid: 0246ab59b179e02418671dc064f4de62, type: 2}
+  - {fileID: 11400000, guid: 6a153d21c6c12a5488da645afa295155, type: 2}
+  - {fileID: 11400000, guid: dc4c10b31cadccb4b8ead8cc9ec908df, type: 2}
+  - {fileID: 11400000, guid: 172da5ad4d58bd64099a5bc70ec30cf0, type: 2}
+  - {fileID: 11400000, guid: 6aed32eadc5fd624e9b4a385e003217a, type: 2}
+  ScriptableObstacle: {fileID: 11400000, guid: ef3fdd3951cb7c9469a242d82f44839d, type: 2}

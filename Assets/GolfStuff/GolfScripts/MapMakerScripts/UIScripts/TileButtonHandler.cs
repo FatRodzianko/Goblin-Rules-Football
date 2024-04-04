@@ -31,6 +31,6 @@ public class TileButtonHandler : MonoBehaviour
     public void SetGroundTileItem(MapMakerGroundTileBase newItem)
     {
         this._item = newItem;
-        this._myImage.sprite = newItem.Tile.sprite;
+        //this._myImage.sprite = newItem.Tile.sprite;
     }
 }

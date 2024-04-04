@@ -888,6 +888,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 22d2297cf53786043ae532b3a4cef836, type: 2}
   - {fileID: 11400000, guid: 548e4a14607dc5c4493451790e7d9810, type: 2}
   - {fileID: 11400000, guid: d8bd43f18c3babc4c9d549c4d11dff79, type: 2}
+  - {fileID: 11400000, guid: 9686f4ec21eaba14ead1dbdd5d4402d6, type: 2}
+  - {fileID: 11400000, guid: 3a51da9b31c4928479b4cbffc9cd512f, type: 2}
+  - {fileID: 11400000, guid: 3edfcf0fcd201424898a933d204ef19f, type: 2}
   _groundTileTypeHolder: {fileID: 4516529001227566640}
 --- !u!114 &6129244854345006434
 MonoBehaviour:
