@@ -53,6 +53,69 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""EraserSelect"",
+                    ""type"": ""Button"",
+                    ""id"": ""f778db25-c50a-401d-bb1c-f784588f93d6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SingleDrawMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""8b9e3add-993b-4a83-8f62-6bbf18839fd5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LineDrawMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""ac736d7f-066d-4620-a730-7af00ecdee23"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FillDrawMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""6d671766-b0da-4d76-bd61-107b3e7aadc7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RectangleDrawMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""7785faa1-52e5-4219-a4b8-1c2ff766f884"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MaximizeWindow"",
+                    ""type"": ""Button"",
+                    ""id"": ""7b6d31e7-b68c-45dd-b9ae-c914d18f206e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MinimizeWindow"",
+                    ""type"": ""Button"",
+                    ""id"": ""d0eb835d-e755-497f-bcc2-fa19db377a98"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -88,6 +151,83 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                     ""action"": ""MousePosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""026a3fde-2932-4dd6-991d-92c027167e97"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EraserSelect"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f606a06e-c639-4bc6-acb6-8623358b24b4"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SingleDrawMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d78a8cf7-65b1-4b05-a535-9ae3a8946624"",
+                    ""path"": ""<Keyboard>/l"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LineDrawMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2f649f9f-f93a-4ceb-864a-9e2f2d153bde"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FillDrawMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ee66bb91-b14c-49b2-bdfa-bc2533cb7125"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RectangleDrawMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""19e9b7c1-c5d1-4f13-9ebe-b5a45ddf04d1"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MaximizeWindow"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""62f35a22-7ed7-4ba4-b152-57848362acc7"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MinimizeWindow"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -99,6 +239,13 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
         m_MapMaker_MouseLeftClick = m_MapMaker.FindAction("MouseLeftClick", throwIfNotFound: true);
         m_MapMaker_MouseRightClick = m_MapMaker.FindAction("MouseRightClick", throwIfNotFound: true);
         m_MapMaker_MousePosition = m_MapMaker.FindAction("MousePosition", throwIfNotFound: true);
+        m_MapMaker_EraserSelect = m_MapMaker.FindAction("EraserSelect", throwIfNotFound: true);
+        m_MapMaker_SingleDrawMode = m_MapMaker.FindAction("SingleDrawMode", throwIfNotFound: true);
+        m_MapMaker_LineDrawMode = m_MapMaker.FindAction("LineDrawMode", throwIfNotFound: true);
+        m_MapMaker_FillDrawMode = m_MapMaker.FindAction("FillDrawMode", throwIfNotFound: true);
+        m_MapMaker_RectangleDrawMode = m_MapMaker.FindAction("RectangleDrawMode", throwIfNotFound: true);
+        m_MapMaker_MaximizeWindow = m_MapMaker.FindAction("MaximizeWindow", throwIfNotFound: true);
+        m_MapMaker_MinimizeWindow = m_MapMaker.FindAction("MinimizeWindow", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -161,6 +308,13 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
     private readonly InputAction m_MapMaker_MouseLeftClick;
     private readonly InputAction m_MapMaker_MouseRightClick;
     private readonly InputAction m_MapMaker_MousePosition;
+    private readonly InputAction m_MapMaker_EraserSelect;
+    private readonly InputAction m_MapMaker_SingleDrawMode;
+    private readonly InputAction m_MapMaker_LineDrawMode;
+    private readonly InputAction m_MapMaker_FillDrawMode;
+    private readonly InputAction m_MapMaker_RectangleDrawMode;
+    private readonly InputAction m_MapMaker_MaximizeWindow;
+    private readonly InputAction m_MapMaker_MinimizeWindow;
     public struct MapMakerActions
     {
         private @MapMakerGolfControls m_Wrapper;
@@ -168,6 +322,13 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
         public InputAction @MouseLeftClick => m_Wrapper.m_MapMaker_MouseLeftClick;
         public InputAction @MouseRightClick => m_Wrapper.m_MapMaker_MouseRightClick;
         public InputAction @MousePosition => m_Wrapper.m_MapMaker_MousePosition;
+        public InputAction @EraserSelect => m_Wrapper.m_MapMaker_EraserSelect;
+        public InputAction @SingleDrawMode => m_Wrapper.m_MapMaker_SingleDrawMode;
+        public InputAction @LineDrawMode => m_Wrapper.m_MapMaker_LineDrawMode;
+        public InputAction @FillDrawMode => m_Wrapper.m_MapMaker_FillDrawMode;
+        public InputAction @RectangleDrawMode => m_Wrapper.m_MapMaker_RectangleDrawMode;
+        public InputAction @MaximizeWindow => m_Wrapper.m_MapMaker_MaximizeWindow;
+        public InputAction @MinimizeWindow => m_Wrapper.m_MapMaker_MinimizeWindow;
         public InputActionMap Get() { return m_Wrapper.m_MapMaker; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -186,6 +347,27 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                 @MousePosition.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMousePosition;
                 @MousePosition.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMousePosition;
                 @MousePosition.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMousePosition;
+                @EraserSelect.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnEraserSelect;
+                @EraserSelect.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnEraserSelect;
+                @EraserSelect.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnEraserSelect;
+                @SingleDrawMode.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnSingleDrawMode;
+                @SingleDrawMode.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnSingleDrawMode;
+                @SingleDrawMode.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnSingleDrawMode;
+                @LineDrawMode.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnLineDrawMode;
+                @LineDrawMode.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnLineDrawMode;
+                @LineDrawMode.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnLineDrawMode;
+                @FillDrawMode.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnFillDrawMode;
+                @FillDrawMode.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnFillDrawMode;
+                @FillDrawMode.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnFillDrawMode;
+                @RectangleDrawMode.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnRectangleDrawMode;
+                @RectangleDrawMode.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnRectangleDrawMode;
+                @RectangleDrawMode.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnRectangleDrawMode;
+                @MaximizeWindow.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMaximizeWindow;
+                @MaximizeWindow.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMaximizeWindow;
+                @MaximizeWindow.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMaximizeWindow;
+                @MinimizeWindow.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMinimizeWindow;
+                @MinimizeWindow.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMinimizeWindow;
+                @MinimizeWindow.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMinimizeWindow;
             }
             m_Wrapper.m_MapMakerActionsCallbackInterface = instance;
             if (instance != null)
@@ -199,6 +381,27 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                 @MousePosition.started += instance.OnMousePosition;
                 @MousePosition.performed += instance.OnMousePosition;
                 @MousePosition.canceled += instance.OnMousePosition;
+                @EraserSelect.started += instance.OnEraserSelect;
+                @EraserSelect.performed += instance.OnEraserSelect;
+                @EraserSelect.canceled += instance.OnEraserSelect;
+                @SingleDrawMode.started += instance.OnSingleDrawMode;
+                @SingleDrawMode.performed += instance.OnSingleDrawMode;
+                @SingleDrawMode.canceled += instance.OnSingleDrawMode;
+                @LineDrawMode.started += instance.OnLineDrawMode;
+                @LineDrawMode.performed += instance.OnLineDrawMode;
+                @LineDrawMode.canceled += instance.OnLineDrawMode;
+                @FillDrawMode.started += instance.OnFillDrawMode;
+                @FillDrawMode.performed += instance.OnFillDrawMode;
+                @FillDrawMode.canceled += instance.OnFillDrawMode;
+                @RectangleDrawMode.started += instance.OnRectangleDrawMode;
+                @RectangleDrawMode.performed += instance.OnRectangleDrawMode;
+                @RectangleDrawMode.canceled += instance.OnRectangleDrawMode;
+                @MaximizeWindow.started += instance.OnMaximizeWindow;
+                @MaximizeWindow.performed += instance.OnMaximizeWindow;
+                @MaximizeWindow.canceled += instance.OnMaximizeWindow;
+                @MinimizeWindow.started += instance.OnMinimizeWindow;
+                @MinimizeWindow.performed += instance.OnMinimizeWindow;
+                @MinimizeWindow.canceled += instance.OnMinimizeWindow;
             }
         }
     }
@@ -208,5 +411,12 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
         void OnMouseLeftClick(InputAction.CallbackContext context);
         void OnMouseRightClick(InputAction.CallbackContext context);
         void OnMousePosition(InputAction.CallbackContext context);
+        void OnEraserSelect(InputAction.CallbackContext context);
+        void OnSingleDrawMode(InputAction.CallbackContext context);
+        void OnLineDrawMode(InputAction.CallbackContext context);
+        void OnFillDrawMode(InputAction.CallbackContext context);
+        void OnRectangleDrawMode(InputAction.CallbackContext context);
+        void OnMaximizeWindow(InputAction.CallbackContext context);
+        void OnMinimizeWindow(InputAction.CallbackContext context);
     }
 }

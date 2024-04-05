@@ -27,12 +27,28 @@ public class MapMakerUIManager : MonoBehaviour
     Dictionary<UITileTypes, GameObject> _uiElements = new Dictionary<UITileTypes, GameObject>();
     Dictionary<GameObject, Transform> _elementItemSlot = new Dictionary<GameObject, Transform>();
 
+    [Header("UI Objects")]
+    Dictionary<GameObject, MapMakerGroundTileBase> _allTileObjectsByTileBase = new Dictionary<GameObject, MapMakerGroundTileBase>();
+    [SerializeField] List<GameObject> _manualTileObjects = new List<GameObject>();
+    [SerializeField] List<GameObject> _ruleTileObjects = new List<GameObject>();
 
+    [Header("Tiling Mode UI")]
+    [SerializeField] Button _autoTileButton;
+    [SerializeField] Button _manualTileButton;
+    [SerializeField] Color _tileModeSelectedColor = Color.yellow;
+
+    private void Awake()
+    {
+        _autoTileButton.onClick.AddListener(SelectAutoTileMode);
+        _manualTileButton.onClick.AddListener(SelectManualTileMode);
+    }
     // Start is called before the first frame update
     void Start()
     {
         //LoadGroundTileTypesForUI();
         BuildUI();
+        //Default to rule tile mode to begin
+        SelectAutoTileMode();
     }
 
     // Update is called once per frame
@@ -107,14 +123,24 @@ public class MapMakerUIManager : MonoBehaviour
                 
                 Tile t = (Tile)groundTileBase.TileBase;
                 img.sprite = t.sprite;
-                Debug.Log("BuildUI: groundTileBase.TileBase is Tile: " + groundTileBase.name + " sprite name is: " + t.sprite.name.ToString());
+                //Debug.Log("BuildUI: groundTileBase.TileBase is Tile: " + groundTileBase.name + " sprite name is: " + t.sprite.name.ToString());
+
+                // saving all tile objects that aren't rule tiles or obstacles to reference when player selects to see manual tiles
+                if (groundTileBase.GetType() != typeof(MapMakerObstacle) && groundTileBase.GetType() != typeof(MapMakerTool)) 
+                {
+                    if (!_manualTileObjects.Contains(inst))
+                        _manualTileObjects.Add(inst);
+                }
             }
             else if (groundTileBase.TileBase is RuleTile)
             {
                 
                 RuleTile rt = (RuleTile)groundTileBase.TileBase;
                 img.sprite = rt.m_DefaultSprite;
-                Debug.Log("BuildUI: groundTileBase.TileBase is RuleTile: " + groundTileBase.name + " sprite name is: " + rt.m_DefaultSprite.name.ToString());
+                //Debug.Log("BuildUI: groundTileBase.TileBase is RuleTile: " + groundTileBase.name + " sprite name is: " + rt.m_DefaultSprite.name.ToString());
+                // saving the "rule tiles" to reference when player selects to see auto-tiling tiles
+                if (!_ruleTileObjects.Contains(inst))
+                    _ruleTileObjects.Add(inst);
             }
             else
             {
@@ -126,11 +152,52 @@ public class MapMakerUIManager : MonoBehaviour
             var script = inst.GetComponent<TileButtonHandler>();
             script.SetGroundTileItem(groundTileBase);
 
-
+            if (!_allTileObjectsByTileBase.ContainsKey(inst))
+            {
+                _allTileObjectsByTileBase.Add(inst, groundTileBase);
+            }
         }
     }
     MapMakerGroundTileBase[] GetAllGroundTiles()
     {
         return Resources.LoadAll<MapMakerGroundTileBase>("MapMakerGolf/GroundTileScriptables");
+    }
+    void EnableRegularTileObjects(bool enable)
+    {
+        Debug.Log("EnableRegularTileObjects: " + enable);
+        if (_manualTileObjects.Count == 0)
+            return;
+        foreach (GameObject ob in _manualTileObjects)
+        {
+            // Add checks here for "course type." If the course type is minigolf, only enable _allowedInMiniGolf tiles. If it is regular golf, don't enable _miniGolfOnly tiles
+            ob.SetActive(enable);
+        }
+    }
+    void EnableRuleTileObjects(bool enable)
+    {
+        Debug.Log("EnableRuleTileObjects: " + enable);
+        if (_ruleTileObjects.Count == 0)
+            return;
+        foreach (GameObject ob in _ruleTileObjects)
+        {
+            // Add checks here for "course type." If the course type is minigolf, only enable _allowedInMiniGolf tiles. If it is regular golf, don't enable _miniGolfOnly tiles
+            ob.SetActive(enable);
+        }
+    }
+    void SelectAutoTileMode()
+    {
+        Debug.Log("SelectAutoTileMode: ");
+        EnableRuleTileObjects(true);
+        EnableRegularTileObjects(false);
+        _autoTileButton.GetComponent<Image>().color = _tileModeSelectedColor;
+        _manualTileButton.GetComponent<Image>().color = Color.white;
+    }
+    void SelectManualTileMode()
+    {
+        Debug.Log("SelectManualTileMode: ");
+        EnableRuleTileObjects(false);
+        EnableRegularTileObjects(true);
+        _autoTileButton.GetComponent<Image>().color = Color.white;
+        _manualTileButton.GetComponent<Image>().color = _tileModeSelectedColor;
     }
 }

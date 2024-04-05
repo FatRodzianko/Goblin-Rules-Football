@@ -21,3 +21,5 @@ MonoBehaviour:
   _placeType: 1
   _usePlacementRestrictions: 0
   _placementRestrictions: []
+  _allowedInMiniGolf: 1
+  _miniGolfOnly: 0

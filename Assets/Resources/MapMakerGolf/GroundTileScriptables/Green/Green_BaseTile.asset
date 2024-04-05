@@ -19,3 +19,7 @@ MonoBehaviour:
   _tileBase: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   _tile: {fileID: 11400000, guid: 981fb04fab6f3044993d82bcde6ed5d9, type: 2}
   _placeType: 1
+  _usePlacementRestrictions: 0
+  _placementRestrictions: []
+  _allowedInMiniGolf: 1
+  _miniGolfOnly: 0

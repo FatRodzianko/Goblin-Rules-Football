@@ -183,7 +183,7 @@ public class MapMakerHistoryItem
             if (_previousMapMakerTileBase.GetType() == typeof(MapMakerObstacle))
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                Debug.Log("MapMakerHistoryItem: Undo: _previousMapMakerTileBase was NOT null and was an obstacle. Obstacle was deleted and needs to be respawned?");
+                Debug.Log("MapMakerHistoryItem: Undo: _previousMapMakerTileBase" + _previousMapMakerTileBase.name + " was NOT null and was an obstacle. Obstacle was deleted and needs to be respawned? Position: " + _position.ToString() + " new tile was: " + _newMapMakerTileBase);
                 builder.PlaceObstacle(_position, (MapMakerObstacle)_previousMapMakerTileBase);
             }
         }
@@ -193,7 +193,7 @@ public class MapMakerHistoryItem
             if (_newMapMakerTileBase.GetType() == typeof(MapMakerObstacle))
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                Debug.Log("MapMakerHistoryItem: Undo: _newMapMakerTileBase was NOT null and was an obstacle. Obstacle will be removed.");
+                Debug.Log("MapMakerHistoryItem: Undo: _newMapMakerTileBase " + _newMapMakerTileBase.name + " was NOT null and was an obstacle. Obstacle will be removed. Position: " + _position.ToString() + " previous tile was: " + _previousMapMakerTileBase);
                 builder.RemoveObstacle(_position);
             }
         }

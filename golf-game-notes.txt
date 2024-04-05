@@ -580,8 +580,8 @@ x Drawing "Modes"
 - - - - - - - - - https://en.wikipedia.org/w/index.php?title=Flood_fill&oldid=526445808#Alternative_implementations
 - - - - - - - - - https://simpledevcode.wordpress.com/2015/12/29/flood-fill-algorithm-using-c-net/
 - - - - - - - - - tutorials: https://www.youtube.com/watch?v=VuiXOc81UDM
-- Create "Rule" tiles for each ground type
-- - - copy the current ones (fairway, green) then add the correct tiles for that ground type
+x Create "Rule" tiles for each ground type
+- - x copy the current ones (fairway, green) then add the correct tiles for that ground type
 - - - - - x Rough
 - - - - - x Water
 - - - - - x Sand
@@ -589,7 +589,7 @@ x Drawing "Modes"
 - - - direction tiles
 - - - minigolf walls
 - Add other obstacles/objects/placemakers players can add
-- - - flag/hole
+- - x flag/hole
 - - - - - - need the map maker to check that a hole exists before it can be marked as "finalized?"
 - - - tee off location
 - - - tee markers
@@ -602,23 +602,28 @@ x Drawing "Modes"
 - - - Minigolf pipes
 - - - - - - check there is a pair for them to be saved?
 - - - - - - someway of allowing players to make the path?
+- Things like the tee off location and aim points should be a tile type of "markers" that is separate from "obstacles"
+- - - should appear on their own UI row
 - Add a zoom out/zoom in feature with the mouse scroll wheel and/or with zoom out buttons
-- Ability for the player to hide the tile selection UI?
-- - - downward arrow they can click to minimize, then upward arrow to bring back up
-- keyboard shortcuts?
-- - - "E" for erase?
-- - - "S" for paint brush/single
-- - - "L" for line drawing mode?
-- - - "F" for fill/paint bucket?
-- - - "R" for rectangle
-- - - will need some sort of visual indicator to let the player know what mode they are currently in
+x Ability for the player to hide the tile selection UI?
+- - x downward arrow they can click to minimize, then upward arrow to bring back up
+x keyboard shortcuts?
+- - x "E" for erase?
+- - x "S" for paint brush/single
+- - x "L" for line drawing mode?
+- - x "F" for fill/paint bucket?
+- - x "R" for rectangle
+- - x will need some sort of visual indicator to let the player know what mode they are currently in
 x figure out how to make the rectangle drawing of rule tiles not so laggy - don't think there is a way around this????
 - - - has something to do with whenever you move the mouse when making a rectangle, the preview is cleared, and then redrawn
 - - - figure out a way so it only updates "new" tiles
 - - - - - - if old tile is in bounds, leave it. Don't clear
 - - - - - - if old tile is out of bounds, remove it?
-- give player option to use "auto tiles" (the rule tiles) or "manual tiles
-- - - auto tiles shrinks the UI. Only shows the rule tile for each tilemap
-- - - manual tiles shows all tiles for each tile map individually
+x give player option to use "auto tiles" (the rule tiles) or "manual tiles
+- - x auto tiles shrinks the UI. Only shows the rule tile for each tilemap
+- - x manual tiles shows all tiles for each tile map individually
 - - - - - - will need a horizontal scroll for this...
 - make the UI for the tiles be a scroll rect that can scroll up/down and left/right
+- - x up/down
+- - - left/right
+x Make the "Object" tilemap show the tile icons when the mouse is held down for line/rectangle. Otherwise, set it to be transparent

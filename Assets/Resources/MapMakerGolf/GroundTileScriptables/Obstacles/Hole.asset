@@ -27,4 +27,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dc4c10b31cadccb4b8ead8cc9ec908df, type: 2}
   - {fileID: 11400000, guid: 172da5ad4d58bd64099a5bc70ec30cf0, type: 2}
   - {fileID: 11400000, guid: 6aed32eadc5fd624e9b4a385e003217a, type: 2}
+  _allowedInMiniGolf: 1
+  _miniGolfOnly: 0
   ScriptableObstacle: {fileID: 11400000, guid: ef3fdd3951cb7c9469a242d82f44839d, type: 2}

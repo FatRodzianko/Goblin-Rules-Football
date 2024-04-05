@@ -62,8 +62,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
     //DrawModeHandler
     [SerializeField] DrawingModeHandler _drawModeHandler;
+    [SerializeField] MapMakerGroundTileBase _eraser;
+    [SerializeField] MinimizeMaximizeManager _minMaxManager;
 
-    
+
 
     protected override void Awake()
     {
@@ -87,6 +89,16 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         // right click events
         _playerInput.MapMaker.MouseRightClick.performed += OnRightClick;
+
+        // Keyboard shortcuts
+        _playerInput.MapMaker.EraserSelect.performed += EForEraserPressed;
+        _playerInput.MapMaker.SingleDrawMode.performed += SForSingleModePressed;
+        _playerInput.MapMaker.LineDrawMode.performed += LForLineModePressed;
+        _playerInput.MapMaker.FillDrawMode.performed += FForFillModePressed;
+        _playerInput.MapMaker.RectangleDrawMode.performed += RForRectangleModePressed;
+        _playerInput.MapMaker.MaximizeWindow.performed += MaximizeShortCut;
+        _playerInput.MapMaker.MinimizeWindow.performed += MinimizeShortCut;
+
     }
     private void OnDisable()
     {
@@ -102,6 +114,15 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         // right click events
         _playerInput.MapMaker.MouseRightClick.performed -= OnRightClick;
+
+        // Keyboard shortcuts
+        _playerInput.MapMaker.EraserSelect.performed -= EForEraserPressed;
+        _playerInput.MapMaker.SingleDrawMode.performed -= SForSingleModePressed;
+        _playerInput.MapMaker.LineDrawMode.performed -= LForLineModePressed;
+        _playerInput.MapMaker.FillDrawMode.performed -= FForFillModePressed;
+        _playerInput.MapMaker.RectangleDrawMode.performed -= RForRectangleModePressed;
+        _playerInput.MapMaker.MaximizeWindow.performed -= MaximizeShortCut;
+        _playerInput.MapMaker.MinimizeWindow.performed -= MinimizeShortCut;
     }
     private void Start()
     {
@@ -214,11 +235,13 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         Vector3 pos = _camera.ScreenToWorldPoint(_mousePos);
         //Vector3Int gridPos = _previewMap.WorldToCell(pos);
         Vector3Int gridPos = _tilemap.WorldToCell(pos);
+        //Debug.Log("UpdateGridPosition: gridPos: " + gridPos.ToString() + " _currentGridPosition" + _currentGridPosition.ToString());
 
         if (gridPos != _currentGridPosition)
         {
             _previousGridPosition = _currentGridPosition;
             _currentGridPosition = gridPos;
+            //Debug.Log("UpdateGridPosition: gridPos: " + gridPos.ToString() + " _currentGridPosition" + _currentGridPosition.ToString() + " previous position: " + _previousGridPosition.ToString());
 
             if (_selectedObject != null)
             {
@@ -335,14 +358,73 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     }
     private void OnRightClick(InputAction.CallbackContext ctx)
     {
+        //_previewHandler.ResetPreview();
+        //// Unselect any tiles when right clicking?
+        //EnableObjectTileMap(false);
+        //SelectedObject = null;
+        //_holdActive = false;
+        //if (_obstaclePreview != null)
+        //{
+        //    Destroy(_obstaclePreview);
+        //    _obstaclePreview = null;
+        //}
+        //if (_drawModeHandler != null)
+        //    _drawModeHandler.ResetToSingle();
+        ResetForRightClickAndOthers();
+    }
+    void ResetForRightClickAndOthers()
+    {
         _previewHandler.ResetPreview();
         // Unselect any tiles when right clicking?
+        EnableObjectTileMap(false);
         SelectedObject = null;
         _holdActive = false;
         if (_obstaclePreview != null)
+        {
             Destroy(_obstaclePreview);
+            _obstaclePreview = null;
+        }
         if (_drawModeHandler != null)
             _drawModeHandler.ResetToSingle();
+    }
+    private void EForEraserPressed(InputAction.CallbackContext ctx)
+    {
+        ResetForRightClickAndOthers();
+        ObjectSelected(_eraser);
+    }
+    private void SForSingleModePressed(InputAction.CallbackContext ctx)
+    {
+        if (_drawModeHandler != null)
+            _drawModeHandler.ButtonClicked(PlaceType.Single);
+    }
+    private void LForLineModePressed(InputAction.CallbackContext ctx)
+    {
+        if (_drawModeHandler != null)
+            _drawModeHandler.ButtonClicked(PlaceType.Line);
+    }
+    private void FForFillModePressed(InputAction.CallbackContext ctx)
+    {
+        if (_drawModeHandler != null)
+            _drawModeHandler.ButtonClicked(PlaceType.FloodFill);
+    }
+    private void RForRectangleModePressed(InputAction.CallbackContext ctx)
+    {
+        if (_drawModeHandler != null)
+            _drawModeHandler.ButtonClicked(PlaceType.Rectangle);
+    }
+    public void SetMinMaxManager(MinimizeMaximizeManager minMax)
+    {
+        this._minMaxManager = minMax;
+    }
+    private void MaximizeShortCut(InputAction.CallbackContext ctx)
+    {
+        if (_minMaxManager != null)
+            _minMaxManager.MaximizeShortCut();
+    }
+    private void MinimizeShortCut(InputAction.CallbackContext ctx)
+    {
+        if (_minMaxManager != null)
+            _minMaxManager.MinimizeShortCut();
     }
     private MapMakerGroundTileBase SelectedObject
     {
@@ -380,7 +462,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         if (obj.GetType() == typeof(MapMakerObstacle))
         {
             if (_obstaclePreview != null)
+            {
                 Destroy(_obstaclePreview);
+                _obstaclePreview = null;
+            }
 
             MapMakerObstacle obstacle = (MapMakerObstacle)obj;
             _obstaclePreview = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, _currentGridPosition, Quaternion.identity);
@@ -388,7 +473,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         else
         {
             if (_obstaclePreview != null)
+            {
                 Destroy(_obstaclePreview);
+                _obstaclePreview = null;
+            }
         }
     }
     public void SetCurrentDrawingMode(PlaceType newDrawingMode)
@@ -412,20 +500,28 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     }
     void UpdatePreview()
     {
+        //Debug.Log("UpdatePreview: current position: " + _currentGridPosition.ToString() + " previous position: " + _previousGridPosition.ToString());
         // Remove old tile from preview if exisiting
         //_previewMap.SetTile(_previousGridPosition, null);
         _previewHandler.ResetPreview(_previousGridPosition);
 
 
-        if (_selectedObject != null && _selectedObject.GetType() != typeof(MapMakerTool))
+        //if (_selectedObject != null && _selectedObject.GetType() != typeof(MapMakerTool))
+        if (_selectedObject != null && _selectedObject.GetType() == typeof(MapMakerObstacle))
         {
+            //Debug.Log("UpdatePreview: IsPlacementForbidden: " + IsPlacementForbidden(_currentGridPosition));
             if (IsPlacementForbidden(_currentGridPosition))
             {
+
                 if (_obstaclePreview != null)
+                {
                     Destroy(_obstaclePreview);
-                return;
+                    _obstaclePreview = null;
+                }
+                    
             }                
-            else if (_selectedObject.GetType() == typeof(MapMakerObstacle))
+            //else if (_selectedObject.GetType() == typeof(MapMakerObstacle))
+            else
             {
                 if (_obstaclePreview == null)
                 {
@@ -452,10 +548,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         List<MapMakerTileTypes> restrictedCategories = _selectedObject.PlacementRestrictions;
         List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
-        Debug.Log("IsPlacementForbidden: length of restrictedMaps maps: " + restrictedMaps.Count() + " length of restrictedCategories: " + restrictedCategories.Count());
+        //Debug.Log("IsPlacementForbidden: length of restrictedMaps maps: " + restrictedMaps.Count() + " length of restrictedCategories: " + restrictedCategories.Count());
 
         List <Tilemap> allMaps = _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Concat(restrictedMaps).ToList();
-        Debug.Log("IsPlacementForbidden: length of all maps: " + allMaps.Count());
+        //Debug.Log("IsPlacementForbidden: length of all maps: " + allMaps.Count());
         return allMaps.Any(map => {
             if (map.HasTile(position))
             {
@@ -521,7 +617,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 FloodFill();
                 break;
         }
-        
+        EnableObjectTileMap(true);
     }
     void HandleDrawRelease()
     {
@@ -545,6 +641,21 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             //    _previewHandler.ResetPreview();
             //    FloodFill();
             //    break;
+        }
+        EnableObjectTileMap(false);
+    }
+    void EnableObjectTileMap(bool enable)
+    {
+        if (_selectedObject == null)
+            return;
+        if (_selectedObject.GroundTileType == GroundTileType.Object)
+        {
+            Color newColor = _tilemap.color;
+            if (enable)
+                newColor.a = 1f;
+            else
+                newColor.a = 0;
+            _tilemap.color = newColor;
         }
 
     }
@@ -820,6 +931,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         // List of positions for the History Steps
         List<Vector3Int> positions = new List<Vector3Int>();
         List<bool> isForbidden = new List<bool>();
+        List<Vector3Int> forbiddenPositions = new List<Vector3Int>();
         for (int x = _rectangleBounds.xMin; x <= _rectangleBounds.xMax; x++)
         {
             for (int y = _rectangleBounds.yMin; y <= _rectangleBounds.yMax; y++)
@@ -833,16 +945,29 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 // NEW for history steps
                 Vector3Int newPos = new Vector3Int(x, y, 0);
                 positions.Add(newPos);
-                isForbidden.Add(IsPlacementForbidden(newPos));
+                //isForbidden.Add(IsPlacementForbidden(newPos));
+                bool forbidden = IsPlacementForbidden(newPos);
+                isForbidden.Add(forbidden);
+                if (forbidden)
+                    forbiddenPositions.Add(newPos);
             }
         }
 
         if (isPreview)
         {
             _previewHandler.SetPreview(positions.ToArray(), isForbidden.ToArray());
+            //_previewHandler.SetPreview(positions.ToArray(), isForbidden.ToArray(), _rectangleBounds);
         }
         else
         {
+            if (forbiddenPositions.Count > 0)
+            {
+                foreach (Vector3Int forbidPos in forbiddenPositions)
+                {
+                    if (positions.Contains(forbidPos))
+                        positions.Remove(forbidPos);
+                }
+            }
             // NEW for history steps
             DrawItem(map, positions.ToArray(), _selectedTileBase);
         }

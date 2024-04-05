@@ -37,6 +37,9 @@ public class MapMakerGroundTileBase : ScriptableObject
     [SerializeField] PlaceType _placeType;
     [SerializeField] bool _usePlacementRestrictions;
     [SerializeField] List<MapMakerTileTypes> _placementRestrictions;
+    [Header("Minigolf?")]
+    [SerializeField] bool _allowedInMiniGolf;
+    [SerializeField] bool _miniGolfOnly;
 
     public List<MapMakerTileTypes> PlacementRestrictions
     {
@@ -85,6 +88,13 @@ public class MapMakerGroundTileBase : ScriptableObject
         get 
         {
             return _placeType == PlaceType.None ? _mapMakerTileType.PlaceType : _placeType ;
+        }
+    }
+    public bool AllowedInMiniGolf
+    {
+        get
+        {
+            return _allowedInMiniGolf;
         }
     }
 }

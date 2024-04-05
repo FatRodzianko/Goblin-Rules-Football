@@ -22,4 +22,6 @@ MonoBehaviour:
   _usePlacementRestrictions: 0
   _placementRestrictions:
   - {fileID: 11400000, guid: 6aed32eadc5fd624e9b4a385e003217a, type: 2}
+  _allowedInMiniGolf: 1
+  _miniGolfOnly: 0
   ScriptableObstacle: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
