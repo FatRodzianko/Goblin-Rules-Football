@@ -116,6 +116,33 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ZoomInOut"",
+                    ""type"": ""Value"",
+                    ""id"": ""3bdaa33d-98a4-4a7e-b63e-c99e0280e5df"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ResetZoom"",
+                    ""type"": ""Button"",
+                    ""id"": ""710a5403-41fa-416e-8b8b-4e58f363657e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MoveCamera"",
+                    ""type"": ""Value"",
+                    ""id"": ""84dd635a-5976-41a1-90f1-c158c63498ce"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -166,7 +193,7 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                 {
                     ""name"": """",
                     ""id"": ""f606a06e-c639-4bc6-acb6-8623358b24b4"",
-                    ""path"": ""<Keyboard>/s"",
+                    ""path"": ""<Keyboard>/p"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -228,6 +255,83 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                     ""action"": ""MinimizeWindow"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f00b1070-edbc-4fdb-aed4-657bc742d115"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ZoomInOut"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4d66c6b4-6178-474f-ad66-de9f5cf8277c"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ResetZoom"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""b0e827ab-cc08-4804-815f-7f0f21bb36e4"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCamera"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""64e8334f-8969-49d8-b8cf-d70c4e960884"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""8b088fed-b5e4-4ae6-9aa6-d7a0466cee96"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""ee6dcffd-d365-43dd-a703-8fa0e8b7dc7b"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""c3227514-d466-4db6-8887-4a51f778a195"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -246,6 +350,9 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
         m_MapMaker_RectangleDrawMode = m_MapMaker.FindAction("RectangleDrawMode", throwIfNotFound: true);
         m_MapMaker_MaximizeWindow = m_MapMaker.FindAction("MaximizeWindow", throwIfNotFound: true);
         m_MapMaker_MinimizeWindow = m_MapMaker.FindAction("MinimizeWindow", throwIfNotFound: true);
+        m_MapMaker_ZoomInOut = m_MapMaker.FindAction("ZoomInOut", throwIfNotFound: true);
+        m_MapMaker_ResetZoom = m_MapMaker.FindAction("ResetZoom", throwIfNotFound: true);
+        m_MapMaker_MoveCamera = m_MapMaker.FindAction("MoveCamera", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -315,6 +422,9 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
     private readonly InputAction m_MapMaker_RectangleDrawMode;
     private readonly InputAction m_MapMaker_MaximizeWindow;
     private readonly InputAction m_MapMaker_MinimizeWindow;
+    private readonly InputAction m_MapMaker_ZoomInOut;
+    private readonly InputAction m_MapMaker_ResetZoom;
+    private readonly InputAction m_MapMaker_MoveCamera;
     public struct MapMakerActions
     {
         private @MapMakerGolfControls m_Wrapper;
@@ -329,6 +439,9 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
         public InputAction @RectangleDrawMode => m_Wrapper.m_MapMaker_RectangleDrawMode;
         public InputAction @MaximizeWindow => m_Wrapper.m_MapMaker_MaximizeWindow;
         public InputAction @MinimizeWindow => m_Wrapper.m_MapMaker_MinimizeWindow;
+        public InputAction @ZoomInOut => m_Wrapper.m_MapMaker_ZoomInOut;
+        public InputAction @ResetZoom => m_Wrapper.m_MapMaker_ResetZoom;
+        public InputAction @MoveCamera => m_Wrapper.m_MapMaker_MoveCamera;
         public InputActionMap Get() { return m_Wrapper.m_MapMaker; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -368,6 +481,15 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                 @MinimizeWindow.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMinimizeWindow;
                 @MinimizeWindow.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMinimizeWindow;
                 @MinimizeWindow.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMinimizeWindow;
+                @ZoomInOut.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnZoomInOut;
+                @ZoomInOut.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnZoomInOut;
+                @ZoomInOut.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnZoomInOut;
+                @ResetZoom.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnResetZoom;
+                @ResetZoom.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnResetZoom;
+                @ResetZoom.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnResetZoom;
+                @MoveCamera.started -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMoveCamera;
+                @MoveCamera.performed -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMoveCamera;
+                @MoveCamera.canceled -= m_Wrapper.m_MapMakerActionsCallbackInterface.OnMoveCamera;
             }
             m_Wrapper.m_MapMakerActionsCallbackInterface = instance;
             if (instance != null)
@@ -402,6 +524,15 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                 @MinimizeWindow.started += instance.OnMinimizeWindow;
                 @MinimizeWindow.performed += instance.OnMinimizeWindow;
                 @MinimizeWindow.canceled += instance.OnMinimizeWindow;
+                @ZoomInOut.started += instance.OnZoomInOut;
+                @ZoomInOut.performed += instance.OnZoomInOut;
+                @ZoomInOut.canceled += instance.OnZoomInOut;
+                @ResetZoom.started += instance.OnResetZoom;
+                @ResetZoom.performed += instance.OnResetZoom;
+                @ResetZoom.canceled += instance.OnResetZoom;
+                @MoveCamera.started += instance.OnMoveCamera;
+                @MoveCamera.performed += instance.OnMoveCamera;
+                @MoveCamera.canceled += instance.OnMoveCamera;
             }
         }
     }
@@ -418,5 +549,8 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
         void OnRectangleDrawMode(InputAction.CallbackContext context);
         void OnMaximizeWindow(InputAction.CallbackContext context);
         void OnMinimizeWindow(InputAction.CallbackContext context);
+        void OnZoomInOut(InputAction.CallbackContext context);
+        void OnResetZoom(InputAction.CallbackContext context);
+        void OnMoveCamera(InputAction.CallbackContext context);
     }
 }

@@ -155,6 +155,13 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         }
     }
+    public MapMakerGolfControls PlayerInput
+    {
+        get
+        {
+            return _playerInput;
+        }
+    }
     public Dictionary<string, Tilemap> GetTileMapNameToTileMapMapping()
     {
         return _tileMaps;

@@ -1687,6 +1687,8 @@ GameObject:
   - component: {fileID: 8592892711101978073}
   - component: {fileID: 2670901551841765759}
   - component: {fileID: 7710947282615436675}
+  - component: {fileID: 1029636750669268490}
+  - component: {fileID: 4055150282438640478}
   m_Layer: 5
   m_Name: MapMakerCanvas
   m_TagString: Untagged
@@ -1915,6 +1917,41 @@ MonoBehaviour:
   _buildingOverlay: {fileID: 4516529001057922895}
   _yPos: 0
   _isMinimized: 0
+  _mapMakerBuilder: {fileID: 0}
+--- !u!114 &1029636750669268490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4516528999549409106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1844614bdf7e0c4479651678c50aed2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _camera: {fileID: 0}
+  _builder: {fileID: 0}
+  _pixelPerfect: {fileID: 0}
+  _defaultOrthoSize: 0
+  _maxOrthSize: 225
+  _scrollRate: 5
+--- !u!114 &4055150282438640478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4516528999549409106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea9eb64b6d40e624d87044d668fbfbe8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _camera: {fileID: 0}
+  _builder: {fileID: 0}
+  _previousInput: {x: 0, y: 0}
+  _movementSpeed: 5
 --- !u!1 &4516529001057922894
 GameObject:
   m_ObjectHideFlags: 0

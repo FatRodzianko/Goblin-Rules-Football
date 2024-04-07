@@ -596,6 +596,8 @@ x Create "Rule" tiles for each ground type
 - - - - - - maybe have the map maker check if they exist. If they don't, just place them around the tee off location. Player can change where they are if they don't like them
 - - - - - - needs to check that there are two, and only two?
 - - - aim points
+- - - statues
+- - - power ups
 - - - Spinning hoop
 - - - Tubes (not minigolf)
 - - - - - - Map maker needs to check there is a pair for them to be save
@@ -627,3 +629,18 @@ x give player option to use "auto tiles" (the rule tiles) or "manual tiles
 - - x up/down
 - - - left/right
 x Make the "Object" tilemap show the tile icons when the mouse is held down for line/rectangle. Otherwise, set it to be transparent
+- Make "storage" or data tiles to store info like zoom out value and position, camera bounding box, isMinigolf
+- - - basically, go through everything required in the TileMapManager to create and load a new hole. Anything that isn't actually a tile or object on the ground, create a "data tile"
+- - - data tiles stored in the data tilemap. Not visible to the player
+- - - when the game saves a hole, goes through each of the data tiles to save them
+- - - hopefully, if this is ever integrated for the real game, TileMapManager could read each "tile" from the JSON
+- - - - - - check if it is a real tile to place, or object point to save/spawn
+- - - - - - if it is a "data tile", extract the data that was saved for that data tile (zoom out values, points for the camera bounding box, whatever
+- - - - - - - - - will need to update SaveHandler to be able to save more than just tilemap, tile, and position...
+- - - - - - - - - To "TilemapData" in SaveHandler.cs, add a "TileType" variable and a string "ExtraData" or something like that
+- - - - - - - - - - - - The "ExtraData" will be a nested json string that contains different data for different data tiles
+- - - - - - - - - - - - probably add to "TileInfo" or something instead. Wouldn't just be for data tiles then. Could be used for:
+- - - - - - - - - - - - - - - Tubes. Tubes need their "partner" tube they are connected to. This would need to be saved somehow in the "ExtraData" field?
+- - - - - - - - - - - - - - - - - - for this specifically, save the location of the other tube. After everything has been spawned on the "load," check for a tube object at that postion?
+- - - - - - - - - - - - - - - minigolf pipes - same as above, but also save the points along the balls path?? Nightmare to figure out how to let the player do that in an in-game editor...
+- - - - - - - - - - - - - - - going to be awful to integrate this kind of stuff with how TileMapManager works...
