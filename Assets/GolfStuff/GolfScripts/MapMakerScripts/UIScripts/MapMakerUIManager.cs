@@ -37,6 +37,20 @@ public class MapMakerUIManager : MonoBehaviour
     [SerializeField] Button _manualTileButton;
     [SerializeField] Color _tileModeSelectedColor = Color.yellow;
 
+    [Header("Current Tile Map UI")]
+    [SerializeField] TMP_Dropdown _currentTileMapDropDown;
+    Dictionary<string, Tilemap> _tileMapsToSelect = new Dictionary<string, Tilemap>();
+
+
+    #region Setters and Getters
+    Dictionary<string, Tilemap> TileMapsToSelect
+    {
+        get
+        {
+            return _tileMapsToSelect;
+        }
+    }
+    #endregion
     private void Awake()
     {
         _autoTileButton.onClick.AddListener(SelectAutoTileMode);
@@ -46,9 +60,11 @@ public class MapMakerUIManager : MonoBehaviour
     void Start()
     {
         //LoadGroundTileTypesForUI();
+        InitializeCurrentTileDropDown();
         BuildUI();
         //Default to rule tile mode to begin
         SelectAutoTileMode();
+        
     }
 
     // Update is called once per frame
@@ -86,12 +102,13 @@ public class MapMakerUIManager : MonoBehaviour
             inst.transform.SetParent(_groundTileTypeHolder, false);
 
             inst.name = ui.name;
-
+            
             _uiElements[ui] = inst;
             _elementItemSlot[inst] = inst.GetComponent<UITileTypeScript>().ItemHolder;
 
             TextMeshProUGUI text = inst.GetComponentInChildren<TextMeshProUGUI>();
-            text.text = ui.name;
+            //text.text = ui.name;
+            text.text = ui.UIName;
 
             inst.transform.SetSiblingIndex(ui.SiblingIndex);
 
@@ -146,6 +163,7 @@ public class MapMakerUIManager : MonoBehaviour
             {
                 Debug.LogError("MapMakerUIManager: BuildUI: Unknown type of tile base: " + groundTileBase.TileBase.GetType());
             }
+
             
 
             // Apply BuildingObjectBase to Button handler script thing?
@@ -156,6 +174,10 @@ public class MapMakerUIManager : MonoBehaviour
             {
                 _allTileObjectsByTileBase.Add(inst, groundTileBase);
             }
+
+            // Build out the current tilemap UI?
+            AddToCurrentTileMapDropDown(groundTileBase);
+
         }
     }
     MapMakerGroundTileBase[] GetAllGroundTiles()
@@ -199,5 +221,69 @@ public class MapMakerUIManager : MonoBehaviour
         EnableRegularTileObjects(true);
         _autoTileButton.GetComponent<Image>().color = Color.white;
         _manualTileButton.GetComponent<Image>().color = _tileModeSelectedColor;
+    }
+    void InitializeCurrentTileDropDown()
+    {
+        _tileMapsToSelect.Add("All", null);
+        _currentTileMapDropDown.AddOptions(new List<string> { "All" });
+        _currentTileMapDropDown.interactable = false;
+    }
+    void AddToCurrentTileMapDropDown(MapMakerGroundTileBase groundTileBase)
+    {
+        if (groundTileBase == null)
+            return;
+        if (groundTileBase.MapMakerTileType.Tilemap == null)
+        {
+            Debug.Log("AddToCurrentTileMapDropDown: groundTileBase.MapMakerTileType.Tilemap is null for " + groundTileBase.name + ". skipping...");
+            return;
+        }
+            
+        if (groundTileBase.GetType() == typeof(MapMakerTool))
+        {
+            Debug.Log("AddToCurrentTileMapDropDown: ground tile base " + groundTileBase.name + " is a tool. skipping...");
+            return;
+        }
+
+        Tilemap newTileMap = groundTileBase.MapMakerTileType.Tilemap;
+
+        if (_tileMapsToSelect.ContainsKey(newTileMap.name))
+        {
+            Debug.Log("AddToCurrentTileMapDropDown: already added " + newTileMap.name + " skipping...");
+            return;
+        }
+        _tileMapsToSelect.Add(newTileMap.name, newTileMap);
+        _currentTileMapDropDown.AddOptions(new List<string> { newTileMap.name });
+
+    }
+    public void PlayerSelectedTileObject(MapMakerGroundTileBase selectedObject)
+    {
+        if (selectedObject == null)
+            return;
+        if (selectedObject.GetType() == typeof(MapMakerTool))
+        {
+            _currentTileMapDropDown.interactable = true;
+        }
+        else
+        {
+            _currentTileMapDropDown.interactable = false;
+            if (selectedObject.MapMakerTileType.Tilemap == null)
+            {
+                Debug.Log("AddToCurrentTileMapDropDown: selectedObject.MapMakerTileType.Tilemap is null for " + selectedObject.name + ". skipping...");
+                return;
+            }
+            string tilemapName = selectedObject.MapMakerTileType.Tilemap.name;
+            for (int i = 0; i < _currentTileMapDropDown.options.Count; i++)
+            {
+                if (_currentTileMapDropDown.options[i].text == tilemapName)
+                {
+                    _currentTileMapDropDown.value = i;
+                    break;
+                }
+            }
+        }
+    }
+    public Tilemap GetCurrentSelectedTileMap()
+    {
+        return _tileMapsToSelect[_currentTileMapDropDown.options[_currentTileMapDropDown.value].text];
     }
 }

@@ -7,6 +7,7 @@ public class UITileTypes : ScriptableObject
 {
     [SerializeField] int _siblingIndex = 0;
     [SerializeField] Color _backgroundColor;
+    [SerializeField] string _uiName;
 
     public int SiblingIndex 
     {
@@ -18,6 +19,16 @@ public class UITileTypes : ScriptableObject
     {
         get {
             return _backgroundColor;
+        }
+    }
+    public string UIName
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(this._uiName))
+                return this.name;
+            else
+                return _uiName.Replace("\\n", "\n");
         }
     }
 }

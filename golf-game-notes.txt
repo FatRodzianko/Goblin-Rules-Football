@@ -644,3 +644,21 @@ x Make the "Object" tilemap show the tile icons when the mouse is held down for 
 - - - - - - - - - - - - - - - - - - for this specifically, save the location of the other tube. After everything has been spawned on the "load," check for a tube object at that postion?
 - - - - - - - - - - - - - - - minigolf pipes - same as above, but also save the points along the balls path?? Nightmare to figure out how to let the player do that in an in-game editor...
 - - - - - - - - - - - - - - - going to be awful to integrate this kind of stuff with how TileMapManager works...
+- The "current select tilemap" workflow?
+- - - When BuildUI() is receiving all the ground tiles, have it build a list of all tilemaps using "groundTileBase.MapMakerTileType.Tilemap"
+- - - - - - build a dictionary that is the string name of the tilemap, and the tilemap. Send this to MapMakerBuilder
+- - - - - - drop down menu is populated with the tilemap names, and the additional "All" option to be used for tools
+- - - - - - when a new tile object is selected, MapMakerBuilder will check if it is a tool or not. If not, set the current tilemap to the object's tilemap value
+- - - - - - - - - if it is a tool, default to "All" tilemap? which is really just the tool map? or whatever
+- - - - - - - - - if it is a tool, the "Current Tile Map" is interactable, if it isn't a tool, it is not interactable
+- - - - - - - - - will need to update the eraser function so it can accept a Tilemap[] parameter or whatever
+
+
+
+### Integrating custom maps to default ones...
+- Game first loads the "course" from the list of "available course"
+- - - looks up course by its courseId (guid). Then loads the course using addressables
+- - - - - - string addressablePath = _availableCourses.Courses.Find(x => x.id == courseID).id;
+- - - - - - AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>(addressablePath);
+- - - - - - ScriptableCourse course = loadCourse.WaitForCompletion();
+- - - doesn't look like an addressable can be used at runtime. will likely need to do something like set a GameplayManager setting called like "_isCustomMap" and if true, load from json. If not, load from the addressables?

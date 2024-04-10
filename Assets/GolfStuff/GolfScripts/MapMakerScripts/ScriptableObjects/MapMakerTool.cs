@@ -37,7 +37,23 @@ public class MapMakerTool : MapMakerGroundTileBase
         switch (_toolType)
         {
             case ToolType.Eraser:
-                tc.Eraser(positions, out MapMakerHistoryStep historyStepEraser);
+                tc.Eraser(positions, null, out MapMakerHistoryStep historyStepEraser);
+                historyStep = historyStepEraser;
+                break;
+            default:
+                Debug.LogError("MapMakerTool: Tool type was not set.");
+                break;
+        }
+    }
+    public void Use(Vector3Int[] positions, Tilemap tilemap, out MapMakerHistoryStep historyStep)
+    {
+        MapMakerToolController tc = MapMakerToolController.instance;
+        historyStep = null;
+
+        switch (_toolType)
+        {
+            case ToolType.Eraser:
+                tc.Eraser(positions, tilemap, out MapMakerHistoryStep historyStepEraser);
                 historyStep = historyStepEraser;
                 break;
             default:

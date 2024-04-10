@@ -45,9 +45,9 @@ public class MapMakerToolController : MonoBehaviour
 
     //    }
     //}
-    public void Eraser(Vector3Int[] positions, out MapMakerHistoryStep historyStep)
+    public void Eraser(Vector3Int[] positions, Tilemap tilemapToUse, out MapMakerHistoryStep historyStep)
     {
-        Debug.Log("MapMakerToolController: Eraser: delete how many positions? " + positions.Length);
+        Debug.Log("MapMakerToolController: Eraser: delete how many positions? " + positions.Length + " is tileMaptoUse null? " + tilemapToUse);
 
         List<MapMakerHistoryItem> items = new List<MapMakerHistoryItem>();
 
@@ -55,7 +55,17 @@ public class MapMakerToolController : MonoBehaviour
         foreach (Vector3Int position in positions)
         {
             // This is for deleting all maps. Eventually have it so it only deletes from your selected map?
-            List<Tilemap> maps = _tileMapReferenceHolder.AllMaps.FindAll(map => map.HasTile(position));
+            //List<Tilemap> maps = _tileMapReferenceHolder.AllMaps.FindAll(map => map.HasTile(position));
+            List<Tilemap> maps = new List<Tilemap>();
+            if (tilemapToUse == null)
+            {
+                maps.AddRange(_tileMapReferenceHolder.AllMaps.FindAll(map => map.HasTile(position)));
+            }
+            else
+            {
+                maps.Add(tilemapToUse);
+            }   
+
             if (maps.Count > 0)
             {
                 foreach (Tilemap map in maps)

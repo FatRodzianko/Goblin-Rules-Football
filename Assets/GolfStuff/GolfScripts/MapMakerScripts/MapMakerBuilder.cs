@@ -65,7 +65,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     [SerializeField] MapMakerGroundTileBase _eraser;
     [SerializeField] MinimizeMaximizeManager _minMaxManager;
 
-
+    // MapMakerUIManager
+    [SerializeField] MapMakerUIManager _mapMakerUIManager;
 
     protected override void Awake()
     {
@@ -131,6 +132,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         InitTilemaps();
         InitTileReferences();
+        if (_mapMakerUIManager == null)
+        {
+            _mapMakerUIManager = GameObject.FindGameObjectWithTag("MapMakerUIManager").GetComponent<MapMakerUIManager>();
+        }
     }
     void InitTilemaps()
     {
@@ -461,6 +466,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             // Update the preview?
             _previewHandler.UpdateTile(_tilemap, _selectedTileBase);
             UpdatePreview();
+            if (_mapMakerUIManager != null)
+                _mapMakerUIManager.PlayerSelectedTileObject(_selectedObject);
         }
     }
     public void ObjectSelected(MapMakerGroundTileBase obj)
@@ -737,7 +744,12 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             _previewHandler.ResetPreview();
 
             MapMakerTool tool = (MapMakerTool)_selectedObject;
-            tool.Use(positions, out MapMakerHistoryStep historyStep);
+            Tilemap currentSelectedTileMap = null;
+            if (_mapMakerUIManager != null)
+                currentSelectedTileMap = _mapMakerUIManager.GetCurrentSelectedTileMap();
+
+            //tool.Use(positions, out MapMakerHistoryStep historyStep);
+            tool.Use(positions, currentSelectedTileMap, out MapMakerHistoryStep historyStep);
 
             if (historyStep != null)
             {

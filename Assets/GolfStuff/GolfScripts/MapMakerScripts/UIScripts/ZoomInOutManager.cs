@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class ZoomInOutManager : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class ZoomInOutManager : MonoBehaviour
     [SerializeField] float _defaultOrthoSize;
     [SerializeField] float _maxOrthSize = 225f;
     [SerializeField] float _scrollRate = 5f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +38,8 @@ public class ZoomInOutManager : MonoBehaviour
     }
     private void ZoomInOut(InputAction.CallbackContext ctx)
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
         Vector2 scrollInput = (Vector2)ctx.ReadValueAsObject();
         Debug.Log("ZoomInOut: scrollInput: + " + scrollInput.ToString());
 

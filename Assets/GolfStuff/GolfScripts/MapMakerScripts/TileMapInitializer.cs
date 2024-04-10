@@ -11,6 +11,11 @@ public class TileMapInitializer : SingletonInstance<TileMapInitializer>
     private void Start()
     {
         //CreateMaps();
+        //AssignTileMaps();
+    }
+    protected override void Awake()
+    {
+        base.Awake();
         AssignTileMaps();
     }
     void CreateMaps()

@@ -902,6 +902,16 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     string GetGroundMaterial()
     {
+        // REWRITE IDEA LIKELY NEEDED BECAUSE MAP MAKER RULE TILES WILL CREATE OVERLAPPING GROUND MATERIALS
+        // Should create a dictionary of all the ground types with their "ranking" "tier" "whatever" as the key (probably have the string of the terrain type as the key, and the tier as the value to make it easier to lookup?)
+        // loop through each "ground" the ball is on top of. Using the heighest tier ground as the final ground material
+        // so, first ground material in the loop, set the current "tier". Let's say it's Green, the lowest at 0
+        // If it finds another ground material, check if the tier is greater than the current tier. If it is, save that tier
+        // so if the next tier was fairway at tier 1, that's higher than tier 0, so save that
+        // water will be highest, followed by sand, then rough, fairway, green?
+        // after the loop finishes, lookup the highest tier that was saved, and set that ground material as the ground material
+        // if the tier was never set or stayed its initial value (-1?) then default to deep rough. This should only happen if there were no other materials beneath the ball and it was just on the "background"
+
         string material = "";
 
         //RaycastHit2D[] ground = Physics2D.CircleCastAll(this.transform.position, this.GetComponent<CircleCollider2D>().radius / 2, Vector2.zero, 0f, groundMask);
