@@ -17,6 +17,8 @@ public class SaveHandler : MonoBehaviour
     //[SerializeField] List<Tilemap> _allMaps = new List<Tilemap>();
     [SerializeField] TileMapReferenceHolder _tileMapReferenceHolder;
     [SerializeField] MapMakerBuilder _mapMakerBuilder;
+    // MapMakerUIManager
+    [SerializeField] MapMakerUIManager _mapMakerUIManager;
 
     private void Start()
     {
@@ -27,6 +29,10 @@ public class SaveHandler : MonoBehaviour
             _tileMapReferenceHolder = this.transform.GetComponent<TileMapReferenceHolder>();
         if (!_mapMakerBuilder)
             _mapMakerBuilder = MapMakerBuilder.GetInstance();
+        if (_mapMakerUIManager == null)
+        {
+            _mapMakerUIManager = GameObject.FindGameObjectWithTag("MapMakerUIManager").GetComponent<MapMakerUIManager>();
+        }
     }
     //void InitTilemaps()
     //{
@@ -177,4 +183,12 @@ public class TileInfo
         position = pos;
         GuidForTile = guid;
     }
+}
+[Serializable]
+public class CourseData
+{
+    public string CourseId;
+    public string CourseName;
+    public List<string> HolesInCourseFileNames;
+    public bool IsMiniGolf;
 }

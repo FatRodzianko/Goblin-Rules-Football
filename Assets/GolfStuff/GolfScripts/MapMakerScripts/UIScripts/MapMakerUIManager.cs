@@ -4,9 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Tilemaps;
+using System;
+using System.Linq;
 
 public class MapMakerUIManager : MonoBehaviour
 {
+    [SerializeField] MapMakerBuilder _mapMakerBuilder;
     [Header("Scriptables")]
     [SerializeField] List<MapMakerGroundTileBase> _green;
     [SerializeField] List<MapMakerGroundTileBase> _fairway;
@@ -41,6 +44,16 @@ public class MapMakerUIManager : MonoBehaviour
     [SerializeField] TMP_Dropdown _currentTileMapDropDown;
     Dictionary<string, Tilemap> _tileMapsToSelect = new Dictionary<string, Tilemap>();
 
+    [Header("Current Course UI")]
+    [SerializeField] TMP_Dropdown _currentCourseDropDown;
+    [SerializeField] Button _createNewCourseButton;
+    [SerializeField] List<CourseData> _allCustomCourses = new List<CourseData>();
+
+    [Header("Create New Course UI")]
+    [SerializeField] GameObject _createNewCoursePanel;
+    [SerializeField] TMP_InputField _nameOfCourseTextInput;
+    [SerializeField] Toggle _isMiniGolfToggle;
+
 
     #region Setters and Getters
     Dictionary<string, Tilemap> TileMapsToSelect
@@ -59,12 +72,15 @@ public class MapMakerUIManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (!_mapMakerBuilder)
+            _mapMakerBuilder = MapMakerBuilder.GetInstance();
         //LoadGroundTileTypesForUI();
         InitializeCurrentTileDropDown();
         BuildUI();
         //Default to rule tile mode to begin
         SelectAutoTileMode();
-        
+        GetAllCustomCourse();
+
     }
 
     // Update is called once per frame
@@ -285,5 +301,124 @@ public class MapMakerUIManager : MonoBehaviour
     public Tilemap GetCurrentSelectedTileMap()
     {
         return _tileMapsToSelect[_currentTileMapDropDown.options[_currentTileMapDropDown.value].text];
+    }
+    void GetAllCustomCourse()
+    {
+        List<string> courses = FileHandler.FindAllCustomCourses();
+        Debug.Log("GetAllCustomCourse: " + courses.Count.ToString() + " course found in " + Application.persistentDataPath.ToString());
+        InitializeCurrentCourseDropDown(courses);
+    }
+    void InitializeCurrentCourseDropDown(List<string> filePathsForCourses)
+    {
+        _currentCourseDropDown.AddOptions(new List<string> { "Create New Course" });
+        if (filePathsForCourses.Count > 0)
+        {
+            List<string> courseNames = new List<string>();
+            foreach (string filepath in filePathsForCourses)
+            {
+                Debug.Log("InitializeCurrentCourseDropDown: course found at: " + filepath);
+                try
+                {
+                    CourseData courseToLoad = FileHandler.ReadFromJSON<CourseData>(filepath, false);
+                    courseNames.Add(courseToLoad.CourseName);
+                    if (courseToLoad != null)
+                    {
+                        _allCustomCourses.Add(courseToLoad);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("InitializeCurrentCourseDropDown: could not read file at: " + filepath + ". Error: " + e);
+                }
+            }
+
+            if (courseNames.Count > 0)
+            {
+                _currentCourseDropDown.AddOptions(courseNames);
+            }
+        }
+    }
+    //public void CreateNewCourse()
+    //{
+    //    Debug.Log("CreateNewCourse: ");
+    //    CourseData newCourse = new CourseData();
+    //    newCourse.CourseId = "123";
+    //    newCourse.CourseName = "New Course";
+    //    newCourse.HolesInCourseFileNames = new List<string>();
+    //    newCourse.IsMiniGolf = false;
+
+    //    FileHandler.SaveToJSON<CourseData>(newCourse, "course_" + newCourse.CourseName + "_" + newCourse.CourseId + ".json");
+    //}
+    public void CreateNewCourseButtonPressed()
+    {
+        Debug.Log("CreateNewCourseButtonPressed: ");
+        _createNewCoursePanel.SetActive(true);
+        _createNewCourseButton.gameObject.SetActive(false);
+        _mapMakerBuilder.PlayerInput.Disable();
+    }
+    public void CreateNewCourse()
+    {
+        Debug.Log("CreateNewCourse: ");
+        string newCourseName = _nameOfCourseTextInput.text;
+        if (string.IsNullOrEmpty(newCourseName))
+            return;
+
+        if (_allCustomCourses.Any(x => x.CourseName == newCourseName))
+        {
+            Debug.Log("CreateNewCourse: Custom course already has same name as: " + newCourseName);
+            // have an error displayed to the user that they already have a course with the same name. Right now just fails silently
+            // Later, when users are able to download custom maps from a host, check if they have a course with the same name as the host. If yes, check the guid and maybe a hash of the course, see if the player's matches. If not, tell the player they don't match and give option to download?
+            return;
+        }
+
+
+        bool isMiniGolf = _isMiniGolfToggle.isOn;
+
+        CourseData newCourse = new CourseData();
+        newCourse.CourseName = newCourseName;
+        newCourse.IsMiniGolf = isMiniGolf;
+        newCourse.CourseId = Guid.NewGuid().ToString();
+        newCourse.HolesInCourseFileNames = new List<string>(); // setting as an empty string when creating a new course. Will add to this as new holes are created?
+
+        string filename = "course_" + newCourse.CourseName.Replace(" ", string.Empty) + "_" + newCourse.CourseId + ".json";
+        Debug.Log("CreateNewCourse: Creating a new course with name: " + newCourseName + " and is minigolf?: " + isMiniGolf + " with a filename of: " + filename);
+        FileHandler.SaveToJSON<CourseData>(newCourse, filename);
+
+        _createNewCoursePanel.SetActive(false);
+        _createNewCourseButton.gameObject.SetActive(false);
+        _mapMakerBuilder.PlayerInput.Enable();
+
+        AddCourseToAvailableCustomCourses(newCourse);
+    }
+    public void AddCourseToAvailableCustomCourses(CourseData newCourse)
+    {
+        if (newCourse == null)
+            return;
+
+        if (_allCustomCourses.Contains(newCourse))
+            return;
+        _allCustomCourses.Add(newCourse);
+        _currentCourseDropDown.AddOptions(new List<string> { newCourse.CourseName });
+        _currentCourseDropDown.value = _currentCourseDropDown.options.Count - 1;
+    }
+    public void CancelCreateNewCourse()
+    {
+        Debug.Log("CancelCreateNewCourse: ");
+        _createNewCoursePanel.SetActive(false);
+        _createNewCourseButton.gameObject.SetActive(true);
+        _mapMakerBuilder.PlayerInput.Enable();
+    }
+    public void CurrentCourseDropDownValueChanged(int index)
+    {
+        Debug.Log("CurrentCourseDropDownValueChanged " + index.ToString());
+
+        if (index == 0)
+        {
+            _createNewCourseButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            _createNewCourseButton.gameObject.SetActive(false);
+        }
     }
 }

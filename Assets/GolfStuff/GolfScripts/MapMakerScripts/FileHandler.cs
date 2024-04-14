@@ -36,9 +36,13 @@ public static class FileHandler
 
     }
 
-    public static T ReadFromJSON<T>(string filename)
+    public static T ReadFromJSON<T>(string filename, bool getPath = true)
     {
-        string content = ReadFile(GetPath(filename));
+        string content = "";
+        if (getPath)
+            content = ReadFile(GetPath(filename));
+        else
+            content = ReadFile(filename);
 
         if (string.IsNullOrEmpty(content) || content == "{}")
         {
@@ -77,6 +81,11 @@ public static class FileHandler
             }
         }
         return "";
+    }
+    public static List<string> FindAllCustomCourses()
+    {
+        string[] customCourses = Directory.GetFiles(Application.persistentDataPath, "course_*");
+        return customCourses.ToList();
     }
 }
 

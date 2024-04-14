@@ -559,15 +559,15 @@ https://www.youtube.com/playlist?list=PLJBcv4t1EiSz-wA35-dWpcI98pNiyK6an
 - - - - - - - - - have a field in ScriptableHole that is marked as "finalized" or something. Player can only "play" a hole if it is finalized
 - - - - - - - - - - - - when TileScreenManager or whatever is presenting user with list of available holes, skip ones that are not marked as final
 - For tilemap erasing:
-- - - I want it so you only erase from the tilemap you have selected from dropdown OR you can erase from all tilemaps
-- - - Track what tilemap the user is currently using. When the user selects a green tile for example, automatically set the "current tilemap" to be Green
-- - - - - - when using a tool like the eraser, the user can select which one they want to erase from
+- - x I want it so you only erase from the tilemap you have selected from dropdown OR you can erase from all tilemaps
+- - x Track what tilemap the user is currently using. When the user selects a green tile for example, automatically set the "current tilemap" to be Green
+- - - - - x when using a tool like the eraser, the user can select which one they want to erase from
 x Ability to set the "drawing type"
 - - x single, line, rectangle, fill (later?)
 - - x should effect the eraser as well
 - Obstacles
 - - x create map maker obstacle scriptable object that inherits from MapMakerGroundTileBase
-- - - - - - new scriptable has reference to the ScriptableObstacle
+- - - - - x new scriptable has reference to the ScriptableObstacle
 x Drawing "Modes"
 - - x instead of the individual tile MapMakerGroundTileBase's being single/line/rectangle/whatever, player first selects a drawing mode, then selects the tile to place
 - - - - - - this is how the tilemap editor in unity editor works. Also how paint and whatever else works
@@ -644,15 +644,34 @@ x Make the "Object" tilemap show the tile icons when the mouse is held down for 
 - - - - - - - - - - - - - - - - - - for this specifically, save the location of the other tube. After everything has been spawned on the "load," check for a tube object at that postion?
 - - - - - - - - - - - - - - - minigolf pipes - same as above, but also save the points along the balls path?? Nightmare to figure out how to let the player do that in an in-game editor...
 - - - - - - - - - - - - - - - going to be awful to integrate this kind of stuff with how TileMapManager works...
-- The "current select tilemap" workflow?
-- - - When BuildUI() is receiving all the ground tiles, have it build a list of all tilemaps using "groundTileBase.MapMakerTileType.Tilemap"
-- - - - - - build a dictionary that is the string name of the tilemap, and the tilemap. Send this to MapMakerBuilder
-- - - - - - drop down menu is populated with the tilemap names, and the additional "All" option to be used for tools
-- - - - - - when a new tile object is selected, MapMakerBuilder will check if it is a tool or not. If not, set the current tilemap to the object's tilemap value
-- - - - - - - - - if it is a tool, default to "All" tilemap? which is really just the tool map? or whatever
-- - - - - - - - - if it is a tool, the "Current Tile Map" is interactable, if it isn't a tool, it is not interactable
-- - - - - - - - - will need to update the eraser function so it can accept a Tilemap[] parameter or whatever
-
+x The "current select tilemap" workflow?
+- - x When BuildUI() is receiving all the ground tiles, have it build a list of all tilemaps using "groundTileBase.MapMakerTileType.Tilemap"
+- - - - - x build a dictionary that is the string name of the tilemap, and the tilemap. Send this to MapMakerBuilder
+- - - - - x drop down menu is populated with the tilemap names, and the additional "All" option to be used for tools
+- - - - - x when a new tile object is selected, MapMakerBuilder will check if it is a tool or not. If not, set the current tilemap to the object's tilemap value
+- - - - - - - - x if it is a tool, default to "All" tilemap? which is really just the tool map? or whatever
+- - - - - - - - - - x right now just have it keep the current selection. Seems to make more sense. Player draws a green tile. Selects eraser intending to remove a green tile. No need to force them to switch back right away?
+- - - - - - - - x if it is a tool, the "Current Tile Map" is interactable, if it isn't a tool, it is not interactable
+- - - - - - - - x will need to update the eraser function so it can accept a Tilemap[] parameter or whatever
+- Creating a new course or selecting old one
+- - - Drop down with a list of all the available courses to modify
+- - - - - x search through Application.persistentDataPath folder for any files that begin with "course_"
+- - - - - x load them from json, get the CourseName value, popluate dropdown with that
+- - - For creating a new one, button to create new course?
+- - - - - x last drop (or first) drop down option is "Create New Course"
+- - - - - - when "Create New Course" is selected, there is a "create new course" button where the "Select Hole" dropdown would be?
+- - - - - x player is prompted for a course name, then can save
+- - - - - - when the course is first created and saved, an "id" value is created - generate GUID? Reuse the "ScriptableObjectIdAttribute" thing in ScriptableCourse.cs?
+- - - - - - - - x when the course is saved to a json, its filename should be "course_<course name>_<guid>"
+- Creating new holes
+- - - When a course is selected/created, dropdown for "Select Hole" appears
+- - - Drop down is populated by pulling data from the "HolesInCourse" value of the saved course
+- - - - - - should be an array/list (whichever ends up being easier) of strings that are the file name of each hole
+- - - - - - - - - hole names should be something like "hole_<course name>_<hole number>"
+- When selecting an exisiting course from the drop down:
+- - - make sure to update a "CurrentSelectedCourse" value somewhere (in MapMakerBuilder???)
+- - - if there are any tiles or anything, clear them. This is to try and prevent user from working on a course, then changing to a different course, and accidentally overwriting a hole?
+- - - - - - or just deactivate the "save hole" button. Only the "load hole" button will be available if the user selects a hole from the new course to load?
 
 
 ### Integrating custom maps to default ones...
