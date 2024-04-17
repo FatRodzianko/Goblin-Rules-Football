@@ -695,6 +695,7 @@ x When a hole is loaded, clear the MapMakerHistory, disable the "save hole butto
 - - - - - - - - x after the x/y min/max values are determined, add some "padding" of a few cells (10, 5?) save those values as the "polygon points"
 - - - - - - - - - - - x would be saving: (xMin, yMax) , (xMin, yMin), (xMax, yMax), (xMax, yMax);
 - - - - - - - - x the above process appears to be working?
+- - - - - - - - - Will need to check if the selected course is minigolf or not. If it is, increase the padding from 10 to 25 or something?
 - - - Zoom out position
 - - - - - - try and automatically find the center of the tilemaps? If able to automatically get tilemap bounds, use Bounds.center?
 - - - Zoom value
