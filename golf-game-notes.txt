@@ -653,26 +653,65 @@ x The "current select tilemap" workflow?
 - - - - - - - - - - x right now just have it keep the current selection. Seems to make more sense. Player draws a green tile. Selects eraser intending to remove a green tile. No need to force them to switch back right away?
 - - - - - - - - x if it is a tool, the "Current Tile Map" is interactable, if it isn't a tool, it is not interactable
 - - - - - - - - x will need to update the eraser function so it can accept a Tilemap[] parameter or whatever
-- Creating a new course or selecting old one
+x Creating a new course or selecting old one
 - - - Drop down with a list of all the available courses to modify
 - - - - - x search through Application.persistentDataPath folder for any files that begin with "course_"
 - - - - - x load them from json, get the CourseName value, popluate dropdown with that
 - - - For creating a new one, button to create new course?
 - - - - - x last drop (or first) drop down option is "Create New Course"
-- - - - - - when "Create New Course" is selected, there is a "create new course" button where the "Select Hole" dropdown would be?
+- - - - - x when "Create New Course" is selected, there is a "create new course" button where the "Select Hole" dropdown would be?
 - - - - - x player is prompted for a course name, then can save
-- - - - - - when the course is first created and saved, an "id" value is created - generate GUID? Reuse the "ScriptableObjectIdAttribute" thing in ScriptableCourse.cs?
+- - - - - x when the course is first created and saved, an "id" value is created - generate GUID? Reuse the "ScriptableObjectIdAttribute" thing in ScriptableCourse.cs?
 - - - - - - - - x when the course is saved to a json, its filename should be "course_<course name>_<guid>"
-- Creating new holes
-- - - When a course is selected/created, dropdown for "Select Hole" appears
-- - - Drop down is populated by pulling data from the "HolesInCourse" value of the saved course
+x Creating new holes
+- - x When a course is selected/created, dropdown for "Select Hole" appears
+- - x Drop down is populated by pulling data from the "HolesInCourse" value of the saved course
 - - - - - - should be an array/list (whichever ends up being easier) of strings that are the file name of each hole
 - - - - - - - - - hole names should be something like "hole_<course name>_<hole number>"
+- - - - - x it is just a list of TilemapData that is saved to the json for now. Seems to make the most sense?
 - When selecting an exisiting course from the drop down:
-- - - make sure to update a "CurrentSelectedCourse" value somewhere (in MapMakerBuilder???)
-- - - if there are any tiles or anything, clear them. This is to try and prevent user from working on a course, then changing to a different course, and accidentally overwriting a hole?
+- - x make sure to update a "CurrentSelectedCourse" value somewhere (in MapMakerBuilder???)
+- - - - - x it is in MapMakerUIManager for now...
+- - x if there are any tiles or anything, clear them. This is to try and prevent user from working on a course, then changing to a different course, and accidentally overwriting a hole?
 - - - - - - or just deactivate the "save hole" button. Only the "load hole" button will be available if the user selects a hole from the new course to load?
-- When a hole is loaded, clear the MapMakerHistory, disable the "save hole button." When something is added to the history, enable the save hole button?
+x When a hole is loaded, clear the MapMakerHistory, disable the "save hole button." When something is added to the history, enable the save hole button?
+- How to prevent a player from editing a custom map they downloaded from another player:
+- - - save hash of player's steamID, or a hash of their computer's name (or mac address or something). When loading "all available custom courses," calculate hashes for local player against the saved hash(es). Only load the courses that match the player's own hashes
+
+
+
+- Data still missing from HoleData that TilemapManager will need to load a file:
+- - - tee off location
+- - - - - - do with a tile placement?
+- - - Tee marker positions (the blue ball things)
+- - - - - - do with a tile placement
+- - - Camera bounding box Position:
+- - - - - - Should just be Vector3.zero for everything based on my saved courses?
+- - x Polygon Points for camera bounding box
+- - - - - - Do with tile placement? Require at least four to be set by player?
+- - - - - x maybe see if this can be down automatically? Get the "bounds" for each tilemap. save max/min X and Y values for each tilemap, save the most extreme values for each to set the out of bounds?
+- - - - - - - - x not sure if this can be done? Maybe do a tilemap.CompressBounds first, then save bounds?
+- - - - - - - - x compress each tilemap. Save the xMin/Max and yMin/Max. In the next tilemap, see if the min/max values are larger, if so, save those
+- - - - - - - - x after the x/y min/max values are determined, add some "padding" of a few cells (10, 5?) save those values as the "polygon points"
+- - - - - - - - - - - x would be saving: (xMin, yMax) , (xMin, yMin), (xMax, yMax), (xMax, yMax);
+- - - - - - - - x the above process appears to be working?
+- - - Zoom out position
+- - - - - - try and automatically find the center of the tilemaps? If able to automatically get tilemap bounds, use Bounds.center?
+- - - Zoom value
+- - - - - - Maybe display "zoom value" while player is zooming out. Then have button to "Save Zoom Value" that will save it to the hole data?
+- - - Tee off aim point
+- - - - - - tile placement?
+- - - Course aim points
+- - - - - - Tile placement? Unsure yet how to let the player set the "order" of the course aim points for numbering them yet though
+- - - - - - - - - maybe just have a 1/2/3/4/5 tile that can be placed?
+- - - Statues/Statue positions
+- - - - - - placed with tile as an obstacle. When saving, or maybe when loading the hole, check if obstacle is of type "statue" to build out the "Statues" value for the Scriptable hole?
+- - - Power Up Balloons
+- - - - - - Tile placement. Likely won't be able to have the player control height, but whatever
+- - - Tubes
+- - - - - - will probably not include this in map maker unless I can figure out a good way to let the player set pairs of tubes?
+- - - Minigolf pipes
+- - - - - - same as tubes, likely won't include unless able to let player set pais
 
 
 ### Integrating custom maps to default ones...

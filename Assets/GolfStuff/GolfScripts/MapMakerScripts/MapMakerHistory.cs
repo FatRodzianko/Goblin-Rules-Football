@@ -82,6 +82,12 @@ public class MapMakerHistory : SingletonInstance<MapMakerHistory>
         }
         SetUndoRedoBools();
     }
+    public void ClearHistoryForNewHole()
+    {
+        _history.Clear();
+        _currentIndex = -1;
+        SetUndoRedoBools();
+    }
     void SetUndoRedoBools()
     {
         CanUndoChanged(this.CanUndo);

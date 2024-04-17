@@ -11,6 +11,8 @@ public class MapMakerUIManager : MonoBehaviour
 {
     [SerializeField] MapMakerBuilder _mapMakerBuilder;
     [SerializeField] SaveHandler _saveHandler;
+    MapMakerHistory _mapMakerHistory;
+
     [Header("Scriptables")]
     [SerializeField] List<MapMakerGroundTileBase> _green;
     [SerializeField] List<MapMakerGroundTileBase> _fairway;
@@ -47,8 +49,7 @@ public class MapMakerUIManager : MonoBehaviour
 
     [Header("Current Course UI")]
     [SerializeField] TMP_Dropdown _currentCourseDropDown;
-    [SerializeField] Button _createNewCourseButton;
-    
+    [SerializeField] Button _createNewCourseButton;    
 
     [Header("Create New Course UI")]
     [SerializeField] GameObject _createNewCoursePanel;
@@ -72,6 +73,14 @@ public class MapMakerUIManager : MonoBehaviour
     public delegate void NewHoleSelected(int holeNumber);
     public event NewHoleSelected NewHoleSelectedChanged;
 
+    [Header("Create/Edit Hole UI")]
+    [SerializeField] GameObject _createNewHolePanel;
+    [SerializeField] TextMeshProUGUI _createNewHoleText;
+    [SerializeField] TMP_InputField _newHoleParTextInput;    
+    [SerializeField] Button _saveNewHoleDetailsButton;
+    [SerializeField] Button _cancelNewHoleDetailsButton;
+
+
     [Header("Save/Load Hole UI")]
     [SerializeField] Button _saveHoleButton;
     [SerializeField] Button _loadHoleButton;
@@ -90,6 +99,12 @@ public class MapMakerUIManager : MonoBehaviour
     {
         _autoTileButton.onClick.AddListener(SelectAutoTileMode);
         _manualTileButton.onClick.AddListener(SelectManualTileMode);
+        _mapMakerHistory = MapMakerHistory.GetInstance();
+        _mapMakerHistory.CanUndoChanged += EnableSaveHoleButton;
+
+        // set select course and hole to null to start?
+        _selectedCourse = null;
+        _selectedHole = null;
     }
     // Start is called before the first frame update
     void Start()
@@ -114,6 +129,7 @@ public class MapMakerUIManager : MonoBehaviour
     {
         NewCourseSelectedChanged -= NewCourseSelectedChangedFunction;
         NewHoleSelectedChanged -= NewHoleSelectedChangedFunction;
+        _mapMakerHistory.CanUndoChanged -= EnableSaveHoleButton;
     }
 
     // Update is called once per frame
@@ -512,7 +528,7 @@ public class MapMakerUIManager : MonoBehaviour
     }
     public void CurrentHoleDropDownValueChanged(int index)
     {
-        Debug.Log("CurrentHoleDropDownValueChanged " + index.ToString());
+        Debug.Log("CurrentHoleDropDownValueChanged: " + index.ToString());
         NewHoleSelectedChanged(index);
     }
     public void CreateNewHoleButtonPressed()
@@ -530,10 +546,70 @@ public class MapMakerUIManager : MonoBehaviour
         //newhole.IsMiniGolf = _selectedCourse.IsMiniGolf;
         //_saveHandler.ClearAllTilesForNewHole();
         //newhole.HoleTileMapData = _saveHandler.GetAllTileMapData();
+
+        // OLD
+        //_saveHandler.ClearAllTilesForNewHole();
+        //HoleData newhole = _saveHandler.CreateNewHole(_selectedCourse.CourseName, _selectedCourse.IsMiniGolf, 3, _selectedCourse.HolesInCourse.Count() + 1);
+        //_selectedCourse.HolesInCourse.Add(newhole);
+        //_saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
+
+        //// this should be added to a different function similar to how Create New Course flow of CreateNewCourseButtonPressed > CreateNewCourse. Player will be prompted to enter in Hole details, which they could cancel
+        //_currentHoleDropDown.AddOptions(new List<string> { newhole.HoleIndex.ToString() });
+        //CurrentHoleDropDownValueChanged(_selectedCourse.HolesInCourse.Count());
+        //_currentHoleDropDown.value = _currentHoleDropDown.options.Count - 1;
+        // OLD
+
+        _createNewHolePanel.SetActive(true);
+        _createNewHoleButton.gameObject.SetActive(false);
+        // making the drop downs not interactable to avoid player changing current course or current hole while creating a new hole?
+        _currentCourseDropDown.interactable = false;
+        _currentHoleDropDown.interactable = false;
+        _mapMakerBuilder.PlayerInput.Disable();
+    }
+    public void CreateNewHole()
+    {
+        Debug.Log("CreateNewHole: ");
+
+        if (string.IsNullOrEmpty(_newHoleParTextInput.text))
+            return;
+
+        if (_selectedCourse == null)
+            return;
+
+        int par = 0;
+        int.TryParse(_newHoleParTextInput.text, out par);
+        if (par <= 0)
+            return;
+
+
+        // create a new empty hole and save to the course
         _saveHandler.ClearAllTilesForNewHole();
-        HoleData newhole = _saveHandler.CreateNewHole(_selectedCourse.CourseName, _selectedCourse.IsMiniGolf, 3, _selectedCourse.HolesInCourse.Count() + 1);
+        HoleData newhole = _saveHandler.CreateNewHole(_selectedCourse.CourseName, _selectedCourse.IsMiniGolf, par, _selectedCourse.HolesInCourse.Count() + 1);
         _selectedCourse.HolesInCourse.Add(newhole);
         _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
+
+        // add hole to the drop down menu and select the hole
+        _currentHoleDropDown.AddOptions(new List<string> { newhole.HoleIndex.ToString() });
+        CurrentHoleDropDownValueChanged(_selectedCourse.HolesInCourse.Count());
+        _currentHoleDropDown.value = _currentHoleDropDown.options.Count - 1;
+
+        // updating UI again
+        _currentCourseDropDown.interactable = true;
+        _currentHoleDropDown.interactable = true;
+        _createNewHolePanel.SetActive(false);
+        _createNewHoleButton.gameObject.SetActive(false);
+        _mapMakerBuilder.PlayerInput.Enable();
+
+    }
+    public void CancelCreateNewHole()
+    {
+        Debug.Log("CancelCreateNewHole: ");
+
+        _createNewHoleButton.gameObject.SetActive(true);
+        _createNewHolePanel.SetActive(false);
+        _currentCourseDropDown.interactable = true;
+        _currentHoleDropDown.interactable = true;
+        _mapMakerBuilder.PlayerInput.Enable();
     }
     void NewHoleSelectedChangedFunction(int holeNumber)
     {
@@ -558,5 +634,39 @@ public class MapMakerUIManager : MonoBehaviour
             _saveHoleButton.gameObject.SetActive(false);
             _loadHoleButton.gameObject.SetActive(true);
         }
+    }
+    void EnableSaveHoleButton(bool enable)
+    {
+        Debug.Log("EnableSaveHoleButton: " + enable);
+        if (_selectedCourse == null || _selectedHole == null || _selectedHoleNumber <= 0)
+        {
+            _saveHoleButton.gameObject.SetActive(false);
+            return;
+        }
+        _saveHoleButton.gameObject.SetActive(enable);
+    }
+    public void SaveHole()
+    {
+        if (_selectedCourse == null)
+            return;
+        if (_selectedHole == null)
+            return;
+
+        Debug.Log("SaveHole: Course: " + _selectedCourse.CourseName + " hole #: " + _selectedHole.HoleIndex);
+        _selectedHole.HoleTileMapData = _saveHandler.GetAllTileMapData();
+        _selectedHole.PolygonPoints = _saveHandler.GetBoundsOfAllTileMaps().ToArray();
+        _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
+    }
+    public void LoadHole()
+    {
+        if (_selectedCourse == null)
+            return;
+        if (_selectedHole == null)
+            return;
+
+        Debug.Log("LoadHole: Course: " + _selectedCourse.CourseName + " hole #: " + _selectedHole.HoleIndex);
+
+        _mapMakerHistory.ClearHistoryForNewHole();
+        _saveHandler.LoadTileMapData(_selectedHole.HoleTileMapData);
     }
 }

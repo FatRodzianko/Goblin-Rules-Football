@@ -192,6 +192,7 @@ public class SaveHandler : MonoBehaviour
         foreach (Tilemap map in _tileMapReferenceHolder.AllMaps)
         {
             map.ClearAllTiles();
+            _mapMakerBuilder.ClearAllObstacles();
         }
     }
     public HoleData CreateNewHole(string courseName, bool isMiniGolf, int holePar, int holeIndex)
@@ -217,6 +218,9 @@ public class SaveHandler : MonoBehaviour
             mapData.key = mapObj.Key;
 
             BoundsInt boundsForThisMap = mapObj.Value.cellBounds;
+            //mapObj.Value.CompressBounds();
+            //BoundsInt compressed = mapObj.Value.cellBounds;
+            //Debug.Log("GetAllTileMapData: " + mapObj.Key.ToString() + ": Bounds before compression: xMin: " + boundsForThisMap.xMin + " xMax: " + boundsForThisMap.xMax + "yMin: " + boundsForThisMap.yMin + " yMax: " + boundsForThisMap.yMax + " bounds after compression: xMin: " + compressed.xMin + " xMax: " + compressed.xMax + "yMin: " + compressed.yMin + " yMax: " + compressed.yMax);
 
             for (int x = boundsForThisMap.xMin; x < boundsForThisMap.xMax; x++)
             {
@@ -247,54 +251,57 @@ public class SaveHandler : MonoBehaviour
         // save the tilemaps to a file
         return data;
     }
-    //
-    // OLD FROM TUTORIAL
-    //
-    public void SaveHole(string fileName)
+    public List<Vector2> GetBoundsOfAllTileMaps()
     {
-        List<TilemapData> data = new List<TilemapData>();
+        List<Vector2> newBounds = new List<Vector2>();
 
-        // foreach existing tilemap
+        Dictionary<string, Tilemap> tileMaps = _mapMakerBuilder.GetTileMapNameToTileMapMapping();
+
+        int xMin = 10000;
+        int xMax = -10000;
+        int yMin = 10000;
+        int yMax = -10000;
+
+        Vector3Int emptySize = new Vector3Int(0, 0, 1);
+
         foreach (var mapObj in _mapMakerBuilder.GetTileMapNameToTileMapMapping())
         {
-            TilemapData mapData = new TilemapData();
-            mapData.key = mapObj.Key;
-
+            mapObj.Value.CompressBounds();
             BoundsInt boundsForThisMap = mapObj.Value.cellBounds;
+            Debug.Log("GetBoundsOfAllTileMaps: " + mapObj.Key.ToString() + ": tilemap size: " + boundsForThisMap.size.ToString() + " xMin: " + boundsForThisMap.xMin + " xMax: " + boundsForThisMap.xMax + "yMin: " + boundsForThisMap.yMin + " yMax: " + boundsForThisMap.yMax);
 
-            for (int x = boundsForThisMap.xMin; x < boundsForThisMap.xMax; x++)
+            if (boundsForThisMap.size == emptySize)
             {
-                for (int y = boundsForThisMap.yMin; y < boundsForThisMap.yMax; y++)
-                {
-                    Vector3Int pos = new Vector3Int(x, y, 0);
-                    TileBase tile = mapObj.Value.GetTile(pos);
-
-                    //if (tile != null && _tileBaseToMapMakerObject.ContainsKey(tile))
-                    //{
-                    //    string guid = _tileBaseToMapMakerObject[tile].Guid;
-                    //    TileInfo ti = new TileInfo(pos, guid);
-                    //    mapData.tiles.Add(ti);
-                    //}
-
-                    MapMakerGroundTileBase mapMakerGroundTileBase = _mapMakerBuilder.GetMapMakerGroundTileBaseFromTileBase(tile);
-                    if (tile != null && mapMakerGroundTileBase != null)
-                    {
-                        string guid = mapMakerGroundTileBase.Guid;
-                        TileInfo ti = new TileInfo(pos, guid);
-                        mapData.tiles.Add(ti);
-                    }
-                }
+                Debug.Log("GetBoundsOfAllTileMaps: tile map is empty?");
+                continue;
             }
-            data.Add(mapData);
+
+            if (boundsForThisMap.xMin < xMin)
+                xMin = boundsForThisMap.xMin;
+            if(boundsForThisMap.xMax > xMax)
+                xMax = boundsForThisMap.xMax;
+            if (boundsForThisMap.yMin < yMin)
+                yMin = boundsForThisMap.yMin;
+            if (boundsForThisMap.yMax > yMax)
+                yMax = boundsForThisMap.yMax;
         }
 
-        // save the tilemaps to a file
-        FileHandler.SaveToJSONFile<TilemapData>(data, fileName);
-    }
-    public void LoadHole(string fileName)
-    {
-        List<TilemapData> data = FileHandler.ReadListFromJSON<TilemapData>(fileName);
+        // add padding?
+        xMin -= 10;
+        xMax += 10;
+        yMin -= 10;
+        yMax += 10;
 
+        newBounds.Add(new Vector2(xMin, yMax));
+        newBounds.Add(new Vector2(xMin, yMin));        
+        newBounds.Add(new Vector2(xMax, yMin));
+        newBounds.Add(new Vector2(xMax, yMax));
+
+
+        return newBounds;
+    }
+    public void LoadTileMapData(List<TilemapData> data)
+    {
         foreach (var mapData in data)
         {
             //if (!_tileMaps.ContainsKey(mapData.key))
@@ -338,7 +345,7 @@ public class SaveHandler : MonoBehaviour
                                 _mapMakerBuilder.PlaceObstacle(tile.position, (MapMakerObstacle)groundTileBase);
                             }
                         }
-                        
+
                     }
                 }
 
@@ -390,4 +397,5 @@ public class HoleData
     public string CourseName;
     public List<TilemapData> HoleTileMapData = new List<TilemapData>();
     public bool IsMiniGolf;
+    public Vector2[] PolygonPoints;
 }
