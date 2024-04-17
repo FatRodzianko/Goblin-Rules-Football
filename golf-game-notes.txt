@@ -672,6 +672,7 @@ x The "current select tilemap" workflow?
 - - - make sure to update a "CurrentSelectedCourse" value somewhere (in MapMakerBuilder???)
 - - - if there are any tiles or anything, clear them. This is to try and prevent user from working on a course, then changing to a different course, and accidentally overwriting a hole?
 - - - - - - or just deactivate the "save hole" button. Only the "load hole" button will be available if the user selects a hole from the new course to load?
+- When a hole is loaded, clear the MapMakerHistory, disable the "save hole button." When something is added to the history, enable the save hole button?
 
 
 ### Integrating custom maps to default ones...

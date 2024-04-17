@@ -40,8 +40,12 @@ public class ZoomInOutManager : MonoBehaviour
     {
         if (EventSystem.current.IsPointerOverGameObject())
             return;
+
+        if (!IsMouseOverGameWindow)
+            return;
+
         Vector2 scrollInput = (Vector2)ctx.ReadValueAsObject();
-        Debug.Log("ZoomInOut: scrollInput: + " + scrollInput.ToString());
+        //Debug.Log("ZoomInOut: scrollInput: + " + scrollInput.ToString());
 
         float currentOrtho = _camera.m_Lens.OrthographicSize;
         float newOrth = currentOrtho + (_scrollRate * (-scrollInput.y / (Mathf.Abs(scrollInput.y))));
@@ -65,4 +69,5 @@ public class ZoomInOutManager : MonoBehaviour
         _camera.m_Lens.OrthographicSize = _defaultOrthoSize;
         _pixelPerfect.enabled = true;
     }
+    bool IsMouseOverGameWindow { get { return !(0 > Input.mousePosition.x || 0 > Input.mousePosition.y || Screen.width < Input.mousePosition.x || Screen.height < Input.mousePosition.y); } }
 }

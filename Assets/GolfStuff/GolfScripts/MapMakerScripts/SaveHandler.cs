@@ -67,7 +67,146 @@ public class SaveHandler : MonoBehaviour
 
     //    }
     //}
-    public void OnSave()
+
+    //
+    // START OLD FROM TUTORIAL
+    //
+    //public void OnSave()
+    //{
+    //    List<TilemapData> data = new List<TilemapData>();
+
+    //    // foreach existing tilemap
+    //    foreach (var mapObj in _mapMakerBuilder.GetTileMapNameToTileMapMapping())
+    //    {
+    //        TilemapData mapData = new TilemapData();
+    //        mapData.key = mapObj.Key;
+
+    //        BoundsInt boundsForThisMap = mapObj.Value.cellBounds;
+
+    //        for (int x = boundsForThisMap.xMin; x < boundsForThisMap.xMax; x++)
+    //        {
+    //            for (int y = boundsForThisMap.yMin; y < boundsForThisMap.yMax; y++)
+    //            {
+    //                Vector3Int pos = new Vector3Int(x, y, 0);
+    //                TileBase tile = mapObj.Value.GetTile(pos);
+
+    //                //if (tile != null && _tileBaseToMapMakerObject.ContainsKey(tile))
+    //                //{
+    //                //    string guid = _tileBaseToMapMakerObject[tile].Guid;
+    //                //    TileInfo ti = new TileInfo(pos, guid);
+    //                //    mapData.tiles.Add(ti);
+    //                //}
+
+    //                MapMakerGroundTileBase mapMakerGroundTileBase = _mapMakerBuilder.GetMapMakerGroundTileBaseFromTileBase(tile);
+    //                if (tile != null && mapMakerGroundTileBase != null)
+    //                {
+    //                    string guid = mapMakerGroundTileBase.Guid;
+    //                    TileInfo ti = new TileInfo(pos, guid);
+    //                    mapData.tiles.Add(ti);
+    //                }
+    //            }
+    //        }
+    //        data.Add(mapData);
+    //    }
+
+    //    // save the tilemaps to a file
+    //    FileHandler.SaveToJSON<TilemapData>(data, _filename);
+
+    //}
+    //public void OnLoad()
+    //{
+    //    List<TilemapData> data = FileHandler.ReadListFromJSON<TilemapData>(_filename);
+
+    //    foreach (var mapData in data)
+    //    {
+    //        //if (!_tileMaps.ContainsKey(mapData.key))
+    //        if (!_mapMakerBuilder.DoesTileMapExistInMapping(mapData.key))
+    //        {
+    //            Debug.LogError("OnLoad: found saved data for tilemap called: '" + ",' but corresponding tilemap does not exist. Skipping...");
+    //            continue;
+    //        }
+
+    //        // get tilemap
+    //        //var map = _tileMaps[mapData.key];
+    //        var map = _mapMakerBuilder.GetTileMapFromTileMapName(mapData.key);
+    //        map.ClearAllTiles();
+    //        _mapMakerBuilder.ClearAllObstacles();
+
+    //        if (mapData.tiles != null && mapData.tiles.Count > 0)
+    //        {
+    //            //old way before asset database
+    //            foreach (TileInfo tile in mapData.tiles)
+    //            {
+    //                //if (!_guidToTileBase.ContainsKey(tile.GuidForTile))
+    //                if (!_mapMakerBuilder.DoesGUIDExistForTileBaseInMapping(tile.GuidForTile))
+    //                {
+    //                    Debug.LogError("OnLoad: Could not find GUID: '" + tile.GuidForTile + " in _guidToTileBase dictionary. Skipping...");
+    //                    continue;
+    //                }
+
+    //                //TileBase tileBase = _guidToTileBase[tile.GuidForTile];
+    //                TileBase tileBase = _mapMakerBuilder.GetTileBaseFromGUID(tile.GuidForTile);
+    //                //map.SetTile(tile.position, _guidToTileBase[tile.GuidForTile]);
+    //                map.SetTile(tile.position, tileBase);
+
+    //                // Check if the tile is being placed on the object map. If so, spawn the appropriate object
+    //                if (map.name == "Object")
+    //                {
+    //                    if (_mapMakerBuilder.DoesMapMakerGroundTileBaseExistForTileBaseInMapping(tileBase))
+    //                    {
+    //                        MapMakerGroundTileBase groundTileBase = _mapMakerBuilder.GetMapMakerGroundTileBaseFromTileBase(tileBase);
+    //                        if (groundTileBase.GetType() == typeof(MapMakerObstacle))
+    //                        {
+    //                            _mapMakerBuilder.PlaceObstacle(tile.position, (MapMakerObstacle)groundTileBase);
+    //                        }
+    //                    }
+
+    //                }
+    //            }
+
+    //        }
+    //    }
+    //}
+    //
+    // END OLD FROM TUTORIAL
+    //
+    public void CreateNewCourse(string courseName, bool isMiniGolf)
+    {
+        CourseData newCourse = new CourseData();
+        newCourse.CourseName = courseName;
+        newCourse.IsMiniGolf = isMiniGolf;
+        newCourse.CourseId = Guid.NewGuid().ToString();
+        //newCourse.HolesInCourseFileNames = new List<string>(); // setting as an empty string when creating a new course. Will add to this as new holes are created?
+        newCourse.HolesInCourse = new List<HoleData>();
+
+        string filename = "course_" + newCourse.CourseName.Replace(" ", string.Empty) + "_" + newCourse.CourseId + ".json";
+        newCourse.RelativeFilePath = filename;
+
+        Debug.Log("CreateNewCourse: Creating a new course with name: " + courseName + " and is minigolf?: " + isMiniGolf + " with a filename of: " + filename);
+        FileHandler.SaveToJSONFile<CourseData>(newCourse, filename);
+
+        _mapMakerUIManager.AddCourseToAvailableCustomCourses(newCourse, true);
+    }
+    public void ClearAllTilesForNewHole()
+    {
+        foreach (Tilemap map in _tileMapReferenceHolder.AllMaps)
+        {
+            map.ClearAllTiles();
+        }
+    }
+    public HoleData CreateNewHole(string courseName, bool isMiniGolf, int holePar, int holeIndex)
+    {
+        HoleData newHole = new HoleData();
+        newHole.HoleIndex = holeIndex;
+        newHole.HolePar = holePar;
+        newHole.CourseName = courseName;
+        newHole.IsMiniGolf = isMiniGolf;
+        //ClearAllTilesForNewHole();
+        newHole.HoleTileMapData = GetAllTileMapData();
+
+        return newHole;
+    }
+    public List<TilemapData> GetAllTileMapData()
     {
         List<TilemapData> data = new List<TilemapData>();
 
@@ -106,12 +245,55 @@ public class SaveHandler : MonoBehaviour
         }
 
         // save the tilemaps to a file
-        FileHandler.SaveToJSON<TilemapData>(data, _filename);
-        
+        return data;
     }
-    public void OnLoad()
+    //
+    // OLD FROM TUTORIAL
+    //
+    public void SaveHole(string fileName)
     {
-        List<TilemapData> data = FileHandler.ReadListFromJSON<TilemapData>(_filename);
+        List<TilemapData> data = new List<TilemapData>();
+
+        // foreach existing tilemap
+        foreach (var mapObj in _mapMakerBuilder.GetTileMapNameToTileMapMapping())
+        {
+            TilemapData mapData = new TilemapData();
+            mapData.key = mapObj.Key;
+
+            BoundsInt boundsForThisMap = mapObj.Value.cellBounds;
+
+            for (int x = boundsForThisMap.xMin; x < boundsForThisMap.xMax; x++)
+            {
+                for (int y = boundsForThisMap.yMin; y < boundsForThisMap.yMax; y++)
+                {
+                    Vector3Int pos = new Vector3Int(x, y, 0);
+                    TileBase tile = mapObj.Value.GetTile(pos);
+
+                    //if (tile != null && _tileBaseToMapMakerObject.ContainsKey(tile))
+                    //{
+                    //    string guid = _tileBaseToMapMakerObject[tile].Guid;
+                    //    TileInfo ti = new TileInfo(pos, guid);
+                    //    mapData.tiles.Add(ti);
+                    //}
+
+                    MapMakerGroundTileBase mapMakerGroundTileBase = _mapMakerBuilder.GetMapMakerGroundTileBaseFromTileBase(tile);
+                    if (tile != null && mapMakerGroundTileBase != null)
+                    {
+                        string guid = mapMakerGroundTileBase.Guid;
+                        TileInfo ti = new TileInfo(pos, guid);
+                        mapData.tiles.Add(ti);
+                    }
+                }
+            }
+            data.Add(mapData);
+        }
+
+        // save the tilemaps to a file
+        FileHandler.SaveToJSONFile<TilemapData>(data, fileName);
+    }
+    public void LoadHole(string fileName)
+    {
+        List<TilemapData> data = FileHandler.ReadListFromJSON<TilemapData>(fileName);
 
         foreach (var mapData in data)
         {
@@ -163,6 +345,12 @@ public class SaveHandler : MonoBehaviour
             }
         }
     }
+    public void SaveCourse(CourseData courseToSave, string filename)
+    {
+        if (courseToSave == null)
+            return;
+        FileHandler.SaveToJSONFile<CourseData>(courseToSave, filename);
+    }
 }
 
 [Serializable]
@@ -189,6 +377,17 @@ public class CourseData
 {
     public string CourseId;
     public string CourseName;
-    public List<string> HolesInCourseFileNames;
+    public string RelativeFilePath;
+    //public List<string> HolesInCourseFileNames; // change this to just be a list of HoleData? CourseData has list of HoleData, which has list of TilemapData, which has list of TileInfo?
+    public List<HoleData> HolesInCourse = new List<HoleData>();
+    public bool IsMiniGolf;
+}
+[Serializable]
+public class HoleData
+{
+    public int HoleIndex;
+    public int HolePar;
+    public string CourseName;
+    public List<TilemapData> HoleTileMapData = new List<TilemapData>();
     public bool IsMiniGolf;
 }

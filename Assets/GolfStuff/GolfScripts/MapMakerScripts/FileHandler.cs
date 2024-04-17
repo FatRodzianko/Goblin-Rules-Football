@@ -7,18 +7,30 @@ using UnityEngine;
 public static class FileHandler
 {
 
-    public static void SaveToJSON<T>(List<T> toSave, string filename)
+    public static void SaveToJSONFile<T>(List<T> toSave, string filename)
     {
-        Debug.Log("SaveToJSON (list): " + GetPath(filename));
+        Debug.Log("SaveToJSONFile (list): " + GetPath(filename));
         string content = JsonHelper.ToJson<T>(toSave.ToArray());
         WriteFile(GetPath(filename), content);
     }
-
-    public static void SaveToJSON<T>(T toSave, string filename)
+    public static string SaveToJSON<T>(List<T> toSave)
     {
-        Debug.Log("SaveToJSON (single): " + GetPath(filename));
+        Debug.Log("SaveToJSON (list): " );
+        string content = JsonHelper.ToJson<T>(toSave.ToArray());
+        return content;
+    }
+
+    public static void SaveToJSONFile<T>(T toSave, string filename)
+    {
+        Debug.Log("SaveToJSONFile (single): " + GetPath(filename));
         string content = JsonUtility.ToJson(toSave);
         WriteFile(GetPath(filename), content);
+    }
+    public static string SaveToJSON<T>(T toSave)
+    {
+        Debug.Log("SaveToJSON (single): ");
+        string content = JsonUtility.ToJson(toSave);
+        return content;
     }
 
     public static List<T> ReadListFromJSON<T>(string filename)
@@ -36,7 +48,7 @@ public static class FileHandler
 
     }
 
-    public static T ReadFromJSON<T>(string filename, bool getPath = true)
+    public static T ReadFromJSONFile<T>(string filename, bool getPath = true)
     {
         string content = "";
         if (getPath)
@@ -52,7 +64,6 @@ public static class FileHandler
         T res = JsonUtility.FromJson<T>(content);
 
         return res;
-
     }
 
     private static string GetPath(string filename)

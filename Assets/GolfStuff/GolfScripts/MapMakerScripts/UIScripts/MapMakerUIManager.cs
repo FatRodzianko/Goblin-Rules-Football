@@ -10,6 +10,7 @@ using System.Linq;
 public class MapMakerUIManager : MonoBehaviour
 {
     [SerializeField] MapMakerBuilder _mapMakerBuilder;
+    [SerializeField] SaveHandler _saveHandler;
     [Header("Scriptables")]
     [SerializeField] List<MapMakerGroundTileBase> _green;
     [SerializeField] List<MapMakerGroundTileBase> _fairway;
@@ -47,12 +48,33 @@ public class MapMakerUIManager : MonoBehaviour
     [Header("Current Course UI")]
     [SerializeField] TMP_Dropdown _currentCourseDropDown;
     [SerializeField] Button _createNewCourseButton;
-    [SerializeField] List<CourseData> _allCustomCourses = new List<CourseData>();
+    
 
     [Header("Create New Course UI")]
     [SerializeField] GameObject _createNewCoursePanel;
     [SerializeField] TMP_InputField _nameOfCourseTextInput;
     [SerializeField] Toggle _isMiniGolfToggle;
+
+    [Header("Current Hole UI")]
+    [SerializeField] GameObject _currentHoleText;
+    [SerializeField] TMP_Dropdown _currentHoleDropDown;
+    [SerializeField] Button _createNewHoleButton;
+
+    [Header("Selected Course")]
+    [SerializeField] CourseData _selectedCourse;
+    [SerializeField] List<CourseData> _allCustomCourses = new List<CourseData>();
+    public delegate void NewCourseSelected(CourseData newCourse);
+    public event NewCourseSelected NewCourseSelectedChanged;
+
+    [Header("Selected Hole")]
+    [SerializeField] int _selectedHoleNumber;
+    [SerializeField] HoleData _selectedHole;
+    public delegate void NewHoleSelected(int holeNumber);
+    public event NewHoleSelected NewHoleSelectedChanged;
+
+    [Header("Save/Load Hole UI")]
+    [SerializeField] Button _saveHoleButton;
+    [SerializeField] Button _loadHoleButton;
 
 
     #region Setters and Getters
@@ -80,7 +102,18 @@ public class MapMakerUIManager : MonoBehaviour
         //Default to rule tile mode to begin
         SelectAutoTileMode();
         GetAllCustomCourse();
-
+        if (_saveHandler == null)
+            _saveHandler = this.GetComponent<SaveHandler>();
+    }
+    private void OnEnable()
+    {
+        NewCourseSelectedChanged += NewCourseSelectedChangedFunction;
+        NewHoleSelectedChanged += NewHoleSelectedChangedFunction;
+    }
+    private void OnDisable()
+    {
+        NewCourseSelectedChanged -= NewCourseSelectedChangedFunction;
+        NewHoleSelectedChanged -= NewHoleSelectedChangedFunction;
     }
 
     // Update is called once per frame
@@ -311,30 +344,26 @@ public class MapMakerUIManager : MonoBehaviour
     void InitializeCurrentCourseDropDown(List<string> filePathsForCourses)
     {
         _currentCourseDropDown.AddOptions(new List<string> { "Create New Course" });
+        CurrentCourseDropDownValueChanged(0);
         if (filePathsForCourses.Count > 0)
         {
-            List<string> courseNames = new List<string>();
             foreach (string filepath in filePathsForCourses)
             {
                 Debug.Log("InitializeCurrentCourseDropDown: course found at: " + filepath);
                 try
                 {
-                    CourseData courseToLoad = FileHandler.ReadFromJSON<CourseData>(filepath, false);
-                    courseNames.Add(courseToLoad.CourseName);
+                    CourseData courseToLoad = FileHandler.ReadFromJSONFile<CourseData>(filepath, false);
+                    //courseNames.Add(courseToLoad.CourseName);
                     if (courseToLoad != null)
                     {
                         _allCustomCourses.Add(courseToLoad);
+                        _currentCourseDropDown.AddOptions(new List<string> { courseToLoad.CourseName });
                     }
                 }
                 catch (Exception e)
                 {
                     Debug.Log("InitializeCurrentCourseDropDown: could not read file at: " + filepath + ". Error: " + e);
                 }
-            }
-
-            if (courseNames.Count > 0)
-            {
-                _currentCourseDropDown.AddOptions(courseNames);
             }
         }
     }
@@ -362,6 +391,11 @@ public class MapMakerUIManager : MonoBehaviour
         string newCourseName = _nameOfCourseTextInput.text;
         if (string.IsNullOrEmpty(newCourseName))
             return;
+        if (newCourseName.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0)
+        {
+            Debug.Log("CreateNewCourse: course name: " + newCourseName + " contains invalid characters for a file.");
+            return;
+        }
 
         if (_allCustomCourses.Any(x => x.CourseName == newCourseName))
         {
@@ -371,35 +405,46 @@ public class MapMakerUIManager : MonoBehaviour
             return;
         }
 
-
+        
         bool isMiniGolf = _isMiniGolfToggle.isOn;
 
-        CourseData newCourse = new CourseData();
-        newCourse.CourseName = newCourseName;
-        newCourse.IsMiniGolf = isMiniGolf;
-        newCourse.CourseId = Guid.NewGuid().ToString();
-        newCourse.HolesInCourseFileNames = new List<string>(); // setting as an empty string when creating a new course. Will add to this as new holes are created?
+        // OLD: MOVED TO SAVEHANDLER.cs
+        //CourseData newCourse = new CourseData();
+        //newCourse.CourseName = newCourseName;
+        //newCourse.IsMiniGolf = isMiniGolf;
+        //newCourse.CourseId = Guid.NewGuid().ToString();
+        //newCourse.HolesInCourseFileNames = new List<string>(); // setting as an empty string when creating a new course. Will add to this as new holes are created?
 
-        string filename = "course_" + newCourse.CourseName.Replace(" ", string.Empty) + "_" + newCourse.CourseId + ".json";
-        Debug.Log("CreateNewCourse: Creating a new course with name: " + newCourseName + " and is minigolf?: " + isMiniGolf + " with a filename of: " + filename);
-        FileHandler.SaveToJSON<CourseData>(newCourse, filename);
+        //string filename = "course_" + newCourse.CourseName.Replace(" ", string.Empty) + "_" + newCourse.CourseId + ".json";
+        //Debug.Log("CreateNewCourse: Creating a new course with name: " + newCourseName + " and is minigolf?: " + isMiniGolf + " with a filename of: " + filename);
+        //FileHandler.SaveToJSON<CourseData>(newCourse, filename);
+        // OLD: MOVED TO SAVEHANDLER.cs
+
+        _saveHandler.CreateNewCourse(newCourseName, isMiniGolf);
 
         _createNewCoursePanel.SetActive(false);
         _createNewCourseButton.gameObject.SetActive(false);
         _mapMakerBuilder.PlayerInput.Enable();
 
-        AddCourseToAvailableCustomCourses(newCourse);
+        //AddCourseToAvailableCustomCourses(newCourse);
     }
-    public void AddCourseToAvailableCustomCourses(CourseData newCourse)
+    public void AddCourseToAvailableCustomCourses(CourseData newCourse, bool selectNewCourse = false)
     {
         if (newCourse == null)
             return;
 
         if (_allCustomCourses.Contains(newCourse))
             return;
+
         _allCustomCourses.Add(newCourse);
         _currentCourseDropDown.AddOptions(new List<string> { newCourse.CourseName });
-        _currentCourseDropDown.value = _currentCourseDropDown.options.Count - 1;
+
+        if (selectNewCourse)
+        {
+            _currentCourseDropDown.value = _currentCourseDropDown.options.Count - 1;
+            CurrentCourseDropDownValueChanged(_currentCourseDropDown.options.Count - 1);
+        }
+            
     }
     public void CancelCreateNewCourse()
     {
@@ -415,10 +460,103 @@ public class MapMakerUIManager : MonoBehaviour
         if (index == 0)
         {
             _createNewCourseButton.gameObject.SetActive(true);
+            //_selectedCourse = null;
+            NewCourseSelectedChanged(null);
         }
         else
         {
             _createNewCourseButton.gameObject.SetActive(false);
+            //_selectedCourse = _allCustomCourses[index-1]; // index minus 1 because "Create New Course" is index 0 of the drop down
+            NewCourseSelectedChanged(_allCustomCourses[index - 1]);
+        }
+    }
+    void NewCourseSelectedChangedFunction(CourseData newCourse)
+    {
+        _selectedCourse = newCourse;
+        if (newCourse == null)
+        {
+            Debug.Log("NewCourseSelectedChangedFunction: null");
+            _currentHoleText.SetActive(false);
+            _currentHoleDropDown.gameObject.SetActive(false);
+            _createNewHoleButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.Log("NewCourseSelectedChangedFunction: " + newCourse.CourseName + ":" + newCourse.CourseId);
+            _currentHoleText.SetActive(true);
+            _currentHoleDropDown.gameObject.SetActive(true);
+            InitializeCurrentHoleDropDown(_selectedCourse);
+            CurrentHoleDropDownValueChanged(0);
+        }
+            
+    }
+    void InitializeCurrentHoleDropDown(CourseData course)
+    {
+        if (course == null)
+            return;
+
+        // clear any old data from the dropdown
+        _currentHoleDropDown.ClearOptions();
+
+        // Add the "create new hole" item first
+        _currentHoleDropDown.AddOptions(new List<string> { "Create New Hole" });
+
+        if (course.HolesInCourse.Count > 0)
+        {
+            for (int i = 0; i < course.HolesInCourse.Count; i++)
+            {
+                //_currentHoleDropDown.AddOptions(new List<string> { (i + 1).ToString() });
+                _currentHoleDropDown.AddOptions(new List<string> { course.HolesInCourse[i].HoleIndex.ToString() });
+            }
+        }
+    }
+    public void CurrentHoleDropDownValueChanged(int index)
+    {
+        Debug.Log("CurrentHoleDropDownValueChanged " + index.ToString());
+        NewHoleSelectedChanged(index);
+    }
+    public void CreateNewHoleButtonPressed()
+    {
+        Debug.Log("CreateNewHoleButtonPressed: ");
+        //_createNewCoursePanel.SetActive(true);
+        //_createNewCourseButton.gameObject.SetActive(false);
+
+        // will need to disable controls when the player has to enter data for the hole, such as par. For now, ignore
+        //_mapMakerBuilder.PlayerInput.Disable();
+
+        //HoleData newhole = new HoleData();
+        //newhole.HolePar = 3;
+        //newhole.CourseName = _selectedCourse.CourseName;
+        //newhole.IsMiniGolf = _selectedCourse.IsMiniGolf;
+        //_saveHandler.ClearAllTilesForNewHole();
+        //newhole.HoleTileMapData = _saveHandler.GetAllTileMapData();
+        _saveHandler.ClearAllTilesForNewHole();
+        HoleData newhole = _saveHandler.CreateNewHole(_selectedCourse.CourseName, _selectedCourse.IsMiniGolf, 3, _selectedCourse.HolesInCourse.Count() + 1);
+        _selectedCourse.HolesInCourse.Add(newhole);
+        _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
+    }
+    void NewHoleSelectedChangedFunction(int holeNumber)
+    {
+        Debug.Log("NewHoleSelectedChangedFunction: " + holeNumber);
+        if (holeNumber > _selectedCourse.HolesInCourse.Count)
+        {
+            Debug.Log("NewHoleSelectedChangedFunction: " + holeNumber + " is more than number of holes in the course: " + _selectedCourse.HolesInCourse.Count);
+            return;
+        }
+        _selectedHoleNumber = holeNumber;
+        if (holeNumber == 0)
+        {
+            _selectedHole = null;
+            _createNewHoleButton.gameObject.SetActive(true);
+            _saveHoleButton.gameObject.SetActive(false);
+            _loadHoleButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            _selectedHole = _selectedCourse.HolesInCourse.FirstOrDefault(x => x.HoleIndex == _selectedHoleNumber);
+            _createNewHoleButton.gameObject.SetActive(false);
+            _saveHoleButton.gameObject.SetActive(false);
+            _loadHoleButton.gameObject.SetActive(true);
         }
     }
 }
