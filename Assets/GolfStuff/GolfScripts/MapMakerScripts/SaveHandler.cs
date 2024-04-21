@@ -399,3 +399,4 @@ public class HoleData
     public bool IsMiniGolf;
     public Vector2[] PolygonPoints;
 }
+

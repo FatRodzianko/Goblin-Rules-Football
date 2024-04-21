@@ -6,6 +6,7 @@ using UnityEngine;
 public class ScriptableObstacle : ScriptableObject
 {
     public GameObject ObstaclePrefab;
+    public GameObject MapMakerPrefab;
     public string SoftBounceSoundType;
     public string HardBounceSoundType;
 

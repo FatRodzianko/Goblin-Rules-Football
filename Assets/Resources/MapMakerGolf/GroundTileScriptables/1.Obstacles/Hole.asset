@@ -30,3 +30,4 @@ MonoBehaviour:
   _allowedInMiniGolf: 1
   _miniGolfOnly: 0
   ScriptableObstacle: {fileID: 11400000, guid: ef3fdd3951cb7c9469a242d82f44839d, type: 2}
+  _obstacleType: 2

@@ -65,6 +65,10 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/handy-question_rms_14.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 55e1fa7010e7b024485a92c8bb6f9cf2
+    m_Address: Assets/SFX/Music/stingy-development_final-1.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

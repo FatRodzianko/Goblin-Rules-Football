@@ -482,7 +482,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             }
 
             MapMakerObstacle obstacle = (MapMakerObstacle)obj;
-            _obstaclePreview = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, _currentGridPosition, Quaternion.identity);
+            //_obstaclePreview = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, _currentGridPosition, Quaternion.identity);
+            _obstaclePreview = Instantiate(GetObstaclePrefabToSpawn(obstacle), _currentGridPosition, Quaternion.identity);
         }
         else
         {
@@ -492,6 +493,15 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 _obstaclePreview = null;
             }
         }
+    }
+    GameObject GetObstaclePrefabToSpawn(MapMakerObstacle obstacle)
+    {
+        if (obstacle == null)
+            return null;
+        if (obstacle.ScriptableObstacle.MapMakerPrefab != null)
+            return obstacle.ScriptableObstacle.MapMakerPrefab;
+
+        return obstacle.ScriptableObstacle.ObstaclePrefab;
     }
     public void SetCurrentDrawingMode(PlaceType newDrawingMode)
     {
@@ -540,7 +550,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 if (_obstaclePreview == null)
                 {
                     MapMakerObstacle obstacle = (MapMakerObstacle)_selectedObject;
-                    _obstaclePreview = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, _currentGridPosition, Quaternion.identity);
+                    //_obstaclePreview = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, _currentGridPosition, Quaternion.identity);
+                    _obstaclePreview = Instantiate(GetObstaclePrefabToSpawn(obstacle), _currentGridPosition, Quaternion.identity);
                 }
                 _obstaclePreview.transform.position = _currentGridPosition;
             }
@@ -846,7 +857,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         //MapMakerObstacle obj = (MapMakerObstacle)_selectedObject;
         //GameObject gameObject = Instantiate(obj.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
-        GameObject gameObject = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
+
+        //GameObject gameObject = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
+        GameObject gameObject = Instantiate(GetObstaclePrefabToSpawn(obstacle), position, Quaternion.identity);
         _placeObstaclesByPostion.Add(position, gameObject);
         gameObject.transform.SetParent(_obstacleHolder);
 

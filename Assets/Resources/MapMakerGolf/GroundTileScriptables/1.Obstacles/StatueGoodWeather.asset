@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbafefafd3278a7458a0e14c45675d17, type: 3}
+  m_Name: StatueGoodWeather
+  m_EditorClassIdentifier: 
+  Guid: fa69d837d822ba644b4bb2ba898f9dd2
+  _groundTileType: 10
+  _mapMakerTileType: {fileID: 11400000, guid: 6a153d21c6c12a5488da645afa295155, type: 2}
+  _uiTileType: {fileID: 11400000, guid: d8bd43f18c3babc4c9d549c4d11dff79, type: 2}
+  _tileBase: {fileID: 11400000, guid: 988af2c9979a64a4dbff3580ae34ff91, type: 2}
+  _tile: {fileID: 11400000, guid: 988af2c9979a64a4dbff3580ae34ff91, type: 2}
+  _placeType: 1
+  _usePlacementRestrictions: 0
+  _placementRestrictions:
+  - {fileID: 11400000, guid: 6aed32eadc5fd624e9b4a385e003217a, type: 2}
+  _allowedInMiniGolf: 1
+  _miniGolfOnly: 0
+  ScriptableObstacle: {fileID: 11400000, guid: 6728756e78868294780645173c0ab9f1, type: 2}
+  _obstacleType: 3

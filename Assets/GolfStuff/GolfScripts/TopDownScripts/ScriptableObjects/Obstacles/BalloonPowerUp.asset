@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: BalloonPowerUp
   m_EditorClassIdentifier: 
   ObstaclePrefab: {fileID: 1294718589790411390, guid: c8516667c86eb314d9c4bd1e33939af9, type: 3}
+  MapMakerPrefab: {fileID: 1294718589790411390, guid: bd07445dbec46624189021229322b3f4, type: 3}
   SoftBounceSoundType: golfball-bounce-brush
   HardBounceSoundType: golfball-bounce-wood

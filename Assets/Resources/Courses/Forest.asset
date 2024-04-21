@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b45ee6b98ca05149badb35431e89665, type: 3}
   m_Name: Forest
   m_EditorClassIdentifier: 
+  id: f8ed099443d7d0e4cb1143f45263a104
   CourseName: Forest
   HolesInCourse:
   - {fileID: 11400000, guid: a87a1099d535fc8458827d42ca136c40, type: 2}
   - {fileID: 11400000, guid: 223e824694cde4a45b88e5b99c8273e8, type: 2}
   - {fileID: 11400000, guid: b2f75a7699c07a94ab4cf2530acc7c39, type: 2}
+  AddressablePath: 

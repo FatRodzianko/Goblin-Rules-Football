@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Statue-Bad
   m_EditorClassIdentifier: 
   ObstaclePrefab: {fileID: 2370977877022451249, guid: 954e062882dd042439c783690da1cf25, type: 3}
+  MapMakerPrefab: {fileID: 2370977877022451249, guid: 95353847665ebcb46a4e1a93c2ff4b8c, type: 3}
   SoftBounceSoundType: golfball-bounce-brush
   HardBounceSoundType: golfball-bounce-wood
