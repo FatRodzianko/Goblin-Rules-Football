@@ -19,7 +19,7 @@ MonoBehaviour:
   _tileBase: {fileID: 11400000, guid: 1e31f51b118bafc46a10d74408f9c1d5, type: 2}
   _tile: {fileID: 11400000, guid: 1e31f51b118bafc46a10d74408f9c1d5, type: 2}
   _placeType: 1
-  _usePlacementRestrictions: 1
+  _usePlacementRestrictions: 0
   _placementRestrictions:
   - {fileID: 11400000, guid: b71ed686fdb9f9f4695c2300982f228b, type: 2}
   - {fileID: 11400000, guid: 0246ab59b179e02418671dc064f4de62, type: 2}
@@ -27,6 +27,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dc4c10b31cadccb4b8ead8cc9ec908df, type: 2}
   - {fileID: 11400000, guid: 172da5ad4d58bd64099a5bc70ec30cf0, type: 2}
   - {fileID: 11400000, guid: 6aed32eadc5fd624e9b4a385e003217a, type: 2}
+  _onlyAllowedOnSpecificGroundType: 1
+  _canOnlyBePlacedOnTheseGroundTypes:
+  - {fileID: 11400000, guid: 27cd04cd3af13244cbc51448174fdc9d, type: 2}
   _allowedInMiniGolf: 1
   _miniGolfOnly: 0
   ScriptableObstacle: {fileID: 11400000, guid: ef3fdd3951cb7c9469a242d82f44839d, type: 2}

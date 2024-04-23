@@ -68,6 +68,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     // MapMakerUIManager
     [SerializeField] MapMakerUIManager _mapMakerUIManager;
 
+    // Course Markers
+    [SerializeField] bool _hasTeeOffLocationBeenPlaced = false;
+    [SerializeField] Vector3Int _teeOffLocationPosition;
+
     protected override void Awake()
     {
         base.Awake();
@@ -508,6 +512,14 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         Debug.Log("SetCurrentDrawingMode: current mode: " + _currentDrawingMode.ToString() + " new mode: " + newDrawingMode.ToString());
         if (_currentDrawingMode != newDrawingMode)
         {
+            if (_selectedObject != null)
+            {
+                if (_selectedObject.GetType() == typeof(MapMakerCourseMarker))
+                {
+                    _drawModeHandler.ResetToSingle();
+                    return;
+                }
+            }
             _currentDrawingMode = newDrawingMode;
         }
     }
@@ -571,9 +583,21 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         if (_selectedObject == null)
             return false;
 
+
+        if (_selectedObject.CanOnlyBePlacedOnTheseGroundTypes.Count > 0)
+        {
+            List<MapMakerTileTypes> allowedCategories = _selectedObject.CanOnlyBePlacedOnTheseGroundTypes;
+            List<Tilemap> allowedMaps = allowedCategories.ConvertAll(category => category.Tilemap);
+            if (allowedMaps.Count > 0)
+            {
+                return !DoesTilemapMatchCanOnlyBePlacedOnTheseGroundTypes(allowedMaps, position);
+            }
+        }
+
         List<MapMakerTileTypes> restrictedCategories = _selectedObject.PlacementRestrictions;
         List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
         //Debug.Log("IsPlacementForbidden: length of restrictedMaps maps: " + restrictedMaps.Count() + " length of restrictedCategories: " + restrictedCategories.Count());
+
 
         List <Tilemap> allMaps = _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Concat(restrictedMaps).ToList();
         //Debug.Log("IsPlacementForbidden: length of all maps: " + allMaps.Count());
@@ -585,32 +609,17 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
             return false;
         });
+    }
+    bool DoesTilemapMatchCanOnlyBePlacedOnTheseGroundTypes(List<Tilemap> allowedMaps, Vector3Int position)
+    {
+        return allowedMaps.Any(map => {
+            if (map.HasTile(position))
+            {
+                return map.GetTile(position) != _selectedTileBase;
+            }
 
-        //if (_tileMapReferenceHolder.ForbiddenPlacingWithMaps.Contains(_tilemap))
-        //{
-        //    Debug.Log("IsPlacementForbidden: forbidden?")
-        //    return false;
-        //}
-        //else
-        //{
-        //    //return _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Any(map =>
-        //    //{
-        //    //    return map.HasTile(position);
-        //    //});
-
-        //    //return allMaps.Any(map =>
-        //    //{
-        //    //    return map.HasTile(position);
-        //    //});
-        //    return allMaps.Any(map =>
-        //    {
-        //        if (map.HasTile(position))
-        //        {
-        //            return map.GetTile(position) != _selectedTileBase;
-        //        }
-        //        return false;
-        //    });
-        //}
+            return false;
+        });
     }
     void HandleDrawing()
     {
@@ -799,6 +808,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                         Debug.Log("DrawItem: Placing obstacle at: " + positions[i].ToString());
                         PlaceObstacle(positions[i], (MapMakerObstacle)_selectedObject);
                     }
+                    else if (_selectedObject.GetType() == typeof(MapMakerCourseMarker))
+                    {
+                        Debug.Log("DrawItem: Placing MapMakerCourseMarker at: " + positions[i].ToString());
+                        PlaceCourseMarker(positions[i], (MapMakerCourseMarker)_selectedObject);
+                    }
                 }
                 else
                 {
@@ -898,6 +912,65 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             _placeObstaclesByPostion.Clear();
             _obstalceGroundTileBaseByPosition.Clear();
         }
+    }
+    public void PlaceCourseMarker(Vector3Int position, MapMakerCourseMarker courseMarker, bool checkIsForbidden = false)
+    {
+        if (courseMarker == null)
+            return;
+
+        switch (courseMarker.CourseMarkerType)
+        {
+            case CourseMarkerType.TeeOffLocation:
+                PlaceTeeOffLocation(position, courseMarker);
+                break;
+        }
+    }
+    public void RemoveCourseMarker(Vector3Int position, MapMakerCourseMarker courseMarker)
+    {
+        if (courseMarker == null)
+            return;
+
+        switch (courseMarker.CourseMarkerType)
+        {
+            case CourseMarkerType.TeeOffLocation:
+                RemoveTeeOffLocation(position, courseMarker);
+                break;
+        }
+    }
+    void PlaceTeeOffLocation(Vector3Int position, MapMakerCourseMarker courseMarker)
+    {
+        if (courseMarker == null)
+            return;
+        Debug.Log("PlaceTeeOffLocation: " + position.ToString());
+
+        // Remove any previously exisiting tilemap markers?
+        if (_hasTeeOffLocationBeenPlaced)
+        {
+            courseMarker.MapMakerTileType.Tilemap.SetTile(_teeOffLocationPosition, null);
+            _hasTeeOffLocationBeenPlaced = false;
+
+            // Add a "deletion" to the history?
+            // Create arrays required for the History Steps
+            List<TileBase> previousTiles = new List<TileBase>{courseMarker.TileBase};
+            TileBase[] newTiles = new List<TileBase> { null }.ToArray();
+            Vector3Int[] positions = new List<Vector3Int> { _teeOffLocationPosition }.ToArray();
+            MapMakerGroundTileBase[] prevMapMakerTileBases = new List<MapMakerGroundTileBase> { (MapMakerGroundTileBase)courseMarker }.ToArray();
+            MapMakerGroundTileBase[] newMapMakerTileBases = new List<MapMakerGroundTileBase> { null }.ToArray();
+
+            _mapMakerHistory.Add(new MapMakerHistoryStep(courseMarker.MapMakerTileType.Tilemap, previousTiles.ToArray(), newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
+        }
+
+        _teeOffLocationPosition = position;
+        _hasTeeOffLocationBeenPlaced = true;
+    }
+    void RemoveTeeOffLocation(Vector3Int position, MapMakerCourseMarker courseMarker)
+    {
+        if (!_hasTeeOffLocationBeenPlaced)
+            return;
+        if (_teeOffLocationPosition != position)
+            return;
+        _hasTeeOffLocationBeenPlaced = false;
+        _teeOffLocationPosition = Vector3Int.zero;
     }
     public MapMakerGroundTileBase GetObstacleAtPosition(Vector3Int position)
     {

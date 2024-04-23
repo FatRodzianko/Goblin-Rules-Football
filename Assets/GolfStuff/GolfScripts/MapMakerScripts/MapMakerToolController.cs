@@ -84,6 +84,10 @@ public class MapMakerToolController : MonoBehaviour
                             //mapMakerGroundTileBase = builder.GetObstacleAtPosition(position);
                             builder.RemoveObstacle(position);
                         }
+                        if (prevMapMakerGroundTileBase.GetType() == typeof(MapMakerCourseMarker))
+                        {
+                            builder.RemoveCourseMarker(position, (MapMakerCourseMarker)prevMapMakerGroundTileBase);
+                        }
 
                         //item = new MapMakerHistoryItem(map, map.GetTile(position), null, position, mapMakerGroundTileBase);
                         item = new MapMakerHistoryItem(map, map.GetTile(position), null, position, prevMapMakerGroundTileBase, null);

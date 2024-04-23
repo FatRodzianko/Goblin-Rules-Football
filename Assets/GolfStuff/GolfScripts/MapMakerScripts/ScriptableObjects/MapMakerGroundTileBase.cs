@@ -14,7 +14,8 @@ public enum GroundTileType {
     DirectionTiles,
     MiniGolfWalls,
     Tool,
-    Object
+    Object,
+    CourseMarkers
 }
 
 public enum PlaceType { 
@@ -37,6 +38,8 @@ public class MapMakerGroundTileBase : ScriptableObject
     [SerializeField] PlaceType _placeType;
     [SerializeField] bool _usePlacementRestrictions;
     [SerializeField] List<MapMakerTileTypes> _placementRestrictions;
+    [SerializeField] bool _onlyAllowedOnSpecificGroundType;
+    [SerializeField] List<MapMakerTileTypes> _canOnlyBePlacedOnTheseGroundTypes;
     [Header("Minigolf?")]
     [SerializeField] bool _allowedInMiniGolf;
     [SerializeField] bool _miniGolfOnly;
@@ -45,6 +48,20 @@ public class MapMakerGroundTileBase : ScriptableObject
     {
         get {
             return _usePlacementRestrictions ? _placementRestrictions : _mapMakerTileType.PlacementRestrictions;
+        }
+    }
+    public bool OnlyAllowedOnSpecificGroundType
+    {
+        get
+        {
+            return _onlyAllowedOnSpecificGroundType;
+        }
+    }
+    public List<MapMakerTileTypes> CanOnlyBePlacedOnTheseGroundTypes
+    {
+        get
+        {
+            return _onlyAllowedOnSpecificGroundType ? _canOnlyBePlacedOnTheseGroundTypes : new List<MapMakerTileTypes>();
         }
     }
 

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e30e2e33d2aeeb4ba4c9fd422d9d1b9, type: 3}
+  m_Name: MiniGolfWall_FlowerBoxes_RuleTile
+  m_EditorClassIdentifier: 
+  Guid: c79e7e8554124b2488f33af59aa8fcad
+  _groundTileType: 8
+  _mapMakerTileType: {fileID: 11400000, guid: 0246ab59b179e02418671dc064f4de62, type: 2}
+  _uiTileType: {fileID: 11400000, guid: 3edfcf0fcd201424898a933d204ef19f, type: 2}
+  _tileBase: {fileID: 11400000, guid: f4ab0d8b06cf58f4e9aa787f79d27756, type: 2}
+  _tile: {fileID: 11400000, guid: 3fe27f06f54a7254abb93cd106e7133e, type: 2}
+  _placeType: 1
+  _usePlacementRestrictions: 0
+  _placementRestrictions: []
+  _allowedInMiniGolf: 1
+  _miniGolfOnly: 1

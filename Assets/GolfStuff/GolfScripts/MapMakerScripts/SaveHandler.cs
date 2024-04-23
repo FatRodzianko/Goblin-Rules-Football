@@ -347,6 +347,17 @@ public class SaveHandler : MonoBehaviour
                         }
 
                     }
+                    else if (map.name == "CourseMarkers")
+                    {
+                        if (_mapMakerBuilder.DoesMapMakerGroundTileBaseExistForTileBaseInMapping(tileBase))
+                        {
+                            MapMakerGroundTileBase groundTileBase = _mapMakerBuilder.GetMapMakerGroundTileBaseFromTileBase(tileBase);
+                            if (groundTileBase.GetType() == typeof(MapMakerCourseMarker))
+                            {
+                                _mapMakerBuilder.PlaceCourseMarker(tile.position, (MapMakerCourseMarker)groundTileBase);
+                            }
+                        }
+                    }
                 }
 
             }
