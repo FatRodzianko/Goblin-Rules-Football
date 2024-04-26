@@ -69,6 +69,10 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/stingy-development_final-1.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 4c228e8a9647f944b9e0da77139f5389
+    m_Address: Assets/SFX/Music/Depressed-Taste_more-kick-2.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

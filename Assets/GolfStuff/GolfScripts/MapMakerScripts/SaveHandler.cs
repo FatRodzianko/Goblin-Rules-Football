@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System;
+using System.Linq;
 
 public class SaveHandler : MonoBehaviour
 {
@@ -194,6 +195,8 @@ public class SaveHandler : MonoBehaviour
             map.ClearAllTiles();
             _mapMakerBuilder.ClearAllObstacles();
         }
+        _mapMakerBuilder.ClearAllMarkers();
+
     }
     public HoleData CreateNewHole(string courseName, bool isMiniGolf, int holePar, int holeIndex)
     {
@@ -300,8 +303,65 @@ public class SaveHandler : MonoBehaviour
 
         return newBounds;
     }
+    public Vector2 GetCenterOfHoleBounds(Vector2[] points)
+    {
+        if (points.Length < 4)
+            return Vector2.zero;
+
+        // Convert the polygon points to a boundsint to get its "center" property
+        BoundsInt holeBounds = new BoundsInt();
+        for (int i = 0; i < points.Length; i++)
+        {
+            if (i == 0)
+            {
+                holeBounds.xMax = (int)points[i].x;
+                holeBounds.xMin = (int)points[i].x;
+                holeBounds.yMax = (int)points[i].y;
+                holeBounds.yMin = (int)points[i].y;
+
+                continue;
+            }
+
+            int newX = (int)points[i].x;
+            int newY = (int)points[i].y;
+
+            // x values
+            if (holeBounds.xMax < newX)
+                holeBounds.xMax = newX;
+            if (holeBounds.xMin > newX)
+                holeBounds.xMin = newX;
+            // y values
+            if (holeBounds.yMax < newY)
+                holeBounds.yMax = newY;
+            if (holeBounds.yMin > newY)
+                holeBounds.yMin = newY;
+        }        
+
+        // return the center of the bounds
+        return holeBounds.center;
+    }
+    public List<Vector3> OrderAimPointsByDistanceToTeeOff(Vector3 startPoint, List<Vector3Int> points)
+    {
+        List<Vector3> ordered = new List<Vector3>();
+
+        SortedDictionary<float, Vector3> distanceByPoints = new SortedDictionary<float, Vector3> ();
+        foreach (Vector3 point in points)
+        {
+            float dist = Vector2.Distance(startPoint, point);
+            distanceByPoints.Add(dist, point);
+        }
+        foreach (KeyValuePair<float, Vector3> entry in distanceByPoints)
+        {
+            ordered.Add(entry.Value);
+        }
+
+        return ordered;
+    }
     public void LoadTileMapData(List<TilemapData> data)
     {
+        // clear obstacles and markers?
+        _mapMakerBuilder.ClearAllObstacles();
+        _mapMakerBuilder.ClearAllMarkers();
         foreach (var mapData in data)
         {
             //if (!_tileMaps.ContainsKey(mapData.key))
@@ -315,7 +375,7 @@ public class SaveHandler : MonoBehaviour
             //var map = _tileMaps[mapData.key];
             var map = _mapMakerBuilder.GetTileMapFromTileMapName(mapData.key);
             map.ClearAllTiles();
-            _mapMakerBuilder.ClearAllObstacles();
+            //_mapMakerBuilder.ClearAllObstacles();
 
             if (mapData.tiles != null && mapData.tiles.Count > 0)
             {
@@ -409,5 +469,8 @@ public class HoleData
     public List<TilemapData> HoleTileMapData = new List<TilemapData>();
     public bool IsMiniGolf;
     public Vector2[] PolygonPoints;
+    public Vector3 ZoomOutPosition;
+    public Vector3 TeeOffLocation;
+    public Vector3[] CourseAimPoints;
 }
 

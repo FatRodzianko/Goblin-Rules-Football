@@ -681,7 +681,7 @@ x When a hole is loaded, clear the MapMakerHistory, disable the "save hole butto
 
 
 - Data still missing from HoleData that TilemapManager will need to load a file:
-- - - tee off location
+- - x tee off location
 - - - - - - do with a tile placement?
 - - - Tee marker positions (the blue ball things)
 - - - - - - do with a tile placement
@@ -696,15 +696,18 @@ x When a hole is loaded, clear the MapMakerHistory, disable the "save hole butto
 - - - - - - - - - - - x would be saving: (xMin, yMax) , (xMin, yMin), (xMax, yMax), (xMax, yMax);
 - - - - - - - - x the above process appears to be working?
 - - - - - - - - - Will need to check if the selected course is minigolf or not. If it is, increase the padding from 10 to 25 or something?
-- - - Zoom out position
-- - - - - - try and automatically find the center of the tilemaps? If able to automatically get tilemap bounds, use Bounds.center?
+- - x Zoom out position
+- - - - - x try and automatically find the center of the tilemaps? If able to automatically get tilemap bounds, use Bounds.center?
+- - - - - x took the polygon points, converted it to a BoundsInt, then used BoundsInt.center to get the center of the tilemap bounds
 - - - Zoom value
 - - - - - - Maybe display "zoom value" while player is zooming out. Then have button to "Save Zoom Value" that will save it to the hole data?
-- - - Tee off aim point
-- - - - - - tile placement?
+- - x Tee off aim point
+- - - - - x tile placement?
 - - - Course aim points
 - - - - - - Tile placement? Unsure yet how to let the player set the "order" of the course aim points for numbering them yet though
 - - - - - - - - - maybe just have a 1/2/3/4/5 tile that can be placed?
+- - - - - - player just places the Aimpoint/crosshair tile. When map is saved, go through each, calculate distance to [tee off location] from that aimpoint, order the list of aimpoints from there?
+- - - - - - - - - stop counting aimpoints after 5?
 - - x Statues/Statue positions
 - - - - - x placed with tile as an obstacle. When saving, or maybe when loading the hole, check if obstacle is of type "statue" to build out the "Statues" value for the Scriptable hole?
 - - - - - - Currently just saves statue position and "statue type." When having the game "load" a custom course, will need to get the statue's ScriptableObstacle from something else to spawn the prefab?

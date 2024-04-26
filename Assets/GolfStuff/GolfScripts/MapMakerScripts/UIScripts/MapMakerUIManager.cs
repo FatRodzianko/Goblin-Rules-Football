@@ -63,7 +63,7 @@ public class MapMakerUIManager : MonoBehaviour
 
     [Header("Selected Course")]
     [SerializeField] CourseData _selectedCourse;
-    [SerializeField] List<CourseData> _allCustomCourses = new List<CourseData>();
+    private List<CourseData> _allCustomCourses = new List<CourseData>();
     public delegate void NewCourseSelected(CourseData newCourse);
     public event NewCourseSelected NewCourseSelectedChanged;
 
@@ -655,6 +655,19 @@ public class MapMakerUIManager : MonoBehaviour
         Debug.Log("SaveHole: Course: " + _selectedCourse.CourseName + " hole #: " + _selectedHole.HoleIndex);
         _selectedHole.HoleTileMapData = _saveHandler.GetAllTileMapData();
         _selectedHole.PolygonPoints = _saveHandler.GetBoundsOfAllTileMaps().ToArray();
+        _selectedHole.ZoomOutPosition = _saveHandler.GetCenterOfHoleBounds(_selectedHole.PolygonPoints);
+
+        // Save the tee off location if it was set in the builder
+        if (_mapMakerBuilder.HasTeeOffLocationBeenPlaced && _mapMakerBuilder.AimPoints.Count > 0)
+        {
+            _selectedHole.TeeOffLocation = _mapMakerBuilder.TeeOffLocationPosition;
+            _selectedHole.CourseAimPoints = _saveHandler.OrderAimPointsByDistanceToTeeOff(_mapMakerBuilder.TeeOffLocationPosition, _mapMakerBuilder.AimPoints).ToArray();
+        }
+        else
+        {
+            _selectedHole.TeeOffLocation = Vector3.zero;
+            _selectedHole.CourseAimPoints = null;
+        }
         _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
     }
     public void LoadHole()

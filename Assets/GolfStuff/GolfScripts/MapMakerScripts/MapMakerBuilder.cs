@@ -68,9 +68,14 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     // MapMakerUIManager
     [SerializeField] MapMakerUIManager _mapMakerUIManager;
 
-    // Course Markers
+    // Course Markers - Tee Off Location
     [SerializeField] bool _hasTeeOffLocationBeenPlaced = false;
     [SerializeField] Vector3Int _teeOffLocationPosition;
+
+    // Course Markers - Aim Point
+    [SerializeField] bool _atLeastOneAimPoint = false;
+    [SerializeField] List<Vector3Int> _aimPoints = new List<Vector3Int>();
+
 
     protected override void Awake()
     {
@@ -222,7 +227,26 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         return _guidToTileBase[guid];
     }
-    
+    public bool HasTeeOffLocationBeenPlaced
+    {
+        get {
+            return _hasTeeOffLocationBeenPlaced;
+        }
+    }
+    public Vector3Int TeeOffLocationPosition
+    {
+        get { 
+            return _teeOffLocationPosition;
+        }
+    }
+
+    public List<Vector3Int> AimPoints
+    {
+        get {
+            return _aimPoints;
+        }
+    }
+
     private void Update()
     {
         // everything below this was previously in Update!!!
@@ -594,6 +618,13 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             }
         }
 
+        if (_selectedObject.GetType() == typeof(MapMakerCourseMarker))
+        {
+            MapMakerCourseMarker marker = (MapMakerCourseMarker)_selectedObject;
+            if (marker.CourseMarkerType != CourseMarkerType.TeeOffLocation)
+                return IsThereATeeOffMarkerAtThisPoint(_selectedObject.MapMakerTileType.Tilemap, position);
+        }
+
         List<MapMakerTileTypes> restrictedCategories = _selectedObject.PlacementRestrictions;
         List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
         //Debug.Log("IsPlacementForbidden: length of restrictedMaps maps: " + restrictedMaps.Count() + " length of restrictedCategories: " + restrictedCategories.Count());
@@ -903,6 +934,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     }
     public void ClearAllObstacles()
     {
+        Debug.Log("ClearAllObstacles: ");
         if (_placeObstaclesByPostion.Count > 0)
         {
             foreach (KeyValuePair<Vector3Int, GameObject> _obstacles in _placeObstaclesByPostion)
@@ -923,6 +955,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             case CourseMarkerType.TeeOffLocation:
                 PlaceTeeOffLocation(position, courseMarker);
                 break;
+            case CourseMarkerType.AimPoint:
+                PlaceAimPoint(position, courseMarker);
+                break;
         }
     }
     public void RemoveCourseMarker(Vector3Int position, MapMakerCourseMarker courseMarker)
@@ -935,7 +970,20 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             case CourseMarkerType.TeeOffLocation:
                 RemoveTeeOffLocation(position, courseMarker);
                 break;
+            case CourseMarkerType.AimPoint:
+                RemoveAimtPoint(position);
+                break;
         }
+    }
+    public void ClearAllMarkers()
+    {
+        // Tee off location
+        _hasTeeOffLocationBeenPlaced = false;
+        _teeOffLocationPosition = Vector3Int.zero;
+
+        // Aim points
+        _atLeastOneAimPoint = false;
+        _aimPoints.Clear();
     }
     void PlaceTeeOffLocation(Vector3Int position, MapMakerCourseMarker courseMarker)
     {
@@ -971,6 +1019,77 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             return;
         _hasTeeOffLocationBeenPlaced = false;
         _teeOffLocationPosition = Vector3Int.zero;
+    }
+    void PlaceAimPoint(Vector3Int position, MapMakerCourseMarker courseMarker)
+    {
+        if (courseMarker == null)
+            return;
+
+        Debug.Log("PlaceAimPoint: " + position + " there are already: " + _aimPoints.Count + " aim points on map");
+
+        // If there are already 4 aim points, remove the "oldest" aimpoint?
+        if (_aimPoints.Count >= 4)
+        {
+            Vector3Int oldPoint = _aimPoints[0];
+            //bool isTeeOffMarkerOnThisPoint = false;
+            //if (courseMarker.MapMakerTileType.Tilemap.HasTile(position))
+            //{
+            //    TileBase oldTileBase = courseMarker.MapMakerTileType.Tilemap.GetTile(position);
+            //    if (_tileBaseToMapMakerObject.ContainsKey(oldTileBase))
+            //    {
+            //        MapMakerCourseMarker marker = (MapMakerCourseMarker)_tileBaseToMapMakerObject[oldTileBase];
+            //        if (marker.CourseMarkerType == CourseMarkerType.TeeOffLocation)
+            //            isTeeOffMarkerOnThisPoint = true;
+            //    }
+            //    if (!isTeeOffMarkerOnThisPoint)
+            //        courseMarker.MapMakerTileType.Tilemap.SetTile(oldPoint, null);
+            //}
+            if (!IsThereATeeOffMarkerAtThisPoint(courseMarker.MapMakerTileType.Tilemap, oldPoint))
+            {
+                courseMarker.MapMakerTileType.Tilemap.SetTile(oldPoint, null);
+
+                // Add a "deletion" to the history?
+                // Create arrays required for the History Steps
+                List<TileBase> previousTiles = new List<TileBase> { courseMarker.TileBase };
+                TileBase[] newTiles = new List<TileBase> { null }.ToArray();
+                Vector3Int[] positions = new List<Vector3Int> { oldPoint }.ToArray();
+                MapMakerGroundTileBase[] prevMapMakerTileBases = new List<MapMakerGroundTileBase> { (MapMakerGroundTileBase)courseMarker }.ToArray();
+                MapMakerGroundTileBase[] newMapMakerTileBases = new List<MapMakerGroundTileBase> { null }.ToArray();
+
+                _mapMakerHistory.Add(new MapMakerHistoryStep(courseMarker.MapMakerTileType.Tilemap, previousTiles.ToArray(), newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
+            }
+                
+
+            _aimPoints.Remove(oldPoint);
+        }
+
+        _aimPoints.Add(position);
+        _atLeastOneAimPoint = true;
+                
+    }
+    bool IsThereATeeOffMarkerAtThisPoint(Tilemap map, Vector3Int position)
+    {        
+        if (map.HasTile(position))
+        {
+            TileBase oldTileBase = map.GetTile(position);
+            if (_tileBaseToMapMakerObject.ContainsKey(oldTileBase))
+            {
+                MapMakerCourseMarker marker = (MapMakerCourseMarker)_tileBaseToMapMakerObject[oldTileBase];
+                if (marker.CourseMarkerType == CourseMarkerType.TeeOffLocation)
+                    return true;
+            }
+        }
+        return false;
+    }
+    void RemoveAimtPoint(Vector3Int position)
+    {
+        if (_aimPoints.Contains(position))
+            _aimPoints.Remove(position);
+
+        if (_aimPoints.Count > 0)
+            _atLeastOneAimPoint = true;
+        else
+            _atLeastOneAimPoint = false;
     }
     public MapMakerGroundTileBase GetObstacleAtPosition(Vector3Int position)
     {

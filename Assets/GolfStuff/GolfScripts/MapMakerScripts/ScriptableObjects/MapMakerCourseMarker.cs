@@ -5,7 +5,8 @@ using UnityEngine;
 public enum CourseMarkerType
 {
     None,
-    TeeOffLocation
+    TeeOffLocation,
+    AimPoint
 }
 [CreateAssetMenu(fileName = "MapMaker", menuName = "MapMakerObjects/Create Course Marker (map maker)")]
 public class MapMakerCourseMarker : MapMakerGroundTileBase
