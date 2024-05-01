@@ -6,7 +6,8 @@ public enum CourseMarkerType
 {
     None,
     TeeOffLocation,
-    AimPoint
+    AimPoint,
+    TeeOffMarker
 }
 [CreateAssetMenu(fileName = "MapMaker", menuName = "MapMakerObjects/Create Course Marker (map maker)")]
 public class MapMakerCourseMarker : MapMakerGroundTileBase

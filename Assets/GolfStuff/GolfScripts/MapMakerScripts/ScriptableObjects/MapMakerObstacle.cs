@@ -9,7 +9,8 @@ public enum ObstacleType
     Hole,
     StatueGoodWeather,
     StatueBadWeather,
-    BalloonPowerUp
+    BalloonPowerUp,
+    TeeOffMarker
 }
 [CreateAssetMenu(fileName = "MapMaker", menuName = "MapMakerObjects/Create Obstacle")]
 public class MapMakerObstacle : MapMakerGroundTileBase

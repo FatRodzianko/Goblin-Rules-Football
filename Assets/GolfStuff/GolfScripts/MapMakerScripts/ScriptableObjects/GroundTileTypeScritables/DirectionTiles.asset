@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 581f4f2368dc14648918b4ae4fcf25a3, type: 3}
+  m_Name: DirectionTiles
+  m_EditorClassIdentifier: 
+  _placeType: 1
+  _sortingOrder: 2
+  _tileMap: {fileID: 0}
+  _placementRestrictions:
+  - {fileID: 11400000, guid: 6aed32eadc5fd624e9b4a385e003217a, type: 2}
+  - {fileID: 11400000, guid: 172da5ad4d58bd64099a5bc70ec30cf0, type: 2}
+  - {fileID: 11400000, guid: 6a153d21c6c12a5488da645afa295155, type: 2}

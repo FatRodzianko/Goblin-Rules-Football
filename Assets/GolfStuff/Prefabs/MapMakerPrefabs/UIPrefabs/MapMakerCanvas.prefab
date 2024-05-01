@@ -2522,7 +2522,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 60
+  m_ScrollSensitivity: 5
   m_Viewport: {fileID: 0}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 1478205260505295772}
@@ -6329,7 +6329,6 @@ MonoBehaviour:
     RelativeFilePath: 
     HolesInCourse: []
     IsMiniGolf: 0
-  _allCustomCourses: []
   _selectedHoleNumber: 0
   _selectedHole:
     HoleIndex: 0
@@ -6337,6 +6336,10 @@ MonoBehaviour:
     CourseName: 
     HoleTileMapData: []
     IsMiniGolf: 0
+    PolygonPoints: []
+    ZoomOutPosition: {x: 0, y: 0, z: 0}
+    TeeOffLocation: {x: 0, y: 0, z: 0}
+    CourseAimPoints: []
   _createNewHolePanel: {fileID: 7860152647807999994}
   _createNewHoleText: {fileID: 3297438167827399725}
   _newHoleParTextInput: {fileID: 1865995538717519587}

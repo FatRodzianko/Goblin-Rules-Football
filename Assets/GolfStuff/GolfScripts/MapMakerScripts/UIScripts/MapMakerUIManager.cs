@@ -208,7 +208,7 @@ public class MapMakerUIManager : MonoBehaviour
                 //Debug.Log("BuildUI: groundTileBase.TileBase is Tile: " + groundTileBase.name + " sprite name is: " + t.sprite.name.ToString());
 
                 // saving all tile objects that aren't rule tiles or obstacles to reference when player selects to see manual tiles
-                if (groundTileBase.GetType() != typeof(MapMakerObstacle) && groundTileBase.GetType() != typeof(MapMakerTool) && groundTileBase.GroundTileType != GroundTileType.CourseMarkers) 
+                if (groundTileBase.GetType() != typeof(MapMakerObstacle) && groundTileBase.GetType() != typeof(MapMakerTool) && groundTileBase.GroundTileType != GroundTileType.CourseMarkers && groundTileBase.GroundTileType != GroundTileType.DirectionTiles) 
                 {
                     if (!_manualTileObjects.Contains(inst))
                         _manualTileObjects.Add(inst);
