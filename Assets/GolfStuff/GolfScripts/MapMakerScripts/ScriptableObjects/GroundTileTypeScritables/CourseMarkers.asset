@@ -15,4 +15,5 @@ MonoBehaviour:
   _placeType: 1
   _sortingOrder: 0
   _tileMap: {fileID: 0}
-  _placementRestrictions: []
+  _placementRestrictions:
+  - {fileID: 11400000}

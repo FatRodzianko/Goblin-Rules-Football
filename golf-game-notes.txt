@@ -683,7 +683,7 @@ x When a hole is loaded, clear the MapMakerHistory, disable the "save hole butto
 - Data still missing from HoleData that TilemapManager will need to load a file:
 - - x tee off location
 - - - - - - do with a tile placement?
-- - - Tee marker positions (the blue ball things)
+- - x Tee marker positions (the blue ball things)
 - - - - - - do with a tile placement
 - - - Camera bounding box Position:
 - - - - - - Should just be Vector3.zero for everything based on my saved courses?
@@ -703,11 +703,13 @@ x When a hole is loaded, clear the MapMakerHistory, disable the "save hole butto
 - - - - - - Maybe display "zoom value" while player is zooming out. Then have button to "Save Zoom Value" that will save it to the hole data?
 - - x Tee off aim point
 - - - - - x tile placement?
-- - - Course aim points
+- - x Course aim points
 - - - - - - Tile placement? Unsure yet how to let the player set the "order" of the course aim points for numbering them yet though
 - - - - - - - - - maybe just have a 1/2/3/4/5 tile that can be placed?
 - - - - - - player just places the Aimpoint/crosshair tile. When map is saved, go through each, calculate distance to [tee off location] from that aimpoint, order the list of aimpoints from there?
 - - - - - - - - - stop counting aimpoints after 5?
+- - - - - x player places aimpoint as a tile. When the hole is saved it calculates the distance from the tee off location for each aim point and orders them in the saved list for the hole
+- - - - - - - x limited to 4 aim points. If an aim point is placed after the 4th has been, the first one in the list is removed
 - - x Statues/Statue positions
 - - - - - x placed with tile as an obstacle. When saving, or maybe when loading the hole, check if obstacle is of type "statue" to build out the "Statues" value for the Scriptable hole?
 - - - - - - Currently just saves statue position and "statue type." When having the game "load" a custom course, will need to get the statue's ScriptableObstacle from something else to spawn the prefab?
@@ -717,7 +719,7 @@ x When a hole is loaded, clear the MapMakerHistory, disable the "save hole butto
 - - - - - - will probably not include this in map maker unless I can figure out a good way to let the player set pairs of tubes?
 - - - Minigolf pipes
 - - - - - - same as tubes, likely won't include unless able to let player set pais
-- - - direction tiles...
+- - x direction tiles...
 - - - - - - just need to add them as a tile type?
 
 - Probably don't need to save individual values like SavedStatues or SavedPowerupBalloons in the json files. Instead, save them all as obstacles, then:
@@ -727,6 +729,13 @@ x When a hole is loaded, clear the MapMakerHistory, disable the "save hole butto
 - - - - - - loops through all MapMakerGroundTileBase types from mapMakerTiles. Creates mapping of GUID to TileBase
 - - - - - - if the MapMakerGroundTileBase is of type MapMakerObstacle, creates mapping of GUID to the obstacles ScriptableObstacle
 - - - - - - then, when building out the new ScriptableHole, can create things like SavedObstacles, SavedStatues, SavedBalloonPowerUp, etc. by getting the required ScriptableObstacle by looking up the tile's GUID 
+
+- Move the "available courses" from TitleScreenManager to the CustomCourseLoader
+- - - CustomCourseLoader creates new "AvailableCourse" scriptable object, adds in the "default" courses
+- - - CustomCourseLoader then loads and adds custom courses
+- - - after all courses added to AvailableCourse, tell TitleScreenManager to update course dropdowns and whatever
+- - - GameplayManagerTopDownGolf will also reference AvailableCourses from CustomCourseLoader instead of its own reference to the old scriptable object
+- - - - - - I think all the addressable stuff I am doing in RpcTellClientsToLoadCourse to load a course is bullshit? Just have it find the course from _availableCourses's using its courseID, and then use that to create the "CourseToPlay"?
 
 
 ### Integrating custom maps to default ones...

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
 using Steamworks;
+using System.Linq;
 
 public class TitleScreenManager : MonoBehaviour
 {
@@ -191,6 +192,7 @@ public class TitleScreenManager : MonoBehaviour
         if (listOfLobbyListItems.Count > 0)
             DestroyOldLobbyListItems();
         IsMusicAlreadyPlaying();
+        //if (_availableCourses && _selectCourseDropdown)
         if (_availableCourses && _selectCourseDropdown)
         {
             UpdateAvailableCourses();
@@ -783,6 +785,8 @@ public class TitleScreenManager : MonoBehaviour
     }
     void UpdateAvailableCourses()
     {
+        UpdateCustomCourses();
+        Debug.Log("UpdateAvailableCourses: ");
         _selectCourseDropdown.ClearOptions();
         List<string> courseOptions = new List<string>();
         foreach (ScriptableCourse course in _availableCourses.Courses)
@@ -793,6 +797,37 @@ public class TitleScreenManager : MonoBehaviour
             _selectCourseDropdown.AddOptions(courseOptions);
 
         CourseSelected(0);
+    }
+    void UpdateCustomCourses()
+    {
+        CustomGolfCourseLoader loader = CustomGolfCourseLoader.GetInstance();
+        if (loader == null)
+            return;
+        if (!loader.HaveCustomCoursesBeenLoaded)
+        {
+            loader.LoadAllCustomCourses();
+        }
+
+        if (loader.CustomCourses.Count > 0)
+        {
+            foreach (ScriptableCourse customCourse in loader.CustomCourses)
+            {
+                if (_availableCourses.Courses.Any(x => x.id == customCourse.id))
+                {
+                    Debug.Log("UpdateCustomCourses: Course with ID of: " + customCourse.id + " is already in list of available courses. Skipping...");
+                    continue;
+                }
+
+                if (customCourse.HolesInCourse.Length <= 0)
+                {
+                    Debug.Log("UpdateCustomCourses: Custom Course with ID of: " + customCourse.id + " does not have any holes. Skipping...");
+                    continue;
+                }
+                Debug.Log("UpdateCustomCourses: Adding Custom Course with ID of: " + customCourse.id + " named: " + customCourse.name + " and has " + customCourse.HolesInCourse.Length + " number of holes.");
+                _availableCourses.Courses.Add(customCourse);
+                    
+            }
+        }
     }
     public void CourseSelected(int index)
     {

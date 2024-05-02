@@ -157,7 +157,8 @@ public class TileMapManager : MonoBehaviour
                     yield return new SavedTile()
                     {
                         TilePos = pos,
-                        MyTile = map.GetTile<Tile>(pos)
+                        //MyTile = map.GetTile<Tile>(pos)
+                        MyTile = map.GetTile<TileBase>(pos)
                     };
                 }
             }
@@ -613,6 +614,7 @@ public class TileMapManager : MonoBehaviour
         // Spawn the camera bounding box and add it to the camera
         GameObject boundingBox = Instantiate(_cameraBoundingBox, hole.CameraBoundingBoxPos, Quaternion.identity);
         PolygonCollider2D polygonCollider = boundingBox.GetComponent<PolygonCollider2D>();
+
         // Check if TileMapManager has a reference to the camera or not
         if (!_myCamera)
             _myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
@@ -700,10 +702,11 @@ public class TileMapManager : MonoBehaviour
         else return new List<Vector3>() { Vector3.zero };
     }
     public void SetTileOnTileMap(Tilemap map, List<SavedTile> savedTiles)
-    {
-        Debug.Log("SetTileOnTileMap: map type: " + map.name + " and tiles to set: " + savedTiles.Count.ToString());
+    {        
         if (savedTiles.Count <= 0)
             return;
+
+        Debug.Log("SetTileOnTileMap: map type: " + map.name + " and tiles to set: " + savedTiles.Count.ToString());
         foreach (SavedTile savedTile in savedTiles)
         {
             map.SetTile(savedTile.TilePos, savedTile.MyTile);

@@ -668,6 +668,33 @@ public class MapMakerUIManager : MonoBehaviour
             _selectedHole.TeeOffLocation = Vector3.zero;
             _selectedHole.CourseAimPoints = null;
         }
+        // save hole position
+        if (_mapMakerBuilder.HasHoleBeenPlaced)
+        {
+            _selectedHole.HolePosition = _mapMakerBuilder.HolePositon;
+        }
+        if (_mapMakerBuilder.HaveBothTeeOffMarkersBeenPlaced)
+        {
+            if (_mapMakerBuilder.TeeOffMarkerPositions.Count == 2)
+            {
+                _selectedHole.TeeOffMarkerPositions.Clear();
+                foreach (Vector3Int markerPosition in _mapMakerBuilder.TeeOffMarkerPositions)
+                {
+                    _selectedHole.TeeOffMarkerPositions.Add(markerPosition);
+                }
+            }
+            
+
+        }
+        // Check if the hole is "complete" or not. Not including aim points at the moment since as long as the hole has been placed, there should be at least one aim point
+        if (_mapMakerBuilder.HasHoleBeenPlaced && _mapMakerBuilder.HasTeeOffLocationBeenPlaced && _mapMakerBuilder.HaveBothTeeOffMarkersBeenPlaced && _mapMakerBuilder.TeeOffMarkerPositions.Count == 2 && _mapMakerBuilder.HasTeeOffLocationBeenPlaced)
+        {
+            _selectedHole.IsHoleCompleted = true;
+        }
+        else
+        {
+            _selectedHole.IsHoleCompleted = false;
+        }
         _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
     }
     public void LoadHole()

@@ -1109,7 +1109,47 @@ MonoBehaviour:
   FairwayTiles: []
   RoughTiles: []
   DeepRoughTiles: []
-  SandTrapTiles: []
+  SandTrapTiles:
+  - TilePos: {x: -4, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -3, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -2, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -1, y: 7, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -5, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -4, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -3, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -2, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -1, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: 0, y: 8, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -5, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -4, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -3, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -2, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -1, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: 0, y: 9, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -4, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -3, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -2, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
+  - TilePos: {x: -1, y: 10, z: 0}
+    MyTile: {fileID: 11400000, guid: e3f5240aa2a1cd64ba338bbbff1378e1, type: 2}
   WaterTrapTiles: []
   EdgesTiles: []
   DirectionTiles:

@@ -56,7 +56,8 @@ public class ScriptableHole : ScriptableObject
 public class SavedTile 
 {
     public Vector3Int TilePos;
-    public Tile MyTile;
+    //public Tile MyTile;
+    public TileBase MyTile;
 }
 [Serializable]
 public class SavedObstacle

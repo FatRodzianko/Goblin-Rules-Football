@@ -472,5 +472,8 @@ public class HoleData
     public Vector3 ZoomOutPosition;
     public Vector3 TeeOffLocation;
     public Vector3[] CourseAimPoints;
+    public Vector3 HolePosition;
+    public List<Vector3> TeeOffMarkerPositions = new List<Vector3>();
+    public bool IsHoleCompleted = false;
 }
 

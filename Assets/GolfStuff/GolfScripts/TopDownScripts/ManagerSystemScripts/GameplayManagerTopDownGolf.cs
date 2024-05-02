@@ -274,7 +274,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         RainManager.instance.SetGameRainMode(GolfSteamLobby.instance.GameRainMode);
         WindManager.instance.SetGameWindMode(GolfSteamLobby.instance.GameWindMode);
         this.SelectedCourseId = GolfSteamLobby.instance.SelectedCourseID;
-        Debug.Log("GetGameSettings: this.SelectedCourseId: " + this.SelectedCourseId+ " GolfSteamLobby.instance.SelectedCourseId: " + GolfSteamLobby.instance.SelectedCourseId);
+        Debug.Log("GetGameSettings: this.SelectedCourseId: " + this.SelectedCourseId+ " GolfSteamLobby.instance.SelectedCourseId: " + GolfSteamLobby.instance.SelectedCourseID);
         this.CourseHolesToPlay = GolfSteamLobby.instance.CourseHoleSelection;
         
         this.CustomHolesSelectedToPlay.Clear();
@@ -285,12 +285,16 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         Debug.Log("RpcTellClientsToLoadCourse: " + courseName.ToString() + " custome holes length: " + customHoles.Count.ToString() + " course id is: " + courseID);
 
+        // OLD BEFORE CUSTOM COURSES
         // Get the addressable path of a course based on the courseId provided by the server?
-        string addressablePath = _availableCourses.Courses.Find(x => x.id == courseID).id;
+        //string addressablePath = _availableCourses.Courses.Find(x => x.id == courseID).id;
 
-        //AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
-        AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>(addressablePath);
-        ScriptableCourse course = loadCourse.WaitForCompletion();
+        ////AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
+        //AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>(addressablePath);
+        //ScriptableCourse course = loadCourse.WaitForCompletion();
+        // OLD BEFORE CUSTOM COURSES
+
+        ScriptableCourse course = _availableCourses.Courses.Find(x => x.id == courseID);
 
         CourseToPlay = ScriptableObject.CreateInstance<ScriptableCourse>();
         CourseToPlay.CourseName = course.CourseName;

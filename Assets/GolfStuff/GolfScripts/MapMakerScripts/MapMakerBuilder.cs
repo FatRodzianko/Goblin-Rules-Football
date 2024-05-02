@@ -80,6 +80,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     [SerializeField] bool _bothTeeMarkersPlaced = false;
     [SerializeField] List<Vector3Int> _teeOffMarkerPositions = new List<Vector3Int>();
 
+    // Hole/Flag placement
+    [SerializeField] bool _hasHoleBeenPlaced = false;
+    [SerializeField] Vector3Int _holePosition = Vector3Int.zero;
+
 
     protected override void Awake()
     {
@@ -248,6 +252,30 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         get {
             return _aimPoints;
+        }
+    }
+    public bool HaveBothTeeOffMarkersBeenPlaced
+    {
+        get{
+            return _bothTeeMarkersPlaced;
+        }
+    }
+    public List<Vector3Int> TeeOffMarkerPositions
+    {
+        get {
+            return  _teeOffMarkerPositions;
+        }
+    }
+    public bool HasHoleBeenPlaced
+    {
+        get {
+            return _hasHoleBeenPlaced;
+        }
+    }
+    public Vector3Int HolePositon
+    {
+        get {
+            return _holePosition;
         }
     }
 
@@ -618,7 +646,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             List<Tilemap> allowedMaps = allowedCategories.ConvertAll(category => category.Tilemap);
             if (allowedMaps.Count > 0)
             {
-                return !DoesTilemapMatchCanOnlyBePlacedOnTheseGroundTypes(allowedMaps, position);
+                //return !DoesTilemapMatchCanOnlyBePlacedOnTheseGroundTypes(allowedMaps, position);
+                if (!DoesTilemapMatchCanOnlyBePlacedOnTheseGroundTypes(allowedMaps, position))
+                {
+                    return true;
+                }
             }
         }
 
@@ -915,6 +947,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         // Save the MapMakerGroundTileType of the obstacle to save for History Steps and stuff
         _obstalceGroundTileBaseByPosition.Add(position, obstacle);
 
+        // Check if the obstacle is a hole or not that needs to have its position saved?
+        CheckIfPlacingHoleFlag(position, obstacle);
+
         Debug.Log("PlaceObstacle: NEW OBJECT has been placeed at this position: " + position + " : " + _placeObstaclesByPostion[position].name);
     }
     public void RemoveObstacle(Vector3Int position, bool removeFromDict = true)
@@ -931,11 +966,14 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         if (removeFromDict)
         {
+            CheckIfRemovingHoleFlag(position);
             _placeObstaclesByPostion.Remove(position);
             _obstalceGroundTileBaseByPosition.Remove(position);
         }
+
             
     }
+
     public void ClearAllObstacles()
     {
         Debug.Log("ClearAllObstacles: ");
@@ -948,6 +986,73 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             _placeObstaclesByPostion.Clear();
             _obstalceGroundTileBaseByPosition.Clear();
         }
+
+        // Reset hole stuff?
+        _hasHoleBeenPlaced = false;
+        _holePosition = Vector3Int.zero;
+    }
+    void CheckIfPlacingHoleFlag(Vector3Int position, MapMakerObstacle obstacle)
+    {
+        if (obstacle == null)
+            return;
+        if (obstacle.ObstacleType != ObstacleType.Hole)
+            return;
+
+        Debug.Log("CheckIfPlacingHoleFlag: for position: " + position + " has hole already been placed on this hole?: " + _hasHoleBeenPlaced);
+        if (_hasHoleBeenPlaced)
+        {
+            Debug.Log("CheckIfPlacingHoleFlag: _hasHoleBeenPlaced is: " + _hasHoleBeenPlaced + " removing hole at postion: " + _holePosition);
+            GameObject holeToRemove = _placeObstaclesByPostion[_holePosition];
+            if (holeToRemove != null)
+            {
+                MapMakerGroundTileBase holeToRemoveTileBase = _obstalceGroundTileBaseByPosition[_holePosition];
+                if (holeToRemoveTileBase != null)
+                {
+                    if (holeToRemoveTileBase.GetType() == typeof(MapMakerObstacle))
+                    {
+                        MapMakerObstacle holeToRemoveObstacle = (MapMakerObstacle)holeToRemoveTileBase;
+                        if (holeToRemoveObstacle.ObstacleType == ObstacleType.Hole)
+                        {
+                            Debug.Log("CheckIfPlacingHoleFlag: a hole is at position: " + position + ". Removing the old hole information for the new hole?");
+                            
+                            CreateHistoryEntryWhenRemovingRestrictedObjectOrTile(_holePosition, (MapMakerGroundTileBase)holeToRemoveObstacle);
+
+                            // Remove the old hole obstacle
+                            RemoveObstacle(_holePosition);
+
+                        }
+                    }
+                }
+            }
+        }
+
+        _hasHoleBeenPlaced = true;
+        _holePosition = position;
+
+    }
+    void CheckIfRemovingHoleFlag(Vector3Int position)
+    {
+        if (!_hasHoleBeenPlaced)
+            return;
+        if (!_obstalceGroundTileBaseByPosition.ContainsKey(position))
+            return;
+
+        Debug.Log("CheckIfRemovingHoleFlag: for position: " + position + " has hole already been placed on this hole?: " + _hasHoleBeenPlaced);
+        MapMakerGroundTileBase holeToRemoveTileBase = _obstalceGroundTileBaseByPosition[position];
+        if (holeToRemoveTileBase != null)
+        {
+            if (holeToRemoveTileBase.GetType() == typeof(MapMakerObstacle))
+            {
+                MapMakerObstacle holeToRemoveObstacle = (MapMakerObstacle)holeToRemoveTileBase;
+                if (holeToRemoveObstacle.ObstacleType == ObstacleType.Hole)
+                {
+                    Debug.Log("CheckIfRemovingHoleFlag: a hole is at position: " + position + ". Resetting hole placement information");
+                    _hasHoleBeenPlaced = false;
+                    _holePosition = Vector3Int.zero;
+                }
+            }
+        }
+
     }
     public void PlaceCourseMarker(Vector3Int position, MapMakerCourseMarker courseMarker, bool checkIsForbidden = false)
     {
@@ -1008,18 +1113,21 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         // Remove any previously exisiting tilemap markers?
         if (_hasTeeOffLocationBeenPlaced)
         {
-            courseMarker.MapMakerTileType.Tilemap.SetTile(_teeOffLocationPosition, null);
+            //courseMarker.MapMakerTileType.Tilemap.SetTile(_teeOffLocationPosition, null);
+            //_hasTeeOffLocationBeenPlaced = false;
+
+            //// Add a "deletion" to the history?
+            //// Create arrays required for the History Steps
+            //List<TileBase> previousTiles = new List<TileBase>{courseMarker.TileBase};
+            //TileBase[] newTiles = new List<TileBase> { null }.ToArray();
+            //Vector3Int[] positions = new List<Vector3Int> { _teeOffLocationPosition }.ToArray();
+            //MapMakerGroundTileBase[] prevMapMakerTileBases = new List<MapMakerGroundTileBase> { (MapMakerGroundTileBase)courseMarker }.ToArray();
+            //MapMakerGroundTileBase[] newMapMakerTileBases = new List<MapMakerGroundTileBase> { null }.ToArray();
+
+            //_mapMakerHistory.Add(new MapMakerHistoryStep(courseMarker.MapMakerTileType.Tilemap, previousTiles.ToArray(), newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
+
+            CreateHistoryEntryWhenRemovingRestrictedObjectOrTile(_teeOffLocationPosition, (MapMakerGroundTileBase)courseMarker);
             _hasTeeOffLocationBeenPlaced = false;
-
-            // Add a "deletion" to the history?
-            // Create arrays required for the History Steps
-            List<TileBase> previousTiles = new List<TileBase>{courseMarker.TileBase};
-            TileBase[] newTiles = new List<TileBase> { null }.ToArray();
-            Vector3Int[] positions = new List<Vector3Int> { _teeOffLocationPosition }.ToArray();
-            MapMakerGroundTileBase[] prevMapMakerTileBases = new List<MapMakerGroundTileBase> { (MapMakerGroundTileBase)courseMarker }.ToArray();
-            MapMakerGroundTileBase[] newMapMakerTileBases = new List<MapMakerGroundTileBase> { null }.ToArray();
-
-            _mapMakerHistory.Add(new MapMakerHistoryStep(courseMarker.MapMakerTileType.Tilemap, previousTiles.ToArray(), newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
         }
 
         _teeOffLocationPosition = position;
@@ -1045,32 +1153,21 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         if (_aimPoints.Count >= 4 && !_aimPoints.Contains(position))
         {
             Vector3Int oldPoint = _aimPoints[0];
-            //bool isTeeOffMarkerOnThisPoint = false;
-            //if (courseMarker.MapMakerTileType.Tilemap.HasTile(position))
-            //{
-            //    TileBase oldTileBase = courseMarker.MapMakerTileType.Tilemap.GetTile(position);
-            //    if (_tileBaseToMapMakerObject.ContainsKey(oldTileBase))
-            //    {
-            //        MapMakerCourseMarker marker = (MapMakerCourseMarker)_tileBaseToMapMakerObject[oldTileBase];
-            //        if (marker.CourseMarkerType == CourseMarkerType.TeeOffLocation)
-            //            isTeeOffMarkerOnThisPoint = true;
-            //    }
-            //    if (!isTeeOffMarkerOnThisPoint)
-            //        courseMarker.MapMakerTileType.Tilemap.SetTile(oldPoint, null);
-            //}
             if (!IsThereATeeOffMarkerAtThisPoint(courseMarker.MapMakerTileType.Tilemap, oldPoint))
             {
-                courseMarker.MapMakerTileType.Tilemap.SetTile(oldPoint, null);
+                //courseMarker.MapMakerTileType.Tilemap.SetTile(oldPoint, null);
 
-                // Add a "deletion" to the history?
-                // Create arrays required for the History Steps
-                List<TileBase> previousTiles = new List<TileBase> { courseMarker.TileBase };
-                TileBase[] newTiles = new List<TileBase> { null }.ToArray();
-                Vector3Int[] positions = new List<Vector3Int> { oldPoint }.ToArray();
-                MapMakerGroundTileBase[] prevMapMakerTileBases = new List<MapMakerGroundTileBase> { (MapMakerGroundTileBase)courseMarker }.ToArray();
-                MapMakerGroundTileBase[] newMapMakerTileBases = new List<MapMakerGroundTileBase> { null }.ToArray();
+                //// Add a "deletion" to the history?
+                //// Create arrays required for the History Steps
+                //List<TileBase> previousTiles = new List<TileBase> { courseMarker.TileBase };
+                //TileBase[] newTiles = new List<TileBase> { null }.ToArray();
+                //Vector3Int[] positions = new List<Vector3Int> { oldPoint }.ToArray();
+                //MapMakerGroundTileBase[] prevMapMakerTileBases = new List<MapMakerGroundTileBase> { (MapMakerGroundTileBase)courseMarker }.ToArray();
+                //MapMakerGroundTileBase[] newMapMakerTileBases = new List<MapMakerGroundTileBase> { null }.ToArray();
 
-                _mapMakerHistory.Add(new MapMakerHistoryStep(courseMarker.MapMakerTileType.Tilemap, previousTiles.ToArray(), newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
+                //_mapMakerHistory.Add(new MapMakerHistoryStep(courseMarker.MapMakerTileType.Tilemap, previousTiles.ToArray(), newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
+
+                CreateHistoryEntryWhenRemovingRestrictedObjectOrTile(oldPoint, (MapMakerGroundTileBase)courseMarker);
             }
                 
 
@@ -1138,17 +1235,19 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             Vector3Int oldPoint = _teeOffMarkerPositions[0];
             if (!IsThereATeeOffMarkerAtThisPoint(courseMarker.MapMakerTileType.Tilemap, oldPoint))
             {
-                courseMarker.MapMakerTileType.Tilemap.SetTile(oldPoint, null);
+                //courseMarker.MapMakerTileType.Tilemap.SetTile(oldPoint, null);
 
-                // Add a "deletion" to the history?
-                // Create arrays required for the History Steps
-                List<TileBase> previousTiles = new List<TileBase> { courseMarker.TileBase };
-                TileBase[] newTiles = new List<TileBase> { null }.ToArray();
-                Vector3Int[] positions = new List<Vector3Int> { oldPoint }.ToArray();
-                MapMakerGroundTileBase[] prevMapMakerTileBases = new List<MapMakerGroundTileBase> { (MapMakerGroundTileBase)courseMarker }.ToArray();
-                MapMakerGroundTileBase[] newMapMakerTileBases = new List<MapMakerGroundTileBase> { null }.ToArray();
+                //// Add a "deletion" to the history?
+                //// Create arrays required for the History Steps
+                //List<TileBase> previousTiles = new List<TileBase> { courseMarker.TileBase };
+                //TileBase[] newTiles = new List<TileBase> { null }.ToArray();
+                //Vector3Int[] positions = new List<Vector3Int> { oldPoint }.ToArray();
+                //MapMakerGroundTileBase[] prevMapMakerTileBases = new List<MapMakerGroundTileBase> { (MapMakerGroundTileBase)courseMarker }.ToArray();
+                //MapMakerGroundTileBase[] newMapMakerTileBases = new List<MapMakerGroundTileBase> { null }.ToArray();
 
-                _mapMakerHistory.Add(new MapMakerHistoryStep(courseMarker.MapMakerTileType.Tilemap, previousTiles.ToArray(), newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
+                //_mapMakerHistory.Add(new MapMakerHistoryStep(courseMarker.MapMakerTileType.Tilemap, previousTiles.ToArray(), newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
+
+                CreateHistoryEntryWhenRemovingRestrictedObjectOrTile(oldPoint, (MapMakerGroundTileBase)courseMarker);
             }
 
 
@@ -1191,6 +1290,23 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             _bothTeeMarkersPlaced = true;
         else
             _bothTeeMarkersPlaced = false;
+    }
+    void CreateHistoryEntryWhenRemovingRestrictedObjectOrTile(Vector3Int position, MapMakerGroundTileBase oldTileBase)
+    {
+        if (oldTileBase == null)
+            return;
+
+        oldTileBase.MapMakerTileType.Tilemap.SetTile(position, null);
+
+        // Add a "deletion" to the history?
+        // Create arrays required for the History Steps
+        List<TileBase> previousTiles = new List<TileBase> { oldTileBase.TileBase };
+        TileBase[] newTiles = new List<TileBase> { null }.ToArray();
+        Vector3Int[] positions = new List<Vector3Int> { position }.ToArray();
+        MapMakerGroundTileBase[] prevMapMakerTileBases = new List<MapMakerGroundTileBase> { oldTileBase }.ToArray();
+        MapMakerGroundTileBase[] newMapMakerTileBases = new List<MapMakerGroundTileBase> { null }.ToArray();
+
+        _mapMakerHistory.Add(new MapMakerHistoryStep(oldTileBase.MapMakerTileType.Tilemap, previousTiles.ToArray(), newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
     }
     public MapMakerGroundTileBase GetObstacleAtPosition(Vector3Int position)
     {

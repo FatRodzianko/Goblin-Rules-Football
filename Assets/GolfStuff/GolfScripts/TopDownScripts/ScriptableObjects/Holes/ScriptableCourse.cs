@@ -36,4 +36,5 @@ public class ScriptableCourse : ScriptableObject
     public string CourseName;
     public ScriptableHole[] HolesInCourse;
     public string AddressablePath;
+    public bool IsCustomCourse = false;
 }
