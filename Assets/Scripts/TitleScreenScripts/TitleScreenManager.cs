@@ -60,7 +60,8 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private TMP_InputField multiplayerMercyRuleInputField;
 
     [Header("Golf MultiplayerGameOptions")]
-    [SerializeField] private AvailableCourses _availableCourses;
+    //[SerializeField] private AvailableCourses _availableCourses;
+    [SerializeField] private CustomGolfCourseLoader _customGolfCourseLoader;
     [SerializeField] private int _selectedCourseIndex;
     [SerializeField] private string _selectedCourseId;
     [SerializeField] private string _selectedCourseName;
@@ -173,7 +174,7 @@ public class TitleScreenManager : MonoBehaviour
     private void Awake()
     {
         MakeInstance();
-        ReturnToMainMenu();
+        ReturnToMainMenu();        
     }
 
     void MakeInstance()
@@ -193,10 +194,15 @@ public class TitleScreenManager : MonoBehaviour
             DestroyOldLobbyListItems();
         IsMusicAlreadyPlaying();
         //if (_availableCourses && _selectCourseDropdown)
-        if (_availableCourses && _selectCourseDropdown)
-        {
-            UpdateAvailableCourses();
-        }
+        //if (_availableCourses && _selectCourseDropdown)
+        //{
+        //    UpdateAvailableCourses();
+        //}
+        if (_customGolfCourseLoader == null)
+            _customGolfCourseLoader = CustomGolfCourseLoader.GetInstance();
+
+        _customGolfCourseLoader.GetAllAvailableCourses();
+        UpdateAvailableCourses();
     }
 
     // Update is called once per frame
@@ -783,13 +789,20 @@ public class TitleScreenManager : MonoBehaviour
     {
         this._selectCustomHolesPanel.SetActive(false);
     }
-    void UpdateAvailableCourses()
+    public void UpdateAvailableCourses()
     {
-        UpdateCustomCourses();
+        //UpdateCustomCourses();
+
+        if (_customGolfCourseLoader.AllAvailableCourses.Courses.Count <= 0)
+            return;
+
         Debug.Log("UpdateAvailableCourses: ");
         _selectCourseDropdown.ClearOptions();
         List<string> courseOptions = new List<string>();
-        foreach (ScriptableCourse course in _availableCourses.Courses)
+        //foreach (ScriptableCourse course in _availableCourses.Courses)
+        
+
+        foreach (ScriptableCourse course in _customGolfCourseLoader.AllAvailableCourses.Courses)
         {
             courseOptions.Add(course.CourseName);
         }
@@ -798,37 +811,37 @@ public class TitleScreenManager : MonoBehaviour
 
         CourseSelected(0);
     }
-    void UpdateCustomCourses()
-    {
-        CustomGolfCourseLoader loader = CustomGolfCourseLoader.GetInstance();
-        if (loader == null)
-            return;
-        if (!loader.HaveCustomCoursesBeenLoaded)
-        {
-            loader.LoadAllCustomCourses();
-        }
+    //void UpdateCustomCourses()
+    //{
+    //    CustomGolfCourseLoader loader = CustomGolfCourseLoader.GetInstance();
+    //    if (loader == null)
+    //        return;
+    //    if (!loader.HaveCustomCoursesBeenLoaded)
+    //    {
+    //        loader.LoadAllCustomCourses();
+    //    }
 
-        if (loader.CustomCourses.Count > 0)
-        {
-            foreach (ScriptableCourse customCourse in loader.CustomCourses)
-            {
-                if (_availableCourses.Courses.Any(x => x.id == customCourse.id))
-                {
-                    Debug.Log("UpdateCustomCourses: Course with ID of: " + customCourse.id + " is already in list of available courses. Skipping...");
-                    continue;
-                }
+    //    if (loader.CustomCourses.Count > 0)
+    //    {
+    //        foreach (ScriptableCourse customCourse in loader.CustomCourses)
+    //        {
+    //            if (_availableCourses.Courses.Any(x => x.id == customCourse.id))
+    //            {
+    //                Debug.Log("UpdateCustomCourses: Course with ID of: " + customCourse.id + " is already in list of available courses. Skipping...");
+    //                continue;
+    //            }
 
-                if (customCourse.HolesInCourse.Length <= 0)
-                {
-                    Debug.Log("UpdateCustomCourses: Custom Course with ID of: " + customCourse.id + " does not have any holes. Skipping...");
-                    continue;
-                }
-                Debug.Log("UpdateCustomCourses: Adding Custom Course with ID of: " + customCourse.id + " named: " + customCourse.name + " and has " + customCourse.HolesInCourse.Length + " number of holes.");
-                _availableCourses.Courses.Add(customCourse);
+    //            if (customCourse.HolesInCourse.Length <= 0)
+    //            {
+    //                Debug.Log("UpdateCustomCourses: Custom Course with ID of: " + customCourse.id + " does not have any holes. Skipping...");
+    //                continue;
+    //            }
+    //            Debug.Log("UpdateCustomCourses: Adding Custom Course with ID of: " + customCourse.id + " named: " + customCourse.name + " and has " + customCourse.HolesInCourse.Length + " number of holes.");
+    //            _availableCourses.Courses.Add(customCourse);
                     
-            }
-        }
-    }
+    //        }
+    //    }
+    //}
     public void CourseSelected(int index)
     {
         Debug.Log("CourseSelected: new index: " + index.ToString() + " old index: " + _selectedCourseIndex.ToString());
@@ -838,9 +851,9 @@ public class TitleScreenManager : MonoBehaviour
     }
     void UpdateCourseHoleOptions(int index)
     {
-        if (_availableCourses.Courses.Count <= 0)
+        if (_customGolfCourseLoader.AllAvailableCourses.Courses.Count <= 0)
             return;
-        ScriptableCourse course = _availableCourses.Courses[index];
+        ScriptableCourse course = _customGolfCourseLoader.AllAvailableCourses.Courses[index];
 
         // set the selected course id? From each courses unique identifier?
         if (course.id == this._selectedCourseId)
@@ -872,7 +885,7 @@ public class TitleScreenManager : MonoBehaviour
     }
     void UpdateCustomHoleToggles(string courseId)
     {
-        ScriptableCourse course = _availableCourses.Courses.Find(x => x.id == courseId);
+        ScriptableCourse course = _customGolfCourseLoader.AllAvailableCourses.Courses.Find(x => x.id == courseId);
         int numberOfHolesInCourse = course.HolesInCourse.Length;
 
         for (int i = 0; i < _allToggles.Length; i++)

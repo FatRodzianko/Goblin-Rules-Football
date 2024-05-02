@@ -4,12 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
 
 public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
 {
+    [Header("Default/Builtin Courses")]
+    [SerializeField] AvailableCourses _builtinCourses;
+
+    [Header("Custom Courses")]
     [SerializeField] bool _haveCustomCoursesBeenLoaded = false;
     [SerializeField] List<ScriptableCourse> _customCourses = new List<ScriptableCourse>();
 
+    [Header("All Available Courses")]
+    [SerializeField] AvailableCourses _allAvailableCourses;
+
+    // Tilebase mapping for loading custom courses
     Dictionary<TileBase, MapMakerGroundTileBase> _tileBaseToMapMakerObject = new Dictionary<TileBase, MapMakerGroundTileBase>();
     Dictionary<string, TileBase> _guidToTileBase = new Dictionary<string, TileBase>();
 
@@ -27,9 +36,21 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
             return _customCourses;
         }
     }
+    public AvailableCourses AllAvailableCourses
+    {
+        get {
+            return _allAvailableCourses;
+        }
+    }
+    protected override void Awake()
+    {
+        base.Awake();
+        InitTileReferences();
+    }
     private void Start()
     {
-        InitTileReferences();
+        
+        
     }
     void InitTileReferences()
     {
@@ -47,11 +68,59 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
 
         }
     }
+    public void GetAllAvailableCourses()
+    {
+        if (!_haveCustomCoursesBeenLoaded)
+        {
+            InitializeAllAvailableCourses();
+            AddBuiltinCourses();
+            LoadAllCustomCourses();
+            AddCustomCourses();
+            _haveCustomCoursesBeenLoaded = true;
+        }        
+        
+    }
+    void InitializeAllAvailableCourses()
+    {
+        _allAvailableCourses = new AvailableCourses();
+    }
+    void AddBuiltinCourses()
+    {
+        if (_builtinCourses == null)
+            return;
+        if (_builtinCourses.Courses.Count <= 0)
+            return;
+        _allAvailableCourses.Courses.AddRange(_builtinCourses.Courses);
+    }
+    void AddCustomCourses()
+    {
+        if (_customCourses == null)
+            return;
+        if (_customCourses.Count <= 0)
+            return;
+
+        //_allAvailableCourses.Courses.AddRange(_customCourses);
+        foreach (ScriptableCourse course in _customCourses)
+        {
+            if (_allAvailableCourses.Courses.Any(x => x.id == course.id))
+            {
+                Debug.Log("AddCustomCourses: Course with ID of: " + course.id + " is already in list of available courses. Skipping...");
+                continue;
+            }
+
+            if (course.HolesInCourse.Length <= 0)
+            {
+                Debug.Log("UpdateCustomCourses: Custom Course with ID of: " + course.id + " does not have any holes. Skipping...");
+                continue;
+            }
+            _allAvailableCourses.Courses.Add(course);
+        }
+
+    }
 
     public void LoadAllCustomCourses()
     {
-        GetAllCustomCourseFilePaths();
-        _haveCustomCoursesBeenLoaded = true;
+        GetAllCustomCourseFilePaths();        
     }
 
     void GetAllCustomCourseFilePaths()

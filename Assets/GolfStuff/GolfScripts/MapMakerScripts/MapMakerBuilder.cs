@@ -6,6 +6,7 @@ using UnityEngine.InputSystem.Interactions;
 using UnityEngine.Tilemaps;
 using UnityEngine.EventSystems;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 {
@@ -141,6 +142,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         _playerInput.MapMaker.RectangleDrawMode.performed -= RForRectangleModePressed;
         _playerInput.MapMaker.MaximizeWindow.performed -= MaximizeShortCut;
         _playerInput.MapMaker.MinimizeWindow.performed -= MinimizeShortCut;
+
+        // Scene manager thing?
+        SceneManager.activeSceneChanged -= ChangedActiveScene;
+        
     }
     private void Start()
     {
@@ -152,6 +157,15 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         if (_mapMakerUIManager == null)
         {
             _mapMakerUIManager = GameObject.FindGameObjectWithTag("MapMakerUIManager").GetComponent<MapMakerUIManager>();
+        }
+        SceneManager.activeSceneChanged += ChangedActiveScene;
+    }
+    private void ChangedActiveScene(Scene current, Scene next)
+    {
+        Debug.Log("MapMakerBuilder: ChangedActiveScene: " + current.name + " to " + next.name);
+        if (next.name != "Golf-MapMaker")
+        {
+            Destroy(this);
         }
     }
     void InitTilemaps()

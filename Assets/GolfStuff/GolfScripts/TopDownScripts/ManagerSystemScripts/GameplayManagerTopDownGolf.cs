@@ -20,7 +20,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     public static GameplayManagerTopDownGolf instance;
 
     [Header("Course Information")]
-    [SerializeField] AvailableCourses _availableCourses;
+    //[SerializeField] AvailableCourses _availableCourses;
+    [SerializeField] CustomGolfCourseLoader _customGolfCourseLoader;
     [SerializeField] public ScriptableCourse CurrentCourse;
     [SerializeField] public ScriptableHole CurrentHoleInCourse;
     [SerializeField] [SyncVar] public int CurrentHoleIndex;
@@ -256,6 +257,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CourseToPlay);
         //PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CurrentCourse);
 
+        if (_customGolfCourseLoader == null)
+            _customGolfCourseLoader = CustomGolfCourseLoader.GetInstance();
+        _customGolfCourseLoader.GetAllAvailableCourses();
     }
 
     // Update is called once per frame
@@ -294,7 +298,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //ScriptableCourse course = loadCourse.WaitForCompletion();
         // OLD BEFORE CUSTOM COURSES
 
-        ScriptableCourse course = _availableCourses.Courses.Find(x => x.id == courseID);
+        //ScriptableCourse course = _availableCourses.Courses.Find(x => x.id == courseID);
+        ScriptableCourse course = _customGolfCourseLoader.AllAvailableCourses.Courses.Find(x => x.id == courseID);
 
         CourseToPlay = ScriptableObject.CreateInstance<ScriptableCourse>();
         CourseToPlay.CourseName = course.CourseName;
@@ -340,12 +345,26 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         else
         {
             Debug.Log("RpcTellClientsToLoadCourse: Loading: Front 3 (holes 1-3)");
-            List<ScriptableHole> holes = new List<ScriptableHole>()
+            List<ScriptableHole> holes = new List<ScriptableHole>();
+            if (course.HolesInCourse.Length > 3)
             {
-                course.HolesInCourse[0],
-                course.HolesInCourse[1],
-                course.HolesInCourse[2],
-            };
+                holes.Add(course.HolesInCourse[0]);
+                holes.Add(course.HolesInCourse[1]);
+                holes.Add(course.HolesInCourse[2]);
+            }
+            else
+            {
+                for (int i = 0; i < course.HolesInCourse.Length; i++)
+                {
+                    holes.Add(course.HolesInCourse[i]);
+                }
+            }
+            //List<ScriptableHole> holes = new List<ScriptableHole>()
+            //{
+            //    course.HolesInCourse[0],
+            //    course.HolesInCourse[1],
+            //    course.HolesInCourse[2],
+            //};
             CourseToPlay.HolesInCourse = holes.ToArray();
         }
         PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CourseToPlay);

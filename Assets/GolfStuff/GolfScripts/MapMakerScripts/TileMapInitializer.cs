@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
 
 public class TileMapInitializer : SingletonInstance<TileMapInitializer>
 {
@@ -10,8 +11,19 @@ public class TileMapInitializer : SingletonInstance<TileMapInitializer>
 
     private void Start()
     {
-        //CreateMaps();
-        //AssignTileMaps();
+        SceneManager.activeSceneChanged += ChangedActiveScene;
+    }
+    private void ChangedActiveScene(Scene current, Scene next)
+    {
+        Debug.Log("MapMakerBuilder: ChangedActiveScene: " + current.name + " to " + next.name);
+        if (next.name != "Golf-MapMaker")
+        {
+            Destroy(this);
+        }
+    }
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= ChangedActiveScene;
     }
     protected override void Awake()
     {

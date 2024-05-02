@@ -722,20 +722,20 @@ x When a hole is loaded, clear the MapMakerHistory, disable the "save hole butto
 - - x direction tiles...
 - - - - - - just need to add them as a tile type?
 
-- Probably don't need to save individual values like SavedStatues or SavedPowerupBalloons in the json files. Instead, save them all as obstacles, then:
-- - - Check obstacle type. If it is a statue, or a balloon, or a hole, or whatever, break those down and save in appropriate field for the New Scriptablehole
-- - - if it doesn't match one of those types, save under "Saved Obstacles"
-- - - When the "Custom Map Loader" first starts, it gets all MapMaker tiles and saves their GUID with MapMakerGroundTileBase[] mapMakerTiles = Resources.LoadAll<MapMakerGroundTileBase>("MapMakerGolf/GroundTileScriptables");
-- - - - - - loops through all MapMakerGroundTileBase types from mapMakerTiles. Creates mapping of GUID to TileBase
-- - - - - - if the MapMakerGroundTileBase is of type MapMakerObstacle, creates mapping of GUID to the obstacles ScriptableObstacle
-- - - - - - then, when building out the new ScriptableHole, can create things like SavedObstacles, SavedStatues, SavedBalloonPowerUp, etc. by getting the required ScriptableObstacle by looking up the tile's GUID 
+x Probably don't need to save individual values like SavedStatues or SavedPowerupBalloons in the json files. Instead, save them all as obstacles, then:
+- - x Check obstacle type. If it is a statue, or a balloon, or a hole, or whatever, break those down and save in appropriate field for the New Scriptablehole
+- - x if it doesn't match one of those types, save under "Saved Obstacles"
+- - x When the "Custom Map Loader" first starts, it gets all MapMaker tiles and saves their GUID with MapMakerGroundTileBase[] mapMakerTiles = Resources.LoadAll<MapMakerGroundTileBase>("MapMakerGolf/GroundTileScriptables");
+- - - - - x loops through all MapMakerGroundTileBase types from mapMakerTiles. Creates mapping of GUID to TileBase
+- - - - - x if the MapMakerGroundTileBase is of type MapMakerObstacle, creates mapping of GUID to the obstacles ScriptableObstacle
+- - - - - x then, when building out the new ScriptableHole, can create things like SavedObstacles, SavedStatues, SavedBalloonPowerUp, etc. by getting the required ScriptableObstacle by looking up the tile's GUID 
 
-- Move the "available courses" from TitleScreenManager to the CustomCourseLoader
-- - - CustomCourseLoader creates new "AvailableCourse" scriptable object, adds in the "default" courses
-- - - CustomCourseLoader then loads and adds custom courses
-- - - after all courses added to AvailableCourse, tell TitleScreenManager to update course dropdowns and whatever
-- - - GameplayManagerTopDownGolf will also reference AvailableCourses from CustomCourseLoader instead of its own reference to the old scriptable object
-- - - - - - I think all the addressable stuff I am doing in RpcTellClientsToLoadCourse to load a course is bullshit? Just have it find the course from _availableCourses's using its courseID, and then use that to create the "CourseToPlay"?
+x Move the "available courses" from TitleScreenManager to the CustomCourseLoader
+- - x CustomCourseLoader creates new "AvailableCourse" scriptable object, adds in the "default" courses
+- - x CustomCourseLoader then loads and adds custom courses
+- - x after all courses added to AvailableCourse, tell TitleScreenManager to update course dropdowns and whatever
+- - x GameplayManagerTopDownGolf will also reference AvailableCourses from CustomCourseLoader instead of its own reference to the old scriptable object
+- - - - - x I think all the addressable stuff I am doing in RpcTellClientsToLoadCourse to load a course is bullshit? Just have it find the course from _availableCourses's using its courseID, and then use that to create the "CourseToPlay"?
 
 
 ### Integrating custom maps to default ones...

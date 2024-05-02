@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
 
 public class MapMakerHistory : SingletonInstance<MapMakerHistory>
 {
@@ -30,6 +31,22 @@ public class MapMakerHistory : SingletonInstance<MapMakerHistory>
         CanUndoChanged = CanUndoChangedFunction;
         CanRedoChanged = CanRedoChangedFunction;
 
+    }
+    private void Start()
+    {
+        SceneManager.activeSceneChanged += ChangedActiveScene;
+    }
+    private void ChangedActiveScene(Scene current, Scene next)
+    {
+        Debug.Log("MapMakerBuilder: ChangedActiveScene: " + current.name + " to " + next.name);
+        if (next.name != "Golf-MapMaker")
+        {
+            Destroy(this);
+        }
+    }
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= ChangedActiveScene;
     }
     void CanUndoChangedFunction(bool canUndo)
     {
