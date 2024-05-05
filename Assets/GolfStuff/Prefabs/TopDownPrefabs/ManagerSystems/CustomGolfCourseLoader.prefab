@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2337923326771831749}
   - component: {fileID: 6770855317524257101}
+  - component: {fileID: 1177820962102686613}
   m_Layer: 0
   m_Name: CustomGolfCourseLoader
   m_TagString: Untagged
@@ -42,5 +43,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc11d2dd306ed2249b89ffa48e094554, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _steamWorkshopCourseDownloader: {fileID: 1177820962102686613}
+  _builtinCourses: {fileID: 11400000, guid: 83d00bb733777f64ebde5255c493e813, type: 2}
+  _haveCustomCoursesBeenLoaded: 0
+  _customCourses: []
+  _allAvailableCourses: {fileID: 0}
+--- !u!114 &1177820962102686613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8645467702334630809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b13f652c960eb8a47a67d1177d6bcbd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

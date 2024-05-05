@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
 {
+    [SerializeField] SteamWorkshopCourseDownloader _steamWorkshopCourseDownloader;
     [Header("Default/Builtin Courses")]
     [SerializeField] AvailableCourses _builtinCourses;
 
@@ -49,8 +50,20 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
     }
     private void Start()
     {
-        
-        
+        SceneManager.activeSceneChanged += ChangedActiveScene;
+
+    }
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= ChangedActiveScene;
+    }
+    private void ChangedActiveScene(Scene current, Scene next)
+    {
+        Debug.Log("CustomGolfCourseLoader: ChangedActiveScene: " + current.name + " to " + next.name);
+        if (next.name == "TitleScreen")
+        {
+            GetAllAvailableCourses(true);
+        }
     }
     void InitTileReferences()
     {
@@ -68,13 +81,18 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
 
         }
     }
-    public void GetAllAvailableCourses()
+    public void GetAllAvailableCourses(bool forceRecheck = false)
     {
-        if (!_haveCustomCoursesBeenLoaded)
+        Debug.Log("GetAllAvailableCourses: forceRecheck: " + forceRecheck);
+        if (!_haveCustomCoursesBeenLoaded || forceRecheck)
         {
             InitializeAllAvailableCourses();
+            _steamWorkshopCourseDownloader.SyncSubscribedToCourses();
             AddBuiltinCourses();
+            if (forceRecheck)
+                _customCourses.Clear();
             LoadAllCustomCourses();
+            
             AddCustomCourses();
             _haveCustomCoursesBeenLoaded = true;
         }        
@@ -82,7 +100,8 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
     }
     void InitializeAllAvailableCourses()
     {
-        _allAvailableCourses = new AvailableCourses();
+        //_allAvailableCourses = new AvailableCourses();
+        _allAvailableCourses = ScriptableObject.CreateInstance<AvailableCourses>();
     }
     void AddBuiltinCourses()
     {
@@ -120,6 +139,7 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
 
     public void LoadAllCustomCourses()
     {
+        Debug.Log("LoadAllCustomCourses: ");
         GetAllCustomCourseFilePaths();        
     }
 

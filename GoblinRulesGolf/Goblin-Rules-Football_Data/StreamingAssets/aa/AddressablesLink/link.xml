@@ -26,6 +26,10 @@
     <type fullname="FishNet.Object.NetworkObject" preserve="all" />
     <type fullname="FishNet.Object.TransformProperties" preserve="nothing" serialized="true" />
   </assembly>
+  <assembly fullname="Unity.2D.Tilemap.Extras, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="UnityEngine.RuleTile" preserve="all" />
+    <type fullname="UnityEngine.RuleTile/TilingRule" preserve="nothing" serialized="true" />
+  </assembly>
   <assembly fullname="Unity.Addressables, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" preserve="all">
     <type fullname="UnityEngine.AddressableAssets.Addressables" preserve="all" />
   </assembly>

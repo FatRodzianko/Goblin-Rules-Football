@@ -85,6 +85,10 @@ public class MapMakerUIManager : MonoBehaviour
     [Header("Save/Load Hole UI")]
     [SerializeField] Button _saveHoleButton;
     [SerializeField] Button _loadHoleButton;
+    [SerializeField] Button _uploadToWorkshopButton;
+
+    [Header("Steam workshop stuff?")]
+    [SerializeField] SteamWorkshopCourseSubmitter _steamWorkshopCourseSubmitter;
 
 
     #region Setters and Getters
@@ -378,7 +382,7 @@ public class MapMakerUIManager : MonoBehaviour
                         //if (!IsThisCourseMadeByThisPlayer(courseToLoad.CourseId))
                         //    continue;
 
-                        if (!IsThisCourseMadeByThisPlayer(courseToLoad.CreatorSteamID, courseToLoad.CreatorMacAddressHash))
+                        if (!IsThisCourseMadeByThisPlayer(courseToLoad.CreatorSteamIDHash, courseToLoad.CreatorMacAddressHash))
                             continue;
 
                         _allCustomCourses.Add(courseToLoad);
@@ -392,9 +396,9 @@ public class MapMakerUIManager : MonoBehaviour
             }
         }
     }
-    bool IsThisCourseMadeByThisPlayer(ulong courseCreatorSteamId, string courseCreatorMac)
+    bool IsThisCourseMadeByThisPlayer(string courseCreatorSteamId, string courseCreatorMac)
     {
-        return ((_saveHandler.GetPlayerSteamID() == courseCreatorSteamId && courseCreatorSteamId != 0) || _saveHandler.GetHashOfSystemMACAddress() == courseCreatorMac);
+        return ((_saveHandler.GetPlayerSteamID() == courseCreatorSteamId && !string.IsNullOrEmpty(courseCreatorSteamId)) || _saveHandler.GetHashOfSystemMACAddress() == courseCreatorMac);
     }
     //bool IsThisCourseMadeByThisPlayer(string courseId)
     //{
@@ -624,6 +628,8 @@ public class MapMakerUIManager : MonoBehaviour
         Debug.Log("CancelCreateNewHole: ");
 
         _createNewHoleButton.gameObject.SetActive(true);
+        if (_uploadToWorkshopButton.gameObject.activeInHierarchy)
+            _uploadToWorkshopButton.gameObject.SetActive(false);
         _createNewHolePanel.SetActive(false);
         _currentCourseDropDown.interactable = true;
         _currentHoleDropDown.interactable = true;
@@ -642,6 +648,8 @@ public class MapMakerUIManager : MonoBehaviour
         {
             _selectedHole = null;
             _createNewHoleButton.gameObject.SetActive(true);
+            if (_uploadToWorkshopButton.gameObject.activeInHierarchy)
+                _uploadToWorkshopButton.gameObject.SetActive(false);
             _saveHoleButton.gameObject.SetActive(false);
             _loadHoleButton.gameObject.SetActive(false);
         }
@@ -650,6 +658,8 @@ public class MapMakerUIManager : MonoBehaviour
             _selectedHole = _selectedCourse.HolesInCourse.FirstOrDefault(x => x.HoleIndex == _selectedHoleNumber);
             _createNewHoleButton.gameObject.SetActive(false);
             _saveHoleButton.gameObject.SetActive(false);
+            if (_uploadToWorkshopButton.gameObject.activeInHierarchy)
+                _uploadToWorkshopButton.gameObject.SetActive(false);
             _loadHoleButton.gameObject.SetActive(true);
         }
     }
@@ -659,9 +669,43 @@ public class MapMakerUIManager : MonoBehaviour
         if (_selectedCourse == null || _selectedHole == null || _selectedHoleNumber <= 0)
         {
             _saveHoleButton.gameObject.SetActive(false);
+            _uploadToWorkshopButton.gameObject.SetActive(false);
             return;
         }
         _saveHoleButton.gameObject.SetActive(enable);
+        //if (enable)
+        //    _uploadToWorkshopButton.gameObject.SetActive(false);
+            
+    }
+    void EnableUploadToWorkshopButton(bool enable)
+    {
+        try
+        {
+            if (!SteamManager.Initialized)
+            {
+                _uploadToWorkshopButton.gameObject.SetActive(false);
+                return;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log("EnableUploadToWorkshopButton: could not access steam manager? Error: " + e);
+            _uploadToWorkshopButton.gameObject.SetActive(false);
+            return;
+        }
+        
+        if (_selectedCourse == null || _selectedHole == null || _selectedHoleNumber <= 0)
+        {
+            _uploadToWorkshopButton.gameObject.SetActive(false);
+            return;
+        }
+        if (!_selectedCourse.HolesInCourse.Any(x => x.IsHoleCompleted))
+        {
+            _uploadToWorkshopButton.gameObject.SetActive(false);
+            return;
+        }
+
+        _uploadToWorkshopButton.gameObject.SetActive(enable);
     }
     public void SaveHole()
     {
@@ -674,16 +718,23 @@ public class MapMakerUIManager : MonoBehaviour
         _selectedHole.HoleTileMapData = _saveHandler.GetAllTileMapData();
         _selectedHole.PolygonPoints = _saveHandler.GetBoundsOfAllTileMaps().ToArray();
         _selectedHole.ZoomOutPosition = _saveHandler.GetCenterOfHoleBounds(_selectedHole.PolygonPoints);
-
         // Save the tee off location if it was set in the builder
-        if (_mapMakerBuilder.HasTeeOffLocationBeenPlaced && _mapMakerBuilder.AimPoints.Count > 0)
+        if (_mapMakerBuilder.HasTeeOffLocationBeenPlaced)
         {
             _selectedHole.TeeOffLocation = _mapMakerBuilder.TeeOffLocationPosition;
-            _selectedHole.CourseAimPoints = _saveHandler.OrderAimPointsByDistanceToTeeOff(_mapMakerBuilder.TeeOffLocationPosition, _mapMakerBuilder.AimPoints).ToArray();
         }
         else
         {
             _selectedHole.TeeOffLocation = Vector3.zero;
+        }
+        // Save the aim points if it was set in the builder
+        if (_mapMakerBuilder.AimPoints.Count > 0)
+        {
+            
+            _selectedHole.CourseAimPoints = _saveHandler.OrderAimPointsByDistanceToTeeOff(_mapMakerBuilder.TeeOffLocationPosition, _mapMakerBuilder.AimPoints).ToArray();
+        }
+        else
+        {
             _selectedHole.CourseAimPoints = null;
         }
         // save hole position
@@ -715,6 +766,7 @@ public class MapMakerUIManager : MonoBehaviour
         }
         //_selectedCourse.CreatorMacAddressHash = _saveHandler.GetHashOfSystemMACAddress();
         _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
+        EnableUploadToWorkshopButton(true);
     }
     public void LoadHole()
     {
@@ -727,5 +779,22 @@ public class MapMakerUIManager : MonoBehaviour
 
         _mapMakerHistory.ClearHistoryForNewHole();
         _saveHandler.LoadTileMapData(_selectedHole.HoleTileMapData);
+    }
+    public void UploadToWorkshopButtonPressed()
+    {
+        Debug.Log("UploadToWorkshopButtonPressed: ");
+        if (_selectedCourse == null)
+            return;
+        _steamWorkshopCourseSubmitter.UploadCourseToSteamWorkshop(_selectedCourse);
+    }
+    public void SetWorkshopIDAfterUpload(ulong publishedFileID)
+    {
+        if (_selectedCourse == null)
+            return;
+        if (publishedFileID == 0)
+            return;
+        Debug.Log("SetWorkshopIDAfterUpload: " + publishedFileID.ToString());
+        _selectedCourse.WorkshopPublishedItemID = publishedFileID;
+        _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
     }
 }

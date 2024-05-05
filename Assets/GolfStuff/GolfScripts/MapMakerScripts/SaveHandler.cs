@@ -188,7 +188,7 @@ public class SaveHandler : MonoBehaviour
         newCourse.RelativeFilePath = filename;
 
         newCourse.CreatorMacAddressHash = GetHashOfSystemMACAddress();
-        newCourse.CreatorSteamID = GetPlayerSteamID();
+        newCourse.CreatorSteamIDHash = GetPlayerSteamID();
 
         Debug.Log("CreateNewCourse: Creating a new course with name: " + courseName + " and is minigolf?: " + isMiniGolf + " with a filename of: " + filename);
         FileHandler.SaveToJSONFile<CourseData>(newCourse, filename);
@@ -436,8 +436,8 @@ public class SaveHandler : MonoBehaviour
             return;
         if (string.IsNullOrEmpty(courseToSave.CreatorMacAddressHash))
             courseToSave.CreatorMacAddressHash = GetHashOfSystemMACAddress();
-        if (courseToSave.CreatorSteamID == (ulong)0)
-            courseToSave.CreatorSteamID = GetPlayerSteamID();
+        if (string.IsNullOrEmpty(courseToSave.CreatorSteamIDHash))
+            courseToSave.CreatorSteamIDHash = GetPlayerSteamID();
         FileHandler.SaveToJSONFile<CourseData>(courseToSave, filename);
     }
     public string GetHashOfSystemMACAddress()
@@ -496,16 +496,18 @@ public class SaveHandler : MonoBehaviour
 
         return encoded;
     }
-    public ulong GetPlayerSteamID()
+    public string GetPlayerSteamID()
     {
         try
         {
-            return (ulong)SteamUser.GetSteamID();
+            //return (ulong)SteamUser.GetSteamID();
+            ulong steamID = (ulong)SteamUser.GetSteamID();
+            return CreateMD5(steamID.ToString());
         }
         catch (Exception e)
         {
             Debug.Log("GetPlayerSteamID: error getting steam id: " + e);
-            return (ulong)0;
+            return "";
         }
     }
 }
@@ -538,8 +540,9 @@ public class CourseData
     //public List<string> HolesInCourseFileNames; // change this to just be a list of HoleData? CourseData has list of HoleData, which has list of TilemapData, which has list of TileInfo?
     public List<HoleData> HolesInCourse = new List<HoleData>();
     public bool IsMiniGolf;
-    public ulong CreatorSteamID;
+    public string CreatorSteamIDHash;
     public string CreatorMacAddressHash;
+    public ulong WorkshopPublishedItemID;
 }
 [Serializable]
 public class HoleData

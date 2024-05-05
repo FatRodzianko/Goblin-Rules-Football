@@ -334,6 +334,34 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""EscMenu"",
+            ""id"": ""f549c1b9-73fa-4033-a312-e861aaec0ff8"",
+            ""actions"": [
+                {
+                    ""name"": ""Escape"",
+                    ""type"": ""Button"",
+                    ""id"": ""f6a948a1-001f-4505-a6ad-253e452fcbc6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""5f9c5f17-b776-4e43-9799-0a7cf416c0ad"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Escape"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -353,6 +381,9 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
         m_MapMaker_ZoomInOut = m_MapMaker.FindAction("ZoomInOut", throwIfNotFound: true);
         m_MapMaker_ResetZoom = m_MapMaker.FindAction("ResetZoom", throwIfNotFound: true);
         m_MapMaker_MoveCamera = m_MapMaker.FindAction("MoveCamera", throwIfNotFound: true);
+        // EscMenu
+        m_EscMenu = asset.FindActionMap("EscMenu", throwIfNotFound: true);
+        m_EscMenu_Escape = m_EscMenu.FindAction("Escape", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -537,6 +568,39 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
         }
     }
     public MapMakerActions @MapMaker => new MapMakerActions(this);
+
+    // EscMenu
+    private readonly InputActionMap m_EscMenu;
+    private IEscMenuActions m_EscMenuActionsCallbackInterface;
+    private readonly InputAction m_EscMenu_Escape;
+    public struct EscMenuActions
+    {
+        private @MapMakerGolfControls m_Wrapper;
+        public EscMenuActions(@MapMakerGolfControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Escape => m_Wrapper.m_EscMenu_Escape;
+        public InputActionMap Get() { return m_Wrapper.m_EscMenu; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(EscMenuActions set) { return set.Get(); }
+        public void SetCallbacks(IEscMenuActions instance)
+        {
+            if (m_Wrapper.m_EscMenuActionsCallbackInterface != null)
+            {
+                @Escape.started -= m_Wrapper.m_EscMenuActionsCallbackInterface.OnEscape;
+                @Escape.performed -= m_Wrapper.m_EscMenuActionsCallbackInterface.OnEscape;
+                @Escape.canceled -= m_Wrapper.m_EscMenuActionsCallbackInterface.OnEscape;
+            }
+            m_Wrapper.m_EscMenuActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Escape.started += instance.OnEscape;
+                @Escape.performed += instance.OnEscape;
+                @Escape.canceled += instance.OnEscape;
+            }
+        }
+    }
+    public EscMenuActions @EscMenu => new EscMenuActions(this);
     public interface IMapMakerActions
     {
         void OnMouseLeftClick(InputAction.CallbackContext context);
@@ -552,5 +616,9 @@ public partial class @MapMakerGolfControls : IInputActionCollection2, IDisposabl
         void OnZoomInOut(InputAction.CallbackContext context);
         void OnResetZoom(InputAction.CallbackContext context);
         void OnMoveCamera(InputAction.CallbackContext context);
+    }
+    public interface IEscMenuActions
+    {
+        void OnEscape(InputAction.CallbackContext context);
     }
 }
