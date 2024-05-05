@@ -4,6 +4,10 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System;
 using System.Linq;
+using System.Net.NetworkInformation;
+using System.Security.Cryptography;
+using System.Text;
+using Steamworks;
 
 public class SaveHandler : MonoBehaviour
 {
@@ -182,6 +186,9 @@ public class SaveHandler : MonoBehaviour
 
         string filename = "course_" + newCourse.CourseName.Replace(" ", string.Empty) + "_" + newCourse.CourseId + ".json";
         newCourse.RelativeFilePath = filename;
+
+        newCourse.CreatorMacAddressHash = GetHashOfSystemMACAddress();
+        newCourse.CreatorSteamID = GetPlayerSteamID();
 
         Debug.Log("CreateNewCourse: Creating a new course with name: " + courseName + " and is minigolf?: " + isMiniGolf + " with a filename of: " + filename);
         FileHandler.SaveToJSONFile<CourseData>(newCourse, filename);
@@ -427,7 +434,79 @@ public class SaveHandler : MonoBehaviour
     {
         if (courseToSave == null)
             return;
+        if (string.IsNullOrEmpty(courseToSave.CreatorMacAddressHash))
+            courseToSave.CreatorMacAddressHash = GetHashOfSystemMACAddress();
+        if (courseToSave.CreatorSteamID == (ulong)0)
+            courseToSave.CreatorSteamID = GetPlayerSteamID();
         FileHandler.SaveToJSONFile<CourseData>(courseToSave, filename);
+    }
+    public string GetHashOfSystemMACAddress()
+    {
+        string mac = GetMacAddress();
+        return CreateMD5(mac);
+    }
+    /// <summary>
+    /// Finds the MAC address of the NIC with maximum speed.
+    /// </summary>
+    /// <returns>The MAC address.</returns>
+    /// https://stackoverflow.com/questions/850650/reliable-method-to-get-machines-mac-address-in-c-sharp
+    private string GetMacAddress()
+    {
+        const int MIN_MAC_ADDR_LENGTH = 12;
+        string macAddress = string.Empty;
+        long maxSpeed = -1;
+
+        foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+        {
+            Debug.Log(
+                "Found MAC Address: " + nic.GetPhysicalAddress() +
+                " Type: " + nic.NetworkInterfaceType);
+
+            string tempMac = nic.GetPhysicalAddress().ToString();
+            if (nic.Speed > maxSpeed &&
+                !string.IsNullOrEmpty(tempMac) &&
+                tempMac.Length >= MIN_MAC_ADDR_LENGTH)
+            {
+                Debug.Log("New Max Speed = " + nic.Speed + ", MAC: " + tempMac);
+                maxSpeed = nic.Speed;
+                macAddress = tempMac;
+            }
+        }
+
+        return macAddress;
+    }
+    // https://stackoverflow.com/questions/11454004/calculate-a-md5-hash-from-a-string
+    public static string CreateMD5(string input)
+    {
+        // given, a password in a string
+        //string password = @"1234abcd";
+
+        // byte array representation of that string
+        byte[] encodedPassword = new UTF8Encoding().GetBytes(input);
+
+        // need MD5 to calculate the hash
+        byte[] hash = ((HashAlgorithm)CryptoConfig.CreateFromName("MD5")).ComputeHash(encodedPassword);
+
+        // string representation (similar to UNIX format)
+        string encoded = BitConverter.ToString(hash)
+           // without dashes
+           .Replace("-", string.Empty)
+           // make lowercase
+           .ToLower();
+
+        return encoded;
+    }
+    public ulong GetPlayerSteamID()
+    {
+        try
+        {
+            return (ulong)SteamUser.GetSteamID();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("GetPlayerSteamID: error getting steam id: " + e);
+            return (ulong)0;
+        }
     }
 }
 
@@ -459,6 +538,8 @@ public class CourseData
     //public List<string> HolesInCourseFileNames; // change this to just be a list of HoleData? CourseData has list of HoleData, which has list of TilemapData, which has list of TileInfo?
     public List<HoleData> HolesInCourse = new List<HoleData>();
     public bool IsMiniGolf;
+    public ulong CreatorSteamID;
+    public string CreatorMacAddressHash;
 }
 [Serializable]
 public class HoleData

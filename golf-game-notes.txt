@@ -745,3 +745,9 @@ x Move the "available courses" from TitleScreenManager to the CustomCourseLoader
 - - - - - - AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>(addressablePath);
 - - - - - - ScriptableCourse course = loadCourse.WaitForCompletion();
 - - - doesn't look like an addressable can be used at runtime. will likely need to do something like set a GameplayManager setting called like "_isCustomMap" and if true, load from json. If not, load from the addressables?
+
+### Steam workshop tutorials
+- - - https://onewheelstudio.com/blog/2020/12/3/steam-workshop-with-unity-and-facepunch-steamworks
+- - - - - - https://www.youtube.com/watch?v=4mfO2pPKVKs
+- - - https://www.youtube.com/watch?v=fh9IdMScJsU
+- - - - - - https://drive.google.com/drive/folders/1uqZKJg3nakP7WrwT4kIk8nUkWMgOuF-d

@@ -16,6 +16,7 @@ public class MapMakerUIManager : MonoBehaviour
     [Header("Scriptables")]
     [SerializeField] List<MapMakerGroundTileBase> _green;
     [SerializeField] List<MapMakerGroundTileBase> _fairway;
+    //[SerializeField] CoursesMadeByThisPlayer _coursesMadeByThisPlayer;
 
     [Header("UI Prefabs")]
     [SerializeField] GameObject _groundTypeItemPrefab;
@@ -372,6 +373,14 @@ public class MapMakerUIManager : MonoBehaviour
                     //courseNames.Add(courseToLoad.CourseName);
                     if (courseToLoad != null)
                     {
+                        // only load courses that were made by this player and not custom courses they got from other players?
+                        // in the future also have a check for the game to see what "Steamid" is listed on the course. If the steam ID matches this player's, load the course?
+                        //if (!IsThisCourseMadeByThisPlayer(courseToLoad.CourseId))
+                        //    continue;
+
+                        if (!IsThisCourseMadeByThisPlayer(courseToLoad.CreatorSteamID, courseToLoad.CreatorMacAddressHash))
+                            continue;
+
                         _allCustomCourses.Add(courseToLoad);
                         _currentCourseDropDown.AddOptions(new List<string> { courseToLoad.CourseName });
                     }
@@ -383,6 +392,14 @@ public class MapMakerUIManager : MonoBehaviour
             }
         }
     }
+    bool IsThisCourseMadeByThisPlayer(ulong courseCreatorSteamId, string courseCreatorMac)
+    {
+        return ((_saveHandler.GetPlayerSteamID() == courseCreatorSteamId && courseCreatorSteamId != 0) || _saveHandler.GetHashOfSystemMACAddress() == courseCreatorMac);
+    }
+    //bool IsThisCourseMadeByThisPlayer(string courseId)
+    //{
+    //    return _coursesMadeByThisPlayer.CourseIDsMadeByThisPlayer.Contains(courseId);
+    //}
     //public void CreateNewCourse()
     //{
     //    Debug.Log("CreateNewCourse: ");
@@ -586,6 +603,7 @@ public class MapMakerUIManager : MonoBehaviour
         _saveHandler.ClearAllTilesForNewHole();
         HoleData newhole = _saveHandler.CreateNewHole(_selectedCourse.CourseName, _selectedCourse.IsMiniGolf, par, _selectedCourse.HolesInCourse.Count() + 1);
         _selectedCourse.HolesInCourse.Add(newhole);
+        //_selectedCourse.CreatorMacAddressHash = _saveHandler.GetHashOfSystemMACAddress();
         _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
 
         // add hole to the drop down menu and select the hole
@@ -695,6 +713,7 @@ public class MapMakerUIManager : MonoBehaviour
         {
             _selectedHole.IsHoleCompleted = false;
         }
+        //_selectedCourse.CreatorMacAddressHash = _saveHandler.GetHashOfSystemMACAddress();
         _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
     }
     public void LoadHole()

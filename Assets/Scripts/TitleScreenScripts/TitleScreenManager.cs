@@ -515,6 +515,11 @@ public class TitleScreenManager : MonoBehaviour
         Game.minPlayers = 1;
         SceneManager.LoadScene("Tutorial");
     }
+    public void LoadGolfMapMakerLevel()
+    {
+        Debug.Log("LoadGolfMapMakerLevel: ");
+        SceneManager.LoadScene("Golf-MapMaker");
+    }
     public void ExitGame()
     {
         Application.Quit();
