@@ -37,4 +37,5 @@ public class ScriptableCourse : ScriptableObject
     public ScriptableHole[] HolesInCourse;
     public string AddressablePath;
     public bool IsCustomCourse = false;
+    public ulong WorkshopID;
 }

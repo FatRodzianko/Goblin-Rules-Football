@@ -47,7 +47,7 @@ public class GolfSteamLobby : MonoBehaviour
     [SerializeField] public string CourseName;
     [SerializeField] public string CourseHolesToPlay;
     [SerializeField] public List<int> CustomHolesToPlay = new List<int>();
-
+    [SerializeField] public ulong CourseWorkshopID;
 
 
     private void Awake()
@@ -75,9 +75,9 @@ public class GolfSteamLobby : MonoBehaviour
     {
 
     }
-    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode, string courseHoleSelection, List<int> customHolesSelected, bool parFavorPenalty, string selectedCourseId, string selectedCourseName)
+    public void CreateLobby(string lobbyName, int numberOfPlayers, bool friendsOnly, bool powerUpsEnabled, bool spawnStatues, bool strokeLimitEnabled, int strokeLimitNumber, string rainMode, string windMode, string courseHoleSelection, List<int> customHolesSelected, bool parFavorPenalty, string selectedCourseId, string selectedCourseName, ulong selectedCourseWorkshopID)
     {
-        Debug.Log("GolfSteamLobby: CreateLobby: number of players: " + numberOfPlayers.ToString() + " selected course id: " + selectedCourseId);
+        Debug.Log("GolfSteamLobby: CreateLobby: number of players: " + numberOfPlayers.ToString() + " selected course id: " + selectedCourseId + " and a workshop ID of: " + selectedCourseWorkshopID);
 
         ResetGameSettingsToDefault();
         // set the lobby name
@@ -148,6 +148,7 @@ public class GolfSteamLobby : MonoBehaviour
         this.ParFavorPenalty = parFavorPenalty;
 
         this.CourseName = selectedCourseName;
+        this.CourseWorkshopID = selectedCourseWorkshopID;
 
         SteamMatchmaking.CreateLobby(newLobbyType, numberOfPlayers);
     }

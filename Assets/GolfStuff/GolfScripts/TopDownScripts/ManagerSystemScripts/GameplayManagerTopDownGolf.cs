@@ -30,6 +30,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] public List<int> CustomHolesSelectedToPlay = new List<int>();
     //[SerializeField] [SyncVar(OnChange = nameof(SyncSelectedCourseId))] public string SelectedCourseId;
     [SerializeField] [SyncVar] public string SelectedCourseId;
+    [SerializeField] [SyncVar] public ulong CourseWorkshopID;
+    [SerializeField] [SyncVar] public string CourseName;
 
     [Header("TeeOffChallenge Info:")]
     [SerializeField] public ScriptableCourse TeeOffChallenges;
@@ -133,6 +135,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SyncVar] public bool WeatherStatuesEnabled = true;
     [SyncVar] public bool ParFavorPenalty = false;
 
+    [Header("Prompt Player to Download Course")]
+    [SerializeField] GameObject _promptPlayerToDownloadPanel;
+    [SerializeField] TextMeshProUGUI _promptPlayerToDownloadText;
+
     [Header("Tasks")]
     [SerializeField] CancellationTokenSource _cancellationTokenSource;
 
@@ -149,6 +155,14 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (!_tileMapManager)
             _tileMapManager = GameObject.FindGameObjectWithTag("TileMapManager").GetComponent<TileMapManager>();
         GolfPlayersServer.OnChange += GolfPlayersServer_OnChange;
+
+        GetCustomGolfCourseLoader();
+        _customGolfCourseLoader.GetAllAvailableCourses();
+    }
+    void GetCustomGolfCourseLoader()
+    {
+        if (_customGolfCourseLoader == null)
+            _customGolfCourseLoader = CustomGolfCourseLoader.GetInstance();
     }
     private void OnDestroy()
     {
@@ -182,7 +196,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         // hardcoding these values for now but they should be set by multiplayer game config in the future?
         GetGameSettings();
-        RpcTellClientsToLoadCourse(this.SelectedCourseId, this.CourseHolesToPlay, this.CustomHolesSelectedToPlay);
+        RpcTellClientsToLoadCourse(this.SelectedCourseId,this.CourseName, this.CourseHolesToPlay, this.CustomHolesSelectedToPlay);
     }
     public override void OnStopServer()
     {
@@ -257,9 +271,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         //PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CourseToPlay);
         //PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CurrentCourse);
 
-        if (_customGolfCourseLoader == null)
-            _customGolfCourseLoader = CustomGolfCourseLoader.GetInstance();
-        _customGolfCourseLoader.GetAllAvailableCourses();
+        
     }
 
     // Update is called once per frame
@@ -280,14 +292,17 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         this.SelectedCourseId = GolfSteamLobby.instance.SelectedCourseID;
         Debug.Log("GetGameSettings: this.SelectedCourseId: " + this.SelectedCourseId+ " GolfSteamLobby.instance.SelectedCourseId: " + GolfSteamLobby.instance.SelectedCourseID);
         this.CourseHolesToPlay = GolfSteamLobby.instance.CourseHoleSelection;
-        
+        this.CourseName = GolfSteamLobby.instance.CourseName;
+        this.CourseWorkshopID = GolfSteamLobby.instance.CourseWorkshopID;
+
         this.CustomHolesSelectedToPlay.Clear();
         this.CustomHolesSelectedToPlay.AddRange(GolfSteamLobby.instance.CustomHolesToPlay);
     }
     [ObserversRpc(BufferLast = true)]
-    void RpcTellClientsToLoadCourse(string courseID, string courseName, List<int> customHoles)
+    void RpcTellClientsToLoadCourse(string courseID,string courseName, string courseHolesToPlay, List<int> customHoles)
+
     {
-        Debug.Log("RpcTellClientsToLoadCourse: " + courseName.ToString() + " custome holes length: " + customHoles.Count.ToString() + " course id is: " + courseID);
+        Debug.Log("RpcTellClientsToLoadCourse: " + courseHolesToPlay.ToString() + " custome holes length: " + customHoles.Count.ToString() + " course id is: " + courseID);
 
         // OLD BEFORE CUSTOM COURSES
         // Get the addressable path of a course based on the courseId provided by the server?
@@ -299,11 +314,26 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // OLD BEFORE CUSTOM COURSES
 
         //ScriptableCourse course = _availableCourses.Courses.Find(x => x.id == courseID);
+        GetCustomGolfCourseLoader();
+        if (!_customGolfCourseLoader.AllAvailableCourses.Courses.Any(x => x.id == courseID))
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Prompt player to download course because they do not have the course locally");
+            try
+            {
+                GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>().PromptPlayerToDownloadCourse(courseName);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("RpcTellClientsToLoadCourse: could not find local network player. Error: " + e);
+                StartCoroutine(DelayBeforeFindingNetworkPlayer(courseName));
+            }
+            return;
+        }
         ScriptableCourse course = _customGolfCourseLoader.AllAvailableCourses.Courses.Find(x => x.id == courseID);
 
         CourseToPlay = ScriptableObject.CreateInstance<ScriptableCourse>();
         CourseToPlay.CourseName = course.CourseName;
-        if (courseName == "Middle 3 (holes 4-6)")
+        if (courseHolesToPlay == "Middle 3 (holes 4-6)")
         {
             Debug.Log("RpcTellClientsToLoadCourse: Loading: Middle 3 (holes 4-6)");
             List<ScriptableHole> holes = new List<ScriptableHole>()
@@ -315,7 +345,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             CourseToPlay.HolesInCourse = holes.ToArray();
 
         }
-        else if (courseName == "Back 3 (holes 7-9)")
+        else if (courseHolesToPlay == "Back 3 (holes 7-9)")
         {
             Debug.Log("RpcTellClientsToLoadCourse: Loading: Back 3 (holes 7-9)");
             List<ScriptableHole> holes = new List<ScriptableHole>()
@@ -326,13 +356,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             };
             CourseToPlay.HolesInCourse = holes.ToArray();
         }
-        else if (courseName == "All Nine Holes")
+        else if (courseHolesToPlay == "All Nine Holes")
         {
             Debug.Log("RpcTellClientsToLoadCourse: Loading: All Nine Holes");
 
             CourseToPlay.HolesInCourse = course.HolesInCourse;
         }
-        else if (courseName.StartsWith("Custom"))
+        else if (courseHolesToPlay.StartsWith("Custom"))
         {
             Debug.Log("RpcTellClientsToLoadCourse: Loading: custom. number of holes selecteD: " + customHoles.Count.ToString());
             List<ScriptableHole> holes = new List<ScriptableHole>();
@@ -1782,6 +1812,22 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     bool IsPlayerOverStrokeLimit(GolfPlayerTopDown player)
     {
         return player.PlayerScore.StrokesForCurrentHole >= this.StrokeLimitNumber;
+    }
+    #endregion
+    #region Prompt Player To Download Course
+    IEnumerator DelayBeforeFindingNetworkPlayer(string courseName)
+    {
+        yield return new WaitForSeconds(0.25f);
+        GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>().PromptPlayerToDownloadCourse(courseName);
+    }
+    public void GetCourseWorkshopIDForPlayer(NetworkConnection conn)
+    {
+        RpcTellPlayerWorkshopIDToDownload(conn, this.CourseWorkshopID);
+    }
+    [TargetRpc]
+    void RpcTellPlayerWorkshopIDToDownload(NetworkConnection conn, ulong workshopID)
+    {
+        GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>().ServerSentCourseWorkshopID(workshopID);
     }
     #endregion
 }

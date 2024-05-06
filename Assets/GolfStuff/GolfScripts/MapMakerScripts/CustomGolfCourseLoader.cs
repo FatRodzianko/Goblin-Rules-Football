@@ -200,6 +200,7 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                 }
                 newCustomCourse.HolesInCourse = holesInCustomCourse.ToArray();
                 newCustomCourse.IsCustomCourse = true;
+                newCustomCourse.WorkshopID = course.WorkshopPublishedItemID;
 
                 _customCourses.Add(newCustomCourse);
             }
@@ -389,6 +390,10 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
         hole.SavedObstacles = obstacles;
         hole.Statues = statues;
         hole.BalloonPowerUps = balloonPowerUps;
+    }
+    public void DownloadNewCourse(ulong courseWorkshopID)
+    {
+        Debug.Log("DownloadNewCourse: " + courseWorkshopID);
     }
 
 }

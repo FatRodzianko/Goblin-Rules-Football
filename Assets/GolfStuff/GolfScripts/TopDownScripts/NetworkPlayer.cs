@@ -32,6 +32,8 @@ public class NetworkPlayer : NetworkBehaviour
     [SerializeField] TextMeshProUGUI _welcomeText;
     [SerializeField] GameObject _uiHolder;
     [SerializeField] TextMeshProUGUI _lobbyNameText;
+    [SerializeField] GameObject _promptPlayerToDownloadHolder;
+    [SerializeField] TextMeshProUGUI _promptPlayerToDownloadText;
 
 
 
@@ -43,6 +45,11 @@ public class NetworkPlayer : NetworkBehaviour
     [Header("Player Status")]
     [SerializeField] [SyncVar(OnChange = nameof(SyncIsReady))] public bool IsReady = false;
     [SerializeField] [SyncVar(OnChange = nameof(SyncPlayerName))] public string PlayerName;
+
+    [Header("Prompt Player To Download")]
+    [SerializeField] GameObject _promptPlayerHolder;
+    [SerializeField] TextMeshProUGUI _promptPlayerText;
+    [SerializeField] ulong _workshopPublishedItemID;
 
     [Header("Networking stuff?")]
     [SerializeField] NetworkManager _networkManager;
@@ -451,5 +458,36 @@ public class NetworkPlayer : NetworkBehaviour
     public void PlayerClickedDisconnect()
     {
         OnClick_Disconnect();
+    }
+    public void PromptPlayerToDownloadCourse(string courseName)
+    {
+        if (!this.IsOwner)
+            return;
+        _promptPlayerHolder.SetActive(true);
+        _promptPlayerText.text = "You do not have the '" + courseName + "' course. Do you want to download '" + courseName + "' from the steam workshop?";
+        _uiHolder.SetActive(false);
+    }
+    public void OnClick_DownloadCourse()
+    {
+        CmdGetWorkshopIDFromServer();
+    }
+    [ServerRpc]
+    void CmdGetWorkshopIDFromServer()
+    {
+        GameplayManagerTopDownGolf.instance.GetCourseWorkshopIDForPlayer(this.Owner);
+    }
+    public void ServerSentCourseWorkshopID(ulong workshopID)
+    {
+        Debug.Log("ServerSentCourseWorkshopID: " + workshopID);
+        if (workshopID == 0)
+        {
+            // will need to have an error displayed here saying the course wasn't found in the workshop and you will disconnect in 5 seconds...
+            OnClick_Disconnect();
+        }
+
+        CustomGolfCourseLoader customGolfCourseLoader = CustomGolfCourseLoader.GetInstance();
+        customGolfCourseLoader.DownloadNewCourse(workshopID);
+        _promptPlayerHolder.SetActive(false);
+        _uiHolder.SetActive(true);
     }
 }
