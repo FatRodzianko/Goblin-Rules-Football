@@ -487,7 +487,25 @@ public class NetworkPlayer : NetworkBehaviour
 
         CustomGolfCourseLoader customGolfCourseLoader = CustomGolfCourseLoader.GetInstance();
         customGolfCourseLoader.DownloadNewCourse(workshopID);
+        //Debug.Log("ServerSentCourseWorkshopID: re-enabling UI");
+        //_promptPlayerHolder.SetActive(false);
+        //_uiHolder.SetActive(true);
+    }
+    public void CustomCourseAdded()
+    {
+        if (!this.IsOwner)
+            return;
+
+        Debug.Log("CustomCourseAdded: re-enabling UI");
         _promptPlayerHolder.SetActive(false);
         _uiHolder.SetActive(true);
+
+        CmdTellServerCusomeCourseAdded();
+    }
+    [ServerRpc]
+    void CmdTellServerCusomeCourseAdded()
+    {
+        Debug.Log("CmdTellServerCusomeCourseAdded: ");
+        GameplayManagerTopDownGolf.instance.PlayerDownDownloadingCustomCourse(this.Owner);
     }
 }

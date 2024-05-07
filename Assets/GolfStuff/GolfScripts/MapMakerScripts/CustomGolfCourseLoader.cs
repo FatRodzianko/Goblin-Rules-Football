@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
 {
@@ -89,8 +90,10 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
             InitializeAllAvailableCourses();
             _steamWorkshopCourseDownloader.SyncSubscribedToCourses();
             AddBuiltinCourses();
+
             if (forceRecheck)
                 _customCourses.Clear();
+
             LoadAllCustomCourses();
             
             AddCustomCourses();
@@ -188,6 +191,20 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                 Debug.Log("AddValidCoursesToCustomCourseList: Course with  with ID of: " + course.CourseId + " named: " + course.CourseName + " and has " + course.HolesInCourse.Count + " number of holes.");
                 ScriptableCourse newCustomCourse = new ScriptableCourse();
                 newCustomCourse.id = course.CourseId;
+                // don't add a course that has already been added?
+
+                if (_allAvailableCourses.Courses.Any(x => x.id == newCustomCourse.id))
+                {
+                    Debug.Log("AddValidCoursesToCustomCourseList: Course with  with ID of: " + course.CourseId + " is already in _allAvailableCourses. Skipping...");
+                    continue;
+                }
+                    
+                if (_customCourses.Any(x => x.id == newCustomCourse.id))
+                {
+                    Debug.Log("AddValidCoursesToCustomCourseList: Course with  with ID of: " + course.CourseId + " is already in _customCourses. Skipping...");
+                    continue;
+                }
+
                 newCustomCourse.CourseName = course.CourseName;
 
                 List<ScriptableHole> holesInCustomCourse = new List<ScriptableHole>();
@@ -201,7 +218,6 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                 newCustomCourse.HolesInCourse = holesInCustomCourse.ToArray();
                 newCustomCourse.IsCustomCourse = true;
                 newCustomCourse.WorkshopID = course.WorkshopPublishedItemID;
-
                 _customCourses.Add(newCustomCourse);
             }
         }
@@ -215,8 +231,10 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
         newHole.CourseName = courseName;
         newHole.HolePar = holeData.HolePar;
         newHole.HolePositions = new List<Vector3> { holeData.HolePosition } ;
-        newHole.TeeOffLocation = holeData.TeeOffLocation;
-        newHole.TeeMarkerPositions = holeData.TeeOffMarkerPositions;
+        //newHole.TeeOffLocation = holeData.TeeOffLocation;
+        newHole.TeeOffLocation = new Vector3(holeData.TeeOffLocation.x + 0.5f, holeData.TeeOffLocation.y + 0.5f, 0f);
+        //newHole.TeeMarkerPositions = holeData.TeeOffMarkerPositions;
+        newHole.TeeMarkerPositions = ShiftTeeMarkerPostions(holeData.TeeOffMarkerPositions);
         newHole.PolygonPoints = holeData.PolygonPoints;
         newHole.ZoomedOutPos = holeData.ZoomOutPosition;
         newHole.CameraZoomValue = 11f; // hard coded for now since the map maker doesn't set this (yet, hopefully)
@@ -238,6 +256,16 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
         ParseTileMapDataToSavedTilesAndSavedStuff(newHole, holeData.HoleTileMapData);
         return newHole;
     }
+    List<Vector3> ShiftTeeMarkerPostions(List<Vector3> markerPositions)
+    {
+        List<Vector3> shiftedPositions = new List<Vector3>();
+        foreach (Vector3 pos in markerPositions)
+        {
+            Vector3 shifted = new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0f);
+            shiftedPositions.Add(shifted);
+        }
+        return shiftedPositions;
+    }
     List<Vector3> GetCourseAimPoints(Vector3[] aimPoints, Vector3 holePosition)
     {
         List<Vector3> newAimpoints = new List<Vector3>();
@@ -248,6 +276,8 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
             {
                 if (newAimpoints.Contains(aimPoints[i]))
                     continue;
+
+                // Shift the aim points similar to the tee off location/ tee off markers?
                 newAimpoints.Add(aimPoints[i]);
             }
         }
@@ -394,6 +424,23 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
     public void DownloadNewCourse(ulong courseWorkshopID)
     {
         Debug.Log("DownloadNewCourse: " + courseWorkshopID);
+        this._steamWorkshopCourseDownloader.DownloadNewCourse(courseWorkshopID);
+    }
+    public void LoadNewCustomCourse(string filePath)
+    {
+        if (!File.Exists(Application.persistentDataPath + "/" + filePath))
+            return;
+        Debug.Log("LoadNewCustomCourse: " + filePath);
+        List<string> courseToLoad = new List<string> { filePath };
+        LoadCoursesFromFilePath(courseToLoad);
+        AddCustomCourses();
+        GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>().CustomCourseAdded();
+    }
+    public void NewCustomCourseFinishedDownloading()
+    {   
+        Debug.Log("NewCustomCourseFinishedDownloading: ");
+        LoadAllCustomCourses();
+        AddCustomCourses();
     }
 
 }

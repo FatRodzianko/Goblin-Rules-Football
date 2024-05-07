@@ -1829,5 +1829,112 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>().ServerSentCourseWorkshopID(workshopID);
     }
+    [Server]
+    public void PlayerDownDownloadingCustomCourse(NetworkConnection conn)
+    {
+        Debug.Log("PlayerDownDownloadingCustomCourse: " + conn.ClientId.ToString());
+        RpcTellPlayerToLoadCustomCourse(conn,this.SelectedCourseId, this.CourseName, this.CourseHolesToPlay, this.CustomHolesSelectedToPlay);
+    }
+    [TargetRpc]
+    void RpcTellPlayerToLoadCustomCourse(NetworkConnection conn, string courseID, string courseName, string courseHolesToPlay, List<int> customHoles)
+
+    {
+        Debug.Log("RpcTellClientsToLoadCourse: " + courseHolesToPlay.ToString() + " custome holes length: " + customHoles.Count.ToString() + " course id is: " + courseID);
+
+        // OLD BEFORE CUSTOM COURSES
+        // Get the addressable path of a course based on the courseId provided by the server?
+        //string addressablePath = _availableCourses.Courses.Find(x => x.id == courseID).id;
+
+        ////AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>("Assets/GolfStuff/GolfCourses/Forest.asset");
+        //AsyncOperationHandle<ScriptableCourse> loadCourse = Addressables.LoadAssetAsync<ScriptableCourse>(addressablePath);
+        //ScriptableCourse course = loadCourse.WaitForCompletion();
+        // OLD BEFORE CUSTOM COURSES
+
+        //ScriptableCourse course = _availableCourses.Courses.Find(x => x.id == courseID);
+        GetCustomGolfCourseLoader();
+        if (!_customGolfCourseLoader.AllAvailableCourses.Courses.Any(x => x.id == courseID))
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Prompt player to download course because they do not have the course locally");
+            try
+            {
+                GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>().PromptPlayerToDownloadCourse(courseName);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("RpcTellClientsToLoadCourse: could not find local network player. Error: " + e);
+                StartCoroutine(DelayBeforeFindingNetworkPlayer(courseName));
+            }
+            return;
+        }
+        ScriptableCourse course = _customGolfCourseLoader.AllAvailableCourses.Courses.Find(x => x.id == courseID);
+
+        CourseToPlay = ScriptableObject.CreateInstance<ScriptableCourse>();
+        CourseToPlay.CourseName = course.CourseName;
+        if (courseHolesToPlay == "Middle 3 (holes 4-6)")
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: Middle 3 (holes 4-6)");
+            List<ScriptableHole> holes = new List<ScriptableHole>()
+            {
+                course.HolesInCourse[3],
+                course.HolesInCourse[4],
+                course.HolesInCourse[5],
+            };
+            CourseToPlay.HolesInCourse = holes.ToArray();
+
+        }
+        else if (courseHolesToPlay == "Back 3 (holes 7-9)")
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: Back 3 (holes 7-9)");
+            List<ScriptableHole> holes = new List<ScriptableHole>()
+            {
+                course.HolesInCourse[6],
+                course.HolesInCourse[7],
+                course.HolesInCourse[8],
+            };
+            CourseToPlay.HolesInCourse = holes.ToArray();
+        }
+        else if (courseHolesToPlay == "All Nine Holes")
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: All Nine Holes");
+
+            CourseToPlay.HolesInCourse = course.HolesInCourse;
+        }
+        else if (courseHolesToPlay.StartsWith("Custom"))
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: custom. number of holes selecteD: " + customHoles.Count.ToString());
+            List<ScriptableHole> holes = new List<ScriptableHole>();
+            foreach (int courseNumber in customHoles)
+            {
+                holes.Add(course.HolesInCourse[courseNumber - 1]);
+            }
+            CourseToPlay.HolesInCourse = holes.ToArray();
+        }
+        else
+        {
+            Debug.Log("RpcTellClientsToLoadCourse: Loading: Front 3 (holes 1-3)");
+            List<ScriptableHole> holes = new List<ScriptableHole>();
+            if (course.HolesInCourse.Length > 3)
+            {
+                holes.Add(course.HolesInCourse[0]);
+                holes.Add(course.HolesInCourse[1]);
+                holes.Add(course.HolesInCourse[2]);
+            }
+            else
+            {
+                for (int i = 0; i < course.HolesInCourse.Length; i++)
+                {
+                    holes.Add(course.HolesInCourse[i]);
+                }
+            }
+            //List<ScriptableHole> holes = new List<ScriptableHole>()
+            //{
+            //    course.HolesInCourse[0],
+            //    course.HolesInCourse[1],
+            //    course.HolesInCourse[2],
+            //};
+            CourseToPlay.HolesInCourse = holes.ToArray();
+        }
+        PlayerScoreBoard.instance.CreateHoleInfoAndParInfoPanels(CourseToPlay);
+    }
     #endregion
 }

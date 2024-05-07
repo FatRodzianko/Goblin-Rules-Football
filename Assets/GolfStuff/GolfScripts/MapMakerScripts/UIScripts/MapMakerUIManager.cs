@@ -384,7 +384,8 @@ public class MapMakerUIManager : MonoBehaviour
 
                         if (!IsThisCourseMadeByThisPlayer(courseToLoad.CreatorSteamIDHash, courseToLoad.CreatorMacAddressHash))
                             continue;
-
+                        if (_allCustomCourses.Any(x => x.CourseId == courseToLoad.CourseId))
+                            return;
                         _allCustomCourses.Add(courseToLoad);
                         _currentCourseDropDown.AddOptions(new List<string> { courseToLoad.CourseName });
                     }
