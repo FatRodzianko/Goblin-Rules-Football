@@ -9,28 +9,25 @@ using System;
 
 public class SteamWorkshopCourseDownloader : MonoBehaviour
 {
-    bool installedStuff;
-    private PublishedFileId_t publishedFileID;
-    private UGCHandle_t UGCHandle;
+    CustomGolfCourseLoader _customGolfCourseLoader;
 
-    private CallResult<DownloadItemResult_t> DownloadItemResult;
-    private CallResult<RemoteStorageGetPublishedFileDetailsResult_t> RemoteStorageGetPublishedFileDetailsResult;
-    private CallResult<RemoteStorageDownloadUGCResult_t> RemoteStorageDownloadUGCResult;
+    bool installedStuff;
+
+    private Callback<DownloadItemResult_t> _downloadItemCallback;
+
 
 
     private CallResult<RemoteStorageSubscribePublishedFileResult_t> SubscribeItemResult;
-    private CallResult<RemoteStorageEnumerateUserSubscribedFilesResult_t> RemoteStorageEnumerateUserSubscribedFilesResult;
-    public List<PublishedFileId_t> subscribedItemList;
-    //whether or not current item has finished downloading
-    public bool fetchedContent;
-    //the contents of the downloaded item
-    private string itemContent;
 
     // Start is called before the first frame update
+    private void Awake()
+    {
+        if (!_customGolfCourseLoader)
+            _customGolfCourseLoader = this.GetComponent<CustomGolfCourseLoader>();
+    }
     void Start()
     {
-        //SyncSubscribedToCourses();
-        subscribedItemList = new List<PublishedFileId_t>();
+
     }
 
     // Update is called once per frame
@@ -40,12 +37,9 @@ public class SteamWorkshopCourseDownloader : MonoBehaviour
     }
     private void OnEnable()
     {
-        DownloadItemResult = CallResult<DownloadItemResult_t>.Create(OnDownloadItemResult);
-        RemoteStorageGetPublishedFileDetailsResult = CallResult<RemoteStorageGetPublishedFileDetailsResult_t>.Create(OnRemoteStorageGetPublishedFileDetailsResult);
-        RemoteStorageDownloadUGCResult = CallResult<RemoteStorageDownloadUGCResult_t>.Create(OnRemoteStorageDownloadUGCResult);
-
         SubscribeItemResult = CallResult<RemoteStorageSubscribePublishedFileResult_t>.Create(OnRemoteStorageSubscribePublishedFileResult);
-        RemoteStorageEnumerateUserSubscribedFilesResult = CallResult<RemoteStorageEnumerateUserSubscribedFilesResult_t>.Create(OnRemoteStorageEnumerateUserSubscribedFilesResult);
+
+        _downloadItemCallback = Callback<DownloadItemResult_t>.Create(OnDownloaded);
     }
 
     public void SyncSubscribedToCourses()
@@ -71,29 +65,14 @@ public class SteamWorkshopCourseDownloader : MonoBehaviour
                 if (itemState.HasFlag(EItemState.k_EItemStateNeedsUpdate))
                 {
                     Debug.Log("SyncSubscribedToCourses: item state is greater than 5, indicating that it needs to be updateD?");
-                    //bool download = SteamUGC.DownloadItem(i, true);
-                    //if (download)
-                    //{
-                    //    SteamAPICall_t handle = SteamRemoteStorage.GetPublishedFileDetails(publishedFileID, 0);
-                    //    DownloadItemResult.Set(handle);
-                    //}
-                    //continue;
+                    bool download = SteamUGC.DownloadItem(i, true);
+                    if (download)
+                    {
+                        Debug.Log("SyncSubscribedToCourses: download started?");
+                    }
+                    continue;
                 }
 
-                //SteamAPICall_t handle = SteamUGC.RequestUGCDetails(i, 5);
-                //installedStuff = SteamUGC.GetItemInstallInfo(i, out ulong SizeOnDisk, out string Folder, 1024, out uint punTimeStamp); //Must name the outs exactly the same as in docs, it returned null with folder, but making it Folder works
-                //                                                                                                                       //print(Folder);
-                //string[] path = Directory.GetFiles(Folder);
-                //string filename = Path.GetFileName(path[0]);
-                //string fullPath = path[0];
-                //string destPath = Application.persistentDataPath + "/" + filename;
-
-                //if (File.GetLastWriteTime(fullPath) > File.GetLastWriteTime(destPath))
-                //{
-                //    Debug.Log("SyncSubscribedToCourses: copying: " + fullPath + " to " + destPath);
-                //    //print(destPath);
-                //    System.IO.File.Copy(fullPath, destPath, true);
-                //}
                 MoveFile(i);
 
 
@@ -137,79 +116,36 @@ public class SteamWorkshopCourseDownloader : MonoBehaviour
         if (courseWorkshopID == 0)
             return;
 
-        //bool ret = SteamUGC.DownloadItem(new PublishedFileId_t(courseWorkshopID),true);
-        //if (ret)
-        //{
-
-        //}
-
+        // subscribe to the item to start the download process
         SteamAPICall_t call = SteamUGC.SubscribeItem(new PublishedFileId_t(courseWorkshopID));
         SubscribeItemResult.Set(call);
 
-
-        //SteamAPICall_t handle = SteamRemoteStorage.GetPublishedFileDetails(new PublishedFileId_t(courseWorkshopID), 0);
-        //RemoteStorageGetPublishedFileDetailsResult.Set(handle);
-
-        //bool ret = SteamUGC.SubscribeItem(new PublishedFileId_t(courseWorkshopID));
     }
-
-    private void OnDownloadItemResult(DownloadItemResult_t pCallback, bool bIOFailure)
+    private void OnDownloaded(DownloadItemResult_t callback)
     {
-        Debug.Log("OnDownloadItemResult: result: " + pCallback.m_eResult.ToString());
-        //MoveFile(pCallback.m_nPublishedFileId);
-        //this.GetComponent<CustomGolfCourseLoader>().NewCustomCourseFinishedDownloading();
-        if (pCallback.m_eResult == EResult.k_EResultOK)
+        Debug.Log("OnDownloaded: File id: " + callback.m_nPublishedFileId + " result? " + callback.m_eResult.ToString());
+
+        if (callback.m_eResult == EResult.k_EResultOK)
         {
-            Debug.Log("OnDownloadItemResult: result ok");
+            Debug.Log("OnDownloaded: result ok");
+            uint state = SteamUGC.GetItemState(callback.m_nPublishedFileId);
+            EItemState itemState = (EItemState)state;
+            Debug.Log("OnDownloaded: item state for: " + callback.m_nPublishedFileId.ToString() + " is: " + state.ToString() + ":" + itemState.ToString());
+
+            if (itemState.HasFlag(EItemState.k_EItemStateInstalled))
+            {
+                MoveFile(callback.m_nPublishedFileId);
+                SyncSubscribedToCourses();
+                _customGolfCourseLoader.NewCustomCourseFinishedDownloading();
+                if (SceneManager.GetActiveScene().name == "Golf-prototype-topdown")
+                    GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>().CustomCourseAdded();
+            }
         }
-        else
-        {
-            Debug.Log("OnDownloadItemResult: result failure?");
-        }
+
+        
     }
-    void OnRemoteStorageGetPublishedFileDetailsResult(RemoteStorageGetPublishedFileDetailsResult_t pCallback, bool bIOFailure)
-    {
-        if (pCallback.m_eResult == EResult.k_EResultOK)
-        {
-            Debug.Log("OnRemoteStorageGetPublishedFileDetailsResult: file details: " + pCallback.m_pchFileName + ":" + pCallback.m_nFileSize.ToString() + ":" + pCallback.m_nPublishedFileId.ToString());
-            //This is where we actually make the callback to download it
-            UGCHandle = pCallback.m_hFile;
 
-            SteamAPICall_t handle = SteamRemoteStorage.UGCDownload(UGCHandle, 0);
-            RemoteStorageDownloadUGCResult.Set(handle);
-        }
-    }
-    void OnRemoteStorageDownloadUGCResult(RemoteStorageDownloadUGCResult_t pCallback, bool bIOFailure)
-    {
-        //finally downloading the file
-        byte[] Data = new byte[pCallback.m_nSizeInBytes];
-        int ret = SteamRemoteStorage.UGCRead(UGCHandle, Data, pCallback.m_nSizeInBytes, 0, EUGCReadAction.k_EUGCRead_Close);
-
-        itemContent = System.Text.Encoding.UTF8.GetString(Data, 0, ret);
-        //File.WriteAllText(pCallback.m_pchFileName, itemContent);
-        Debug.Log("OnRemoteStorageDownloadUGCResult: File written? " + pCallback.m_eResult.ToString() + " " + pCallback.m_pchFileName + " content? " + itemContent);
-
-        //string destPath = Application.persistentDataPath + "/" + pCallback.m_pchFileName;
-        //Debug.Log("OnRemoteStorageDownloadUGCResult: downloading file: " + pCallback.m_pchFileName + " content? " + itemContent);
-
-        ////File.WriteAllText(destPath, itemContent);
-        //FileStream fileStream = new FileStream(destPath, FileMode.Create);
-
-        //using (StreamWriter writer = new StreamWriter(fileStream))
-        //{
-        //    writer.Write(itemContent);
-        //}
-
-        // get the newly subscribed course?
-        //this.GetComponent<CustomGolfCourseLoader>().GetAllAvailableCourses(true);
-
-        StartCoroutine(DelayForCourseDownload());
-        //SyncSubscribedToCourses();
-        //this.GetComponent<CustomGolfCourseLoader>().NewCustomCourseFinishedDownloading();
-        //if (SceneManager.GetActiveScene().name == "Golf-prototype-topdown")
-        //    GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>().CustomCourseAdded();
-
-    }
+    
     IEnumerator DelayForCourseDownload()
     {
         yield return new WaitForSecondsRealtime(2.5f);
@@ -222,53 +158,18 @@ public class SteamWorkshopCourseDownloader : MonoBehaviour
     {
         if (!SteamManager.Initialized)
             return;
-        Debug.Log("RemoteStorageSubscribePublishedFileResult: " + pCallback.m_eResult.ToString() + " " + pCallback.m_nPublishedFileId.ToString());
+        Debug.Log("OnRemoteStorageSubscribePublishedFileResult: " + pCallback.m_eResult.ToString() + " " + pCallback.m_nPublishedFileId.ToString());
 
         if (pCallback.m_eResult == EResult.k_EResultOK)
         {
-            // Get subscribed files?
-            SteamAPICall_t handle = SteamRemoteStorage.EnumerateUserSubscribedFiles(0);
-            RemoteStorageEnumerateUserSubscribedFilesResult.Set(handle);
-
-            //SyncSubscribedToCourses();
-            //if (SceneManager.GetActiveScene().name == "Golf-prototype-topdown")
-            //    GameObject.FindGameObjectWithTag("LocalNetworkPlayer").GetComponent<NetworkPlayer>().CustomCourseAdded();
-        }
-    }
-    void OnRemoteStorageEnumerateUserSubscribedFilesResult(RemoteStorageEnumerateUserSubscribedFilesResult_t pCallback, bool bIOFailure)
-    {
-        //Clear list from last call
-        subscribedItemList = new List<PublishedFileId_t>();
-        for (int i = 0; i < pCallback.m_nTotalResultCount; i++)
-        {
-            //fetch subscribed item and add it to the list
-            PublishedFileId_t f = pCallback.m_rgPublishedFileId[i];
-            subscribedItemList.Add(f);
-            Debug.Log("OnRemoteStorageEnumerateUserSubscribedFilesResult: for " + f.ToString());
-        }
-        //Now that all files have been fetched we need to download them
-        StartCoroutine(DownloadFiles());
-        
-    }
-    IEnumerator DownloadFiles()
-    {
-        int dlItem = 0;
-        while (dlItem < subscribedItemList.Count)
-        {
-            fetchedContent = false;
-            GetItemContent(dlItem);
-            while (fetchedContent == false)
+            // download the item. Will be received as DownloadItemResult_t callback in OnDownloaded
+            bool download = SteamUGC.DownloadItem(pCallback.m_nPublishedFileId, true);
+            if (download)
             {
-                yield return new WaitForEndOfFrame();
+                Debug.Log("OnRemoteStorageSubscribePublishedFileResult: download started?");
             }
-            dlItem++;
+
         }
     }
-    public void GetItemContent(int ItemID)
-    {
-        Debug.Log("GetItemContent: " + ItemID);
-        publishedFileID = subscribedItemList[ItemID];
-        SteamAPICall_t handle = SteamRemoteStorage.GetPublishedFileDetails(publishedFileID, 0);
-        RemoteStorageGetPublishedFileDetailsResult.Set(handle);
-    }
+    
 }
