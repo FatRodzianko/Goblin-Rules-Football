@@ -81,6 +81,10 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/Equal-Pigs_lower-kick-2-2_retuned-melody.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 8d32ead64b74037438fe06e32e67f822
+    m_Address: Assets/SFX/Music/Incompetent-Duck_more-melody-more-reverb_worse-edition-2.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

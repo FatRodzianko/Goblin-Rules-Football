@@ -71,6 +71,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
     // Course Markers - Tee Off Location
     [SerializeField] bool _hasTeeOffLocationBeenPlaced = false;
+    public delegate void HasTeeOffLocationBeenPlacedYet(bool placed);
+    public event HasTeeOffLocationBeenPlacedYet HasTeeOffLocationBeenPlacedYetChanged;
     [SerializeField] Vector3Int _teeOffLocationPosition;
 
     // Course Markers - Aim Point
@@ -83,6 +85,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
     // Hole/Flag placement
     [SerializeField] bool _hasHoleBeenPlaced = false;
+    public delegate void HasHoleBeenPlacedYet(bool placed);
+    public event HasHoleBeenPlacedYet HasHoleBeenPlacedYetChanged;
     [SerializeField] Vector3Int _holePosition = Vector3Int.zero;
 
 
@@ -118,6 +122,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         _playerInput.MapMaker.MaximizeWindow.performed += MaximizeShortCut;
         _playerInput.MapMaker.MinimizeWindow.performed += MinimizeShortCut;
 
+        // Events for hole details
+        HasHoleBeenPlacedYetChanged += HasHoleBeenPlacedYetChangedFunction;
+        HasTeeOffLocationBeenPlacedYetChanged += HasTeeOffLocationBeenPlacedYetChangedFunction;
+
     }
     private void OnDisable()
     {
@@ -145,7 +153,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         // Scene manager thing?
         SceneManager.activeSceneChanged -= ChangedActiveScene;
-        
+
+        // Events for hole details
+        HasHoleBeenPlacedYetChanged -= HasHoleBeenPlacedYetChangedFunction;
+        HasTeeOffLocationBeenPlacedYetChanged -= HasTeeOffLocationBeenPlacedYetChangedFunction;
+
     }
     private void Start()
     {
@@ -1002,7 +1014,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         }
 
         // Reset hole stuff?
-        _hasHoleBeenPlaced = false;
+        //_hasHoleBeenPlaced = false;
+        HasHoleBeenPlacedYetChanged(false);
         _holePosition = Vector3Int.zero;
     }
     void CheckIfPlacingHoleFlag(Vector3Int position, MapMakerObstacle obstacle)
@@ -1040,7 +1053,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             }
         }
 
-        _hasHoleBeenPlaced = true;
+        //_hasHoleBeenPlaced = true;
+        HasHoleBeenPlacedYetChanged(true);
         _holePosition = position;
 
     }
@@ -1061,7 +1075,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 if (holeToRemoveObstacle.ObstacleType == ObstacleType.Hole)
                 {
                     Debug.Log("CheckIfRemovingHoleFlag: a hole is at position: " + position + ". Resetting hole placement information");
-                    _hasHoleBeenPlaced = false;
+                    //_hasHoleBeenPlaced = false;
+                    HasHoleBeenPlacedYetChanged(false);
                     _holePosition = Vector3Int.zero;
                 }
             }
@@ -1107,7 +1122,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     public void ClearAllMarkers()
     {
         // Tee off location
-        _hasTeeOffLocationBeenPlaced = false;
+        //_hasTeeOffLocationBeenPlaced = false;
+        HasTeeOffLocationBeenPlacedYetChanged(false);
         _teeOffLocationPosition = Vector3Int.zero;
 
         // Aim points
@@ -1141,11 +1157,13 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             //_mapMakerHistory.Add(new MapMakerHistoryStep(courseMarker.MapMakerTileType.Tilemap, previousTiles.ToArray(), newTiles, positions, prevMapMakerTileBases, newMapMakerTileBases));
 
             CreateHistoryEntryWhenRemovingRestrictedObjectOrTile(_teeOffLocationPosition, (MapMakerGroundTileBase)courseMarker);
-            _hasTeeOffLocationBeenPlaced = false;
+            //_hasTeeOffLocationBeenPlaced = false;
+            HasTeeOffLocationBeenPlacedYetChanged(false);
         }
 
         _teeOffLocationPosition = position;
-        _hasTeeOffLocationBeenPlaced = true;
+        //_hasTeeOffLocationBeenPlaced = true;
+        HasTeeOffLocationBeenPlacedYetChanged(true);
     }
     void RemoveTeeOffLocation(Vector3Int position, MapMakerCourseMarker courseMarker)
     {
@@ -1153,7 +1171,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             return;
         if (_teeOffLocationPosition != position)
             return;
-        _hasTeeOffLocationBeenPlaced = false;
+        //_hasTeeOffLocationBeenPlaced = false;
+        HasTeeOffLocationBeenPlacedYetChanged(false);
         _teeOffLocationPosition = Vector3Int.zero;
     }
     void PlaceAimPoint(Vector3Int position, MapMakerCourseMarker courseMarker)
@@ -1719,6 +1738,18 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             }
         }
         yield break;
+    }
+    #endregion
+    #region Event Functions for the Hole Details stuff?
+    void HasHoleBeenPlacedYetChangedFunction(bool placed)
+    {
+        Debug.Log("HasHoleBeenPlacedYetChangedFunction: " + placed);
+        _hasHoleBeenPlaced = placed;
+    }
+    void HasTeeOffLocationBeenPlacedYetChangedFunction(bool placed)
+    {
+        Debug.Log("HasTeeOffLocationBeenPlacedYetChangedFunction: " + placed);
+        _hasTeeOffLocationBeenPlaced = placed;
     }
     #endregion
 }

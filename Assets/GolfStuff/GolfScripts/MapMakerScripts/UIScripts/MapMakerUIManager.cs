@@ -90,6 +90,10 @@ public class MapMakerUIManager : MonoBehaviour
     [Header("Steam workshop stuff?")]
     [SerializeField] SteamWorkshopCourseSubmitter _steamWorkshopCourseSubmitter;
 
+    [Header("Edit Hole Details stuff")]
+    [SerializeField] HoleDetailsUIManager _holeDetailsUIManager;
+    [SerializeField] Button _editHoleDetailsButton;
+
 
     #region Setters and Getters
     Dictionary<string, Tilemap> TileMapsToSelect
@@ -116,6 +120,8 @@ public class MapMakerUIManager : MonoBehaviour
     {
         if (!_mapMakerBuilder)
             _mapMakerBuilder = MapMakerBuilder.GetInstance();
+        if (!_holeDetailsUIManager)
+            _holeDetailsUIManager = this.GetComponent<HoleDetailsUIManager>();
         //LoadGroundTileTypesForUI();
         InitializeCurrentTileDropDown();
         BuildUI();
@@ -517,6 +523,7 @@ public class MapMakerUIManager : MonoBehaviour
             _currentHoleText.SetActive(false);
             _currentHoleDropDown.gameObject.SetActive(false);
             _createNewHoleButton.gameObject.SetActive(false);
+            EnableEditDetailsButton(false);
         }
         else
         {
@@ -623,12 +630,16 @@ public class MapMakerUIManager : MonoBehaviour
         _createNewHoleButton.gameObject.SetActive(false);
         _mapMakerBuilder.PlayerInput.Enable();
 
+
+        EnableEditDetailsButton(true);
+        InitializeEditDetailsUI(_selectedHole);
     }
     public void CancelCreateNewHole()
     {
         Debug.Log("CancelCreateNewHole: ");
 
         _createNewHoleButton.gameObject.SetActive(true);
+        EnableEditDetailsButton(false);
         if (_uploadToWorkshopButton.gameObject.activeInHierarchy)
             _uploadToWorkshopButton.gameObject.SetActive(false);
         _createNewHolePanel.SetActive(false);
@@ -649,6 +660,7 @@ public class MapMakerUIManager : MonoBehaviour
         {
             _selectedHole = null;
             _createNewHoleButton.gameObject.SetActive(true);
+            EnableEditDetailsButton(false);
             if (_uploadToWorkshopButton.gameObject.activeInHierarchy)
                 _uploadToWorkshopButton.gameObject.SetActive(false);
             _saveHoleButton.gameObject.SetActive(false);
@@ -658,6 +670,7 @@ public class MapMakerUIManager : MonoBehaviour
         {
             _selectedHole = _selectedCourse.HolesInCourse.FirstOrDefault(x => x.HoleIndex == _selectedHoleNumber);
             _createNewHoleButton.gameObject.SetActive(false);
+            EnableEditDetailsButton(false);
             _saveHoleButton.gameObject.SetActive(false);
             if (_uploadToWorkshopButton.gameObject.activeInHierarchy)
                 _uploadToWorkshopButton.gameObject.SetActive(false);
@@ -780,6 +793,10 @@ public class MapMakerUIManager : MonoBehaviour
 
         _mapMakerHistory.ClearHistoryForNewHole();
         _saveHandler.LoadTileMapData(_selectedHole.HoleTileMapData);
+
+        // Initialize data in the Edit Hole Details menu here???
+        EnableEditDetailsButton(true);
+        InitializeEditDetailsUI(_selectedHole);
     }
     public void UploadToWorkshopButtonPressed()
     {
@@ -797,5 +814,17 @@ public class MapMakerUIManager : MonoBehaviour
         Debug.Log("SetWorkshopIDAfterUpload: " + publishedFileID.ToString());
         _selectedCourse.WorkshopPublishedItemID = publishedFileID;
         _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
+    }
+    void EnableEditDetailsButton(bool enable)
+    {
+        _editHoleDetailsButton.gameObject.SetActive(enable);
+    }
+    void InitializeEditDetailsUI(HoleData hole)
+    {
+        
+    }
+    public void EditHoleDetailsButtonPressed()
+    {
+        Debug.Log("EditHoleDetailsButtonPressed: ");
     }
 }

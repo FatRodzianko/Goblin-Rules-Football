@@ -675,8 +675,8 @@ x Creating new holes
 - - x if there are any tiles or anything, clear them. This is to try and prevent user from working on a course, then changing to a different course, and accidentally overwriting a hole?
 - - - - - - or just deactivate the "save hole" button. Only the "load hole" button will be available if the user selects a hole from the new course to load?
 x When a hole is loaded, clear the MapMakerHistory, disable the "save hole button." When something is added to the history, enable the save hole button?
-- How to prevent a player from editing a custom map they downloaded from another player:
-- - - save hash of player's steamID, or a hash of their computer's name (or mac address or something). When loading "all available custom courses," calculate hashes for local player against the saved hash(es). Only load the courses that match the player's own hashes
+x How to prevent a player from editing a custom map they downloaded from another player:
+- - x save hash of player's steamID, or a hash of their computer's name (or mac address or something). When loading "all available custom courses," calculate hashes for local player against the saved hash(es). Only load the courses that match the player's own hashes
 
 
 
@@ -751,3 +751,17 @@ x Move the "available courses" from TitleScreenManager to the CustomCourseLoader
 - - - - - - https://www.youtube.com/watch?v=4mfO2pPKVKs
 - - - https://www.youtube.com/watch?v=fh9IdMScJsU
 - - - - - - https://drive.google.com/drive/folders/1uqZKJg3nakP7WrwT4kIk8nUkWMgOuF-d
+
+# "Hole Information" UI
+- display after hole has been loaded
+- show following data:
+- - - Hole par - text input field to change
+- - - - - - when hole is saved, get the par value from the text input field
+- - - Is hole placed?
+- - - - - - change setting things like "Has Hole Been Placed" in MapMakerBuilder to be events?
+- - - - - - display the "distance to hole" under this if both HasTeeOffLocationBeenPlaced and HasHoleBeenPlaced are true?
+- - - - - - - - - take action on event from either?
+- - - Is Tee Off Location placed?
+- - - Both tee markers placed?
+- - - Aim points and their positions
+- - - - - - show distance from tee off for each aim point?
