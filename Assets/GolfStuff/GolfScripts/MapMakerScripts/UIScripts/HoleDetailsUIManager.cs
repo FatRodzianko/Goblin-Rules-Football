@@ -11,6 +11,13 @@ public class HoleDetailsUIManager : MonoBehaviour
     [SerializeField] MapMakerUIManager _mapMakerUIManager;
     [SerializeField] GameObject _editHoleDetailsPanel;
 
+    [Header("Hole Details Panel Open")]
+    [SerializeField] bool _isDetailsPanelOpen = false;
+    public delegate void IsDetailsPanelOpenEvent(bool placed);
+    public event IsDetailsPanelOpenEvent IsDetailsPanelOpenEventChanged;
+
+    [Header("Hole Number")]
+    [SerializeField] TextMeshProUGUI _holeNumberValueText;
     [Header("Hole Par")]
     [SerializeField] TMP_InputField _holeParInput;
 
@@ -25,6 +32,14 @@ public class HoleDetailsUIManager : MonoBehaviour
     [Header("Aim pont stuff")]
     [SerializeField] GameObject _aimPointHolder;
     [SerializeField] List<AimPointPanelScript> _aimPointItems = new List<AimPointPanelScript>();
+
+    public bool IsDetailsPanelOpen
+    {
+        get
+        {
+            return _isDetailsPanelOpen;
+        }
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +51,10 @@ public class HoleDetailsUIManager : MonoBehaviour
         // events?
         _builder.HasHoleBeenPlacedYetChanged += SetHasHoleBeenPlaced;
         _builder.HasTeeOffLocationBeenPlacedYetChanged += SetHasTeeOffLocationBeenPlaced;
+        _builder.HaveBothTeeMarkersPlacedYetChanged += SetHaveTeeMarkersBeenPlaced;
+
+        // events for this guy
+        IsDetailsPanelOpenEventChanged += IsDetailsPanelOpenEventChangedFunction;
     }
 
     // Update is called once per frame
@@ -47,6 +66,9 @@ public class HoleDetailsUIManager : MonoBehaviour
     {
         _builder.HasHoleBeenPlacedYetChanged -= SetHasHoleBeenPlaced;
         _builder.HasTeeOffLocationBeenPlacedYetChanged -= SetHasTeeOffLocationBeenPlaced;
+        _builder.HaveBothTeeMarkersPlacedYetChanged -= SetHaveTeeMarkersBeenPlaced;
+
+        IsDetailsPanelOpenEventChanged -= IsDetailsPanelOpenEventChangedFunction;
     }
     public void SetHolePar(int par)
     {
@@ -65,6 +87,10 @@ public class HoleDetailsUIManager : MonoBehaviour
             Debug.Log("GetHolePar: could not parse this._holeParInput.text to an integer");
             return 0;
         }
+    }
+    public void SetHoleNumberValue(int holeNumber)
+    {
+        _holeNumberValueText.text = holeNumber.ToString();
     }
     public void SetHasHoleBeenPlaced(bool placed)
     {
@@ -85,5 +111,35 @@ public class HoleDetailsUIManager : MonoBehaviour
     {
         Debug.Log("SetDistanceToHole: " + distance);
         _distanceToHoleText.text = distance.ToString();
+    }
+    void IsDetailsPanelOpenEventChangedFunction(bool isOpen)
+    {
+        Debug.Log("IsDetailsPanelOpenEventChangedFunction: " + isOpen);
+        _isDetailsPanelOpen = isOpen;
+    }
+    public void OpenDetailsPanelButtonPressed()
+    {
+        Debug.Log("OpenDetailsPanelButtonPressed: _isDetailsPanelOpen: " + _isDetailsPanelOpen.ToString());
+        if (_isDetailsPanelOpen)
+        {
+            CloseDetailsPanel();            
+        }
+        else
+        {
+            OpenDetailsPanel();
+        }
+
+    }
+    void OpenDetailsPanel()
+    {
+        _editHoleDetailsPanel.SetActive(true);
+        //_isDetailsPanelOpen = true;
+        IsDetailsPanelOpenEventChanged(true);
+    }
+    void CloseDetailsPanel()
+    {
+        _editHoleDetailsPanel.SetActive(false);
+        //_isDetailsPanelOpen = false;
+        IsDetailsPanelOpenEventChanged(false);
     }
 }

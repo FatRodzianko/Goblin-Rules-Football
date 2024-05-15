@@ -120,8 +120,12 @@ public class MapMakerUIManager : MonoBehaviour
     {
         if (!_mapMakerBuilder)
             _mapMakerBuilder = MapMakerBuilder.GetInstance();
+
+        //details panel stuff
         if (!_holeDetailsUIManager)
-            _holeDetailsUIManager = this.GetComponent<HoleDetailsUIManager>();
+            _holeDetailsUIManager = this.GetComponent<HoleDetailsUIManager>();        
+        _holeDetailsUIManager.IsDetailsPanelOpenEventChanged += EditDetailsPanelOpen;
+
         //LoadGroundTileTypesForUI();
         InitializeCurrentTileDropDown();
         BuildUI();
@@ -135,12 +139,17 @@ public class MapMakerUIManager : MonoBehaviour
     {
         NewCourseSelectedChanged += NewCourseSelectedChangedFunction;
         NewHoleSelectedChanged += NewHoleSelectedChangedFunction;
+
+        
     }
     private void OnDisable()
     {
         NewCourseSelectedChanged -= NewCourseSelectedChangedFunction;
         NewHoleSelectedChanged -= NewHoleSelectedChangedFunction;
         _mapMakerHistory.CanUndoChanged -= EnableSaveHoleButton;
+
+        //details panel stuff
+        _holeDetailsUIManager.IsDetailsPanelOpenEventChanged -= EditDetailsPanelOpen;
     }
 
     // Update is called once per frame
@@ -778,6 +787,13 @@ public class MapMakerUIManager : MonoBehaviour
         {
             _selectedHole.IsHoleCompleted = false;
         }
+
+        int newHolePar = _holeDetailsUIManager.GetHolePar();
+        if (_selectedHole.HolePar != newHolePar && newHolePar > 0)
+        {
+            Debug.Log("SaveHole: changing hole par from: "+ _selectedHole.HolePar.ToString() + " to " + newHolePar.ToString());
+            _selectedHole.HolePar = newHolePar;
+        }
         //_selectedCourse.CreatorMacAddressHash = _saveHandler.GetHashOfSystemMACAddress();
         _saveHandler.SaveCourse(_selectedCourse, _selectedCourse.RelativeFilePath);
         EnableUploadToWorkshopButton(true);
@@ -821,10 +837,19 @@ public class MapMakerUIManager : MonoBehaviour
     }
     void InitializeEditDetailsUI(HoleData hole)
     {
-        
+        _holeDetailsUIManager.SetHolePar(hole.HolePar);
+        _holeDetailsUIManager.SetHoleNumberValue(hole.HoleIndex);
     }
     public void EditHoleDetailsButtonPressed()
     {
         Debug.Log("EditHoleDetailsButtonPressed: ");
+    }
+    void EditDetailsPanelOpen(bool isOpen)
+    {
+        _currentCourseDropDown.interactable = !isOpen;
+        _currentHoleDropDown.interactable = !isOpen;
+        _loadHoleButton.interactable = !isOpen;
+        _saveHoleButton.interactable = !isOpen;
+        _uploadToWorkshopButton.interactable = !isOpen;
     }
 }

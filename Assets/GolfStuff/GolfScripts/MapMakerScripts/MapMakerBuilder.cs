@@ -81,6 +81,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
     // Tee Markers (the blue balls)
     [SerializeField] bool _bothTeeMarkersPlaced = false;
+    public delegate void HaveBothTeeMarkersPlacedYet(bool placed);
+    public event HaveBothTeeMarkersPlacedYet HaveBothTeeMarkersPlacedYetChanged;
     [SerializeField] List<Vector3Int> _teeOffMarkerPositions = new List<Vector3Int>();
 
     // Hole/Flag placement
@@ -125,6 +127,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         // Events for hole details
         HasHoleBeenPlacedYetChanged += HasHoleBeenPlacedYetChangedFunction;
         HasTeeOffLocationBeenPlacedYetChanged += HasTeeOffLocationBeenPlacedYetChangedFunction;
+        HaveBothTeeMarkersPlacedYetChanged += HaveBothTeeMarkersPlacedYetChangedFunction;
 
     }
     private void OnDisable()
@@ -157,6 +160,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         // Events for hole details
         HasHoleBeenPlacedYetChanged -= HasHoleBeenPlacedYetChangedFunction;
         HasTeeOffLocationBeenPlacedYetChanged -= HasTeeOffLocationBeenPlacedYetChangedFunction;
+        HaveBothTeeMarkersPlacedYetChanged -= HaveBothTeeMarkersPlacedYetChangedFunction;
 
     }
     private void Start()
@@ -1131,7 +1135,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         _aimPoints.Clear();
 
         // Tee Off Marker balls
-        _bothTeeMarkersPlaced = false;
+        //_bothTeeMarkersPlaced = false;
+        HaveBothTeeMarkersPlacedYetChanged(false);
         _teeOffMarkerPositions.Clear();
     }
     void PlaceTeeOffLocation(Vector3Int position, MapMakerCourseMarker courseMarker)
@@ -1292,9 +1297,16 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         _teeOffMarkerPositions.Add(position);
         if (_teeOffMarkerPositions.Count == 2)
-            _bothTeeMarkersPlaced = true;
+        {
+            //_bothTeeMarkersPlaced = true;
+            HaveBothTeeMarkersPlacedYetChanged(true);
+        }
         else
-            _bothTeeMarkersPlaced = false;
+        {
+            //_bothTeeMarkersPlaced = false;
+            HaveBothTeeMarkersPlacedYetChanged(false);
+        }
+            
 
     }
     void RemoveTeeOffMarkerBall(Vector3Int position, MapMakerCourseMarker courseMarker)
@@ -1319,10 +1331,21 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         }
 
+        //if (_teeOffMarkerPositions.Count == 2)
+        //    _bothTeeMarkersPlaced = true;
+        //else
+        //    _bothTeeMarkersPlaced = false;
+
         if (_teeOffMarkerPositions.Count == 2)
-            _bothTeeMarkersPlaced = true;
+        {
+            //_bothTeeMarkersPlaced = true;
+            HaveBothTeeMarkersPlacedYetChanged(true);
+        }
         else
-            _bothTeeMarkersPlaced = false;
+        {
+            //_bothTeeMarkersPlaced = false;
+            HaveBothTeeMarkersPlacedYetChanged(false);
+        }
     }
     void CreateHistoryEntryWhenRemovingRestrictedObjectOrTile(Vector3Int position, MapMakerGroundTileBase oldTileBase)
     {
@@ -1750,6 +1773,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         Debug.Log("HasTeeOffLocationBeenPlacedYetChangedFunction: " + placed);
         _hasTeeOffLocationBeenPlaced = placed;
+    }
+    void HaveBothTeeMarkersPlacedYetChangedFunction(bool placed)
+    {
+        Debug.Log("HaveBothTeeMarkersPlacedYetChangedFunction: " + placed);
+        _bothTeeMarkersPlaced = placed;
     }
     #endregion
 }
