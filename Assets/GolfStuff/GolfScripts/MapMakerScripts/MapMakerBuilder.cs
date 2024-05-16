@@ -91,6 +91,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     public event HasHoleBeenPlacedYet HasHoleBeenPlacedYetChanged;
     [SerializeField] Vector3Int _holePosition = Vector3Int.zero;
 
+    // distance from tee off to hole
+    [SerializeField] float _distanceFromTeeOffToHole = 0f;
+    public delegate void UpdateDistanceFromTeeOffToHole(float distance);
+    public event UpdateDistanceFromTeeOffToHole UpdateDistanceFromTeeOffToHoleChanged;
+
 
     protected override void Awake()
     {
@@ -128,6 +133,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         HasHoleBeenPlacedYetChanged += HasHoleBeenPlacedYetChangedFunction;
         HasTeeOffLocationBeenPlacedYetChanged += HasTeeOffLocationBeenPlacedYetChangedFunction;
         HaveBothTeeMarkersPlacedYetChanged += HaveBothTeeMarkersPlacedYetChangedFunction;
+        UpdateDistanceFromTeeOffToHoleChanged += UpdateDistanceFromTeeOffToHoleChangedFunction;
 
     }
     private void OnDisable()
@@ -161,6 +167,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         HasHoleBeenPlacedYetChanged -= HasHoleBeenPlacedYetChangedFunction;
         HasTeeOffLocationBeenPlacedYetChanged -= HasTeeOffLocationBeenPlacedYetChangedFunction;
         HaveBothTeeMarkersPlacedYetChanged -= HaveBothTeeMarkersPlacedYetChangedFunction;
+        UpdateDistanceFromTeeOffToHoleChanged -= UpdateDistanceFromTeeOffToHoleChangedFunction;
 
     }
     private void Start()
@@ -1019,8 +1026,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         // Reset hole stuff?
         //_hasHoleBeenPlaced = false;
-        HasHoleBeenPlacedYetChanged(false);
+        
         _holePosition = Vector3Int.zero;
+        HasHoleBeenPlacedYetChanged(false);
     }
     void CheckIfPlacingHoleFlag(Vector3Int position, MapMakerObstacle obstacle)
     {
@@ -1058,8 +1066,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         }
 
         //_hasHoleBeenPlaced = true;
-        HasHoleBeenPlacedYetChanged(true);
+        
         _holePosition = position;
+        HasHoleBeenPlacedYetChanged(true);
 
     }
     void CheckIfRemovingHoleFlag(Vector3Int position)
@@ -1080,8 +1089,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 {
                     Debug.Log("CheckIfRemovingHoleFlag: a hole is at position: " + position + ". Resetting hole placement information");
                     //_hasHoleBeenPlaced = false;
-                    HasHoleBeenPlacedYetChanged(false);
+                    
                     _holePosition = Vector3Int.zero;
+                    HasHoleBeenPlacedYetChanged(false);
                 }
             }
         }
@@ -1127,8 +1137,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         // Tee off location
         //_hasTeeOffLocationBeenPlaced = false;
-        HasTeeOffLocationBeenPlacedYetChanged(false);
+        
         _teeOffLocationPosition = Vector3Int.zero;
+        HasTeeOffLocationBeenPlacedYetChanged(false);
 
         // Aim points
         _atLeastOneAimPoint = false;
@@ -1177,8 +1188,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         if (_teeOffLocationPosition != position)
             return;
         //_hasTeeOffLocationBeenPlaced = false;
-        HasTeeOffLocationBeenPlacedYetChanged(false);
+        
         _teeOffLocationPosition = Vector3Int.zero;
+        HasTeeOffLocationBeenPlacedYetChanged(false);
     }
     void PlaceAimPoint(Vector3Int position, MapMakerCourseMarker courseMarker)
     {
@@ -1768,16 +1780,33 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         Debug.Log("HasHoleBeenPlacedYetChangedFunction: " + placed);
         _hasHoleBeenPlaced = placed;
+        CalculateDistanceFromTeeOffToHole();
     }
     void HasTeeOffLocationBeenPlacedYetChangedFunction(bool placed)
     {
         Debug.Log("HasTeeOffLocationBeenPlacedYetChangedFunction: " + placed);
         _hasTeeOffLocationBeenPlaced = placed;
+        CalculateDistanceFromTeeOffToHole();
     }
     void HaveBothTeeMarkersPlacedYetChangedFunction(bool placed)
     {
         Debug.Log("HaveBothTeeMarkersPlacedYetChangedFunction: " + placed);
         _bothTeeMarkersPlaced = placed;
+    }
+    void CalculateDistanceFromTeeOffToHole()
+    {
+        if (!_hasHoleBeenPlaced || !_hasTeeOffLocationBeenPlaced)
+        {
+            UpdateDistanceFromTeeOffToHoleChanged(0f);
+            return;
+        }
+        Debug.Log("CalculateDistanceFromTeeOffToHole: Tee Off position: " + _teeOffLocationPosition + " hole position: " + _holePosition);
+        UpdateDistanceFromTeeOffToHoleChanged(Vector2.Distance(new Vector2(_teeOffLocationPosition.x, _teeOffLocationPosition.y), new Vector2(_holePosition.x,_holePosition.y)));
+    }
+    void UpdateDistanceFromTeeOffToHoleChangedFunction(float distance)
+    {
+        Debug.Log("UpdateDistanceFromTeeOffToHoleChangedFunction: " + distance);
+        _distanceFromTeeOffToHole = distance;
     }
     #endregion
 }

@@ -52,6 +52,7 @@ public class HoleDetailsUIManager : MonoBehaviour
         _builder.HasHoleBeenPlacedYetChanged += SetHasHoleBeenPlaced;
         _builder.HasTeeOffLocationBeenPlacedYetChanged += SetHasTeeOffLocationBeenPlaced;
         _builder.HaveBothTeeMarkersPlacedYetChanged += SetHaveTeeMarkersBeenPlaced;
+        _builder.UpdateDistanceFromTeeOffToHoleChanged += SetDistanceToHole;
 
         // events for this guy
         IsDetailsPanelOpenEventChanged += IsDetailsPanelOpenEventChangedFunction;
@@ -67,7 +68,9 @@ public class HoleDetailsUIManager : MonoBehaviour
         _builder.HasHoleBeenPlacedYetChanged -= SetHasHoleBeenPlaced;
         _builder.HasTeeOffLocationBeenPlacedYetChanged -= SetHasTeeOffLocationBeenPlaced;
         _builder.HaveBothTeeMarkersPlacedYetChanged -= SetHaveTeeMarkersBeenPlaced;
+        _builder.UpdateDistanceFromTeeOffToHoleChanged -= SetDistanceToHole;
 
+        // events for this guy
         IsDetailsPanelOpenEventChanged -= IsDetailsPanelOpenEventChangedFunction;
     }
     public void SetHolePar(int par)
@@ -110,7 +113,7 @@ public class HoleDetailsUIManager : MonoBehaviour
     public void SetDistanceToHole(float distance)
     {
         Debug.Log("SetDistanceToHole: " + distance);
-        _distanceToHoleText.text = distance.ToString();
+        _distanceToHoleText.text = distance.ToString("0.00");
     }
     void IsDetailsPanelOpenEventChangedFunction(bool isOpen)
     {
