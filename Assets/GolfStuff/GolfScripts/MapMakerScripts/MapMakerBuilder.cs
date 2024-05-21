@@ -74,10 +74,15 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     public delegate void HasTeeOffLocationBeenPlacedYet(bool placed);
     public event HasTeeOffLocationBeenPlacedYet HasTeeOffLocationBeenPlacedYetChanged;
     [SerializeField] Vector3Int _teeOffLocationPosition;
+    public delegate void TeeOffLocationUpdated(Vector3Int newPosition);
+    public event TeeOffLocationUpdated TeeOffLocationUpdatedChanged;
 
     // Course Markers - Aim Point
     [SerializeField] bool _atLeastOneAimPoint = false;
     [SerializeField] List<Vector3Int> _aimPoints = new List<Vector3Int>();
+    [SerializeField] Dictionary<Vector3Int, float> _aimPointToTeeOffDistance = new Dictionary<Vector3Int, float>();
+    public delegate void AimPointsAddOrRemoved(Dictionary<Vector3Int, float> aimPointsAndDistance);
+    public event AimPointsAddOrRemoved AimPointsAddOrRemovedChanged;
 
     // Tee Markers (the blue balls)
     [SerializeField] bool _bothTeeMarkersPlaced = false;
@@ -90,6 +95,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     public delegate void HasHoleBeenPlacedYet(bool placed);
     public event HasHoleBeenPlacedYet HasHoleBeenPlacedYetChanged;
     [SerializeField] Vector3Int _holePosition = Vector3Int.zero;
+    public delegate void HolePositionUpdated(Vector3Int newPosition);
+    public event HolePositionUpdated HolePositionUpdatedChanged;
 
     // distance from tee off to hole
     [SerializeField] float _distanceFromTeeOffToHole = 0f;
@@ -134,7 +141,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         HasTeeOffLocationBeenPlacedYetChanged += HasTeeOffLocationBeenPlacedYetChangedFunction;
         HaveBothTeeMarkersPlacedYetChanged += HaveBothTeeMarkersPlacedYetChangedFunction;
         UpdateDistanceFromTeeOffToHoleChanged += UpdateDistanceFromTeeOffToHoleChangedFunction;
-
+        AimPointsAddOrRemovedChanged += AimPointsAddOrRemovedChangedFunction;
+        TeeOffLocationUpdatedChanged += TeeOffLocationUpdatedChangedFunction;
+        HolePositionUpdatedChanged += HolePositionUpdatedChangedFunction;
     }
     private void OnDisable()
     {
@@ -168,6 +177,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         HasTeeOffLocationBeenPlacedYetChanged -= HasTeeOffLocationBeenPlacedYetChangedFunction;
         HaveBothTeeMarkersPlacedYetChanged -= HaveBothTeeMarkersPlacedYetChangedFunction;
         UpdateDistanceFromTeeOffToHoleChanged -= UpdateDistanceFromTeeOffToHoleChangedFunction;
+        AimPointsAddOrRemovedChanged -= AimPointsAddOrRemovedChangedFunction;
+        TeeOffLocationUpdatedChanged -= TeeOffLocationUpdatedChangedFunction;
+        HolePositionUpdatedChanged -= HolePositionUpdatedChangedFunction;
 
     }
     private void Start()
@@ -1026,8 +1038,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         // Reset hole stuff?
         //_hasHoleBeenPlaced = false;
-        
-        _holePosition = Vector3Int.zero;
+
+        //_holePosition = Vector3Int.zero;
+        HolePositionUpdatedChanged(Vector3Int.zero);
         HasHoleBeenPlacedYetChanged(false);
     }
     void CheckIfPlacingHoleFlag(Vector3Int position, MapMakerObstacle obstacle)
@@ -1066,8 +1079,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         }
 
         //_hasHoleBeenPlaced = true;
-        
-        _holePosition = position;
+
+        //_holePosition = position;
+        HolePositionUpdatedChanged(position);
         HasHoleBeenPlacedYetChanged(true);
 
     }
@@ -1089,8 +1103,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 {
                     Debug.Log("CheckIfRemovingHoleFlag: a hole is at position: " + position + ". Resetting hole placement information");
                     //_hasHoleBeenPlaced = false;
-                    
-                    _holePosition = Vector3Int.zero;
+
+                    //_holePosition = Vector3Int.zero;
+                    HolePositionUpdatedChanged(Vector3Int.zero);
                     HasHoleBeenPlacedYetChanged(false);
                 }
             }
@@ -1177,7 +1192,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             HasTeeOffLocationBeenPlacedYetChanged(false);
         }
 
-        _teeOffLocationPosition = position;
+        //_teeOffLocationPosition = position;
+        TeeOffLocationUpdatedChanged(position);
         //_hasTeeOffLocationBeenPlaced = true;
         HasTeeOffLocationBeenPlacedYetChanged(true);
     }
@@ -1188,8 +1204,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         if (_teeOffLocationPosition != position)
             return;
         //_hasTeeOffLocationBeenPlaced = false;
-        
-        _teeOffLocationPosition = Vector3Int.zero;
+
+        //_teeOffLocationPosition = Vector3Int.zero;
+        TeeOffLocationUpdatedChanged(Vector3Int.zero);
         HasTeeOffLocationBeenPlacedYetChanged(false);
     }
     void PlaceAimPoint(Vector3Int position, MapMakerCourseMarker courseMarker)
@@ -1222,13 +1239,19 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 
 
             _aimPoints.Remove(oldPoint);
+            RemoveAimPointFromDistanceDictionary(oldPoint);
         }
 
         if (_aimPoints.Contains(position))
+        {
             _aimPoints.Remove(position);
+            RemoveAimPointFromDistanceDictionary(position);
+        }
+            
 
         _aimPoints.Add(position);
         _atLeastOneAimPoint = true;
+        AddAimPointToDistanceDictionary(position);
                 
     }
     bool IsThereATeeOffMarkerAtThisPoint(Tilemap map, Vector3Int position)
@@ -1248,7 +1271,10 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     void RemoveAimPoint(Vector3Int position, MapMakerCourseMarker courseMarker)
     {
         if (_aimPoints.Contains(position))
+        {
             _aimPoints.Remove(position);
+            RemoveAimPointFromDistanceDictionary(position);
+        }            
 
         // check if an aim point tile still exists here. If so, remove it?
         if (courseMarker.MapMakerTileType.Tilemap.HasTile(position))
@@ -1271,6 +1297,81 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             _atLeastOneAimPoint = true;
         else
             _atLeastOneAimPoint = false;
+    }
+    void AddAimPointToDistanceDictionary(Vector3Int point)
+    {
+        if (_aimPointToTeeOffDistance.ContainsKey(point))
+            return;
+        float distance = CalculateDistanceFromTeeOffToAimPoints(point);
+        _aimPointToTeeOffDistance.Add(point, distance);
+        AimPointsAddOrRemovedChanged(_aimPointToTeeOffDistance);
+    }
+    void RemoveAimPointFromDistanceDictionary(Vector3Int point)
+    {
+        if (!_aimPointToTeeOffDistance.ContainsKey(point))
+            return;
+
+        _aimPointToTeeOffDistance.Remove(point);
+        AimPointsAddOrRemovedChanged(_aimPointToTeeOffDistance);
+    }
+    public void ClearAimPointFromDistanceDictionary()
+    {
+        _aimPointToTeeOffDistance.Clear();
+        AimPointsAddOrRemovedChanged(_aimPointToTeeOffDistance);
+    }
+    float CalculateDistanceFromTeeOffToAimPoints(Vector3Int point)
+    {
+        if (!_hasTeeOffLocationBeenPlaced)
+            return 0f;
+
+        return Vector2.Distance(new Vector2(_teeOffLocationPosition.x, _teeOffLocationPosition.y), new Vector2(point.x, point.y));
+
+    }
+    void ResetAimPointToTeeOffDistanceAfterTeeOffLocationAddedOrRemoved()
+    {
+        if (_aimPointToTeeOffDistance.Count == 0)
+            return;
+
+        Dictionary<Vector3Int, float> newPointToTeeOffDistance = new Dictionary<Vector3Int, float>();
+        //newPointToTeeOffDistance = _aimPointToTeeOffDistance;
+        bool wasNewDictionaryChanged = false;
+
+        if (_hasTeeOffLocationBeenPlaced)
+        {
+            foreach (KeyValuePair<Vector3Int, float> pointDistPair in _aimPointToTeeOffDistance)
+            {
+                newPointToTeeOffDistance.Add(pointDistPair.Key, pointDistPair.Value);
+                float newDist = CalculateDistanceFromTeeOffToAimPoints(pointDistPair.Key);
+                if (pointDistPair.Value != newDist)
+                {
+                    //_aimPointToTeeOffDistance[pointDistPair.Key] = newDist;
+                    newPointToTeeOffDistance[pointDistPair.Key] = newDist;
+                    wasNewDictionaryChanged = true;
+                }
+            }
+        }
+        else
+        {
+            foreach (KeyValuePair<Vector3Int, float> pointDistPair in _aimPointToTeeOffDistance)
+            {
+
+                //_aimPointToTeeOffDistance[pointDistPair.Key] = 0f;
+                //newPointToTeeOffDistance[pointDistPair.Key] = 0f;
+                newPointToTeeOffDistance.Add(pointDistPair.Key, 0f);
+                wasNewDictionaryChanged = true;
+            }
+        }
+        if (wasNewDictionaryChanged)
+        {
+            foreach (KeyValuePair<Vector3Int, float> pointDistPair in newPointToTeeOffDistance)
+            {
+                if (_aimPointToTeeOffDistance.ContainsKey(pointDistPair.Key))
+                {
+                    _aimPointToTeeOffDistance[pointDistPair.Key] = pointDistPair.Value;
+                }
+            }
+        }
+        AimPointsAddOrRemovedChanged(_aimPointToTeeOffDistance);
     }
     void PlaceTeeOffMarkerBall(Vector3Int position, MapMakerCourseMarker courseMarker)
     {
@@ -1787,6 +1888,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         Debug.Log("HasTeeOffLocationBeenPlacedYetChangedFunction: " + placed);
         _hasTeeOffLocationBeenPlaced = placed;
         CalculateDistanceFromTeeOffToHole();
+        ResetAimPointToTeeOffDistanceAfterTeeOffLocationAddedOrRemoved();
     }
     void HaveBothTeeMarkersPlacedYetChangedFunction(bool placed)
     {
@@ -1807,6 +1909,18 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         Debug.Log("UpdateDistanceFromTeeOffToHoleChangedFunction: " + distance);
         _distanceFromTeeOffToHole = distance;
+    }
+    void AimPointsAddOrRemovedChangedFunction(Dictionary<Vector3Int, float> aimPointsAndDistance)
+    {
+        Debug.Log("AimPointsAddOrRemovedChangedFunction: number of aim points: " + aimPointsAndDistance.Count.ToString());
+    }
+    void TeeOffLocationUpdatedChangedFunction(Vector3Int newPosition)
+    {
+        _teeOffLocationPosition = newPosition;
+    }
+    void HolePositionUpdatedChangedFunction(Vector3Int newPosition)
+    {
+        _holePosition = newPosition;
     }
     #endregion
 }

@@ -755,13 +755,13 @@ x Move the "available courses" from TitleScreenManager to the CustomCourseLoader
 # "Hole Information" UI
 - display after hole has been loaded
 - show following data:
-- - - Hole par - text input field to change
-- - - - - - when hole is saved, get the par value from the text input field
-- - - Is hole placed?
-- - - - - - change setting things like "Has Hole Been Placed" in MapMakerBuilder to be events?
-- - - - - - display the "distance to hole" under this if both HasTeeOffLocationBeenPlaced and HasHoleBeenPlaced are true?
-- - - - - - - - - take action on event from either?
-- - - Is Tee Off Location placed?
-- - - Both tee markers placed?
-- - - Aim points and their positions
-- - - - - - show distance from tee off for each aim point?
+- - x Hole par - text input field to change
+- - - - - x when hole is saved, get the par value from the text input field
+- - x Is hole placed?
+- - - - - x change setting things like "Has Hole Been Placed" in MapMakerBuilder to be events?
+- - - - - x display the "distance to hole" under this if both HasTeeOffLocationBeenPlaced and HasHoleBeenPlaced are true?
+- - - - - - - - x take action on event from either?
+- - x Is Tee Off Location placed?
+- - x Both tee markers placed?
+- - x Aim points and their positions
+- - - - - x show distance from tee off for each aim point?

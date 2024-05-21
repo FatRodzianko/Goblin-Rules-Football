@@ -18,6 +18,7 @@ public class HoleDetailsUIManager : MonoBehaviour
 
     [Header("Hole Number")]
     [SerializeField] TextMeshProUGUI _holeNumberValueText;
+
     [Header("Hole Par")]
     [SerializeField] TMP_InputField _holeParInput;
 
@@ -25,6 +26,13 @@ public class HoleDetailsUIManager : MonoBehaviour
     [SerializeField] Toggle _hasHoleBeenPlaced;
     [SerializeField] Toggle _hasTeeOffLocationBeenSet;
     [SerializeField] Toggle _haveTeeMarkersBeenPlaced;
+
+    [Header("Distance texts")]
+    [SerializeField] GameObject _teeOffLocationText;
+    [SerializeField] TextMeshProUGUI _teeOffLocationValue;
+    [SerializeField] GameObject _holePositionText;
+    [SerializeField] TextMeshProUGUI _holePositionValue;
+
 
     [Header("Hole Distance")]
     [SerializeField] TextMeshProUGUI _distanceToHoleText;
@@ -53,6 +61,9 @@ public class HoleDetailsUIManager : MonoBehaviour
         _builder.HasTeeOffLocationBeenPlacedYetChanged += SetHasTeeOffLocationBeenPlaced;
         _builder.HaveBothTeeMarkersPlacedYetChanged += SetHaveTeeMarkersBeenPlaced;
         _builder.UpdateDistanceFromTeeOffToHoleChanged += SetDistanceToHole;
+        _builder.AimPointsAddOrRemovedChanged += SetAimPointsAndDistances;
+        _builder.TeeOffLocationUpdatedChanged += SetTeeOffLocationPosition;
+        _builder.HolePositionUpdatedChanged += SetHolePosition;
 
         // events for this guy
         IsDetailsPanelOpenEventChanged += IsDetailsPanelOpenEventChangedFunction;
@@ -69,6 +80,9 @@ public class HoleDetailsUIManager : MonoBehaviour
         _builder.HasTeeOffLocationBeenPlacedYetChanged -= SetHasTeeOffLocationBeenPlaced;
         _builder.HaveBothTeeMarkersPlacedYetChanged -= SetHaveTeeMarkersBeenPlaced;
         _builder.UpdateDistanceFromTeeOffToHoleChanged -= SetDistanceToHole;
+        _builder.AimPointsAddOrRemovedChanged -= SetAimPointsAndDistances;
+        _builder.TeeOffLocationUpdatedChanged -= SetTeeOffLocationPosition;
+        _builder.HolePositionUpdatedChanged -= SetHolePosition;
 
         // events for this guy
         IsDetailsPanelOpenEventChanged -= IsDetailsPanelOpenEventChangedFunction;
@@ -99,11 +113,15 @@ public class HoleDetailsUIManager : MonoBehaviour
     {
         Debug.Log("SetHasHoleBeenPlaced: " + placed);
         _hasHoleBeenPlaced.isOn = placed;
+        _holePositionText.SetActive(placed);
+        _holePositionValue.gameObject.SetActive(placed);
     }
     public void SetHasTeeOffLocationBeenPlaced(bool placed)
     {
         Debug.Log("SetHasTeeOffLocationBeenPlaced: " + placed);
         _hasTeeOffLocationBeenSet.isOn = placed;
+        _teeOffLocationText.SetActive(placed);
+        _teeOffLocationValue.gameObject.SetActive(placed);
     }
     public void SetHaveTeeMarkersBeenPlaced(bool placed)
     {
@@ -113,7 +131,47 @@ public class HoleDetailsUIManager : MonoBehaviour
     public void SetDistanceToHole(float distance)
     {
         Debug.Log("SetDistanceToHole: " + distance);
-        _distanceToHoleText.text = distance.ToString("0.00");
+        _distanceToHoleText.text = distance.ToString("0.##");
+    }
+    void SetAimPointsAndDistances(Dictionary<Vector3Int, float> aimPointsAndDistances)
+    {
+        Debug.Log("SetAimPointsAndDistances: aimPointsAndDistances.Count: " + aimPointsAndDistances.Count);
+
+        if (aimPointsAndDistances.Count == 0)
+        {
+            foreach (AimPointPanelScript aimPointitems in _aimPointItems)
+            {
+                aimPointitems.gameObject.SetActive(false);
+            }
+            _aimPointHolder.SetActive(false);
+            return;
+        }
+
+        _aimPointHolder.SetActive(true);
+        int i = 0;
+        foreach (KeyValuePair<Vector3Int, float> pointDistPair in aimPointsAndDistances)
+        {
+            _aimPointItems[i].gameObject.SetActive(true);
+            _aimPointItems[i].SetAimPointPositionText(new Vector2(pointDistPair.Key.x, pointDistPair.Key.y));
+            _aimPointItems[i].SetAimPointDistanceText(pointDistPair.Value);
+            i++;
+        }
+
+        if (i < _aimPointItems.Count - 1)
+        {
+            for (int j = i; j < _aimPointItems.Count; j++)
+            {
+                _aimPointItems[j].gameObject.SetActive(false);
+            }
+        }
+    }
+    void SetHolePosition(Vector3Int holePosition)
+    {
+        _holePositionValue.text = "(" + holePosition.x.ToString("0.##") + "," + holePosition.y.ToString("0.##") + ")";
+    }
+    void SetTeeOffLocationPosition(Vector3Int teeOffLocationPosition)
+    {
+        _teeOffLocationValue.text = "(" + teeOffLocationPosition.x.ToString("0.##") + "," + teeOffLocationPosition.y.ToString("0.##") + ")";
     }
     void IsDetailsPanelOpenEventChangedFunction(bool isOpen)
     {

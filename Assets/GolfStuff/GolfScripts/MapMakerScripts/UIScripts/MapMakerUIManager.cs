@@ -620,6 +620,9 @@ public class MapMakerUIManager : MonoBehaviour
             return;
 
 
+        // make sure the aim point dictionary is empty?
+        _mapMakerBuilder.ClearAimPointFromDistanceDictionary();
+
         // create a new empty hole and save to the course
         _saveHandler.ClearAllTilesForNewHole();
         HoleData newhole = _saveHandler.CreateNewHole(_selectedCourse.CourseName, _selectedCourse.IsMiniGolf, par, _selectedCourse.HolesInCourse.Count() + 1);
@@ -807,6 +810,7 @@ public class MapMakerUIManager : MonoBehaviour
 
         Debug.Log("LoadHole: Course: " + _selectedCourse.CourseName + " hole #: " + _selectedHole.HoleIndex);
 
+        _mapMakerBuilder.ClearAimPointFromDistanceDictionary();
         _mapMakerHistory.ClearHistoryForNewHole();
         _saveHandler.LoadTileMapData(_selectedHole.HoleTileMapData);
 
@@ -851,5 +855,10 @@ public class MapMakerUIManager : MonoBehaviour
         _loadHoleButton.interactable = !isOpen;
         _saveHoleButton.interactable = !isOpen;
         _uploadToWorkshopButton.interactable = !isOpen;
+
+        if(isOpen)
+            _mapMakerBuilder.PlayerInput.Disable();
+        else
+            _mapMakerBuilder.PlayerInput.Enable();
     }
 }

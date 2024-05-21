@@ -25,6 +25,6 @@ public class AimPointPanelScript : MonoBehaviour
     }
     public void SetAimPointDistanceText(float distance)
     {
-        this._distanceText.text = distance.ToString() + "m";
+        this._distanceText.text = distance.ToString("0.##") + "m";
     }
 }
