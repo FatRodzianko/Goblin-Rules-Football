@@ -142,6 +142,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [Header("Tasks")]
     [SerializeField] CancellationTokenSource _cancellationTokenSource;
 
+    public TileMapManager TileMapMangerObject
+    {
+        get
+        {
+            return _tileMapManager;
+        }
+    }
     private void Awake()
     {
 

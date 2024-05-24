@@ -10027,6 +10027,7 @@ MonoBehaviour:
   _clientMovingBall: 0
   PlayerUsingRocket: 0
   BallInTube: 0
+  BallOnPipeEntryHole: 0
   hitBallPonts:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
@@ -10064,6 +10065,8 @@ MonoBehaviour:
   twoBounceDistancesAgo: 0
   isRolling: 0
   HitApexOfHill: 0
+  _lastKnownPosition: {x: 0, y: 0}
+  _stuckWhileRollingCount: 0
   LocalIsInHole: 0
   IsInHole: 0
   BouncedOffObstacle: 0
@@ -10087,6 +10090,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 67108864
   _currentTileCell: {x: 0, y: 0, z: 0}
+  _groundTileOrder: {fileID: 11400000, guid: 2e752f8e7589d054481e68f7669e465a, type: 2}
   _ballSounds: {fileID: 11400000, guid: b32cc943f2db3b64a987f96b00abadc9, type: 2}
 --- !u!50 &578994876
 Rigidbody2D:

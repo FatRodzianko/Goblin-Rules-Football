@@ -7,6 +7,7 @@ using System.Linq;
 
 public class GroundTopDown : MonoBehaviour
 {
+    [SerializeField] public int GroundLayerValue;
     [SerializeField] public string groundType;
     [SerializeField] public Vector2 slopeDirection;
     [SerializeField] public float slopeSpeedIncrease;

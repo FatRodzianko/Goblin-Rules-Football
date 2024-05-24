@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7917d57e94beebb41a2edcfedcc61b5a, type: 3}
+  m_Name: GroundTileOrderMapping
+  m_EditorClassIdentifier: 
+  GroundTileOrderDictionary:
+  - GroundType: deep rough background
+    GroundOrderValue: 0
+  - GroundType: green
+    GroundOrderValue: 1
+  - GroundType: fairway
+    GroundOrderValue: 2
+  - GroundType: rough
+    GroundOrderValue: 3
+  - GroundType: water trap
+    GroundOrderValue: 4
+  - GroundType: sand trap
+    GroundOrderValue: 5

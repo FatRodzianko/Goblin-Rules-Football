@@ -41,6 +41,13 @@ public class TileMapManager : MonoBehaviour
     [Header("Camera stuff?")]
     [SerializeField] CinemachineVirtualCamera _myCamera;
 
+    public Tilemap WaterTrapMap
+    {
+        get
+        {
+            return _waterTrapMap;
+        }
+    }
     private void Start()
     {
         if(!_myCamera)

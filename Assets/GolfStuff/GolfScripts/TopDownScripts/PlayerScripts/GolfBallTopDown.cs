@@ -118,6 +118,8 @@ public class GolfBallTopDown : NetworkBehaviour
     public float slopeSpeedModifier = 0f;
     [SerializeField] LayerMask _golfHoleLayerMask;
     [SerializeField] Vector3Int _currentTileCell;
+    [SerializeField] GroundTileOrder _groundTileOrder;
+    private Dictionary<string, int> _groundTileOrderDictionary = new Dictionary<string, int>();
 
     [Header("Sounds References")]
     [SerializeField] ScriptableBallSounds _ballSounds;
@@ -127,6 +129,7 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         isHit = false;
         //MyColliderRadius = myCollider.radius;
+        InitializeGroundTileOrderDictionary();
     }
     public override void OnStartClient()
     {
@@ -900,79 +903,125 @@ public class GolfBallTopDown : NetworkBehaviour
         if (HitApexOfHill)
             HitApexOfHill = false;
     }
+    void InitializeGroundTileOrderDictionary()
+    {
+        _groundTileOrderDictionary.Clear();
+        foreach (var item in _groundTileOrder.GroundTileOrderDictionary)
+        {
+            _groundTileOrderDictionary.Add(item.GroundType, item.GroundOrderValue);
+        }
+    }
+    //
+    // OLD WAY
+    //
+    //string GetGroundMaterial()
+    //{
+    //    // REWRITE IDEA LIKELY NEEDED BECAUSE MAP MAKER RULE TILES WILL CREATE OVERLAPPING GROUND MATERIALS
+    //    // Should create a dictionary of all the ground types with their "ranking" "tier" "whatever" as the key (probably have the string of the terrain type as the key, and the tier as the value to make it easier to lookup?)
+    //    // loop through each "ground" the ball is on top of. Using the heighest tier ground as the final ground material
+    //    // so, first ground material in the loop, set the current "tier". Let's say it's Green, the lowest at 0
+    //    // If it finds another ground material, check if the tier is greater than the current tier. If it is, save that tier
+    //    // so if the next tier was fairway at tier 1, that's higher than tier 0, so save that
+    //    // water will be highest, followed by sand, then rough, fairway, green?
+    //    // after the loop finishes, lookup the highest tier that was saved, and set that ground material as the ground material
+    //    // if the tier was never set or stayed its initial value (-1?) then default to deep rough. This should only happen if there were no other materials beneath the ball and it was just on the "background"
+
+    //    string material = "";
+
+    //    //RaycastHit2D[] ground = Physics2D.CircleCastAll(this.transform.position, this.GetComponent<CircleCollider2D>().radius / 2, Vector2.zero, 0f, groundMask);
+    //    RaycastHit2D[] ground = Physics2D.CircleCastAll(this.transform.position, pixelUnit, Vector2.zero, 0f, groundMask);
+    //    if (ground.Length > 0)
+    //    {
+    //        for (int i = 0; i < ground.Length; i++)
+    //        {
+    //            GroundTopDown groundScript = ground[i].collider.GetComponent<GroundTopDown>();
+    //            GetTileSlopeInformation(groundScript);
+    //            string groundMaterial = groundScript.groundType;
+    //            //Debug.Log("GetGroundMaterial: material found: " + groundMaterial);
+
+    //            // Always have rough or trap override 
+    //            if (groundMaterial.Contains("trap"))
+    //            {
+    //                material = groundMaterial;
+    //                //GetTileSlopeInformation(groundScript);
+    //                break;
+    //            }
+    //            // Check to see if the ball is overlapping any types of ground. If it is on the edge of a green ground and non-green ground, keep the non-green ground
+    //            if (!string.IsNullOrWhiteSpace(material))
+    //            {
+    //                if (i == 0)
+    //                {
+    //                    material = groundMaterial;
+    //                    continue;
+    //                }
+    //                if (groundMaterial == "green" && !material.Equals("green") && !material.Equals("deep rough background")) // if a material found in a prior loop is not green AND ALSO NOT deep rough background, skip this green detection
+    //                {
+    //                    continue;
+    //                }
+    //                else if (groundMaterial == "deep rough background" && !material.Equals("deep rough background")) // override for deep rough because I have that fill in everything instead of having to reload it every time?
+    //                {
+    //                    continue;
+    //                }
+    //                else
+    //                {
+    //                    material = groundMaterial;
+
+    //                    // Check to see if the ball has moved onto a new tile. If so, check if that new tile has any slope information
+    //                    //GetTileSlopeInformation(groundScript);
+    //                    //groundSlopeDirection = groundScript.slopeDirection;
+    //                    //slopeSpeedModifier = groundScript.slopeSpeedIncrease;
+    //                }
+    //            }
+    //            else
+    //            {
+    //                material = groundMaterial;
+    //                // Check to see if the ball has moved onto a new tile. If so, check if that new tile has any slope information
+    //                //GetTileSlopeInformation(groundScript);
+    //                //groundSlopeDirection = groundScript.slopeDirection;
+    //                //slopeSpeedModifier = groundScript.slopeSpeedIncrease;
+    //            }
+    //        }
+    //    }
+    //    else
+    //        material = "fairway"; // in case of failure, default to fairway?
+
+
+    //    //Debug.Log("GetGroundMaterial: returning material as: " + material);
+    //    return material;
+    //}
+    //
+    // OLD WAY
+    //
     string GetGroundMaterial()
     {
-        // REWRITE IDEA LIKELY NEEDED BECAUSE MAP MAKER RULE TILES WILL CREATE OVERLAPPING GROUND MATERIALS
-        // Should create a dictionary of all the ground types with their "ranking" "tier" "whatever" as the key (probably have the string of the terrain type as the key, and the tier as the value to make it easier to lookup?)
-        // loop through each "ground" the ball is on top of. Using the heighest tier ground as the final ground material
-        // so, first ground material in the loop, set the current "tier". Let's say it's Green, the lowest at 0
-        // If it finds another ground material, check if the tier is greater than the current tier. If it is, save that tier
-        // so if the next tier was fairway at tier 1, that's higher than tier 0, so save that
-        // water will be highest, followed by sand, then rough, fairway, green?
-        // after the loop finishes, lookup the highest tier that was saved, and set that ground material as the ground material
-        // if the tier was never set or stayed its initial value (-1?) then default to deep rough. This should only happen if there were no other materials beneath the ball and it was just on the "background"
-
         string material = "";
 
         //RaycastHit2D[] ground = Physics2D.CircleCastAll(this.transform.position, this.GetComponent<CircleCollider2D>().radius / 2, Vector2.zero, 0f, groundMask);
         RaycastHit2D[] ground = Physics2D.CircleCastAll(this.transform.position, pixelUnit, Vector2.zero, 0f, groundMask);
+
         if (ground.Length > 0)
         {
+            int highestGroundValue = -1;
             for (int i = 0; i < ground.Length; i++)
             {
                 GroundTopDown groundScript = ground[i].collider.GetComponent<GroundTopDown>();
                 GetTileSlopeInformation(groundScript);
-                string groundMaterial = groundScript.groundType;
-                //Debug.Log("GetGroundMaterial: material found: " + groundMaterial);
 
-                // Always have rough or trap override 
-                if (groundMaterial.Contains("trap"))
+                if (_groundTileOrderDictionary.ContainsKey(groundScript.groundType))
                 {
-                    material = groundMaterial;
-                    //GetTileSlopeInformation(groundScript);
-                    break;
-                }
-                // Check to see if the ball is overlapping any types of ground. If it is on the edge of a green ground and non-green ground, keep the non-green ground
-                if (!string.IsNullOrWhiteSpace(material))
-                {
-                    if (i == 0)
+                    int groundValue = _groundTileOrderDictionary[groundScript.groundType];
+                    if (groundValue > highestGroundValue)
                     {
-                        material = groundMaterial;
-                        continue;
+                        Debug.Log("GetGroundMaterial: " + groundScript.groundType + " has a ground value of " + groundValue + " which is higher than the previous high value of: " + highestGroundValue.ToString());
+                        material = groundScript.groundType;
+                        highestGroundValue = groundValue;
                     }
-                    if (groundMaterial == "green" && !material.Equals("green") && !material.Equals("deep rough background")) // if a material found in a prior loop is not green AND ALSO NOT deep rough background, skip this green detection
-                    {
-                        continue;
-                    }
-                    else if (groundMaterial == "deep rough background" && !material.Equals("deep rough background")) // override for deep rough because I have that fill in everything instead of having to reload it every time?
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        material = groundMaterial;
-
-                        // Check to see if the ball has moved onto a new tile. If so, check if that new tile has any slope information
-                        //GetTileSlopeInformation(groundScript);
-                        //groundSlopeDirection = groundScript.slopeDirection;
-                        //slopeSpeedModifier = groundScript.slopeSpeedIncrease;
-                    }
-                }
-                else
-                {
-                    material = groundMaterial;
-                    // Check to see if the ball has moved onto a new tile. If so, check if that new tile has any slope information
-                    //GetTileSlopeInformation(groundScript);
-                    //groundSlopeDirection = groundScript.slopeDirection;
-                    //slopeSpeedModifier = groundScript.slopeSpeedIncrease;
                 }
             }
         }
         else
-            material = "fairway"; // in case of failure, default to fairway?
-
-
-        //Debug.Log("GetGroundMaterial: returning material as: " + material);
+            material = "fairway";
+        
         return material;
     }
     bool KeepBouncing(float previousHeight, string groundMaterial)
@@ -1968,59 +2017,129 @@ public class GolfBallTopDown : NetworkBehaviour
 
         return bounceOffSlope;
     }
+    //
+    // OLD WAY
+    //
+    //Vector3 FindPointOutOfWater()
+    //{
+    //    Vector3 playerPos = MyPlayer.transform.position;
+    //    Vector3 ballPos = this.transform.position;
+    //    Vector2 directionToPlayer = (playerPos - ballPos).normalized;
+    //    float distanceToPlayer = Vector2.Distance(playerPos, ballPos);
+
+    //    // Loop through the hits. Check if the ground type is NOT water. If so, check the collision point. Use the closest collision point to the ball to replace the ball. Make sure to set the ball at a point + the ball's circle collider radius along the line
+    //    List<Vector3> contactPoints = new List<Vector3>();
+    //    RaycastHit2D[] hits = Physics2D.RaycastAll(ballPos, directionToPlayer, distanceToPlayer, groundMask);
+    //    if (hits.Length > 0)
+    //    {
+    //        for (int i = 0; i < hits.Length; i++)
+    //        {
+
+    //            RaycastHit2D hit = hits[i];
+    //            GroundTopDown ground = hit.transform.GetComponent<GroundTopDown>();
+    //            if (ground.groundType.Contains("water") || ground.groundType.Equals("deep rough background"))
+    //                continue;
+    //            Debug.Log("FindPointOutOfWater: Raycast from ball hit collider of ground type: " + ground.groundType + " at position: " + hit.point.ToString());
+    //            contactPoints.Add(hit.point);
+    //        }
+    //    }
+    //    // Find the closest contact point based on distance to the ball
+    //    Vector3 closestContactPoint = Vector3.zero;
+    //    if (contactPoints.Count > 0)
+    //    {
+    //        float closestContactPointDist = 0f;
+    //        for (int i = 0; i < contactPoints.Count; i++)
+    //        {
+    //            float distToContactPoint = Vector2.Distance(contactPoints[i], ballPos);
+    //            if (i == 0)
+    //            {
+    //                closestContactPointDist = distToContactPoint;
+    //                closestContactPoint = contactPoints[i];
+    //                continue;
+    //            }
+
+    //            if (distToContactPoint < closestContactPointDist)
+    //            {
+    //                closestContactPointDist = distToContactPoint;
+    //                closestContactPoint = contactPoints[i];
+    //            }
+    //        }
+    //    }
+    //    else
+    //        closestContactPoint = ballPos;
+
+    //    // Add the ball's circle collider radius along path to player to get point that is off the water?
+    //    Vector3 newBallPos = closestContactPoint + (Vector3)(directionToPlayer * (this.MyColliderRadius * 2));
+
+    //    Debug.Log("FindPointOutOfWater: Closest contact point was: " + closestContactPoint.ToString("0.00000") + " and after adding ball circle collider radius: " + newBallPos.ToString("0.00000"));
+    //    return newBallPos;
+    //}
+    //
+    // OLD WAY
+    //
     Vector3 FindPointOutOfWater()
     {
         Vector3 playerPos = MyPlayer.transform.position;
         Vector3 ballPos = this.transform.position;
-        Vector2 directionToPlayer = (playerPos - ballPos).normalized;
+        Vector3 directionToPlayer = (playerPos - ballPos).normalized;
         float distanceToPlayer = Vector2.Distance(playerPos, ballPos);
+        float distanceChecked = 0f;
 
-        // Loop through the hits. Check if the ground type is NOT water. If so, check the collision point. Use the closest collision point to the ball to replace the ball. Make sure to set the ball at a point + the ball's circle collider radius along the line
-        List<Vector3> contactPoints = new List<Vector3>();
-        RaycastHit2D[] hits = Physics2D.RaycastAll(ballPos, directionToPlayer, distanceToPlayer, groundMask);
-        if (hits.Length > 0)
+        Debug.Log("FindPointOutOfWater: ballPos " + ballPos.ToString() + " directionToPlayer: " + directionToPlayer.ToString());
+
+        bool isBallStillOnWater = true;
+        float timeStarted = Time.time;
+
+        while (isBallStillOnWater)
         {
-            for (int i = 0; i < hits.Length; i++)
+            ballPos += directionToPlayer * .5f;
+            distanceChecked += .5f;
+            Vector3Int ballTilePos = Vector3Int.FloorToInt(ballPos);
+
+            Debug.Log("FindPointOutOfWater: checking new position at: " + ballPos.ToString() +  " have checked over a distance of: " + distanceChecked);
+
+            if (GameplayManagerTopDownGolf.instance.TileMapMangerObject.WaterTrapMap.GetTile(ballTilePos) == null)
             {
-                
-                RaycastHit2D hit = hits[i];
-                GroundTopDown ground = hit.transform.GetComponent<GroundTopDown>();
-                if (ground.groundType.Contains("water") || ground.groundType.Equals("deep rough background"))
-                    continue;
-                Debug.Log("FindPointOutOfWater: Raycast from ball hit collider of ground type: " + ground.groundType + " at position: " + hit.point.ToString());
-                contactPoints.Add(hit.point);
+                Debug.Log("FindPointOutOfWater: no longer over a tile that has a water tile. BallPos: " + ballPos.ToString() + " ballTilePos: " + ballTilePos.ToString());
+                //ballPos = ballTilePos;
+                isBallStillOnWater = false;
             }
+
+            //if (distanceChecked >= distanceToPlayer)
+            //{
+            //    isBallStillOnWater = false;
+            //    //return ballPos;
+            //}
+            //if (Time.time > timeStarted + 1f)
+            //{
+            //    isBallStillOnWater = false;
+            //}
+
+            //RaycastHit2D[] ground = Physics2D.CircleCastAll(ballPos, pixelUnit, Vector2.zero, 0f, groundMask);
+            //if (ground.Length > 0)
+            //{
+            //    for (int i = 0; i < ground.Length; i++)
+            //    {
+            //        GroundTopDown groundScript = ground[i].collider.GetComponent<GroundTopDown>();
+            //        if (groundScript.groundType.Contains("water"))
+            //        {
+            //            isBallStillOnWater = true;
+            //            break;
+            //        }
+            //        else
+            //        {
+            //            isBallStillOnWater = false;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    isBallStillOnWater = false;
+            //    //return ballPos;
+            //}
         }
-        // Find the closest contact point based on distance to the ball
-        Vector3 closestContactPoint = Vector3.zero;
-        if (contactPoints.Count > 0)
-        {
-            float closestContactPointDist = 0f;
-            for (int i = 0; i < contactPoints.Count; i++)
-            {
-                float distToContactPoint = Vector2.Distance(contactPoints[i], ballPos);
-                if (i == 0)
-                {
-                    closestContactPointDist = distToContactPoint;
-                    closestContactPoint = contactPoints[i];
-                    continue;
-                }
-
-                if (distToContactPoint < closestContactPointDist)
-                {
-                    closestContactPointDist = distToContactPoint;
-                    closestContactPoint = contactPoints[i];
-                }
-            }
-        }
-        else
-            closestContactPoint = ballPos;
-
-        // Add the ball's circle collider radius along path to player to get point that is off the water?
-        Vector3 newBallPos = closestContactPoint + (Vector3)(directionToPlayer * (this.MyColliderRadius * 2));
-
-        Debug.Log("FindPointOutOfWater: Closest contact point was: " + closestContactPoint.ToString("0.00000") + " and after adding ball circle collider radius: " + newBallPos.ToString("0.00000"));
-        return newBallPos;
+        Debug.Log("FindPointOutOfWater: ball is no longer on water at " + ballPos.ToString());
+        return ballPos;
     }
     public void BallEndedInWater()
     {
