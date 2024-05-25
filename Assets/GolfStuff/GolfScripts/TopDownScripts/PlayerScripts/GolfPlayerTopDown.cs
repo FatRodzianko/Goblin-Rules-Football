@@ -1508,7 +1508,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 }
                 else
                 {
-                    SoundManager.instance.PlaySound("golfball-hit", 1f);
+                    //SoundManager.instance.PlaySound("golfball-hit", 1f);
                     soundName = _ballSounds.HitOffGround;
                 }
 
