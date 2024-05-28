@@ -247,7 +247,8 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
 
         newHole.IsTeeOffChallenge = false;
         newHole.ClubToUse = "";
-        newHole.IsMiniGolf = false;
+        //newHole.IsMiniGolf = false;
+        newHole.IsMiniGolf = holeData.IsMiniGolf;
 
         newHole.CameraBoundingBoxPos = Vector3.zero;
 

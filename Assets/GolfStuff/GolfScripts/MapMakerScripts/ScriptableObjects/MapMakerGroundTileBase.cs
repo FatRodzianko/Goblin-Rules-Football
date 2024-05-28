@@ -114,4 +114,11 @@ public class MapMakerGroundTileBase : ScriptableObject
             return _allowedInMiniGolf;
         }
     }
+    public bool MiniGolfOnly
+    {
+        get
+        {
+            return _miniGolfOnly;
+        }
+    }
 }

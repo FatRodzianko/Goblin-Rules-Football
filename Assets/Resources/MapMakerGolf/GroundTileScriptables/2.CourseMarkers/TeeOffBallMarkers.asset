@@ -26,6 +26,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6a153d21c6c12a5488da645afa295155, type: 2}
   _onlyAllowedOnSpecificGroundType: 0
   _canOnlyBePlacedOnTheseGroundTypes: []
-  _allowedInMiniGolf: 0
+  _allowedInMiniGolf: 1
   _miniGolfOnly: 0
   _courseMarkerType: 3

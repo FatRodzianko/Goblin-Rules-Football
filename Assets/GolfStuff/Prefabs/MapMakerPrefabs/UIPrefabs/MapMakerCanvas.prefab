@@ -9459,13 +9459,14 @@ MonoBehaviour:
   _greenItems: {fileID: 0}
   _fairwayItems: {fileID: 0}
   _uiTileTypes:
+  - {fileID: 11400000, guid: 22d2297cf53786043ae532b3a4cef836, type: 2}
+  - {fileID: 11400000, guid: d8bd43f18c3babc4c9d549c4d11dff79, type: 2}
   - {fileID: 11400000, guid: cab1aecbdcce20141ae4d3bba34fc6da, type: 2}
   - {fileID: 11400000, guid: c8863beacaaa2f24a8d83454bb429fd0, type: 2}
-  - {fileID: 11400000, guid: 22d2297cf53786043ae532b3a4cef836, type: 2}
-  - {fileID: 11400000, guid: 548e4a14607dc5c4493451790e7d9810, type: 2}
-  - {fileID: 11400000, guid: d8bd43f18c3babc4c9d549c4d11dff79, type: 2}
-  - {fileID: 11400000, guid: 9686f4ec21eaba14ead1dbdd5d4402d6, type: 2}
   - {fileID: 11400000, guid: 3a51da9b31c4928479b4cbffc9cd512f, type: 2}
+  - {fileID: 11400000, guid: b70595ccd76166644b3fabd821397acf, type: 2}
+  - {fileID: 11400000, guid: 9686f4ec21eaba14ead1dbdd5d4402d6, type: 2}
+  - {fileID: 11400000, guid: 548e4a14607dc5c4493451790e7d9810, type: 2}
   - {fileID: 11400000, guid: 3edfcf0fcd201424898a933d204ef19f, type: 2}
   _groundTileTypeHolder: {fileID: 5637575297077147970}
   _manualTileObjects: []

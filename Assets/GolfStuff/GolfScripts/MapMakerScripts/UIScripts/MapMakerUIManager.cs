@@ -38,11 +38,14 @@ public class MapMakerUIManager : MonoBehaviour
     Dictionary<GameObject, MapMakerGroundTileBase> _allTileObjectsByTileBase = new Dictionary<GameObject, MapMakerGroundTileBase>();
     [SerializeField] List<GameObject> _manualTileObjects = new List<GameObject>();
     [SerializeField] List<GameObject> _ruleTileObjects = new List<GameObject>();
+    [SerializeField] List<GameObject> _allowedInMiniGolf = new List<GameObject>();
+    [SerializeField] List<GameObject> _miniGolfOnly = new List<GameObject>();
 
     [Header("Tiling Mode UI")]
     [SerializeField] Button _autoTileButton;
     [SerializeField] Button _manualTileButton;
     [SerializeField] Color _tileModeSelectedColor = Color.yellow;
+    bool _isAutoTileModeOn = false;
 
     [Header("Current Tile Map UI")]
     [SerializeField] TMP_Dropdown _currentTileMapDropDown;
@@ -67,6 +70,9 @@ public class MapMakerUIManager : MonoBehaviour
     private List<CourseData> _allCustomCourses = new List<CourseData>();
     public delegate void NewCourseSelected(CourseData newCourse);
     public event NewCourseSelected NewCourseSelectedChanged;
+    public delegate void IsCourseMiniGolf(bool isMini);
+    public event IsCourseMiniGolf IsCourseMiniGolfChanged;
+    bool _isSelectedCourseMiniGolf;
 
     [Header("Selected Hole")]
     [SerializeField] int _selectedHoleNumber;
@@ -139,7 +145,7 @@ public class MapMakerUIManager : MonoBehaviour
     {
         NewCourseSelectedChanged += NewCourseSelectedChangedFunction;
         NewHoleSelectedChanged += NewHoleSelectedChangedFunction;
-
+        IsCourseMiniGolfChanged += IsCourseMiniGolfChangedFunction;
         
     }
     private void OnDisable()
@@ -147,6 +153,7 @@ public class MapMakerUIManager : MonoBehaviour
         NewCourseSelectedChanged -= NewCourseSelectedChangedFunction;
         NewHoleSelectedChanged -= NewHoleSelectedChangedFunction;
         _mapMakerHistory.CanUndoChanged -= EnableSaveHoleButton;
+        IsCourseMiniGolfChanged -= IsCourseMiniGolfChangedFunction;
 
         //details panel stuff
         _holeDetailsUIManager.IsDetailsPanelOpenEventChanged -= EditDetailsPanelOpen;
@@ -179,6 +186,10 @@ public class MapMakerUIManager : MonoBehaviour
     //}
     void BuildUI()
     {
+
+        _allowedInMiniGolf.Clear();
+        _miniGolfOnly.Clear();
+
         foreach (UITileTypes ui in _uiTileTypes)
         {
             if (_uiElements.ContainsKey(ui))
@@ -196,10 +207,20 @@ public class MapMakerUIManager : MonoBehaviour
             text.text = ui.UIName;
 
             inst.transform.SetSiblingIndex(ui.SiblingIndex);
+            Debug.Log("BuildUI: Adding: " + inst.name + " at sibling index of "  + ui.SiblingIndex);
 
             Image img = inst.GetComponentInChildren<Image>();
             img.color = ui.BackgroundColor;
         }
+        //foreach (UITileTypes ui in _uiTileTypes)
+        //{
+        //    if (_uiElements.ContainsKey(ui))
+        //    {
+        //        var inst = _uiElements[ui];
+        //        inst.transform.SetSiblingIndex(ui.SiblingIndex);
+        //    }
+            
+        //}
 
         MapMakerGroundTileBase[] groundTiles = GetAllGroundTiles();
 
@@ -249,6 +270,16 @@ public class MapMakerUIManager : MonoBehaviour
                 Debug.LogError("MapMakerUIManager: BuildUI: Unknown type of tile base: " + groundTileBase.TileBase.GetType());
             }
 
+            if (groundTileBase.AllowedInMiniGolf)
+            {
+                if (!_allowedInMiniGolf.Contains(inst))
+                    _allowedInMiniGolf.Add(inst);
+            }
+            if (groundTileBase.MiniGolfOnly)
+            {
+                if (!_miniGolfOnly.Contains(inst))
+                    _miniGolfOnly.Add(inst);
+            }
             
 
             // Apply BuildingObjectBase to Button handler script thing?
@@ -277,7 +308,30 @@ public class MapMakerUIManager : MonoBehaviour
         foreach (GameObject ob in _manualTileObjects)
         {
             // Add checks here for "course type." If the course type is minigolf, only enable _allowedInMiniGolf tiles. If it is regular golf, don't enable _miniGolfOnly tiles
-            ob.SetActive(enable);
+            if (_isSelectedCourseMiniGolf)
+            {
+                Debug.Log("EnableRegularTileObjects: enable " + enable + " _isSelectedCourseMiniGolf: " + _isSelectedCourseMiniGolf);
+                if (_allowedInMiniGolf.Contains(ob))
+                {
+                    ob.SetActive(enable);
+                }
+                else
+                {
+                    ob.SetActive(false);
+                }
+            }
+            else
+            {
+                Debug.Log("EnableRegularTileObjects: enable " + enable + " _isSelectedCourseMiniGolf: " + _isSelectedCourseMiniGolf);
+                if (_miniGolfOnly.Contains(ob))
+                {
+                    ob.SetActive(false);
+                }
+                else
+                {
+                    ob.SetActive(enable);
+                }                
+            }            
         }
     }
     void EnableRuleTileObjects(bool enable)
@@ -288,7 +342,31 @@ public class MapMakerUIManager : MonoBehaviour
         foreach (GameObject ob in _ruleTileObjects)
         {
             // Add checks here for "course type." If the course type is minigolf, only enable _allowedInMiniGolf tiles. If it is regular golf, don't enable _miniGolfOnly tiles
-            ob.SetActive(enable);
+            //ob.SetActive(enable);
+            if (_isSelectedCourseMiniGolf)
+            {
+                Debug.Log("EnableRuleTileObjects: enable " + enable + " _isSelectedCourseMiniGolf: " + _isSelectedCourseMiniGolf);
+                if (_allowedInMiniGolf.Contains(ob))
+                {
+                    ob.SetActive(enable);
+                }
+                else
+                {
+                    ob.SetActive(false);
+                }
+            }
+            else
+            {
+                Debug.Log("EnableRuleTileObjects: enable " + enable + " _isSelectedCourseMiniGolf: " + _isSelectedCourseMiniGolf);
+                if (_miniGolfOnly.Contains(ob))
+                {
+                    ob.SetActive(false);
+                }
+                else
+                {
+                    ob.SetActive(enable);
+                }
+            }
         }
     }
     void SelectAutoTileMode()
@@ -296,6 +374,7 @@ public class MapMakerUIManager : MonoBehaviour
         Debug.Log("SelectAutoTileMode: ");
         EnableRuleTileObjects(true);
         EnableRegularTileObjects(false);
+        _isAutoTileModeOn = true;
         _autoTileButton.GetComponent<Image>().color = _tileModeSelectedColor;
         _manualTileButton.GetComponent<Image>().color = Color.white;
     }
@@ -304,6 +383,7 @@ public class MapMakerUIManager : MonoBehaviour
         Debug.Log("SelectManualTileMode: ");
         EnableRuleTileObjects(false);
         EnableRegularTileObjects(true);
+        _isAutoTileModeOn = false;
         _autoTileButton.GetComponent<Image>().color = Color.white;
         _manualTileButton.GetComponent<Image>().color = _tileModeSelectedColor;
     }
@@ -541,8 +621,18 @@ public class MapMakerUIManager : MonoBehaviour
             _currentHoleDropDown.gameObject.SetActive(true);
             InitializeCurrentHoleDropDown(_selectedCourse);
             CurrentHoleDropDownValueChanged(0);
+            IsCourseMiniGolfChanged(_selectedCourse.IsMiniGolf);
         }
-            
+        
+
+    }
+    void IsCourseMiniGolfChangedFunction(bool isMini)
+    {
+        _isSelectedCourseMiniGolf = isMini;
+        if (_isAutoTileModeOn)
+            SelectAutoTileMode();
+        else
+            SelectManualTileMode();
     }
     void InitializeCurrentHoleDropDown(CourseData course)
     {
@@ -688,6 +778,7 @@ public class MapMakerUIManager : MonoBehaviour
                 _uploadToWorkshopButton.gameObject.SetActive(false);
             _loadHoleButton.gameObject.SetActive(true);
         }
+        
     }
     void EnableSaveHoleButton(bool enable)
     {
