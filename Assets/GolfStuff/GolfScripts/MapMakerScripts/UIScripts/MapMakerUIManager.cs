@@ -30,6 +30,7 @@ public class MapMakerUIManager : MonoBehaviour
     [Header("UI Elements (from video")]
     [SerializeField] List<UITileTypes> _uiTileTypes;
     [SerializeField] Transform _groundTileTypeHolder;
+    List<UITileTypeScript> _uiTileTypeScriptObjects = new List<UITileTypeScript>();
 
     Dictionary<UITileTypes, GameObject> _uiElements = new Dictionary<UITileTypes, GameObject>();
     Dictionary<GameObject, Transform> _elementItemSlot = new Dictionary<GameObject, Transform>();
@@ -189,6 +190,7 @@ public class MapMakerUIManager : MonoBehaviour
 
         _allowedInMiniGolf.Clear();
         _miniGolfOnly.Clear();
+        _uiTileTypeScriptObjects.Clear();
 
         foreach (UITileTypes ui in _uiTileTypes)
         {
@@ -200,7 +202,12 @@ public class MapMakerUIManager : MonoBehaviour
             inst.name = ui.name;
             
             _uiElements[ui] = inst;
-            _elementItemSlot[inst] = inst.GetComponent<UITileTypeScript>().ItemHolder;
+            UITileTypeScript uiTileTypeScript = inst.GetComponent<UITileTypeScript>();
+            uiTileTypeScript.UITileType = ui;
+            if (!_uiTileTypeScriptObjects.Contains(uiTileTypeScript))
+                _uiTileTypeScriptObjects.Add(uiTileTypeScript);
+            //_elementItemSlot[inst] = inst.GetComponent<UITileTypeScript>().ItemHolder;
+            _elementItemSlot[inst] = uiTileTypeScript.ItemHolder;
 
             TextMeshProUGUI text = inst.GetComponentInChildren<TextMeshProUGUI>();
             //text.text = ui.name;
@@ -629,10 +636,34 @@ public class MapMakerUIManager : MonoBehaviour
     void IsCourseMiniGolfChangedFunction(bool isMini)
     {
         _isSelectedCourseMiniGolf = isMini;
+        EnableOrDisableUIForMiniGolf(isMini);
         if (_isAutoTileModeOn)
             SelectAutoTileMode();
         else
             SelectManualTileMode();
+    }
+    void EnableOrDisableUIForMiniGolf(bool isMini)
+    {
+        if (_uiTileTypeScriptObjects.Count == 0)
+            return;
+
+        foreach (UITileTypeScript uiTileTypeScript in _uiTileTypeScriptObjects)
+        {
+            if (isMini)
+            {
+                if (uiTileTypeScript.UITileType.AllowedInMiniGolf || uiTileTypeScript.UITileType.MiniGolfOnly)
+                    uiTileTypeScript.gameObject.SetActive(true);
+                else
+                    uiTileTypeScript.gameObject.SetActive(false);
+            }
+            else
+            {
+                if(uiTileTypeScript.UITileType.MiniGolfOnly)
+                    uiTileTypeScript.gameObject.SetActive(false);
+                else
+                    uiTileTypeScript.gameObject.SetActive(true);
+            }
+        }
     }
     void InitializeCurrentHoleDropDown(CourseData course)
     {
@@ -833,7 +864,7 @@ public class MapMakerUIManager : MonoBehaviour
 
         Debug.Log("SaveHole: Course: " + _selectedCourse.CourseName + " hole #: " + _selectedHole.HoleIndex);
         _selectedHole.HoleTileMapData = _saveHandler.GetAllTileMapData();
-        _selectedHole.PolygonPoints = _saveHandler.GetBoundsOfAllTileMaps().ToArray();
+        _selectedHole.PolygonPoints = _saveHandler.GetBoundsOfAllTileMaps(_selectedCourse.IsMiniGolf).ToArray();
         _selectedHole.ZoomOutPosition = _saveHandler.GetCenterOfHoleBounds(_selectedHole.PolygonPoints);
         // Save the tee off location if it was set in the builder
         if (_mapMakerBuilder.HasTeeOffLocationBeenPlaced)

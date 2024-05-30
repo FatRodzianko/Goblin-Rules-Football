@@ -8,6 +8,8 @@ public class UITileTypes : ScriptableObject
     [SerializeField] int _siblingIndex = 0;
     [SerializeField] Color _backgroundColor;
     [SerializeField] string _uiName;
+    [SerializeField] bool _allowedInMiniGolf;
+    [SerializeField] bool _miniGolfOnly;
 
     public int SiblingIndex 
     {
@@ -29,6 +31,20 @@ public class UITileTypes : ScriptableObject
                 return this.name;
             else
                 return _uiName.Replace("\\n", "\n");
+        }
+    }
+    public bool AllowedInMiniGolf
+    {
+        get
+        {
+            return _allowedInMiniGolf;
+        }
+    }
+    public bool MiniGolfOnly
+    {
+        get
+        {
+            return _miniGolfOnly;
         }
     }
 }

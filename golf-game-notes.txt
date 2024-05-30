@@ -737,6 +737,16 @@ x Move the "available courses" from TitleScreenManager to the CustomCourseLoader
 - - x GameplayManagerTopDownGolf will also reference AvailableCourses from CustomCourseLoader instead of its own reference to the old scriptable object
 - - - - - x I think all the addressable stuff I am doing in RpcTellClientsToLoadCourse to load a course is bullshit? Just have it find the course from _availableCourses's using its courseID, and then use that to create the "CourseToPlay"?
 
+### Remaining tasks before full "release" of map maker:
+x Change the hole location to be offset from the tile location
+- - x if tile is at 1,1, hole should be at 1.5,1.5
+- - x this is already down when setting the tee off location in CustomGolfCourseLoader, just need to do this when spawning a hole in map maker as well
+- - x double check to make sure hole can't be surrounded by direction tiles. That is the reason for this
+- - x made it so this affects ALL obstacles that are placed from the map maker
+x Remove "empty" UI tiles / Rows from the tile placement UI
+- - x basically, don't show the "Minigolf Walls" when making a full course. Don't show fairway/rough/water/sand for minigolf
+- add the "manual" minigolf wall tiles
+
 
 ### Integrating custom maps to default ones...
 - Game first loads the "course" from the list of "available course"

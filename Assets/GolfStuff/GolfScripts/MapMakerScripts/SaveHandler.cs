@@ -261,7 +261,7 @@ public class SaveHandler : MonoBehaviour
         // save the tilemaps to a file
         return data;
     }
-    public List<Vector2> GetBoundsOfAllTileMaps()
+    public List<Vector2> GetBoundsOfAllTileMaps(bool isMiniGolf)
     {
         List<Vector2> newBounds = new List<Vector2>();
 
@@ -297,10 +297,21 @@ public class SaveHandler : MonoBehaviour
         }
 
         // add padding?
-        xMin -= 10;
-        xMax += 10;
-        yMin -= 10;
-        yMax += 10;
+        if (isMiniGolf)
+        {
+            xMin -= 25;
+            xMax += 25;
+            yMin -= 25;
+            yMax += 25;
+        }
+        else
+        {
+            xMin -= 10;
+            xMax += 10;
+            yMin -= 10;
+            yMax += 10;
+        }
+        
 
         newBounds.Add(new Vector2(xMin, yMax));
         newBounds.Add(new Vector2(xMin, yMin));        

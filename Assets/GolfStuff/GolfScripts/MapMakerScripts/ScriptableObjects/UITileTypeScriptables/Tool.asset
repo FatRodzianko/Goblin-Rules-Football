@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _siblingIndex: 0
   _backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+  _uiName: 
+  _allowedInMiniGolf: 1
+  _miniGolfOnly: 0

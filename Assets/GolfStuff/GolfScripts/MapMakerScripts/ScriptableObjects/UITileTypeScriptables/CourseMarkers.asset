@@ -15,3 +15,5 @@ MonoBehaviour:
   _siblingIndex: 2
   _backgroundColor: {r: 0.9960785, g: 0.9960785, b: 0, a: 1}
   _uiName: Course\nMarkers
+  _allowedInMiniGolf: 1
+  _miniGolfOnly: 0

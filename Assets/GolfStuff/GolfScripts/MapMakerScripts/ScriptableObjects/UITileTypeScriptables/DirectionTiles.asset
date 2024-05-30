@@ -15,3 +15,5 @@ MonoBehaviour:
   _siblingIndex: 6
   _backgroundColor: {r: 0.5764706, g: 0.8431373, b: 0.9843138, a: 1}
   _uiName: Direction\nTiles
+  _allowedInMiniGolf: 1
+  _miniGolfOnly: 0

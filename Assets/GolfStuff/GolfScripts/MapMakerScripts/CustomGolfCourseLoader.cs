@@ -230,11 +230,11 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
         newHole.HoleIndex = holeData.HoleIndex;
         newHole.CourseName = courseName;
         newHole.HolePar = holeData.HolePar;
-        newHole.HolePositions = new List<Vector3> { holeData.HolePosition } ;
+        newHole.HolePositions = ShiftListOfPostions(new List<Vector3> { holeData.HolePosition }) ;
         //newHole.TeeOffLocation = holeData.TeeOffLocation;
         newHole.TeeOffLocation = new Vector3(holeData.TeeOffLocation.x + 0.5f, holeData.TeeOffLocation.y + 0.5f, 0f);
         //newHole.TeeMarkerPositions = holeData.TeeOffMarkerPositions;
-        newHole.TeeMarkerPositions = ShiftTeeMarkerPostions(holeData.TeeOffMarkerPositions);
+        newHole.TeeMarkerPositions = ShiftListOfPostions(holeData.TeeOffMarkerPositions);
         newHole.PolygonPoints = holeData.PolygonPoints;
         newHole.ZoomedOutPos = holeData.ZoomOutPosition;
         newHole.CameraZoomValue = 11f; // hard coded for now since the map maker doesn't set this (yet, hopefully)
@@ -257,7 +257,7 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
         ParseTileMapDataToSavedTilesAndSavedStuff(newHole, holeData.HoleTileMapData);
         return newHole;
     }
-    List<Vector3> ShiftTeeMarkerPostions(List<Vector3> markerPositions)
+    List<Vector3> ShiftListOfPostions(List<Vector3> markerPositions)
     {
         List<Vector3> shiftedPositions = new List<Vector3>();
         foreach (Vector3 pos in markerPositions)
@@ -266,6 +266,10 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
             shiftedPositions.Add(shifted);
         }
         return shiftedPositions;
+    }
+    Vector3 ShiftSinglePosition(Vector3 position)
+    {
+        return new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
     }
     List<Vector3> GetCourseAimPoints(Vector3[] aimPoints, Vector3 holePosition)
     {
@@ -380,7 +384,8 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                             if (mapMakerObstacle.ObstacleType == ObstacleType.StatueGoodWeather)
                             {
                                 SavedStatue newStatue = new SavedStatue();
-                                newStatue.StatuePosition = tile.position;
+                                //newStatue.StatuePosition = tile.position;
+                                newStatue.StatuePosition = ShiftSinglePosition(tile.position);
                                 newStatue.StatueType = "good-weather";
                                 newStatue.StatueScriptableObstacle = mapMakerObstacle.ScriptableObstacle;
                                 statues.Add(newStatue);
@@ -389,7 +394,8 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                             else if (mapMakerObstacle.ObstacleType == ObstacleType.StatueBadWeather)
                             {
                                 SavedStatue newStatue = new SavedStatue();
-                                newStatue.StatuePosition = tile.position;
+                                //newStatue.StatuePosition = tile.position;
+                                newStatue.StatuePosition = ShiftSinglePosition(tile.position);
                                 newStatue.StatueType = "bad-weather";
                                 newStatue.StatueScriptableObstacle = mapMakerObstacle.ScriptableObstacle;
                                 statues.Add(newStatue);
@@ -398,7 +404,8 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                             else if (mapMakerObstacle.ObstacleType == ObstacleType.BalloonPowerUp)
                             {
                                 SavedBalloonPowerUp balloon = new SavedBalloonPowerUp();
-                                balloon.BalloonPosition = tile.position;
+                                //balloon.BalloonPosition = tile.position;
+                                balloon.BalloonPosition = ShiftSinglePosition(tile.position);
                                 balloon.BalloonHeight = "";
                                 balloon.BalloonScriptableObstacle = mapMakerObstacle.ScriptableObstacle;
                                 balloonPowerUps.Add(balloon);
@@ -407,7 +414,8 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                             else if (mapMakerObstacle.ObstacleType == ObstacleType.Tree)
                             {
                                 SavedObstacle obstacle = new SavedObstacle();
-                                obstacle.ObstaclePos = tile.position;
+                                //obstacle.ObstaclePos = tile.position;
+                                obstacle.ObstaclePos = ShiftSinglePosition(tile.position);
                                 obstacle.ObstacleScriptableObject = mapMakerObstacle.ScriptableObstacle;
                                 obstacles.Add(obstacle);
                                 //hole.SavedObstacles.Add(obstacle);

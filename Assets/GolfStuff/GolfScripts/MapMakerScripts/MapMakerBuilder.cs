@@ -592,7 +592,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
             MapMakerObstacle obstacle = (MapMakerObstacle)obj;
             //_obstaclePreview = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, _currentGridPosition, Quaternion.identity);
-            _obstaclePreview = Instantiate(GetObstaclePrefabToSpawn(obstacle), _currentGridPosition, Quaternion.identity);
+
+            //_obstaclePreview = Instantiate(GetObstaclePrefabToSpawn(obstacle), _currentGridPosition, Quaternion.identity);
+            _obstaclePreview = Instantiate(GetObstaclePrefabToSpawn(obstacle), new Vector3(_currentGridPosition.x + 0.5f, _currentGridPosition.y + 0.5f, 0f), Quaternion.identity);
         }
         else
         {
@@ -668,9 +670,12 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 {
                     MapMakerObstacle obstacle = (MapMakerObstacle)_selectedObject;
                     //_obstaclePreview = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, _currentGridPosition, Quaternion.identity);
-                    _obstaclePreview = Instantiate(GetObstaclePrefabToSpawn(obstacle), _currentGridPosition, Quaternion.identity);
+
+                    //_obstaclePreview = Instantiate(GetObstaclePrefabToSpawn(obstacle), _currentGridPosition, Quaternion.identity);
+                    _obstaclePreview = Instantiate(GetObstaclePrefabToSpawn(obstacle), new Vector3(_currentGridPosition.x + 0.5f, _currentGridPosition.y + 0.5f, 0f), Quaternion.identity);
                 }
-                _obstaclePreview.transform.position = _currentGridPosition;
+                //_obstaclePreview.transform.position = _currentGridPosition;
+                _obstaclePreview.transform.position = new Vector3(_currentGridPosition.x + 0.5f, _currentGridPosition.y + 0.5f, 0f);
             }
         }
 
@@ -989,7 +994,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         //GameObject gameObject = Instantiate(obj.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
 
         //GameObject gameObject = Instantiate(obstacle.ScriptableObstacle.ObstaclePrefab, position, Quaternion.identity);
-        GameObject gameObject = Instantiate(GetObstaclePrefabToSpawn(obstacle), position, Quaternion.identity);
+        //GameObject gameObject = Instantiate(GetObstaclePrefabToSpawn(obstacle), position, Quaternion.identity);
+        GameObject gameObject = Instantiate(GetObstaclePrefabToSpawn(obstacle), new Vector3(position.x + 0.5f, position.y + 0.5f,0f), Quaternion.identity);
         _placeObstaclesByPostion.Add(position, gameObject);
         gameObject.transform.SetParent(_obstacleHolder);
 
@@ -1081,6 +1087,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         //_hasHoleBeenPlaced = true;
 
         //_holePosition = position;
+
         HolePositionUpdatedChanged(position);
         HasHoleBeenPlacedYetChanged(true);
 
