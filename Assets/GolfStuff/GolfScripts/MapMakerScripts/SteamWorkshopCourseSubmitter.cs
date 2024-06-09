@@ -125,7 +125,9 @@ public class SteamWorkshopCourseSubmitter : MonoBehaviour
 
             updateHandle = SteamUGC.StartItemUpdate(new AppId_t(2071510), pCallback.m_nPublishedFileId); //may need to do a create and onFunction to set the handle of UGCUpdateHandle_t
             SteamUGC.SetItemTitle(updateHandle, _courseToUpload.CourseName);
-            SteamUGC.SetItemDescription(updateHandle, "Number of complete holes to play: " + _numberOfCompletedHoles.ToString());
+
+            //SteamUGC.SetItemDescription(updateHandle, "Number of complete holes to play: " + _numberOfCompletedHoles.ToString());
+            SteamUGC.SetItemDescription(updateHandle, GetBeginningOfCourseDescription(_courseToUpload) + " " + _numberOfCompletedHoles.ToString() + " holes to play");
             SteamUGC.SetItemContent(updateHandle, _path);
 
             // item preview image stuff I haven't implemented yet...
@@ -159,7 +161,8 @@ public class SteamWorkshopCourseSubmitter : MonoBehaviour
     {
         Debug.Log("UpdateExistingWorkshopFile: " + publishedFileID.ToString());
         UGCUpdateHandle_t m_UGCUpdateHandle = SteamUGC.StartItemUpdate(new AppId_t(2071510), new PublishedFileId_t(publishedFileID));
-        SteamUGC.SetItemDescription(m_UGCUpdateHandle, "Number of complete holes to play: " + _numberOfCompletedHoles.ToString());
+        //SteamUGC.SetItemDescription(m_UGCUpdateHandle, "Number of complete holes to play: " + _numberOfCompletedHoles.ToString());
+        SteamUGC.SetItemDescription(m_UGCUpdateHandle, GetBeginningOfCourseDescription(_courseToUpload) + " " + _numberOfCompletedHoles.ToString() + " holes to play");
         bool ret = SteamUGC.SetItemContent(m_UGCUpdateHandle, _path);
         if (ret)
         {
@@ -182,5 +185,15 @@ public class SteamWorkshopCourseSubmitter : MonoBehaviour
     {
         Debug.Log("RedirectToLegal: ");
         SteamFriends.ActivateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement");
+    }
+    string GetBeginningOfCourseDescription(CourseData course)
+    {
+        if (course == null)
+            return "";
+
+        if (course.IsMiniGolf)
+            return "Minigolf course with: ";
+        else
+            return "Regular course with: ";
     }
 }

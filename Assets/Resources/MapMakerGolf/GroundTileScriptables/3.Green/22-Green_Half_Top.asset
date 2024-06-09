@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e30e2e33d2aeeb4ba4c9fd422d9d1b9, type: 3}
+  m_Name: 22-Green_Half_Top
+  m_EditorClassIdentifier: 
+  Guid: b8db6354c63ebde4bbf201e3f96d6742
+  _groundTileType: 0
+  _mapMakerTileType: {fileID: 11400000, guid: 27cd04cd3af13244cbc51448174fdc9d, type: 2}
+  _uiTileType: {fileID: 11400000, guid: cab1aecbdcce20141ae4d3bba34fc6da, type: 2}
+  _tileBase: {fileID: 11400000, guid: e47ac09a7c809ae4bb531290dbe81c39, type: 2}
+  _tile: {fileID: 11400000, guid: e47ac09a7c809ae4bb531290dbe81c39, type: 2}
+  _placeType: 2
+  _usePlacementRestrictions: 0
+  _placementRestrictions: []
+  _onlyAllowedOnSpecificGroundType: 0
+  _canOnlyBePlacedOnTheseGroundTypes: []
+  _allowedInMiniGolf: 1
+  _miniGolfOnly: 0

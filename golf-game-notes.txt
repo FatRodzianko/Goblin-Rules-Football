@@ -746,6 +746,8 @@ x Change the hole location to be offset from the tile location
 x Remove "empty" UI tiles / Rows from the tile placement UI
 - - x basically, don't show the "Minigolf Walls" when making a full course. Don't show fairway/rough/water/sand for minigolf
 - add the "manual" minigolf wall tiles
+- manual tiles for rough and sand
+- add the shallow angled manual tiles for all types
 
 
 ### Integrating custom maps to default ones...

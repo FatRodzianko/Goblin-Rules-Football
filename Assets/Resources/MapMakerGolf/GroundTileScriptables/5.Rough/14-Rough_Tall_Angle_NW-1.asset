@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e30e2e33d2aeeb4ba4c9fd422d9d1b9, type: 3}
+  m_Name: 14-Rough_Tall_Angle_NW-1
+  m_EditorClassIdentifier: 
+  Guid: 87cbe6ebdbb8b7148a81114882b6c091
+  _groundTileType: 2
+  _mapMakerTileType: {fileID: 11400000, guid: dc4c10b31cadccb4b8ead8cc9ec908df, type: 2}
+  _uiTileType: {fileID: 11400000, guid: 3a51da9b31c4928479b4cbffc9cd512f, type: 2}
+  _tileBase: {fileID: 11400000, guid: 0a5f94ac156d0cf4faa8990689cdadcb, type: 2}
+  _tile: {fileID: 11400000, guid: 0a5f94ac156d0cf4faa8990689cdadcb, type: 2}
+  _placeType: 1
+  _usePlacementRestrictions: 0
+  _placementRestrictions: []
+  _onlyAllowedOnSpecificGroundType: 0
+  _canOnlyBePlacedOnTheseGroundTypes: []
+  _allowedInMiniGolf: 0
+  _miniGolfOnly: 0
