@@ -56,7 +56,7 @@ Material:
     m_Floats:
     - _EnableExternalAlpha: 0
     - _FillingValue: 0
-    - _Tiling: 0.78093994
+    - _Tiling: 2.8000085
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}

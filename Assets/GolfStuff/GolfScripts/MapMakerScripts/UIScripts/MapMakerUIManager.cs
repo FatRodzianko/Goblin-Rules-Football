@@ -101,6 +101,10 @@ public class MapMakerUIManager : MonoBehaviour
     [SerializeField] HoleDetailsUIManager _holeDetailsUIManager;
     [SerializeField] Button _editHoleDetailsButton;
 
+    [Header("View Controls Stuff")]
+    [SerializeField] GameObject _viewControlsPanel;
+    bool _isControlsWindowOpen = false;
+    
 
     #region Setters and Getters
     Dictionary<string, Tilemap> TileMapsToSelect
@@ -982,5 +986,23 @@ public class MapMakerUIManager : MonoBehaviour
             _mapMakerBuilder.PlayerInput.Disable();
         else
             _mapMakerBuilder.PlayerInput.Enable();
+    }
+    public void ViewControlsButtonPressed()
+    {
+        if (_isControlsWindowOpen)
+        {
+            _viewControlsPanel.SetActive(false);
+            _isControlsWindowOpen = false;
+        }
+        else
+        {
+            _viewControlsPanel.SetActive(true);
+            _isControlsWindowOpen = true;
+        }
+    }
+    public void CloseControlsPanel()
+    {
+        _viewControlsPanel.SetActive(false);
+        _isControlsWindowOpen = false;
     }
 }

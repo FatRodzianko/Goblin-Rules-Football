@@ -16,6 +16,11 @@ public class HoleDetailsUIManager : MonoBehaviour
     public delegate void IsDetailsPanelOpenEvent(bool placed);
     public event IsDetailsPanelOpenEvent IsDetailsPanelOpenEventChanged;
 
+    [Header("Hole Type")]
+    [SerializeField] TextMeshProUGUI _holeTypeText;
+    string _regularHoleType = "Regular Golf Course:";
+    string _miniHoleType = "Mini Golf Course:";
+
     [Header("Hole Number")]
     [SerializeField] TextMeshProUGUI _holeNumberValueText;
 
@@ -64,6 +69,7 @@ public class HoleDetailsUIManager : MonoBehaviour
         _builder.AimPointsAddOrRemovedChanged += SetAimPointsAndDistances;
         _builder.TeeOffLocationUpdatedChanged += SetTeeOffLocationPosition;
         _builder.HolePositionUpdatedChanged += SetHolePosition;
+        _mapMakerUIManager.IsCourseMiniGolfChanged += SetHoleTypeText;
 
         // events for this guy
         IsDetailsPanelOpenEventChanged += IsDetailsPanelOpenEventChangedFunction;
@@ -83,6 +89,7 @@ public class HoleDetailsUIManager : MonoBehaviour
         _builder.AimPointsAddOrRemovedChanged -= SetAimPointsAndDistances;
         _builder.TeeOffLocationUpdatedChanged -= SetTeeOffLocationPosition;
         _builder.HolePositionUpdatedChanged -= SetHolePosition;
+        _mapMakerUIManager.IsCourseMiniGolfChanged -= SetHoleTypeText;
 
         // events for this guy
         IsDetailsPanelOpenEventChanged -= IsDetailsPanelOpenEventChangedFunction;
@@ -104,6 +111,14 @@ public class HoleDetailsUIManager : MonoBehaviour
             Debug.Log("GetHolePar: could not parse this._holeParInput.text to an integer");
             return 0;
         }
+    }
+    void SetHoleTypeText(bool isMini)
+    {
+        Debug.Log("SetHoleTypeText: " + isMini);
+        if (isMini)
+            _holeTypeText.text = _miniHoleType;
+        else
+            _holeTypeText.text = _regularHoleType;
     }
     public void SetHoleNumberValue(int holeNumber)
     {

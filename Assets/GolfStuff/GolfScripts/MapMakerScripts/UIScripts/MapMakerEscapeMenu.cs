@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class MapMakerEscapeMenu : MonoBehaviour
 {
+    [SerializeField] MapMakerUIManager _mapMakerUIManager;
     [SerializeField] bool _isMenuOpen = false;
     [SerializeField] GameObject _escMenuPanel;
     [SerializeField] MapMakerBuilder _builder;
@@ -17,6 +18,8 @@ public class MapMakerEscapeMenu : MonoBehaviour
         _builder = MapMakerBuilder.GetInstance();
         if (!_minimizeMaximizeManager)
             _minimizeMaximizeManager = this.GetComponent<MinimizeMaximizeManager>();
+        if (!_mapMakerUIManager)
+            _mapMakerUIManager = this.GetComponent<MapMakerUIManager>();
         _playerInput = _builder.PlayerInput;
         _playerInput.EscMenu.Escape.performed += EscapeKeyPressed;
     }
@@ -39,6 +42,7 @@ public class MapMakerEscapeMenu : MonoBehaviour
     }
     public void EscapeKeyPressed(InputAction.CallbackContext ctx)
     {
+        _mapMakerUIManager.CloseControlsPanel();
         if (_isMenuOpen)
             CloseEscapeMenu();
         else
