@@ -56,4 +56,27 @@
 - team of sapper goblins escorting bomb through mines
 - - - need to proect the bomb from attackers
 - - - if enemy captures your bomb, you lose
-- - - 
+
+
+### Tasks to get a PoC going?
+- Creating a hex grid with hex tiles
+- - - https://www.youtube.com/watch?v=9WElejje6Sc
+- - - https://www.youtube.com/watch?v=Vt6hM6f9-Dk
+- - - https://www.youtube.com/watch?v=0nXmuJuWS8I
+- movement on a hex grid
+- - - https://youtu.be/htZijEO7ZmE?si=gfo-SYl1lne9AJIT
+- generate a hex grid
+- - - load from a saved "map"/json file
+- - - auto generate a new level, with tiles you can move on and tiles you can't (obstacles and walls)
+- - - - - - walls surrounding the outside of the level
+- AI/Opposing player moves their characters in response to yours
+- - - AI will move toward player and their bomb
+- - - AI will attack if they have an advantage (greater army than player on a tile) or if they don't have a path to retreat)
+- player achieving goal (capturing the flag/planting bomb) ends level, new level is generated
+- cards and battle system following card conquest
+- - - detect battles
+- - - show player and oppnent decks/hands
+- - - player chooses card
+- - - opponent AI chooses their "best" card if they can win, "worst" card if it looks like a sure defeat
+- turn based strategy course from code monkey?
+- - - https://unitycodemonkey.com/courses.php?c=turnbasedstrategy

@@ -748,7 +748,7 @@ x Remove "empty" UI tiles / Rows from the tile placement UI
 x add the "manual" minigolf wall tiles
 x manual tiles for rough and sand
 x add the shallow angled manual tiles for all types
-- some sort of controls UI to show the player how to use controls
+x some sort of controls UI to show the player how to use controls
 
 
 ### Integrating custom maps to default ones...
