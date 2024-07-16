@@ -93,6 +93,14 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/ad-hoc-reward_final_less-kick.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: f57fd07f7a8b97945ba8624dd72fa8a9
+    m_Address: Assets/SFX/Music/Thin-Authority_take-6.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 504d133d2fa1c944d8267100918f74c1
+    m_Address: Assets/SFX/Music/thoughtless-argument_less-kick_5_more-snare.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:
