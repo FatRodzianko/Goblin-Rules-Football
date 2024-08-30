@@ -963,7 +963,7 @@ public class GoblinScript : NetworkBehaviour
                     //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    //GetOpenForPass();
+                    GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
                     //MoveTowardGoblinTarget();

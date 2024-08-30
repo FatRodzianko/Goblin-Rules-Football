@@ -681,9 +681,35 @@ public class Football : NetworkBehaviour
         Vector2 receivingGoblinMovementDirection = receivingGoblin.GetRunningDirectionOnServer();
         float receivingGobinSpeed = receivingGoblin.speed;
 
+        // Get a rough estimate of the max distance the receiving goblin will travel during a throw based on how long the ball will travel while thrown to the receiving goblin's starting position
         float distanceBetweenGoblins = Vector2.Distance(throwingGoblinPosition, receivingGoblinPosition);
+        float timeForBallToGetToReceivingGoblin = GetTimeForThrownBallToTravel(distanceBetweenGoblins);
+        Debug.Log("GetDirectionOfThrow: The throw ball will take: " + timeForBallToGetToReceivingGoblin.ToString() + " seconds to travel a distance of: " + distanceBetweenGoblins.ToString() + ". Start position: " + throwingGoblinPosition.ToString() + " end position: " + receivingGoblinPosition.ToString());
+        float maxDistanceReceivingGoblinWillTravel = DistanceReceivingGoblinWillTravel(timeForBallToGetToReceivingGoblin, receivingGobinSpeed);
+
+        // With the max distance traveled for the receiving goblin calculated, get their "end position" if they traveled that far?
+        Vector3 receivingGoblinEndPosition = ReceivingGoblinEndPosition(receivingGoblinPosition, receivingGoblinMovementDirection, maxDistanceReceivingGoblinWillTravel);
+        Debug.Log("GetDirectionOfThrow: Max distance receiving goblin will travel is: " + maxDistanceReceivingGoblinWillTravel.ToString() + " start position: " + receivingGoblinPosition.ToString() + " End position: " + receivingGoblinEndPosition.ToString() + " Receiving Goblin speed: " + receivingGobinSpeed.ToString() + " and direction: " + receivingGoblinMovementDirection.ToString());
+
 
         return throwDirection;
+    }
+    private float GetTimeForThrownBallToTravel(float distance)
+    {
+        if (distance > maxThrowDistance)
+        {
+            distance = maxThrowDistance;
+        }
+
+        return distance / speedOfThrow;
+    }
+    private float DistanceReceivingGoblinWillTravel(float time, float speed)
+    {
+        return time * speed;
+    }
+    private Vector3 ReceivingGoblinEndPosition(Vector3 startPosition, Vector2 direction, float distance)
+    {
+        return startPosition + (Vector3)(direction * distance);
     }
     [Server]
     public void FumbleFootball()
