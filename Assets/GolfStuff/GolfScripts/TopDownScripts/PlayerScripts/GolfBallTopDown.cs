@@ -1012,7 +1012,7 @@ public class GolfBallTopDown : NetworkBehaviour
                     int groundValue = _groundTileOrderDictionary[groundScript.groundType];
                     if (groundValue > highestGroundValue)
                     {
-                        Debug.Log("GetGroundMaterial: " + groundScript.groundType + " has a ground value of " + groundValue + " which is higher than the previous high value of: " + highestGroundValue.ToString());
+                        //Debug.Log("GetGroundMaterial: " + groundScript.groundType + " has a ground value of " + groundValue + " which is higher than the previous high value of: " + highestGroundValue.ToString());
                         material = groundScript.groundType;
                         highestGroundValue = groundValue;
                     }

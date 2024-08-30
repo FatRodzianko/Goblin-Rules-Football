@@ -106,6 +106,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar(hook = nameof(HandleHasBall))] public bool doesCharacterHaveBall;
     [SyncVar(hook = nameof(HandleIsThrowing))] public bool isThrowing = false;
     [SyncVar] public bool isRunningOnServer = false;
+    private Vector2 runningDirectionOnServer = Vector2.zero;
     public bool isRunning = false;
     public bool isSprinting = false;
     public bool shiftHeldDown = false;
@@ -828,7 +829,7 @@ public class GoblinScript : NetworkBehaviour
             isRunning = false;
             if (previousInput.x != 0 || previousInput.y != 0)
                 isRunning = true;
-            CmdSetIsRunningOnServer(isRunning);
+            CmdSetIsRunningOnServer(isRunning, previousInput);
 
             if (isSprinting && !isFatigued)
             {
@@ -956,16 +957,16 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    MoveTowrdBallCarrier();
+                    //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    GetOpenForPass();
+                    //GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    MoveTowardGoblinTarget();
+                    //MoveTowardGoblinTarget();
                     break;
             }
         }
@@ -985,19 +986,19 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    MoveTowrdBallCarrier();
+                    //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    GetOpenForPass();
+                    //GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    MoveTowardGoblinTarget();
+                    //MoveTowardGoblinTarget();
                     break;
                 case State.RunTowardEndzone:
-                    myGamePlayer.myAiPlayer.RunTowardEndZone();
+                    //myGamePlayer.myAiPlayer.RunTowardEndZone();
                     break;
             }
 
@@ -1479,9 +1480,15 @@ public class GoblinScript : NetworkBehaviour
             
     }
     [Command]
-    void CmdSetIsRunningOnServer(bool isPlayerRunning)
+    void CmdSetIsRunningOnServer(bool isPlayerRunning, Vector2 runningDirection)
     {
         isRunningOnServer = isPlayerRunning;
+        runningDirectionOnServer = runningDirection;
+    }
+    [Server]
+    public Vector2 GetRunningDirectionOnServer()
+    {
+        return runningDirectionOnServer;
     }
     [Command]
     void CmdDrainStamina()
@@ -3050,7 +3057,7 @@ public class GoblinScript : NetworkBehaviour
         if (direction.x != 0 || direction.y != 0)
             isRunning = true;
         // Set the goblin's "Running On Server" value so that can be tracked by the server?
-        CmdSetIsRunningOnServer(isRunning);
+        CmdSetIsRunningOnServer(isRunning, direction);
 
         //Set the "isSprinting" on the server and make sure that all the speed modifiers get set correctly?
         CmdIsPlayerSprinting(isSprinting);

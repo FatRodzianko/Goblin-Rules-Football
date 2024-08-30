@@ -24,7 +24,7 @@ public class Football : NetworkBehaviour
     private GameObject ballMarkerObject;
 
     [Header("Throwing and Kicking Stuff?")]
-    [SyncVar] public Vector2 directionToThrow = Vector2.zero;
+    [SyncVar] public Vector2 _directionToThrow = Vector2.zero;
     [SerializeField] [SyncVar] public float speedOfThrow; //  = 15 f;
     [SerializeField] float maxThrowDistance; // 10. 0f
     [SyncVar] public float fallSpeed = 3f;
@@ -221,11 +221,11 @@ public class Football : NetworkBehaviour
             {
                 if (transform.position.y < ThrownMaxY && transform.position.y > ThrownMinY && transform.position.x > ThrownMinX && transform.position.x < ThrownMaxX)
                 {
-                    myRigidBody.MovePosition(myRigidBody.position + directionToThrow * speedOfThrow * Time.fixedDeltaTime);
+                    myRigidBody.MovePosition(myRigidBody.position + _directionToThrow * speedOfThrow * Time.fixedDeltaTime);
                     //transform.position += (directionToThrow * speedOfThrow * Time.fixedDeltaTime);
                     animator.SetBool("isThrown", isThrown);
 
-                    if (Mathf.Abs(directionToThrow.y) < 0.55f)
+                    if (Mathf.Abs(_directionToThrow.y) < 0.55f)
                         animator.SetBool("isSideways", true);
                     else
                         animator.SetBool("isSideways", false);
@@ -244,7 +244,7 @@ public class Football : NetworkBehaviour
                 }
                 else
                 {
-                    directionToThrow = Vector2.zero;
+                    _directionToThrow = Vector2.zero;
                     isThrown = false;
                     animator.SetBool("isThrown", isThrown);
                     if (transform.position.y >= (GroundedMaxY - 0.52f))
@@ -263,13 +263,13 @@ public class Football : NetworkBehaviour
             {
                 if (transform.position.y < ThrownMaxY && transform.position.y > ThrownMinY && transform.position.x > ThrownMinX && transform.position.x < ThrownMaxX)
                 {
-                    Vector2 directionToFall = directionToThrow;
+                    Vector2 directionToFall = _directionToThrow;
                     directionToFall.y -= (fallSpeed * Time.fixedDeltaTime);
                     myRigidBody.MovePosition(myRigidBody.position + directionToFall * speedOfThrow * Time.fixedDeltaTime);
                 }
                 else
                 {
-                    directionToThrow = Vector2.zero;
+                    _directionToThrow = Vector2.zero;
                     isThrown = false;
                     animator.SetBool("isThrown", isThrown);
                     isFalling = false;
@@ -555,7 +555,7 @@ public class Football : NetworkBehaviour
                 {
                     isThrown = false;
 
-                    directionToThrow = Vector2.zero;
+                    _directionToThrow = Vector2.zero;
                     animator.SetBool("isThrown", false);
                     animator.SetBool("isSideways", false);
 
@@ -643,10 +643,11 @@ public class Football : NetworkBehaviour
             this.HandleIsHeld(isHeld, false);
             RpcBallIsHeld(false);
 
-            Vector3 direction = (goblinToThrowToScript.transform.position - throwingGoblinScript.transform.position).normalized;
+            //Vector3 direction = (goblinToThrowToScript.transform.position - throwingGoblinScript.transform.position).normalized;
+            Vector3 direction = GetDirectionOfThrow(throwingGoblinScript, goblinToThrowToScript);
             startingPositionOfThrow = this.transform.position;
             Debug.Log("CmdThrowFootball: The direction of the throw is: " + direction.ToString());
-            directionToThrow = direction;
+            _directionToThrow = direction;
             //float angletoThrow = Vector2.Angle(new Vector2(1f, 0f), direction);
             //Debug.Log("CmdThrowFootball: angle of the throw is " + angletoThrow.ToString());
             // this.transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, angletoThrow);
@@ -664,6 +665,25 @@ public class Football : NetworkBehaviour
                 animator.SetBool("isSideways", false);*/
             TeamManager.instance.PassThrown(throwingGoblinScript.serverGamePlayer);
         }
+    }
+    [Server]
+    private Vector2 GetDirectionOfThrow(GoblinScript throwingGoblin, GoblinScript receivingGoblin)
+    {
+        Vector3 throwingGoblinPosition = throwingGoblin.transform.position;
+        Vector3 receivingGoblinPosition = receivingGoblin.transform.position;
+        Vector2 throwDirection = (receivingGoblinPosition - throwingGoblinPosition).normalized;
+        // If the receiving goblin is not moving, just throw toward their current position using direction calculated above
+        if (!receivingGoblin.isRunningOnServer)
+        {
+            Debug.Log("GetDirectionOfThrow: receiving goblin is not moving. Throwing toward their current position of " + receivingGoblin.ToString());
+            return throwDirection;
+        }
+        Vector2 receivingGoblinMovementDirection = receivingGoblin.GetRunningDirectionOnServer();
+        float receivingGobinSpeed = receivingGoblin.speed;
+
+        float distanceBetweenGoblins = Vector2.Distance(throwingGoblinPosition, receivingGoblinPosition);
+
+        return throwDirection;
     }
     [Server]
     public void FumbleFootball()

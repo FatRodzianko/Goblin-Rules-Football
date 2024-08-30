@@ -101,6 +101,14 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/thoughtless-argument_less-kick_5_more-snare.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 68c86c09403136f4487ec705a02439b7
+    m_Address: Assets/SFX/Music/warm-butter_take-3.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: ee845b065a7cd8745912c1ae962d9ed5
+    m_Address: Assets/SFX/Music/highfalutin-bait_no-gated-reverb-6.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

@@ -904,7 +904,7 @@ x If kick is "blocked" right after kick is released, the "blocked kick" text app
 x When kick was blocked before half time, my "Game Play Controls" were not reset?
 - - x was able to move around as a goblin
 - - x during the kick after, I was the blocking team and the opponent was the kicking team. The opponent tripped on a trip object
-- Make it so punches and slide tackles and only hit one goblin?
+x Make it so punches and slide tackles and only hit one goblin?
 - - x Punches can't go "through" more than one goblin
 - - x save the goblin that is hit. Start timer of like 0.5 seconds to reset the goblin afterward?
 - - x keep it so multiple goblins can be tripped by one slide tackle? It kind of makes sense that someone could trip multiple people if they slid into them?
@@ -1207,7 +1207,31 @@ x Switch all gamepad controls from "Xbox Controller" to generic "Gamepad"?
 - - - - - - everything seems to work actually with just setting the layermask values for the scripts to include goblinPlayers,greenGoblin,and greyGoblin???
 - slide tackle stats for CPU goblins not correct? Looks to only add to stat counts when they land a slide tackle. Missed slide tackles are not tracked?
 
-
+### Changes to passing:
+- have the ball move slower when it is thrown
+- Have the ball be passed to a "predicted" point the goblin the player passes will be
+- - - right now, I believe when you pass, the ball is thrown to the point where the goblin is when you press pass
+- - - change it to try and "predict" where that goblin will be
+- - - - - x if the goblin is not moving, set the pass target to the goblin's position
+- - - - - - if the golbin is moving:
+- - - - - - - - - Get their movement speed and movement direction
+- - - - - - - - - Get the distance between the passer and the receiver
+- - - - - - - - - - - - calculate how long it takes the ball to travel that distance
+- - - - - - - - - Given the receiving goblin's current movement speed and current direction, predict the point where the receiving goblin will be if they 
+- - - - - - - - - - - - if the receiving goblin is sprint, check how much stamina they have (if that is available?)
+- - - - - - - - - - - - - - - If it is >50% stamina remaining, use goblin's sprinting speed in the distance calculation
+- - - - - - - - - - - - - - - if it is  <50% stamina, take an average of the goblin's sprinting speed and their none sprinting speed
+- - - - - - - - - Try and make a rough guess at the "best" point for the thrower to throw to based on the receiver's distance/time/direction values?
+- - - - - - - - - - - - check to see if the ball can even make it to the end of the receiver's line based on throw speed and max throw distance
+- - - - - - - - - - - - - - - If the ball can't make it to the endpoint, throw there and let the receiving goblin pick it off the ground?
+- - - - - - - - - - - - test the beginning point + 1% first. Receiver should get their first, unless very close?
+- - - - - - - - - - - - then, check the midway point on the receiver's distance/time/direction line
+- - - - - - - - - - - - - - - if the ball gets their first, go back toward the start point by 50%? So from 50% on the line to 25% on the line
+- - - - - - - - - - - - - - - - - - basically, get the distance from the test point to the end or beginning point, depending on the direction you need to test again on. Add 50% of that distance to the next test
+- - - - - - - - - - - - - - - if the goblin gets there first, move the next test point toward the end point by 50%
+- - - - - - - - - - - - - - - First test should be if the ball can make it to the point given max throw distance and throw speed
+- - - - - - - - - - - - - - - - - - If it can't make it, skip all checks?
+- - - changes needed in CmdThrowFootball in football.cs
 
 
 - "How to get a variable from another script in Unity (the right way)" connecting scripts/objects without singletons?

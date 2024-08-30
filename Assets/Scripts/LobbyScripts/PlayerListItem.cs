@@ -265,13 +265,13 @@ public class PlayerListItem : MonoBehaviour
         GameObject[] LobbyPlayers = GameObject.FindGameObjectsWithTag("LobbyPlayer");
         if (LobbyPlayers.Length > 0)
         {
-            Debug.Log("GetDLCImageInfoFromLobbyPlayer: Length of lobby players: " + LobbyPlayers.Length.ToString());
+            //Debug.Log("GetDLCImageInfoFromLobbyPlayer: Length of lobby players: " + LobbyPlayers.Length.ToString());
             for (int i = 0; i < LobbyPlayers.Length; i++)
             {
                 LobbyPlayer lobbyPlayerScript = LobbyPlayers[i].GetComponent<LobbyPlayer>();
                 if (this.playerSteamId == lobbyPlayerScript.playerSteamId)
                 {
-                    Debug.Log("GetDLCImageInfoFromLobbyPlayer: Matching steam id found. Lobby Player Steam id: " + lobbyPlayerScript.playerSteamId.ToString() + " this player list item steam id: " + this.playerSteamId);
+                    //Debug.Log("GetDLCImageInfoFromLobbyPlayer: Matching steam id found. Lobby Player Steam id: " + lobbyPlayerScript.playerSteamId.ToString() + " this player list item steam id: " + this.playerSteamId);
                     this.UpdateDLCImages(lobbyPlayerScript.whatDLCsAreInstalled);
                     break;
                 }
