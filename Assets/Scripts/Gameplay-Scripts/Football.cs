@@ -678,8 +678,12 @@ public class Football : NetworkBehaviour
             Debug.Log("GetDirectionOfThrow: receiving goblin is not moving. Throwing toward their current position of " + receivingGoblin.ToString());
             return throwDirection;
         }
-        Vector2 receivingGoblinMovementDirection = receivingGoblin.GetRunningDirectionOnServer();
-        float receivingGobinSpeed = receivingGoblin.speed;
+        //Vector2 receivingGoblinMovementDirection = receivingGoblin.GetRunningDirectionOnServer();
+        //Vector2 receivingGoblinMovementDirection = GetDirectionToReceivingGoblinsGoal(receivingGoblin);
+        Vector2 receivingGoblinMovementDirection = GetReceivingGoblinMovementDirection(throwingGoblin, receivingGoblin);
+
+        //float receivingGobinSpeed = receivingGoblin.speed;
+        float receivingGobinSpeed = GetReceivingGoblinSpeed(receivingGoblin);
 
         // Get a rough estimate of the max distance the receiving goblin will travel during a throw based on how long the ball will travel while thrown to the receiving goblin's starting position
         float distanceBetweenGoblins = Vector2.Distance(throwingGoblinPosition, receivingGoblinPosition);
@@ -692,7 +696,21 @@ public class Football : NetworkBehaviour
         Debug.Log("GetDirectionOfThrow: Max distance receiving goblin will travel is: " + maxDistanceReceivingGoblinWillTravel.ToString() + " start position: " + receivingGoblinPosition.ToString() + " End position: " + receivingGoblinEndPosition.ToString() + " Receiving Goblin speed: " + receivingGobinSpeed.ToString() + " and direction: " + receivingGoblinMovementDirection.ToString());
 
 
-        return throwDirection;
+        //return throwDirection;
+        Vector2 newThrowDirection = GetBestDirectionToThrowToMovingGoblin(throwingGoblinPosition, receivingGoblinPosition, receivingGoblinEndPosition, maxDistanceReceivingGoblinWillTravel, distanceBetweenGoblins, receivingGoblinMovementDirection, receivingGobinSpeed, throwingGoblin.isGoblinGrey);
+        Debug.Log("GetDirectionOfThrow: Original throw direction: " + throwDirection.ToString("0.000") + " new throw direction: " + newThrowDirection.ToString("0.000"));
+        return CheckIfThrowDirectionIsMoreThanLateral(newThrowDirection, throwingGoblin);
+    }
+    private Vector2 GetDirectionToReceivingGoblinsGoal(GoblinScript receivingGoblin)
+    {
+        if (receivingGoblin.isGoblinGrey)
+        {
+            return new Vector2(-1, 0);
+        }
+        else
+        {
+            return new Vector2(1, 0);
+        }
     }
     private float GetTimeForThrownBallToTravel(float distance)
     {
@@ -703,6 +721,22 @@ public class Football : NetworkBehaviour
 
         return distance / speedOfThrow;
     }
+    private float GetReceivingGoblinSpeed(GoblinScript receivingGoblin)
+    {
+        float speed = receivingGoblin.speed;
+
+        if (!receivingGoblin.isSprintingOnServer)
+            return speed;
+
+        float staminaPercentage = receivingGoblin.stamina / receivingGoblin.MaxStamina;
+
+        if (staminaPercentage > 0.5f)
+            return speed;
+        // average the goblin's sprinting speed and non-sprinting speed if stamina is below 50%?
+        speed = (speed + (speed / receivingGoblin.GetSprintSpeedModifier())) / 2;
+
+        return speed;
+    }
     private float DistanceReceivingGoblinWillTravel(float time, float speed)
     {
         return time * speed;
@@ -710,6 +744,131 @@ public class Football : NetworkBehaviour
     private Vector3 ReceivingGoblinEndPosition(Vector3 startPosition, Vector2 direction, float distance)
     {
         return startPosition + (Vector3)(direction * distance);
+    }
+    private Vector2 GetBestDirectionToThrowToMovingGoblin(Vector3 throwingPosition, Vector3 receivingStartPosition, Vector3 receivingEndPosition, float maxDistanceReceivingGoblinWillTravel, float distanceToReceivingStartPosition, Vector2 receivingGoblinMovementDirection, float receivingGobinSpeed, bool areGoblinsGrey)
+    {
+        float distanceToReceivingEndPosition = Vector2.Distance(throwingPosition, receivingEndPosition);
+        // Check if the longest throw can make it to the receiving goblin's end position
+        if (distanceToReceivingEndPosition > maxThrowDistance)
+        {
+            // double check that the distance to the end position is greater than distance to start position. Basically checking if receiving goblin is moving away from the throwing goblin if not
+            // if the receiver is moving away from the goblin, then check if the start position is also further than max throw distance
+            // if distance to start position is closer than distance to end position AND a max throw still can't make it to the start position, just throw in direction toward start position
+            if (distanceToReceivingEndPosition < distanceToReceivingStartPosition)
+            {
+                return (receivingEndPosition - throwingPosition).normalized;
+            }
+            else if (distanceToReceivingStartPosition > maxThrowDistance)
+            {
+                return (receivingStartPosition - throwingPosition).normalized;
+            }
+        }
+
+
+        // Get first test point that is 50% of the way between receiving goblins end and start positions
+        float testDistance = (maxDistanceReceivingGoblinWillTravel / 2);
+        Vector3 testPoint = receivingStartPosition + (Vector3)(receivingGoblinMovementDirection * testDistance);
+
+        bool doneCalculating = false;
+        int totalCalculations = 0;
+        int maxCalculations = 5;
+        Vector2 throwDirection = (receivingStartPosition - throwingPosition).normalized;
+        float maxTimeDifference = 0.15f;
+
+        // Calculate time it takes for thrown ball to reach this point and time it takes for receiving goblin to reach this point
+        float distanceForBallToTravelToTestPoint;
+        float timeForBallToTravelToTestPoint;
+        float timeForReceivingGoblinToTraveltoTestPoint;
+        float differenceInTravelTimes;
+
+        while (!doneCalculating && totalCalculations < maxCalculations)
+        {
+            // Calculate time it takes for thrown ball to reach this point and time it takes for receiving goblin to reach this point
+            distanceForBallToTravelToTestPoint = Vector2.Distance(throwingPosition, testPoint);
+            timeForBallToTravelToTestPoint = GetTimeForThrownBallToTravel(distanceForBallToTravelToTestPoint);
+            timeForReceivingGoblinToTraveltoTestPoint = testDistance / receivingGobinSpeed;
+
+            differenceInTravelTimes = timeForBallToTravelToTestPoint - timeForReceivingGoblinToTraveltoTestPoint;
+            if (Mathf.Abs(differenceInTravelTimes) < maxTimeDifference)
+            {
+                Debug.Log("GetBestDirectionToThrowToMovingGoblin: Found point where goblin and football meet at similar time: " + testPoint.ToString());
+                throwDirection = (testPoint - throwingPosition).normalized;
+                doneCalculating = true;
+            }
+            else if (differenceInTravelTimes > 0)
+            {
+                // ball took longer than receiving goblin to reach test point. Move test point closer to endTestPosition so it is closer to throwing goblin
+                testDistance += Vector2.Distance(receivingEndPosition, testPoint) / 2;
+            }
+            else
+            {
+                // receiving goblin took longer than ball to reach test point. Move test point closer to startTestPosition so it is closer to throwing goblin
+                testDistance += Vector2.Distance(receivingStartPosition, testPoint) / 2;
+            }
+
+            testPoint = receivingStartPosition + (Vector3)(receivingGoblinMovementDirection * testDistance);
+            totalCalculations++;
+        }
+
+        return throwDirection;
+
+    }
+    private Vector2 GetReceivingGoblinMovementDirection(GoblinScript throwingGoblin, GoblinScript receivingGoblin)
+    {
+        if (GameplayManager.instance.isSinglePlayer || GameplayManager.instance.is1v1)
+        {
+            if (throwingGoblin.isRunningOnServer)
+            {
+                return throwingGoblin.GetRunningDirectionOnServer();
+            }
+            else
+            {
+                return GetDirectionToReceivingGoblinsGoal(receivingGoblin);
+            }
+        }
+        else
+        {
+            if (receivingGoblin.isRunningOnServer)
+            {
+                return receivingGoblin.GetRunningDirectionOnServer();
+            }
+            else
+            {
+                return GetDirectionToReceivingGoblinsGoal(receivingGoblin);
+            }
+        }
+    }
+    private Vector2 CheckIfThrowDirectionIsMoreThanLateral(Vector2 throwDirection, GoblinScript throwingGoblin)
+    {
+        if (throwingGoblin.isGoblinGrey)
+        {
+            if (throwDirection.x < 0)
+            {
+                if (throwDirection.y >= 0)
+                {
+                    return new Vector2(0, 1);
+                }
+                else
+                {
+                    return new Vector2(0, -1);
+                }
+            }
+        }
+        else
+        {
+            if (throwDirection.x > 0)
+            {
+                if (throwDirection.y >= 0)
+                {
+                    return new Vector2(0, 1);
+                }
+                else
+                {
+                    return new Vector2(0, -1);
+                }
+            }
+        }
+        return throwDirection;
     }
     [Server]
     public void FumbleFootball()

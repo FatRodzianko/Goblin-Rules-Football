@@ -55,6 +55,7 @@ public class GoblinScript : NetworkBehaviour
     [SyncVar] public float speedModifierFromPowerUps = 1.0f;
     [SyncVar] public float slowDownObstacleModifier = 1.0f;
     [SyncVar] public float possessionSpeedBonus = 1.0f;
+    private float _sprintSpeedModifier = 1.15f;
 
 
     [Header("Character selection stuff")]
@@ -1455,7 +1456,8 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (stamina > 0f)
                 {
-                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * 1.15f;
+                    //this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * 1.15f;
+                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * _sprintSpeedModifier;
                 }
                 //Update CanRecoverStamina Event here?
                 if (isStaminaRecoveryRoutineRunning)
@@ -1478,6 +1480,10 @@ public class GoblinScript : NetworkBehaviour
                 this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * 0.5f;
         }
             
+    }
+    public float GetSprintSpeedModifier()
+    {
+        return _sprintSpeedModifier;
     }
     [Command]
     void CmdSetIsRunningOnServer(bool isPlayerRunning, Vector2 runningDirection)
@@ -1579,7 +1585,8 @@ public class GoblinScript : NetworkBehaviour
     public IEnumerator CantMove()
     {
         Debug.Log("Starting CantMove for " + this.name) ;
-        canGoblinMove = false;
+        if(!this.isRunning)
+            canGoblinMove = false;
         yield return new WaitForSeconds(0.25f);
         canGoblinMove = true;
     }

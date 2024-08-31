@@ -1214,23 +1214,28 @@ x Switch all gamepad controls from "Xbox Controller" to generic "Gamepad"?
 - - - change it to try and "predict" where that goblin will be
 - - - - - x if the goblin is not moving, set the pass target to the goblin's position
 - - - - - - if the golbin is moving:
-- - - - - - - - - Get their movement speed and movement direction
-- - - - - - - - - Get the distance between the passer and the receiver
-- - - - - - - - - - - - calculate how long it takes the ball to travel that distance
+- - - - - - - - x Get their movement speed and movement direction
+- - - - - - - - x Get the distance between the passer and the receiver
+- - - - - - - - - - - x calculate how long it takes the ball to travel that distance
 - - - - - - - - - Given the receiving goblin's current movement speed and current direction, predict the point where the receiving goblin will be if they 
-- - - - - - - - - - - - if the receiving goblin is sprint, check how much stamina they have (if that is available?)
-- - - - - - - - - - - - - - - If it is >50% stamina remaining, use goblin's sprinting speed in the distance calculation
-- - - - - - - - - - - - - - - if it is  <50% stamina, take an average of the goblin's sprinting speed and their none sprinting speed
+- - - - - - - - - - - x if the receiving goblin is sprint, check how much stamina they have (if that is available?)
+- - - - - - - - - - - - - - x If it is >50% stamina remaining, use goblin's sprinting speed in the distance calculation
+- - - - - - - - - - - - - - x if it is  <50% stamina, take an average of the goblin's sprinting speed and their none sprinting speed
 - - - - - - - - - Try and make a rough guess at the "best" point for the thrower to throw to based on the receiver's distance/time/direction values?
-- - - - - - - - - - - - check to see if the ball can even make it to the end of the receiver's line based on throw speed and max throw distance
-- - - - - - - - - - - - - - - If the ball can't make it to the endpoint, throw there and let the receiving goblin pick it off the ground?
-- - - - - - - - - - - - test the beginning point + 1% first. Receiver should get their first, unless very close?
-- - - - - - - - - - - - then, check the midway point on the receiver's distance/time/direction line
-- - - - - - - - - - - - - - - if the ball gets their first, go back toward the start point by 50%? So from 50% on the line to 25% on the line
-- - - - - - - - - - - - - - - - - - basically, get the distance from the test point to the end or beginning point, depending on the direction you need to test again on. Add 50% of that distance to the next test
-- - - - - - - - - - - - - - - if the goblin gets there first, move the next test point toward the end point by 50%
+- - - - - - - - - - - x check to see if the ball can even make it to the end of the receiver's line based on throw speed and max throw distance
+- - - - - - - - - - - - - - x If the ball can't make it to the endpoint, throw there and let the receiving goblin pick it off the ground?
+- - - - - - - - - - - x test the beginning point + 1% first. Receiver should get their first, unless very close?
+- - - - - - - - - - - - - - x skipped this check and just check the midway point first?
+- - - - - - - - - - - x then, check the midway point on the receiver's distance/time/direction line
+- - - - - - - - - - - - - - x if the ball gets their first, go back toward the start point by 50%? So from 50% on the line to 25% on the line
+- - - - - - - - - - - - - - - - - x basically, get the distance from the test point to the end or beginning point, depending on the direction you need to test again on. Add 50% of that distance to the next test
+- - - - - - - - - - - - - - x if the goblin gets there first, move the next test point toward the end point by 50%
 - - - - - - - - - - - - - - - First test should be if the ball can make it to the point given max throw distance and throw speed
 - - - - - - - - - - - - - - - - - - If it can't make it, skip all checks?
+- - - - - - - - - - - - for the direction of the "receiving goblin":
+- - - - - - - - - - - - - - for single player and 1v1, use the throwing goblin's direction since that is what the player is moving toward already
+- - - - - - - - - - - - - - - - - if the player is stationary but the receiving goblin is not, just set the direction to be toward the endzone
+- - - - - - - - - - - - - - for 3v3, use the receiving goblin's direction
 - - - changes needed in CmdThrowFootball in football.cs
 
 
