@@ -159,10 +159,9 @@ public class CoinTossManager : NetworkBehaviour
         { "heads","tails"};
         var rng = new System.Random();
 
-        //HARDCODED FOR TESTING
-        //string result = headsTails[rng.Next(headsTails.Length)];
-        string result = "tails";
-        //HARDCODED FOR TESTING
+        
+        string result = headsTails[rng.Next(headsTails.Length)];
+        //string result = "tails";
 
         Debug.Log("FlipCoin: " + result);
         HandleHeadsOrTailsOnServer(headsOrTailsServer, result);

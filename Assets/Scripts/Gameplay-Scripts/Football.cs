@@ -676,7 +676,7 @@ public class Football : NetworkBehaviour
         if (!receivingGoblin.isRunningOnServer)
         {
             Debug.Log("GetDirectionOfThrow: receiving goblin is not moving. Throwing toward their current position of " + receivingGoblin.ToString());
-            return throwDirection;
+            return CheckIfThrowDirectionIsMoreThanLateral(throwDirection, throwingGoblin);
         }
         //Vector2 receivingGoblinMovementDirection = receivingGoblin.GetRunningDirectionOnServer();
         //Vector2 receivingGoblinMovementDirection = GetDirectionToReceivingGoblinsGoal(receivingGoblin);
@@ -685,11 +685,11 @@ public class Football : NetworkBehaviour
         //float receivingGobinSpeed = receivingGoblin.speed;
         float receivingGobinSpeed = GetReceivingGoblinSpeed(receivingGoblin);
 
-        // Get a rough estimate of the max distance the receiving goblin will travel during a throw based on how long the ball will travel while thrown to the receiving goblin's starting position
         float distanceBetweenGoblins = Vector2.Distance(throwingGoblinPosition, receivingGoblinPosition);
-        float timeForBallToGetToReceivingGoblin = GetTimeForThrownBallToTravel(distanceBetweenGoblins);
-        Debug.Log("GetDirectionOfThrow: The throw ball will take: " + timeForBallToGetToReceivingGoblin.ToString() + " seconds to travel a distance of: " + distanceBetweenGoblins.ToString() + ". Start position: " + throwingGoblinPosition.ToString() + " end position: " + receivingGoblinPosition.ToString());
-        float maxDistanceReceivingGoblinWillTravel = DistanceReceivingGoblinWillTravel(timeForBallToGetToReceivingGoblin, receivingGobinSpeed);
+        float maxThrowtime = GetTimeForThrownBallToTravel(distanceBetweenGoblins);
+        //float maxThrowtime = maxThrowDistance / speedOfThrow;
+        Debug.Log("GetDirectionOfThrow: The throw ball will take: " + maxThrowtime.ToString() + " seconds to travel a distance of: " + maxThrowDistance.ToString());
+        float maxDistanceReceivingGoblinWillTravel = DistanceReceivingGoblinWillTravel(maxThrowtime, receivingGobinSpeed);
 
         // With the max distance traveled for the receiving goblin calculated, get their "end position" if they traveled that far?
         Vector3 receivingGoblinEndPosition = ReceivingGoblinEndPosition(receivingGoblinPosition, receivingGoblinMovementDirection, maxDistanceReceivingGoblinWillTravel);
@@ -697,7 +697,7 @@ public class Football : NetworkBehaviour
 
 
         //return throwDirection;
-        Vector2 newThrowDirection = GetBestDirectionToThrowToMovingGoblin(throwingGoblinPosition, receivingGoblinPosition, receivingGoblinEndPosition, maxDistanceReceivingGoblinWillTravel, distanceBetweenGoblins, receivingGoblinMovementDirection, receivingGobinSpeed, throwingGoblin.isGoblinGrey);
+        Vector2 newThrowDirection = GetBestDirectionToThrowToMovingGoblin(throwingGoblinPosition, receivingGoblinPosition, receivingGoblinEndPosition, maxDistanceReceivingGoblinWillTravel, receivingGoblinMovementDirection, receivingGobinSpeed, throwingGoblin.isGoblinGrey);
         Debug.Log("GetDirectionOfThrow: Original throw direction: " + throwDirection.ToString("0.000") + " new throw direction: " + newThrowDirection.ToString("0.000"));
         return CheckIfThrowDirectionIsMoreThanLateral(newThrowDirection, throwingGoblin);
     }
@@ -745,9 +745,18 @@ public class Football : NetworkBehaviour
     {
         return startPosition + (Vector3)(direction * distance);
     }
-    private Vector2 GetBestDirectionToThrowToMovingGoblin(Vector3 throwingPosition, Vector3 receivingStartPosition, Vector3 receivingEndPosition, float maxDistanceReceivingGoblinWillTravel, float distanceToReceivingStartPosition, Vector2 receivingGoblinMovementDirection, float receivingGobinSpeed, bool areGoblinsGrey)
+    private Vector2 GetBestDirectionToThrowToMovingGoblin(Vector3 throwingPosition, Vector3 receivingStartPosition, Vector3 receivingEndPosition, float maxDistanceReceivingGoblinWillTravel, Vector2 receivingGoblinMovementDirection, float receivingGobinSpeed, bool areGoblinsGrey)
     {
         float distanceToReceivingEndPosition = Vector2.Distance(throwingPosition, receivingEndPosition);
+        float distanceToReceivingStartPosition = Vector2.Distance(throwingPosition, receivingStartPosition);
+        // check if the distance to the receiver's start and end positions is greater than the max throw distance. If they are, Throw can never make it to the receiver. 'Lead' the receiver by throwing to mid point?
+        if (distanceToReceivingEndPosition > maxThrowDistance && distanceToReceivingStartPosition > maxThrowDistance)
+        {
+            Debug.Log("GetBestDirectionToThrowToMovingGoblin: Distance from throwing position to receiver's start and end positions are both greater than max throw distance.");
+            float halfDistance = (maxDistanceReceivingGoblinWillTravel / 2);
+            Vector3 midPoint = receivingStartPosition + (Vector3)(receivingGoblinMovementDirection * halfDistance);
+            return (midPoint - throwingPosition).normalized;
+        }
         // Check if the longest throw can make it to the receiving goblin's end position
         if (distanceToReceivingEndPosition > maxThrowDistance)
         {
@@ -768,18 +777,22 @@ public class Football : NetworkBehaviour
         // Get first test point that is 50% of the way between receiving goblins end and start positions
         float testDistance = (maxDistanceReceivingGoblinWillTravel / 2);
         Vector3 testPoint = receivingStartPosition + (Vector3)(receivingGoblinMovementDirection * testDistance);
+        Vector3 previousTestPoint = Vector2.zero;
 
         bool doneCalculating = false;
         int totalCalculations = 0;
-        int maxCalculations = 5;
+        int maxCalculations = 10;
         Vector2 throwDirection = (receivingStartPosition - throwingPosition).normalized;
-        float maxTimeDifference = 0.15f;
+        float maxTimeDifference = 0.05f;
 
         // Calculate time it takes for thrown ball to reach this point and time it takes for receiving goblin to reach this point
         float distanceForBallToTravelToTestPoint;
         float timeForBallToTravelToTestPoint;
         float timeForReceivingGoblinToTraveltoTestPoint;
         float differenceInTravelTimes;
+        float previousDifferenceInTraveltimes = 0f;
+        Vector3 lowerBound = receivingStartPosition;
+        Vector3 upperBound = receivingEndPosition;
 
         while (!doneCalculating && totalCalculations < maxCalculations)
         {
@@ -794,20 +807,49 @@ public class Football : NetworkBehaviour
                 Debug.Log("GetBestDirectionToThrowToMovingGoblin: Found point where goblin and football meet at similar time: " + testPoint.ToString());
                 throwDirection = (testPoint - throwingPosition).normalized;
                 doneCalculating = true;
+                break;
             }
             else if (differenceInTravelTimes > 0)
             {
                 // ball took longer than receiving goblin to reach test point. Move test point closer to endTestPosition so it is closer to throwing goblin
-                testDistance += Vector2.Distance(receivingEndPosition, testPoint) / 2;
+                testDistance += Vector2.Distance(upperBound, testPoint) / 2;
+                lowerBound = testPoint;
             }
             else
             {
                 // receiving goblin took longer than ball to reach test point. Move test point closer to startTestPosition so it is closer to throwing goblin
-                testDistance += Vector2.Distance(receivingStartPosition, testPoint) / 2;
+                testDistance += Vector2.Distance(lowerBound, testPoint) / 2;
+                upperBound = testPoint;
             }
 
-            testPoint = receivingStartPosition + (Vector3)(receivingGoblinMovementDirection * testDistance);
+            if (totalCalculations > 0)
+            {
+                if (Mathf.Abs(differenceInTravelTimes) > Mathf.Abs(previousDifferenceInTraveltimes))
+                {
+                    Debug.Log("GetBestDirectionToThrowToMovingGoblin: Difference in times got worse. Reverting to the previous test point and exiting?");
+                    throwDirection = (previousTestPoint - throwingPosition).normalized;
+                    doneCalculating = true;
+                    break;
+                }
+            }
+
+
             totalCalculations++;
+            if (totalCalculations >= maxCalculations)
+            {
+                throwDirection = (testPoint - throwingPosition).normalized;
+                doneCalculating = true;
+                break;
+            }
+
+            // save previous test point
+            previousTestPoint = testPoint;
+            // calculate the test point for the next iteration of the test
+            testPoint = receivingStartPosition + (Vector3)(receivingGoblinMovementDirection * testDistance);
+            Debug.Log("GetBestDirectionToThrowToMovingGoblin: Completed while loop iteration: " + totalCalculations.ToString() + " current time difference: " + differenceInTravelTimes.ToString("0.000") + " previous difference in times: " + previousDifferenceInTraveltimes.ToString("0.000"));
+            // save the difference in times so the next chacek can see if this is getting worse or not?
+            previousDifferenceInTraveltimes = differenceInTravelTimes;            
+            
         }
 
         return throwDirection;

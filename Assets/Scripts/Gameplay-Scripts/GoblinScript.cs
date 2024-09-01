@@ -949,7 +949,7 @@ public class GoblinScript : NetworkBehaviour
                 }
                 else
                 {
-                    //MoveTowardFootball();
+                    MoveTowardFootball();
                     state = State.ChaseFootball;
                     goblinTarget = null;
                 }
@@ -958,16 +958,16 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    //MoveTowardFootball();
+                    MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    //MoveTowrdBallCarrier();
+                    MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
                     GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    //MoveTowardGoblinTarget();
+                    MoveTowardGoblinTarget();
                     break;
             }
         }
@@ -987,19 +987,19 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    //MoveTowardFootball();
+                    MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    //MoveTowrdBallCarrier();
+                    MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    //GetOpenForPass();
+                    GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    //MoveTowardGoblinTarget();
+                    MoveTowardGoblinTarget();
                     break;
                 case State.RunTowardEndzone:
-                    //myGamePlayer.myAiPlayer.RunTowardEndZone();
+                    myGamePlayer.myAiPlayer.RunTowardEndZone();
                     break;
             }
 
