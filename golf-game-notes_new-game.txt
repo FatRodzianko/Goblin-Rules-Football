@@ -80,3 +80,21 @@
 - - - opponent AI chooses their "best" card if they can win, "worst" card if it looks like a sure defeat
 - turn based strategy course from code monkey?
 - - - https://unitycodemonkey.com/courses.php?c=turnbasedstrategy
+
+### First steps to get started
+- Created a hex grid with tiles
+- - - try as hex first (flat top? pointy top?)
+- - - - - - see this aseprite tool for creating hex tiles? https://www.reddit.com/r/aseprite/comments/1awquqn/created_a_tool_for_creating_isometric_hexagonal/
+- - - - - - CodeMonkey tutorial was for pointy top. I think for flat top all I'd change is have a horizontal offset of 0.75 instead of a vertical offset. So, change HEX_VERTICAL_OFFSET_MULTIPLIER to HEX_Horizontal_OFFSET_MULTIPLIER
+- - - if creating hex pixel art tiles is too difficult/annoying, just switch to a rectangle grid
+- - - - - - think Core Keeper for asethetic
+- Detect mouse click on a grid tile
+- - - highlight the correct grid position when clicked on
+- Have a unit that is on the grid
+- - - make unit selectable by clicking on them
+- Pathfinding to allow unit to move from one grid position to another
+- Allow for obstacles/walls on the grid
+- - - pathfinding to navigate around obstacles
+- "Fog of war" on the grid - only reveal tiles within a certain range of player's units
+- - - black for tiles that have not been navigated to or seen yet. Transparent grey for ones that have been but are no longer in view
+- - - - - - "in view" modifiable by a "view distance" for each unit?
