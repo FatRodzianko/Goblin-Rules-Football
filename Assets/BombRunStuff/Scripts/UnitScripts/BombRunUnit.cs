@@ -8,6 +8,8 @@ public class BombRunUnit : MonoBehaviour
     private float _moveSpeed = 4f;
     private float _stoppingDistance = 0.05f;
 
+    
+
     private void Awake()
     {
         _targetPosition = this.transform.position;

@@ -1,12 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class UnitActionSystem : MonoBehaviour
 {
+    public static UnitActionSystem Instance { get; private set; }
+
+
     [SerializeField] private BombRunUnit _selectedUnit;
     [SerializeField] private LayerMask _unitLayerMask;
 
+    // Events
+    public event EventHandler<BombRunUnit> OnSelectedUnitChanged;
+
+    private void Awake()
+    {
+        MakeInstance();
+    }
+   
+    void MakeInstance()
+    {
+        if (Instance != null)
+        {
+            Debug.Log("MakeInstance: more than one UnitActionSystem. Destroying...");
+            Destroy(this);
+            return;
+        }
+        Instance = this;
+    }
+    private void Start()
+    {
+        SetSelectedUnit(_selectedUnit);
+    }
     private void Update()
     {
         
@@ -26,10 +52,22 @@ public class UnitActionSystem : MonoBehaviour
         {
             if (raycastHit.transform.TryGetComponent<BombRunUnit>(out BombRunUnit unit))
             {
-                _selectedUnit = unit;
+                //_selectedUnit = unit;
+                SetSelectedUnit(unit);
                 return true;
             }
         }
         return false;
+    }
+    private void SetSelectedUnit(BombRunUnit unit)
+    {
+        this._selectedUnit = unit;
+
+        OnSelectedUnitChanged?.Invoke(this, _selectedUnit);
+        Debug.Log("SetSelectedUnit: " + unit);
+    }
+    public BombRunUnit GetSelectedUnit()
+    {
+        return _selectedUnit;
     }
 }

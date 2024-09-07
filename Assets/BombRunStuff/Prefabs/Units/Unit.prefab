@@ -94,6 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3006723863001832530}
   - component: {fileID: 3408740805264284271}
+  - component: {fileID: 7297105716296972232}
   - component: {fileID: 3220647545044700835}
   m_Layer: 22
   m_Name: Unit
@@ -131,6 +132,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8e71ecf61c8fd54892d9db60497d819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7297105716296972232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4944422538143551182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc825664b9724ae4f9cea69aa2acabc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unit: {fileID: 3408740805264284271}
+  _unitSpriteRenderer: {fileID: 3774028933683333569}
+  _shadowSpriteRenderer: {fileID: 2357901413509587883}
+  _notSelectedMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  _selectedMaterial: {fileID: 2100000, guid: 81f1e9b064d2605419629aa1ef5c9c31, type: 2}
+  _notSelectedShadowSprite: {fileID: 21300000, guid: 28646c1e8a22dda489a4f42a40fb8171, type: 3}
+  _selectedShadowSprite: {fileID: 21300000, guid: 9a210f9583bc41941a395ad8d9d63e34, type: 3}
 --- !u!61 &3220647545044700835
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -209,7 +229,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
