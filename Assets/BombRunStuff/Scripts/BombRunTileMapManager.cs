@@ -58,7 +58,7 @@ public class BombRunTileMapManager : MonoBehaviour
     }
     public void AddFloorTileToGridPosition(GridPosition gridPosition)
     {
-        if (gridPosition == new GridPosition(5, 5) || gridPosition == new GridPosition(7, 8))
+        if (gridPosition == new GridPosition(3, 9) || gridPosition == new GridPosition(2, 4))
             return;
         _floorTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _floorTile);
         if (!_floorTilePositions.Contains(gridPosition))
