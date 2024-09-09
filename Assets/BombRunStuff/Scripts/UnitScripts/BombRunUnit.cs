@@ -4,26 +4,38 @@ using UnityEngine;
 
 public class BombRunUnit : MonoBehaviour
 {
-    private Vector3 _targetPosition;
-    private float _moveSpeed = 4f;
-    private float _stoppingDistance = 0.05f;
 
-    
+    [Header("GridPosition stuff")]
+    private GridPosition _gridPosition;
+
+    [Header("Actions")]
+    [SerializeField] MoveAction _moveAction;
 
     private void Awake()
     {
-        _targetPosition = this.transform.position;
+        _moveAction = GetComponent<MoveAction>();
+    }
+    private void Start()
+    {
+        _gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
+        LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
     }
     private void Update()
     {
-        if (Vector2.Distance(transform.position, _targetPosition) > _stoppingDistance)
+        GridPosition newGridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
+        if (newGridPosition != _gridPosition)
         {
-            Vector3 moveDirection = (_targetPosition - this.transform.position).normalized;
-            transform.position += moveDirection * _moveSpeed * Time.deltaTime;
+            // unit changed grid position
+            LevelGrid.Instance.UnitMovedGridPosition(this, _gridPosition, newGridPosition);
+            _gridPosition = newGridPosition;
         }
     }
-    public void Move(Vector3 targetPosition)
+    public MoveAction GetMoveAction()
     {
-        _targetPosition = targetPosition;
+        return _moveAction;
+    }
+    public GridPosition GetGridPosition()
+    {
+        return _gridPosition;
     }
 }

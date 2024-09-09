@@ -27,9 +27,9 @@ public class GridSystem<TGridObject>
             }
         }
     }
-    public Vector3 GetWorldPosition(int x, int y)
+    public Vector3 GetWorldPosition(GridPosition gridPosition)
     {
-        return new Vector3(x, y, 0) * _cellSize;
+        return new Vector3(gridPosition.x, gridPosition.y, 0) * _cellSize;
     }
     public GridPosition GetGridPositon(Vector3 worldPosition)
     {
@@ -52,8 +52,24 @@ public class GridSystem<TGridObject>
         {
             for (int y = 0; y < _height; y++)
             {
-                GameObject.Instantiate(debugPrefab, GetWorldPosition(x, y), Quaternion.identity);
+                GridPosition gridPosition = new GridPosition(x, y);
+
+                Transform debugTransform = GameObject.Instantiate(debugPrefab, GetWorldPosition(gridPosition), Quaternion.identity);
+                GridDebugObject gridDebugObject = debugTransform.GetComponent<GridDebugObject>();
+                gridDebugObject.SetGridObject(GetGridObject(gridPosition));
+                gridDebugObject.SetDebugText();
             }
         }
+    }
+    public TGridObject GetGridObject(GridPosition gridPosition)
+    {
+        return _gridObjectArray[gridPosition.x, gridPosition.y];
+    }
+    public bool IsValidGridPosition(GridPosition gridPosition)
+    {
+        return gridPosition.x >= 0 && 
+            gridPosition.y >= 0 && 
+            gridPosition.x < _width && 
+            gridPosition.y < _height;
     }
 }
