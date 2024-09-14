@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class TestingBombRun : MonoBehaviour
 {
     [SerializeField] private BombRunUnit _unit;
+    [SerializeField] private Tile _actionVisualTile;
     private void Start()
     {
 
@@ -13,7 +15,10 @@ public class TestingBombRun : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            _unit.GetMoveAction().GetValidActionGridPositionList();
+            //List<GridPosition> movePositions = _unit.GetMoveAction().GetValidActionGridPositionList();
+            //List<GridPosition> movePositions = UnitActionSystem.Instance.GetSelectedUnit().GetMoveAction().GetValidActionGridPositionList();
+            //BombRunTileMapManager.Instance.HideAllActionVisuals();
+            //BombRunTileMapManager.Instance.ShowActionVisualsFromList(movePositions, _actionVisualTile, Color.white);
         }
     }
 }

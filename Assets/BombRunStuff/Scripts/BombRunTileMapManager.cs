@@ -2,28 +2,58 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System;
 
 public class BombRunTileMapManager : MonoBehaviour
 {
     public static BombRunTileMapManager Instance { get; private set; }
 
+    [Serializable]
+    public struct GridVisualTypeColor
+    {
+        public GridVisualType gridVisualType;
+        public Color color;
+        public Tile tile;
+    }
+    public enum GridVisualType
+    {
+        White,
+        Blue,
+        Red,
+        Yellow,
+        RedSoft
+    }
+
+
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _floorTileMap;
     [SerializeField] private Tilemap _wallTileMap;
-    [SerializeField] private Tilemap _gridVisualsTileMap;
+    [SerializeField] private Tilemap _gridVisualTileMap;
+    [SerializeField] private Tilemap _actionVisualsTileMap;
 
     [Header("Tiles")]
+    [Header("Floor Tiles")]
     [SerializeField] private Tile _floorTile;
+
+    [Header("Wall Tiles")]
     [SerializeField] private Tile _wallTile;
+
+    [Header("Grid Visual Tiles")]
     [SerializeField] private Tile _gridVisualDefaulTile;
+    [SerializeField] private Tile _actionVisualTile;
+
+    [Header("Action Visual Colors")]
 
     [Header("Tile List")]
     [SerializeField] private List<GridPosition> _floorTilePositions = new List<GridPosition>();
     [SerializeField] private List<GridPosition> _wallTilePositions = new List<GridPosition>();
+    [SerializeField] private List<GridPosition> _actionVisualPositions = new List<GridPosition>();
 
 
     [Header("Grid System Stuff")]
     [SerializeField] private GridSystem<GridObject> _gridSystem;
+
+    [SerializeField] private List<GridVisualTypeColor> _gridVisualTypeMaterialList;
 
 
     private void Awake()
@@ -40,6 +70,14 @@ public class BombRunTileMapManager : MonoBehaviour
             return;
         }
         Instance = this;
+    }
+    private void Update()
+    {
+        UpdateActionVisuals();
+    }
+    private void Start()
+    {
+        
     }
     public void SetGridSystem(GridSystem<GridObject> gridSystem)
     {
@@ -72,13 +110,26 @@ public class BombRunTileMapManager : MonoBehaviour
         {
             for (int y = 0; y < gridSystem.GetHeight(); y++)
             {
-                AddGridVisualDefaultToGridPosition(new GridPosition(x, y));
+                GridPosition gridPosition = new GridPosition(x, y);
+                if (_wallTilePositions.Contains(gridPosition))
+                    continue;
+                AddGridVisualToGridPosition(gridPosition, _gridVisualDefaulTile);
             }
         }
     }
-    public void AddGridVisualDefaultToGridPosition(GridPosition gridPosition)
+    public void AddGridVisualToGridPosition(GridPosition gridPosition, Tile gridVisual)
     {
-        _gridVisualsTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _gridVisualDefaulTile);
+        _gridVisualTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), gridVisual);
+    }
+    public void AddActionVisualToGridPosition(GridPosition gridPosition, Tile gridVisual, Color color)
+    {
+        gridVisual.color = color;
+        _actionVisualsTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), gridVisual);
+        _actionVisualPositions.Add(gridPosition);
+    }
+    public void RemoveActionVisualToGridPosition(GridPosition gridPosition)
+    {
+        _actionVisualsTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), null);
     }
     public void AddWallsOutSideOfFloors()
     {
@@ -128,5 +179,26 @@ public class BombRunTileMapManager : MonoBehaviour
         {
             _wallTilePositions.Add(gridPosition);
         }
+    }
+    public void ShowActionVisualsFromList(List<GridPosition> gridPositions, Tile gridVisual, Color color)
+    {
+        foreach (GridPosition gridPosition in gridPositions)
+        {
+            AddActionVisualToGridPosition(gridPosition, gridVisual, color);
+        }
+    }
+    public void HideAllActionVisuals()
+    {
+        foreach (GridPosition gridPosition in _actionVisualPositions)
+        {
+            RemoveActionVisualToGridPosition(gridPosition);
+        }
+        _actionVisualPositions.Clear();
+    }
+    private void UpdateActionVisuals()
+    {
+        List<GridPosition> movePositions = UnitActionSystem.Instance.GetSelectedUnit().GetMoveAction().GetValidActionGridPositionList();
+        HideAllActionVisuals();
+        ShowActionVisualsFromList(movePositions, _actionVisualTile, Color.white);
     }
 }

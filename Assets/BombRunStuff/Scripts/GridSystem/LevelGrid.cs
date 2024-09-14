@@ -12,6 +12,8 @@ public class LevelGrid : MonoBehaviour
     private void Awake()
     {
         MakeInstance();
+        _gridSystem = new GridSystem<GridObject>(10, 10, 2f, (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition));
+        _gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
     }
 
     void MakeInstance()
@@ -26,9 +28,6 @@ public class LevelGrid : MonoBehaviour
     }
     private void Start()
     {
-        _gridSystem = new GridSystem<GridObject>(10, 10, 2f, (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition));
-        _gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
-
         BombRunTileMapManager.Instance.SetGridSystem(_gridSystem);
         BombRunTileMapManager.Instance.AddFloorTilesFromGridSystem(_gridSystem);
         BombRunTileMapManager.Instance.AddGridVisualDefaultFromGridSystem(_gridSystem);
@@ -69,5 +68,17 @@ public class LevelGrid : MonoBehaviour
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         return gridObject.HasAnyUnit();
+    }
+    public int GetWidth()
+    {
+        return _gridSystem.GetWidth();
+    }
+    public int GetHeight()
+    {
+        return _gridSystem.GetHeight();
+    }
+    public GridSystem<GridObject> GetGridObjectGridSystem()
+    {
+        return _gridSystem;
     }
 }
