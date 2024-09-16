@@ -48,6 +48,10 @@ public class UnitActionSystem : MonoBehaviour
             }
             //_selectedUnit.GetMoveAction().Move(MouseWorld.GetPosition());
         }
+        if (InputManagerBombRun.Instance.IsRightMouseButtonDownThisFrame())
+        {
+            _selectedUnit.GetSpinAction().Spin();
+        }
     }
     private bool TryHandleUnitSelection()
     {

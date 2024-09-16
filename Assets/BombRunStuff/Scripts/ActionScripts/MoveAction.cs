@@ -2,10 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveAction : MonoBehaviour
+public abstract class MoveAction : BaseAction
 {
-    [Header(" Unit Info ")]
-    [SerializeField] private BombRunUnit _unit;
 
     [Header("Moving")]
     private Vector3 _targetPosition;
@@ -16,22 +14,32 @@ public class MoveAction : MonoBehaviour
     [Header("Animation")]
     [SerializeField] private Animator _unitAnimator;
 
-    private void Awake()
+
+    protected override void Awake()
     {
-        _unit = GetComponent<BombRunUnit>();
+        base.Awake();
         _targetPosition = this.transform.position;
     }
     private void Update()
     {
+        if (!_isActive)
+            return;
+
+
         if (Vector2.Distance(transform.position, _targetPosition) > _stoppingDistance)
         {
             Vector3 moveDirection = (_targetPosition - this.transform.position).normalized;
             transform.position += moveDirection * _moveSpeed * Time.deltaTime;
         }
+        else
+        {
+            _isActive = false;
+        }
     }
     public void Move(GridPosition targetPosition)
     {
         _targetPosition = LevelGrid.Instance.GetWorldPosition(targetPosition);
+        _isActive = true;
     }
     public bool IsValidActionGridPosition(GridPosition gridPosition)
     {

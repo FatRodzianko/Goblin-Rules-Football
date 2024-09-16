@@ -33,4 +33,8 @@ public class InputManagerBombRun : MonoBehaviour
     {
         return _bombRunControls.UI.Click.WasPerformedThisFrame();
     }
+    public bool IsRightMouseButtonDownThisFrame()
+    {
+        return _bombRunControls.UI.RightClick.WasPerformedThisFrame();
+    }
 }

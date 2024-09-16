@@ -92,7 +92,7 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""RightClick"",
-                    ""type"": ""PassThrough"",
+                    ""type"": ""Button"",
                     ""id"": ""b0658d08-0156-4494-8dc7-b7202f6b3791"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",

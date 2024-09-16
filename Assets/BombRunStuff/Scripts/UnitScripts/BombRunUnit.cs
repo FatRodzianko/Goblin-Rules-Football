@@ -10,10 +10,13 @@ public class BombRunUnit : MonoBehaviour
 
     [Header("Actions")]
     [SerializeField] MoveAction _moveAction;
+    [SerializeField] SpinAction _spinAction;
 
     private void Awake()
     {
         _moveAction = GetComponent<MoveAction>();
+        _spinAction = GetComponent<SpinAction>();
+
     }
     private void Start()
     {
@@ -33,6 +36,10 @@ public class BombRunUnit : MonoBehaviour
     public MoveAction GetMoveAction()
     {
         return _moveAction;
+    }
+    public SpinAction GetSpinAction()
+    {
+        return _spinAction;
     }
     public GridPosition GetGridPosition()
     {
