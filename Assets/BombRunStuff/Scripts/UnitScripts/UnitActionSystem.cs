@@ -10,6 +10,7 @@ public class UnitActionSystem : MonoBehaviour
 
     [SerializeField] private BombRunUnit _selectedUnit;
     [SerializeField] private LayerMask _unitLayerMask;
+    [SerializeField] private BaseAction _selectedAction;
 
     private bool _isBusy;
 
@@ -40,30 +41,37 @@ public class UnitActionSystem : MonoBehaviour
         if (_isBusy)
             return;
 
-        if (InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
-        {
-            //if (TryHandleUnitSelection())
-            //    return;
+        //if (InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
+        //{
+        //    //if (TryHandleUnitSelection())
+        //    //    return;
 
-            if (TryHandleSelectGridPosition())
-                return;
+        //    if (TryHandleSelectGridPosition())
+        //        return;
 
-            GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
-            if (_selectedUnit.GetMoveAction().IsValidActionGridPosition(mouseGridPosition))
-            {
-                _selectedUnit.GetMoveAction().Move(mouseGridPosition, ClearBusy);
-                SetBusy();
-            }
-            //_selectedUnit.GetMoveAction().Move(MouseWorld.GetPosition());
-        }
-        if (InputManagerBombRun.Instance.IsRightMouseButtonDownThisFrame())
-        {
-            _selectedUnit.GetSpinAction().Spin(ClearBusy);
-            SetBusy();
-        }
+
+        //    GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
+        //    if (_selectedUnit.GetMoveAction().IsValidActionGridPosition(mouseGridPosition))
+        //    {
+        //        _selectedUnit.GetMoveAction().Move(mouseGridPosition, ClearBusy);
+        //        SetBusy();
+        //    }
+        //    //_selectedUnit.GetMoveAction().Move(MouseWorld.GetPosition());
+        //}
+
+        //if (InputManagerBombRun.Instance.IsRightMouseButtonDownThisFrame())
+        //{
+        //    _selectedUnit.GetSpinAction().Spin(ClearBusy);
+        //    SetBusy();
+        //}
+
+        if (TryHandleSelectGridPosition())
+            return;
+        HandleSelectedAction();
     }
     private bool TryHandleUnitSelection()
     {
+        
         Ray ray = Camera.main.ScreenPointToRay(InputManagerBombRun.Instance.GetMouseScreenPosition());
         RaycastHit2D raycastHit = Physics2D.Raycast(ray.origin, ray.direction, float.MaxValue, _unitLayerMask);
         if (raycastHit)
@@ -79,7 +87,14 @@ public class UnitActionSystem : MonoBehaviour
     }
     private bool TryHandleSelectGridPosition()
     {
+        if (!InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
+            return false;
+
         GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
+        Debug.Log("TryHandleSelectGridPosition: " + mouseGridPosition);
+        if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
+            return false;
+
         List<BombRunUnit> units = LevelGrid.Instance.GetUnitListAtGridPosition(mouseGridPosition);
 
         if (units.Count > 0)
@@ -93,12 +108,40 @@ public class UnitActionSystem : MonoBehaviour
             return false;
         }
     }
+    private void HandleSelectedAction()
+    {
+        if (!InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
+            return;
+
+        GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
+        switch (_selectedAction)
+        {
+            case MoveAction moveAction:
+                if (moveAction.IsValidActionGridPosition(mouseGridPosition))
+                {
+                    moveAction.Move(mouseGridPosition, ClearBusy);
+                    SetBusy();
+                }
+                break;
+            case SpinAction spinAction:
+                spinAction.Spin(ClearBusy);
+                SetBusy();
+                break;
+        }
+        
+    }
     private void SetSelectedUnit(BombRunUnit unit)
     {
         this._selectedUnit = unit;
+        SetSelectedAction(unit.GetMoveAction());
 
         OnSelectedUnitChanged?.Invoke(this, _selectedUnit);
         Debug.Log("SetSelectedUnit: " + unit);
+    }
+    public void SetSelectedAction(BaseAction baseAction)
+    {
+        _selectedAction = baseAction;
+        Debug.Log("SetSelectedAction: " + baseAction.GetActionName());
     }
     public BombRunUnit GetSelectedUnit()
     {
