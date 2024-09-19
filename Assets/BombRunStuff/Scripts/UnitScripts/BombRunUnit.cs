@@ -11,12 +11,13 @@ public class BombRunUnit : MonoBehaviour
     [Header("Actions")]
     [SerializeField] MoveAction _moveAction;
     [SerializeField] SpinAction _spinAction;
+    [SerializeField] private BaseAction[] _baseActionArray;
 
     private void Awake()
     {
         _moveAction = GetComponent<MoveAction>();
         _spinAction = GetComponent<SpinAction>();
-
+        _baseActionArray = GetComponents<BaseAction>();
     }
     private void Start()
     {
@@ -44,5 +45,9 @@ public class BombRunUnit : MonoBehaviour
     public GridPosition GetGridPosition()
     {
         return _gridPosition;
+    }
+    public BaseAction[] GetBaseActionArray()
+    {
+        return _baseActionArray;
     }
 }

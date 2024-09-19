@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public abstract class MoveAction : BaseAction
+public class MoveAction : BaseAction
 {
 
     [Header("Moving")]
@@ -34,10 +35,12 @@ public abstract class MoveAction : BaseAction
         else
         {
             _isActive = false;
+            _onActionComplete();
         }
     }
-    public void Move(GridPosition targetPosition)
+    public void Move(GridPosition targetPosition, Action onActionComplete)
     {
+        _onActionComplete = onActionComplete;
         _targetPosition = LevelGrid.Instance.GetWorldPosition(targetPosition);
         _isActive = true;
     }
@@ -71,6 +74,7 @@ public abstract class MoveAction : BaseAction
                 {
                     // Grid position already occupied by a unit
                     // later will check if number of units is below max allowed on a tile
+                    // Will need to take into account if the number of selected units would put the testGridPosition above the max units allowed
                     continue;
                 }
 
@@ -79,5 +83,10 @@ public abstract class MoveAction : BaseAction
         }
 
         return validGridPositionList;
+    }
+
+    public override string GetActionName()
+    {
+        return "Move";
     }
 }

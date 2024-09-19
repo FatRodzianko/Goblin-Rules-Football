@@ -86,12 +86,17 @@
 - - - try as hex first (flat top? pointy top?)
 - - - - - - see this aseprite tool for creating hex tiles? https://www.reddit.com/r/aseprite/comments/1awquqn/created_a_tool_for_creating_isometric_hexagonal/
 - - - - - - CodeMonkey tutorial was for pointy top. I think for flat top all I'd change is have a horizontal offset of 0.75 instead of a vertical offset. So, change HEX_VERTICAL_OFFSET_MULTIPLIER to HEX_Horizontal_OFFSET_MULTIPLIER
-- - - if creating hex pixel art tiles is too difficult/annoying, just switch to a rectangle grid
-- - - - - - think Core Keeper for asethetic
+- - x if creating hex pixel art tiles is too difficult/annoying, just switch to a rectangle grid
+- - - - - x think Core Keeper for asethetic
 - Detect mouse click on a grid tile
 - - - highlight the correct grid position when clicked on
-- Have a unit that is on the grid
-- - - make unit selectable by clicking on them
+x Have a unit that is on the grid
+- - x make unit selectable by clicking on them
+- - - - - x selectable by clicking on the tile/grid object the unit is on
+- - - select multiple units:
+- - - - - - if multiple units are selected, get their available grid positions they can each move to
+- - - - - - check what movement grid positions the multiple units share, if any 
+- - - - - - if there are shared movement grid positions, show those grid positions as possible "moves"
 - Pathfinding to allow unit to move from one grid position to another
 - Allow for obstacles/walls on the grid
 - - - pathfinding to navigate around obstacles

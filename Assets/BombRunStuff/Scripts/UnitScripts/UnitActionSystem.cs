@@ -11,6 +11,8 @@ public class UnitActionSystem : MonoBehaviour
     [SerializeField] private BombRunUnit _selectedUnit;
     [SerializeField] private LayerMask _unitLayerMask;
 
+    private bool _isBusy;
+
     // Events
     public event EventHandler<BombRunUnit> OnSelectedUnitChanged;
 
@@ -35,22 +37,29 @@ public class UnitActionSystem : MonoBehaviour
     }
     private void Update()
     {
-        
+        if (_isBusy)
+            return;
+
         if (InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
         {
-            if (TryHandleUnitSelection())
+            //if (TryHandleUnitSelection())
+            //    return;
+
+            if (TryHandleSelectGridPosition())
                 return;
 
             GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
             if (_selectedUnit.GetMoveAction().IsValidActionGridPosition(mouseGridPosition))
             {
-                _selectedUnit.GetMoveAction().Move(mouseGridPosition);
+                _selectedUnit.GetMoveAction().Move(mouseGridPosition, ClearBusy);
+                SetBusy();
             }
             //_selectedUnit.GetMoveAction().Move(MouseWorld.GetPosition());
         }
         if (InputManagerBombRun.Instance.IsRightMouseButtonDownThisFrame())
         {
-            _selectedUnit.GetSpinAction().Spin();
+            _selectedUnit.GetSpinAction().Spin(ClearBusy);
+            SetBusy();
         }
     }
     private bool TryHandleUnitSelection()
@@ -68,6 +77,22 @@ public class UnitActionSystem : MonoBehaviour
         }
         return false;
     }
+    private bool TryHandleSelectGridPosition()
+    {
+        GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
+        List<BombRunUnit> units = LevelGrid.Instance.GetUnitListAtGridPosition(mouseGridPosition);
+
+        if (units.Count > 0)
+        {
+            // later will need to check if multiple units are on a grid position. If so, expand those units to allow player to select individual units?
+            SetSelectedUnit(units[0]);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     private void SetSelectedUnit(BombRunUnit unit)
     {
         this._selectedUnit = unit;
@@ -78,5 +103,13 @@ public class UnitActionSystem : MonoBehaviour
     public BombRunUnit GetSelectedUnit()
     {
         return _selectedUnit;
+    }
+    private void SetBusy()
+    {
+        _isBusy = true;
+    }
+    private void ClearBusy()
+    {
+        _isBusy = false;
     }
 }
