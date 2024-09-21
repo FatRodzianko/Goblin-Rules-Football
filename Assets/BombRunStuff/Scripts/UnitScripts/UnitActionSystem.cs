@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.EventSystems;
 
 public class UnitActionSystem : MonoBehaviour
 {
@@ -65,6 +66,9 @@ public class UnitActionSystem : MonoBehaviour
         //    SetBusy();
         //}
 
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+
         if (TryHandleSelectGridPosition())
             return;
         HandleSelectedAction();
@@ -91,7 +95,7 @@ public class UnitActionSystem : MonoBehaviour
             return false;
 
         GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
-        Debug.Log("TryHandleSelectGridPosition: " + mouseGridPosition);
+        //Debug.Log("TryHandleSelectGridPosition: " + mouseGridPosition);
         if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
             return false;
 
@@ -99,6 +103,12 @@ public class UnitActionSystem : MonoBehaviour
 
         if (units.Count > 0)
         {
+            // don't re-select the unit if it is already selected
+            if (_selectedUnit == units[0])
+            {
+                return false;
+            }
+
             // later will need to check if multiple units are on a grid position. If so, expand those units to allow player to select individual units?
             SetSelectedUnit(units[0]);
             return true;
@@ -114,20 +124,28 @@ public class UnitActionSystem : MonoBehaviour
             return;
 
         GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
-        switch (_selectedAction)
+        if (_selectedAction.IsValidActionGridPosition(mouseGridPosition))
         {
-            case MoveAction moveAction:
-                if (moveAction.IsValidActionGridPosition(mouseGridPosition))
-                {
-                    moveAction.Move(mouseGridPosition, ClearBusy);
-                    SetBusy();
-                }
-                break;
-            case SpinAction spinAction:
-                spinAction.Spin(ClearBusy);
-                SetBusy();
-                break;
+            SetBusy();
+            _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
         }
+        
+
+        // alternative for take actions to do a switch and call each actions individual method for its action
+        //switch (_selectedAction)
+        //{
+        //    case MoveAction moveAction:
+        //        if (moveAction.IsValidActionGridPosition(mouseGridPosition))
+        //        {
+        //            moveAction.Move(mouseGridPosition, ClearBusy);
+        //            SetBusy();
+        //        }
+        //        break;
+        //    case SpinAction spinAction:
+        //        spinAction.Spin(ClearBusy);
+        //        SetBusy();
+        //        break;
+        //}
         
     }
     private void SetSelectedUnit(BombRunUnit unit)
@@ -146,6 +164,10 @@ public class UnitActionSystem : MonoBehaviour
     public BombRunUnit GetSelectedUnit()
     {
         return _selectedUnit;
+    }
+    public BaseAction GetSelectedAction()
+    {
+        return _selectedAction;
     }
     private void SetBusy()
     {

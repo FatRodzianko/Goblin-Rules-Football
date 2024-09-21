@@ -5,6 +5,18 @@ using System;
 
 public class MoveAction : BaseAction
 {
+    //public class MoveActionBaseParameters : BaseParameters // override the base parameter for the spin class?
+    //{
+    //    private GridPosition gridPosition;
+    //    public MoveActionBaseParameters(GridPosition gridPosition)
+    //    {
+    //        this.gridPosition = gridPosition;
+    //    }
+    //    public GridPosition GetGridPosition()
+    //    {
+    //        return this.gridPosition;
+    //    }
+    //} 
 
     [Header("Moving")]
     private Vector3 _targetPosition;
@@ -38,18 +50,13 @@ public class MoveAction : BaseAction
             _onActionComplete();
         }
     }
-    public void Move(GridPosition targetPosition, Action onActionComplete)
+    public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
         _onActionComplete = onActionComplete;
-        _targetPosition = LevelGrid.Instance.GetWorldPosition(targetPosition);
+        _targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
         _isActive = true;
     }
-    public bool IsValidActionGridPosition(GridPosition gridPosition)
-    {
-        List<GridPosition> validGridPositionList = GetValidActionGridPositionList();
-        return validGridPositionList.Contains(gridPosition);
-    }
-    public List<GridPosition> GetValidActionGridPositionList()
+    public override List<GridPosition> GetValidActionGridPositionList()
     {
         List<GridPosition> validGridPositionList = new List<GridPosition>();
 

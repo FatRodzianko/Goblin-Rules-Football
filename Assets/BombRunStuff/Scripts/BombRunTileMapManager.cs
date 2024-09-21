@@ -197,8 +197,10 @@ public class BombRunTileMapManager : MonoBehaviour
     }
     private void UpdateActionVisuals()
     {
-        List<GridPosition> movePositions = UnitActionSystem.Instance.GetSelectedUnit().GetMoveAction().GetValidActionGridPositionList();
         HideAllActionVisuals();
-        ShowActionVisualsFromList(movePositions, _actionVisualTile, Color.white);
+
+        List<GridPosition> actionVisualPositions = UnitActionSystem.Instance.GetSelectedAction().GetValidActionGridPositionList();
+        
+        ShowActionVisualsFromList(actionVisualPositions, _actionVisualTile, Color.white);
     }
 }

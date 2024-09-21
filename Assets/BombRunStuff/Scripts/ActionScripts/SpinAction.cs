@@ -5,7 +5,10 @@ using System;
 
 public class SpinAction : BaseAction
 {
+    //public class SpinBaseParameters : BaseParameters // override the base parameter for the spin class?
+    //{
 
+    //} 
     private float _totalSpinAmount;
     private float _maxSpinAmount = 360f;
 
@@ -33,7 +36,7 @@ public class SpinAction : BaseAction
 
         transform.eulerAngles += new Vector3(0, spinAddAmount, 0);
     }
-    public void Spin(Action onSpinComplete)
+    public override void TakeAction(GridPosition gridPosition, Action onSpinComplete)
     {
         _onActionComplete = onSpinComplete;
         _totalSpinAmount = 0;
@@ -42,5 +45,14 @@ public class SpinAction : BaseAction
     public override string GetActionName()
     {
         return "Spin";
+    }
+    public override List<GridPosition> GetValidActionGridPositionList()
+    {
+        GridPosition unitGridPosition = _unit.GetGridPosition();
+
+        return new List<GridPosition>
+        {
+            unitGridPosition
+        };
     }
 }
