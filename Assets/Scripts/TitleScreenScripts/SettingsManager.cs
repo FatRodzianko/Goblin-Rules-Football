@@ -113,20 +113,24 @@ public class SettingsManager : MonoBehaviour
 
         double maxHeight = 0;
 
-        foreach (Resolution resolution in Screen.resolutions)
-        {
-            double resolutionAspectRation = (double)resolution.width / (double)resolution.height;
-            if ((resolutionAspectRation == aspectRatio) && (resolution.refreshRate == Screen.currentResolution.refreshRate))
-            {
-                resolutionList.Add(resolution);
-            }
+        // OLD WAY
+        //foreach (Resolution resolution in Screen.resolutions)
+        //{
+        //    double resolutionAspectRation = (double)resolution.width / (double)resolution.height;
+        //    if ((resolutionAspectRation == aspectRatio) && (resolution.refreshRate == Screen.currentResolution.refreshRate))
+        //    {
+        //        resolutionList.Add(resolution);
+        //    }
 
-            //Debug.Log("GetResolutions: Found resolution of " + resolution.ToString());
-            if (resolution.height > maxHeight)
-                maxHeight = resolution.height;
+        //    //Debug.Log("GetResolutions: Found resolution of " + resolution.ToString());
+        //    if (resolution.height > maxHeight)
+        //        maxHeight = resolution.height;
 
-        }
-        Debug.Log("GetResolutions: The max screen resolution height is: " + maxHeight.ToString());
+        //}
+
+        //Debug.Log("GetResolutions: The max screen resolution height is: " + maxHeight.ToString());
+        // OLD WAY
+
         /*if (resolutionList.Count > 0)
         {
             resolutions = resolutionList.ToArray();
@@ -152,7 +156,7 @@ public class SettingsManager : MonoBehaviour
             resolutionDropdown.value = currentResolutionIndex;
             ResolutionDropDown(currentResolutionIndex);
         }*/
-        resolutionList.Clear();
+        //resolutionList.Clear();
         resolutionDropdown.ClearOptions();
         List<string> options = new List<string>();
         string option = "";
@@ -160,75 +164,95 @@ public class SettingsManager : MonoBehaviour
         int currentResolutionIndex = 0;
         Resolution newRes = new Resolution();
 
-        if (maxHeight >= 720)
-        {
-            option = "1280x720";
-            options.Add(option);
-            
-            newRes.width = 1280;
-            newRes.height = 720;
-            newRes.refreshRate = Screen.currentResolution.refreshRate;
-            resolutionList.Add(newRes);
+        // OLD WAY
+        //if (maxHeight >= 720)
+        //{
+        //    option = "1280x720";
+        //    options.Add(option);
 
-            if (Screen.width == 1280 && Screen.height == 720)
+        //    newRes.width = 1280;
+        //    newRes.height = 720;
+        //    newRes.refreshRate = Screen.currentResolution.refreshRate;
+        //    resolutionList.Add(newRes);
+
+        //    if (Screen.width == 1280 && Screen.height == 720)
+        //    {
+        //        currentResolutionIndex = index;
+        //    }
+        //    index++;
+        //}
+
+
+        //if (maxHeight >= 900)
+        //{
+        //    option = "1600x900";
+        //    options.Add(option);
+
+        //    newRes.width = 1600;
+        //    newRes.height = 900;
+        //    newRes.refreshRate = Screen.currentResolution.refreshRate;
+        //    resolutionList.Add(newRes);
+
+        //    if (Screen.width == 1600 && Screen.height == 900)
+        //    {
+        //        currentResolutionIndex = index;
+        //    }
+        //    index++;
+        //}
+        //if (maxHeight >= 1080)
+        //{
+        //    option = "1920x1080";
+        //    options.Add(option);
+
+        //    newRes.width = 1920;
+        //    newRes.height = 1080;
+        //    newRes.refreshRate = Screen.currentResolution.refreshRate;
+        //    resolutionList.Add(newRes);
+
+        //    if (Screen.width == 1920 && Screen.height == 1080)
+        //    {
+        //        currentResolutionIndex = index;
+        //    }
+        //    index++;
+        //}
+        //if (maxHeight >= 1440)
+        //{
+        //    option = "2560x1440";
+        //    options.Add(option);
+
+        //    newRes.width = 2560;
+        //    newRes.height = 1440;
+        //    newRes.refreshRate = Screen.currentResolution.refreshRate;
+        //    resolutionList.Add(newRes);
+
+        //    if (Screen.width == 2560 && Screen.height == 1440)
+        //    {
+        //        currentResolutionIndex = index;
+        //    }
+        //    index++;
+        //}
+        // OLD WAY
+
+        foreach (Resolution resolution in Screen.resolutions)
+        {
+            if (resolutionList.Contains(resolution))
+                continue;
+            Debug.Log("New resolution: " + resolution.ToString());
+            //option = resolution.width.ToString() + "x" + resolution.height.ToString() + "@" + resolution.refreshRate;
+            option = resolution.ToString();
+            options.Add(option);
+            resolutionList.Add(resolution);
+
+            if (Screen.width == resolution.width && Screen.height == resolution.height && (resolution.refreshRate == Screen.currentResolution.refreshRate || resolution.refreshRate + 1 == Screen.currentResolution.refreshRate))
             {
+                Debug.Log("Resolution match: " + resolution.ToString() + " at index: " + index.ToString());
                 currentResolutionIndex = index;
             }
+
             index++;
         }
         
-
-        if (maxHeight >= 900)
-        {
-            option = "1600x900";
-            options.Add(option);
-
-            newRes.width = 1600;
-            newRes.height = 900;
-            newRes.refreshRate = Screen.currentResolution.refreshRate;
-            resolutionList.Add(newRes);
-
-            if (Screen.width == 1600 && Screen.height == 900)
-            {
-                currentResolutionIndex = index;
-            }
-            index++;
-        }
-        if (maxHeight >= 1080)
-        {
-            option = "1920x1080";
-            options.Add(option);
-
-            newRes.width = 1920;
-            newRes.height = 1080;
-            newRes.refreshRate = Screen.currentResolution.refreshRate;
-            resolutionList.Add(newRes);
-
-            if (Screen.width == 1920 && Screen.height == 1080)
-            {
-                currentResolutionIndex = index;
-            }
-            index++;
-        }
-        if (maxHeight >= 1440)
-        {
-            option = "2560x1440";
-            options.Add(option);
-
-            newRes.width = 2560;
-            newRes.height = 1440;
-            newRes.refreshRate = Screen.currentResolution.refreshRate;
-            resolutionList.Add(newRes);
-
-            if (Screen.width == 2560 && Screen.height == 1440)
-            {
-                currentResolutionIndex = index;
-            }
-            index++;
-        }
-
         
-
         if (resolutionList.Count > 0)
         {
             resolutions = resolutionList.ToArray();
