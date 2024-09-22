@@ -235,17 +235,24 @@ public class SettingsManager : MonoBehaviour
 
         foreach (Resolution resolution in Screen.resolutions)
         {
-            if (resolutionList.Contains(resolution))
-                continue;
-            Debug.Log("New resolution: " + resolution.ToString());
-            //option = resolution.width.ToString() + "x" + resolution.height.ToString() + "@" + resolution.refreshRate;
-            option = resolution.ToString();
-            options.Add(option);
-            resolutionList.Add(resolution);
+            newRes.width = resolution.width;
+            newRes.height = resolution.height;
+            newRes.refreshRate = Screen.currentResolution.refreshRate;
 
-            if (Screen.width == resolution.width && Screen.height == resolution.height && (resolution.refreshRate == Screen.currentResolution.refreshRate || resolution.refreshRate + 1 == Screen.currentResolution.refreshRate))
+            if (resolutionList.Contains(newRes))
+                continue;
+            Debug.Log("New resolution: " + newRes.ToString());
+            //option = resolution.width.ToString() + "x" + resolution.height.ToString() + "@" + resolution.refreshRate;
+
+            
+            option = newRes.ToString();
+            options.Add(option);
+            resolutionList.Add(newRes);
+
+            //if (Screen.width == resolution.width && Screen.height == resolution.height && (resolution.refreshRate == Screen.currentResolution.refreshRate || resolution.refreshRate + 1 == Screen.currentResolution.refreshRate))
+            if (Screen.width == newRes.width && Screen.height == newRes.height)
             {
-                Debug.Log("Resolution match: " + resolution.ToString() + " at index: " + index.ToString());
+                Debug.Log("Resolution match: " + newRes.ToString() + " at index: " + index.ToString());
                 currentResolutionIndex = index;
             }
 
