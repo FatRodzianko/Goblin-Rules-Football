@@ -434,7 +434,8 @@ public class SettingsManager : MonoBehaviour
         }
         else
         {
-            SetResolution(1920, 1080, false);
+            //SetResolution(1920, 1080, false);
+            SetResolution(Screen.currentResolution.width, Screen.currentResolution.width, true);
         }
         if (PlayerPrefs.HasKey(gamepadUIPlayerPrefKey))
         {
@@ -468,5 +469,14 @@ public class SettingsManager : MonoBehaviour
         {
             SetCRTScreenEffect(false);
         }
+    }
+    public void ResetToDefault()
+    {
+        PlayerPrefs.DeleteAll();
+        
+        LoadSettings();
+        SetResolution(Screen.currentResolution.width, Screen.currentResolution.width, true);
+        SetFullscreen(true);
+
     }
 }
