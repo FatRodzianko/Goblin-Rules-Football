@@ -265,6 +265,7 @@ public class SettingsManager : MonoBehaviour
             resolutions = resolutionList.ToArray();
         }
         resolutionDropdown.AddOptions(options);
+        resolutionDropdown.value = 0;
         resolutionDropdown.value = currentResolutionIndex;
         ResolutionDropDown(currentResolutionIndex);
 
@@ -282,13 +283,43 @@ public class SettingsManager : MonoBehaviour
         Debug.Log("SetResolution: " + width.ToString() + "x" + height.ToString() + " " + fullScreen.ToString());
         if (width > 0 && height > 0 && ((width / height) == (1920 / 1080)))
         {
-            if(fullScreen)
+            if (fullScreen)
                 Screen.SetResolution(width, height, FullScreenMode.FullScreenWindow);
             else
                 Screen.SetResolution(width, height, false);
-        }   
+
+            currentScreenWidth = width;
+            currentScreenHeight = height;
+        }
         else
-            Screen.SetResolution(1920, 1080, false);
+        {
+            //Screen.SetResolution(1920, 1080, false);
+            if (fullScreen)
+                Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, FullScreenMode.FullScreenWindow);
+            else
+                Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, false);
+
+            currentScreenWidth = Screen.currentResolution.width;
+            currentScreenHeight = Screen.currentResolution.height;
+
+        }
+        SetResolutionIndex(currentScreenWidth, currentScreenHeight);
+    }
+    void SetResolutionIndex(int width, int height)
+    {
+        Debug.Log("SetResolutionIndex: " + resolutions.Length);
+        if (resolutions.Length > 0)
+        {
+            for (int i = 0; i < resolutions.Length; i++)
+            {
+                if (width == resolutions[i].width && height == resolutions[i].height)
+                {
+                    Debug.Log("SetResolutionIndex: to " + i + " for " + resolutions[i].ToString());
+                    resolutionDropdown.value = i;
+                    break;
+                }
+            }
+        }
     }
     public void SetCRTScreenEffect(bool isCRTEffectOn)
     {
@@ -411,11 +442,13 @@ public class SettingsManager : MonoBehaviour
             if (fullScreenBool == 1 || fullScreenBool == 0)
                 SetFullscreen(Convert.ToBoolean(PlayerPrefs.GetInt(fullScreenPlayerPrefKey)));
             else
-                SetFullscreen(false);
+                SetFullscreen(true);
+            //  SetFullscreen(false);
         }
         else
         {
-            SetFullscreen(false);
+            //SetFullscreen(false);
+            SetFullscreen(true);
         }
         if (PlayerPrefs.HasKey(resolutionWidthPlayerPrefKey) && PlayerPrefs.HasKey(resolutionHeightPlayerPrefKey) && PlayerPrefs.HasKey(fullScreenPlayerPrefKey))
         {
@@ -428,14 +461,15 @@ public class SettingsManager : MonoBehaviour
             }
             else
             {
-                SetResolution(1920, 1080, false);
+                //SetResolution(1920, 1080, false);
+                SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, true);
             }
 
         }
         else
         {
             //SetResolution(1920, 1080, false);
-            SetResolution(Screen.currentResolution.width, Screen.currentResolution.width, true);
+            SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, true);
         }
         if (PlayerPrefs.HasKey(gamepadUIPlayerPrefKey))
         {
@@ -473,10 +507,14 @@ public class SettingsManager : MonoBehaviour
     public void ResetToDefault()
     {
         PlayerPrefs.DeleteAll();
-        
+        Debug.Log("ResetToDefault: Screen.currentResolution.width: " + Screen.currentResolution.width.ToString() + " x Screen.currentResolution.height: " + Screen.currentResolution.height.ToString());
+        //Resolution max = GetMaxResolution();
+        ////SetResolution(Screen.currentResolution.width, Screen.currentResolution.width, true);
+        //SetResolution(max.width, max.width, true);
         LoadSettings();
-        SetResolution(Screen.currentResolution.width, Screen.currentResolution.width, true);
-        SetFullscreen(true);
-
+    }
+    Resolution GetMaxResolution()
+    {
+        return Screen.resolutions[Screen.resolutions.Length - 1];
     }
 }

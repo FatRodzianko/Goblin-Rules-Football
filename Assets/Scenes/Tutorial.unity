@@ -96289,10 +96289,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
+    x: 0.3609375
     y: 0
-    width: 1
-    height: 1
+    width: 0.36944446
+    height: 0.36944443
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 90
@@ -99347,7 +99347,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7777778, y: 1}
+    m_SensorSize: {x: 1.777778, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -139732,7 +139732,7 @@ MonoBehaviour:
   m_LeftClickAction: {fileID: 6966786460067654099, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
   m_MiddleClickAction: {fileID: -6488421050140879094, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
   m_RightClickAction: {fileID: 2908480008050930272, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
-  m_ScrollWheelAction: {fileID: 0}
+  m_ScrollWheelAction: {fileID: -2404361486386570707, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
   m_TrackedDevicePositionAction: {fileID: 0}
   m_TrackedDeviceOrientationAction: {fileID: 0}
   m_DeselectOnBackgroundClick: 0
