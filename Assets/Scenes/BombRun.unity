@@ -781,6 +781,7 @@ MonoBehaviour:
   _unitLayerMask:
     serializedVersion: 2
     m_Bits: 4194304
+  _selectedAction: {fileID: 0}
 --- !u!4 &536453334
 Transform:
   m_ObjectHideFlags: 0

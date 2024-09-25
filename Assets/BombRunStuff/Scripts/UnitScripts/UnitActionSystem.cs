@@ -17,6 +17,7 @@ public class UnitActionSystem : MonoBehaviour
 
     // Events
     public event EventHandler<BombRunUnit> OnSelectedUnitChanged;
+    public event EventHandler OnSelectedActionChanged;
 
     private void Awake()
     {
@@ -159,6 +160,7 @@ public class UnitActionSystem : MonoBehaviour
     public void SetSelectedAction(BaseAction baseAction)
     {
         _selectedAction = baseAction;
+        OnSelectedActionChanged?.Invoke(this, EventArgs.Empty);
         Debug.Log("SetSelectedAction: " + baseAction.GetActionName());
     }
     public BombRunUnit GetSelectedUnit()
