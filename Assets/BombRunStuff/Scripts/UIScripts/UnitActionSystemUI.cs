@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using TMPro;
 
 public class UnitActionSystemUI : MonoBehaviour
 {
     [SerializeField] private Transform _actionButtonPrefab;
     [SerializeField] private Transform _actionButtonContainer;
+    [SerializeField] private TextMeshProUGUI _actionPointsText;
 
     private List<ActionButtonUI> _actionButtonUIList = new List<ActionButtonUI>();
 
@@ -15,9 +17,17 @@ public class UnitActionSystemUI : MonoBehaviour
     {
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
+        UnitActionSystem.Instance.OnActionStarted += UnitActionSystem_OnActionStarted;
 
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();
+        UpdateActionPoints();
+    }
+    private void OnDisable()
+    {
+        UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
+        UnitActionSystem.Instance.OnSelectedActionChanged -= UnitActionSystem_OnSelectedActionChanged;
+        UnitActionSystem.Instance.OnActionStarted -= UnitActionSystem_OnActionStarted;
     }
     private void CreateUnitActionButtons(BombRunUnit selectedUnit)
     {
@@ -42,10 +52,15 @@ public class UnitActionSystemUI : MonoBehaviour
     {
         CreateUnitActionButtons(unit);
         UpdateSelectedActionVisual();
+        UpdateActionPoints();
     }
     private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
     {
         UpdateSelectedActionVisual();
+    }
+    private void UnitActionSystem_OnActionStarted(object sender, EventArgs e)
+    {
+        UpdateActionPoints();
     }
     private void UpdateSelectedActionVisual()
     {
@@ -54,6 +69,10 @@ public class UnitActionSystemUI : MonoBehaviour
             actionButtonUI.UpdateSelectedActionVisual();
         }
     }
-
+    private void UpdateActionPoints()
+    {
+        BombRunUnit unit = UnitActionSystem.Instance.GetSelectedUnit();
+        _actionPointsText.text = "Action Points: " + unit.GetActionPoints().ToString();
+    }
 }
 

@@ -19,6 +19,7 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler<BombRunUnit> OnSelectedUnitChanged;
     public event EventHandler OnSelectedActionChanged;
     public event EventHandler<bool> OnBusyChanged;
+    public event EventHandler OnActionStarted;
 
     private void Awake()
     {
@@ -126,12 +127,20 @@ public class UnitActionSystem : MonoBehaviour
             return;
 
         GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
-        if (_selectedAction.IsValidActionGridPosition(mouseGridPosition))
+
+        if (!_selectedAction.IsValidActionGridPosition(mouseGridPosition))
         {
-            SetBusy();
-            _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
+            return;
         }
-        
+        if (!_selectedUnit.TrySpendActionPointsToTakeAction(_selectedAction))
+        {
+            return;
+        }
+
+        SetBusy();
+        _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
+
+        OnActionStarted?.Invoke(this, EventArgs.Empty);
 
         // alternative for take actions to do a switch and call each actions individual method for its action
         //switch (_selectedAction)

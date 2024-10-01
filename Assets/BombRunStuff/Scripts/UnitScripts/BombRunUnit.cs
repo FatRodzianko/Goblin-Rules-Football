@@ -12,6 +12,7 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] MoveAction _moveAction;
     [SerializeField] SpinAction _spinAction;
     [SerializeField] private BaseAction[] _baseActionArray;
+    [SerializeField] private int _actionPoints = 2;
 
     private void Awake()
     {
@@ -49,5 +50,36 @@ public class BombRunUnit : MonoBehaviour
     public BaseAction[] GetBaseActionArray()
     {
         return _baseActionArray;
+    }
+    public bool TrySpendActionPointsToTakeAction(BaseAction baseAction)
+    {
+        if (CanSpendActionPointsToTakeAction(baseAction))
+        {
+            SpendActionPoints(baseAction.GetActionPointsCost());
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    public bool CanSpendActionPointsToTakeAction(BaseAction baseAction)
+    {
+        if (_actionPoints >= baseAction.GetActionPointsCost())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    private void SpendActionPoints(int cost)
+    {
+        _actionPoints -= cost;
+    }
+    public int GetActionPoints()
+    {
+        return _actionPoints;
     }
 }
