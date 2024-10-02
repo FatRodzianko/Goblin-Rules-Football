@@ -18,6 +18,7 @@ public class UnitActionSystemUI : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnActionStarted += UnitActionSystem_OnActionStarted;
+        BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
 
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();
@@ -28,6 +29,7 @@ public class UnitActionSystemUI : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
         UnitActionSystem.Instance.OnSelectedActionChanged -= UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnActionStarted -= UnitActionSystem_OnActionStarted;
+        BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
     }
     private void CreateUnitActionButtons(BombRunUnit selectedUnit)
     {
@@ -73,6 +75,10 @@ public class UnitActionSystemUI : MonoBehaviour
     {
         BombRunUnit unit = UnitActionSystem.Instance.GetSelectedUnit();
         _actionPointsText.text = "Action Points: " + unit.GetActionPoints().ToString();
+    }
+    private void BombRunUnit_OnAnyActionPointsChanged(object sender, EventArgs e)
+    {
+        UpdateActionPoints();
     }
 }
 

@@ -1,9 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BombRunUnit : MonoBehaviour
 {
+    private const int ACTION_POINTS_MAX = 2;
+
+    // static events
+    public static event EventHandler OnAnyActionPointsChanged;
 
     [Header("GridPosition stuff")]
     private GridPosition _gridPosition;
@@ -12,7 +17,7 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] MoveAction _moveAction;
     [SerializeField] SpinAction _spinAction;
     [SerializeField] private BaseAction[] _baseActionArray;
-    [SerializeField] private int _actionPoints = 2;
+    [SerializeField] private int _actionPoints = ACTION_POINTS_MAX;
 
     private void Awake()
     {
@@ -24,6 +29,12 @@ public class BombRunUnit : MonoBehaviour
     {
         _gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
         LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
+
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+    }
+    private void OnDisable()
+    {
+        TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
     }
     private void Update()
     {
@@ -77,9 +88,15 @@ public class BombRunUnit : MonoBehaviour
     private void SpendActionPoints(int cost)
     {
         _actionPoints -= cost;
+        OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
     }
     public int GetActionPoints()
     {
         return _actionPoints;
+    }
+    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
+    {
+        _actionPoints = ACTION_POINTS_MAX;
+        OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
     }
 }
