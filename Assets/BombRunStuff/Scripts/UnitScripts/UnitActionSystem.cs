@@ -162,7 +162,7 @@ public class UnitActionSystem : MonoBehaviour
     private void SetSelectedUnit(BombRunUnit unit)
     {
         this._selectedUnit = unit;
-        SetSelectedAction(unit.GetMoveAction());
+        SetSelectedAction(unit.GetAction<MoveAction>());
 
         OnSelectedUnitChanged?.Invoke(this, _selectedUnit);
         Debug.Log("SetSelectedUnit: " + unit);

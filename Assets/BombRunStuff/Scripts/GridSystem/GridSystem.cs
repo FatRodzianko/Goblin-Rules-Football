@@ -10,7 +10,7 @@ public class GridSystem<TGridObject>
     private float _cellSize;
     private TGridObject[,] _gridObjectArray;
 
-    public GridSystem(int width, int height, float cellsize, Func<GridSystem<TGridObject>, GridPosition, TGridObject> createGridObject)
+    public GridSystem(int width, int height, float cellsize, Func<GridSystem<TGridObject>, GridPosition, TGridObject> createGridObject) // the "Func" thing is a delegate function. Receives a GridSystem of type TGridObject, a GridPosition, and returns a TGridObject. createGridObject is the name of the delegate
     {
         this._width = width;
         this._height = height;
