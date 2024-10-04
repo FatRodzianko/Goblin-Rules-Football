@@ -10,6 +10,9 @@ public class BombRunUnit : MonoBehaviour
     // static events
     public static event EventHandler OnAnyActionPointsChanged;
 
+    [SerializeField] private bool _isEnemy;
+
+
     [Header("GridPosition stuff")]
     private GridPosition _gridPosition;
 
@@ -95,7 +98,16 @@ public class BombRunUnit : MonoBehaviour
     }
     private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
     {
-        _actionPoints = ACTION_POINTS_MAX;
-        OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        if ((this.IsEnemy() && !TurnSystem.Instance.IsPlayerTurn()) || // if the unit IS an enemy and it IS NOT the player's turn aka, the unit is an enemy and it is the enemy turn
+            (!this.IsEnemy() && TurnSystem.Instance.IsPlayerTurn())) // if the unit IS NOT an enemy and it IS the player's turn, aka the unit is the player's and it is the player's turn
+        {
+            _actionPoints = ACTION_POINTS_MAX;
+            OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        }
+        
+    }
+    public bool IsEnemy()
+    {
+        return _isEnemy;
     }
 }

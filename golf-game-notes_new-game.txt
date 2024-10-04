@@ -52,6 +52,57 @@
 - procedurally generate each new "level"?
 - - - also have the enemy squad generated new for each level
 - - - and the enemy's hand
+- "sneak" action
+- - - move half normal distance BUT make no noise, so enemies won't detect you
+- - - have to turn off light/smother torch. Reveal less fog of war as you pass through. Basically only see tiles immediately around you
+- "Low Light Vision"
+- - - without a torch, can only see immediate surroundings
+- - - can faintly see torches in the distance. Fog turns a light grey to show there is a torch, but you can't see what is near the torch/light until you get close
+- - - ability to upgrade low light vision to increase distance you can see lights from, and see farther from your light
+- Other "actions"
+- - - open doors / interact
+- - - - - - dungeons should have multiple paths. Some will be closed off by doors
+- - - - - - unlocked doors can be opened, but they make a noise detectable by enemies
+- - - - - - - - - "grease can" upgrade to lower distance noise from door open travels?
+- - - - - - some doors require multiple "switches" to be opened in different locations to open?
+- - - - - - - - - make the switches have to be opened on the same turn, forcing player to split up group to get by this?
+- - - - - - should try to make it so there is always an "open" path to the end, but it is long and full of enemies? Or maybe not
+- - - unlock doors/pick locks/smash open
+- - - - - - some doors will be locked
+- - - - - - You can choose to smash them open (if you have a heavy unit?), but makes a ton of noise
+- - - - - - blow up door if you have an engineer?
+- - - - - - if you have a lock picker, you can pick the lock
+- Special unit types for special actions
+- - - selected at beginning of game, and can be "won" or trained after completing levels?
+- - - depending on the special unit type, may have some starts lowered for balance?
+- - - - - - lock picker
+- - - - - - - - - picks locks on doors
+- - - - - - - - - does very little combat damage
+- - - - - - engineer
+- - - - - - - - - blows open doors
+- - - - - - - - - dig through some "soft" walls. Makes a lot of noise without upgrades though?
+- - - - - - - - - low combat damage, unless they spent a turn "making grenades" or something?
+- - - - - - - - - - - - using a grenade during a battle will make a lot of noise though
+- - - - - - heavy infantry
+- - - - - - - - - can break down dooors
+- - - - - - - - - extra combat damage
+- - - - - - - - - - - - requires 2 "attack" from an opponents card to kill?
+- - - - - - - - - low movement
+- - - - - - scout
+- - - - - - - - - moves twice as fast
+- - - - - - - - - better low light vision, so can see farther
+- - - - - - - - - less combat damage
+- - - - - - ranged
+- - - - - - - - - more combat damage when acting as a reinforcement
+- - - - - - - - - less combat damage when on the tile being attacked?
+- Instead of battles occuring when players end turn on same tile, they only need to be adjacent?
+- - - can make the rooms a little bigger that way? More room to move in
+- - - direction units were moving in before the battle can cause things to be "flanked" or attacked from behind
+- - - - - - if unit was moving straight forward, and enemy unit is in the tile directly infront of them, direct attack
+- - - - - - if one unit was moving forward toward the battle tile, and the other is moving away, then flank attack?
+- - - - - - - - - the units being flanked do less overall combat damage. Flanking units gain 1 attack/sword to kill units?
+- - - - - - only have a unit be "flanked" if the are moving directly away from the battle site, or left/right, or back and left/right. Diagonal toward the battle site isn't a flank?
+
 # Lore?
 - team of sapper goblins escorting bomb through mines
 - - - need to proect the bomb from attackers

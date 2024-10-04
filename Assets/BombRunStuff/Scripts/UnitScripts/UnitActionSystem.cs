@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 using UnityEngine.EventSystems;
 
 public class UnitActionSystem : MonoBehaviour
@@ -44,6 +45,10 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (_isBusy)
             return;
+        if (!TurnSystem.Instance.IsPlayerTurn())
+        {
+            return;
+        }
 
         //if (InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
         //{
@@ -111,6 +116,12 @@ public class UnitActionSystem : MonoBehaviour
             {
                 return false;
             }
+
+            if (units.Any(x => x.IsEnemy()))
+            {
+                return false;
+            }
+
 
             // later will need to check if multiple units are on a grid position. If so, expand those units to allow player to select individual units?
             SetSelectedUnit(units[0]);
