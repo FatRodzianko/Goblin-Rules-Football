@@ -19,10 +19,11 @@ public class MoveAction : BaseAction
     //} 
 
     [Header("Moving")]
+    [SerializeField] private int _maxMoveDistance = 4;
     private Vector3 _targetPosition;
     private float _moveSpeed = 4f;
     private float _stoppingDistance = 0.05f;
-    [SerializeField] private int _maxMoveDistance = 4;
+    
 
     [Header("Animation")]
     [SerializeField] private Animator _unitAnimator;

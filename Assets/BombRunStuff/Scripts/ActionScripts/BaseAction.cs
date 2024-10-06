@@ -14,6 +14,10 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] protected bool _isActive;
     protected Action _onActionComplete;
 
+    [Header("Action Info")]
+    [SerializeField] private int _actionPointsCost = 1;
+    [SerializeField] private Sprite _actionSymbolSprite;
+
 
     protected virtual void Awake()
     {
@@ -30,6 +34,10 @@ public abstract class BaseAction : MonoBehaviour
     public abstract List<GridPosition> GetValidActionGridPositionList();
     public virtual int GetActionPointsCost()
     {
-        return 1;
+        return _actionPointsCost;
+    }
+    public virtual Sprite GetActionSymbolSprite()
+    {
+        return _actionSymbolSprite;
     }
 }

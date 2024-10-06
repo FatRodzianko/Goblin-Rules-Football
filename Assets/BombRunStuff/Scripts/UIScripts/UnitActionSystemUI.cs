@@ -19,6 +19,7 @@ public class UnitActionSystemUI : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnActionStarted += UnitActionSystem_OnActionStarted;
         BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
 
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();
@@ -30,6 +31,7 @@ public class UnitActionSystemUI : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedActionChanged -= UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnActionStarted -= UnitActionSystem_OnActionStarted;
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
+        TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
     }
     private void CreateUnitActionButtons(BombRunUnit selectedUnit)
     {
@@ -44,6 +46,9 @@ public class UnitActionSystemUI : MonoBehaviour
         // instantiate new button game objects
         foreach (BaseAction baseAction in selectedUnit.GetBaseActionArray())
         {
+            if (!selectedUnit.CanSpendActionPointsToTakeAction(baseAction))
+                continue;
+
             Transform actionButtonTransform = Instantiate(_actionButtonPrefab, _actionButtonContainer);
             ActionButtonUI actionButtonUI = actionButtonTransform.GetComponent<ActionButtonUI>();
             actionButtonUI.SetBaseAction(baseAction);
@@ -52,9 +57,10 @@ public class UnitActionSystemUI : MonoBehaviour
     }
     private void UnitActionSystem_OnSelectedUnitChanged(object sender, BombRunUnit unit)
     {
-        CreateUnitActionButtons(unit);
-        UpdateSelectedActionVisual();
-        UpdateActionPoints();
+        //CreateUnitActionButtons(unit);
+        //UpdateSelectedActionVisual();
+        //UpdateActionPoints();
+        UpdateActionItems();
     }
     private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
     {
@@ -62,7 +68,10 @@ public class UnitActionSystemUI : MonoBehaviour
     }
     private void UnitActionSystem_OnActionStarted(object sender, EventArgs e)
     {
-        UpdateActionPoints();
+        //UpdateActionPoints();
+        //CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
+        //UpdateSelectedActionVisual();
+        UpdateActionItems();
     }
     private void UpdateSelectedActionVisual()
     {
@@ -79,6 +88,19 @@ public class UnitActionSystemUI : MonoBehaviour
     private void BombRunUnit_OnAnyActionPointsChanged(object sender, EventArgs e)
     {
         UpdateActionPoints();
+    }
+    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
+    {
+        if (!TurnSystem.Instance.IsPlayerTurn())
+            return;
+
+        UpdateActionItems();
+    }
+    private void UpdateActionItems()
+    {
+        UpdateActionPoints();
+        CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
+        UpdateSelectedActionVisual();
     }
 }
 

@@ -19,6 +19,7 @@ public class BombRunUnit : MonoBehaviour
     [Header("Actions")]
     [SerializeField] private BaseAction[] _baseActionArray;
     [SerializeField] private int _actionPoints = ACTION_POINTS_MAX;
+    [SerializeField] private List<BaseAction> _actionsTakenThisTurn = new List<BaseAction>();
 
     private void Awake()
     {
@@ -69,6 +70,7 @@ public class BombRunUnit : MonoBehaviour
         if (CanSpendActionPointsToTakeAction(baseAction))
         {
             SpendActionPoints(baseAction.GetActionPointsCost());
+            AddActionTakenThisTurn(baseAction);
             return true;
         }
         else
@@ -102,9 +104,24 @@ public class BombRunUnit : MonoBehaviour
             (!this.IsEnemy() && TurnSystem.Instance.IsPlayerTurn())) // if the unit IS NOT an enemy and it IS the player's turn, aka the unit is the player's and it is the player's turn
         {
             _actionPoints = ACTION_POINTS_MAX;
+            ClearActionsTakenThisTurn();
             OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
         }
         
+    }
+    private void ClearActionsTakenThisTurn()
+    {
+        _actionsTakenThisTurn.Clear();
+    }
+    public void AddActionTakenThisTurn(BaseAction action)
+    {
+        if (action == null)
+            return;
+
+        if (!_actionsTakenThisTurn.Contains(action))
+        {
+            _actionsTakenThisTurn.Add(action);
+        }
     }
     public bool IsEnemy()
     {
