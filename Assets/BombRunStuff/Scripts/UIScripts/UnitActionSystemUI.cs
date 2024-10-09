@@ -87,7 +87,8 @@ public class UnitActionSystemUI : MonoBehaviour
     }
     private void BombRunUnit_OnAnyActionPointsChanged(object sender, EventArgs e)
     {
-        UpdateActionPoints();
+        //UpdateActionPoints();
+        UpdateActionItems();
     }
     private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
     {

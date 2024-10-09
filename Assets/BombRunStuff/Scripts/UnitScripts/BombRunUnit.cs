@@ -10,6 +10,9 @@ public class BombRunUnit : MonoBehaviour
     // static events
     public static event EventHandler OnAnyActionPointsChanged;
 
+    // non-static events
+    public event EventHandler<BaseAction> OnActionTaken;
+
     [SerializeField] private bool _isEnemy;
 
 
@@ -122,6 +125,8 @@ public class BombRunUnit : MonoBehaviour
         {
             _actionsTakenThisTurn.Add(action);
         }
+
+        OnActionTaken?.Invoke(this, action);
     }
     public bool IsEnemy()
     {
