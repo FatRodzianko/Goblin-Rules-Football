@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,9 @@ public class LevelGrid : MonoBehaviour
 
     [SerializeField] private Transform _gridDebugObjectPrefab;
     private GridSystem<GridObject> _gridSystem;
+
+    // events
+    public event EventHandler OnAnyUnitMovedGridPosition;
 
     private void Awake()
     {
@@ -29,9 +33,9 @@ public class LevelGrid : MonoBehaviour
     }
     private void Start()
     {
-        BombRunTileMapManager.Instance.SetGridSystem(_gridSystem);
-        BombRunTileMapManager.Instance.AddFloorTilesFromGridSystem(_gridSystem);
-        BombRunTileMapManager.Instance.AddGridVisualDefaultFromGridSystem(_gridSystem);
+        //BombRunTileMapManager.Instance.SetGridSystem(_gridSystem);
+        //BombRunTileMapManager.Instance.AddFloorTilesFromGridSystem(_gridSystem);
+        //BombRunTileMapManager.Instance.AddGridVisualDefaultFromGridSystem(_gridSystem);
     }
     public void AddUnitAtGridPosition(GridPosition gridPosition, BombRunUnit unit)
     {
@@ -52,6 +56,8 @@ public class LevelGrid : MonoBehaviour
     {
         RemoveUnitAtGridPosition(fromGridPosition, unit);
         AddUnitAtGridPosition(toGridPosition, unit);
+
+        OnAnyUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
     }
     public GridPosition GetGridPositon(Vector3 worldPosition)
     {

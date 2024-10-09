@@ -1,8 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using System;
 
 public class BombRunTileMapManager : MonoBehaviour
 {
@@ -30,6 +30,7 @@ public class BombRunTileMapManager : MonoBehaviour
     [SerializeField] private Tilemap _wallTileMap;
     [SerializeField] private Tilemap _gridVisualTileMap;
     [SerializeField] private Tilemap _actionVisualsTileMap;
+    
 
     [Header("Tiles")]
     [Header("Floor Tiles")]
@@ -42,7 +43,7 @@ public class BombRunTileMapManager : MonoBehaviour
     [SerializeField] private Tile _gridVisualDefaulTile;
     [SerializeField] private Tile _actionVisualTile;
 
-    [Header("Action Visual Colors")]
+    
 
     [Header("Tile List")]
     [SerializeField] private List<GridPosition> _floorTilePositions = new List<GridPosition>();
@@ -73,12 +74,30 @@ public class BombRunTileMapManager : MonoBehaviour
     }
     private void Update()
     {
-        UpdateActionVisuals();
+
     }
     private void Start()
     {
-        
+        // event subscriptions
+        UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
+
+        // get the grid system from LevelGrid that is created during its Awake function
+        //_gridSystem = LevelGrid.Instance.GetGridObjectGridSystem();
+        SetGridSystem(LevelGrid.Instance.GetGridObjectGridSystem());
+
+        // Create all the tiles needed for the grid system
+        AddFloorTilesFromGridSystem(_gridSystem);
+        AddGridVisualDefaultFromGridSystem(_gridSystem);
+
+        // Update the action visuals for the initially selected unit and selected action
+        UpdateActionVisuals();
     }
+    private void OnDisable()
+    {
+        UnitActionSystem.Instance.OnSelectedActionChanged -= UnitActionSystem_OnSelectedActionChanged;
+    }
+
+
     public void SetGridSystem(GridSystem<GridObject> gridSystem)
     {
         _gridSystem = gridSystem;
@@ -195,6 +214,11 @@ public class BombRunTileMapManager : MonoBehaviour
         }
         _actionVisualPositions.Clear();
     }
+    private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
+    {
+        UpdateActionVisuals();
+    }
+
     private void UpdateActionVisuals()
     {
         HideAllActionVisuals();
