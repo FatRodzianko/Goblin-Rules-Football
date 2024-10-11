@@ -80,6 +80,7 @@ public class BombRunTileMapManager : MonoBehaviour
     {
         // event subscriptions
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
+        UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
 
         // get the grid system from LevelGrid that is created during its Awake function
         //_gridSystem = LevelGrid.Instance.GetGridObjectGridSystem();
@@ -92,9 +93,13 @@ public class BombRunTileMapManager : MonoBehaviour
         // Update the action visuals for the initially selected unit and selected action
         UpdateActionVisuals();
     }
+
+    
+
     private void OnDisable()
     {
         UnitActionSystem.Instance.OnSelectedActionChanged -= UnitActionSystem_OnSelectedActionChanged;
+        UnitActionSystem.Instance.OnBusyChanged -= UnitActionSystem_OnBusyChanged;
     }
 
 
@@ -218,7 +223,14 @@ public class BombRunTileMapManager : MonoBehaviour
     {
         UpdateActionVisuals();
     }
-
+    private void UnitActionSystem_OnBusyChanged(object sender, bool busy)
+    {
+        if (busy)
+        {
+            return;
+        }
+        UpdateActionVisuals();
+    }
     private void UpdateActionVisuals()
     {
         HideAllActionVisuals();
