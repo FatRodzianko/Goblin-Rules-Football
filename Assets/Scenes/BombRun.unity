@@ -2222,6 +2222,7 @@ GameObject:
   - component: {fileID: 1494887098}
   - component: {fileID: 1494887097}
   - component: {fileID: 1494887099}
+  - component: {fileID: 1494887100}
   m_Layer: 0
   m_Name: TileMapManager
   m_TagString: Untagged
@@ -2249,22 +2250,6 @@ MonoBehaviour:
   _wallTile: {fileID: 11400000, guid: 8d28aa6e8220e944f93c5313f6fa2965, type: 2}
   _gridVisualDefaulTile: {fileID: 11400000, guid: 554219682278b0a458e54714ce076199, type: 2}
   _actionVisualTile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
-  _gridVisualTypeMaterialList:
-  - gridVisualType: 0
-    color: {r: 1, g: 1, b: 1, a: 1}
-    tile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
-  - gridVisualType: 1
-    color: {r: 0, g: 0, b: 1, a: 1}
-    tile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
-  - gridVisualType: 2
-    color: {r: 1, g: 0, b: 0, a: 1}
-    tile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
-  - gridVisualType: 3
-    color: {r: 1, g: 1, b: 0, a: 1}
-    tile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
-  - gridVisualType: 4
-    color: {r: 1, g: 0.22822624, b: 0, a: 0.5882353}
-    tile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
 --- !u!4 &1494887098
 Transform:
   m_ObjectHideFlags: 0
@@ -2294,6 +2279,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selectedTileVisualTileMap: {fileID: 919384927}
   _selectedTileVisualTile: {fileID: 11400000, guid: 1ed2be25b5534834789e669c7c67c82f, type: 2}
+--- !u!114 &1494887100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494887096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04e0a0c75eab3fd42aaadcf80e88f62c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _actionVisualsTileMap: {fileID: 2138507409}
+  _actionVisualTile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
+  _gridVisualTypeColorList:
+  - gridVisualType: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+    tile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
+  - gridVisualType: 1
+    color: {r: 0, g: 0, b: 1, a: 1}
+    tile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
+  - gridVisualType: 2
+    color: {r: 1, g: 0, b: 0, a: 1}
+    tile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
+  - gridVisualType: 3
+    color: {r: 1, g: 1, b: 0, a: 1}
+    tile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
+  - gridVisualType: 4
+    color: {r: 1, g: 0, b: 0, a: 0.19607843}
+    tile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
 --- !u!1 &1539402877
 GameObject:
   m_ObjectHideFlags: 0

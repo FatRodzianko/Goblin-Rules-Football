@@ -8,29 +8,12 @@ public class BombRunTileMapManager : MonoBehaviour
 {
     public static BombRunTileMapManager Instance { get; private set; }
 
-    [Serializable]
-    public struct GridVisualTypeColor
-    {
-        public GridVisualType gridVisualType;
-        public Color color;
-        public Tile tile;
-    }
-    public enum GridVisualType
-    {
-        White,
-        Blue,
-        Red,
-        Yellow,
-        RedSoft
-    }
-
 
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _floorTileMap;
     [SerializeField] private Tilemap _wallTileMap;
     [SerializeField] private Tilemap _gridVisualTileMap;
-    [SerializeField] private Tilemap _actionVisualsTileMap;
-    
+    [SerializeField] private Tilemap _actionVisualsTileMap;    
 
     [Header("Tiles")]
     [Header("Floor Tiles")]
@@ -41,20 +24,14 @@ public class BombRunTileMapManager : MonoBehaviour
 
     [Header("Grid Visual Tiles")]
     [SerializeField] private Tile _gridVisualDefaulTile;
-    [SerializeField] private Tile _actionVisualTile;
-
-    
+    [SerializeField] private Tile _actionVisualTile;    
 
     [Header("Tile List")]
     [SerializeField] private List<GridPosition> _floorTilePositions = new List<GridPosition>();
     [SerializeField] private List<GridPosition> _wallTilePositions = new List<GridPosition>();
-    [SerializeField] private List<GridPosition> _actionVisualPositions = new List<GridPosition>();
-
 
     [Header("Grid System Stuff")]
     [SerializeField] private GridSystem<GridObject> _gridSystem;
-
-    [SerializeField] private List<GridVisualTypeColor> _gridVisualTypeMaterialList;
 
 
     private void Awake()
@@ -78,10 +55,6 @@ public class BombRunTileMapManager : MonoBehaviour
     }
     private void Start()
     {
-        // event subscriptions
-        UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
-        UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
-
         // get the grid system from LevelGrid that is created during its Awake function
         //_gridSystem = LevelGrid.Instance.GetGridObjectGridSystem();
         SetGridSystem(LevelGrid.Instance.GetGridObjectGridSystem());
@@ -89,17 +62,11 @@ public class BombRunTileMapManager : MonoBehaviour
         // Create all the tiles needed for the grid system
         AddFloorTilesFromGridSystem(_gridSystem);
         AddGridVisualDefaultFromGridSystem(_gridSystem);
-
-        // Update the action visuals for the initially selected unit and selected action
-        UpdateActionVisuals();
-    }
-
-    
+    }    
 
     private void OnDisable()
     {
-        UnitActionSystem.Instance.OnSelectedActionChanged -= UnitActionSystem_OnSelectedActionChanged;
-        UnitActionSystem.Instance.OnBusyChanged -= UnitActionSystem_OnBusyChanged;
+
     }
 
 
@@ -144,16 +111,6 @@ public class BombRunTileMapManager : MonoBehaviour
     public void AddGridVisualToGridPosition(GridPosition gridPosition, Tile gridVisual)
     {
         _gridVisualTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), gridVisual);
-    }
-    public void AddActionVisualToGridPosition(GridPosition gridPosition, Tile gridVisual, Color color)
-    {
-        gridVisual.color = color;
-        _actionVisualsTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), gridVisual);
-        _actionVisualPositions.Add(gridPosition);
-    }
-    public void RemoveActionVisualToGridPosition(GridPosition gridPosition)
-    {
-        _actionVisualsTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), null);
     }
     public void AddWallsOutSideOfFloors()
     {
@@ -203,40 +160,5 @@ public class BombRunTileMapManager : MonoBehaviour
         {
             _wallTilePositions.Add(gridPosition);
         }
-    }
-    public void ShowActionVisualsFromList(List<GridPosition> gridPositions, Tile gridVisual, Color color)
-    {
-        foreach (GridPosition gridPosition in gridPositions)
-        {
-            AddActionVisualToGridPosition(gridPosition, gridVisual, color);
-        }
-    }
-    public void HideAllActionVisuals()
-    {
-        foreach (GridPosition gridPosition in _actionVisualPositions)
-        {
-            RemoveActionVisualToGridPosition(gridPosition);
-        }
-        _actionVisualPositions.Clear();
-    }
-    private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
-    {
-        UpdateActionVisuals();
-    }
-    private void UnitActionSystem_OnBusyChanged(object sender, bool busy)
-    {
-        if (busy)
-        {
-            return;
-        }
-        UpdateActionVisuals();
-    }
-    private void UpdateActionVisuals()
-    {
-        HideAllActionVisuals();
-
-        List<GridPosition> actionVisualPositions = UnitActionSystem.Instance.GetSelectedAction().GetValidActionGridPositionList();
-        
-        ShowActionVisualsFromList(actionVisualPositions, _actionVisualTile, Color.white);
     }
 }

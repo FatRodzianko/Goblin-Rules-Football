@@ -45,8 +45,10 @@ public class BombRunUnit : MonoBehaviour
         if (newGridPosition != _gridPosition)
         {
             // unit changed grid position
-            LevelGrid.Instance.UnitMovedGridPosition(this, _gridPosition, newGridPosition);
+            GridPosition oldGridPosition = _gridPosition;
             _gridPosition = newGridPosition;
+            LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
+            
         }
     }
     public T GetAction<T>() where T : BaseAction

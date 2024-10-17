@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class DefendAction : BaseAction
 {
+    [SerializeField] private int _maxReinforceDistance = 1;
     public override string GetActionName()
     {
         return "Defend";
@@ -30,5 +31,9 @@ public class DefendAction : BaseAction
     {
         _isActive = false;
         _onActionComplete();
+    }
+    public int GetMaxReinforceDistance()
+    {
+        return _maxReinforceDistance;
     }
 }
