@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public struct GridPosition : IEquatable<GridPosition>
 {
@@ -48,5 +49,13 @@ public struct GridPosition : IEquatable<GridPosition>
     public static GridPosition operator -(GridPosition a, GridPosition b)
     {
         return new GridPosition(a.x - b.x, a.y - b.y);
+    }
+    public static int Distance(GridPosition a, GridPosition b)
+    {
+        int distX = Mathf.Abs(a.x - b.x);
+        int distZ = Mathf.Abs(a.y - b.y);
+        int orthogonal = Mathf.Min(distX, distZ);
+        int diagonal = Mathf.Max(distX, distZ) - orthogonal;
+        return orthogonal * 10 + diagonal * 14;
     }
 }

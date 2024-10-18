@@ -6,6 +6,7 @@ using UnityEngine;
 public class DefendAction : BaseAction
 {
     [SerializeField] private int _maxReinforceDistance = 1;
+    [SerializeField] private int _enemyNearbyDistance = 3;
     public override string GetActionName()
     {
         return "Defend";
@@ -35,5 +36,40 @@ public class DefendAction : BaseAction
     public int GetMaxReinforceDistance()
     {
         return _maxReinforceDistance;
+    }
+    public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    {
+        int unitsNearby = GetNumberOfNearbyEnemyUnits(gridPosition);
+        return new BombRunEnemyAIAction
+        {
+            GridPosition = gridPosition,
+            ActionValue = unitsNearby * 5,
+        };
+    }
+    private int GetNumberOfNearbyEnemyUnits(GridPosition gridPosition)
+    {
+        int unitsNearby = 0;
+        
+        List<BombRunUnit> units = new List<BombRunUnit>();
+
+        if (this._unit.IsEnemy())
+        {
+            units.AddRange(BombRunUnitManager.Instance.GetFriendlyUnitList());
+        }
+        else
+        {
+            units.AddRange(BombRunUnitManager.Instance.GetEnemyUnitList());
+        }
+
+        foreach (BombRunUnit unit in units)
+        {
+            int gridDistance = GridPosition.Distance(gridPosition, unit.GetGridPosition());
+            if (gridDistance <= _enemyNearbyDistance)
+            {
+                unitsNearby++;
+            }
+        }
+
+        return unitsNearby;
     }
 }

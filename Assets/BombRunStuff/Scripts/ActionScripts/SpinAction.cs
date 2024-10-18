@@ -55,4 +55,12 @@ public class SpinAction : BaseAction
             unitGridPosition
         };
     }
+    public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    {
+        return new BombRunEnemyAIAction
+        {
+            GridPosition = this._unit.GetGridPosition(),
+            ActionValue = 0,
+        };
+    }
 }
