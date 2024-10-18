@@ -9,6 +9,8 @@ public class BombRunUnit : MonoBehaviour
 
     // static events
     public static event EventHandler OnAnyActionPointsChanged;
+    public static event EventHandler OnAnyUnitSpawned;
+    public static event EventHandler OnAnyUnitDied;
 
     // non-static events
     public event EventHandler<BaseAction> OnActionTaken;
@@ -34,6 +36,8 @@ public class BombRunUnit : MonoBehaviour
         LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
 
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+
+        OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
     }
     private void OnDisable()
     {
@@ -133,5 +137,24 @@ public class BombRunUnit : MonoBehaviour
     public bool IsEnemy()
     {
         return _isEnemy;
+    }
+    private void KillUnit()
+    {
+        LevelGrid.Instance.RemoveUnitAtGridPosition(this._gridPosition, this);
+
+        Destroy(this.gameObject);
+
+        OnAnyUnitDied?.Invoke(this, EventArgs.Empty);
+    }
+    public SpinAction GetSpinAction()
+    {
+        for (int i = 0; i < _baseActionArray.Length; i++)
+        {
+            if (_baseActionArray[i] is SpinAction)
+            {
+                return (SpinAction)_baseActionArray[i];
+            }
+        }
+        return null;
     }
 }
