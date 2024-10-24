@@ -23,7 +23,7 @@ public class GridSystem<TGridObject>
             for (int y = 0; y < _height; y++)
             {
                 GridPosition gridPosition = new GridPosition(x, y);
-                _gridObjectArray[x, y] = createGridObject(this, gridPosition);
+                _gridObjectArray[x, y] = createGridObject(this, gridPosition); // using the delegate function createGridObject to create the grid object
             }
         }
     }

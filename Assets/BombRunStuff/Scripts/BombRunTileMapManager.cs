@@ -161,4 +161,12 @@ public class BombRunTileMapManager : MonoBehaviour
             _wallTilePositions.Add(gridPosition);
         }
     }
+    public List<GridPosition> GetFloorGridPositions()
+    {
+        return _floorTilePositions;
+    }
+    public List<GridPosition> GetWallGridPositions()
+    {
+        return _wallTilePositions;
+    }
 }
