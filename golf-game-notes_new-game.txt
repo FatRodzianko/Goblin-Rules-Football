@@ -176,3 +176,9 @@ x Have a unit that is on the grid
 - - - maybe relavent to performance? Fastest way to iterate over a List/Array in C# is: for loop with Length/Count cached in variable
 - - - - - - for (int i = 0, n = collection.Count; i < n; i++) { /*...*/ }
 - - - - - - https://www.reddit.com/r/dotnet/comments/ovscq7/performance_comparison_of_iteration_methods_over/
+- precompute and cache grid neighbors when creating the path nodes?
+- - - Add _neighborList to the pathnode class
+- - - would need to remember to add neighbors if a new node became walkable or something? Like if players dug through wall
+- - - - - - find neighbors for the new node
+- - - - - - then go through each new neighbor, tell them to add the new node to their neighborList (unless the new node is already in the list)
+- - - same for remembering to remove a neighbor if it became unblockable

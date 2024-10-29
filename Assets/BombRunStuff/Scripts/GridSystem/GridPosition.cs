@@ -53,9 +53,9 @@ public struct GridPosition : IEquatable<GridPosition>
     public static int Distance(GridPosition a, GridPosition b)
     {
         int distX = Mathf.Abs(a.x - b.x);
-        int distZ = Mathf.Abs(a.y - b.y);
-        int orthogonal = Mathf.Min(distX, distZ);
-        int diagonal = Mathf.Max(distX, distZ) - orthogonal;
+        int distY = Mathf.Abs(a.y - b.y);
+        int orthogonal = Mathf.Min(distX, distY);
+        int diagonal = Mathf.Max(distX, distY) - orthogonal;        
         return orthogonal * 10 + diagonal * 14;
     }
 }
