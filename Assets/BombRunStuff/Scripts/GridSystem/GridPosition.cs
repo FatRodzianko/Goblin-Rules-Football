@@ -3,6 +3,9 @@ using UnityEngine;
 
 public struct GridPosition : IEquatable<GridPosition>
 {
+    private const int MOVE_STRAIGHT_COST = 10;
+    private const int MOVE_DIAGONAL_COST = 14;
+
     public int x;
     public int y;
 
@@ -55,7 +58,27 @@ public struct GridPosition : IEquatable<GridPosition>
         int distX = Mathf.Abs(a.x - b.x);
         int distY = Mathf.Abs(a.y - b.y);
         int orthogonal = Mathf.Min(distX, distY);
-        int diagonal = Mathf.Max(distX, distY) - orthogonal;        
-        return orthogonal * 10 + diagonal * 14;
+        int diagonal = Mathf.Max(distX, distY) - orthogonal;
+        return orthogonal * MOVE_STRAIGHT_COST + diagonal * MOVE_DIAGONAL_COST;
     }
+    public static int CalculateDistance(GridPosition a, GridPosition b)
+    {
+        GridPosition gridPositionDistance = a - b;
+        int distance = Mathf.Abs(gridPositionDistance.x) + Mathf.Abs(gridPositionDistance.y);
+
+        // Get the "x distance" and "z distance." Basically how far do you need to move in the X axis and how far do you move in the Z axis to get from point a to b
+        int xDistance = Mathf.Abs(gridPositionDistance.x);
+        int yDistance = Mathf.Abs(gridPositionDistance.y);
+
+        // get the distance that will be traveled diagonally by getting the "overlap" between the x and z distances.
+        // Ex.: If you move to a position that is 1 distance on the x and 2 on the z, then you'd go diagonally 1 time, then straight 1 additional time
+        // Ex.: if you moved 2 on x, and 5 on z, 
+        int diagonalDistance = Mathf.Min(xDistance, yDistance);
+
+        // Get the remaining "Straight" distance by subtracting the x distance from z distance
+        int remainingStraightDistance = Mathf.Abs(xDistance - yDistance);
+
+        return (diagonalDistance * MOVE_DIAGONAL_COST) + (remainingStraightDistance * MOVE_STRAIGHT_COST);
+    }
+
 }

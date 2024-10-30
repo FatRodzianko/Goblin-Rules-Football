@@ -166,8 +166,10 @@ public class MoveAction : BaseAction
 
             int numberOfEnemiesOnPosition = LevelGrid.Instance.GetUnitListAtGridPosition(enemyGridPosition).Count;
             int numberOfFriendlyUnits = LevelGrid.Instance.GetUnitListAtGridPosition(gridPosition).Count + LevelGrid.Instance.GetUnitListAtGridPosition(_unit.GetGridPosition()).Count;
-            int distanceFromEnemy = GridPosition.Distance(gridPosition, enemyGridPosition);
-
+            int distanceFromEnemy = GridPosition.CalculateDistance(gridPosition, enemyGridPosition);
+            //int otherDistance = GridPosition.CalculateDistance(gridPosition, enemyGridPosition);
+            //Debug.Log("GetActionValueOfMove: distance calculations: Positions: " + gridPosition.ToString() + ":" + enemyGridPosition.ToString() + " distances: " + distanceFromEnemy.ToString() + " : " + otherDistance.ToString());
+                 
 
             int newActionValue = 100 + ((numberOfFriendlyUnits - numberOfEnemiesOnPosition) * 100) - distanceFromEnemy;
 

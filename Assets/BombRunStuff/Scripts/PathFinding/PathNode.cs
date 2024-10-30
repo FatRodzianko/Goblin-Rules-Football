@@ -54,4 +54,12 @@ public class PathNode
     {
         return _gridPosition;
     }
+    public void SetCameFromPathNode(PathNode node)
+    {
+        _cameFromPathNode = node;
+    }
+    public PathNode GetCameFromPathNode()
+    {
+        return _cameFromPathNode;
+    }
 }

@@ -63,7 +63,7 @@ public class DefendAction : BaseAction
 
         foreach (BombRunUnit unit in units)
         {
-            int gridDistance = GridPosition.Distance(gridPosition, unit.GetGridPosition());
+            int gridDistance = GridPosition.CalculateDistance(gridPosition, unit.GetGridPosition());
             if (gridDistance <= _enemyNearbyDistance)
             {
                 unitsNearby++;

@@ -5,7 +5,7 @@ using UnityEngine;
 public class PathFinding : MonoBehaviour
 {
     private const int MOVE_STRAIGHT_COST = 10;
-    private const int MOVE_DIAGONAL_COST = 10;
+    private const int MOVE_DIAGONAL_COST = 14;
 
     [SerializeField] private Transform _gridDebugObjectPrefab;
     private int _width;
@@ -22,7 +22,7 @@ public class PathFinding : MonoBehaviour
 
         _gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
     }
-    public List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition)
+    public List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
     {
         List<PathNode> openList = new List<PathNode>(); // used for nodes waiting to be searched
         List<PathNode> closedList = new List<PathNode>(); // used for nodes that have already been searched
@@ -60,12 +60,14 @@ public class PathFinding : MonoBehaviour
         // search for a path until the openList count is 0
         while (openList.Count > 0)
         {
+            // set the current node to the node in the list with the lowest f cost. The node with the lowest f cost is what we'd want to prioritize in path calculations?
             PathNode currentNode = GetLowestFCostPathNode(openList);
 
             // check if this is the current node is at the end node
             if (currentNode == endNode)
             {
                 // reach final node
+                pathLength = endNode.GetFCost();
                 return CalculatePath(endNode);
             }
 
@@ -74,16 +76,66 @@ public class PathFinding : MonoBehaviour
             closedList.Add(currentNode);
 
             // Get Neighbors to search through
+            // consider "caching" neighbor nodes in the nodes themselves so this doesn't need to be recalculated every time? When the path nodes are created, get all the neighbor nodes for each node?
+            foreach (PathNode neighborNode in GetNeighborList(currentNode))
+            {
+                // check if the neighborNode is already in closed list. If it is, it was already searched and can be skippeed
+                if (closedList.Contains(neighborNode))
+                {
+                    continue;
+                }
+
+                // Get the tenative G cost of the neighbor node by taking the current node's g cost, and then adding the distance to the neighbor node.
+                // this should be currentNode.gCost + 10 if it is adjacent to the current node, and currentNode.gCost + 14 if it is diagonal to the current node
+                int distanceToNeighborNode = CalculateDistance(currentNode.GetGridPosition(), neighborNode.GetGridPosition());
+                int tentativeGCost = currentNode.GetGCost() + distanceToNeighborNode;
+
+                // Check if the tenative Gcost is lower than the neighbor node's current g cost. If it is, update the nodes "came from path node" value as well as it's G, H, and F costs
+                // if the tenative g cost is lower than the neighbor node's current g cost, that means a better/shorter path was found to the neighbor node
+                // example: Before the path was two "straight" movements, like up then right, for a movement cost of 20. The new tenative g cost is a direct diagonal going up/right, for a cost of 14
+                if (tentativeGCost < neighborNode.GetGCost())
+                {
+                    neighborNode.SetCameFromPathNode(currentNode);
+                    neighborNode.SetGCost(tentativeGCost);
+                    neighborNode.SetHCost(distanceToNeighborNode);
+                    neighborNode.CalculateFCost();
+
+                    // add the neighbor node to the open list of nodes to check
+                    if (!openList.Contains(neighborNode))
+                    {
+                        openList.Add(neighborNode);
+                    }
+                }
+            }
         }
 
-        return new List<GridPosition>();
+        // If you are here, no path was found to the end grid position
+        pathLength = 0;
+        return null;
     }
     public int CalculateDistance(GridPosition a, GridPosition b)
     {
-        GridPosition gridPositionDistance = a - b;
-        int distance = Mathf.Abs(gridPositionDistance.x) + Mathf.Abs(gridPositionDistance.y);
-        return distance * MOVE_STRAIGHT_COST;
+        return GridPosition.CalculateDistance(a, b);
     }
+    //public int CalculateDistance(GridPosition a, GridPosition b)
+    //{
+    //    GridPosition gridPositionDistance = a - b;
+    //    int distance = Mathf.Abs(gridPositionDistance.x) + Mathf.Abs(gridPositionDistance.y);
+
+    //    // Get the "x distance" and "z distance." Basically how far do you need to move in the X axis and how far do you move in the Z axis to get from point a to b
+    //    int xDistance = Mathf.Abs(gridPositionDistance.x);
+    //    int yDistance = Mathf.Abs(gridPositionDistance.y);
+
+    //    // get the distance that will be traveled diagonally by getting the "overlap" between the x and z distances.
+    //    // Ex.: If you move to a position that is 1 distance on the x and 2 on the z, then you'd go diagonally 1 time, then straight 1 additional time
+    //    // Ex.: if you moved 2 on x, and 5 on z, 
+    //    int diagonalDistance = Mathf.Min(xDistance, yDistance);
+
+    //    // Get the remaining "Straight" distance by subtracting the x distance from z distance
+    //    int remainingStraightDistance = Mathf.Abs(xDistance - yDistance);
+
+    //    return (diagonalDistance * MOVE_DIAGONAL_COST) + (remainingStraightDistance * MOVE_STRAIGHT_COST);
+    //}
     private PathNode GetLowestFCostPathNode(List<PathNode> pathNodeList)
     {
         PathNode lowestFCostPathNode = pathNodeList[0];
@@ -110,38 +162,48 @@ public class PathFinding : MonoBehaviour
     {
         List<PathNode> neighborList = new List<PathNode>();
 
+        // get grid position of current node
         GridPosition gridPosition = currentNode.GetGridPosition();
 
-        if (gridPosition.x - 1 >= 0)
+        // Check if the "Left" neighbors will be valid by checking if gridPosition.x is greater than 0
+        if (gridPosition.x > 0)
         {
-            // node to the left
+            // get the node directly to the left of the current node by subtracting 1 from the current node's .x position
             neighborList.Add(GetNode(gridPosition.x - 1, gridPosition.y + 0));
+
+            // Diagonal nodes
+            // make sure the "up" node is not at the highest possible value
             if (gridPosition.y + 1 < _gridSystem.GetHeight())
             {
-                // left up
+                // Left Up
                 neighborList.Add(GetNode(gridPosition.x - 1, gridPosition.y + 1));
-            }            
-            if (gridPosition.y - 1 >= 0)
+            }
+            // Make sure the "down" nodes are not below 0
+            if (gridPosition.y > 0)
             {
-                // left down
+                // Left Down
                 neighborList.Add(GetNode(gridPosition.x - 1, gridPosition.y - 1));
             }
-
         }
+
+        // check if the "Right" neighbors will be valid by checking if gridposition.x + 1 is less than the width (+1 because the if the width is 10, the highest x value for the grid will be 9 since grid coordinates start at 0)
         if (gridPosition.x + 1 < _gridSystem.GetWidth())
         {
-            // right
+            // right node
             neighborList.Add(GetNode(gridPosition.x + 1, gridPosition.y + 0));
+
+            // diagonals
             if (gridPosition.y + 1 < _gridSystem.GetHeight())
             {
-                // right up
+                // right Up
                 neighborList.Add(GetNode(gridPosition.x + 1, gridPosition.y + 1));
             }
-            if (gridPosition.y - 1 >= 0)
+            // Make sure the "down" nodes are not below 0
+            if (gridPosition.y > 0)
             {
                 // right down
                 neighborList.Add(GetNode(gridPosition.x + 1, gridPosition.y - 1));
-            }            
+            }
         }
         // up
         if (gridPosition.y + 1 < _gridSystem.GetHeight())
@@ -149,11 +211,38 @@ public class PathFinding : MonoBehaviour
             neighborList.Add(GetNode(gridPosition.x + 0, gridPosition.y + 1));
         }
         // down
-        if (gridPosition.y - 1 >= 0)
+        if (gridPosition.y > 0)
         {
             neighborList.Add(GetNode(gridPosition.x + 0, gridPosition.y - 1));
         }
 
         return neighborList;
+    }
+    private List<GridPosition> CalculatePath(PathNode endNode)
+    {
+        List<PathNode> pathNodeList = new List<PathNode>();
+        pathNodeList.Add(endNode);
+
+        PathNode currentNode = endNode;
+
+        // The starting node will have a "null" value for _cameFromPathNode, so you know you've reached the end of the path when the current node has a null _cameFromPathNode value
+        while (currentNode.GetCameFromPathNode() != null)
+        {
+            // Add the _cameFromPathNode value from the current node to the path list. Then, set the current node to that same _cameFromPathNode value
+            pathNodeList.Add(currentNode.GetCameFromPathNode());
+            currentNode = currentNode.GetCameFromPathNode();
+        }
+
+        // reverse the path node list since it currently has the end node at position 0
+        pathNodeList.Reverse();
+
+        // convert the path nodes to grid positions
+        List<GridPosition> gridPositionList = new List<GridPosition>();
+        foreach (PathNode pathNode in pathNodeList)
+        {
+            gridPositionList.Add(pathNode.GetGridPosition());
+        }
+
+        return gridPositionList;
     }
 }
