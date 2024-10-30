@@ -15,10 +15,21 @@ public class TestingBombRun : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            //List<GridPosition> movePositions = _unit.GetMoveAction().GetValidActionGridPositionList();
-            //List<GridPosition> movePositions = UnitActionSystem.Instance.GetSelectedUnit().GetMoveAction().GetValidActionGridPositionList();
-            //BombRunTileMapManager.Instance.HideAllActionVisuals();
-            //BombRunTileMapManager.Instance.ShowActionVisualsFromList(movePositions, _actionVisualTile, Color.white);
+            GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
+            GridPosition startGridPosition = new GridPosition(0, 0);
+
+            
+            List<GridPosition> pathGridPositionList = PathFinding.Instance.FindPath(startGridPosition, mouseGridPosition, out int pathLength);
+
+            for (int i = 0, n = pathGridPositionList.Count - 1; i < n; i++)
+            {
+                Debug.DrawLine(
+                    LevelGrid.Instance.GetWorldPosition(pathGridPositionList[i]),
+                    LevelGrid.Instance.GetWorldPosition(pathGridPositionList[i + 1]),
+                    Color.white,
+                    10f
+                    );
+            }
         }
     }
 }

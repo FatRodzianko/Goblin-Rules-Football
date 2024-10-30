@@ -7,6 +7,8 @@ public class PathFinding : MonoBehaviour
     private const int MOVE_STRAIGHT_COST = 10;
     private const int MOVE_DIAGONAL_COST = 14;
 
+    public static PathFinding Instance { get; private set; }
+
     [SerializeField] private Transform _gridDebugObjectPrefab;
     private int _width;
     private int _height;
@@ -17,10 +19,22 @@ public class PathFinding : MonoBehaviour
 
     private void Awake()
     {
+        MakeInstance();
+
         _gridSystem = new GridSystem<PathNode>(10, 10, 2f, 
             (GridSystem<PathNode> g, GridPosition gridPosition) => new PathNode(gridPosition));
 
         _gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
+    }
+    void MakeInstance()
+    {
+        if (Instance != null)
+        {
+            Debug.Log("MakeInstance: more than one PathFinding. Destroying...");
+            Destroy(this);
+            return;
+        }
+        Instance = this;
     }
     public List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
     {
@@ -87,8 +101,7 @@ public class PathFinding : MonoBehaviour
 
                 // Get the tenative G cost of the neighbor node by taking the current node's g cost, and then adding the distance to the neighbor node.
                 // this should be currentNode.gCost + 10 if it is adjacent to the current node, and currentNode.gCost + 14 if it is diagonal to the current node
-                int distanceToNeighborNode = CalculateDistance(currentNode.GetGridPosition(), neighborNode.GetGridPosition());
-                int tentativeGCost = currentNode.GetGCost() + distanceToNeighborNode;
+                int tentativeGCost = currentNode.GetGCost() + CalculateDistance(currentNode.GetGridPosition(), neighborNode.GetGridPosition());
 
                 // Check if the tenative Gcost is lower than the neighbor node's current g cost. If it is, update the nodes "came from path node" value as well as it's G, H, and F costs
                 // if the tenative g cost is lower than the neighbor node's current g cost, that means a better/shorter path was found to the neighbor node
@@ -97,7 +110,7 @@ public class PathFinding : MonoBehaviour
                 {
                     neighborNode.SetCameFromPathNode(currentNode);
                     neighborNode.SetGCost(tentativeGCost);
-                    neighborNode.SetHCost(distanceToNeighborNode);
+                    neighborNode.SetHCost(CalculateDistance(neighborNode.GetGridPosition(), endGridPosition));
                     neighborNode.CalculateFCost();
 
                     // add the neighbor node to the open list of nodes to check
