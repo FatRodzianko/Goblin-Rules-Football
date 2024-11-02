@@ -182,3 +182,14 @@ x Have a unit that is on the grid
 - - - - - - find neighbors for the new node
 - - - - - - then go through each new neighbor, tell them to add the new node to their neighborList (unless the new node is already in the list)
 - - - same for remembering to remove a neighbor if it became unblockable
+
+### For hex grid stuff:
+- Remember to set the cell size to 2x2
+- - - For flat top, the grid's X and Y coordinates are flipped
+- - - - - - So, if the grid position is X:4,Y:6 and you want to convert to world position:
+- - - - - - - - - World position x = 6 * 2 * .75 = 9
+- - - - - - - - - World Position y = 4 * 2 = 8
+- - - - - - - - - when setting the tile on the tilemap then:
+- - - - - - - - - - - - normal: _floorTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _floorTile);
+- - - - - - - - - - - - new for flat top: _floorTileMap.SetTile(new Vector3Int(gridPosition.y, gridPosition.x, 0), _floorTile);
+- - - Pointed top is still normal X and Y in the grid space. Probably easier to just use that...
