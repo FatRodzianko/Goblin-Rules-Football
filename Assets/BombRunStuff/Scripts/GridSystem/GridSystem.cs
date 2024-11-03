@@ -9,6 +9,7 @@ public class GridSystem<TGridObject>
     private int _height;
     private float _cellSize;
     private TGridObject[,] _gridObjectArray;
+   
 
     public GridSystem(int width, int height, float cellsize, Func<GridSystem<TGridObject>, GridPosition, TGridObject> createGridObject) // the "Func" thing is a delegate function. Receives a GridSystem of type TGridObject, a GridPosition, and returns a TGridObject. createGridObject is the name of the delegate
     {
@@ -48,6 +49,7 @@ public class GridSystem<TGridObject>
     }
     public void CreateDebugObjects(Transform debugPrefab)
     {
+        Transform debugObjectHolder = GameObject.FindGameObjectWithTag("DebugObjectHolder").transform;
         for (int x = 0; x < _width; x++)
         {
             for (int y = 0; y < _height; y++)
@@ -55,6 +57,7 @@ public class GridSystem<TGridObject>
                 GridPosition gridPosition = new GridPosition(x, y);
 
                 Transform debugTransform = GameObject.Instantiate(debugPrefab, GetWorldPosition(gridPosition), Quaternion.identity);
+                debugTransform.parent = debugObjectHolder;
                 GridDebugObject gridDebugObject = debugTransform.GetComponent<GridDebugObject>();
                 gridDebugObject.SetGridObject(GetGridObject(gridPosition));
                 gridDebugObject.SetDebugText();

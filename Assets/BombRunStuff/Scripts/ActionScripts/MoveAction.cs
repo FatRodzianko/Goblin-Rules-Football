@@ -22,7 +22,9 @@ public class MoveAction : BaseAction
 
     [Header("Moving")]
     [SerializeField] private int _maxMoveDistance = 4;
+    private List<Vector3> _positionList;
     private Vector3 _targetPosition;
+    private int _currentPositionIndex = 0;
     private float _moveSpeed = 4f;
     private float _stoppingDistance = 0.05f;
     
@@ -31,17 +33,12 @@ public class MoveAction : BaseAction
     [SerializeField] private Animator _unitAnimator;
 
 
-    protected override void Awake()
-    {
-        base.Awake();
-        _targetPosition = this.transform.position;
-    }
     private void Update()
     {
         if (!_isActive)
             return;
 
-
+        _targetPosition = _positionList[_currentPositionIndex];
         if (Vector2.Distance(transform.position, _targetPosition) > _stoppingDistance)
         {
             Vector3 moveDirection = (_targetPosition - this.transform.position).normalized;
@@ -49,14 +46,29 @@ public class MoveAction : BaseAction
         }
         else
         {
-            _isActive = false;
-            _onActionComplete();
+            _currentPositionIndex++;
+            // check if the position index is larger than the position list. If so, action has completed
+            if (_currentPositionIndex >= _positionList.Count())
+            {
+                _isActive = false;
+                _onActionComplete();
+            }
+            
         }
     }
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
+        // Get the path to the end position
+        List<GridPosition> pathGridPositionList =  PathFinding.Instance.FindPath(_unit.GetGridPosition(), gridPosition, out int pathLength);
+        _currentPositionIndex = 0;
+        _positionList = new List<Vector3>();
+
+        foreach (GridPosition pathGridPosition in pathGridPositionList)
+        {
+            _positionList.Add(LevelGrid.Instance.GetWorldPosition(pathGridPosition));
+        }
+
         _onActionComplete = onActionComplete;
-        _targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
         _isActive = true;
     }
     public override List<GridPosition> GetValidActionGridPositionList()
@@ -87,7 +99,22 @@ public class MoveAction : BaseAction
                     // Will need to take into account if the number of selected units would put the testGridPosition above the max units allowed
                     continue;
                 }
-
+                if (!PathFinding.Instance.IsWalkableGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+                if (!PathFinding.Instance.HasPath(unitGridPosition, testGridPosition, out int pathLength))
+                {
+                    continue;
+                }
+                //Debug.Log("GetValidActionGridPositionList: Valid position at: " + testGridPosition.ToString() + " with a length of: " + pathLength.ToString());
+                // Get the length of the path and make sure it does not exceed the unit's max moving distance
+                int pathFindingDistanceMultiplier = 10;
+                if (pathLength > _maxMoveDistance * pathFindingDistanceMultiplier) // pathLength was returned by the HasPath call above. Doing this instead of calling PathFinding.Instance.GetPathLength so that the same path isn't calculated twice
+                {
+                    // path length is too long
+                    continue;
+                }
                 validGridPositionList.Add(testGridPosition);
             }
         }
@@ -166,10 +193,16 @@ public class MoveAction : BaseAction
 
             int numberOfEnemiesOnPosition = LevelGrid.Instance.GetUnitListAtGridPosition(enemyGridPosition).Count;
             int numberOfFriendlyUnits = LevelGrid.Instance.GetUnitListAtGridPosition(gridPosition).Count + LevelGrid.Instance.GetUnitListAtGridPosition(_unit.GetGridPosition()).Count;
-            int distanceFromEnemy = GridPosition.CalculateDistance(gridPosition, enemyGridPosition);
+            // old pre path-finding
+            //int distanceFromEnemy = GridPosition.CalculateDistance(gridPosition, enemyGridPosition);
+            // old pre-pathfinding
+
+            // using path finding to get length of the path to this point
+            int distanceFromEnemy = PathFinding.Instance.GetPathLength(gridPosition, enemyGridPosition);
+
             //int otherDistance = GridPosition.CalculateDistance(gridPosition, enemyGridPosition);
             //Debug.Log("GetActionValueOfMove: distance calculations: Positions: " + gridPosition.ToString() + ":" + enemyGridPosition.ToString() + " distances: " + distanceFromEnemy.ToString() + " : " + otherDistance.ToString());
-                 
+
 
             int newActionValue = 100 + ((numberOfFriendlyUnits - numberOfEnemiesOnPosition) * 100) - distanceFromEnemy;
 

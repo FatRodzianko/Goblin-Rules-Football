@@ -63,6 +63,7 @@ TagManager:
   - MiniGolfWall
   - MiniGolfPipe
   - MapMakerUIManager
+  - DebugObjectHolder
   layers:
   - Default
   - TransparentFX
