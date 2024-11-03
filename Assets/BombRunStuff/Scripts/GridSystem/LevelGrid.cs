@@ -10,13 +10,17 @@ public class LevelGrid : MonoBehaviour
     [SerializeField] private Transform _gridDebugObjectPrefab;
     private GridSystem<GridObject> _gridSystem;
 
+    [SerializeField] private int _width = 10;
+    [SerializeField] private int _height = 10;
+    [SerializeField] private float _cellSize = 2f;
+
     // events
     public event EventHandler OnAnyUnitMovedGridPosition;
 
     private void Awake()
     {
         MakeInstance();
-        _gridSystem = new GridSystem<GridObject>(10, 10, 2f, 
+        _gridSystem = new GridSystem<GridObject>(_width, _height, _cellSize, 
             (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
         //_gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
     }
@@ -33,9 +37,13 @@ public class LevelGrid : MonoBehaviour
     }
     private void Start()
     {
-        //BombRunTileMapManager.Instance.SetGridSystem(_gridSystem);
-        //BombRunTileMapManager.Instance.AddFloorTilesFromGridSystem(_gridSystem);
-        //BombRunTileMapManager.Instance.AddGridVisualDefaultFromGridSystem(_gridSystem);
+        // Set the tiles on the tile maps
+        BombRunTileMapManager.Instance.SetGridSystem(_gridSystem);
+        BombRunTileMapManager.Instance.AddFloorTilesFromGridSystem(_gridSystem);
+        BombRunTileMapManager.Instance.AddGridVisualDefaultFromGridSystem(_gridSystem);
+
+        // Create the pathfinding grid
+        PathFinding.Instance.Setup(_width, _height, _cellSize);
     }
     public void AddUnitAtGridPosition(GridPosition gridPosition, BombRunUnit unit)
     {

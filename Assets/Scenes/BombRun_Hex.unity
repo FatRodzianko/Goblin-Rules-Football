@@ -1081,11 +1081,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 499015226548175057, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 18
+      value: 7.5
       objectReference: {fileID: 0}
     - target: {fileID: 499015226548175057, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8
+      value: 8.89
       objectReference: {fileID: 0}
     - target: {fileID: 499015226548175057, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5117,12 +5117,12 @@ GameObject:
   - component: {fileID: 1701164159}
   - component: {fileID: 1701164158}
   m_Layer: 0
-  m_Name: Grid (1)
+  m_Name: Grid_PointedTop_2x2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!156049354 &1701164158
 Grid:
   m_ObjectHideFlags: 0
@@ -5165,11 +5165,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 499015226548175057, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8
+      value: 10.53
       objectReference: {fileID: 0}
     - target: {fileID: 499015226548175057, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 16
+      value: 4.89
       objectReference: {fileID: 0}
     - target: {fileID: 499015226548175057, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5273,7 +5273,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7777778, y: 1}
+    m_SensorSize: {x: 1, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -5453,8 +5453,8 @@ Camera:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1
-    height: 1
+    width: 0
+    height: 0
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 90
@@ -6994,12 +6994,12 @@ GameObject:
   - component: {fileID: 2064621788}
   - component: {fileID: 2064621787}
   m_Layer: 0
-  m_Name: Grid
+  m_Name: Grid_FlatTop_2x2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!156049354 &2064621787
 Grid:
   m_ObjectHideFlags: 0

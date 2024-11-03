@@ -57,11 +57,11 @@ public class BombRunTileMapManager : MonoBehaviour
     {
         // get the grid system from LevelGrid that is created during its Awake function
         //_gridSystem = LevelGrid.Instance.GetGridObjectGridSystem();
-        SetGridSystem(LevelGrid.Instance.GetGridObjectGridSystem());
+        //SetGridSystem(LevelGrid.Instance.GetGridObjectGridSystem());
 
         // Create all the tiles needed for the grid system
-        AddFloorTilesFromGridSystem(_gridSystem);
-        AddGridVisualDefaultFromGridSystem(_gridSystem);
+        //AddFloorTilesFromGridSystem(_gridSystem);
+        //AddGridVisualDefaultFromGridSystem(_gridSystem);
     }    
 
     private void OnDisable()
@@ -76,6 +76,9 @@ public class BombRunTileMapManager : MonoBehaviour
     }
     public void AddFloorTilesFromGridSystem(GridSystem<GridObject> gridSystem)
     {
+        // Get the walls that were drawn onto the wall tilemap
+        // in the future a different function will generate the level that contains where the walls are?
+        _wallTilePositions = GetWallGridPositionsFromTileMap();
         for (int x = 0; x < gridSystem.GetWidth(); x++)
         {
             for (int y = 0; y < gridSystem.GetHeight(); y++)
@@ -83,12 +86,42 @@ public class BombRunTileMapManager : MonoBehaviour
                 AddFloorTileToGridPosition(new GridPosition(x, y));
             }
         }
-        AddWallsOutSideOfFloors();
+
+        // Can also use this if the level generator generates the floor instead of the walls?
+        //AddWallsOutSideOfFloors();
+    }
+    private List<GridPosition> GetWallGridPositionsFromTileMap()
+    {
+        List<GridPosition> wallPositions = new List<GridPosition>();
+
+        for (int x = 0; x < _gridSystem.GetWidth(); x++)
+        {
+            for (int y = 0; y < _gridSystem.GetHeight(); y++)
+            {
+                if (_wallTileMap.HasTile(new Vector3Int(x, y, 0)))
+                {
+                    Debug.Log("GetWallGridPositionsFromTileMap: found wall tile at: " + x.ToString() + ", " + y.ToString());
+                    wallPositions.Add(new GridPosition(x, y));
+                }
+
+            }
+        }
+        return wallPositions;
     }
     public void AddFloorTileToGridPosition(GridPosition gridPosition)
     {
-        if (gridPosition == new GridPosition(3, 9) || gridPosition == new GridPosition(2, 4))
+        //// for testing that walls are added in for gaps in the floor map
+        //if (gridPosition == new GridPosition(3, 8) || gridPosition == new GridPosition(2, 4) || gridPosition == new GridPosition(5, 2) || gridPosition == new GridPosition(5, 3) || gridPosition == new GridPosition(5, 4))
+        //    return;
+        //// for testing that walls are added in for gaps in the floor map
+
+        if (_wallTilePositions.Contains(gridPosition))
+        {
+            Debug.Log("AddFloorTileToGridPosition: wall tile at: " + gridPosition.ToString() + ". Skipping...");
             return;
+        }
+
+
         _floorTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _floorTile);
         if (!_floorTilePositions.Contains(gridPosition))
         {
@@ -168,5 +201,9 @@ public class BombRunTileMapManager : MonoBehaviour
     public List<GridPosition> GetWallGridPositions()
     {
         return _wallTilePositions;
+    }
+    public bool IsWallOnThisPosition(GridPosition gridPosition)
+    {
+        return _wallTilePositions.Contains(gridPosition);
     }
 }

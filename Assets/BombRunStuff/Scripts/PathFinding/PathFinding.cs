@@ -21,10 +21,10 @@ public class PathFinding : MonoBehaviour
     {
         MakeInstance();
 
-        _gridSystem = new GridSystem<PathNode>(10, 10, 2f, 
-            (GridSystem<PathNode> g, GridPosition gridPosition) => new PathNode(gridPosition));
+        //_gridSystem = new GridSystem<PathNode>(10, 10, 2f, 
+        //    (GridSystem<PathNode> g, GridPosition gridPosition) => new PathNode(gridPosition));
 
-        _gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
+        //_gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
     }
     void MakeInstance()
     {
@@ -36,8 +36,46 @@ public class PathFinding : MonoBehaviour
         }
         Instance = this;
     }
+    public void Setup(int width, int height, float cellSize)
+    {
+        this._width = width;
+        this._height = height;
+        this._cellSize = cellSize;
+
+        _gridSystem = new GridSystem<PathNode>(_width, _height, _cellSize,
+            (GridSystem<PathNode> g, GridPosition gridPosition) => new PathNode(gridPosition));
+
+        _gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
+
+        InitializeIsWalkable();
+    }
+    void InitializeIsWalkable()
+    {
+        for (int x = 0; x < _width; x++)
+        {
+            for (int y = 0; y < _height; y++)
+            {
+                GridPosition gridPosition = new GridPosition(x, y);
+                if (BombRunTileMapManager.Instance.IsWallOnThisPosition(gridPosition))
+                {
+                    GetNode(x, y).SetIsWalkable(false);
+                }
+                else
+                {
+                    GetNode(x, y).SetIsWalkable(true);
+                }
+            }
+        }
+    }
     public List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
     {
+        if (!LevelGrid.Instance.IsValidGridPosition(endGridPosition))
+        {
+            Debug.Log("FindPath: " + endGridPosition.ToString() + " is not a valid position");
+            pathLength = 0;
+            return null;
+        }
+
         List<PathNode> openList = new List<PathNode>(); // used for nodes waiting to be searched
         List<PathNode> closedList = new List<PathNode>(); // used for nodes that have already been searched
 
@@ -96,6 +134,12 @@ public class PathFinding : MonoBehaviour
                 // check if the neighborNode is already in closed list. If it is, it was already searched and can be skippeed
                 if (closedList.Contains(neighborNode))
                 {
+                    continue;
+                }
+                // check if the node is walkable. If not, it is not a valid point on the path
+                if (!neighborNode.IsWalkable())
+                {
+                    closedList.Add(neighborNode);
                     continue;
                 }
 

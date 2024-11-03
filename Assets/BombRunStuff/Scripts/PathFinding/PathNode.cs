@@ -14,6 +14,8 @@ public class PathNode
     // reference to previous node
     private PathNode _cameFromPathNode; // this is the node the algorithm "came from" to reach this node. Used when building out what the final path will be by "walking back" from the final node to each "_cameFrom" node
 
+    private bool _isWalkable = true;
+
     public PathNode(GridPosition gridPosition)
     {
         this._gridPosition = gridPosition;
@@ -61,5 +63,13 @@ public class PathNode
     public PathNode GetCameFromPathNode()
     {
         return _cameFromPathNode;
+    }
+    public bool IsWalkable()
+    {
+        return _isWalkable;
+    }
+    public void SetIsWalkable(bool isWalkable)
+    {
+        this._isWalkable = isWalkable;
     }
 }
