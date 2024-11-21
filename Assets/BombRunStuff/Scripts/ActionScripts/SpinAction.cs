@@ -59,8 +59,8 @@ public class SpinAction : BaseAction
     {
         return new BombRunEnemyAIAction
         {
-            GridPosition = this._unit.GetGridPosition(),
-            ActionValue = 0,
+            _GridPosition = this._unit.GetGridPosition(),
+            _ActionValue = 0,
         };
     }
 }

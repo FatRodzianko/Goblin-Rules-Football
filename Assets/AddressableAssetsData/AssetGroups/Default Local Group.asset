@@ -109,6 +109,18 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/highfalutin-bait_no-gated-reverb-6.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 519ee287a4d5d104ca84232a0c51dfe6
+    m_Address: Assets/SFX/Music/acceptable-smell_03_less-arp_remastered-office.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d63a357072d6c304ea8f3b87cc5f6fd0
+    m_Address: Assets/SFX/Music/jobless-hole-watching_less-bass_03_remastered.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 81e7e6579d94d964d94501698b5d759a
+    m_Address: Assets/SFX/Music/calculating-sense_withOUT-master-compressor_less-chords_remaster-24_officewave-3.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

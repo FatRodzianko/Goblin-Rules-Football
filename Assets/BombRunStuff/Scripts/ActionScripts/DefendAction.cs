@@ -42,8 +42,8 @@ public class DefendAction : BaseAction
         int unitsNearby = GetNumberOfNearbyEnemyUnits(gridPosition);
         return new BombRunEnemyAIAction
         {
-            GridPosition = gridPosition,
-            ActionValue = unitsNearby * 5,
+            _GridPosition = gridPosition,
+            _ActionValue = unitsNearby * 5,
         };
     }
     private int GetNumberOfNearbyEnemyUnits(GridPosition gridPosition)

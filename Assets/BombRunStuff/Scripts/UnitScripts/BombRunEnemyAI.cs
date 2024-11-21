@@ -108,7 +108,7 @@ public class BombRunEnemyAI : MonoBehaviour
             else
             {
                 BombRunEnemyAIAction testEnemyAIAction = baseAction.GetBestEnemyAIAction();
-                if (testEnemyAIAction != null && testEnemyAIAction.ActionValue > bestEnemyAIAction.ActionValue)
+                if (testEnemyAIAction != null && testEnemyAIAction._ActionValue > bestEnemyAIAction._ActionValue)
                 {
                     bestEnemyAIAction = baseAction.GetBestEnemyAIAction();
                     bestBaseAction = baseAction;
@@ -117,7 +117,7 @@ public class BombRunEnemyAI : MonoBehaviour
         }
         if (bestEnemyAIAction != null && enemyUnit.TrySpendActionPointsToTakeAction(bestBaseAction))
         {
-            bestBaseAction.TakeAction(bestEnemyAIAction.GridPosition, onEnemyActionComplete);
+            bestBaseAction.TakeAction(bestEnemyAIAction._GridPosition, onEnemyActionComplete);
             return true;
         }
         else

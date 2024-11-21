@@ -4,6 +4,6 @@ using UnityEngine;
 
 public class BombRunEnemyAIAction
 {
-    public GridPosition GridPosition;
-    public int ActionValue;
+    public GridPosition _GridPosition;
+    public int _ActionValue;
 }

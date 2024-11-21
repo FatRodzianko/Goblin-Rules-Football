@@ -18,6 +18,11 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] private int _actionPointsCost = 1;
     [SerializeField] private Sprite _actionSymbolSprite;
 
+    // Actions
+    public static event EventHandler OnAnyActionStarted;
+    public static event EventHandler OnAnyActionCompleted;
+
+
 
     protected virtual void Awake()
     {
@@ -36,6 +41,21 @@ public abstract class BaseAction : MonoBehaviour
     {
         return _actionPointsCost;
     }
+    protected void ActionStart(Action onActionComplete)
+    {
+        _isActive = true;
+        this._onActionComplete = onActionComplete;
+
+        OnAnyActionStarted?.Invoke(this, EventArgs.Empty);
+    }
+    protected void ActionComplete()
+    {
+        _isActive = false;
+        _onActionComplete();
+
+        OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
+    }
+
     public virtual Sprite GetActionSymbolSprite()
     {
         return _actionSymbolSprite;
@@ -53,7 +73,7 @@ public abstract class BaseAction : MonoBehaviour
         if (enemyAIActionList.Count > 0)
         {
             // sort list by action value?
-            enemyAIActionList.Sort((BombRunEnemyAIAction a, BombRunEnemyAIAction b) => b.ActionValue - a.ActionValue);
+            enemyAIActionList.Sort((BombRunEnemyAIAction a, BombRunEnemyAIAction b) => b._ActionValue - a._ActionValue);
             return enemyAIActionList[0];
         }
         else

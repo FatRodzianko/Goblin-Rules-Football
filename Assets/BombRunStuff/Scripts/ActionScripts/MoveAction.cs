@@ -140,8 +140,8 @@ public class MoveAction : BaseAction
 
         return new BombRunEnemyAIAction
         {
-            GridPosition = gridPosition,
-            ActionValue = actionValue,
+            _GridPosition = gridPosition,
+            _ActionValue = actionValue,
         };
     }
     private List<GridPosition> GetGridPositionsWithEnemyUnits()
