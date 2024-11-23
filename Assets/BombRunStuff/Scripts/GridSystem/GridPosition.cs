@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public struct GridPosition : IEquatable<GridPosition>
@@ -80,5 +81,30 @@ public struct GridPosition : IEquatable<GridPosition>
 
         return (diagonalDistance * MOVE_DIAGONAL_COST) + (remainingStraightDistance * MOVE_STRAIGHT_COST);
     }
+    public static List<GridPosition> GetNeighborGridPositions(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false)
+    {
+        List<GridPosition> neighborGridPositions = new List<GridPosition>();
 
+        for (int x = -distanceFromStartingPosition; x <= distanceFromStartingPosition; x++)
+        {
+            for (int y = -distanceFromStartingPosition; y <= distanceFromStartingPosition; y++)
+            {
+                GridPosition offsetGridPosition = new GridPosition(x, y);
+                GridPosition newNeighborPosition = startingGridPosition + offsetGridPosition;
+
+                // only needed for square grid. Hex grid won't need this?
+                if (makeCircular)
+                {
+                    int testDistance = Mathf.Abs(x) + Mathf.Abs(y);
+                    if (testDistance > distanceFromStartingPosition)
+                    {
+                        continue;
+                    }
+                }                
+
+                neighborGridPositions.Add(newNeighborPosition);
+            }
+        }
+        return neighborGridPositions;
+    }
 }

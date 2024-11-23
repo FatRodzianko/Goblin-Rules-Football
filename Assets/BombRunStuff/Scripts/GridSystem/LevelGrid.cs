@@ -96,4 +96,18 @@ public class LevelGrid : MonoBehaviour
     {
         return _gridSystem;
     }
+    public List<GridPosition> GetValidNeighborGridPositions(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false)
+    {
+        List<GridPosition> allNeighborPositions = GridPosition.GetNeighborGridPositions(startingGridPosition, distanceFromStartingPosition, makeCircular);
+        List<GridPosition> validNeighborPositions = new List<GridPosition>();
+
+        for (int i = 0; i < allNeighborPositions.Count; i++)
+        {
+            if (IsValidGridPosition(allNeighborPositions[i]))
+            {
+                validNeighborPositions.Add(allNeighborPositions[i]);
+            }
+        }
+        return validNeighborPositions;
+    }
 }

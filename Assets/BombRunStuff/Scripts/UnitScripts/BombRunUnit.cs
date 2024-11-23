@@ -70,6 +70,10 @@ public class BombRunUnit : MonoBehaviour
     {
         return _gridPosition;
     }
+    public Vector3 GetWorldPosition()
+    {
+        return this.transform.position;
+    }
     public BaseAction[] GetBaseActionArray()
     {
         return _baseActionArray;
@@ -137,6 +141,11 @@ public class BombRunUnit : MonoBehaviour
     public bool IsEnemy()
     {
         return _isEnemy;
+    }
+    public void Damage(int damage)
+    {
+        if (damage > 0)
+            KillUnit();
     }
     private void KillUnit()
     {
