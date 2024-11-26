@@ -24,6 +24,10 @@ public class UnitSelectedVisual : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChange;
         CheckIfSelectedUnit();
     }
+    private void OnDisable()
+    {
+        UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChange;
+    }
     private void UnitActionSystem_OnSelectedUnitChange(object sender, BombRunUnit unit)
     {
         Debug.Log("UnitActionSystem_OnSelectedUnitChange: " + _unit + " : " + unit);

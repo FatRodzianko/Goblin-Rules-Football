@@ -12,6 +12,7 @@ public class BombRunTileMapManager : MonoBehaviour
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _floorTileMap;
     [SerializeField] private Tilemap _wallTileMap;
+    [SerializeField] private Tilemap _obstaclesTileMap;
     [SerializeField] private Tilemap _gridVisualTileMap;
     [SerializeField] private Tilemap _actionVisualsTileMap;    
 
@@ -29,9 +30,13 @@ public class BombRunTileMapManager : MonoBehaviour
     [Header("Tile List")]
     [SerializeField] private List<GridPosition> _floorTilePositions = new List<GridPosition>();
     [SerializeField] private List<GridPosition> _wallTilePositions = new List<GridPosition>();
+    [SerializeField] private List<GridPosition> _obstalceTilePositions = new List<GridPosition>();
 
     [Header("Grid System Stuff")]
     [SerializeField] private GridSystem<GridObject> _gridSystem;
+
+    [Header("Obstacles")]
+    [SerializeField] private BombRunObstacleManager _bombRunObstacleSpawner;
 
 
     private void Awake()
@@ -78,7 +83,15 @@ public class BombRunTileMapManager : MonoBehaviour
     {
         // Get the walls that were drawn onto the wall tilemap
         // in the future a different function will generate the level that contains where the walls are?
-        _wallTilePositions = GetWallGridPositionsFromTileMap();
+        // OLD
+        //_wallTilePositions = GetWallGridPositionsFromTileMap();
+        // OLD
+
+        ClearWallPositions();
+        ClearObstaclePositions();
+        UpdateWallAndObstaclePositionLists();
+        HideObstacleTileMap();
+
         for (int x = 0; x < gridSystem.GetWidth(); x++)
         {
             for (int y = 0; y < gridSystem.GetHeight(); y++)
@@ -107,6 +120,39 @@ public class BombRunTileMapManager : MonoBehaviour
             }
         }
         return wallPositions;
+    }
+    private void ClearWallPositions()
+    {
+        _wallTilePositions.Clear();
+    }
+    private void ClearObstaclePositions()
+    {
+        _obstalceTilePositions.Clear();
+    }
+    private void UpdateWallAndObstaclePositionLists()
+    {
+        for (int x = 0; x < _gridSystem.GetWidth(); x++)
+        {
+            for (int y = 0; y < _gridSystem.GetHeight(); y++)
+            {
+                Vector3Int newPosition = new Vector3Int(x, y, 0);
+                if (_wallTileMap.HasTile(newPosition))
+                {
+                    Debug.Log("UpdateWallAndObstaclePositionLists: found wall tile at: " + x.ToString() + ", " + y.ToString());
+                    _wallTilePositions.Add(new GridPosition(x, y));
+                }
+                if (_obstaclesTileMap.HasTile(newPosition))
+                {
+                    Debug.Log("UpdateWallAndObstaclePositionLists: found obstacle tile at: " + x.ToString() + ", " + y.ToString());
+                    //_obstalceTilePositions.Add(new GridPosition(x, y));
+                    _bombRunObstacleSpawner.AddObstacleToPosition(new GridPosition(x, y), _obstaclesTileMap.GetTile(newPosition));
+                }
+            }
+        }
+    }
+    private void HideObstacleTileMap()
+    {
+        _obstaclesTileMap.color = new Color(1f, 1f, 1f, 0f);
     }
     public void AddFloorTileToGridPosition(GridPosition gridPosition)
     {

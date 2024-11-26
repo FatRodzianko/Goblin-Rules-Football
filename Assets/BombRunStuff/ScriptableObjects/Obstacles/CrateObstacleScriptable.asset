@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c94200f5a8a619c46ae2e7599dd98780, type: 3}
+  m_Name: CrateObstacleScriptable
+  m_EditorClassIdentifier: 
+  _bombRunObstaclePrefab: {fileID: 5012286597566041423, guid: 957de87dcd662734389105765a37a1df, type: 3}
+  _bombRunObstacleType: 0
+  _tile: {fileID: 11400000, guid: 44fb4f696085f774e8181d1564410992, type: 2}
+  _isDestrucable: 1
+  _isInteractable: 0

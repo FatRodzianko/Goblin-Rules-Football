@@ -110,4 +110,19 @@ public class LevelGrid : MonoBehaviour
         }
         return validNeighborPositions;
     }
+    public void AddObstacleAtGridPosition(GridPosition gridPosition, Transform obstacle)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        gridObject.AddObstacle(obstacle);
+    }
+    public List<Transform> GetObstacleListAtGridPosition(GridPosition gridPosition)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        return gridObject.GetObstacleList();
+    }
+    public void RemoveObstacleAtGridPosition(GridPosition gridPosition, Transform obstacle)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        gridObject.RemoveObstacle(obstacle);
+    }
 }

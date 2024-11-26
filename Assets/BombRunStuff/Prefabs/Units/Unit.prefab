@@ -370,7 +370,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 95177d6dba8cb634e8b9977040bf3f44, type: 3}
-  _maxThrowDistance: 7
+  _maxThrowDistance: 12
   _grenadeProjectilePrefab: {fileID: 8449958251188467104, guid: 6da71e249ebcf6541a508c7537619a78, type: 3}
 --- !u!1 &8876794406186424813
 GameObject:
@@ -455,4 +455,4 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
