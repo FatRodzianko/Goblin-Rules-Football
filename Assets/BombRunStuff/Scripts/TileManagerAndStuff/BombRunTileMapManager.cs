@@ -36,7 +36,7 @@ public class BombRunTileMapManager : MonoBehaviour
     [SerializeField] private GridSystem<GridObject> _gridSystem;
 
     [Header("Obstacles")]
-    [SerializeField] private BombRunObstacleManager _bombRunObstacleSpawner;
+    [SerializeField] private BombRunObstacleManager _bombRunObstacleManager;
 
 
     private void Awake()
@@ -145,7 +145,11 @@ public class BombRunTileMapManager : MonoBehaviour
                 {
                     Debug.Log("UpdateWallAndObstaclePositionLists: found obstacle tile at: " + x.ToString() + ", " + y.ToString());
                     //_obstalceTilePositions.Add(new GridPosition(x, y));
-                    _bombRunObstacleSpawner.AddObstacleToPosition(new GridPosition(x, y), _obstaclesTileMap.GetTile(newPosition));
+                    GridPosition newGridPosition = new GridPosition(x, y);
+                    // spawn the obstacle transform at the grid position. Get the obstacle to spawn based on the tile at that position and the mapping in BombRunObstacleManager
+                    _bombRunObstacleManager.AddObstacleToPosition(newGridPosition, _obstaclesTileMap.GetTile(newPosition));
+                    // Get the transform of the object at the grid position and add to the grid object
+                    Transform obstacleTransform = _bombRunObstacleManager.GetObstacleAtGridPosition(newGridPosition);
                 }
             }
         }
@@ -164,7 +168,7 @@ public class BombRunTileMapManager : MonoBehaviour
         if (_wallTilePositions.Contains(gridPosition))
         {
             Debug.Log("AddFloorTileToGridPosition: wall tile at: " + gridPosition.ToString() + ". Skipping...");
-            return;
+            //return;
         }
 
 
@@ -251,5 +255,9 @@ public class BombRunTileMapManager : MonoBehaviour
     public bool IsWallOnThisPosition(GridPosition gridPosition)
     {
         return _wallTilePositions.Contains(gridPosition);
+    }
+    public bool IsObstacleOnThisPosition(GridPosition gridPosition)
+    {
+        return _bombRunObstacleManager.IsObstacleAtGridPosition(gridPosition);
     }
 }

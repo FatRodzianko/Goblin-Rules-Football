@@ -37,13 +37,28 @@ public class BombRunObstacleManager : MonoBehaviour
         {
             Debug.Log("AddObstacleToPosition: nothing found for " + gridTile.name);
             return;
-        }
-            
+        }            
 
         _obstacleGridPositions.Add(gridPosition);
         Transform obstacleTransform = Instantiate(obstacle.BombRunObstaclePrefab, LevelGrid.Instance.GetWorldPosition(gridPosition), Quaternion.identity);
         _obstaclePositionMapping.Add(new ObstaclePositionMapping(gridPosition, obstacleTransform, obstacle.BombRunObstacleType));
 
+        AddObstacleToGridObject(gridPosition, obstacleTransform);
+    }
+    void AddObstacleToGridObject(GridPosition gridPosition, Transform obstacleTransform)
+    {
+        // currently takes the obstacle transform and adds that to the grid object. Later will likely have a BombRunObstacle class/monobehavior that is added instead
+        if (obstacleTransform == null)
+            return;
+
         LevelGrid.Instance.AddObstacleAtGridPosition(gridPosition, obstacleTransform);
+    }
+    public Transform GetObstacleAtGridPosition(GridPosition gridPostion)
+    {
+        return _obstaclePositionMapping.FirstOrDefault(x => x._GridPosititon == gridPostion)._ObstacleTransform;
+    }
+    public bool IsObstacleAtGridPosition(GridPosition gridPosition)
+    {
+        return _obstaclePositionMapping.Any(x => x._GridPosititon == gridPosition);
     }
 }

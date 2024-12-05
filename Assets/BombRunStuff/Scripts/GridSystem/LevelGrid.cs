@@ -112,6 +112,7 @@ public class LevelGrid : MonoBehaviour
     }
     public void AddObstacleAtGridPosition(GridPosition gridPosition, Transform obstacle)
     {
+        Debug.Log("AddObstacleAtGridPosition: adding: " + obstacle.name + " to: " + gridPosition.ToString());
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.AddObstacle(obstacle);
     }
@@ -124,5 +125,10 @@ public class LevelGrid : MonoBehaviour
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.RemoveObstacle(obstacle);
+    }
+    public bool HasAnyObstacleOnGridPosition(GridPosition gridPosition)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        return gridObject.HasAnyObstacle();
     }
 }
