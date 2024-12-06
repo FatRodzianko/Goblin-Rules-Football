@@ -93,9 +93,9 @@ public class GrenadeProjectile : MonoBehaviour
         // get list of neighbor grid positions for the blast radius
         List<GridPosition> neighborGridPositons = LevelGrid.Instance.GetValidNeighborGridPositions(_targetGridPosition, damageRadius, true);
         neighborGridPositons.Add(_targetGridPosition);
-        DamageUnitsWithGrenade(neighborGridPositons);
+        FindUnitsAndObstaclesHitByGrenade(neighborGridPositons);
     }
-    private void DamageUnitsWithGrenade(List<GridPosition> gridPositions)
+    private void FindUnitsAndObstaclesHitByGrenade(List<GridPosition> gridPositions)
     {
         if (gridPositions.Count < 1)
             return;
@@ -103,13 +103,29 @@ public class GrenadeProjectile : MonoBehaviour
         for (int i = 0; i < gridPositions.Count; i++)
         {
             List<BombRunUnit> units = LevelGrid.Instance.GetUnitListAtGridPosition(gridPositions[i]);
-            if (units.Count < 1)
-                continue;
-            Debug.Log("DamageUnitsWithGrenade: " + units.Count + " units at position: " + gridPositions[i].ToString());
-            for (int x = 0; x < units.Count; x++)
-            {
-                units[x].Damage(grenadeDamage);
-            }
+            DamageUnitsHitByGrenade(units, gridPositions[i]);
+            List<BaseBombRunObstacle> obstacles = LevelGrid.Instance.GetObstacleListAtGridPosition(gridPositions[i]);
+            DamageObstaclessHitByGrenade(obstacles, gridPositions[i]);
+        }
+    }
+    private void DamageUnitsHitByGrenade(List<BombRunUnit> units, GridPosition gridPosition)
+    {
+        if (units.Count < 1)
+            return;
+        Debug.Log("DamageUnitsHitByGrenade: " + units.Count + " units at position: " + gridPosition.ToString());
+        for (int x = 0; x < units.Count; x++)
+        {
+            units[x].Damage(grenadeDamage);
+        }
+    }
+    private void DamageObstaclessHitByGrenade(List<BaseBombRunObstacle> obstacles, GridPosition gridPosition)
+    {
+        if (obstacles.Count < 1)
+            return;
+        Debug.Log("DamageObstaclessHitByGrenade: " + obstacles.Count + " obstacles at position: " + gridPosition.ToString());
+        for (int x = 0; x < obstacles.Count; x++)
+        {
+            obstacles[x].DamageObstacle(grenadeDamage);
         }
     }
     void MoveGrenadeOnTrajectory()

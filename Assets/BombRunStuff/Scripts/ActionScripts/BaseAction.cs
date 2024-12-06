@@ -22,8 +22,6 @@ public abstract class BaseAction : MonoBehaviour
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
 
-
-
     protected virtual void Awake()
     {
         _unit = GetComponent<BombRunUnit>();

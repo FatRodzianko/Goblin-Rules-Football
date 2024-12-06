@@ -11,13 +11,13 @@ public class BombRunObstacleManager : MonoBehaviour
     public struct ObstaclePositionMapping
     {
         public GridPosition _GridPosititon;
-        public Transform _ObstacleTransform;
+        public BaseBombRunObstacle _ObstacleScript;
         public BombRunObstacleType _BombRunObstacleType;
 
-        public ObstaclePositionMapping(GridPosition gridPisition, Transform obstacleTransform, BombRunObstacleType bombRunObstacleType)
+        public ObstaclePositionMapping(GridPosition gridPosition, BaseBombRunObstacle obstacleScript, BombRunObstacleType bombRunObstacleType)
         {
-            this._GridPosititon = gridPisition;
-            this._ObstacleTransform = obstacleTransform;
+            this._GridPosititon = gridPosition;
+            this._ObstacleScript = obstacleScript;
             this._BombRunObstacleType = bombRunObstacleType;
         }
     }
@@ -29,7 +29,22 @@ public class BombRunObstacleManager : MonoBehaviour
     [Header("Scriptable Obstacles")]
     [SerializeField] List<ScriptableBombrunObstacle> _scriptableBombRunObstacles = new List<ScriptableBombrunObstacle>();
 
-    public void AddObstacleToPosition(GridPosition gridPosition, TileBase gridTile)
+    private void Start()
+    {
+        BaseBombRunObstacle.OnAnyObstacleDestroyed += BaseBombRunObstacle_OnAnyObstacleDestroyed;
+    }    
+
+    private void OnDisable()
+    {
+        BaseBombRunObstacle.OnAnyObstacleDestroyed -= BaseBombRunObstacle_OnAnyObstacleDestroyed;
+    }
+    private void BaseBombRunObstacle_OnAnyObstacleDestroyed(object sender, GridPosition gridPosition)
+    {
+        BaseBombRunObstacle obstacle = sender as BaseBombRunObstacle;
+        LevelGrid.Instance.RemoveObstacleAtGridPosition(gridPosition, obstacle);
+        RemoveObstacleToObstaclePositionMapping(gridPosition, obstacle, obstacle.GetBombRunObstacleType());
+    }
+    public void AddObstacleToPositionFromTile(GridPosition gridPosition, TileBase gridTile)
     {
         Debug.Log("AddObstacleToPosition: at position: " + gridPosition.ToString() + " for tile: " + gridTile.name);
         ScriptableBombrunObstacle obstacle = _scriptableBombRunObstacles.FirstOrDefault(x => x.Tile == gridTile);
@@ -41,21 +56,38 @@ public class BombRunObstacleManager : MonoBehaviour
 
         _obstacleGridPositions.Add(gridPosition);
         Transform obstacleTransform = Instantiate(obstacle.BombRunObstaclePrefab, LevelGrid.Instance.GetWorldPosition(gridPosition), Quaternion.identity);
-        _obstaclePositionMapping.Add(new ObstaclePositionMapping(gridPosition, obstacleTransform, obstacle.BombRunObstacleType));
-
-        AddObstacleToGridObject(gridPosition, obstacleTransform);
+        BaseBombRunObstacle obstacleScript = obstacleTransform.GetComponent<BaseBombRunObstacle>();
+        //_obstaclePositionMapping.Add(new ObstaclePositionMapping(gridPosition, obstacleScript, obstacle.BombRunObstacleType));
+        AddObstacleToObstaclePositionMapping(gridPosition, obstacleScript, obstacle.BombRunObstacleType);
+        AddObstacleToGridObject(gridPosition, obstacleScript);
     }
-    void AddObstacleToGridObject(GridPosition gridPosition, Transform obstacleTransform)
+    void AddObstacleToObstaclePositionMapping(GridPosition gridPosition, BaseBombRunObstacle obstacleScript, BombRunObstacleType bombRunObstacleType)
     {
-        // currently takes the obstacle transform and adds that to the grid object. Later will likely have a BombRunObstacle class/monobehavior that is added instead
-        if (obstacleTransform == null)
+        _obstaclePositionMapping.Add(new ObstaclePositionMapping(gridPosition, obstacleScript, bombRunObstacleType));
+    }
+    void RemoveObstacleToObstaclePositionMapping(GridPosition gridPosition, BaseBombRunObstacle obstacleScript, BombRunObstacleType bombRunObstacleType)
+    {
+        if (obstacleScript == null)
             return;
 
-        LevelGrid.Instance.AddObstacleAtGridPosition(gridPosition, obstacleTransform);
+        ObstaclePositionMapping obstacleMapping = _obstaclePositionMapping.FirstOrDefault(x => x._ObstacleScript == obstacleScript && x._GridPosititon == gridPosition);
+        if (_obstaclePositionMapping.Contains(obstacleMapping))
+        {
+            _obstaclePositionMapping.Remove(obstacleMapping);
+            Debug.Log("RemoveObstacleToObstaclePositionMapping: Removed obstacle: " + obstacleScript.name + " from _obstaclePositionMapping at position: " + gridPosition.ToString());
+        }
     }
-    public Transform GetObstacleAtGridPosition(GridPosition gridPostion)
+    void AddObstacleToGridObject(GridPosition gridPosition, BaseBombRunObstacle obstacle)
     {
-        return _obstaclePositionMapping.FirstOrDefault(x => x._GridPosititon == gridPostion)._ObstacleTransform;
+        // currently takes the obstacle transform and adds that to the grid object. Later will likely have a BombRunObstacle class/monobehavior that is added instead
+        if (obstacle == null)
+            return;
+
+        LevelGrid.Instance.AddObstacleAtGridPosition(gridPosition, obstacle);
+    }
+    public BaseBombRunObstacle GetObstacleAtGridPosition(GridPosition gridPostion)
+    {
+        return _obstaclePositionMapping.FirstOrDefault(x => x._GridPosititon == gridPostion)._ObstacleScript;
     }
     public bool IsObstacleAtGridPosition(GridPosition gridPosition)
     {

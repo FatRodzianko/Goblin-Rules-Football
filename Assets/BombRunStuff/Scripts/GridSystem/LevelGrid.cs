@@ -110,21 +110,22 @@ public class LevelGrid : MonoBehaviour
         }
         return validNeighborPositions;
     }
-    public void AddObstacleAtGridPosition(GridPosition gridPosition, Transform obstacle)
+    public void AddObstacleAtGridPosition(GridPosition gridPosition, BaseBombRunObstacle obstacle)
     {
         Debug.Log("AddObstacleAtGridPosition: adding: " + obstacle.name + " to: " + gridPosition.ToString());
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.AddObstacle(obstacle);
     }
-    public List<Transform> GetObstacleListAtGridPosition(GridPosition gridPosition)
+    public List<BaseBombRunObstacle> GetObstacleListAtGridPosition(GridPosition gridPosition)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         return gridObject.GetObstacleList();
     }
-    public void RemoveObstacleAtGridPosition(GridPosition gridPosition, Transform obstacle)
+    public void RemoveObstacleAtGridPosition(GridPosition gridPosition, BaseBombRunObstacle obstacle)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.RemoveObstacle(obstacle);
+        Debug.Log("RemoveObstacleAtGridPosition: Removed obstacle: " + obstacle.name + " at position: " + gridPosition.ToString());
     }
     public bool HasAnyObstacleOnGridPosition(GridPosition gridPosition)
     {

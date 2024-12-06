@@ -8,7 +8,7 @@ public class GridObject
     private GridPosition _gridPosition;
 
     private List<BombRunUnit> _unitList = new List<BombRunUnit>();
-    private List<Transform> _obstacleList = new List<Transform>(); // change this to the obstacle script to be made later?
+    private List<BaseBombRunObstacle> _obstacleList = new List<BaseBombRunObstacle>();
 
     public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
     {
@@ -46,18 +46,18 @@ public class GridObject
     {
         return _unitList.Count > 0;
     }
-    public List<Transform> GetObstacleList()
+    public List<BaseBombRunObstacle> GetObstacleList()
     {
         return _obstacleList;
     }
-    public void AddObstacle(Transform obstacle)
+    public void AddObstacle(BaseBombRunObstacle obstacle)
     {
         if (!_obstacleList.Contains(obstacle))
         {
             _obstacleList.Add(obstacle);
         }
     }
-    public void RemoveObstacle(Transform obstacle)
+    public void RemoveObstacle(BaseBombRunObstacle obstacle)
     {
         if (_obstacleList.Contains(obstacle))
         {

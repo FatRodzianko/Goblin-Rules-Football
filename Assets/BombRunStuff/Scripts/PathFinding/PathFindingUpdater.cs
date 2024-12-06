@@ -1,18 +1,20 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PathFindingUpdater : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        
+        BaseBombRunObstacle.OnAnyObstacleDestroyed += BaseBombRunObstacle_OnAnyObstacleDestroyed;
     }
-
-    // Update is called once per frame
-    void Update()
+    private void OnDisable()
     {
-        
+        BaseBombRunObstacle.OnAnyObstacleDestroyed -= BaseBombRunObstacle_OnAnyObstacleDestroyed;
+    }
+    private void BaseBombRunObstacle_OnAnyObstacleDestroyed(object sender, GridPosition gridPosition)
+    {
+        PathFinding.Instance.SetIsWalkableGridPosition(gridPosition, true);
     }
 }

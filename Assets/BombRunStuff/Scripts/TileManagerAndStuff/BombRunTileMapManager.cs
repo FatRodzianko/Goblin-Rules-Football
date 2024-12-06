@@ -147,9 +147,7 @@ public class BombRunTileMapManager : MonoBehaviour
                     //_obstalceTilePositions.Add(new GridPosition(x, y));
                     GridPosition newGridPosition = new GridPosition(x, y);
                     // spawn the obstacle transform at the grid position. Get the obstacle to spawn based on the tile at that position and the mapping in BombRunObstacleManager
-                    _bombRunObstacleManager.AddObstacleToPosition(newGridPosition, _obstaclesTileMap.GetTile(newPosition));
-                    // Get the transform of the object at the grid position and add to the grid object
-                    Transform obstacleTransform = _bombRunObstacleManager.GetObstacleAtGridPosition(newGridPosition);
+                    _bombRunObstacleManager.AddObstacleToPositionFromTile(newGridPosition, _obstaclesTileMap.GetTile(newPosition));
                 }
             }
         }
