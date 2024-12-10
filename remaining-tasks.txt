@@ -1,5 +1,5 @@
 ### Other "Goblin Sports" games to add:
-- Golf
+x Golf
 - - - Look to recreate something like Golf Story / Mario Golf for GBA
 - - - "OGgolf" looks like basically what I am trying to make...
 - - - - - - https://store.steampowered.com/app/1608820/OGgolf/
@@ -15,6 +15,10 @@
 - - - like Kirby's Dream Course
 - Bowling
 - - - Championship Bowling for NES: https://www.youtube.com/watch?v=txV21zS2PBA
+- - - - - - for sega https://www.youtube.com/watch?v=SkR032GsehY
+- - - Super Bowling SNES: https://www.youtube.com/watch?v=V1wUnqIu95Q
+- - - - - - Description of super bowling. Mentions "golf mode" and "oil distance" to affect ball spin and how far down on the lane the spin "catches"
+- - - - - - - - - https://www.youtube.com/watch?v=w9Tgo8RGzbk&t=27s
 - Basketball:
 - - - Tecmo Basketball: https://www.youtube.com/watch?v=EZYcTUBTpsg
 - - - obviously nba jam

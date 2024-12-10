@@ -200,6 +200,7 @@ GameObject:
   - component: {fileID: 3362271877576885837}
   - component: {fileID: 4184348786050281194}
   - component: {fileID: 2898562228658105131}
+  - component: {fileID: 4589616383332178742}
   m_Layer: 22
   m_Name: Unit
   m_TagString: Untagged
@@ -372,6 +373,22 @@ MonoBehaviour:
   _actionSymbolSprite: {fileID: 21300000, guid: 95177d6dba8cb634e8b9977040bf3f44, type: 3}
   _maxThrowDistance: 12
   _grenadeProjectilePrefab: {fileID: 8449958251188467104, guid: 6da71e249ebcf6541a508c7537619a78, type: 3}
+--- !u!114 &4589616383332178742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4944422538143551182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01bccb6a2dc8f2b469f2ab0514a30db0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unit: {fileID: 0}
+  _isActive: 0
+  _actionPointsCost: 1
+  _actionSymbolSprite: {fileID: 21300000, guid: d395f258769a207428224a76105b5ee8, type: 3}
 --- !u!1 &8876794406186424813
 GameObject:
   m_ObjectHideFlags: 0

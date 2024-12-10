@@ -165,7 +165,7 @@ public class BombRunTileMapManager : MonoBehaviour
 
         if (_wallTilePositions.Contains(gridPosition))
         {
-            Debug.Log("AddFloorTileToGridPosition: wall tile at: " + gridPosition.ToString() + ". Skipping...");
+            //Debug.Log("AddFloorTileToGridPosition: wall tile at: " + gridPosition.ToString() + ". Skipping...");
             //return;
         }
 

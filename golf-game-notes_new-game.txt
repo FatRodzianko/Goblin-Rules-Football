@@ -148,9 +148,9 @@ x Have a unit that is on the grid
 - - - - - - if multiple units are selected, get their available grid positions they can each move to
 - - - - - - check what movement grid positions the multiple units share, if any 
 - - - - - - if there are shared movement grid positions, show those grid positions as possible "moves"
-- Pathfinding to allow unit to move from one grid position to another
+x Pathfinding to allow unit to move from one grid position to another
 - Allow for obstacles/walls on the grid
-- - - pathfinding to navigate around obstacles
+- - x pathfinding to navigate around obstacles
 - "Fog of war" on the grid - only reveal tiles within a certain range of player's units
 - - - black for tiles that have not been navigated to or seen yet. Transparent grey for ones that have been but are no longer in view
 - - - - - - "in view" modifiable by a "view distance" for each unit?

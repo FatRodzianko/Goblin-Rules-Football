@@ -59,6 +59,10 @@ public class GrenadeAction : BaseAction
                 {
                     continue;
                 }
+                if (BombRunTileMapManager.Instance.GetWallGridPositions().Contains(testGridPosition))
+                {
+                    continue;
+                }
                 validGridPositionList.Add(testGridPosition);
             }
         }

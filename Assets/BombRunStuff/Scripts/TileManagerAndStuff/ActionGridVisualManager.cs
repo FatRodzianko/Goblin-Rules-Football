@@ -64,6 +64,7 @@ public class ActionGridVisualManager : MonoBehaviour
     public void AddActionVisualToGridPosition(GridPosition gridPosition, Tile gridVisual, Color color)
     {
         gridVisual.color = color;
+        _actionVisualsTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), null);
         _actionVisualsTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), gridVisual);
         _actionVisualPositions.Add(gridPosition);
     }
@@ -93,6 +94,28 @@ public class ActionGridVisualManager : MonoBehaviour
                     continue;
                 }
                 
+                gridPositionList.Add(testGridPosition);
+            }
+        }
+        ShowActionVisualsFromList(gridPositionList, gridVisualType);
+    }
+    private void ShowGridPositionRangeSquare(GridPosition gridPosition, int range, GridVisualType gridVisualType)
+    {
+        List<GridPosition> gridPositionList = new List<GridPosition>();
+        for (int x = -range; x <= range; x++)
+        {
+            for (int y = -range; y <= range; y++)
+            {
+                GridPosition testGridPosition = gridPosition + new GridPosition(x, y);
+                if (testGridPosition == gridPosition)
+                {
+                    continue;
+                }
+                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+
                 gridPositionList.Add(testGridPosition);
             }
         }
@@ -129,7 +152,7 @@ public class ActionGridVisualManager : MonoBehaviour
     {
         HideAllActionVisuals();
 
-        BombRunUnit unit = UnitActionSystem.Instance.GetSelectedUnit();
+        BombRunUnit selectedUnit = UnitActionSystem.Instance.GetSelectedUnit();
         BaseAction selectedAction = UnitActionSystem.Instance.GetSelectedAction();
 
         GridVisualType gridVisualType;
@@ -143,7 +166,14 @@ public class ActionGridVisualManager : MonoBehaviour
                 gridVisualType = GridVisualType.Blue;
                 break;
             case DefendAction defendAction:
+                gridVisualType = GridVisualType.Blue;
+                break;
+            case GrenadeAction grenadeAction:
+                gridVisualType = GridVisualType.Yellow;
+                break;
+            case SwordAction swordAction:
                 gridVisualType = GridVisualType.Red;
+                ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
                 break;
         }
 
