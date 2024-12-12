@@ -3531,6 +3531,7 @@ MonoBehaviour:
   _obstaclePositionMapping: []
   _scriptableBombRunObstacles:
   - {fileID: 11400000, guid: 5ee1c17a4fcacea4ca3a0bd5de4f8292, type: 2}
+  - {fileID: 11400000, guid: 7e2d9b8cba488844ba591ebf0bc588fb, type: 2}
 --- !u!1 &1539402877
 GameObject:
   m_ObjectHideFlags: 0
