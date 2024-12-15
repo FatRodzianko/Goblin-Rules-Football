@@ -84,6 +84,10 @@ public class BombRunObstacleManager : MonoBehaviour
             return;
 
         LevelGrid.Instance.AddObstacleAtGridPosition(gridPosition, obstacle);
+        if (obstacle.IsInteractable())
+        {
+            LevelGrid.Instance.AddInteractableAtGridPosition(gridPosition, obstacle.GetComponent<BombRunDoor>());
+        }
     }
     public BaseBombRunObstacle GetObstacleAtGridPosition(GridPosition gridPostion)
     {

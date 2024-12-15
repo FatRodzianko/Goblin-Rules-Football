@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5012286597566041423}
   - component: {fileID: 417569609976739657}
+  - component: {fileID: 8709339349430172556}
   m_Layer: 0
   m_Name: DestrucibleCrate
   m_TagString: Untagged
@@ -49,7 +50,27 @@ MonoBehaviour:
   _isDestructible: 1
   _isInteractable: 0
   _bombRunObstacleType: 0
-  _animator: {fileID: 5807462547773922178}
+  _animator: {fileID: 8709339349430172556}
+--- !u!95 &8709339349430172556
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5012286597566041424}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 315dbfa1fb4e203429b004a06ef4da31, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &5012286597766624628
 GameObject:
   m_ObjectHideFlags: 0
@@ -60,8 +81,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5012286597766624626}
   - component: {fileID: 5012286597766624627}
-  - component: {fileID: 5807462547773922178}
-  - component: {fileID: 1859717702605971429}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -136,39 +155,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
---- !u!95 &5807462547773922178
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5012286597766624628}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 315dbfa1fb4e203429b004a06ef4da31, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &1859717702605971429
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5012286597766624628}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8747bf9e682d46d4bbb038d0529c8f1a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _destructibleCrateBombRunObstacle: {fileID: 417569609976739657}
 --- !u!1 &5012286597895555901
 GameObject:
   m_ObjectHideFlags: 0

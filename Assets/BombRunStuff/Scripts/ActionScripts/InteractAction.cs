@@ -47,6 +47,20 @@ public class InteractAction : BaseAction
                 {
                     continue;
                 }
+                // check if an obstacle exists at this point. All interactables will be obstacles?
+                // should separate later in own "interactables" since an obstacle can be an interactable (like a door) but an interactable may not be an obstacle (like a switch on a wall
+                if (!LevelGrid.Instance.HasAnyObstacleOnGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+                BaseBombRunObstacle obstacle = LevelGrid.Instance.GetObstacleAtGridPosition(testGridPosition);
+                bool isInteractable = obstacle.IsInteractable();
+                Debug.Log("InteractAction: GetValidActionGridPositionList: Obstacle: " + obstacle.name + " at grid position: " + testGridPosition.ToString() + " interactable: " + isInteractable.ToString());
+                if (!isInteractable)
+                {
+                    continue;
+                }
+
 
                 validGridPositionList.Add(testGridPosition);
             }
@@ -57,6 +71,10 @@ public class InteractAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
         Debug.Log("TakeAction: Interact");
+
+        BombRunDoor interactable = LevelGrid.Instance.GetInteractableAtGridPosition(gridPosition);
+        interactable.Interact();
+
         ActionStart(onActionComplete);
     }
 }

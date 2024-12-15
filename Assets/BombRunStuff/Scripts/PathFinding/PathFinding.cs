@@ -56,8 +56,13 @@ public class PathFinding : MonoBehaviour
             for (int y = 0; y < _height; y++)
             {
                 GridPosition gridPosition = new GridPosition(x, y);
-                if (BombRunTileMapManager.Instance.IsWallOnThisPosition(gridPosition) || BombRunTileMapManager.Instance.IsObstacleOnThisPosition(gridPosition))
+                if (BombRunTileMapManager.Instance.IsWallOnThisPosition(gridPosition))
                 {
+                    GetNode(x, y).SetIsWalkable(false);
+                }
+                else if (BombRunTileMapManager.Instance.IsObstacleOnThisPosition(gridPosition))
+                {
+                    // Check if the obstale is walkable or not?
                     GetNode(x, y).SetIsWalkable(false);
                 }
                 else

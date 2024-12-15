@@ -114,7 +114,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6539029415208435019}
-  - component: {fileID: 1944417972782974797}
+  - component: {fileID: 6252935963700547636}
+  - component: {fileID: 6359947295081794852}
+  - component: {fileID: 3170212911073900375}
   m_Layer: 0
   m_Name: DoorSideways
   m_TagString: Untagged
@@ -139,7 +141,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1944417972782974797
+--- !u!114 &6252935963700547636
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -148,13 +150,46 @@ MonoBehaviour:
   m_GameObject: {fileID: 6539029415208435028}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a7d557b3a9d9c14abfb00c7a3227d90, type: 3}
+  m_Script: {fileID: 11500000, guid: 2ce9c94ad0dc9604ab072d4e32ae7bb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _isDestructible: 0
   _isInteractable: 1
   _bombRunObstacleType: 1
-  _animator: {fileID: 5739895912550312838}
+--- !u!114 &6359947295081794852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6539029415208435028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89caf73707b41174896d19723274afb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isOpen: 0
+  _animator: {fileID: 3170212911073900375}
+--- !u!95 &3170212911073900375
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6539029415208435028}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 88933b777c75e49499c32aec0ff63fb9, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &6539029416481143609
 GameObject:
   m_ObjectHideFlags: 0
@@ -171,7 +206,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6539029416481143608
 Transform:
   m_ObjectHideFlags: 0

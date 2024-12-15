@@ -8,7 +8,8 @@ public class GridObject
     private GridPosition _gridPosition;
 
     private List<BombRunUnit> _unitList = new List<BombRunUnit>();
-    private List<BaseBombRunObstacle> _obstacleList = new List<BaseBombRunObstacle>();
+    private BaseBombRunObstacle _obstacle;
+    private BombRunDoor _interactable;
 
     public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
     {
@@ -46,27 +47,63 @@ public class GridObject
     {
         return _unitList.Count > 0;
     }
-    public List<BaseBombRunObstacle> GetObstacleList()
+    public BaseBombRunObstacle GetObstacle()
     {
-        return _obstacleList;
+        return _obstacle;
     }
     public void AddObstacle(BaseBombRunObstacle obstacle)
     {
-        if (!_obstacleList.Contains(obstacle))
+        // can't have more than one obstacle, so if there is already an obstacle on this grid object, just skip it for now?
+        if (_obstacle != null)
         {
-            _obstacleList.Add(obstacle);
+            Debug.Log("AddObstacle: obstacle already exists at: " + this._gridPosition.ToString() + " obstacle: " + _obstacle.name + ". Skipping...");
+            return;
         }
+
+        _obstacle = obstacle;
+
+        // old
+        //if (!_obstacleList.Contains(obstacle))
+        //{
+        //    _obstacleList.Add(obstacle);
+        //}
     }
     public void RemoveObstacle(BaseBombRunObstacle obstacle)
     {
-        if (_obstacleList.Contains(obstacle))
+        if (_obstacle == obstacle)
         {
-            _obstacleList.Remove(obstacle);
+            _obstacle = null;
         }
     }
     public bool HasAnyObstacle()
     {
-        return _obstacleList.Count > 0;
+        return _obstacle != null;
+    }
+    public BombRunDoor GetInteractable()
+    {
+        return _interactable;
+    }
+    public void AddInteractable(BombRunDoor interatable)
+    {
+        // can't have more than one obstacle, so if there is already an obstacle on this grid object, just skip it for now?
+        if (_interactable != null)
+        {
+            Debug.Log("AddInterActable: interactable already exists at: " + this._gridPosition.ToString() + " interatable: " + interatable.name + ". Skipping...");
+            return;
+        }
+
+        _interactable = interatable;
+    }
+    public void RemoveInteractable(BombRunDoor interactable)
+    {
+        if (_interactable == interactable)
+        {
+            _obstacle = null;
+        }
+    }
+    public bool HasAnyInteractable()
+    {
+        return _interactable != null;
     }
 }
 

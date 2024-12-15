@@ -104,8 +104,12 @@ public class GrenadeProjectile : MonoBehaviour
         {
             List<BombRunUnit> units = LevelGrid.Instance.GetUnitListAtGridPosition(gridPositions[i]);
             DamageUnitsHitByGrenade(units, gridPositions[i]);
-            List<BaseBombRunObstacle> obstacles = LevelGrid.Instance.GetObstacleListAtGridPosition(gridPositions[i]);
-            DamageObstaclessHitByGrenade(obstacles, gridPositions[i]);
+            if (LevelGrid.Instance.HasAnyObstacleOnGridPosition(gridPositions[i]))
+            {
+                BaseBombRunObstacle obstacle = LevelGrid.Instance.GetObstacleAtGridPosition(gridPositions[i]);
+                DamageObstaclessHitByGrenade(obstacle, gridPositions[i]);
+            }
+            
         }
     }
     private void DamageUnitsHitByGrenade(List<BombRunUnit> units, GridPosition gridPosition)
@@ -118,15 +122,20 @@ public class GrenadeProjectile : MonoBehaviour
             units[x].Damage(grenadeDamage);
         }
     }
-    private void DamageObstaclessHitByGrenade(List<BaseBombRunObstacle> obstacles, GridPosition gridPosition)
+    private void DamageObstaclessHitByGrenade(BaseBombRunObstacle obstacle, GridPosition gridPosition)
     {
-        if (obstacles.Count < 1)
+        if (obstacle == null)
             return;
-        Debug.Log("DamageObstaclessHitByGrenade: " + obstacles.Count + " obstacles at position: " + gridPosition.ToString());
-        for (int x = 0; x < obstacles.Count; x++)
-        {
-            obstacles[x].DamageObstacle(grenadeDamage);
-        }
+        if (!obstacle.IsDestructible())
+            return;
+        Debug.Log("DamageObstaclessHitByGrenade: " + obstacle.name + " obstacle at position: " + gridPosition.ToString());
+        obstacle.DamageObstacle(grenadeDamage);
+
+        // old
+        //for (int x = 0; x < obstacle.Count; x++)
+        //{
+        //    obstacle[x].DamageObstacle(grenadeDamage);
+        //}
     }
     void MoveGrenadeOnTrajectory()
     {
