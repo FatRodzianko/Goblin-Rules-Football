@@ -132,22 +132,22 @@ public class LevelGrid : MonoBehaviour
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         return gridObject.HasAnyObstacle();
     }
-    public void AddInteractableAtGridPosition(GridPosition gridPosition, BombRunDoor interactable)
+    public void AddInteractableAtGridPosition(GridPosition gridPosition, IInteractable interactable)
     {
-        Debug.Log("AddInteractableAtGridPosition: adding: " + interactable.name + " to: " + gridPosition.ToString());
+        Debug.Log("AddInteractableAtGridPosition: adding: " + interactable + " to: " + gridPosition.ToString());
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.AddInteractable(interactable);
     }
-    public BombRunDoor GetInteractableAtGridPosition(GridPosition gridPosition)
+    public IInteractable GetInteractableAtGridPosition(GridPosition gridPosition)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         return gridObject.GetInteractable();
     }
-    public void RemoveInteractableAtGridPosition(GridPosition gridPosition, BombRunDoor interactable)
+    public void RemoveInteractableAtGridPosition(GridPosition gridPosition, IInteractable interactable)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.RemoveInteractable(interactable);
-        Debug.Log("RemoveInteractableAtGridPosition: Removed interactable: " + interactable.name + " at position: " + gridPosition.ToString());
+        Debug.Log("RemoveInteractableAtGridPosition: Removed interactable: " + interactable + " at position: " + gridPosition.ToString());
     }
     public bool HasAnyInteractableOnGridPosition(GridPosition gridPosition)
     {

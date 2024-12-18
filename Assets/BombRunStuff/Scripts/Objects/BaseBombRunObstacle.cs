@@ -10,6 +10,7 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
     [Header("Obstacle Properties")]
     [SerializeField] private bool _isDestructible = false;
     [SerializeField] private bool _isInteractable = false;
+    [SerializeField] private bool _isWalkable = false;
 
     [SerializeField] private BombRunObstacleType _bombRunObstacleType;
 
@@ -43,6 +44,14 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
     public bool IsInteractable()
     {
         return _isInteractable;
+    }
+    public bool IsWalkable()
+    {
+        return _isWalkable;
+    }
+    public void SetIsWalkable(bool isWalkable)
+    {
+        this._isWalkable = isWalkable;
     }
     public virtual void DamageObstacle(int damageAmount)
     {

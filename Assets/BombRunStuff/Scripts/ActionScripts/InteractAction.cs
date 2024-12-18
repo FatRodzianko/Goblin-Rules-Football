@@ -10,8 +10,6 @@ public class InteractAction : BaseAction
     {
         if (!_isActive)
             return;
-
-        ActionComplete();
     }
     public override string GetActionName()
     {
@@ -72,9 +70,13 @@ public class InteractAction : BaseAction
     {
         Debug.Log("TakeAction: Interact");
 
-        BombRunDoor interactable = LevelGrid.Instance.GetInteractableAtGridPosition(gridPosition);
-        interactable.Interact();
+        IInteractable interactable = LevelGrid.Instance.GetInteractableAtGridPosition(gridPosition);
+        interactable.Interact(OnInteractComplete);
 
         ActionStart(onActionComplete);
+    }
+    private void OnInteractComplete()
+    {
+        ActionComplete();
     }
 }

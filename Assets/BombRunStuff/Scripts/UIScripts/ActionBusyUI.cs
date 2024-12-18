@@ -19,6 +19,7 @@ public class ActionBusyUI : MonoBehaviour
     }
     private void UnitActionSystem_OnBusyChanged(object sender, bool isBusy)
     {
+        Debug.Log("UnitActionSystem_OnBusyChanged: " + isBusy.ToString());
         if (isBusy)
         {
             this.Show();

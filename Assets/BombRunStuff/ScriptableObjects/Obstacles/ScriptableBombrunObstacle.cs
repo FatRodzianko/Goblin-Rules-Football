@@ -7,7 +7,8 @@ using UnityEngine.Tilemaps;
 public enum BombRunObstacleType
 {
     Crate,
-    Door
+    Door,
+    Misc
 }
 
 [CreateAssetMenu(fileName = "BombRunObstacle", menuName = "BombRun/Obstacles/Create Obstacle")]

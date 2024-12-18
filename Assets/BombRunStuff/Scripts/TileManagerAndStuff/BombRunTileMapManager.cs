@@ -38,7 +38,6 @@ public class BombRunTileMapManager : MonoBehaviour
     [Header("Obstacles")]
     [SerializeField] private BombRunObstacleManager _bombRunObstacleManager;
 
-
     private void Awake()
     {
         MakeInstance();

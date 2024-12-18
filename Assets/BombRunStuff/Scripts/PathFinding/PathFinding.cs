@@ -63,7 +63,14 @@ public class PathFinding : MonoBehaviour
                 else if (BombRunTileMapManager.Instance.IsObstacleOnThisPosition(gridPosition))
                 {
                     // Check if the obstale is walkable or not?
-                    GetNode(x, y).SetIsWalkable(false);
+                    if (LevelGrid.Instance.GetObstacleAtGridPosition(gridPosition).IsWalkable())
+                    {
+                        GetNode(x, y).SetIsWalkable(true);
+                    }
+                    else
+                    {
+                        GetNode(x, y).SetIsWalkable(false);
+                    }
                 }
                 else
                 {

@@ -9,7 +9,7 @@ public class GridObject
 
     private List<BombRunUnit> _unitList = new List<BombRunUnit>();
     private BaseBombRunObstacle _obstacle;
-    private BombRunDoor _interactable;
+    private IInteractable _interactable;
 
     public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
     {
@@ -79,26 +79,26 @@ public class GridObject
     {
         return _obstacle != null;
     }
-    public BombRunDoor GetInteractable()
+    public IInteractable GetInteractable()
     {
         return _interactable;
     }
-    public void AddInteractable(BombRunDoor interatable)
+    public void AddInteractable(IInteractable interactable)
     {
         // can't have more than one obstacle, so if there is already an obstacle on this grid object, just skip it for now?
         if (_interactable != null)
         {
-            Debug.Log("AddInterActable: interactable already exists at: " + this._gridPosition.ToString() + " interatable: " + interatable.name + ". Skipping...");
+            Debug.Log("AddInterActable: interactable already exists at: " + this._gridPosition.ToString() + " interatable: " + interactable + ". Skipping...");
             return;
         }
 
-        _interactable = interatable;
+        _interactable = interactable;
     }
-    public void RemoveInteractable(BombRunDoor interactable)
+    public void RemoveInteractable(IInteractable interactable)
     {
         if (_interactable == interactable)
         {
-            _obstacle = null;
+            _interactable = null;
         }
     }
     public bool HasAnyInteractable()
