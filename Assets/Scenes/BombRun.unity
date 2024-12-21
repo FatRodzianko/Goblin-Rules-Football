@@ -2095,6 +2095,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e6b4e9466780fa40b0f856607b99afc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _previousInput: {x: 0, y: 0}
 --- !u!4 &738913053
 Transform:
   m_ObjectHideFlags: 0
@@ -3927,6 +3928,7 @@ GameObject:
   - component: {fileID: 1778082216}
   - component: {fileID: 1778082219}
   - component: {fileID: 1778082220}
+  - component: {fileID: 1778082221}
   m_Layer: 0
   m_Name: CM vcam1
   m_TagString: camera
@@ -4038,6 +4040,19 @@ MonoBehaviour:
     m_FrequencyGain: 5
     m_Duration: 0.5
     m_NoiseOffsets: {x: 0, y: 0, z: 0}
+--- !u!114 &1778082221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778082213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bd13992d6aefd04b91224d97415c2ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cinemachineVirtualCamera: {fileID: 1778082217}
 --- !u!1 &1787541132
 GameObject:
   m_ObjectHideFlags: 0

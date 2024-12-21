@@ -538,6 +538,78 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""CameraMovement"",
+            ""id"": ""f13057db-8f09-4189-a780-6d58aecc84a5"",
+            ""actions"": [
+                {
+                    ""name"": ""Move"",
+                    ""type"": ""Value"",
+                    ""id"": ""9e3038d8-34cc-4933-a0ef-73469e7efd77"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""b3219632-21d4-4dad-a310-c577cb824390"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""ec91c798-d55b-4b0d-990c-5b685d365782"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""72ff3e1d-5a9b-4b63-89a4-3eae0163a348"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""b3b4a741-09c9-4813-8517-bff2b549a619"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""91376403-d02d-4c22-888a-86dcdd4477cc"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -554,6 +626,9 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
         m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+        // CameraMovement
+        m_CameraMovement = asset.FindActionMap("CameraMovement", throwIfNotFound: true);
+        m_CameraMovement_Move = m_CameraMovement.FindAction("Move", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -714,6 +789,39 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
         }
     }
     public UIActions @UI => new UIActions(this);
+
+    // CameraMovement
+    private readonly InputActionMap m_CameraMovement;
+    private ICameraMovementActions m_CameraMovementActionsCallbackInterface;
+    private readonly InputAction m_CameraMovement_Move;
+    public struct CameraMovementActions
+    {
+        private @BombRunControls m_Wrapper;
+        public CameraMovementActions(@BombRunControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Move => m_Wrapper.m_CameraMovement_Move;
+        public InputActionMap Get() { return m_Wrapper.m_CameraMovement; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(CameraMovementActions set) { return set.Get(); }
+        public void SetCallbacks(ICameraMovementActions instance)
+        {
+            if (m_Wrapper.m_CameraMovementActionsCallbackInterface != null)
+            {
+                @Move.started -= m_Wrapper.m_CameraMovementActionsCallbackInterface.OnMove;
+                @Move.performed -= m_Wrapper.m_CameraMovementActionsCallbackInterface.OnMove;
+                @Move.canceled -= m_Wrapper.m_CameraMovementActionsCallbackInterface.OnMove;
+            }
+            m_Wrapper.m_CameraMovementActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Move.started += instance.OnMove;
+                @Move.performed += instance.OnMove;
+                @Move.canceled += instance.OnMove;
+            }
+        }
+    }
+    public CameraMovementActions @CameraMovement => new CameraMovementActions(this);
     public interface IUIActions
     {
         void OnNavigate(InputAction.CallbackContext context);
@@ -726,5 +834,9 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
         void OnRightClick(InputAction.CallbackContext context);
         void OnTrackedDevicePosition(InputAction.CallbackContext context);
         void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+    }
+    public interface ICameraMovementActions
+    {
+        void OnMove(InputAction.CallbackContext context);
     }
 }
