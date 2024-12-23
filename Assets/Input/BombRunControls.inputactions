@@ -518,17 +518,35 @@
             ]
         },
         {
-            "name": "CameraMovement",
+            "name": "PlayerActions",
             "id": "f13057db-8f09-4189-a780-6d58aecc84a5",
             "actions": [
                 {
-                    "name": "Move",
+                    "name": "MoveCamera",
                     "type": "Value",
                     "id": "9e3038d8-34cc-4933-a0ef-73469e7efd77",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Click",
+                    "type": "Button",
+                    "id": "2d7784b8-5d18-472a-945c-552f9ae3b042",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "RightClick",
+                    "type": "Button",
+                    "id": "b70f7d21-6048-466f-9d4c-be0f12e56c0c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -539,7 +557,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "MoveCamera",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -550,7 +568,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "MoveCamera",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -561,7 +579,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "MoveCamera",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -572,7 +590,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "MoveCamera",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -583,9 +601,64 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "MoveCamera",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "5d098106-88b1-49d3-b032-4804f233db2c",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7f22bfac-b19a-478a-b736-f3473ceea11c",
+                    "path": "<Pen>/tip",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e4230c2f-da56-4e64-9045-a89246da95de",
+                    "path": "<Touchscreen>/touch*/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "41afecad-2f40-4af3-992f-72d21facb19a",
+                    "path": "<XRController>/trigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d47f99ce-b587-4f5f-9f0d-22a3fb47e80d",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightClick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

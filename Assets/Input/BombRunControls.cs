@@ -540,17 +540,35 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
             ]
         },
         {
-            ""name"": ""CameraMovement"",
+            ""name"": ""PlayerActions"",
             ""id"": ""f13057db-8f09-4189-a780-6d58aecc84a5"",
             ""actions"": [
                 {
-                    ""name"": ""Move"",
+                    ""name"": ""MoveCamera"",
                     ""type"": ""Value"",
                     ""id"": ""9e3038d8-34cc-4933-a0ef-73469e7efd77"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Click"",
+                    ""type"": ""Button"",
+                    ""id"": ""2d7784b8-5d18-472a-945c-552f9ae3b042"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""RightClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""b70f7d21-6048-466f-9d4c-be0f12e56c0c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -561,7 +579,7 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""MoveCamera"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -572,7 +590,7 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""MoveCamera"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -583,7 +601,7 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""MoveCamera"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -594,7 +612,7 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""MoveCamera"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -605,9 +623,64 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""MoveCamera"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5d098106-88b1-49d3-b032-4804f233db2c"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7f22bfac-b19a-478a-b736-f3473ceea11c"",
+                    ""path"": ""<Pen>/tip"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e4230c2f-da56-4e64-9045-a89246da95de"",
+                    ""path"": ""<Touchscreen>/touch*/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""41afecad-2f40-4af3-992f-72d21facb19a"",
+                    ""path"": ""<XRController>/trigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d47f99ce-b587-4f5f-9f0d-22a3fb47e80d"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -626,9 +699,11 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
         m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
-        // CameraMovement
-        m_CameraMovement = asset.FindActionMap("CameraMovement", throwIfNotFound: true);
-        m_CameraMovement_Move = m_CameraMovement.FindAction("Move", throwIfNotFound: true);
+        // PlayerActions
+        m_PlayerActions = asset.FindActionMap("PlayerActions", throwIfNotFound: true);
+        m_PlayerActions_MoveCamera = m_PlayerActions.FindAction("MoveCamera", throwIfNotFound: true);
+        m_PlayerActions_Click = m_PlayerActions.FindAction("Click", throwIfNotFound: true);
+        m_PlayerActions_RightClick = m_PlayerActions.FindAction("RightClick", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -790,38 +865,54 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
     }
     public UIActions @UI => new UIActions(this);
 
-    // CameraMovement
-    private readonly InputActionMap m_CameraMovement;
-    private ICameraMovementActions m_CameraMovementActionsCallbackInterface;
-    private readonly InputAction m_CameraMovement_Move;
-    public struct CameraMovementActions
+    // PlayerActions
+    private readonly InputActionMap m_PlayerActions;
+    private IPlayerActionsActions m_PlayerActionsActionsCallbackInterface;
+    private readonly InputAction m_PlayerActions_MoveCamera;
+    private readonly InputAction m_PlayerActions_Click;
+    private readonly InputAction m_PlayerActions_RightClick;
+    public struct PlayerActionsActions
     {
         private @BombRunControls m_Wrapper;
-        public CameraMovementActions(@BombRunControls wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Move => m_Wrapper.m_CameraMovement_Move;
-        public InputActionMap Get() { return m_Wrapper.m_CameraMovement; }
+        public PlayerActionsActions(@BombRunControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @MoveCamera => m_Wrapper.m_PlayerActions_MoveCamera;
+        public InputAction @Click => m_Wrapper.m_PlayerActions_Click;
+        public InputAction @RightClick => m_Wrapper.m_PlayerActions_RightClick;
+        public InputActionMap Get() { return m_Wrapper.m_PlayerActions; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(CameraMovementActions set) { return set.Get(); }
-        public void SetCallbacks(ICameraMovementActions instance)
+        public static implicit operator InputActionMap(PlayerActionsActions set) { return set.Get(); }
+        public void SetCallbacks(IPlayerActionsActions instance)
         {
-            if (m_Wrapper.m_CameraMovementActionsCallbackInterface != null)
+            if (m_Wrapper.m_PlayerActionsActionsCallbackInterface != null)
             {
-                @Move.started -= m_Wrapper.m_CameraMovementActionsCallbackInterface.OnMove;
-                @Move.performed -= m_Wrapper.m_CameraMovementActionsCallbackInterface.OnMove;
-                @Move.canceled -= m_Wrapper.m_CameraMovementActionsCallbackInterface.OnMove;
+                @MoveCamera.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnMoveCamera;
+                @MoveCamera.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnMoveCamera;
+                @MoveCamera.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnMoveCamera;
+                @Click.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnClick;
+                @Click.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnClick;
+                @Click.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnClick;
+                @RightClick.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnRightClick;
+                @RightClick.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnRightClick;
+                @RightClick.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnRightClick;
             }
-            m_Wrapper.m_CameraMovementActionsCallbackInterface = instance;
+            m_Wrapper.m_PlayerActionsActionsCallbackInterface = instance;
             if (instance != null)
             {
-                @Move.started += instance.OnMove;
-                @Move.performed += instance.OnMove;
-                @Move.canceled += instance.OnMove;
+                @MoveCamera.started += instance.OnMoveCamera;
+                @MoveCamera.performed += instance.OnMoveCamera;
+                @MoveCamera.canceled += instance.OnMoveCamera;
+                @Click.started += instance.OnClick;
+                @Click.performed += instance.OnClick;
+                @Click.canceled += instance.OnClick;
+                @RightClick.started += instance.OnRightClick;
+                @RightClick.performed += instance.OnRightClick;
+                @RightClick.canceled += instance.OnRightClick;
             }
         }
     }
-    public CameraMovementActions @CameraMovement => new CameraMovementActions(this);
+    public PlayerActionsActions @PlayerActions => new PlayerActionsActions(this);
     public interface IUIActions
     {
         void OnNavigate(InputAction.CallbackContext context);
@@ -835,8 +926,10 @@ public partial class @BombRunControls : IInputActionCollection2, IDisposable
         void OnTrackedDevicePosition(InputAction.CallbackContext context);
         void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
     }
-    public interface ICameraMovementActions
+    public interface IPlayerActionsActions
     {
-        void OnMove(InputAction.CallbackContext context);
+        void OnMoveCamera(InputAction.CallbackContext context);
+        void OnClick(InputAction.CallbackContext context);
+        void OnRightClick(InputAction.CallbackContext context);
     }
 }

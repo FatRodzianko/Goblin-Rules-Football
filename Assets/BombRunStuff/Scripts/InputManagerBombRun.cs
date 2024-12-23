@@ -16,10 +16,8 @@ public class InputManagerBombRun : MonoBehaviour
         MakeInstance();
 
         _bombRunControls = new BombRunControls();
-        _bombRunControls.UI.Enable();
-        _bombRunControls.UI.Navigate.Disable();
-        _bombRunControls.CameraMovement.Enable();
-        _bombRunControls.CameraMovement.Move.Enable();
+        _bombRunControls.PlayerActions.Enable();
+        //_bombRunControls.PlayerActions.MoveCamera.Enable();
     }
     void MakeInstance()
     {
@@ -33,12 +31,12 @@ public class InputManagerBombRun : MonoBehaviour
     }
     private void Start()
     {
-        _bombRunControls.CameraMovement.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
-        _bombRunControls.CameraMovement.Move.canceled += ctx => ResetMovement();
+        _bombRunControls.PlayerActions.MoveCamera.performed += ctx => SetMoveCamerament(ctx.ReadValue<Vector2>());
+        _bombRunControls.PlayerActions.MoveCamera.canceled += ctx => ResetMoveCamerament();
     }
     private void Update()
     {
-        //MoveCamera();
+
     }
     public Vector2 GetMouseScreenPosition()
     {
@@ -46,39 +44,24 @@ public class InputManagerBombRun : MonoBehaviour
     }
     public bool IsMouseButtonDownThisFrame()
     {
-        return _bombRunControls.UI.Click.WasPerformedThisFrame();
+        return _bombRunControls.PlayerActions.Click.WasPerformedThisFrame();
     }
     public bool IsRightMouseButtonDownThisFrame()
     {
-        return _bombRunControls.UI.RightClick.WasPerformedThisFrame();
+        return _bombRunControls.PlayerActions.RightClick.WasPerformedThisFrame();
     }
-    //public Vector2 GetCameraMoveVector()
-    //{
-    //    if (_previousCameraMovement.x == 0 && _previousCameraMovement.y == 0)
-    //        return Vector2.zero;
-
-    //    Vector2 direction = Vector2.ClampMagnitude(_previousCameraMovement, 1);
-    //    return direction;
-    //}
     public Vector2 GetCameraMoveVector()
     {
-        if (_previousInput.x == 0 && _previousInput.y == 0)
-            return Vector2.zero;
+        //if (_previousInput.x == 0 && _previousInput.y == 0)
+        //    return Vector2.zero;
 
-        Vector2 direction = Vector2.ClampMagnitude(_previousInput, 1);
-        return direction;
+        //Vector2 direction = Vector2.ClampMagnitude(_previousInput, 1);
+        //return direction;
+        return _bombRunControls.PlayerActions.MoveCamera.ReadValue<Vector2>();
     }
 
-    private void SetMovement(Vector2 movement) => _previousInput = movement;
+    private void SetMoveCamerament(Vector2 MoveCamerament) => _previousInput = MoveCamerament;
 
 
-    private void ResetMovement() => _previousInput = Vector2.zero;
-    //void MoveCamera()
-    //{
-    //    if (_previousInput.x == 0 && _previousInput.y == 0)
-    //        return;
-
-    //    Vector2 direction = Vector2.ClampMagnitude(_previousInput, 1);
-    //    _camera.transform.position += (Vector3)(direction * (_movementSpeed * (_camera.m_Lens.OrthographicSize / 5f)) * Time.deltaTime);
-    //}
+    private void ResetMoveCamerament() => _previousInput = Vector2.zero;
 }

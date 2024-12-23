@@ -43,6 +43,12 @@ public class UnitActionSystemUI : MonoBehaviour
         // clear the button list
         _actionButtonUIList.Clear();
 
+        if (selectedUnit == null)
+        {
+            Debug.Log("CreateUnitActionButtons: selected unit is null?");
+            return;
+        }
+
         // instantiate new button game objects
         foreach (BaseAction baseAction in selectedUnit.GetBaseActionArray())
         {
@@ -83,7 +89,16 @@ public class UnitActionSystemUI : MonoBehaviour
     private void UpdateActionPoints()
     {
         BombRunUnit unit = UnitActionSystem.Instance.GetSelectedUnit();
-        _actionPointsText.text = "Action Points: " + unit.GetActionPoints().ToString();
+
+        _actionPointsText.text = "Action Points: ";
+        if (unit == null)
+        {
+            Debug.Log("UpdateActionPoints: no selected unit?");
+            
+            return;
+        }
+
+        _actionPointsText.text += unit.GetActionPoints().ToString();
     }
     private void BombRunUnit_OnAnyActionPointsChanged(object sender, EventArgs e)
     {

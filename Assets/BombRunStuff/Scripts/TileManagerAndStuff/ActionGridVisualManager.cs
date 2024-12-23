@@ -154,6 +154,13 @@ public class ActionGridVisualManager : MonoBehaviour
 
         BombRunUnit selectedUnit = UnitActionSystem.Instance.GetSelectedUnit();
         BaseAction selectedAction = UnitActionSystem.Instance.GetSelectedAction();
+        Debug.Log("UpdateActionVisuals: " + selectedAction);
+
+        if (selectedAction == null)
+        {
+            Debug.Log("UpdateActionVisuals: selected action is null?");
+            return;
+        }
 
         GridVisualType gridVisualType;
         switch (selectedAction)

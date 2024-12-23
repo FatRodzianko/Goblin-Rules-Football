@@ -40,6 +40,8 @@ public class UnitActionSystem : MonoBehaviour
     private void Start()
     {
         SetSelectedUnit(_selectedUnit);
+
+        BombRunUnit.OnAnyUnitDied += BombRunUnit_OnAnyUnitDied;
     }
     private void Update()
     {
@@ -139,6 +141,10 @@ public class UnitActionSystem : MonoBehaviour
 
         GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
 
+        if (_selectedAction == null)
+        {
+            return;
+        }
         if (!_selectedAction.IsValidActionGridPosition(mouseGridPosition))
         {
             return;
@@ -173,16 +179,19 @@ public class UnitActionSystem : MonoBehaviour
     private void SetSelectedUnit(BombRunUnit unit)
     {
         this._selectedUnit = unit;
-        SetSelectedAction(unit.GetAction<MoveAction>());
-
+        if (_selectedUnit != null)
+        {
+            SetSelectedAction(unit.GetAction<MoveAction>());
+        }
         OnSelectedUnitChanged?.Invoke(this, _selectedUnit);
         Debug.Log("SetSelectedUnit: " + unit);
+
+        
     }
     public void SetSelectedAction(BaseAction baseAction)
     {
         _selectedAction = baseAction;
         OnSelectedActionChanged?.Invoke(this, EventArgs.Empty);
-        Debug.Log("SetSelectedAction: " + baseAction.GetActionName());
     }
     public BombRunUnit GetSelectedUnit()
     {
@@ -201,5 +210,33 @@ public class UnitActionSystem : MonoBehaviour
     {
         _isBusy = false;
         OnBusyChanged?.Invoke(this, _isBusy);
+    }
+    private void BombRunUnit_OnAnyUnitDied(object sender, EventArgs e)
+    {
+        BombRunUnit unit = sender as BombRunUnit;
+
+        if (_selectedUnit == unit)
+        {
+            // change selected unit
+            List<BombRunUnit> friendlyUnits = BombRunUnitManager.Instance.GetFriendlyUnitList();
+
+            // make sure the dead unit is no longer in the list
+            if (friendlyUnits.Contains(unit))
+                friendlyUnits.Remove(unit);
+
+            // check if the play has any units remain
+            // if yes, set selected unit to the first unit in the list
+            if (friendlyUnits.Count > 0)
+            {
+                SetSelectedUnit(friendlyUnits[0]);
+            }
+            else
+            {
+                // game over thing?
+                SetSelectedUnit(null);
+                SetSelectedAction(null);
+            }
+
+        }
     }
 }

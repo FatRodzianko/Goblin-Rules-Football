@@ -82,7 +82,6 @@ public class BombRunUnitManager : MonoBehaviour
                 _friendlyUnitList.Remove(unit);
             }
         }
-
     }
     public List<BombRunUnit> GetUnitList()
     {
