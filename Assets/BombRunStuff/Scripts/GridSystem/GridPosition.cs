@@ -81,7 +81,19 @@ public struct GridPosition : IEquatable<GridPosition>
 
         return (diagonalDistance * MOVE_DIAGONAL_COST) + (remainingStraightDistance * MOVE_STRAIGHT_COST);
     }
-    public static List<GridPosition> GetNeighborGridPositions(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false)
+    public static List<GridPosition> GetNeighborGridPositions(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false, bool isHex = false)
+    {
+        if (isHex)
+        {
+            return GetNeighborGridPositionsHex(startingGridPosition, distanceFromStartingPosition, makeCircular);
+        }
+        else
+        {
+            return GetNeighborGridPositionsSquare(startingGridPosition, distanceFromStartingPosition, makeCircular);
+        }
+        
+    }
+    public static List<GridPosition> GetNeighborGridPositionsSquare(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false)
     {
         List<GridPosition> neighborGridPositions = new List<GridPosition>();
 
@@ -105,6 +117,12 @@ public struct GridPosition : IEquatable<GridPosition>
                 neighborGridPositions.Add(newNeighborPosition);
             }
         }
+        return neighborGridPositions;
+    }
+    public static List<GridPosition> GetNeighborGridPositionsHex(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false)
+    {
+        List<GridPosition> neighborGridPositions = new List<GridPosition>();
+
         return neighborGridPositions;
     }
 }

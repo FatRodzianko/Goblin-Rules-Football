@@ -28,9 +28,11 @@ public class MouseWorld : MonoBehaviour
     }
     public static Vector3 GetPosition()
     {
-        Ray ray = Camera.main.ScreenPointToRay(InputManagerBombRun.Instance.GetMouseScreenPosition());
-        RaycastHit2D raycastHit = Physics2D.Raycast(ray.origin, ray.direction, float.MaxValue, MouseWorld.instance._floorMaskLayer);
-        return raycastHit.point;
+        //Ray ray = Camera.main.ScreenPointToRay(InputManagerBombRun.Instance.GetMouseScreenPosition());
+        //RaycastHit2D raycastHit = Physics2D.Raycast(ray.origin, ray.direction, float.MaxValue, MouseWorld.instance._floorMaskLayer);
+        //return raycastHit.point;
+
+        return Camera.main.ScreenToWorldPoint(InputManagerBombRun.Instance.GetMouseScreenPosition());
     }
     private void UpdateMouseGridPosition()
     {

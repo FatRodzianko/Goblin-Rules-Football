@@ -3,15 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelGrid : MonoBehaviour
+public class LevelGridHex : MonoBehaviour
 {
-    public static LevelGrid Instance { get; private set; }
-
-    [SerializeField] private bool _isHex;
+    public static LevelGridHex Instance { get; private set; }
 
     [SerializeField] private Transform _gridDebugObjectPrefab;
-    [SerializeField] private GridSystem<GridObject> _gridSystem;
-
+    private GridSystemHex<GridObject> _gridSystem;
 
     [SerializeField] private int _width = 10;
     [SerializeField] private int _height = 10;
@@ -23,24 +20,8 @@ public class LevelGrid : MonoBehaviour
     private void Awake()
     {
         MakeInstance();
-
-        if (_isHex)
-        {
-            _gridSystem = new GridSystemHex<GridObject>(_width, _height, _cellSize,
+        _gridSystem = new GridSystemHex<GridObject>(_width, _height, _cellSize,
             (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
-        }
-        else
-        {
-            _gridSystem = new GridSystem<GridObject>(_width, _height, _cellSize,
-            (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
-        }
-        
-
-
-        //_gridSystem = new GridSystem<GridObject>(_width, _height, _cellSize,
-        //   (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
-
-
         //_gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
     }
 
@@ -48,7 +29,7 @@ public class LevelGrid : MonoBehaviour
     {
         if (Instance != null)
         {
-            Debug.Log("MakeInstance: more than one LevelGrid. Destroying...");
+            Debug.Log("MakeInstance: more than one LevelGridHex. Destroying...");
             Destroy(this);
             return;
         }
@@ -57,9 +38,9 @@ public class LevelGrid : MonoBehaviour
     private void Start()
     {
         // Set the tiles on the tile maps
-        BombRunTileMapManager.Instance.SetGridSystem(_gridSystem);
-        BombRunTileMapManager.Instance.AddFloorTilesFromGridSystem(_gridSystem);
-        BombRunTileMapManager.Instance.AddGridVisualDefaultFromGridSystem(_gridSystem);
+        //BombRunTileMapManager.Instance.SetGridSystem(_gridSystem);
+        //BombRunTileMapManager.Instance.AddFloorTilesFromGridSystem(_gridSystem);
+        //BombRunTileMapManager.Instance.AddGridVisualDefaultFromGridSystem(_gridSystem);
 
         // Create the pathfinding grid
         PathFinding.Instance.Setup(_width, _height, _cellSize);
@@ -111,13 +92,13 @@ public class LevelGrid : MonoBehaviour
     {
         return _gridSystem.GetHeight();
     }
-    public GridSystem<GridObject> GetGridObjectGridSystem()
+    public GridSystemHex<GridObject> GetGridObjectGridSystem()
     {
         return _gridSystem;
     }
     public List<GridPosition> GetValidNeighborGridPositions(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false)
     {
-        List<GridPosition> allNeighborPositions = GridPosition.GetNeighborGridPositions(startingGridPosition, distanceFromStartingPosition, makeCircular);
+        List<GridPosition> allNeighborPositions = GridPosition.GetNeighborGridPositions(startingGridPosition, distanceFromStartingPosition, makeCircular, true);
         List<GridPosition> validNeighborPositions = new List<GridPosition>();
 
         for (int i = 0; i < allNeighborPositions.Count; i++)
