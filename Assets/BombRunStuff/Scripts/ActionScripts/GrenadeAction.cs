@@ -22,6 +22,7 @@ public class GrenadeAction : BaseAction
 
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
+        // if I keep this as an action will need to add logic to find enemy units in range to to throw at. Right now, it just throws at the 0,0 grid position
         return new BombRunEnemyAIAction
         {
             _GridPosition = gridPosition,

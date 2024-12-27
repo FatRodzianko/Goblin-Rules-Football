@@ -33,6 +33,7 @@ public class BombRunUnit : MonoBehaviour
     private void Start()
     {
         _gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
+        Debug.Log("BombRunUnit: Start: " + this.name + ": Starting position at: " + _gridPosition.ToString());
         LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
 
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;

@@ -28,11 +28,11 @@ public class GridSystem<TGridObject>
             }
         }
     }
-    public Vector3 GetWorldPosition(GridPosition gridPosition)
+    public virtual Vector3 GetWorldPosition(GridPosition gridPosition)
     {
         return new Vector3(gridPosition.x, gridPosition.y, 0) * _cellSize;
     }
-    public GridPosition GetGridPositon(Vector3 worldPosition)
+    public virtual GridPosition GetGridPositon(Vector3 worldPosition)
     {
         return new GridPosition(
             Mathf.RoundToInt(worldPosition.x / _cellSize),
