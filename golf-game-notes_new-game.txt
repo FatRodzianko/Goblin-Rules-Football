@@ -193,3 +193,6 @@ x Pathfinding to allow unit to move from one grid position to another
 - - - - - - - - - - - - normal: _floorTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _floorTile);
 - - - - - - - - - - - - new for flat top: _floorTileMap.SetTile(new Vector3Int(gridPosition.y, gridPosition.x, 0), _floorTile);
 - - - Pointed top is still normal X and Y in the grid space. Probably easier to just use that...
+
+### isometric grid stuff:
+https://www.youtube.com/playlist?list=PLaiY5ttc7bmd070CyEaCG0xBqecxZXk-d

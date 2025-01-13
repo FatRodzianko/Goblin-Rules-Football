@@ -21,11 +21,35 @@ public class PathFindingGridDebugObject : GridDebugObject
     protected override void Update()
     {
         base.Update();
+        //_gCostText.text = _pathNode.GetGCost().ToString();
+        //_hCostText.text = _pathNode.GetHCost().ToString();
+        //_fCostText.text = _pathNode.GetFCost().ToString();
+
+        //// set the "Is Walkable" sprite color
+        //_isWalkableSpriteRenderer.color = _pathNode.IsWalkable() ? Color.green : Color.red; // if IsWalkable is true, set color to green. If IsWalkable is false, set color to red
+
+        UpdateHexText();
+    }
+    void UpdateHexText()
+    {
         _gCostText.text = _pathNode.GetGCost().ToString();
         _hCostText.text = _pathNode.GetHCost().ToString();
         _fCostText.text = _pathNode.GetFCost().ToString();
 
         // set the "Is Walkable" sprite color
         _isWalkableSpriteRenderer.color = _pathNode.IsWalkable() ? Color.green : Color.red; // if IsWalkable is true, set color to green. If IsWalkable is false, set color to red
+    }
+    private void Start()
+    {
+        //StartCoroutine(UpdateHexDebugText());
+    }
+    IEnumerator UpdateHexDebugText()
+    {
+        yield return new WaitForSeconds(0.75f);
+        UpdateHexText();
+    }
+    private void OnDisable()
+    {
+        StopAllCoroutines();
     }
 }

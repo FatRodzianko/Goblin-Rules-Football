@@ -112,7 +112,6 @@ public class BombRunTileMapManager : MonoBehaviour
             {
                 if (_wallTileMap.HasTile(new Vector3Int(x, y, 0)))
                 {
-                    Debug.Log("GetWallGridPositionsFromTileMap: found wall tile at: " + x.ToString() + ", " + y.ToString());
                     wallPositions.Add(new GridPosition(x, y));
                 }
 
@@ -137,12 +136,12 @@ public class BombRunTileMapManager : MonoBehaviour
                 Vector3Int newPosition = new Vector3Int(x, y, 0);
                 if (_wallTileMap.HasTile(newPosition))
                 {
-                    Debug.Log("UpdateWallAndObstaclePositionLists: found wall tile at: " + x.ToString() + ", " + y.ToString());
+                    //Debug.Log("UpdateWallAndObstaclePositionLists: found wall tile at: " + x.ToString() + ", " + y.ToString());
                     _wallTilePositions.Add(new GridPosition(x, y));
                 }
                 if (_obstaclesTileMap.HasTile(newPosition))
                 {
-                    Debug.Log("UpdateWallAndObstaclePositionLists: found obstacle tile at: " + x.ToString() + ", " + y.ToString());
+                    //Debug.Log("UpdateWallAndObstaclePositionLists: found obstacle tile at: " + x.ToString() + ", " + y.ToString());
                     //_obstalceTilePositions.Add(new GridPosition(x, y));
                     GridPosition newGridPosition = new GridPosition(x, y);
                     // spawn the obstacle transform at the grid position. Get the obstacle to spawn based on the tile at that position and the mapping in BombRunObstacleManager
@@ -162,7 +161,7 @@ public class BombRunTileMapManager : MonoBehaviour
         //    return;
         //// for testing that walls are added in for gaps in the floor map
 
-        if (_wallTilePositions.Contains(gridPosition))
+        if (IsWallOnThisPosition(gridPosition))
         {
             //Debug.Log("AddFloorTileToGridPosition: wall tile at: " + gridPosition.ToString() + ". Skipping...");
             //return;
@@ -182,7 +181,7 @@ public class BombRunTileMapManager : MonoBehaviour
             for (int y = 0; y < gridSystem.GetHeight(); y++)
             {
                 GridPosition gridPosition = new GridPosition(x, y);
-                if (_wallTilePositions.Contains(gridPosition))
+                if (IsWallOnThisPosition(gridPosition))
                     continue;
                 AddGridVisualToGridPosition(gridPosition, _gridVisualDefaulTile);
             }
@@ -236,7 +235,7 @@ public class BombRunTileMapManager : MonoBehaviour
     public void AddWallTileFromGridPosition(GridPosition gridPosition)
     {
         _wallTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _wallTile);
-        if (!_wallTilePositions.Contains(gridPosition))
+        if (!IsWallOnThisPosition(gridPosition))
         {
             _wallTilePositions.Add(gridPosition);
         }

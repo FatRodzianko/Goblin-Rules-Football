@@ -145,6 +145,10 @@ public class UnitActionSystem : MonoBehaviour
         {
             return;
         }
+        if (_selectedUnit.GetActionPoints() <= 0)
+        {
+            return;
+        }
         if (!_selectedAction.IsValidActionGridPosition(mouseGridPosition))
         {
             return;

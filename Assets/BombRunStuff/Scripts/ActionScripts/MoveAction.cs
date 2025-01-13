@@ -83,6 +83,11 @@ public class MoveAction : BaseAction
                 GridPosition offsetGridPosition = new GridPosition(x, y);
                 GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
 
+                // check to see if test position is the unit's current position. Skip if so because player can't move to the position they are already on
+                if (testGridPosition == unitGridPosition)
+                {
+                    continue;
+                }
                 if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
                 {
                     continue;

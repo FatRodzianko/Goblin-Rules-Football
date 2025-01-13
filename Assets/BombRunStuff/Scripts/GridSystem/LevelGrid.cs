@@ -117,7 +117,9 @@ public class LevelGrid : MonoBehaviour
     }
     public List<GridPosition> GetValidNeighborGridPositions(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false)
     {
-        List<GridPosition> allNeighborPositions = GridPosition.GetNeighborGridPositions(startingGridPosition, distanceFromStartingPosition, makeCircular);
+        // change the GetNeighborGridPositions on the GridPosition class to the GridSystem class so there can be an override for hex?
+        //List<GridPosition> allNeighborPositions = GridPosition.GetNeighborGridPositions(startingGridPosition, distanceFromStartingPosition, makeCircular);
+        List<GridPosition> allNeighborPositions = _gridSystem.GetNeighborGridPositions(startingGridPosition, distanceFromStartingPosition, makeCircular);
         List<GridPosition> validNeighborPositions = new List<GridPosition>();
 
         for (int i = 0; i < allNeighborPositions.Count; i++)
@@ -172,5 +174,9 @@ public class LevelGrid : MonoBehaviour
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         return gridObject.HasAnyInteractable();
+    }
+    public int CalculateDistance(GridPosition a, GridPosition b)
+    {
+        return _gridSystem.CalculateDistance(a, b);
     }
 }

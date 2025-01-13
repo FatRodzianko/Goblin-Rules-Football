@@ -22,6 +22,11 @@ public class SelectedTileVisualManager : MonoBehaviour
         if (_currentSelectedGridPosition == gridPosition)
             return;
 
+        if (BombRunTileMapManager.Instance.IsWallOnThisPosition(gridPosition))
+        {
+            return;
+        }
+
         _selectedTileVisualTileMap.SetTile(new Vector3Int(_currentSelectedGridPosition.x, _currentSelectedGridPosition.y, 0), null);
         _selectedTileVisualTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _selectedTileVisualTile);
 

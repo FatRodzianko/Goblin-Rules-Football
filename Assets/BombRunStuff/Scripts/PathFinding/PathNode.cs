@@ -10,12 +10,15 @@ public class PathNode
     private int _gCost;
     private int _hCost;
     private int _fCost;
+    private bool _wasChecked = false;
 
     // reference to previous node
     private PathNode _cameFromPathNode; // this is the node the algorithm "came from" to reach this node. Used when building out what the final path will be by "walking back" from the final node to each "_cameFrom" node
 
     private bool _isWalkable = true;
 
+    // cached neighbors
+    List<PathNode> _neighborNodes = new List<PathNode>();
     public PathNode(GridPosition gridPosition)
     {
         this._gridPosition = gridPosition;
@@ -71,5 +74,21 @@ public class PathNode
     public void SetIsWalkable(bool isWalkable)
     {
         this._isWalkable = isWalkable;
+    }
+    public void SetWasChecked(bool wasChecked)
+    {
+        this._wasChecked = wasChecked;
+    }
+    public bool GetWasChecked()
+    {
+        return _wasChecked;
+    }
+    public void SetNeighborList(List<PathNode> newNeighbors)
+    {
+        this._neighborNodes.AddRange(newNeighbors);
+    }
+    public List<PathNode> GetNeighborNodes()
+    {
+        return _neighborNodes;
     }
 }

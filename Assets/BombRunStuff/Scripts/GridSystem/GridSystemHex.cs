@@ -8,6 +8,8 @@ public class GridSystemHex<TGridObject> : GridSystem<TGridObject>
     private const float HEX_VERTICAL_OFFSET_MULTIPLIER = 0.75f;
     private const float HEX_HORIZONTAL_ODD_ROW_OFFSET = 0.5f;
 
+    private const int MOVE_STRAIGHT_COST = 10;
+
     private int _width;
     private int _height;
     private float _cellSize;
@@ -54,10 +56,10 @@ public class GridSystemHex<TGridObject> : GridSystem<TGridObject>
 
         // test each neighbor to see which is closest to the worldPosition value
         GridPosition closestGridPosition = roughXY;
-        float closestDistance = Vector3.Distance(worldPosition, this.GetWorldPosition(roughXY));
+        float closestDistance = Vector2.Distance(worldPosition, this.GetWorldPosition(roughXY));
         foreach (GridPosition neighborGridPosition in neighborGridPositionList)
         {
-            float distance = Vector3.Distance(worldPosition, this.GetWorldPosition(neighborGridPosition));
+            float distance = Vector2.Distance(worldPosition, this.GetWorldPosition(neighborGridPosition));
             if (distance < closestDistance)
             {
                 closestGridPosition = neighborGridPosition;
@@ -85,5 +87,40 @@ public class GridSystemHex<TGridObject> : GridSystem<TGridObject>
         };
 
         return neighborGridPositionList;
+    }
+    public override List<GridPosition> GetNeighborGridPositions(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false)
+    {
+        List<GridPosition> neighborGridPositions = GetNeighborGridPositions(startingGridPosition);       
+
+        if (distanceFromStartingPosition > 1)
+        {
+            List<GridPosition> mostRecentNeighbors = new List<GridPosition>();
+            mostRecentNeighbors.AddRange(neighborGridPositions);
+
+            for (int i = 1; i < distanceFromStartingPosition; i++)
+            {
+                // used to track neighbors to look at for next turn
+                List<GridPosition> newRecentNeighbors = new List<GridPosition>();
+                foreach (GridPosition recentNeighbor in mostRecentNeighbors)
+                {
+                    List<GridPosition> newNeighbors = GetNeighborGridPositions(recentNeighbor);
+                    foreach (GridPosition newNeighbor in newNeighbors)
+                    {
+                        if (!neighborGridPositions.Contains(newNeighbor))
+                        {
+                            neighborGridPositions.Add(newNeighbor);
+                            newRecentNeighbors.Add(newNeighbor);
+                        }
+                    }
+                }
+                mostRecentNeighbors.Clear();
+                mostRecentNeighbors.AddRange(newRecentNeighbors);
+            }
+        }        
+        return neighborGridPositions;
+    }
+    public override int CalculateDistance(GridPosition a, GridPosition b)
+    {
+        return Mathf.RoundToInt(MOVE_STRAIGHT_COST * Vector3.Distance(GetWorldPosition(a), GetWorldPosition(b)));
     }
 }

@@ -62,25 +62,25 @@ public struct GridPosition : IEquatable<GridPosition>
         int diagonal = Mathf.Max(distX, distY) - orthogonal;
         return orthogonal * MOVE_STRAIGHT_COST + diagonal * MOVE_DIAGONAL_COST;
     }
-    public static int CalculateDistance(GridPosition a, GridPosition b)
-    {
-        GridPosition gridPositionDistance = a - b;
-        int distance = Mathf.Abs(gridPositionDistance.x) + Mathf.Abs(gridPositionDistance.y);
+    //public static int CalculateDistance(GridPosition a, GridPosition b)
+    //{
+    //    GridPosition gridPositionDistance = a - b;
+    //    int distance = Mathf.Abs(gridPositionDistance.x) + Mathf.Abs(gridPositionDistance.y);
 
-        // Get the "x distance" and "z distance." Basically how far do you need to move in the X axis and how far do you move in the Z axis to get from point a to b
-        int xDistance = Mathf.Abs(gridPositionDistance.x);
-        int yDistance = Mathf.Abs(gridPositionDistance.y);
+    //    // Get the "x distance" and "z distance." Basically how far do you need to move in the X axis and how far do you move in the Z axis to get from point a to b
+    //    int xDistance = Mathf.Abs(gridPositionDistance.x);
+    //    int yDistance = Mathf.Abs(gridPositionDistance.y);
 
-        // get the distance that will be traveled diagonally by getting the "overlap" between the x and z distances.
-        // Ex.: If you move to a position that is 1 distance on the x and 2 on the z, then you'd go diagonally 1 time, then straight 1 additional time
-        // Ex.: if you moved 2 on x, and 5 on z, 
-        int diagonalDistance = Mathf.Min(xDistance, yDistance);
+    //    // get the distance that will be traveled diagonally by getting the "overlap" between the x and z distances.
+    //    // Ex.: If you move to a position that is 1 distance on the x and 2 on the z, then you'd go diagonally 1 time, then straight 1 additional time
+    //    // Ex.: if you moved 2 on x, and 5 on z, 
+    //    int diagonalDistance = Mathf.Min(xDistance, yDistance);
 
-        // Get the remaining "Straight" distance by subtracting the x distance from z distance
-        int remainingStraightDistance = Mathf.Abs(xDistance - yDistance);
+    //    // Get the remaining "Straight" distance by subtracting the x distance from z distance
+    //    int remainingStraightDistance = Mathf.Abs(xDistance - yDistance);
 
-        return (diagonalDistance * MOVE_DIAGONAL_COST) + (remainingStraightDistance * MOVE_STRAIGHT_COST);
-    }
+    //    return (diagonalDistance * MOVE_DIAGONAL_COST) + (remainingStraightDistance * MOVE_STRAIGHT_COST);
+    //}
     public static List<GridPosition> GetNeighborGridPositions(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false, bool isHex = false)
     {
         if (isHex)
@@ -95,6 +95,7 @@ public struct GridPosition : IEquatable<GridPosition>
     }
     public static List<GridPosition> GetNeighborGridPositionsSquare(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false)
     {
+        Debug.Log("GetNeighborGridPositionsSquare: ");
         List<GridPosition> neighborGridPositions = new List<GridPosition>();
 
         for (int x = -distanceFromStartingPosition; x <= distanceFromStartingPosition; x++)
@@ -121,6 +122,7 @@ public struct GridPosition : IEquatable<GridPosition>
     }
     public static List<GridPosition> GetNeighborGridPositionsHex(GridPosition startingGridPosition, int distanceFromStartingPosition, bool makeCircular = false)
     {
+        Debug.Log("GetNeighborGridPositionsSquare: Hex");
         List<GridPosition> neighborGridPositions = new List<GridPosition>();
 
         return neighborGridPositions;
