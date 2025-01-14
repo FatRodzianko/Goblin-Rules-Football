@@ -59,7 +59,17 @@ public class MoveAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
         // Get the path to the end position
-        List<GridPosition> pathGridPositionList =  PathFinding.Instance.FindPath(_unit.GetGridPosition(), gridPosition, out int pathLength);
+        //List<GridPosition> pathGridPositionList =  PathFinding.Instance.FindPath(_unit.GetGridPosition(), gridPosition, out int pathLength);
+        List<GridPosition> pathGridPositionList = PathFinding.Instance.FindPathDots(_unit.GetGridPosition(), gridPosition, out int pathLength);
+
+        //string pathString = "";
+        //for (int i = 0; i < pathGridPositionList.Count; i++)
+        //{
+        //    pathString += i.ToString() + ": " + pathGridPositionList[i].ToString() + " ";
+        //}
+        //Debug.Log("PathFinding: Setup test path: " + pathString);
+
+        //Debug.Log("MoveAction: TakeAction: Path starting at: " + _unit.GetGridPosition() + " and ending at: " + gridPosition + ": path length: " + pathLength + " and now the path: " + pathString);
         _currentPositionIndex = 0;
         _positionList = new List<Vector3>();
 
@@ -73,6 +83,7 @@ public class MoveAction : BaseAction
     }
     public override List<GridPosition> GetValidActionGridPositionList()
     {
+        float startTime = Time.realtimeSinceStartup;
         List<GridPosition> validGridPositionList = new List<GridPosition>();
 
         GridPosition unitGridPosition = _unit.GetGridPosition();
@@ -123,7 +134,7 @@ public class MoveAction : BaseAction
                 validGridPositionList.Add(testGridPosition);
             }
         }
-
+        Debug.Log("Time: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
         return validGridPositionList;
         // sort positions by closest to the unit position?
         //return validGridPositionList.OrderBy(gp => GridPosition.Distance(unitGridPosition, gp)).ToList();

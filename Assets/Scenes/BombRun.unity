@@ -2841,7 +2841,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _actionPoints
-      value: 4
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 4944422538143551182, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_Name
@@ -2849,7 +2849,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5928444417147222519, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _maxMoveDistance
-      value: 6
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
@@ -3293,8 +3293,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isHex: 0
   _gridDebugObjectPrefab: {fileID: 5961246192533329702, guid: f14f2963a40d1ce42b4ae47769e73a5a, type: 3}
-  _width: 50
-  _height: 50
+  _width: 100
+  _height: 100
   _cellSize: 2
 --- !u!4 &468905859
 Transform:
@@ -6627,7 +6627,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _actionPoints
-      value: 4
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 3774028933683333569, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_SpriteSortPoint
