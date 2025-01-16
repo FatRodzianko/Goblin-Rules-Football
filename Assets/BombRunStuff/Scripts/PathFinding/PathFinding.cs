@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Mathematics;
 using Unity.Collections;
+using System;
 
 public class PathFinding : MonoBehaviour
 {
@@ -23,9 +24,9 @@ public class PathFinding : MonoBehaviour
     // cache modified nodes from FindPath
     List<PathNode> _modifiedNodes = new List<PathNode>();
 
-    
 
-    
+    // DOTS grid system?
+    [SerializeField] PathFindingCodeMonkey _pathfindingCodeMonkey;
 
     private void Awake()
     {
@@ -58,20 +59,22 @@ public class PathFinding : MonoBehaviour
         //_gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
 
         InitializeIsWalkable();
-        //float startTime = Time.realtimeSinceStartup;
-        //List<GridPosition> testPath = FindPathDots(new GridPosition(11, 7), new GridPosition(27, 15), out int pathLength);
-        //Debug.Log("Time: Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
+        float startTime = Time.realtimeSinceStartup;
+        List<GridPosition> testPath = FindPathDots(new GridPosition(1, 1), new GridPosition(4, 4), out int pathLength);
+        Debug.Log("PathFinding: Time: Setup: Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f) + " path length: " + pathLength);
         //string pathString = "";
         //for (int i = 0; i < testPath.Count; i++)
         //{
         //    pathString += i.ToString() + ": " + testPath[i].ToString() + " ";
         //}
-        //Debug.Log("PathFinding: Setup test path: " + pathString);
+        ////Debug.Log("PathFinding: Setup test path: " + pathString);
 
-        //testPath.Clear();
-        //startTime = Time.realtimeSinceStartup;
-        //testPath = FindPath(new GridPosition(11, 7), new GridPosition(27, 15), out pathLength);
-        //Debug.Log("Time: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
+        testPath.Clear();
+        startTime = Time.realtimeSinceStartup;
+        testPath = FindPath(new GridPosition(1, 1), new GridPosition(7, 13), out pathLength);
+        Debug.Log("PathFinding: Time: Setup: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f) + " path length: " + pathLength);
+
+        _pathfindingCodeMonkey.FindPath(this._width, this._height, new GridPosition(1, 1), new GridPosition(7, 13));
 
     }
     protected void InitializeIsWalkable()
@@ -103,11 +106,16 @@ public class PathFinding : MonoBehaviour
                 }
                 PathNode newNode = GetNode(x, y);
                 ResetPathNode(newNode);
-                newNode.SetNeighborList(GetNeighborList(newNode));
+                List<PathNode> neighborList = GetNeighborList(newNode);
+                newNode.SetNeighborList(neighborList);
+                foreach (PathNode neighborNode in neighborList)
+                {
+                    newNode.AddNeighborToNeighborNodeCostDictionary(neighborNode, CalculateDistance(gridPosition, neighborNode.GetGridPosition()));
+                }
             }
         }
     }
-    public virtual List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
+    public virtual List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength, int maxMoveDistance = int.MaxValue)
     {
         if (!LevelGrid.Instance.IsValidGridPosition(endGridPosition))
         {
@@ -118,7 +126,6 @@ public class PathFinding : MonoBehaviour
 
         List<PathNode> openList = new List<PathNode>(); // used for nodes waiting to be searched
         //List<PathNode> closedList = new List<PathNode>(); // used for nodes that have already been searched
-        //HashSet<PathNode> openList = new HashSet<PathNode>();
         
 
         // add the starting node to the open list
@@ -134,7 +141,7 @@ public class PathFinding : MonoBehaviour
             return null;
         }
 
-        openList.Add(startNode);
+
 
         // cycle through all nodes and reset their state
         // todo: instead of iterating through every possible node and resetting it, instead track what nodes were updated in FindPath
@@ -143,6 +150,7 @@ public class PathFinding : MonoBehaviour
         //{
         //    for (int y = 0; y < _gridSystem.GetHeight(); y++)
         //    {
+
         //        GridPosition gridPosition = new GridPosition(x, y);
         //        PathNode pathNode = _gridSystem.GetGridObject(gridPosition);
 
@@ -164,31 +172,38 @@ public class PathFinding : MonoBehaviour
         startNode.SetGCost(0);
         startNode.SetHCost(CalculateDistance(startGridPosition, endGridPosition));
         startNode.CalculateFCost();
+
         _modifiedNodes.Add(startNode);
         _modifiedNodes.Add(endNode);
+
+        openList.Add(startNode);
+        //SortedDictionary<int, PathNode> openListDictionary = new SortedDictionary<int, PathNode>();
+        //openListDictionary.Add(startNode.GetFCost(), startNode);
 
         // search for a path until the openList count is 0
         while (openList.Count > 0)
         {
             // set the current node to the node in the list with the lowest f cost. The node with the lowest f cost is what we'd want to prioritize in path calculations?
-            //PathNode currentNode = GetLowestFCostPathNode(openList);
-
-            // when item is added to openlist, it is first checked to see if its f cost is lower than the openList[0] item. If it is, it is inserted at index 0. If it is not, it is added to the list at the end
-            // hopefully this means openList[0] is now always the lowest f cost node on the openlist
-            PathNode currentNode = openList[0];
+            PathNode currentNode = GetLowestFCostPathNode(openList);
+            // instead of this, create a "sorted dictionary" thats SortedDictionary<int, PathNode> where the int is the f score of the node. This way, the node with the lowest f score will always be first entry in the dictionary?
+            //int firstKey = openListDictionary.Keys.First();
+            //PathNode currentNode = openListDictionary[firstKey];
 
             // check if this is the current node is at the end node
             if (currentNode == endNode)
             {
                 // reach final node
                 pathLength = endNode.GetFCost();
+                //pathLength = endNode.GetGCost();
                 return CalculatePath(endNode);
             }
 
             // remove current node from openList and add to closeList
             openList.Remove(currentNode);
+            //openListDictionary.Remove(firstKey);
+
             //closedList.Add(currentNode);
-            currentNode.SetWasChecked(true);
+            currentNode.SetIsClosed(true);
 
             // Get Neighbors to search through
             // consider "caching" neighbor nodes in the nodes themselves so this doesn't need to be recalculated every time? When the path nodes are created, get all the neighbor nodes for each node?
@@ -200,7 +215,7 @@ public class PathFinding : MonoBehaviour
                 //{
                 //    continue;
                 //}
-                if (neighborNode.GetWasChecked())
+                if (neighborNode.IsClosed())
                 {
                     continue;
                 }
@@ -208,7 +223,19 @@ public class PathFinding : MonoBehaviour
                 if (!neighborNode.IsWalkable())
                 {
                     //closedList.Add(neighborNode);
-                    neighborNode.SetWasChecked(true);
+                    //neighborNode.SetWasChecked(true);
+                    continue;
+                }
+
+                // check the distance to the neighbor node from the start position. If it is greater than the max move distance, ignore. Check this by seeing if the X or Y coordinate of the neighbor node is greater than startNode.x/y + max move distance
+                int neighborX = neighborNode.GetGridPosition().x;
+                int neighborY = neighborNode.GetGridPosition().y;
+                if (MathF.Abs(neighborX - startGridPosition.x) > maxMoveDistance)
+                {
+                    continue;
+                }
+                if (MathF.Abs(neighborY - startGridPosition.y) > maxMoveDistance)
+                {
                     continue;
                 }
 
@@ -216,6 +243,9 @@ public class PathFinding : MonoBehaviour
                 // this should be currentNode.gCost + 10 if it is adjacent to the current node, and currentNode.gCost + 14 if it is diagonal to the current node
                 //int tentativeGCost = currentNode.GetGCost() + CalculateDistance(currentNode.GetGridPosition(), neighborNode.GetGridPosition());
                 int tentativeGCost = GetTenativeGCost(currentNode,neighborNode);
+
+                
+
 
                 // Check if the tenative Gcost is lower than the neighbor node's current g cost. If it is, update the nodes "came from path node" value as well as it's G, H, and F costs
                 // if the tenative g cost is lower than the neighbor node's current g cost, that means a better/shorter path was found to the neighbor node
@@ -225,35 +255,37 @@ public class PathFinding : MonoBehaviour
                     neighborNode.SetCameFromPathNode(currentNode);
                     neighborNode.SetGCost(tentativeGCost);
                     neighborNode.SetHCost(CalculateDistance(neighborNode.GetGridPosition(), endGridPosition));
-                    neighborNode.CalculateFCost();
+                    neighborNode.CalculateFCost();                    
 
                     //if (!_modifiedNodes.Contains(neighborNode))
                     //    _modifiedNodes.Add(neighborNode);
                     _modifiedNodes.Add(neighborNode);
 
-                    //// add the neighbor node to the open list of nodes to check
-                    if (!openList.Contains(neighborNode))
+                    if (!neighborNode.IsOpen())
                     {
-                        if (openList.Count > 0 && neighborNode.GetFCost() < openList[0].GetFCost())
-                        {
-                            openList.Insert(0, neighborNode);
-                        }
-                        else
-                        {
-                            openList.Add(neighborNode);
-                        }
+                        openList.Add(neighborNode);
 
+                        //try
+                        //{
+                        //    openListDictionary.Add(neighborNode.GetFCost(), neighborNode);
+                        //}
+                        //catch (Exception e)
+                        //{
+                        //    Debug.Log("FindPath: Exception writing to sorted dictionary for key: " + neighborNode.GetFCost().ToString() + ". Error: " + e);
+                        //}
+
+                        neighborNode.SetIsOpen(true);
                     }
-                    //if (!openList.Contains(neighborNode))
-                    //{
-                    //    openList.Add(neighborNode);
-                    //}
                 }
             }
         }
 
         // If you are here, no path was found to the end grid position
         //Debug.Log("FindPath: no valid path found");
+        if (endGridPosition.x == 4 && endGridPosition.y == 4)
+        {
+            Debug.Log("FindPath: No path found to: " + endGridPosition.ToString() + " pathlength was: " + GetNode(endGridPosition.x,endGridPosition.y).GetFCost().ToString());
+        }
         ResetModifiedNodes(_modifiedNodes);
         pathLength = 0;
         return null;
@@ -261,10 +293,15 @@ public class PathFinding : MonoBehaviour
     public virtual int GetTenativeGCost(PathNode currentNode, PathNode neighborNode)
     {
         return currentNode.GetGCost() + CalculateDistance(currentNode.GetGridPosition(), neighborNode.GetGridPosition());
+        //return currentNode.GetGCost() + currentNode.GetNeighborNodeCostDictionary()[neighborNode];
     }
     public virtual int CalculateDistance(GridPosition a, GridPosition b)
     {
-        return LevelGrid.Instance.CalculateDistance(a, b);
+        //return LevelGrid.Instance.CalculateDistance(a, b);
+        int xDistance = math.abs(a.x - b.x);
+        int yDistance = math.abs(a.y - b.y);
+        int remaining = math.abs(xDistance - yDistance);
+        return MOVE_DIAGONAL_COST * math.min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
     }
     //public int CalculateDistance(GridPosition a, GridPosition b)
     //{
@@ -424,15 +461,15 @@ public class PathFinding : MonoBehaviour
     {
         _gridSystem.GetGridObject(gridPosition).SetIsWalkable(isWalkable);
     }
-    public bool HasPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
+    public bool HasPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength, int maxMoveDistance = int.MaxValue)
     {
-        return FindPath(startGridPosition, endGridPosition, out pathLength) != null;
+        return FindPath(startGridPosition, endGridPosition, out pathLength, maxMoveDistance) != null;
         //return FindPathDots(startGridPosition, endGridPosition, out pathLength) != null;
     }
     public int GetPathLength(GridPosition startGridPosition, GridPosition endGridPosition)
     {
-        //FindPath(startGridPosition, endGridPosition, out int pathLength);
-        FindPathDots(startGridPosition, endGridPosition, out int pathLength);
+        FindPath(startGridPosition, endGridPosition, out int pathLength);
+        //FindPathDots(startGridPosition, endGridPosition, out int pathLength);
         return pathLength;
     }
     void ResetModifiedNodes(List<PathNode> modifiedNodes)
@@ -440,17 +477,6 @@ public class PathFinding : MonoBehaviour
         if (modifiedNodes.Count == 0)
             return;
 
-        //IEnumerable<PathNode> distincNodesIEnumerable = modifiedNodes.Distinct();
-        //List<PathNode> distincNodesList = distincNodesIEnumerable.ToList();
-
-        ////for (int i = 0, n = modifiedNodes.Count; i < n; i++)
-        ////{
-        ////    ResetPathNode(modifiedNodes[i]);
-        ////}
-        //for (int i = 0, n = distincNodesList.Count; i < n; i++)
-        //{
-        //    ResetPathNode(distincNodesList[i]);
-        //}
 
         for (int i = 0, n = modifiedNodes.Count; i < n; i++)
         {
@@ -467,7 +493,14 @@ public class PathFinding : MonoBehaviour
 
         // reset the "came from node" value
         pathNode.ResetCameFromPathNode();
-        pathNode.SetWasChecked(false);
+        pathNode.SetIsClosed(false);
+        pathNode.SetIsOpen(false);
+    }
+    public bool IsPathNodeWalkable(int x, int y)
+    {
+        if (!LevelGrid.Instance.IsValidGridPosition(new GridPosition(x, y)))
+            return false;
+        return GetNode(x, y).IsWalkable();
     }
     public virtual List<GridPosition> FindPathDots(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
     {
@@ -486,7 +519,7 @@ public class PathFinding : MonoBehaviour
         // store path nodes in a nativearray
         NativeArray<PathNodeDots> pathNodeArray = new NativeArray<PathNodeDots>(gridSize.x * gridSize.y, Allocator.Temp);
 
-        // create path nodes for the grid and initialize values
+        //create path nodes for the grid and initialize values
         for (int x = 0; x < gridSize.x; x++)
         {
             for (int y = 0; y < gridSize.y; y++)
@@ -498,11 +531,11 @@ public class PathFinding : MonoBehaviour
 
                 // initialize path cost values
                 pathNode.gCost = int.MaxValue;
-                pathNode.hCost = CalculateDistanceDots(new int2(x, y), endPosition);
+                pathNode.hCost = 0;
                 //pathNode.hCost = 0;
                 pathNode.CalculateFCost();
 
-                pathNode.isWalkable = _gridSystem.GetGridObject(new GridPosition(x,y)).IsWalkable();
+                pathNode.isWalkable = _gridSystem.GetGridObject(new GridPosition(x, y)).IsWalkable();
                 pathNode.wasChecked = false;
 
                 pathNode.cameFromNodeIndex = -1;
@@ -511,6 +544,7 @@ public class PathFinding : MonoBehaviour
                 pathNodeArray[pathNode.index] = pathNode;
             }
         }
+
         // get the end node's index
         int endNodeIndex = CalculateDotsNodeIndex(endPosition.x, endPosition.y, gridSize.x);
         PathNodeDots endNode = pathNodeArray[endNodeIndex];
@@ -587,13 +621,18 @@ public class PathFinding : MonoBehaviour
 
                 // get the index of the neighbor node. If the index is in the closed list, skip as that node has already been checked
                 int neighborNodeIndex = CalculateDotsNodeIndex(neighborPosition.x, neighborPosition.y, gridSize.x);
-                if (closedList.Contains(neighborNodeIndex))
+                //if (closedList.Contains(neighborNodeIndex))
+                //{
+                //    continue;
+                //}
+
+                // check if the neighbor node is walkable. If not, skip
+                PathNodeDots neighborNode = pathNodeArray[neighborNodeIndex];
+                if (neighborNode.wasChecked)
                 {
                     continue;
                 }
 
-                // check if the neighbor node is walkable. If not, skip
-                PathNodeDots neighborNode = pathNodeArray[neighborNodeIndex];
                 if (!neighborNode.isWalkable)
                 {
                     continue;
@@ -612,6 +651,7 @@ public class PathFinding : MonoBehaviour
                     // remember to update the struct that is at the neighbor node's index with the values that were just updated. So far all changes were made to a copy of that struct
                     pathNodeArray[neighborNodeIndex] = neighborNode;
 
+
                     // add the neighbor noded to the openlist so its neighbor's will be checked
                     if (!openList.Contains(neighborNodeIndex))
                     {
@@ -627,6 +667,7 @@ public class PathFinding : MonoBehaviour
         closedList.Dispose();
 
         // if you're here, no path was found D:
+
         pathLength = 0;
         return null;
         
@@ -744,4 +785,6 @@ public class PathFinding : MonoBehaviour
             return x;
         }
     }
+
+
 }

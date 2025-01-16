@@ -59,8 +59,8 @@ public class MoveAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
         // Get the path to the end position
-        //List<GridPosition> pathGridPositionList =  PathFinding.Instance.FindPath(_unit.GetGridPosition(), gridPosition, out int pathLength);
-        List<GridPosition> pathGridPositionList = PathFinding.Instance.FindPathDots(_unit.GetGridPosition(), gridPosition, out int pathLength);
+        List<GridPosition> pathGridPositionList =  PathFinding.Instance.FindPath(_unit.GetGridPosition(), gridPosition, out int pathLength, _maxMoveDistance);
+        //List<GridPosition> pathGridPositionList = PathFinding.Instance.FindPathDots(_unit.GetGridPosition(), gridPosition, out int pathLength);
 
         //string pathString = "";
         //for (int i = 0; i < pathGridPositionList.Count; i++)
@@ -119,7 +119,8 @@ public class MoveAction : BaseAction
                 {
                     continue;
                 }
-                if (!PathFinding.Instance.HasPath(unitGridPosition, testGridPosition, out int pathLength))
+                
+                if (!PathFinding.Instance.HasPath(unitGridPosition, testGridPosition, out int pathLength, _maxMoveDistance))
                 {
                     continue;
                 }
@@ -129,6 +130,7 @@ public class MoveAction : BaseAction
                 if (pathLength > _maxMoveDistance * pathFindingDistanceMultiplier) // pathLength was returned by the HasPath call above. Doing this instead of calling PathFinding.Instance.GetPathLength so that the same path isn't calculated twice
                 {
                     // path length is too long
+                    //Debug.Log("GetValidActionGridPositionList: Path length from: " + unitGridPosition.ToString() + " to: " + testGridPosition.ToString() + " is: " + pathLength + " which is too far! Max movedistance is: " + _maxMoveDistance + " ("+ (_maxMoveDistance * pathFindingDistanceMultiplier).ToString() +")");
                     continue;
                 }
                 validGridPositionList.Add(testGridPosition);
