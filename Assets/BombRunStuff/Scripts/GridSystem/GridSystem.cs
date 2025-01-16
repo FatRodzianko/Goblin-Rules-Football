@@ -50,6 +50,10 @@ public class GridSystem<TGridObject>
     {
         return _height;
     }
+    public int GetMaxSize()
+    {
+        return _width * _height;
+    }
     public void CreateDebugObjects(Transform debugPrefab)
     {
         Transform debugObjectHolder = GameObject.FindGameObjectWithTag("DebugObjectHolder").transform;
@@ -106,20 +110,27 @@ public class GridSystem<TGridObject>
     }
     public virtual int CalculateDistance(GridPosition a, GridPosition b)
     {
-        GridPosition gridPositionDistance = a - b;
+        //GridPosition gridPositionDistance = a - b;
 
-        // Get the "x distance" and "z distance." Basically how far do you need to move in the X axis and how far do you move in the Z axis to get from point a to b
+        //// Get the "x distance" and "z distance." Basically how far do you need to move in the X axis and how far do you move in the Z axis to get from point a to b
+        //int xDistance = Mathf.Abs(gridPositionDistance.x);
+        //int yDistance = Mathf.Abs(gridPositionDistance.y);
+
+        //// get the distance that will be traveled diagonally by getting the "overlap" between the x and z distances.
+        //// Ex.: If you move to a position that is 1 distance on the x and 2 on the z, then you'd go diagonally 1 time, then straight 1 additional time
+        //// Ex.: if you moved 2 on x, and 5 on z, 
+        //int diagonalDistance = Mathf.Min(xDistance, yDistance);
+
+        //// Get the remaining "Straight" distance by subtracting the x distance from z distance
+        //int remainingStraightDistance = Mathf.Abs(xDistance - yDistance);
+
+        //return (diagonalDistance * MOVE_DIAGONAL_COST) + (remainingStraightDistance * MOVE_STRAIGHT_COST);
+
+        GridPosition gridPositionDistance = a - b;
         int xDistance = Mathf.Abs(gridPositionDistance.x);
         int yDistance = Mathf.Abs(gridPositionDistance.y);
+        int remaining = Mathf.Abs(xDistance - yDistance);
+        return MOVE_DIAGONAL_COST * Mathf.Min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
 
-        // get the distance that will be traveled diagonally by getting the "overlap" between the x and z distances.
-        // Ex.: If you move to a position that is 1 distance on the x and 2 on the z, then you'd go diagonally 1 time, then straight 1 additional time
-        // Ex.: if you moved 2 on x, and 5 on z, 
-        int diagonalDistance = Mathf.Min(xDistance, yDistance);
-
-        // Get the remaining "Straight" distance by subtracting the x distance from z distance
-        int remainingStraightDistance = Mathf.Abs(xDistance - yDistance);
-
-        return (diagonalDistance * MOVE_DIAGONAL_COST) + (remainingStraightDistance * MOVE_STRAIGHT_COST);
     }
 }

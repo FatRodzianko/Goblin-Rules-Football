@@ -10,7 +10,8 @@ public class PathNode
     private int _gCost;
     private int _hCost;
     private int _fCost;
-    private bool _wasChecked = false;
+    private bool _isClosed = false;
+    private bool _isOpen = false;
 
     // reference to previous node
     private PathNode _cameFromPathNode; // this is the node the algorithm "came from" to reach this node. Used when building out what the final path will be by "walking back" from the final node to each "_cameFrom" node
@@ -19,6 +20,7 @@ public class PathNode
 
     // cached neighbors
     List<PathNode> _neighborNodes = new List<PathNode>();
+    Dictionary<PathNode, int> _neighborNodeCostDictionary = new Dictionary<PathNode, int>();
     public PathNode(GridPosition gridPosition)
     {
         this._gridPosition = gridPosition;
@@ -75,20 +77,39 @@ public class PathNode
     {
         this._isWalkable = isWalkable;
     }
-    public void SetWasChecked(bool wasChecked)
+    public void SetIsClosed(bool isClosed)
     {
-        this._wasChecked = wasChecked;
+        this._isClosed = isClosed;
     }
-    public bool GetWasChecked()
+    public bool IsClosed()
     {
-        return _wasChecked;
+        return _isClosed;
+    }
+    public void SetIsOpen(bool isOpen)
+    {
+        this._isOpen = isOpen;
+    }
+    public bool IsOpen()
+    {
+        return _isOpen;
     }
     public void SetNeighborList(List<PathNode> newNeighbors)
     {
+        this._neighborNodes.Clear();
         this._neighborNodes.AddRange(newNeighbors);
     }
     public List<PathNode> GetNeighborNodes()
     {
         return _neighborNodes;
+    }
+    public void AddNeighborToNeighborNodeCostDictionary(PathNode neighborNode, int distanceToNeighbor)
+    {
+        if (_neighborNodeCostDictionary.ContainsKey(neighborNode))
+            return;
+        _neighborNodeCostDictionary.Add(neighborNode, distanceToNeighbor);        
+    }
+    public Dictionary<PathNode, int> GetNeighborNodeCostDictionary()
+    {
+        return _neighborNodeCostDictionary;
     }
 }
