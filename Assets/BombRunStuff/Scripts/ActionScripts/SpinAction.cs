@@ -36,11 +36,12 @@ public class SpinAction : BaseAction
 
         transform.eulerAngles += new Vector3(0, spinAddAmount, 0);
     }
-    public override void TakeAction(GridPosition gridPosition, Action onSpinComplete)
+    public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-        _onActionComplete = onSpinComplete;
+        //_onActionComplete = onSpinComplete;
         _totalSpinAmount = 0;
-        _isActive = true;        
+        //_isActive = true;
+        ActionStart(onActionComplete);
     }
     public override string GetActionName()
     {

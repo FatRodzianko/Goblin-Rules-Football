@@ -18,7 +18,7 @@ public class GrenadeProjectile : MonoBehaviour
     [Header("Grenade Stats")]
     [SerializeField] private float _throwSpeed = 15f;
     [SerializeField] private int damageRadius = 1;
-    [SerializeField] private int grenadeDamage = 30;
+    [SerializeField] private int grenadeDamage = 69;
     
 
     [Header("Sprite Objects")]

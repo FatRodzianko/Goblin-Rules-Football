@@ -21,6 +21,9 @@ public class PathNode
     // cached neighbors
     List<PathNode> _neighborNodes = new List<PathNode>();
     Dictionary<PathNode, int> _neighborNodeCostDictionary = new Dictionary<PathNode, int>();
+
+    // heap stuff
+    private int _heapIndex;
     public PathNode(GridPosition gridPosition)
     {
         this._gridPosition = gridPosition;
@@ -112,4 +115,26 @@ public class PathNode
     {
         return _neighborNodeCostDictionary;
     }
+    //public int HeapIndex
+    //{
+    //    get {
+    //        return _heapIndex;
+    //    }
+    //    set {
+    //        this._heapIndex = value;
+    //    }
+    //}
+    //// Compare the f costs of two path nodes?
+    //public int CompareTo(PathNode pathNodeToCompare)
+    //{
+    //    int compare = _fCost.CompareTo(pathNodeToCompare.GetFCost());
+    //    // if f costs are the same, compare the h costs?
+    //    if (compare == 0)
+    //    {
+    //        compare = _hCost.CompareTo(pathNodeToCompare.GetHCost());
+    //    }
+
+    //    // set compare to negative because int.Compare() (what _fCost.CompareTo is doing) returns 1 if the int is higher than what you are comparing two. However, for the Heap stuff, the lower fCost should be the higher priority and return 1
+    //    return -compare;
+    //}
 }

@@ -196,6 +196,7 @@ GameObject:
   - component: {fileID: 7297105716296972232}
   - component: {fileID: 3220647545044700835}
   - component: {fileID: 5928444417147222519}
+  - component: {fileID: 4887323598526683332}
   - component: {fileID: 396472657878469393}
   - component: {fileID: 3362271877576885837}
   - component: {fileID: 4184348786050281194}
@@ -238,6 +239,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8e71ecf61c8fd54892d9db60497d819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _startingHealth: 100
+  _health: 0
   _isEnemy: 0
   _baseActionArray: []
   _actionPoints: 2
@@ -305,6 +308,23 @@ MonoBehaviour:
   _actionSymbolSprite: {fileID: 21300000, guid: e5917e614c198a94aa34d711c31edc9d, type: 3}
   _maxMoveDistance: 4
   _unitAnimator: {fileID: 0}
+--- !u!114 &4887323598526683332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4944422538143551182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f72d2ecf7b893be4e9eebbc7a2e1bc90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unit: {fileID: 0}
+  _isActive: 0
+  _actionPointsCost: 1
+  _actionSymbolSprite: {fileID: 21300000, guid: 235fab481a567c44ca1574a2cee9b931, type: 3}
+  _maxShootDistance: 10
 --- !u!114 &396472657878469393
 MonoBehaviour:
   m_ObjectHideFlags: 0

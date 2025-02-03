@@ -32,7 +32,21 @@ public class MoveAction : BaseAction
     [Header("Animation")]
     [SerializeField] private Animator _unitAnimator;
 
+    // cache the last valid action list so it doesn't need to be recalculated for every mouse click?
+    private Dictionary<GridPosition, List<GridPosition>> _cachedValidActionList = new Dictionary<GridPosition, List<GridPosition>>();
 
+    private void Start()
+    {
+        PathFinding.Instance.IsWalkableUpdated += PathFinding_IsWalkableUpdated;
+    }
+    private void OnDisable()
+    {
+        PathFinding.Instance.IsWalkableUpdated -= PathFinding_IsWalkableUpdated;
+    }
+    private void PathFinding_IsWalkableUpdated(object sender, EventArgs e)
+    {
+        ResetCachedValidPositionList();
+    }
     private void Update()
     {
         if (!_isActive)
@@ -56,6 +70,21 @@ public class MoveAction : BaseAction
             
         }
     }
+    public int GetMaxMoveDistance()
+    {
+        return _maxMoveDistance;
+    }
+    public void SetMaxMoveDistance(int maxMoveDistance)
+    {
+        if (maxMoveDistance < 0)
+            return;
+        _maxMoveDistance = maxMoveDistance;
+        ResetCachedValidPositionList();
+    }
+    void ResetCachedValidPositionList()
+    {
+        _cachedValidActionList.Clear();
+    }
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
         // Get the path to the end position
@@ -73,20 +102,40 @@ public class MoveAction : BaseAction
         _currentPositionIndex = 0;
         _positionList = new List<Vector3>();
 
+        if (pathGridPositionList == null)
+        {
+            {
+                _onActionComplete = onActionComplete;
+                StartCoroutine(WaitForBadMove());
+                return;
+            }
+
+        }
         foreach (GridPosition pathGridPosition in pathGridPositionList)
         {
             _positionList.Add(LevelGrid.Instance.GetWorldPosition(pathGridPosition));
         }
 
-        _onActionComplete = onActionComplete;
-        _isActive = true;
+        //_onActionComplete = onActionComplete;
+        //_isActive = true;
+        ActionStart(onActionComplete);
     }
     public override List<GridPosition> GetValidActionGridPositionList()
     {
         float startTime = Time.realtimeSinceStartup;
         List<GridPosition> validGridPositionList = new List<GridPosition>();
+        // For testing jobs?
+        //List<GridPosition> gridPositionsToTest = new List<GridPosition>();
 
         GridPosition unitGridPosition = _unit.GetGridPosition();
+
+        if (_cachedValidActionList.ContainsKey(unitGridPosition))
+        {
+            Debug.Log("GetValidActionGridPositionList: repeating for grid position: " + unitGridPosition.ToString() + " returning cached list?");
+            Debug.Log("Time: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
+            return _cachedValidActionList[unitGridPosition];
+        }
+        _cachedValidActionList.Clear();
         for (int x = -_maxMoveDistance; x <= _maxMoveDistance; x++)
         {
             for (int y = -_maxMoveDistance; y <= _maxMoveDistance; y++)
@@ -119,14 +168,19 @@ public class MoveAction : BaseAction
                 {
                     continue;
                 }
-                
+                // check the distance to the target grid position. This will be the distance assuming no walls or anything. If distance with that is greater than distance max, skip
+                int pathFindingDistanceMultiplier = 10;
+                if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > _maxMoveDistance * pathFindingDistanceMultiplier)
+                {
+                    continue;
+                }
                 if (!PathFinding.Instance.HasPath(unitGridPosition, testGridPosition, out int pathLength, _maxMoveDistance))
                 {
                     continue;
                 }
                 //Debug.Log("GetValidActionGridPositionList: Valid position at: " + testGridPosition.ToString() + " with a length of: " + pathLength.ToString());
                 // Get the length of the path and make sure it does not exceed the unit's max moving distance
-                int pathFindingDistanceMultiplier = 10;
+                
                 if (pathLength > _maxMoveDistance * pathFindingDistanceMultiplier) // pathLength was returned by the HasPath call above. Doing this instead of calling PathFinding.Instance.GetPathLength so that the same path isn't calculated twice
                 {
                     // path length is too long
@@ -137,6 +191,8 @@ public class MoveAction : BaseAction
             }
         }
         Debug.Log("Time: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
+        _cachedValidActionList.Add(unitGridPosition, validGridPositionList);
+
         return validGridPositionList;
         // sort positions by closest to the unit position?
         //return validGridPositionList.OrderBy(gp => GridPosition.Distance(unitGridPosition, gp)).ToList();
@@ -239,4 +295,11 @@ public class MoveAction : BaseAction
 
         return actionValue;
     }
+    IEnumerator WaitForBadMove()
+    {
+        //yield on a new YieldInstruction that waits for 5 seconds.
+        yield return new WaitForSeconds(2f);
+        _onActionComplete();
+    }
+
 }

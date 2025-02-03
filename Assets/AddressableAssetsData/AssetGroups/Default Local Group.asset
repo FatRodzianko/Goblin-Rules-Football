@@ -121,6 +121,22 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/calculating-sense_withOUT-master-compressor_less-chords_remaster-24_officewave-3.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: d2176a84bdd73834bbecf837ac81c696
+    m_Address: Assets/SFX/Music/23_Table-Full-of-Dread.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 6be8dd1bb4d32fc44937cf0f2f2ad91e
+    m_Address: Assets/SFX/Music/25_Right-Side-In.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 94a91699d00355241820bd2bb169a243
+    m_Address: Assets/SFX/Music/24_Mayonnaise-Malaise.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1cdca43f1cecf3046a532e15b442f95c
+    m_Address: Assets/SFX/Music/22_Gifted-Week-Sweeps.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

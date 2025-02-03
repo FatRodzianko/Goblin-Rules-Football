@@ -25,8 +25,12 @@ public class PathFinding : MonoBehaviour
     List<PathNode> _modifiedNodes = new List<PathNode>();
 
 
-    // DOTS grid system?
-    [SerializeField] PathFindingCodeMonkey _pathfindingCodeMonkey;
+    //// DOTS grid system?
+    //[SerializeField] PathFindingCodeMonkey _pathfindingCodeMonkey;
+    //[SerializeField] PathFindingFindValidPositionJob _pathFindingFindValidPositionJob;
+
+    // events
+    public event EventHandler IsWalkableUpdated;
 
     private void Awake()
     {
@@ -60,7 +64,7 @@ public class PathFinding : MonoBehaviour
 
         InitializeIsWalkable();
         float startTime = Time.realtimeSinceStartup;
-        List<GridPosition> testPath = FindPathDots(new GridPosition(1, 1), new GridPosition(4, 4), out int pathLength);
+        List<GridPosition> testPath = FindPathDots(new GridPosition(1, 1), new GridPosition(2, 17), out int pathLength);
         Debug.Log("PathFinding: Time: Setup: Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f) + " path length: " + pathLength);
         //string pathString = "";
         //for (int i = 0; i < testPath.Count; i++)
@@ -71,10 +75,10 @@ public class PathFinding : MonoBehaviour
 
         testPath.Clear();
         startTime = Time.realtimeSinceStartup;
-        testPath = FindPath(new GridPosition(1, 1), new GridPosition(7, 13), out pathLength);
+        testPath = FindPath(new GridPosition(1, 1), new GridPosition(2, 17), out pathLength);
         Debug.Log("PathFinding: Time: Setup: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f) + " path length: " + pathLength);
 
-        _pathfindingCodeMonkey.FindPath(this._width, this._height, new GridPosition(1, 1), new GridPosition(7, 13));
+        //_pathfindingCodeMonkey.FindPath(this._width, this._height, new GridPosition(1, 1), new GridPosition(2, 17), int.MaxValue, _gridSystem);
 
     }
     protected void InitializeIsWalkable()
@@ -260,6 +264,13 @@ public class PathFinding : MonoBehaviour
                     //if (!_modifiedNodes.Contains(neighborNode))
                     //    _modifiedNodes.Add(neighborNode);
                     _modifiedNodes.Add(neighborNode);
+
+                    // The fcost is the distance from the start node to this node. If fcost is greater than max move distance, player can't get to this node
+                    // if the player can't get to this node, there is no reason to add to openlist to check?
+                    if (neighborNode.GetFCost() > maxMoveDistance * 10)
+                    {
+                        continue;
+                    }
 
                     if (!neighborNode.IsOpen())
                     {
@@ -460,6 +471,19 @@ public class PathFinding : MonoBehaviour
     public void SetIsWalkableGridPosition(GridPosition gridPosition, bool isWalkable)
     {
         _gridSystem.GetGridObject(gridPosition).SetIsWalkable(isWalkable);
+        IsWalkableUpdated?.Invoke(this, EventArgs.Empty);
+    }
+    public int GetGridWidth()
+    {
+        return _width;
+    }
+    public int GetGridHeight()
+    {
+        return _height;
+    }
+    public Vector2 GetGridSize()
+    {
+        return new Vector2(_width, _height);
     }
     public bool HasPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength, int maxMoveDistance = int.MaxValue)
     {
@@ -502,6 +526,12 @@ public class PathFinding : MonoBehaviour
             return false;
         return GetNode(x, y).IsWalkable();
     }
+    //public List<GridPosition> FindValidPositionsFromList(List<GridPosition> gridPositions, int maxDistance, GridPosition startPosition)
+    //{
+    //    List<GridPosition> validGridPostions = _pathFindingFindValidPositionJob.GetValidGridPositionsJob(gridPositions, maxDistance, startPosition);
+
+    //    return validGridPostions;
+    //}
     public virtual List<GridPosition> FindPathDots(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
     {
         if (!LevelGrid.Instance.IsValidGridPosition(endGridPosition))

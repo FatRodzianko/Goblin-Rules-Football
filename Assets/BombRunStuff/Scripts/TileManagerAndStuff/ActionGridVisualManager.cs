@@ -115,7 +115,31 @@ public class ActionGridVisualManager : MonoBehaviour
                 {
                     continue;
                 }
-
+                gridPositionList.Add(testGridPosition);
+            }
+        }
+        ShowActionVisualsFromList(gridPositionList, gridVisualType);
+    }
+    private void ShowGridPositionRangeRadius(GridPosition gridPosition, int range, GridVisualType gridVisualType)
+    {
+        List<GridPosition> gridPositionList = new List<GridPosition>();
+        for (int x = -range; x <= range; x++)
+        {
+            for (int y = -range; y <= range; y++)
+            {
+                GridPosition testGridPosition = gridPosition + new GridPosition(x, y);
+                if (testGridPosition == gridPosition)
+                {
+                    continue;
+                }
+                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+                if (LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > range * 10)
+                {
+                    continue;
+                }
                 gridPositionList.Add(testGridPosition);
             }
         }
@@ -180,10 +204,22 @@ public class ActionGridVisualManager : MonoBehaviour
                 break;
             case SwordAction swordAction:
                 gridVisualType = GridVisualType.Red;
-                ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
+                if (LevelGrid.Instance.GetGridObjectGridSystem().GetType() == typeof(GridSystemHex<GridObject>))
+                {
+                    ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
+                }
+                else
+                {
+                    ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
+                }
+                
                 break;
             case InteractAction interactAction:
                 gridVisualType = GridVisualType.Blue;
+                break;
+            case ShootAction shootAction:
+                gridVisualType = GridVisualType.Red;
+                ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), shootAction.GetMaxShootDistance(), GridVisualType.RedSoft);
                 break;
         }
 

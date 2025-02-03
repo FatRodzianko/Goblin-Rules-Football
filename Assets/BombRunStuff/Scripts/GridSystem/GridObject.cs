@@ -37,6 +37,15 @@ public class GridObject
     {
         return _unitList;
     }
+    public BombRunUnit GetUnit()
+    {
+        if (HasAnyUnit())
+        {
+            return _unitList[0];
+        }
+
+        return null;
+    }
     public void AddUnit(BombRunUnit unit)
     {
         if (!_unitList.Contains(unit))

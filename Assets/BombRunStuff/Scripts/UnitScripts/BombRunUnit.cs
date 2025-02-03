@@ -15,6 +15,9 @@ public class BombRunUnit : MonoBehaviour
     // non-static events
     public event EventHandler<BaseAction> OnActionTaken;
 
+    [Header("Unit Info")]
+    [SerializeField] private int _startingHealth = 100;
+    [SerializeField] private int _health;
     [SerializeField] private bool _isEnemy;
 
 
@@ -37,6 +40,8 @@ public class BombRunUnit : MonoBehaviour
         LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
 
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+
+        _health = _startingHealth;
 
         OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
     }
@@ -145,8 +150,13 @@ public class BombRunUnit : MonoBehaviour
     }
     public void Damage(int damage)
     {
-        if (damage > 0)
+        Debug.Log("Damage: " + damage);
+        _health -= damage;
+
+        if (_health <= 0)
+        {
             KillUnit();
+        }
     }
     private void KillUnit()
     {

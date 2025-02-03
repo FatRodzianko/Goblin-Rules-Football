@@ -24,8 +24,9 @@ public class DefendAction : BaseAction
 
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-        _onActionComplete = onActionComplete;
-        _isActive = true;
+        //_onActionComplete = onActionComplete;
+        //_isActive = true;
+        ActionStart(onActionComplete);
         FinishAction();
     }
     private void FinishAction()

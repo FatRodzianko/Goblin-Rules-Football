@@ -74,6 +74,11 @@ public class LevelGrid : MonoBehaviour
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         return gridObject.GetUnitList();
     }
+    public BombRunUnit GetUnitAtGridPosition(GridPosition gridPosition)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        return gridObject.GetUnit();
+    }
     public void RemoveUnitAtGridPosition(GridPosition gridPosition, BombRunUnit unit)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
@@ -178,5 +183,13 @@ public class LevelGrid : MonoBehaviour
     public int CalculateDistance(GridPosition a, GridPosition b)
     {
         return _gridSystem.CalculateDistance(a, b);
+    }
+    public int GetGridWidth()
+    {
+        return _width;
+    }
+    public int GetGridHeight()
+    {
+        return _height;
     }
 }

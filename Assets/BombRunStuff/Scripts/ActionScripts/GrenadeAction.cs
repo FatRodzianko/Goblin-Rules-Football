@@ -54,13 +54,12 @@ public class GrenadeAction : BaseAction
                 {
                     continue;
                 }
-                // calculate the distance to the grid position to make sure it is in the shooting radius. Right now the for loops form a big square around selected unit. This will make it more circular
-                int testDistance = Mathf.Abs(x) + Mathf.Abs(y);
-                if (testDistance > _maxThrowDistance)
+                if (BombRunTileMapManager.Instance.GetWallGridPositions().Contains(testGridPosition))
                 {
                     continue;
                 }
-                if (BombRunTileMapManager.Instance.GetWallGridPositions().Contains(testGridPosition))
+                // calculate the distance to the grid position to make sure it is in the shooting radius. Right now the for loops form a big square around selected unit. This will make it more circular
+                if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > _maxThrowDistance * 10)
                 {
                     continue;
                 }

@@ -121,6 +121,28 @@ public class GridSystemHex<TGridObject> : GridSystem<TGridObject>
     }
     public override int CalculateDistance(GridPosition a, GridPosition b)
     {
-        return Mathf.RoundToInt(MOVE_STRAIGHT_COST * Vector3.Distance(GetWorldPosition(a), GetWorldPosition(b)));
+        //// from: https://www.redblobgames.com/grids/hexagons/#distances
+        //GridPosition gridPositionDistance = a - b;
+        //int distance = Mathf.RoundToInt(Mathf.Abs((gridPositionDistance.x) + Mathf.Abs(gridPositionDistance.x + gridPositionDistance.y) + Mathf.Abs(gridPositionDistance.y) / 2) * MOVE_STRAIGHT_COST);
+
+        // Get "axial coordinates"
+        GridPosition aAxial = ConvertToAxialCoordinates(a);
+        GridPosition bAxial = ConvertToAxialCoordinates(b);
+
+        // Get the "Axial Distance"
+        GridPosition axialDifference = aAxial - bAxial;
+        int distance = Mathf.RoundToInt((Mathf.Abs(axialDifference.x) + Mathf.Abs(axialDifference.x + axialDifference.y) + Mathf.Abs(axialDifference.y)) / 2) * MOVE_STRAIGHT_COST;
+
+        return distance;
+        //return Mathf.RoundToInt(MOVE_STRAIGHT_COST * Vector3.Distance(GetWorldPosition(a), GetWorldPosition(b)));
+        
     }
+    private GridPosition ConvertToAxialCoordinates(GridPosition position)
+    {
+        int x = position.x - (position.y - (position.y & 1)) / 2;
+        int y = position.y;
+
+        return new GridPosition(x, y);
+    }
+    
 }

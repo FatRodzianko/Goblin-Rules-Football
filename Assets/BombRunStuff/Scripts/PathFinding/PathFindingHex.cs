@@ -18,6 +18,12 @@ public class PathFindingHex : PathFinding
         //_gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
 
         InitializeIsWalkable();
+
+        float startTime = Time.realtimeSinceStartup;
+        startTime = Time.realtimeSinceStartup;
+        List<GridPosition> testPath = FindPath(new GridPosition(1, 1), new GridPosition(2, 17), out int pathLength, 20);
+        Debug.Log("PathFindingHex: Time: Setup: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f) + " path length: " + pathLength);
+
     }
 
     public override List<PathNode> GetNeighborList(PathNode currentNode)
@@ -87,9 +93,30 @@ public class PathFindingHex : PathFinding
     }
     public override int CalculateDistance(GridPosition a, GridPosition b)
     {
-        return Mathf.RoundToInt(MOVE_STRAIGHT_COST *
-            Vector2.Distance(_gridSystem.GetWorldPosition(a), _gridSystem.GetWorldPosition(b)));
+        // OLD
+        //return Mathf.RoundToInt(MOVE_STRAIGHT_COST *
+        //    Vector2.Distance(_gridSystem.GetWorldPosition(a), _gridSystem.GetWorldPosition(b)));
+        // OLD
+
+        //// from: https://www.redblobgames.com/grids/hexagons/#distances
+        // Get "axial coordinates"
+        GridPosition aAxial = ConvertToAxialCoordinates(a);
+        GridPosition bAxial = ConvertToAxialCoordinates(b);
+
+        // Get the "Axial Distance"
+        GridPosition axialDifference = aAxial - bAxial;
+        int distance = Mathf.RoundToInt((Mathf.Abs(axialDifference.x) + Mathf.Abs(axialDifference.x + axialDifference.y) + Mathf.Abs(axialDifference.y)) / 2) * MOVE_STRAIGHT_COST;
+
+        return distance;
+
     }
-    
+    private GridPosition ConvertToAxialCoordinates(GridPosition position)
+    {
+        int x = position.x - (position.y - (position.y & 1)) / 2;
+        int y = position.y;
+
+        return new GridPosition(x, y);
+    }
+
 
 }

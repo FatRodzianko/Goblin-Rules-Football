@@ -437,7 +437,7 @@ public class Football : NetworkBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("OnTriggerEnter2D for football");
+        //Debug.Log("OnTriggerEnter2D for football");
         if (collision.tag == "goblin-body")
         {
             Debug.Log("Football: collided with goblin-body of goblin named: " + collision.transform.parent.name);

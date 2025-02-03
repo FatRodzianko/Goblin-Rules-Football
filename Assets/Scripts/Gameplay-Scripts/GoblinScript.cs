@@ -1081,7 +1081,7 @@ public class GoblinScript : NetworkBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("OnTriggerEnter2D for Goblin");
+        //Debug.Log("OnTriggerEnter2D for Goblin");
         if (collision.tag == "football")
         {
             Debug.Log("Goblin collided with football");
@@ -2339,13 +2339,13 @@ public class GoblinScript : NetworkBehaviour
             isKicking = newValue;
         if (isClient)
         {
-            Debug.Log("HandleIsKicking: isClient");
+            //Debug.Log("HandleIsKicking: isClient");
             if (hasAuthority)
             {
-                Debug.Log("HandleIsKicking: hasAuthority");
+                //Debug.Log("HandleIsKicking: hasAuthority");
                 if (newValue)
                 {
-                    Debug.Log("HandleIsKicking: start the kick animation");
+                    //Debug.Log("HandleIsKicking: start the kick animation");
                     animator.Play(goblinType + "-kick-football");
                 }
                     
@@ -3784,7 +3784,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void AIResetSprintingParameters()
     {
-        Debug.Log("AIResetSprintingParameters: for goblin: " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
+        //Debug.Log("AIResetSprintingParameters: for goblin: " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
         this.didGoblinCompleteSprint = false;
         this.willGoblinSprintToFatigue = false;
         this.minStaminaToSprintTo = 1.0f;
@@ -3800,7 +3800,7 @@ public class GoblinScript : NetworkBehaviour
     // Determine if the goblin should keep sprinting based on the Sprint Parameters that were set earlier?
     public bool AIWillGoblinKeepSprinting()
     {
-        Debug.Log("AIWillGoblinKeepSprinting: for goblin: " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
+        //Debug.Log("AIWillGoblinKeepSprinting: for goblin: " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
         bool keepSprinting = false;
         if (!this.canGoblinSprint)
         {
