@@ -2,6 +2,7 @@
   "dependencies": {
     "com.heathen.steamworksfoundation": "https://github.com/heathen-engineering/SteamworksFoundation.git?path=Unity/com.heathen.steamworksfoundation",
     "com.heathen.systemcore": "https://github.com/heathen-engineering/SystemCore.git?path=/com.heathen.systemcore",
+    "com.pandaroo.auto-rule-tile": "https://gitlab.com/pandaroo-public/auto-rule-tile.git",
     "com.unity.2d.animation": "7.0.7",
     "com.unity.2d.pixel-perfect": "5.0.1",
     "com.unity.2d.psdimporter": "6.0.5",

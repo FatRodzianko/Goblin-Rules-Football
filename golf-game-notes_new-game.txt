@@ -201,3 +201,20 @@ https://www.youtube.com/playlist?list=PLaiY5ttc7bmd070CyEaCG0xBqecxZXk-d
 "Midnight Bomb Run"
 - Goblins have evolved beyond the human need for bloodsheed to justify their conquests. All the great Goblin Nations agreed to (something about laser tag for combat)
 - - - An elite group of sappers and engineers were chosen to infiltrate behind enemy lines and plant the gigaton laser bomb at the heart of the <x empire>. Misson Code Name: Midnight Bomb Run
+
+### Wall Tiles
+- Make the top of the walls one "flat" color so I don't need to make a million different tiles?
+- - - should reduce it to ~8 different wall tiles, instead of the 20 I already have...
+x create a "wall object" that is just a rectangle collider
+- - x spawn them at wall tile position
+- - x store in dictionary of position:wall object
+- - - - - x to be used to find wall objects to remove if a wall tile is removed?
+- - x create a "wall object holder" to make them all a child of
+
+
+### Bowling Game:
+- super bowling lane starts at 222px and narrows to 66 px : 3.36 to 1
+- - - mine 128 to 70: 1.82 to one
+- - - should be down to 38 on mine??? or start at 235
+- Maybe use SNES resolution of 256x224?
+- - - or just halve current resolution to 384x216? 320x180? 640x360?

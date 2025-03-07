@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1719337278835388221}
   - component: {fileID: 2357901413509587883}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: test-unit-shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 8827558691476924513}
   - component: {fileID: 4432905341255503547}
   - component: {fileID: 3886970355815099910}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: action-symbol-sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -202,9 +202,10 @@ GameObject:
   - component: {fileID: 4184348786050281194}
   - component: {fileID: 2898562228658105131}
   - component: {fileID: 4589616383332178742}
-  m_Layer: 22
+  - component: {fileID: 5333451106934887573}
+  m_Layer: 11
   m_Name: Unit
-  m_TagString: Untagged
+  m_TagString: Goblin
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -277,7 +278,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.96875}
+  m_Offset: {x: 0, y: 0.3125}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -288,7 +289,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1.9375}
+  m_Size: {x: 0.875, y: 0.625}
   m_EdgeRadius: 0
 --- !u!114 &5928444417147222519
 MonoBehaviour:
@@ -306,8 +307,8 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: e5917e614c198a94aa34d711c31edc9d, type: 3}
+  _bombRunUnitAnimator: {fileID: 0}
   _maxMoveDistance: 4
-  _unitAnimator: {fileID: 0}
 --- !u!114 &4887323598526683332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -324,7 +325,16 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 235fab481a567c44ca1574a2cee9b931, type: 3}
+  _bombRunUnitAnimator: {fileID: 0}
   _maxShootDistance: 10
+  _shotBlockerLayerMasks:
+  - serializedVersion: 2
+    m_Bits: 1073741824
+  - serializedVersion: 2
+    m_Bits: 134217728
+  - serializedVersion: 2
+    m_Bits: 2048
+  _minDistanceToTravelThroughObstacle: 0.25
 --- !u!114 &396472657878469393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -341,6 +351,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 2
   _actionSymbolSprite: {fileID: 21300000, guid: 14844317d65c4d8469e3e3862a79d298, type: 3}
+  _bombRunUnitAnimator: {fileID: 0}
 --- !u!114 &3362271877576885837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -357,6 +368,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 2
   _actionSymbolSprite: {fileID: 21300000, guid: e4fae6034bcdca14390523951abc0dbe, type: 3}
+  _bombRunUnitAnimator: {fileID: 0}
   _maxReinforceDistance: 1
   _enemyNearbyDistance: 3
 --- !u!114 &4184348786050281194
@@ -375,6 +387,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: f2cdd7d90789c824882003eb372b8618, type: 3}
+  _bombRunUnitAnimator: {fileID: 0}
 --- !u!114 &2898562228658105131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -391,6 +404,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 95177d6dba8cb634e8b9977040bf3f44, type: 3}
+  _bombRunUnitAnimator: {fileID: 0}
   _maxThrowDistance: 12
   _grenadeProjectilePrefab: {fileID: 8449958251188467104, guid: 6da71e249ebcf6541a508c7537619a78, type: 3}
 --- !u!114 &4589616383332178742
@@ -409,6 +423,23 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: d395f258769a207428224a76105b5ee8, type: 3}
+  _bombRunUnitAnimator: {fileID: 0}
+--- !u!114 &5333451106934887573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4944422538143551182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3b7ea3ad265985419c2383e9c73d34b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 2261695523738932377}
+  _spriteRenderer: {fileID: 3774028933683333569}
+  _shootProjectilePrefab: {fileID: 6527801240750598869, guid: a9e4d5d120043af429184696ec5f8786, type: 3}
+  _shootPoint: {x: 0.1875, y: 1.34375, z: 0}
 --- !u!1 &8876794406186424813
 GameObject:
   m_ObjectHideFlags: 0
@@ -419,7 +450,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6166125511920968727}
   - component: {fileID: 3774028933683333569}
-  m_Layer: 22
+  - component: {fileID: 2261695523738932377}
+  m_Layer: 11
   m_Name: UnitSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -493,3 +525,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!95 &2261695523738932377
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8876794406186424813}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 92673fe8c911b324f96104c8981826c9, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

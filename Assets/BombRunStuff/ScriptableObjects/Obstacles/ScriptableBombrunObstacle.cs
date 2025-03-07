@@ -8,7 +8,14 @@ public enum BombRunObstacleType
 {
     Crate,
     Door,
+    Wall,
     Misc
+}
+public enum ObstacleCoverType
+{
+    None,
+    Full,
+    Partial    
 }
 
 [CreateAssetMenu(fileName = "BombRunObstacle", menuName = "BombRun/Obstacles/Create Obstacle")]
@@ -19,6 +26,9 @@ public class ScriptableBombrunObstacle : ScriptableObject
     [SerializeField] private TileBase _tile;
     [SerializeField] private bool _isDestrucable;
     [SerializeField] private bool _isInteractable;
+
+    [Header("Cover Stuff")]
+    [SerializeField] private ObstacleCoverType _obstacleCoverType;
 
     public Transform BombRunObstaclePrefab
     {
@@ -32,6 +42,13 @@ public class ScriptableBombrunObstacle : ScriptableObject
         get
         {
             return _bombRunObstacleType;
+        }
+    }
+    public ObstacleCoverType ObstacleCoverType
+    {
+        get
+        {
+            return _obstacleCoverType;
         }
     }
     public TileBase Tile

@@ -135,9 +135,9 @@ GameObject:
   - component: {fileID: 39569862}
   - component: {fileID: 39569861}
   - component: {fileID: 39569863}
-  m_Layer: 24
+  m_Layer: 30
   m_Name: Walls
-  m_TagString: Untagged
+  m_TagString: BombRunWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

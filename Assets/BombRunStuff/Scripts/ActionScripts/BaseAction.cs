@@ -18,6 +18,9 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] private int _actionPointsCost = 1;
     [SerializeField] private Sprite _actionSymbolSprite;
 
+    [Header("Animation Stuff")]
+    [SerializeField] protected BombRunUnitAnimator _bombRunUnitAnimator;
+
     // Actions
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
@@ -25,6 +28,10 @@ public abstract class BaseAction : MonoBehaviour
     protected virtual void Awake()
     {
         _unit = GetComponent<BombRunUnit>();
+        if (_bombRunUnitAnimator == null)
+        {
+            _bombRunUnitAnimator = GetComponent<BombRunUnitAnimator>();
+        }
     }
     public abstract string GetActionName();
     public abstract void TakeAction(GridPosition gridPosition, Action onActionComplete);

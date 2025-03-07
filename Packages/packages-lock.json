@@ -18,6 +18,13 @@
       },
       "hash": "6d58a14fd74c493bdad1476051e5cd48d3553499"
     },
+    "com.pandaroo.auto-rule-tile": {
+      "version": "https://gitlab.com/pandaroo-public/auto-rule-tile.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "2fa6eefd0905090df76aba60aea2fede89db9b4b"
+    },
     "com.unity.2d.animation": {
       "version": "7.0.7",
       "depth": 0,

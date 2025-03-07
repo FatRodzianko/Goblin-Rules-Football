@@ -64,6 +64,9 @@ TagManager:
   - MiniGolfPipe
   - MapMakerUIManager
   - DebugObjectHolder
+  - BombRunWall
+  - BombRunObstacle
+  - WallObjectHolder
   layers:
   - Default
   - TransparentFX
@@ -95,7 +98,7 @@ TagManager:
   - golfEnvironmentObstacles
   - spriteCollisions
   - golfBall
-  - 
+  - walls
   - 
   m_SortingLayers:
   - name: Default

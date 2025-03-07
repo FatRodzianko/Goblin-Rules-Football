@@ -5,6 +5,16 @@ using UnityEngine;
 
 public class ShootAction : BaseAction
 {
+    // events
+    public event EventHandler<OnStartShootingEventArgs> OnStartShooting;
+    public event EventHandler OnStopShooting;
+
+    public class OnStartShootingEventArgs : EventArgs 
+    {
+        public BombRunUnit TargetUnit;
+        public BombRunUnit ShootingUnit;
+    }
+
     private enum State
     {
         Aiming,
@@ -27,6 +37,10 @@ public class ShootAction : BaseAction
     private float _maxSpinAmount = 360f;
     private bool _aiming = false;
 
+    [Header("Shooting Stuff?")]
+    [SerializeField] private List<LayerMask> _shotBlockerLayerMasks = new List<LayerMask>();
+    [SerializeField] private float _minDistanceToTravelThroughObstacle = 0.25f;
+
     private void Update()
     {
         if (!_isActive)
@@ -40,7 +54,7 @@ public class ShootAction : BaseAction
             case State.Aiming:
                 if (_aiming)
                 {
-                    AimTowardTarget();
+                    SpinSprite();
                 }
                 else
                 {
@@ -79,7 +93,19 @@ public class ShootAction : BaseAction
                 break;
         }
     }
-    private void AimTowardTarget()
+    private void TurnTowardTarget(Vector3 targetPostion)
+    {
+        Vector3 directionToTarget = (targetPostion - _unit.transform.position).normalized;
+        if (directionToTarget.x < 0)
+        {
+            _bombRunUnitAnimator.FlipSprite(true);
+        }
+        else
+        {
+            _bombRunUnitAnimator.FlipSprite(false);
+        }
+    }
+    private void SpinSprite()
     {
         float spinAddAmount = _maxSpinAmount * Time.deltaTime;
 
@@ -99,6 +125,10 @@ public class ShootAction : BaseAction
     private void Shoot()
     {
         Debug.Log("Shoot");
+        OnStartShooting?.Invoke(this, new OnStartShootingEventArgs { 
+            TargetUnit = _targetUnit,
+            ShootingUnit = _unit
+        });
         _targetUnit.Damage(35);
     }
     public override string GetActionName()
@@ -148,11 +178,101 @@ public class ShootAction : BaseAction
                 {
                     continue;
                 }
+                if (DoesShotHitWallOrObstacle(unitGridPosition, testGridPosition))
+                {
+                    continue;
+                }
                 validGridPositionList.Add(testGridPosition);
             }
         }
 
         return validGridPositionList;
+    }
+    private bool DoesShotHitWallOrObstacle(GridPosition unitPosition, GridPosition targetPosition)
+    {
+        //Debug.Log("DoesShotHitWallOrObstacle: Unit Position: " + unitPosition + " Target position: " + targetPosition);
+        Vector2 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(unitPosition);
+        Vector2 targetWorldPosition = LevelGrid.Instance.GetWorldPosition(targetPosition);
+        Vector2 shootDirection = (targetWorldPosition - unitWorldPosition).normalized;
+
+        BombRunUnit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);
+
+        float distance = Vector2.Distance(unitWorldPosition, targetWorldPosition);
+        //Debug.Log("DoesShotHitWallOrObstacle: Unit Position: " + unitWorldPosition + " Target position: " + targetWorldPosition);
+
+        foreach (LayerMask mask in _shotBlockerLayerMasks)
+        {
+            RaycastHit2D[] hits = Physics2D.RaycastAll(unitWorldPosition, shootDirection, distance, mask);
+            if (hits.Length > 0)
+            {
+                RaycastHit2D[] reverseHits = Physics2D.RaycastAll(targetWorldPosition, (unitWorldPosition - targetWorldPosition).normalized, distance, mask);
+
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    Vector2 hit = hits[i].point;
+                    Vector2 reverseHit = reverseHits[reverseHits.Length - 1 - i].point;
+                    //Vector2 reverseHit = reverseHits[i].point;
+
+                    //Debug.Log("DoesShotHitWallOrObstacle: Hit collider: " + hits[i].collider.name + ":" + hit + " Reverse hit collider: " + reverseHits[i].collider.name + ":" + reverseHit);
+                    Debug.Log("DoesShotHitWallOrObstacle: Target Position: " + targetWorldPosition + " Hit collider: " + hits[i].collider.name + ":" + hit + " Reverse hit collider: " + reverseHits[reverseHits.Length - 1 - i].collider.name + ":" + reverseHit);
+
+                    if (hit == reverseHit)
+                    {
+                        Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. BUT the reverse hit is the same. This means a corner was hit? First hit position: " + hit + " Second hit position: " + reverseHit + " Target position: " + targetWorldPosition + " hit object: " + hits[i].collider.name);
+                        continue;
+                    }
+                    float distanceBetweenHits = Vector2.Distance(hit, reverseHit);
+                    if (distanceBetweenHits < _minDistanceToTravelThroughObstacle)
+                    {
+                        Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. BUT the distance between hit and reverse hit is less than " + _minDistanceToTravelThroughObstacle + ". This means a corner was hit? First hit position: " + hit + " Second hit position: " + reverseHit + " Distance between the hits: " + distanceBetweenHits + " Target position: " + targetWorldPosition);
+                        continue;
+                    }
+                    //Debug.Log("DoesShotHitWallOrObstacle: distanceBetweenHits: " + distanceBetweenHits + " Hit point: " + hit + " reverse hit point: " + reverseHit + " hit object?: " + hits[i].collider.name);
+                    if (hits[i].collider.CompareTag("BombRunWall"))
+                    {
+                        //Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + LevelGrid.Instance.GetGridPositon(hits[i].point) + " Target position: " + targetPosition);
+                        Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + hits[i].point + " Target position: " + targetWorldPosition);
+                        return true;
+                    }
+                    if (hits[i].collider.CompareTag("BombRunObstacle"))
+                    {
+                        if (hits[i].collider.GetComponent<BaseBombRunObstacle>().GetObstacleCoverType() == ObstacleCoverType.Full)
+                        {
+                            //Debug.Log("DoesShotHitWallOrObstacle: Hit Obstacle with Full Cover. Obstacle position: " + LevelGrid.Instance.GetGridPositon(hits[i].point) + " Target position: " + targetPosition);
+                            Debug.Log("DoesShotHitWallOrObstacle: Hit Obstacle with Full Cover. Obstacle position: " + hits[i].point + " Target position: " + targetWorldPosition);
+                            return true;
+                        }
+                    }
+                    if (hits[i].collider.CompareTag("Goblin"))
+                    {
+                        if (hits[i].collider.TryGetComponent<BombRunUnit>(out BombRunUnit hitGoblin))
+                        {
+                            if (hitGoblin == this._unit)
+                            {
+                                continue;
+                            }
+                            if (hitGoblin != targetUnit)
+                            {
+                                Debug.Log("DoesShotHitWallOrObstacle: Hit goblin that was not the target. Goblin position: " + hits[i].point + " Target position: " + targetWorldPosition);
+                                return true;
+                            }
+                        }
+                        
+                    }
+                }
+
+            }
+        }
+
+        Debug.Log("DoesShotHitWallOrObstacle: No walls or obstacles hit for position: " + targetWorldPosition);
+
+        return false;
+    }
+    private ObstacleCoverType GetMaxCoverTypeForShoot(GridPosition unitPosition, GridPosition targetPosition)
+    {
+        ObstacleCoverType maxOBstacleCoverType = ObstacleCoverType.None;
+
+        return maxOBstacleCoverType;
     }
     public override void TakeAction(GridPosition gridPosition, Action onSpinComplete)
     {
@@ -167,6 +287,7 @@ public class ShootAction : BaseAction
         _aiming = true;
         _totalSpinAmount = 0;
 
+        TurnTowardTarget(_targetUnit.GetWorldPosition());
 
         _isActive = true;
     }

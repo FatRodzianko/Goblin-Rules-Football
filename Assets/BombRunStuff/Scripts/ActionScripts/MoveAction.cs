@@ -20,6 +20,11 @@ public class MoveAction : BaseAction
     //    }
     //} 
 
+    // events?
+    public event EventHandler OnStartMoving;
+    public event EventHandler OnStopMoving;
+    public event EventHandler<bool> OnChangeDirection;
+
     [Header("Moving")]
     [SerializeField] private int _maxMoveDistance = 4;
     private List<Vector3> _positionList;
@@ -28,9 +33,6 @@ public class MoveAction : BaseAction
     private float _moveSpeed = 4f;
     private float _stoppingDistance = 0.05f;
     
-
-    [Header("Animation")]
-    [SerializeField] private Animator _unitAnimator;
 
     // cache the last valid action list so it doesn't need to be recalculated for every mouse click?
     private Dictionary<GridPosition, List<GridPosition>> _cachedValidActionList = new Dictionary<GridPosition, List<GridPosition>>();
@@ -56,6 +58,9 @@ public class MoveAction : BaseAction
         if (Vector2.Distance(transform.position, _targetPosition) > _stoppingDistance)
         {
             Vector3 moveDirection = (_targetPosition - this.transform.position).normalized;
+
+            CheckIfSpriteShouldFlip(moveDirection);
+
             transform.position += moveDirection * _moveSpeed * Time.deltaTime;
         }
         else
@@ -65,9 +70,21 @@ public class MoveAction : BaseAction
             if (_currentPositionIndex >= _positionList.Count())
             {
                 _isActive = false;
+                OnStopMoving?.Invoke(this, EventArgs.Empty);
                 _onActionComplete();
             }
             
+        }
+    }
+    private void CheckIfSpriteShouldFlip(Vector3 moveDirection)
+    {
+        if (moveDirection.x < 0)
+        {
+            _bombRunUnitAnimator.FlipSprite(true);
+        }
+        else
+        {
+            _bombRunUnitAnimator.FlipSprite(false);
         }
     }
     public int GetMaxMoveDistance()
@@ -119,6 +136,8 @@ public class MoveAction : BaseAction
         //_onActionComplete = onActionComplete;
         //_isActive = true;
         ActionStart(onActionComplete);
+
+        OnStartMoving?.Invoke(this, EventArgs.Empty);
     }
     public override List<GridPosition> GetValidActionGridPositionList()
     {

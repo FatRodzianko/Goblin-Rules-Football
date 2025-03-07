@@ -38,6 +38,11 @@ public class BombRunTileMapManager : MonoBehaviour
     [Header("Obstacles")]
     [SerializeField] private BombRunObstacleManager _bombRunObstacleManager;
 
+    [Header("Wall Object Stuff")]
+    [SerializeField] Transform _wallObjectHolder;
+    [SerializeField] Transform _wallObjectPrefab;
+    private Dictionary<Vector3Int, GameObject> _wallObjectPositions = new Dictionary<Vector3Int, GameObject>();
+
     private void Awake()
     {
         MakeInstance();
@@ -122,6 +127,7 @@ public class BombRunTileMapManager : MonoBehaviour
     private void ClearWallPositions()
     {
         _wallTilePositions.Clear();
+        _wallObjectPositions.Clear();
     }
     private void ClearObstaclePositions()
     {
@@ -138,6 +144,7 @@ public class BombRunTileMapManager : MonoBehaviour
                 {
                     //Debug.Log("UpdateWallAndObstaclePositionLists: found wall tile at: " + x.ToString() + ", " + y.ToString());
                     _wallTilePositions.Add(new GridPosition(x, y));
+                    SpawnWallObject(newPosition);
                 }
                 if (_obstaclesTileMap.HasTile(newPosition))
                 {
@@ -148,6 +155,25 @@ public class BombRunTileMapManager : MonoBehaviour
                     _bombRunObstacleManager.AddObstacleToPositionFromTile(newGridPosition, _obstaclesTileMap.GetTile(newPosition));
                 }
             }
+        }
+    }
+    private void SpawnWallObject(Vector3Int position)
+    {
+        if (_wallObjectPositions.ContainsKey(position))
+            return;
+
+        GameObject newWallObject = Instantiate(_wallObjectPrefab, _wallObjectHolder).gameObject;
+        newWallObject.transform.position = LevelGrid.Instance.GetWorldPosition(new GridPosition(position.x, position.y));
+
+        _wallObjectPositions.Add(position, newWallObject);
+    }
+    private void RemoveWallObject(Vector3Int position)
+    {
+        if (_wallObjectPositions.ContainsKey(position))
+        {
+            GameObject wallObject = _wallObjectPositions[position];
+            _wallObjectPositions.Remove(position);
+            Destroy(wallObject);
         }
     }
     private void HideObstacleTileMap()

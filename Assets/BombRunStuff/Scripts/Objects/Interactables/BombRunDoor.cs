@@ -54,12 +54,14 @@ public class BombRunDoor : BaseBombRunObstacle, IInteractable
     {
         _isOpen = true;
         PathFinding.Instance.SetIsWalkableGridPosition(_gridPosition, true);
+        SetObstacleCoverType(ObstacleCoverType.None);
         _animator.Play("Open");
     }
     private void CloseDoor()
     {
         _isOpen = false;
         PathFinding.Instance.SetIsWalkableGridPosition(_gridPosition, false);
+        SetObstacleCoverType(ObstacleCoverType.Full);
         _animator.Play("Closed");
     }
     public bool GetIsOpen()

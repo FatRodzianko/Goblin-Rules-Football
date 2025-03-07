@@ -14,6 +14,9 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
 
     [SerializeField] private BombRunObstacleType _bombRunObstacleType;
 
+    [Header("Obstacle Cover")]
+    [SerializeField] private ObstacleCoverType _obstacleCoverType;
+
     // Actions
     public static event EventHandler<GridPosition> OnAnyObstacleDestroyed;
 
@@ -52,6 +55,14 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
     public void SetIsWalkable(bool isWalkable)
     {
         this._isWalkable = isWalkable;
+    }
+    public void SetObstacleCoverType(ObstacleCoverType newCoverType)
+    {
+        this._obstacleCoverType = newCoverType;
+    }
+    public ObstacleCoverType GetObstacleCoverType()
+    {
+        return _obstacleCoverType;
     }
     public virtual void DamageObstacle(int damageAmount)
     {
