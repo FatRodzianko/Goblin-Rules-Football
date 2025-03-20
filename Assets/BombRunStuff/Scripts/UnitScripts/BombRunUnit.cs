@@ -16,9 +16,13 @@ public class BombRunUnit : MonoBehaviour
     public event EventHandler<BaseAction> OnActionTaken;
 
     [Header("Unit Info")]
-    [SerializeField] private int _startingHealth = 100;
-    [SerializeField] private int _health;
+    //[SerializeField] private int _startingHealth = 100;
+    //[SerializeField] private int _health;
     [SerializeField] private bool _isEnemy;
+
+    [Header("Unit Health Stuff")]
+    [SerializeField] private BombRunUnitHealthSystem _healthSystem;
+
 
 
     [Header("GridPosition stuff")]
@@ -29,9 +33,14 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] private int _actionPoints = ACTION_POINTS_MAX;
     [SerializeField] private List<BaseAction> _actionsTakenThisTurn = new List<BaseAction>();
 
+    [Header("Animation Stuff")]
+    [SerializeField] private BombRunUnitAnimator _animator;
+
     private void Awake()
     {
         _baseActionArray = GetComponents<BaseAction>();
+        if (_healthSystem == null)
+            _healthSystem = GetComponent<BombRunUnitHealthSystem>();
     }
     private void Start()
     {
@@ -40,14 +49,16 @@ public class BombRunUnit : MonoBehaviour
         LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
 
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
-
-        _health = _startingHealth;
+        _healthSystem.OnDead += HealthSystem_OnDead;
 
         OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
+        
     }
+
     private void OnDisable()
     {
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
+        _healthSystem.OnDead -= HealthSystem_OnDead;
     }
     private void Update()
     {
@@ -150,13 +161,18 @@ public class BombRunUnit : MonoBehaviour
     }
     public void Damage(int damage)
     {
-        Debug.Log("Damage: " + damage);
-        _health -= damage;
+        //Debug.Log("Damage: " + damage);
+        //_health -= damage;
 
-        if (_health <= 0)
-        {
-            KillUnit();
-        }
+        //if (_health <= 0)
+        //{
+        //    KillUnit();
+        //}
+        _healthSystem.TakeDamage(damage);
+    }
+    private void HealthSystem_OnDead(object sender, EventArgs e)
+    {
+        KillUnit();
     }
     private void KillUnit()
     {
@@ -176,5 +192,34 @@ public class BombRunUnit : MonoBehaviour
             }
         }
         return null;
+    }
+    public BombRunUnitAnimator GetUnitAnimator()
+    {
+        if (_animator == null)
+        {
+            FindAnimatorScript();
+        }
+        return _animator;
+    }
+    private void FindAnimatorScript()
+    {
+        if (TryGetComponent<BombRunUnitAnimator>(out BombRunUnitAnimator animator))
+        {
+            _animator = animator;
+        }
+
+        // if not found on parent, try children
+        if (_animator == null)
+        {
+            Transform[] allChildren = GetComponentsInChildren<Transform>();
+            for (int i = 0; i < allChildren.Length; i++)
+            {
+                if (allChildren[i].TryGetComponent<BombRunUnitAnimator>(out BombRunUnitAnimator childAnimator))
+                {
+                    _animator = childAnimator;
+                    break;
+                }
+            }
+        }
     }
 }

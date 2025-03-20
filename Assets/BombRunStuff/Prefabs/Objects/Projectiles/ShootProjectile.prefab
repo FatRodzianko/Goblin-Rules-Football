@@ -46,6 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _yOffset: 1
+  _trailRenderer: {fileID: 6527801241438751114}
+  _bulletHitVFX: {fileID: 4116254651814618528, guid: 40e45c27bfaf29d4a96ea6d1637fa23e, type: 3}
 --- !u!1 &6527801241438751124
 GameObject:
   m_ObjectHideFlags: 0
@@ -184,5 +186,5 @@ TrailRenderer:
     shadowBias: 0.5
     generateLightingData: 0
   m_MinVertexDistance: 0.01
-  m_Autodestruct: 0
+  m_Autodestruct: 1
   m_Emitting: 1

@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class BombRunUnitAnimator : MonoBehaviour
 {
+    [SerializeField] private BombRunUnit _unit;
     [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer _spriteRenderer;
 
@@ -16,28 +17,32 @@ public class BombRunUnitAnimator : MonoBehaviour
 
     private void Awake()
     {
-        if (TryGetComponent<MoveAction>(out MoveAction moveAction))
+        if (_unit == null)
+        {
+            _unit = this.transform.parent.GetComponent<BombRunUnit>();
+        }
+        if (transform.parent.TryGetComponent<MoveAction>(out MoveAction moveAction))
         {
             moveAction.OnStartMoving += MoveAction_OnStartMoving;
             moveAction.OnStopMoving += MoveAction_OnStopMoving;
         }
-        if (TryGetComponent<ShootAction>(out ShootAction shootAction))
+        if (transform.parent.TryGetComponent<ShootAction>(out ShootAction shootAction))
         {
             shootAction.OnStartShooting += ShootAction_OnStartShooting;
             shootAction.OnStopShooting += ShootAction_OnStopShooting;
         }
     }
 
-    
+   
 
     private void OnDisable()
     {
-        if (TryGetComponent<MoveAction>(out MoveAction moveAction))
+        if (transform.parent.TryGetComponent<MoveAction>(out MoveAction moveAction))
         {
             moveAction.OnStartMoving -= MoveAction_OnStartMoving;
             moveAction.OnStopMoving -= MoveAction_OnStopMoving;
         }
-        if (TryGetComponent<ShootAction>(out ShootAction shootAction))
+        if (transform.parent.TryGetComponent<ShootAction>(out ShootAction shootAction))
         {
             shootAction.OnStartShooting -= ShootAction_OnStartShooting;
             shootAction.OnStopShooting -= ShootAction_OnStopShooting;
@@ -46,6 +51,7 @@ public class BombRunUnitAnimator : MonoBehaviour
 
     private void MoveAction_OnStartMoving(object sender, EventArgs e)
     {
+        Debug.Log("MoveAction_OnStartMoving: " + _unit.name);
         _animator.SetBool("IsWalking", true);
     }
     private void MoveAction_OnStopMoving(object sender, EventArgs e)
@@ -54,16 +60,41 @@ public class BombRunUnitAnimator : MonoBehaviour
     }
     private void ShootAction_OnStopShooting(object sender, EventArgs e)
     {
+        
+    }
+    public void FireShootProjectile()
+    {
+        Debug.Log("FireShootProjectile: " + _unit.name);
+        ShootAction shootAction = _unit.GetAction<ShootAction>();
 
+        if (shootAction == null)
+            return;
+
+        Transform shootProjectile = Instantiate(_shootProjectilePrefab, this.transform.position + _shootPoint, Quaternion.identity);
+        ShootProjectile shootProjectileScript = shootProjectile.GetComponent<ShootProjectile>();
+
+        shootProjectileScript.OnProjectileHitTarget += ShootProjectile_OnProjectileHitTarget;
+
+        //shootProjectileScript.Setup(shootAction.TargetUnit.GetWorldPosition());
+        shootProjectileScript.Setup(shootAction.GetTargetUnitWorldPosition());
+    }
+
+    private void ShootProjectile_OnProjectileHitTarget(object sender, EventArgs e)
+    {
+        ShootProjectile shootProjectileScript = sender as ShootProjectile;
+        ShootAction shootAction = _unit.GetAction<ShootAction>();
+        if (shootAction == null)
+            return;
+        shootAction.ProjectileHitTarget();
+
+        shootProjectileScript.OnProjectileHitTarget -= ShootProjectile_OnProjectileHitTarget;
+        Debug.Log("ShootProjectile_OnProjectileHitTarget: unsubscribe shoot projectile event " + Time.time.ToString("0.00000000"));
     }
 
     private void ShootAction_OnStartShooting(object sender, ShootAction.OnStartShootingEventArgs e)
     {
+        Debug.Log("ShootAction_OnStartShooting: " + _unit.name);
         _animator.SetTrigger("Shoot");
-        Transform shootProjectile = Instantiate(_shootProjectilePrefab, this.transform.position + _shootPoint, Quaternion.identity);
-        ShootProjectile shootProjectileScript = shootProjectile.GetComponent<ShootProjectile>();
-
-        shootProjectileScript.Setup(e.TargetUnit.GetWorldPosition());
     }
 
     public void FlipSprite(bool flipSprite)

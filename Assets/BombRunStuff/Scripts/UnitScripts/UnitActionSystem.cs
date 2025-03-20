@@ -43,6 +43,10 @@ public class UnitActionSystem : MonoBehaviour
 
         BombRunUnit.OnAnyUnitDied += BombRunUnit_OnAnyUnitDied;
     }
+    private void OnDisable()
+    {
+        BombRunUnit.OnAnyUnitDied -= BombRunUnit_OnAnyUnitDied;
+    }
     private void Update()
     {
         if (_isBusy)

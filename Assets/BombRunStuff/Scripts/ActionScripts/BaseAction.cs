@@ -30,7 +30,8 @@ public abstract class BaseAction : MonoBehaviour
         _unit = GetComponent<BombRunUnit>();
         if (_bombRunUnitAnimator == null)
         {
-            _bombRunUnitAnimator = GetComponent<BombRunUnitAnimator>();
+            //_bombRunUnitAnimator = GetComponent<BombRunUnitAnimator>();
+            _bombRunUnitAnimator = _unit.GetUnitAnimator();
         }
     }
     public abstract string GetActionName();
