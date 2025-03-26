@@ -40,12 +40,21 @@ public class MoveAction : BaseAction
     private void Start()
     {
         PathFinding.Instance.IsWalkableUpdated += PathFinding_IsWalkableUpdated;
+        BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
     }
+
+    
+
     private void OnDisable()
     {
         PathFinding.Instance.IsWalkableUpdated -= PathFinding_IsWalkableUpdated;
+        BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
     }
     private void PathFinding_IsWalkableUpdated(object sender, EventArgs e)
+    {
+        ResetCachedValidPositionList();
+    }
+    private void BombRunUnit_OnAnyActionPointsChanged(object sender, EventArgs e)
     {
         ResetCachedValidPositionList();
     }

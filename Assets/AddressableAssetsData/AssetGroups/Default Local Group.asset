@@ -137,6 +137,18 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/22_Gifted-Week-Sweeps.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 595a171558440fa459278d1e2576ec41
+    m_Address: Assets/SFX/Music/bored-nights.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 435c262d26dbc564c8c44eaa906722fc
+    m_Address: Assets/SFX/Music/sad-cap.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c767ac64108062244b5e315f6dcf4125
+    m_Address: Assets/SFX/Music/more-than-brick.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

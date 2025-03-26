@@ -42,6 +42,7 @@ public class ShootAction : BaseAction
     [Header("Shooting Stuff?")]
     [SerializeField] private List<LayerMask> _shotBlockerLayerMasks = new List<LayerMask>();
     [SerializeField] private float _minDistanceToTravelThroughObstacle = 0.25f;
+    [SerializeField] private float _circleCastRadius = 0.2f;
 
     private void Update()
     {
@@ -190,6 +191,9 @@ public class ShootAction : BaseAction
 
         return validGridPositionList;
     }
+    //
+    // OLD
+    //
     //private bool DoesShotHitWallOrObstacle(GridPosition unitPosition, GridPosition targetPosition)
     //{
     //    //Debug.Log("DoesShotHitWallOrObstacle: Unit Position: " + unitPosition + " Target position: " + targetPosition);
@@ -275,9 +279,125 @@ public class ShootAction : BaseAction
 
     //    return false;
     //}
+    //
+    // OLD
+    //
+
+    //
+    // NEWER 3/25/2025
+    //
+    //private bool DoesShotHitWallOrObstacle(GridPosition unitPosition, GridPosition targetPosition)
+    //{
+    //    //Debug.Log("DoesShotHitWallOrObstacle: Unit Position: " + unitPosition + " Target position: " + targetPosition);
+    //    Vector2 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(unitPosition);
+    //    Vector2 targetWorldPosition = LevelGrid.Instance.GetWorldPosition(targetPosition);
+    //    Vector2 shootDirection = (targetWorldPosition - unitWorldPosition).normalized;
+
+    //    BombRunUnit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);
+
+    //    float distance = Vector2.Distance(unitWorldPosition, targetWorldPosition);
+    //    //Debug.Log("DoesShotHitWallOrObstacle: Unit Position: " + unitWorldPosition + " Target position: " + targetWorldPosition);
+
+    //    foreach (LayerMask mask in _shotBlockerLayerMasks)
+    //    {
+    //        RaycastHit2D[] hits = Physics2D.RaycastAll(unitWorldPosition, shootDirection, distance, mask);
+    //        //RaycastHit2D hit = Physics2D.Raycast(unitWorldPosition, shootDirection, distance, mask);
+    //        if (hits.Length > 0)
+    //        {
+    //            RaycastHit2D[] reverseHits = Physics2D.RaycastAll(targetWorldPosition, (unitWorldPosition - targetWorldPosition).normalized, distance, mask);
+
+    //            if (hits.Length != reverseHits.Length)
+    //            {
+    //                List<RaycastHit2D> forwardHitList = hits.ToList();
+    //                List<RaycastHit2D> reverseHitList = reverseHits.ToList();
+    //                Debug.Log("DoesShotHitWallOrObstacle: forward and reverse hit counts do not match???. Checking to see if any are hitting obstacles...");
+    //                foreach (RaycastHit2D hit in reverseHitList)
+    //                {
+    //                    if (!forwardHitList.Contains(hit))
+    //                    {
+    //                        Debug.Log("DoesShotHitWallOrObstacle: hit from reverse hit list: " + hit.point + " not found in forward hit list. returning true.");
+    //                        return true;
+    //                    }
+    //                }
+    //                foreach (RaycastHit2D hit in forwardHitList)
+    //                {
+    //                    if (!reverseHitList.Contains(hit))
+    //                    {
+    //                        Debug.Log("DoesShotHitWallOrObstacle: hit from forward hit list: " + hit.point + " not found in reverse hit list. returning true.");
+    //                        return true;
+    //                    }
+    //                }
+    //            }
+
+    //            for (int i = 0; i < hits.Length; i++)
+    //            {
+    //                Vector2 hit = hits[i].point;
+    //                Vector2 reverseHit = reverseHits[reverseHits.Length - 1 - i].point;
+    //                //Vector2 reverseHit = reverseHits[i].point;
+
+    //                //Debug.Log("DoesShotHitWallOrObstacle: Hit collider: " + hits[i].collider.name + ":" + hit + " Reverse hit collider: " + reverseHits[i].collider.name + ":" + reverseHit);
+    //                Debug.Log("DoesShotHitWallOrObstacle: Target Position: " + targetWorldPosition + " Hit collider: " + hits[i].collider.name + ":" + hit + " Reverse hit collider: " + reverseHits[reverseHits.Length - 1 - i].collider.name + ":" + reverseHit + " Total hits: " + hits.Length + ":" + reverseHits.Length);
+
+
+
+    //                if (hit == reverseHit)
+    //                {
+    //                    Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. BUT the reverse hit is the same. This means a corner was hit? First hit position: " + hit + " Second hit position: " + reverseHit + " Target position: " + targetWorldPosition + " hit object: " + hits[i].collider.name);
+    //                    continue;
+    //                }
+    //                float distanceBetweenHits = Vector2.Distance(hit, reverseHit);
+    //                if (distanceBetweenHits < _minDistanceToTravelThroughObstacle)
+    //                {
+    //                    Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. BUT the distance between hit and reverse hit is less than " + _minDistanceToTravelThroughObstacle + ". This means a corner was hit? First hit position: " + hit + " Second hit position: " + reverseHit + " Distance between the hits: " + distanceBetweenHits + " Target position: " + targetWorldPosition);
+    //                    continue;
+    //                }
+    //                //Debug.Log("DoesShotHitWallOrObstacle: distanceBetweenHits: " + distanceBetweenHits + " Hit point: " + hit + " reverse hit point: " + reverseHit + " hit object?: " + hits[i].collider.name);
+    //                if (hits[i].collider.CompareTag("BombRunWall"))
+    //                {
+    //                    //Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + LevelGrid.Instance.GetGridPositon(hits[i].point) + " Target position: " + targetPosition);
+    //                    Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + hits[i].point + " Target position: " + targetWorldPosition);
+    //                    return true;
+    //                }
+    //                if (hits[i].collider.CompareTag("BombRunObstacle"))
+    //                {
+    //                    if (hits[i].collider.GetComponent<BaseBombRunObstacle>().GetObstacleCoverType() == ObstacleCoverType.Full)
+    //                    {
+    //                        //Debug.Log("DoesShotHitWallOrObstacle: Hit Obstacle with Full Cover. Obstacle position: " + LevelGrid.Instance.GetGridPositon(hits[i].point) + " Target position: " + targetPosition);
+    //                        Debug.Log("DoesShotHitWallOrObstacle: Hit Obstacle with Full Cover. Obstacle position: " + hits[i].point + " Target position: " + targetWorldPosition);
+    //                        return true;
+    //                    }
+    //                }
+    //                if (hits[i].collider.CompareTag("Goblin"))
+    //                {
+    //                    if (hits[i].collider.TryGetComponent<BombRunUnit>(out BombRunUnit hitGoblin))
+    //                    {
+    //                        if (hitGoblin == this._unit)
+    //                        {
+    //                            continue;
+    //                        }
+    //                        if (hitGoblin != targetUnit)
+    //                        {
+    //                            Debug.Log("DoesShotHitWallOrObstacle: Hit goblin that was not the target. Goblin position: " + hits[i].point + " Target position: " + targetWorldPosition);
+    //                            return true;
+    //                        }
+    //                    }
+
+    //                }
+    //            }
+
+    //        }
+    //    }
+
+    //    Debug.Log("DoesShotHitWallOrObstacle: No walls or obstacles hit for position: " + targetWorldPosition);
+
+    //    return false;
+    //}
+    //
+    // NEWER 3/25/2025
+    //
     private bool DoesShotHitWallOrObstacle(GridPosition unitPosition, GridPosition targetPosition)
     {
-        //Debug.Log("DoesShotHitWallOrObstacle: Unit Position: " + unitPosition + " Target position: " + targetPosition);
+
         Vector2 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(unitPosition);
         Vector2 targetWorldPosition = LevelGrid.Instance.GetWorldPosition(targetPosition);
         Vector2 shootDirection = (targetWorldPosition - unitWorldPosition).normalized;
@@ -285,62 +405,60 @@ public class ShootAction : BaseAction
         BombRunUnit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);
 
         float distance = Vector2.Distance(unitWorldPosition, targetWorldPosition);
-        //Debug.Log("DoesShotHitWallOrObstacle: Unit Position: " + unitWorldPosition + " Target position: " + targetWorldPosition);
+
+        Debug.Log("DoesShotHitWallOrObstacle: shooter position: " + unitWorldPosition + " target position: " + targetWorldPosition);
 
         foreach (LayerMask mask in _shotBlockerLayerMasks)
         {
             RaycastHit2D[] hits = Physics2D.RaycastAll(unitWorldPosition, shootDirection, distance, mask);
-            //RaycastHit2D hit = Physics2D.Raycast(unitWorldPosition, shootDirection, distance, mask);
+
             if (hits.Length > 0)
             {
-                RaycastHit2D[] reverseHits = Physics2D.RaycastAll(targetWorldPosition, (unitWorldPosition - targetWorldPosition).normalized, distance, mask);
-
-                if (hits.Length != reverseHits.Length)
-                {
-                    List<RaycastHit2D> forwardHitList = hits.ToList();
-                    List<RaycastHit2D> reverseHitList = reverseHits.ToList();
-                    Debug.Log("DoesShotHitWallOrObstacle: forward and reverse hit counts do not match???. Checking to see if any are hitting obstacles...");
-                    foreach (RaycastHit2D hit in reverseHitList)
-                    {
-                        if (!forwardHitList.Contains(hit))
-                        {
-                            Debug.Log("DoesShotHitWallOrObstacle: hit from reverse hit list: " + hit.point + " not found in forward hit list. returning true.");
-                            return true;
-                        }
-                    }
-                    foreach (RaycastHit2D hit in forwardHitList)
-                    {
-                        if (!reverseHitList.Contains(hit))
-                        {
-                            Debug.Log("DoesShotHitWallOrObstacle: hit from forward hit list: " + hit.point + " not found in reverse hit list. returning true.");
-                            return true;
-                        }
-                    }
-                }
-
                 for (int i = 0; i < hits.Length; i++)
                 {
-                    Vector2 hit = hits[i].point;
-                    Vector2 reverseHit = reverseHits[reverseHits.Length - 1 - i].point;
-                    //Vector2 reverseHit = reverseHits[i].point;
+                    Debug.Log("DoesShotHitWallOrObstacle: hit " + hits[i].collider.name + " collider at: " + hits[i].point.ToString("0.00000000"));
+                    //hits[i].collider.bounds
+                    // check if the hit is on a corner?
+                    if (IsCornerHit(hits[i].point))
+                    {
+                        Debug.Log("DoesShotHitWallOrObstacle: Hit corner of a collider at: " + hits[i].point.ToString());
+                        // check to see if the shoot direction is moving away or toward the center of the hit collider
+                        // if moving toward center of collider, it is a direct hit
+                        // if moving away from center of collider, might be glancing blow on corner to ignore?
+                        Vector2 directionToCenterOfCollider = ((Vector2)hits[i].collider.bounds.center - hits[i].point).normalized;
+                        float angle = Vector2.Angle(directionToCenterOfCollider, shootDirection);
+                        Debug.Log("DoesShotHitWallOrObstacle: Angle of corner hit: " + angle.ToString() + " hit point: " + hits[i].point + " shoot direction: " + shootDirection + " direction from hitpoint to collider center: " + directionToCenterOfCollider);
 
-                    //Debug.Log("DoesShotHitWallOrObstacle: Hit collider: " + hits[i].collider.name + ":" + hit + " Reverse hit collider: " + reverseHits[i].collider.name + ":" + reverseHit);
-                    Debug.Log("DoesShotHitWallOrObstacle: Target Position: " + targetWorldPosition + " Hit collider: " + hits[i].collider.name + ":" + hit + " Reverse hit collider: " + reverseHits[reverseHits.Length - 1 - i].collider.name + ":" + reverseHit + " Total hits: " + hits.Length + ":" + reverseHits.Length);
-
+                        if (angle < 45f)
+                        {
+                            Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving TOWARD the collider. Corner hit into the wall. Wall hit?");
+                            return true;
+                        }
+                        else
+                        {
+                            Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving AWAY from the collider. Glancing corner hit? Checking for surrounding colliders...");
+                            RaycastHit2D[] circleCastHits = Physics2D.CircleCastAll(hits[i].point, _circleCastRadius, Vector2.zero, 0f, mask);
+                            if (circleCastHits.Length > 0)
+                            {
+                                for (int z = 0; z < circleCastHits.Length; z++)
+                                {
+                                    if (circleCastHits[z].collider != hits[i].collider)
+                                    {
+                                        Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, but collider is near another collider. Should be blocked? Hit collider: " + hits[i].collider + " second collider: " + circleCastHits[z].collider.name);
+                                        return true;
+                                    }
+                                }
+                            }
+                            // if the code makes it here, no other collider was near the corner. Glancing blow to skip rest of checks with "continue?"    
+                            Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, AND no surrounding collider. Skipping this hit?");
+                            continue;                            
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("DoesShotHitWallOrObstacle: DID NOT Hit corner of a collider at: " + hits[i].point.ToString("0.0000000000"));
+                    }
                     
-
-                    if (hit == reverseHit)
-                    {
-                        Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. BUT the reverse hit is the same. This means a corner was hit? First hit position: " + hit + " Second hit position: " + reverseHit + " Target position: " + targetWorldPosition + " hit object: " + hits[i].collider.name);
-                        continue;
-                    }
-                    float distanceBetweenHits = Vector2.Distance(hit, reverseHit);
-                    if (distanceBetweenHits < _minDistanceToTravelThroughObstacle)
-                    {
-                        Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. BUT the distance between hit and reverse hit is less than " + _minDistanceToTravelThroughObstacle + ". This means a corner was hit? First hit position: " + hit + " Second hit position: " + reverseHit + " Distance between the hits: " + distanceBetweenHits + " Target position: " + targetWorldPosition);
-                        continue;
-                    }
-                    //Debug.Log("DoesShotHitWallOrObstacle: distanceBetweenHits: " + distanceBetweenHits + " Hit point: " + hit + " reverse hit point: " + reverseHit + " hit object?: " + hits[i].collider.name);
                     if (hits[i].collider.CompareTag("BombRunWall"))
                     {
                         //Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + LevelGrid.Instance.GetGridPositon(hits[i].point) + " Target position: " + targetPosition);
@@ -372,13 +490,20 @@ public class ShootAction : BaseAction
                         }
 
                     }
+                    
                 }
-
             }
         }
 
         Debug.Log("DoesShotHitWallOrObstacle: No walls or obstacles hit for position: " + targetWorldPosition);
-
+        return false;
+    }
+    private bool IsCornerHit(Vector2 hitPoint)
+    {
+        if ((hitPoint.x + 1) % 2 == 0 && (hitPoint.y + 1) % 2 == 0)
+        {
+            return true;
+        }
         return false;
     }
     private ObstacleCoverType GetMaxCoverTypeForShoot(GridPosition unitPosition, GridPosition targetPosition)
