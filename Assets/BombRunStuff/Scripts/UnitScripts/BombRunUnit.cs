@@ -222,4 +222,8 @@ public class BombRunUnit : MonoBehaviour
             }
         }
     }
+    public BombRunUnitHealthSystem GetUnitHealthSystem()
+    {
+        return _healthSystem;
+    }
 }
