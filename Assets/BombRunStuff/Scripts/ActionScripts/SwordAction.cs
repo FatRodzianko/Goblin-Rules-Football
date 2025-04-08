@@ -80,7 +80,7 @@ public class SwordAction : BaseAction
         return new BombRunEnemyAIAction
         {
             _GridPosition = gridPosition,
-            _ActionValue = 200,
+            _ActionValue = 1000,
         };
     }
 

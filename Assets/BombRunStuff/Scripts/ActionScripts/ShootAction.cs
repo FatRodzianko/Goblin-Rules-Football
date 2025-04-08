@@ -24,7 +24,7 @@ public class ShootAction : BaseAction
     }
     private State _state;
     private float _stateTimer;
-    private float _aimingStateTime = 5f;
+    private float _aimingStateTime = 0.5f;
     private float _shootStateTime = 0.1f;
     private float _coolOffStateTime = 0.5f;
 
@@ -57,7 +57,10 @@ public class ShootAction : BaseAction
             case State.Aiming:
                 if (_aiming)
                 {
-                    SpinSprite();
+                    //SpinSprite();
+                    TurnTowardTarget(_targetUnitWorldPosition);
+                    // add animation for unit to get into shooting position. If kneeling, stand up? Hold gun to shoulder, whatever
+                    // once that animation completes, then set _aiming = false to go to NextState?
                 }
                 else
                 {
@@ -138,11 +141,16 @@ public class ShootAction : BaseAction
     {
         return "Shoot";
     }
-
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        List<GridPosition> validGridPositionList = new List<GridPosition>();
         GridPosition unitGridPosition = _unit.GetGridPosition();
+        return GetValidActionGridPositionList(unitGridPosition);
+    }
+    public List<GridPosition> GetValidActionGridPositionList(GridPosition gridPosition)
+    {
+        List<GridPosition> validGridPositionList = new List<GridPosition>();
+        //GridPosition unitGridPosition = _unit.GetGridPosition();
+        GridPosition unitGridPosition = gridPosition;
 
         for (int x = -_maxShootDistance; x <= _maxShootDistance; x++)
         {
@@ -527,16 +535,27 @@ public class ShootAction : BaseAction
         _totalSpinAmount = 0;
 
         //TurnTowardTarget(_targetUnit.GetWorldPosition());
-        TurnTowardTarget(_targetUnitWorldPosition);
+        //TurnTowardTarget(_targetUnitWorldPosition);
 
         _isActive = true;
     }
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
+        int targetRemainingHealth = GetTargetUnitRemainingHealth(gridPosition);
+        if (targetRemainingHealth == -1)
+        {
+            return new BombRunEnemyAIAction
+            {
+                _GridPosition = gridPosition,
+                _ActionValue = 0,
+            };
+        }
+
+        int actionValue = 1000 - targetRemainingHealth;
         return new BombRunEnemyAIAction
         {
-            _GridPosition = this._unit.GetGridPosition(),
-            _ActionValue = 0,
+            _GridPosition = gridPosition,
+            _ActionValue = actionValue,
         };
     }
     public int GetMaxShootDistance()
@@ -554,5 +573,20 @@ public class ShootAction : BaseAction
     public void ProjectileHitTarget()
     {
         _targetUnit.Damage(35);
+    }
+    int GetTargetUnitRemainingHealth(GridPosition gridPosition)
+    {
+        BombRunUnit target = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+        if (target == null)
+            return -1;
+
+        return target.GetRemainingHealth();
+    }
+    public int GetTargetCountAtGridPosition(GridPosition gridPosition)
+    {
+        List<GridPosition> targetPosition = GetValidActionGridPositionList(gridPosition);
+
+        Debug.Log("GetTargetCountAtGridPosition: " + targetPosition.Count + " targets at: " + gridPosition);
+        return targetPosition.Count;
     }
 }

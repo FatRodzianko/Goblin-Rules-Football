@@ -51,8 +51,7 @@ public class BombRunUnit : MonoBehaviour
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         _healthSystem.OnDead += HealthSystem_OnDead;
 
-        OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
-        
+        OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);        
     }
 
     private void OnDisable()
@@ -225,5 +224,9 @@ public class BombRunUnit : MonoBehaviour
     public BombRunUnitHealthSystem GetUnitHealthSystem()
     {
         return _healthSystem;
+    }
+    public int GetRemainingHealth()
+    {
+        return _healthSystem.GetHealth();
     }
 }

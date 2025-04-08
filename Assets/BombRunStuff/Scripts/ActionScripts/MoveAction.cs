@@ -237,7 +237,13 @@ public class MoveAction : BaseAction
         List<GridPosition> enemyGridPositions = GetGridPositionsWithEnemyUnits();
         if (enemyGridPositions.Count > 0)
         {
-            actionValue = GetActionValueOfMove(enemyGridPositions, gridPosition);
+            // first check for targets to shoot at?
+            actionValue = GetActionValueOfMove(gridPosition);
+            if (actionValue == 0)
+            {
+                Debug.Log("GetEnemyAIAction: MoveAction: Did not find any shootable targets at position: " + gridPosition + " Checking for other move options...");
+                actionValue = GetActionValueOfMove(enemyGridPositions, gridPosition);
+            }            
         }
 
         return new BombRunEnemyAIAction
@@ -276,6 +282,20 @@ public class MoveAction : BaseAction
 
         return enemyUnitGridPositions;
     }
+    private int GetActionValueOfMove(GridPosition gridPosition)
+    {
+        ShootAction unitShootAction = _unit.GetAction<ShootAction>();
+        if (unitShootAction == null)
+        {
+            return 0;
+        }
+
+        int targetsAtPosition = unitShootAction.GetTargetCountAtGridPosition(gridPosition);
+        return 100 + (targetsAtPosition * 10);
+    }
+    // This is the check to see where to move when the unit cannot move to a new position that has an enemy to shoot at
+    // should prioritize getting closer to enemies
+    // should also prioritize finding a position with "cover" once I implement that...
     private int GetActionValueOfMove(List<GridPosition> enemyGridPositions, GridPosition gridPosition)
     {
         int actionValue = 0;
@@ -325,6 +345,7 @@ public class MoveAction : BaseAction
     }
     IEnumerator WaitForBadMove()
     {
+        Debug.Log("WaitForBadMove: ");
         //yield on a new YieldInstruction that waits for 5 seconds.
         yield return new WaitForSeconds(2f);
         _onActionComplete();

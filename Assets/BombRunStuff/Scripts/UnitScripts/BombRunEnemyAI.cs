@@ -56,9 +56,8 @@ public class BombRunEnemyAI : MonoBehaviour
             }
             else
             {
-                // no more enemy units have actions they can take
+                // no more enemy units have actions they can take. End enemy turn
                 TurnSystem.Instance.NextTurn();
-                //_state = State.WaitingForEnemyTurn;
             }
         }
     }
@@ -67,7 +66,7 @@ public class BombRunEnemyAI : MonoBehaviour
         if (!TurnSystem.Instance.IsPlayerTurn())
         {
             _state = State.TakingTurn;
-            _timer = 3f;
+            _timer = 2f;
         }        
     }
     private void SetStateTakingTurn()
@@ -98,7 +97,6 @@ public class BombRunEnemyAI : MonoBehaviour
                 // enemy cannot afford action
                 continue;
             }
-
             
             if (bestEnemyAIAction == null)
             {
@@ -110,7 +108,7 @@ public class BombRunEnemyAI : MonoBehaviour
                 BombRunEnemyAIAction testEnemyAIAction = baseAction.GetBestEnemyAIAction();
                 if (testEnemyAIAction != null && testEnemyAIAction._ActionValue > bestEnemyAIAction._ActionValue)
                 {
-                    bestEnemyAIAction = baseAction.GetBestEnemyAIAction();
+                    bestEnemyAIAction = testEnemyAIAction;
                     bestBaseAction = baseAction;
                 }
             }

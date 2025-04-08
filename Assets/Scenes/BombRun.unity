@@ -20367,7 +20367,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9011927230685996404, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: _actionPointsCost
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
@@ -21824,7 +21824,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9011927230685996404, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: _actionPointsCost
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
@@ -22904,7 +22904,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9011927230685996404, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: _actionPointsCost
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
@@ -22965,7 +22965,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9011927230685996404, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: _actionPointsCost
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
