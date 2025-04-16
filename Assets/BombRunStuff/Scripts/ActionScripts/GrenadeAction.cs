@@ -78,6 +78,9 @@ public class GrenadeAction : BaseAction
         grenadeProjectileScript.Setup(gridPosition, OnGrenadeBehaviorComplete);
 
         ActionStart(onActionComplete);
+
+        if(_requiresAmmo)
+            _remainingAmmo--;
     }
     private void OnGrenadeBehaviorComplete()
     {

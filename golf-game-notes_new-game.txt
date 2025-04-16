@@ -139,8 +139,8 @@
 - - - - - - CodeMonkey tutorial was for pointy top. I think for flat top all I'd change is have a horizontal offset of 0.75 instead of a vertical offset. So, change HEX_VERTICAL_OFFSET_MULTIPLIER to HEX_Horizontal_OFFSET_MULTIPLIER
 - - x if creating hex pixel art tiles is too difficult/annoying, just switch to a rectangle grid
 - - - - - x think Core Keeper for asethetic
-- Detect mouse click on a grid tile
-- - - highlight the correct grid position when clicked on
+x Detect mouse click on a grid tile
+- - x highlight the correct grid position when clicked on
 x Have a unit that is on the grid
 - - x make unit selectable by clicking on them
 - - - - - x selectable by clicking on the tile/grid object the unit is on
@@ -218,3 +218,29 @@ x create a "wall object" that is just a rectangle collider
 - - - should be down to 38 on mine??? or start at 235
 - Maybe use SNES resolution of 256x224?
 - - - or just halve current resolution to 384x216? 320x180? 640x360?
+
+### Change to a "freeze tag" game?
+- when you shoot an enemy, you choose a body part to "freeze"
+- - - Legs, Arms, Head
+- - - Legs
+- - - - - - shoot one leg max movement reduced by half
+- - - - - - Freeze both, no movement allowed
+- - - Arms
+- - - - - - Shoot one arm shoot distance reduced by half 
+- - - - - - Both, cannot shoot, throw grenades
+- - - - - - OR
+- - - - - - - - - one arm shot: double cost of all "arm" actions: Shooting, melee, throwing grenade, interacting with doors, etc...
+- - - - - - - - - shoot both arms: all "arm" actions are disabled
+- - - Head
+- - - - - - This one maybe a bit "tricky," but...
+- - - - - - shooting a unit's head fixes the characters "point of view"
+- - - - - - - - - When a unit takes an action normally, their "head" turns toward the action in one of the eight directions
+- - - - - - - - - - - - Up, Down, Left, Right - Up&Right, Down&Right, Down&Left, Up&Left
+- - - - - - - - - - - - there will be a "cone of vision" to show where the unit is looking after their action
+- - - - - - - - - When you shoot a unit in the head, the unit can no longer perform actions outside of their "cone"
+- - - - - - - - - - - - so, if the unit is looking "up" when shot in the head, they could not then shoot at a target that is "down" from them
+- - - - - - This might be a bit OP, so maybe make it so you have to hit the head twice for the effect, or shoot the body first then the head?
+- You can unfreeze a teammate's body part by shooting them?
+- for grenades: freeze one "body part" for every unit that is in the blast radius?
+- - - if both legs are already frozen, freeze an arm. If both arms and legs are frozen, freeze head?
+- - - can also be used to unfreeze teammates if you hit them

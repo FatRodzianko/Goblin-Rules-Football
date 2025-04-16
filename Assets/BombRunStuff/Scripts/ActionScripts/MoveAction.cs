@@ -296,6 +296,10 @@ public class MoveAction : BaseAction
     // This is the check to see where to move when the unit cannot move to a new position that has an enemy to shoot at
     // should prioritize getting closer to enemies
     // should also prioritize finding a position with "cover" once I implement that...
+
+    // Another movement check - if there are no valid moves found, find the nearest enemy
+    // calculate the path to that enemy with no max movement restriction. If there is one that exists, pick the furthest tile furthest along that path that the unit can move to
+    // this is to try and get "better" movement actions from the AI when there is a wall between them and a player unit, and going around the wall would be beyond one movement move?
     private int GetActionValueOfMove(List<GridPosition> enemyGridPositions, GridPosition gridPosition)
     {
         int actionValue = 0;

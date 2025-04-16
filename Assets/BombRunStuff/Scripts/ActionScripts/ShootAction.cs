@@ -520,6 +520,31 @@ public class ShootAction : BaseAction
 
         return maxOBstacleCoverType;
     }
+    public override bool CanTakeAction(int actionPointsAvailable)
+    {
+        if (actionPointsAvailable > _actionPointsCost)
+        {
+            if (_requiresAmmo)
+            {
+                if (_remainingAmmo > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
     public override void TakeAction(GridPosition gridPosition, Action onSpinComplete)
     {
         _onActionComplete = onSpinComplete;
@@ -538,6 +563,9 @@ public class ShootAction : BaseAction
         //TurnTowardTarget(_targetUnitWorldPosition);
 
         _isActive = true;
+
+        if (_requiresAmmo)
+            _remainingAmmo--;
     }
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {

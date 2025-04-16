@@ -34,4 +34,8 @@ public class ActionButtonUI : MonoBehaviour
             _outline.effectColor = Color.black;
         }
     }
+    public void EnableOrDisableButton(bool enable)
+    {
+        _button.interactable = enable;
+    }
 }

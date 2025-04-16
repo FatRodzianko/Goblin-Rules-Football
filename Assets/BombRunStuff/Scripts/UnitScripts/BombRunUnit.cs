@@ -111,7 +111,22 @@ public class BombRunUnit : MonoBehaviour
     {
         if (_actionPoints >= baseAction.GetActionPointsCost())
         {
-            return true;
+            if (baseAction.GetRequiresAmmo())
+            {
+                if (baseAction.GetRemainingAmmo() > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    Debug.Log("CanSpendActionPointsToTakeAction: Action requires ammo: " + baseAction.GetRequiresAmmo() + " and ammo  remaining: " + baseAction.GetRemainingAmmo());
+                    return false;
+                }
+            }
+            else 
+            {
+                return true;
+            }
         }
         else
         {

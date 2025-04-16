@@ -52,11 +52,16 @@ public class UnitActionSystemUI : MonoBehaviour
         // instantiate new button game objects
         foreach (BaseAction baseAction in selectedUnit.GetBaseActionArray())
         {
-            if (!selectedUnit.CanSpendActionPointsToTakeAction(baseAction))
-                continue;
+            //if (!selectedUnit.CanSpendActionPointsToTakeAction(baseAction))
+            //{
+            //    continue;
+            //}
+
 
             Transform actionButtonTransform = Instantiate(_actionButtonPrefab, _actionButtonContainer);
             ActionButtonUI actionButtonUI = actionButtonTransform.GetComponent<ActionButtonUI>();
+            // Check if the player can use the action or not. If not, disable the button to make it non-clickable and greyed out
+            actionButtonUI.EnableOrDisableButton(selectedUnit.CanSpendActionPointsToTakeAction(baseAction));
             actionButtonUI.SetBaseAction(baseAction);
             _actionButtonUIList.Add(actionButtonUI);
         }

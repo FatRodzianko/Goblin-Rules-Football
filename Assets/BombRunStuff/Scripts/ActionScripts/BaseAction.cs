@@ -15,11 +15,17 @@ public abstract class BaseAction : MonoBehaviour
     protected Action _onActionComplete;
 
     [Header("Action Info")]
-    [SerializeField] private int _actionPointsCost = 1;
+    [SerializeField] protected int _actionPointsCost = 1;
     [SerializeField] private Sprite _actionSymbolSprite;
 
     [Header("Animation Stuff")]
     [SerializeField] protected BombRunUnitAnimator _bombRunUnitAnimator;
+
+    [Header("Ammo / Reloadable stuff?")]
+    [SerializeField] private bool _isReloadable;
+    [SerializeField] protected bool _requiresAmmo;
+    [SerializeField] protected int _maxAmmo;
+    [SerializeField] protected int _remainingAmmo = 0;
 
     // Actions
     public static event EventHandler OnAnyActionStarted;
@@ -33,6 +39,7 @@ public abstract class BaseAction : MonoBehaviour
             //_bombRunUnitAnimator = GetComponent<BombRunUnitAnimator>();
             _bombRunUnitAnimator = _unit.GetUnitAnimator();
         }
+        SetInitialAmmo();
     }
     public abstract string GetActionName();
     public abstract void TakeAction(GridPosition gridPosition, Action onActionComplete);
@@ -90,4 +97,55 @@ public abstract class BaseAction : MonoBehaviour
         
     }
     public abstract BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
+    public virtual bool CanTakeAction(int actionPointsAvailable)
+    {
+        if (actionPointsAvailable > _actionPointsCost)
+        {
+            return true;
+        }
+            
+        else
+        {
+            return false;
+        }
+            
+    }
+    public bool GetIsReloadable()
+    {
+        return _isReloadable;
+    }
+    private void SetInitialAmmo()
+    {
+        if (!_requiresAmmo)
+            return;        
+    }
+    public void SetRequiresAmmo(bool required)
+    {
+        _requiresAmmo = required;
+    }
+    public bool GetRequiresAmmo()
+    {
+        return _requiresAmmo;
+    }
+    public void SetMaxAmmo(int newMaxAmmo)
+    {
+        _maxAmmo = newMaxAmmo;
+    }
+    public int GetMaxAmmo()
+    {
+        return _maxAmmo;
+    }
+    public void SetRemainingAmmo(int newRemainingAmmo)
+    {
+        _remainingAmmo = newRemainingAmmo;
+    }
+    public int GetRemainingAmmo()
+    {
+        return _remainingAmmo;
+    }
+    public void ReloadAmmo()
+    {
+        if (!_isReloadable)
+            return;
+    }
 }
