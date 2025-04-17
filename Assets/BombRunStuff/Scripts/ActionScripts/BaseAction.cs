@@ -26,10 +26,16 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] protected bool _requiresAmmo;
     [SerializeField] protected int _maxAmmo;
     [SerializeField] protected int _remainingAmmo = 0;
+    [SerializeField] protected int _ammoCost;
 
-    // Actions
+    // Static Actions
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
+    public static event EventHandler OnAnyReloadableFired;
+    public static event EventHandler OnAnyAmmoRemainingChanged;
+
+    // Non-static Actions
+
 
     protected virtual void Awake()
     {
@@ -117,7 +123,9 @@ public abstract class BaseAction : MonoBehaviour
     private void SetInitialAmmo()
     {
         if (!_requiresAmmo)
-            return;        
+            return;
+
+        _remainingAmmo = _maxAmmo;
     }
     public void SetRequiresAmmo(bool required)
     {
@@ -143,9 +151,25 @@ public abstract class BaseAction : MonoBehaviour
     {
         return _remainingAmmo;
     }
+    public int GetAmmoCost()
+    {
+        return _ammoCost;
+    }
+    public void SetAmmoCost(int newCost)
+    {
+        _ammoCost = newCost;
+    }
+    protected void UseAmmo(int amountUsed)
+    {
+        _remainingAmmo -= amountUsed;
+        //OnAnyAmmoRemainingChanged?.Invoke(this, EventArgs.Empty);
+    }
     public void ReloadAmmo()
     {
         if (!_isReloadable)
             return;
+
+        _remainingAmmo = _maxAmmo;
+        //OnAnyAmmoRemainingChanged?.Invoke(this, EventArgs.Empty);
     }
 }

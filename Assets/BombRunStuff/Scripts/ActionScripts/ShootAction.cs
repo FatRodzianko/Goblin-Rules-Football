@@ -565,7 +565,10 @@ public class ShootAction : BaseAction
         _isActive = true;
 
         if (_requiresAmmo)
-            _remainingAmmo--;
+        {
+            UseAmmo(this._ammoCost);
+        }
+            
     }
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {

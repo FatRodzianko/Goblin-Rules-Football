@@ -20,11 +20,15 @@ public class UnitActionSystemUI : MonoBehaviour
         UnitActionSystem.Instance.OnActionStarted += UnitActionSystem_OnActionStarted;
         BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+        BaseAction.OnAnyAmmoRemainingChanged += BaseAction_OnAnyAmmoRemainingChanged;
 
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();
         UpdateActionPoints();
     }
+
+    
+
     private void OnDisable()
     {
         UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
@@ -32,6 +36,7 @@ public class UnitActionSystemUI : MonoBehaviour
         UnitActionSystem.Instance.OnActionStarted -= UnitActionSystem_OnActionStarted;
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
+        BaseAction.OnAnyAmmoRemainingChanged -= BaseAction_OnAnyAmmoRemainingChanged;
     }
     private void CreateUnitActionButtons(BombRunUnit selectedUnit)
     {
@@ -63,7 +68,8 @@ public class UnitActionSystemUI : MonoBehaviour
             // Check if the player can use the action or not. If not, disable the button to make it non-clickable and greyed out
             actionButtonUI.EnableOrDisableButton(selectedUnit.CanSpendActionPointsToTakeAction(baseAction));
             actionButtonUI.SetBaseAction(baseAction);
-            _actionButtonUIList.Add(actionButtonUI);
+            actionButtonUI.UpdateAmmoRemaining();
+            _actionButtonUIList.Add(actionButtonUI);            
         }
     }
     private void UnitActionSystem_OnSelectedUnitChanged(object sender, BombRunUnit unit)
@@ -122,6 +128,17 @@ public class UnitActionSystemUI : MonoBehaviour
         UpdateActionPoints();
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();
+    }
+    private void BaseAction_OnAnyAmmoRemainingChanged(object sender, EventArgs e)
+    {
+        if (_actionButtonUIList.Count == 0)
+            return;
+
+        foreach (ActionButtonUI actionButtonUI in _actionButtonUIList)
+        {
+            actionButtonUI.UpdateAmmoRemaining();
+        }
+
     }
 }
 

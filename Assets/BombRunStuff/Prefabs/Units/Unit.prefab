@@ -810,7 +810,8 @@ MonoBehaviour:
   _isReloadable: 0
   _requiresAmmo: 0
   _maxAmmo: 0
-  _ammoRemaining: 0
+  _remainingAmmo: 0
+  _ammoCost: 0
   _maxMoveDistance: 4
 --- !u!114 &4887323598526683332
 MonoBehaviour:
@@ -832,7 +833,8 @@ MonoBehaviour:
   _isReloadable: 1
   _requiresAmmo: 1
   _maxAmmo: 3
-  _ammoRemaining: 0
+  _remainingAmmo: 0
+  _ammoCost: 1
   _maxShootDistance: 10
   _shotBlockerLayerMasks:
   - serializedVersion: 2
@@ -863,7 +865,8 @@ MonoBehaviour:
   _isReloadable: 0
   _requiresAmmo: 0
   _maxAmmo: 0
-  _ammoRemaining: 0
+  _remainingAmmo: 0
+  _ammoCost: 0
 --- !u!114 &3362271877576885837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -884,7 +887,8 @@ MonoBehaviour:
   _isReloadable: 0
   _requiresAmmo: 0
   _maxAmmo: 0
-  _ammoRemaining: 0
+  _remainingAmmo: 0
+  _ammoCost: 0
   _maxReinforceDistance: 1
   _enemyNearbyDistance: 3
 --- !u!114 &4184348786050281194
@@ -907,7 +911,8 @@ MonoBehaviour:
   _isReloadable: 0
   _requiresAmmo: 0
   _maxAmmo: 0
-  _ammoRemaining: 0
+  _remainingAmmo: 0
+  _ammoCost: 0
 --- !u!114 &2898562228658105131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -928,7 +933,8 @@ MonoBehaviour:
   _isReloadable: 0
   _requiresAmmo: 1
   _maxAmmo: 1
-  _ammoRemaining: 0
+  _remainingAmmo: 0
+  _ammoCost: 1
   _maxThrowDistance: 12
   _grenadeProjectilePrefab: {fileID: 8449958251188467104, guid: 6da71e249ebcf6541a508c7537619a78, type: 3}
 --- !u!114 &4589616383332178742
@@ -951,7 +957,8 @@ MonoBehaviour:
   _isReloadable: 0
   _requiresAmmo: 0
   _maxAmmo: 0
-  _ammoRemaining: 0
+  _remainingAmmo: 0
+  _ammoCost: 0
 --- !u!114 &4506797595294261930
 MonoBehaviour:
   m_ObjectHideFlags: 0

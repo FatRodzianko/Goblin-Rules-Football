@@ -79,8 +79,10 @@ public class GrenadeAction : BaseAction
 
         ActionStart(onActionComplete);
 
-        if(_requiresAmmo)
-            _remainingAmmo--;
+        if (_requiresAmmo)
+        {
+            UseAmmo(this._ammoCost);
+        }
     }
     private void OnGrenadeBehaviorComplete()
     {
