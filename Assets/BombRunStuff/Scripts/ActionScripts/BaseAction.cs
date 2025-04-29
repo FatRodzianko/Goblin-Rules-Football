@@ -28,6 +28,9 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] protected int _remainingAmmo = 0;
     [SerializeField] protected int _ammoCost;
 
+    [Header("UI Stuff")]
+    [SerializeField] protected bool _hideWhenCantUse = false;
+
     // Static Actions
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
@@ -171,5 +174,13 @@ public abstract class BaseAction : MonoBehaviour
 
         _remainingAmmo = _maxAmmo;
         //OnAnyAmmoRemainingChanged?.Invoke(this, EventArgs.Empty);
+    }
+    public bool GetHideWhenCantUse()
+    {
+        return _hideWhenCantUse;
+    }
+    public void SetHideWhenCantUse(bool newhideWhenCantUse)
+    {
+        _hideWhenCantUse = newhideWhenCantUse;
     }
 }

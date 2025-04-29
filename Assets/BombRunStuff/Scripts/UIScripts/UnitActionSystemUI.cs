@@ -65,7 +65,16 @@ public class UnitActionSystemUI : MonoBehaviour
 
             Transform actionButtonTransform = Instantiate(_actionButtonPrefab, _actionButtonContainer);
             ActionButtonUI actionButtonUI = actionButtonTransform.GetComponent<ActionButtonUI>();
-            // Check if the player can use the action or not. If not, disable the button to make it non-clickable and greyed out
+            // Check if the player can use the action or not. If "HideWhenCantUse" is true, don't create it.
+            // If HideWhenCantUse is false (the default), disable the button to make it non-clickable and greyed out
+            if (baseAction.GetHideWhenCantUse())
+            {
+                if (!selectedUnit.CanSpendActionPointsToTakeAction(baseAction))
+                {
+                    continue;
+                }
+            }
+
             actionButtonUI.EnableOrDisableButton(selectedUnit.CanSpendActionPointsToTakeAction(baseAction));
             actionButtonUI.SetBaseAction(baseAction);
             actionButtonUI.UpdateAmmoRemaining();

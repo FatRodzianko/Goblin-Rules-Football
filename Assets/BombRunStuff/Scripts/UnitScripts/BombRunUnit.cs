@@ -109,6 +109,7 @@ public class BombRunUnit : MonoBehaviour
     }
     public bool CanSpendActionPointsToTakeAction(BaseAction baseAction)
     {
+        // re-write to call the CanTakeAction function from the base action? That way all actions can have custom logic for whether a player can take the action or not?
         if (_actionPoints >= baseAction.GetActionPointsCost())
         {
             if (baseAction.GetRequiresAmmo())
