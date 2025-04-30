@@ -520,34 +520,34 @@ public class ShootAction : BaseAction
 
         return maxOBstacleCoverType;
     }
-    public override bool CanTakeAction(int actionPointsAvailable)
+    //public override bool CanTakeAction(int actionPointsAvailable)
+    //{
+    //    if (actionPointsAvailable >= _actionPointsCost)
+    //    {
+    //        if (_requiresAmmo)
+    //        {
+    //            if (_remainingAmmo > 0)
+    //            {
+    //                return true;
+    //            }
+    //            else
+    //            {
+    //                return false;
+    //            }
+    //        }
+    //        else
+    //        {
+    //            return true;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    }
+    //}
+    public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-        if (actionPointsAvailable > _actionPointsCost)
-        {
-            if (_requiresAmmo)
-            {
-                if (_remainingAmmo > 0)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return true;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
-    public override void TakeAction(GridPosition gridPosition, Action onSpinComplete)
-    {
-        _onActionComplete = onSpinComplete;
+        _onActionComplete = onActionComplete;
 
         _state = State.Aiming;
         _stateTimer = _aimingStateTime;

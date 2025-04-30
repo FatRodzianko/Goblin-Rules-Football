@@ -108,16 +108,38 @@ public abstract class BaseAction : MonoBehaviour
     public abstract BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
     public virtual bool CanTakeAction(int actionPointsAvailable)
     {
-        if (actionPointsAvailable > _actionPointsCost)
+        //if (actionPointsAvailable >= _actionPointsCost)
+        //{
+        //    return true;
+        //}
+
+        //else
+        //{
+        //    return false;
+        //}
+        if (actionPointsAvailable >= _actionPointsCost)
         {
-            return true;
+            if (_requiresAmmo)
+            {
+                if (_remainingAmmo > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
         }
-            
         else
         {
             return false;
         }
-            
+
     }
     public bool GetIsReloadable()
     {

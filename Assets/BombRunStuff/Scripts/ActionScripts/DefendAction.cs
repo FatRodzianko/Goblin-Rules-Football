@@ -31,8 +31,9 @@ public class DefendAction : BaseAction
     }
     private void FinishAction()
     {
-        _isActive = false;
-        _onActionComplete();
+        //_isActive = false;
+        //_onActionComplete();
+        ActionComplete();
     }
     public int GetMaxReinforceDistance()
     {

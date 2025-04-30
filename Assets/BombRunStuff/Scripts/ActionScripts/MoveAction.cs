@@ -78,9 +78,10 @@ public class MoveAction : BaseAction
             // check if the position index is larger than the position list. If so, action has completed
             if (_currentPositionIndex >= _positionList.Count())
             {
-                _isActive = false;
+                //_isActive = false;
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
-                _onActionComplete();
+                //_onActionComplete();
+                ActionComplete();
             }
             
         }

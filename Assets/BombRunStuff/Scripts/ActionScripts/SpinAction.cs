@@ -26,8 +26,9 @@ public class SpinAction : BaseAction
         {
             spinAddAmount = _maxSpinAmount - _totalSpinAmount;
             _totalSpinAmount += spinAddAmount;
-            _isActive = false;
-            _onActionComplete();
+            //_isActive = false;
+            //_onActionComplete();
+            ActionComplete();
         }
         else
         {

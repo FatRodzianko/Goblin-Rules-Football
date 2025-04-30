@@ -21,6 +21,7 @@ public class UnitActionSystemUI : MonoBehaviour
         BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         BaseAction.OnAnyAmmoRemainingChanged += BaseAction_OnAnyAmmoRemainingChanged;
+        BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
 
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();
@@ -37,6 +38,7 @@ public class UnitActionSystemUI : MonoBehaviour
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
         BaseAction.OnAnyAmmoRemainingChanged -= BaseAction_OnAnyAmmoRemainingChanged;
+        BaseAction.OnAnyActionCompleted -= BaseAction_OnAnyActionCompleted;
     }
     private void CreateUnitActionButtons(BombRunUnit selectedUnit)
     {
@@ -62,20 +64,21 @@ public class UnitActionSystemUI : MonoBehaviour
             //    continue;
             //}
 
-
-            Transform actionButtonTransform = Instantiate(_actionButtonPrefab, _actionButtonContainer);
-            ActionButtonUI actionButtonUI = actionButtonTransform.GetComponent<ActionButtonUI>();
+            bool canUnitUseAction = selectedUnit.CanSpendActionPointsToTakeAction(baseAction);
             // Check if the player can use the action or not. If "HideWhenCantUse" is true, don't create it.
-            // If HideWhenCantUse is false (the default), disable the button to make it non-clickable and greyed out
             if (baseAction.GetHideWhenCantUse())
             {
-                if (!selectedUnit.CanSpendActionPointsToTakeAction(baseAction))
+                if (!canUnitUseAction)
                 {
                     continue;
                 }
             }
 
-            actionButtonUI.EnableOrDisableButton(selectedUnit.CanSpendActionPointsToTakeAction(baseAction));
+            // if action will not be hidden, create the action buttons
+            Transform actionButtonTransform = Instantiate(_actionButtonPrefab, _actionButtonContainer);
+            ActionButtonUI actionButtonUI = actionButtonTransform.GetComponent<ActionButtonUI>();
+            // disable/grey out button if it can't be used, but also doesn't get hidden
+            actionButtonUI.EnableOrDisableButton(canUnitUseAction);
             actionButtonUI.SetBaseAction(baseAction);
             actionButtonUI.UpdateAmmoRemaining();
             _actionButtonUIList.Add(actionButtonUI);            
@@ -97,6 +100,12 @@ public class UnitActionSystemUI : MonoBehaviour
         //UpdateActionPoints();
         //CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         //UpdateSelectedActionVisual();
+
+        //UpdateActionItems();
+    }
+    private void BaseAction_OnAnyActionCompleted(object sender, EventArgs e)
+    {
+        Debug.Log("UnitActionSystemUI: BaseAction_OnAnyActionCompleted");
         UpdateActionItems();
     }
     private void UpdateSelectedActionVisual()
@@ -123,7 +132,8 @@ public class UnitActionSystemUI : MonoBehaviour
     private void BombRunUnit_OnAnyActionPointsChanged(object sender, EventArgs e)
     {
         //UpdateActionPoints();
-        UpdateActionItems();
+
+        //UpdateActionItems();
     }
     private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
     {
@@ -134,6 +144,7 @@ public class UnitActionSystemUI : MonoBehaviour
     }
     private void UpdateActionItems()
     {
+        Debug.Log("UpdateActionItems: ");
         UpdateActionPoints();
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();

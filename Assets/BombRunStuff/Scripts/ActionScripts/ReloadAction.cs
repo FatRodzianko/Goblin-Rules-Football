@@ -18,8 +18,7 @@ public class ReloadAction : BaseAction
         if (_reloadCounter <= 0)
         {
             ReloadWeapons();
-            _isActive = false;
-            _onActionComplete();
+            ActionComplete();
         }
     }
     public override string GetActionName()
@@ -69,7 +68,7 @@ public class ReloadAction : BaseAction
     }
     public override bool CanTakeAction(int actionPointsAvailable)
     {
-        if (actionPointsAvailable > _actionPointsCost)
+        if (actionPointsAvailable >= _actionPointsCost)
         {
             BaseAction[] baseActionArray = _unit.GetBaseActionArray();
             if (baseActionArray.Length == 0)
