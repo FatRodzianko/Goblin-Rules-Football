@@ -22,6 +22,7 @@ public class UnitActionSystemUI : MonoBehaviour
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         BaseAction.OnAnyAmmoRemainingChanged += BaseAction_OnAnyAmmoRemainingChanged;
         BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
+        
 
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();
@@ -131,9 +132,9 @@ public class UnitActionSystemUI : MonoBehaviour
     }
     private void BombRunUnit_OnAnyActionPointsChanged(object sender, EventArgs e)
     {
-        //UpdateActionPoints();
+        UpdateActionPoints();
 
-        //UpdateActionItems();
+        UpdateActionItems();
     }
     private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
     {

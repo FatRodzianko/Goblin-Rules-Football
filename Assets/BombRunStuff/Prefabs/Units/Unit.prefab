@@ -982,7 +982,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionPointsCost: 1
-  _actionSymbolSprite: {fileID: 0}
+  _actionSymbolSprite: {fileID: 21300000, guid: 43f5f3f3a0a869b4e9a942547883c2b2, type: 3}
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -990,6 +990,8 @@ MonoBehaviour:
   _remainingAmmo: 0
   _ammoCost: 0
   _hideWhenCantUse: 1
+  _reloadTime: 1.5
+  _reloadCounter: 0
 --- !u!114 &4506797595294261930
 MonoBehaviour:
   m_ObjectHideFlags: 0

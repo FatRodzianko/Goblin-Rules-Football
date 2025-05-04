@@ -117,10 +117,10 @@ public class SwordAction : BaseAction
                     continue;
                 }
                 // calculate the distance to the grid position to make sure it is in the shooting radius. Right now the for loops form a big square around selected unit. This will make it more circular
-                if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > _maxSwordDistance * 10)
-                {
-                    continue;
-                }
+                //if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > _maxSwordDistance * 10)
+                //{
+                //    continue;
+                //}
                 Debug.Log("SwordAction: GetValidActionGridPositionList: Valid position found at: " + testGridPosition.ToString());
                 validGridPositionList.Add(testGridPosition);
             }
