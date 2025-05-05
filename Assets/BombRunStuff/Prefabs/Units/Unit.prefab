@@ -693,6 +693,7 @@ GameObject:
   - component: {fileID: 3408740805264284271}
   - component: {fileID: 7297105716296972232}
   - component: {fileID: 3220647545044700835}
+  - component: {fileID: 4506797595294261930}
   - component: {fileID: 5928444417147222519}
   - component: {fileID: 4887323598526683332}
   - component: {fileID: 396472657878469393}
@@ -701,7 +702,6 @@ GameObject:
   - component: {fileID: 2898562228658105131}
   - component: {fileID: 4589616383332178742}
   - component: {fileID: 1951318674019840855}
-  - component: {fileID: 4506797595294261930}
   m_Layer: 11
   m_Name: Unit
   m_TagString: Goblin
@@ -791,6 +791,28 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.875, y: 0.625}
   m_EdgeRadius: 0
+--- !u!114 &4506797595294261930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4944422538143551182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 169b43700e1881e408ce260b158bce85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startingHealth: 100
+  _health: 100
+  _maxHealth: 0
+  _bodyParts:
+  - BodyPart: 0
+    BodyPartFrozenState: 0
+  - BodyPart: 1
+    BodyPartFrozenState: 0
+  - BodyPart: 2
+    BodyPartFrozenState: 0
 --- !u!114 &5928444417147222519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -807,6 +829,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: e5917e614c198a94aa34d711c31edc9d, type: 3}
+  _actionBodyPart: 2
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -831,6 +854,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 235fab481a567c44ca1574a2cee9b931, type: 3}
+  _actionBodyPart: 1
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 1
   _requiresAmmo: 1
@@ -864,6 +888,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 2
   _actionSymbolSprite: {fileID: 21300000, guid: 14844317d65c4d8469e3e3862a79d298, type: 3}
+  _actionBodyPart: 2
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -887,6 +912,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 2
   _actionSymbolSprite: {fileID: 21300000, guid: e4fae6034bcdca14390523951abc0dbe, type: 3}
+  _actionBodyPart: 2
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -912,6 +938,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: f2cdd7d90789c824882003eb372b8618, type: 3}
+  _actionBodyPart: 1
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -935,6 +962,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 95177d6dba8cb634e8b9977040bf3f44, type: 3}
+  _actionBodyPart: 1
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 1
@@ -960,6 +988,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: d395f258769a207428224a76105b5ee8, type: 3}
+  _actionBodyPart: 1
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -983,6 +1012,7 @@ MonoBehaviour:
   _isActive: 0
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 43f5f3f3a0a869b4e9a942547883c2b2, type: 3}
+  _actionBodyPart: 1
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -992,28 +1022,6 @@ MonoBehaviour:
   _hideWhenCantUse: 1
   _reloadTime: 1.5
   _reloadCounter: 0
---- !u!114 &4506797595294261930
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4944422538143551182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 169b43700e1881e408ce260b158bce85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _startingHealth: 100
-  _health: 100
-  _maxHealth: 0
-  _bodyParts:
-  - BodyPart: 0
-    BodyPartFrozenState: 0
-  - BodyPart: 1
-    BodyPartFrozenState: 0
-  - BodyPart: 2
-    BodyPartFrozenState: 0
 --- !u!1 &5004671053109487943
 GameObject:
   m_ObjectHideFlags: 0

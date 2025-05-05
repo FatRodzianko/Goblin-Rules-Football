@@ -37,13 +37,12 @@ public class MoveAction : BaseAction
     // cache the last valid action list so it doesn't need to be recalculated for every mouse click?
     private Dictionary<GridPosition, List<GridPosition>> _cachedValidActionList = new Dictionary<GridPosition, List<GridPosition>>();
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         PathFinding.Instance.IsWalkableUpdated += PathFinding_IsWalkableUpdated;
         BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
     }
-
-    
 
     private void OnDisable()
     {

@@ -244,3 +244,26 @@ x create a "wall object" that is just a rectangle collider
 - for grenades: freeze one "body part" for every unit that is in the blast radius?
 - - - if both legs are already frozen, freeze an arm. If both arms and legs are frozen, freeze head?
 - - - can also be used to unfreeze teammates if you hit them
+
+
+### Immediate Tasks:
+x Have actions check if applicable body part is frozen
+- - x if yes, affect actions for that task
+- - x each action should have an associated body part?
+- Display on action if it is "hindered" or affected by a half-frozen or frozen body part
+- - - indicator to player when half frozen so they know that action will use all action points
+- - - indicator to player when fully frozen to show why the action is not available
+- Action to display an icon to show what body part affects them?
+x Event when a body part's frozen state changes
+- - x actions will update action point cost as needed?
+
+### Longer term tasks
+- When doing shoot action, prompt player to choose what body part to shoot before taking action
+- Add in a "cover" system
+- - - full cover if behind a wall or obstable that provides full coverage - can't hit that unit unless you flank them
+- - - half cover if behind a shorter half wall/obstable - can only hit arms or head, not legs
+- Change "defend" to "hunker down" or "take cover"
+- - - allows for full cover if unit is behind wall/obstacle that only provides half cover
+- - - removes unit vision past that wall though?
+- Fog of war based on what units can "see"
+- - - ties this into the "vision cone" that's affected by head status

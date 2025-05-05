@@ -28,6 +28,7 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     // events
     public event EventHandler OnDead;
     public event EventHandler OnTakeDamage;
+    public event EventHandler<BodyPart> OnBodyPartFrozenStateChanged;
 
     [SerializeField] private int _startingHealth = 100;
     [SerializeField] private int _health = 100;
@@ -163,6 +164,7 @@ public class BombRunUnitHealthSystem : MonoBehaviour
             case BodyPartFrozenState.FullFrozen:
                 break;
         }
+        OnBodyPartFrozenStateChanged?.Invoke(this, bombRunUnitBodyPart.BodyPart);
     }
     public void UnFreezeBodyPart(BodyPart bodyPart)
     {
@@ -185,5 +187,6 @@ public class BombRunUnitHealthSystem : MonoBehaviour
                 bombRunUnitBodyPart.BodyPartFrozenState = BodyPartFrozenState.HalfFrozen;
                 break;
         }
+        OnBodyPartFrozenStateChanged?.Invoke(this, bombRunUnitBodyPart.BodyPart);
     }
 }

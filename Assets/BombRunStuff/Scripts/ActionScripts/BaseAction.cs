@@ -6,7 +6,7 @@ using System;
 public abstract class BaseAction : MonoBehaviour
 {
     //public class BaseParameters { } //this can be extended to have a "generic" base parameter for the TakeAction method
-    
+
     [Header(" Unit Info ")]
     [SerializeField] protected BombRunUnit _unit;
 
@@ -15,8 +15,10 @@ public abstract class BaseAction : MonoBehaviour
     protected Action _onActionComplete;
 
     [Header("Action Info")]
+    [SerializeField] protected int _actionPointDefaultCost = 1;
     [SerializeField] protected int _actionPointsCost = 1;
     [SerializeField] private Sprite _actionSymbolSprite;
+    [SerializeField] private BodyPart _actionBodyPart;
 
     [Header("Animation Stuff")]
     [SerializeField] protected BombRunUnitAnimator _bombRunUnitAnimator;
@@ -49,6 +51,15 @@ public abstract class BaseAction : MonoBehaviour
             _bombRunUnitAnimator = _unit.GetUnitAnimator();
         }
         SetInitialAmmo();
+    }
+    protected virtual void Start()
+    {
+        _unit.GetUnitHealthSystem().OnBodyPartFrozenStateChanged += BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged;
+    }
+
+    protected virtual void OnDisable()
+    {
+        _unit.GetUnitHealthSystem().OnBodyPartFrozenStateChanged -= BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged;
     }
     public abstract string GetActionName();
     public abstract void TakeAction(GridPosition gridPosition, Action onActionComplete);
@@ -103,7 +114,7 @@ public abstract class BaseAction : MonoBehaviour
             // no possible Enemy AI actions
             return null;
         }
-        
+
     }
     public abstract BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
     public virtual bool CanTakeAction(int actionPointsAvailable)
@@ -117,6 +128,11 @@ public abstract class BaseAction : MonoBehaviour
         //{
         //    return false;
         //}
+
+        // Check if the applicable body part is frozen. If so, cannot take the action
+        if (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(_actionBodyPart) == BodyPartFrozenState.FullFrozen)
+            return false;
+
         if (actionPointsAvailable >= _actionPointsCost)
         {
             if (_requiresAmmo)
@@ -204,5 +220,31 @@ public abstract class BaseAction : MonoBehaviour
     public void SetHideWhenCantUse(bool newhideWhenCantUse)
     {
         _hideWhenCantUse = newhideWhenCantUse;
+    }
+    public BodyPart GetActionBodyPart()
+    {
+        return _actionBodyPart;
+    }
+    public void SetActionBodyPart(BodyPart bodyPart)
+    {
+        this._actionBodyPart = bodyPart;
+    }
+    protected virtual void BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged(object sender, BodyPart bodyPart)
+    {
+        if (this._actionBodyPart != bodyPart)
+            return;
+
+        switch (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(bodyPart))
+        {
+            case BodyPartFrozenState.None:
+                _actionPointsCost = _actionPointDefaultCost;
+                break;
+            case BodyPartFrozenState.HalfFrozen:
+                _actionPointsCost = _actionPointDefaultCost * 2;
+                break;
+            case BodyPartFrozenState.FullFrozen:
+                _actionPointsCost = int.MaxValue;
+                break;
+        }
     }
 }
