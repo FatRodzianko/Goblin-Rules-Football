@@ -1007,6 +1007,13 @@ MonoBehaviour:
   _startingHealth: 100
   _health: 100
   _maxHealth: 0
+  _bodyParts:
+  - BodyPart: 0
+    BodyPartFrozenState: 0
+  - BodyPart: 1
+    BodyPartFrozenState: 0
+  - BodyPart: 2
+    BodyPartFrozenState: 0
 --- !u!1 &5004671053109487943
 GameObject:
   m_ObjectHideFlags: 0
