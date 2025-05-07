@@ -254,6 +254,9 @@ x Have actions check if applicable body part is frozen
 - - - indicator to player when half frozen so they know that action will use all action points
 - - - indicator to player when fully frozen to show why the action is not available
 - Action to display an icon to show what body part affects them?
+- - - scriptable object for "sprite mapping"
+- - - - - - map a sprite for not frozen, half frozen, and full frozen
+- - - - - - create scriptable object for each body part (head, arms, legs)
 x Event when a body part's frozen state changes
 - - x actions will update action point cost as needed?
 

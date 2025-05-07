@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e9576f76e3853b409b96c21a3563015, type: 3}
   m_Name: BodyPartSpriteMappingScriptable
   m_EditorClassIdentifier: 
-  BodyPartSpriteMappingDictionary:
+  _bodyPartSpriteMappingDictionary:
   - BodyPart: 0
-    Sprite: {fileID: 0}
+    Sprites: {fileID: 11400000, guid: e49e3d2a75cddc6488035980e252acef, type: 2}
   - BodyPart: 1
-    Sprite: {fileID: 0}
+    Sprites: {fileID: 11400000, guid: 9bb6c69f189961e4695c14551401fc8e, type: 2}
   - BodyPart: 2
-    Sprite: {fileID: 0}
+    Sprites: {fileID: 11400000, guid: 5356bf421e4ed3a4580609aa2ecd02df, type: 2}

@@ -149,6 +149,7 @@ public class BombRunUnitHealthSystem : MonoBehaviour
         if (!_bodyParts.Exists(x => x.BodyPart == bodyPart))
         {
             Debug.Log("FreezeBodyPart: could not find body part: " + bodyPart.ToString());
+            return;
         }
         
         BombRunUnitBodyPart bombRunUnitBodyPart = _bodyParts.First(x => x.BodyPart == bodyPart);
