@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ead33430b43376645ace441046d127df, type: 3}
   m_Name: ArmsBodyPartSpritesScriptable
   m_EditorClassIdentifier: 
-  _notFrozenSprite: {fileID: 0}
-  _halfFrozenSprite: {fileID: 0}
-  _fullFrozenSprite: {fileID: 0}
+  _noneSprite: {fileID: 21300000, guid: 0ea4204404691544a97f56b7edddb10c, type: 3}
+  _notFrozenSprite: {fileID: 21300000, guid: 918772699e6cf7d4db96321f53840e0d, type: 3}
+  _halfFrozenSprite: {fileID: 21300000, guid: 07d7e2ac9e3b33e4ea324d1e8c13a4b3, type: 3}
+  _fullFrozenSprite: {fileID: 21300000, guid: c383ec0e084b2384bbdfcbffd553b66f, type: 3}

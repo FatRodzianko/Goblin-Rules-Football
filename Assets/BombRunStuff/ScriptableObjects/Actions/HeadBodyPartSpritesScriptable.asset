@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ead33430b43376645ace441046d127df, type: 3}
   m_Name: HeadBodyPartSpritesScriptable
   m_EditorClassIdentifier: 
-  _notFrozenSprite: {fileID: 0}
-  _halfFrozenSprite: {fileID: 0}
-  _fullFrozenSprite: {fileID: 0}
+  _noneSprite: {fileID: 21300000, guid: 2e81d8070ce6144409e6e67bf9f53121, type: 3}
+  _notFrozenSprite: {fileID: 21300000, guid: 9743e61f14458444f8724bbad982a461, type: 3}
+  _halfFrozenSprite: {fileID: 21300000, guid: bc9e61ad5ac91c64a987e66cc64cda97, type: 3}
+  _fullFrozenSprite: {fileID: 21300000, guid: 45fc71607e29b624bb8ba6f0a98ebc10, type: 3}

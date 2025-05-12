@@ -236,7 +236,7 @@ public abstract class BaseAction : MonoBehaviour
 
         switch (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(bodyPart))
         {
-            case BodyPartFrozenState.None:
+            case BodyPartFrozenState.NotFrozen:
                 _actionPointsCost = _actionPointDefaultCost;
                 break;
             case BodyPartFrozenState.HalfFrozen:

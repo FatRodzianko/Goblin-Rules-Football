@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ead33430b43376645ace441046d127df, type: 3}
   m_Name: LegsBodyPartSpritesScriptable
   m_EditorClassIdentifier: 
-  _notFrozenSprite: {fileID: 0}
-  _halfFrozenSprite: {fileID: 0}
-  _fullFrozenSprite: {fileID: 0}
+  _noneSprite: {fileID: 21300000, guid: 5f7cdc91e7bc7d54484f994b934372f9, type: 3}
+  _notFrozenSprite: {fileID: 21300000, guid: 11992b51136bb574fa7eeb91f47bd468, type: 3}
+  _halfFrozenSprite: {fileID: 21300000, guid: bf241099ab9f2f144818802ecf0f902c, type: 3}
+  _fullFrozenSprite: {fileID: 21300000, guid: 039a7805d8cd0724c8485ce2fbb05140, type: 3}

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public enum BodyPartFrozenState
 {
-    None,
+    NotFrozen,
     HalfFrozen,
     FullFrozen
 }
@@ -100,7 +100,7 @@ public class BombRunUnitHealthSystem : MonoBehaviour
         }
         else
         {
-            return BodyPartFrozenState.None;
+            return BodyPartFrozenState.NotFrozen;
         }
     }
     public void TestFreezeBodyPart()
@@ -125,15 +125,15 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     }
     public void TestUnFreezeBodyPart()
     {
-        if (GetSpecificBodyPart(BodyPart.Legs).BodyPartFrozenState != BodyPartFrozenState.None)
+        if (GetSpecificBodyPart(BodyPart.Legs).BodyPartFrozenState != BodyPartFrozenState.NotFrozen)
         {
             UnFreezeBodyPart(BodyPart.Legs);
         }
-        else if (GetSpecificBodyPart(BodyPart.Arms).BodyPartFrozenState != BodyPartFrozenState.None)
+        else if (GetSpecificBodyPart(BodyPart.Arms).BodyPartFrozenState != BodyPartFrozenState.NotFrozen)
         {
             UnFreezeBodyPart(BodyPart.Arms);
         }
-        else if (GetSpecificBodyPart(BodyPart.Head).BodyPartFrozenState != BodyPartFrozenState.None)
+        else if (GetSpecificBodyPart(BodyPart.Head).BodyPartFrozenState != BodyPartFrozenState.NotFrozen)
         {
             UnFreezeBodyPart(BodyPart.Head);
         }
@@ -156,7 +156,7 @@ public class BombRunUnitHealthSystem : MonoBehaviour
 
         switch (bombRunUnitBodyPart.BodyPartFrozenState)
         {
-            case BodyPartFrozenState.None:
+            case BodyPartFrozenState.NotFrozen:
                 bombRunUnitBodyPart.BodyPartFrozenState = BodyPartFrozenState.HalfFrozen;
                 break;
             case BodyPartFrozenState.HalfFrozen:
@@ -179,10 +179,10 @@ public class BombRunUnitHealthSystem : MonoBehaviour
 
         switch (bombRunUnitBodyPart.BodyPartFrozenState)
         {
-            case BodyPartFrozenState.None:
+            case BodyPartFrozenState.NotFrozen:
                 break;
             case BodyPartFrozenState.HalfFrozen:
-                bombRunUnitBodyPart.BodyPartFrozenState = BodyPartFrozenState.None;
+                bombRunUnitBodyPart.BodyPartFrozenState = BodyPartFrozenState.NotFrozen;
                 break;
             case BodyPartFrozenState.FullFrozen:
                 bombRunUnitBodyPart.BodyPartFrozenState = BodyPartFrozenState.HalfFrozen;

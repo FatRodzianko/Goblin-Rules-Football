@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 
+
 public class ActionButtonUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _actionName;
@@ -53,6 +54,10 @@ public class ActionButtonUI : MonoBehaviour
             return;
         }
         _remainingAmmoText.text = _baseAction.GetRemainingAmmo().ToString();
+    }
+    public void UpdateBodyPartSpriteIndicator()
+    {
+        
     }
 
 }
