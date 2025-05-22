@@ -803,6 +803,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 169b43700e1881e408ce260b158bce85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _unit: {fileID: 3408740805264284271}
   _startingHealth: 100
   _health: 100
   _maxHealth: 0
@@ -827,6 +828,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: e5917e614c198a94aa34d711c31edc9d, type: 3}
   _actionBodyPart: 2
@@ -852,6 +854,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 235fab481a567c44ca1574a2cee9b931, type: 3}
   _actionBodyPart: 1
@@ -886,6 +889,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionPointDefaultCost: 1
   _actionPointsCost: 2
   _actionSymbolSprite: {fileID: 21300000, guid: 14844317d65c4d8469e3e3862a79d298, type: 3}
   _actionBodyPart: 2
@@ -910,6 +914,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionPointDefaultCost: 1
   _actionPointsCost: 2
   _actionSymbolSprite: {fileID: 21300000, guid: e4fae6034bcdca14390523951abc0dbe, type: 3}
   _actionBodyPart: 2
@@ -936,6 +941,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: f2cdd7d90789c824882003eb372b8618, type: 3}
   _actionBodyPart: 1
@@ -960,6 +966,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 95177d6dba8cb634e8b9977040bf3f44, type: 3}
   _actionBodyPart: 1
@@ -986,6 +993,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: d395f258769a207428224a76105b5ee8, type: 3}
   _actionBodyPart: 1
@@ -1010,6 +1018,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 43f5f3f3a0a869b4e9a942547883c2b2, type: 3}
   _actionBodyPart: 1

@@ -23,8 +23,6 @@ public class BombRunUnit : MonoBehaviour
     [Header("Unit Health Stuff")]
     [SerializeField] private BombRunUnitHealthSystem _healthSystem;
 
-
-
     [Header("GridPosition stuff")]
     private GridPosition _gridPosition;
 

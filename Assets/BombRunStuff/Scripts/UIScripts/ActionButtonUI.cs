@@ -12,6 +12,9 @@ public class ActionButtonUI : MonoBehaviour
     [SerializeField] private Button _button;
     [SerializeField] private Outline _outline;
 
+    [Header("Body Part Stuff")]
+    [SerializeField] private ActionButtonBodyPartSpriteHolderScript _actionButtonBodyPartSpriteHolderScript;
+
     [Header("Ammo Stuff")]
     [SerializeField] private TextMeshProUGUI _remainingAmmoText;
 
@@ -55,9 +58,13 @@ public class ActionButtonUI : MonoBehaviour
         }
         _remainingAmmoText.text = _baseAction.GetRemainingAmmo().ToString();
     }
+    public void SetBodyPartType(BodyPart bodyPart)
+    {
+        _actionButtonBodyPartSpriteHolderScript.SetBodyPartType(bodyPart);
+    }
     public void UpdateBodyPartSpriteIndicator()
     {
-        
+        _actionButtonBodyPartSpriteHolderScript.UpdateBodyPartImage();
     }
 
 }

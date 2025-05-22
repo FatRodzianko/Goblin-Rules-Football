@@ -250,13 +250,13 @@ x create a "wall object" that is just a rectangle collider
 x Have actions check if applicable body part is frozen
 - - x if yes, affect actions for that task
 - - x each action should have an associated body part?
-- Display on action if it is "hindered" or affected by a half-frozen or frozen body part
-- - - indicator to player when half frozen so they know that action will use all action points
-- - - indicator to player when fully frozen to show why the action is not available
-- Action to display an icon to show what body part affects them?
-- - - scriptable object for "sprite mapping"
-- - - - - - map a sprite for not frozen, half frozen, and full frozen
-- - - - - - create scriptable object for each body part (head, arms, legs)
+x Display on action if it is "hindered" or affected by a half-frozen or frozen body part
+- - x indicator to player when half frozen so they know that action will use all action points
+- - x indicator to player when fully frozen to show why the action is not available
+x Action to display an icon to show what body part affects them?
+- - x scriptable object for "sprite mapping"
+- - - - - x map a sprite for not frozen, half frozen, and full frozen
+- - - - - x create scriptable object for each body part (head, arms, legs)
 x Event when a body part's frozen state changes
 - - x actions will update action point cost as needed?
 
@@ -269,4 +269,6 @@ x Event when a body part's frozen state changes
 - - - allows for full cover if unit is behind wall/obstacle that only provides half cover
 - - - removes unit vision past that wall though?
 - Fog of war based on what units can "see"
-- - - ties this into the "vision cone" that's affected by head status
+- - - ties this into the "vision cone" that's affected by head statussasdsdsdfsadafdasdaadadasda
+
+768x432

@@ -3,18 +3,19 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+[Serializable]
+public class BodyPartSpriteMapping
+{
+    public BodyPart BodyPart; // the key of the dictionary
+    public ScriptableBodyPartSprites Sprites;
+}
 
 [CreateAssetMenu(fileName = "New Body Part Sprite Mapping", menuName = "Body Part Sprite Mapping")]
 public class ScriptableBodyPartSpriteMapping : ScriptableObject
 {
     [SerializeField] private List<BodyPartSpriteMapping> _bodyPartSpriteMappingDictionary = new List<BodyPartSpriteMapping>();
 
-    [Serializable]
-    public class BodyPartSpriteMapping
-    {
-        public BodyPart BodyPart; // the key of the dictionary
-        public ScriptableBodyPartSprites Sprites;
-    }
+    
 
     public List<BodyPartSpriteMapping> BodyPartSpriteMappingDictionary()
     {

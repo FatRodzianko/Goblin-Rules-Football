@@ -22,7 +22,7 @@ public class UnitActionSystemUI : MonoBehaviour
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         BaseAction.OnAnyAmmoRemainingChanged += BaseAction_OnAnyAmmoRemainingChanged;
         BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
-        
+        BombRunUnitHealthSystem.OnAnyBodyPartFrozenStateChanged += BombRunUnitHealthSystem_OnAnyBodyPartFrozenStateChanged;
 
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();
@@ -40,6 +40,7 @@ public class UnitActionSystemUI : MonoBehaviour
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
         BaseAction.OnAnyAmmoRemainingChanged -= BaseAction_OnAnyAmmoRemainingChanged;
         BaseAction.OnAnyActionCompleted -= BaseAction_OnAnyActionCompleted;
+        BombRunUnitHealthSystem.OnAnyBodyPartFrozenStateChanged -= BombRunUnitHealthSystem_OnAnyBodyPartFrozenStateChanged;
     }
     private void CreateUnitActionButtons(BombRunUnit selectedUnit)
     {
@@ -82,6 +83,8 @@ public class UnitActionSystemUI : MonoBehaviour
             actionButtonUI.EnableOrDisableButton(canUnitUseAction);
             actionButtonUI.SetBaseAction(baseAction);
             actionButtonUI.UpdateAmmoRemaining();
+            actionButtonUI.SetBodyPartType(baseAction.GetActionBodyPart());
+
             _actionButtonUIList.Add(actionButtonUI);            
         }
     }
@@ -114,6 +117,13 @@ public class UnitActionSystemUI : MonoBehaviour
         foreach (ActionButtonUI actionButtonUI in _actionButtonUIList)
         {
             actionButtonUI.UpdateSelectedActionVisual();
+        }
+    }
+    private void UpdateActionButtonBodyPartVisuals()
+    {
+        foreach (ActionButtonUI actionButtonUI in _actionButtonUIList)
+        {
+            actionButtonUI.UpdateBodyPartSpriteIndicator();
         }
     }
     private void UpdateActionPoints()
@@ -160,6 +170,14 @@ public class UnitActionSystemUI : MonoBehaviour
             actionButtonUI.UpdateAmmoRemaining();
         }
 
+    }
+    private void BombRunUnitHealthSystem_OnAnyBodyPartFrozenStateChanged(object sender, EventArgs e)
+    {
+        BombRunUnitHealthSystem healthSystem = sender as BombRunUnitHealthSystem;
+        if (healthSystem.GetUnit() == UnitActionSystem.Instance.GetSelectedUnit())
+        {
+            UpdateActionButtonBodyPartVisuals();
+        }
     }
 }
 

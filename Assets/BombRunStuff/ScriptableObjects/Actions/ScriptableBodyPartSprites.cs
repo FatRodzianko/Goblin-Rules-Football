@@ -10,6 +10,10 @@ public class ScriptableBodyPartSprites : ScriptableObject
     [SerializeField] private Sprite _halfFrozenSprite;
     [SerializeField] private Sprite _fullFrozenSprite;
 
+    public Sprite NoneSprite()
+    {
+        return _noneSprite;
+    }
     public Sprite NotFrozenSprite()
     {
         return _notFrozenSprite;
@@ -21,5 +25,21 @@ public class ScriptableBodyPartSprites : ScriptableObject
     public Sprite FullFrozenSprite()
     {
         return _fullFrozenSprite;
+    }
+    public Sprite GetSpriteForState(BodyPartFrozenState bodyPartFrozenState)
+    {
+        switch (bodyPartFrozenState)
+        {
+            default:
+            case BodyPartFrozenState.NotFrozen:
+                return _notFrozenSprite;
+                break;
+            case BodyPartFrozenState.HalfFrozen:
+                return _halfFrozenSprite;
+                break;
+            case BodyPartFrozenState.FullFrozen:
+                return _fullFrozenSprite;
+                break;
+        }
     }
 }

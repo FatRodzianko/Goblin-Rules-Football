@@ -192,9 +192,7 @@ public class UnitActionSystem : MonoBehaviour
             SetSelectedAction(unit.GetAction<MoveAction>());
         }
         OnSelectedUnitChanged?.Invoke(this, _selectedUnit);
-        Debug.Log("SetSelectedUnit: " + unit);
-
-        
+        Debug.Log("SetSelectedUnit: " + unit);        
     }
     public void SetSelectedAction(BaseAction baseAction)
     {

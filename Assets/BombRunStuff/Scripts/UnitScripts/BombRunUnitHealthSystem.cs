@@ -24,12 +24,15 @@ public class BombRunUnitBodyPart
 }
 public class BombRunUnitHealthSystem : MonoBehaviour
 {
-
+    // static events
+    public static event EventHandler OnAnyBodyPartFrozenStateChanged;
     // events
     public event EventHandler OnDead;
     public event EventHandler OnTakeDamage;
     public event EventHandler<BodyPart> OnBodyPartFrozenStateChanged;
 
+    [Header("Unit Details?")]
+    [SerializeField] private BombRunUnit _unit;
     [SerializeField] private int _startingHealth = 100;
     [SerializeField] private int _health = 100;
     [SerializeField] private int _maxHealth;
@@ -63,6 +66,10 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     private void Die()
     {
         OnDead?.Invoke(this, EventArgs.Empty);
+    }
+    public BombRunUnit GetUnit()
+    {
+        return _unit;
     }
     public int GetHealth()
     {
@@ -166,6 +173,7 @@ public class BombRunUnitHealthSystem : MonoBehaviour
                 break;
         }
         OnBodyPartFrozenStateChanged?.Invoke(this, bombRunUnitBodyPart.BodyPart);
+        OnAnyBodyPartFrozenStateChanged?.Invoke(this, EventArgs.Empty);
     }
     public void UnFreezeBodyPart(BodyPart bodyPart)
     {
@@ -189,5 +197,6 @@ public class BombRunUnitHealthSystem : MonoBehaviour
                 break;
         }
         OnBodyPartFrozenStateChanged?.Invoke(this, bombRunUnitBodyPart.BodyPart);
+        OnAnyBodyPartFrozenStateChanged?.Invoke(this, EventArgs.Empty);
     }
 }
