@@ -10,12 +10,18 @@ public class BombRunUnitWorldUI : MonoBehaviour
     [SerializeField] private BombRunUnit _unit;
     [SerializeField] private SpriteRenderer _actionSymbolSpriteRenderer;
 
-    // Action points
+    [Header("ACtion Points")]
     [SerializeField] private TextMeshPro _actionPointsText;
 
-    // Health
+    [Header("Health Bar (old)")]
     [SerializeField] private Image _healthBarImage;
     [SerializeField] private BombRunUnitHealthSystem _healthSystem;
+
+    [Header("Body Part Sprites")]
+    [SerializeField] private Transform _bodyPartSpriteHolder;
+    [SerializeField] private SpriteRenderer _legsSprite;
+    [SerializeField] private SpriteRenderer _armsSprite;
+    [SerializeField] private SpriteRenderer _headSprite;
 
     private void Start()
     {
