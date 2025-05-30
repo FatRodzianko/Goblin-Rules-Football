@@ -5,6 +5,12 @@ using System;
 using TMPro;
 using UnityEngine.UI;
 
+[Serializable]
+public class BodyPartToSpriteObjectMapping
+{
+    public BodyPart BodyPart;
+    public SpriteRenderer Sprite;
+}
 public class BombRunUnitWorldUI : MonoBehaviour
 {
     [SerializeField] private BombRunUnit _unit;
@@ -18,10 +24,9 @@ public class BombRunUnitWorldUI : MonoBehaviour
     [SerializeField] private BombRunUnitHealthSystem _healthSystem;
 
     [Header("Body Part Sprites")]
+    [SerializeField] private ScriptableBodyPartSpriteMapping _scriptableBodyPartSpriteMapping;
+    [SerializeField] private List<BodyPartToSpriteObjectMapping> _bodyPartToSpriteObjectMapping = new List<BodyPartToSpriteObjectMapping>();
     [SerializeField] private Transform _bodyPartSpriteHolder;
-    [SerializeField] private SpriteRenderer _legsSprite;
-    [SerializeField] private SpriteRenderer _armsSprite;
-    [SerializeField] private SpriteRenderer _headSprite;
 
     private void Start()
     {
@@ -33,6 +38,7 @@ public class BombRunUnitWorldUI : MonoBehaviour
             _healthSystem = _unit.GetUnitHealthSystem();
 
         _healthSystem.OnTakeDamage += HealthSystem_OnTakeDamage;
+        _healthSystem.OnBodyPartFrozenStateChanged += HealthSystem_OnBodyPartFrozenStateChanged;
 
         ResetActionSymbolSprite();
         UpdateActionPointsText();
@@ -46,6 +52,7 @@ public class BombRunUnitWorldUI : MonoBehaviour
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
         _healthSystem.OnTakeDamage -= HealthSystem_OnTakeDamage;
+        _healthSystem.OnBodyPartFrozenStateChanged -= HealthSystem_OnBodyPartFrozenStateChanged;
     }
     private void ResetActionSymbolSprite()
     {
@@ -85,6 +92,22 @@ public class BombRunUnitWorldUI : MonoBehaviour
     private void UpdateHealthBar()
     {
         _healthBarImage.fillAmount = _healthSystem.GetHealthPercentRemaining();
+    }
+    private void HealthSystem_OnBodyPartFrozenStateChanged(object sender, BodyPart bodyPart)
+    {
+        UpdateBodyPartSprites(bodyPart);
+    }
+    public void UpdateBodyPartSprites(BodyPart bodyPartToUpdate)
+    {
+        foreach (BodyPartToSpriteObjectMapping bodyPartToSpriteObjectMapping in _bodyPartToSpriteObjectMapping)
+        {
+            ScriptableBodyPartSprites scriptableBodyPartSprites = _scriptableBodyPartSpriteMapping.GetBodyPartSpriteMappingForBodyPart(bodyPartToSpriteObjectMapping.BodyPart).Sprites;
+            if (bodyPartToSpriteObjectMapping.BodyPart == bodyPartToUpdate)
+            {
+                BodyPartFrozenState state = _healthSystem.GetBodyPartFrozenState(bodyPartToUpdate);
+                bodyPartToSpriteObjectMapping.Sprite.sprite = scriptableBodyPartSprites.GetSpriteForState(state);
+            }
+        }
     }
 
 }

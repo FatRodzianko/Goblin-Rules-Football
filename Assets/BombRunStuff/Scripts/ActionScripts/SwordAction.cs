@@ -132,6 +132,7 @@ public class SwordAction : BaseAction
     {
         Debug.Log("TakeAction: SwordAction");
 
+        _totalSpinAmount = 0f;
         _state = State.SwingingSwordBeforeHit;
         float beforeHitStateTime = 0.7f;
         _stateTimer = beforeHitStateTime;
