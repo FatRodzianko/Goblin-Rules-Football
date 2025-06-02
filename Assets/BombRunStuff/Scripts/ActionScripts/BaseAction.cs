@@ -79,6 +79,9 @@ public abstract class BaseAction : MonoBehaviour
         _isActive = true;
         this._onActionComplete = onActionComplete;
 
+        this._unit.SpendActionPoints(this._actionPointsCost);
+        this._unit.AddActionTakenThisTurn(this);
+
         OnAnyActionStarted?.Invoke(this, EventArgs.Empty);
     }
     protected void ActionComplete()

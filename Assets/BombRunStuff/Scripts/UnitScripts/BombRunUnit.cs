@@ -96,8 +96,8 @@ public class BombRunUnit : MonoBehaviour
     {
         if (CanSpendActionPointsToTakeAction(baseAction))
         {
-            SpendActionPoints(baseAction.GetActionPointsCost());
-            AddActionTakenThisTurn(baseAction);
+            //SpendActionPoints(baseAction.GetActionPointsCost());
+            //AddActionTakenThisTurn(baseAction);
             return true;
         }
         else
@@ -133,7 +133,7 @@ public class BombRunUnit : MonoBehaviour
         //    return false;
         //}
     }
-    private void SpendActionPoints(int cost)
+    public void SpendActionPoints(int cost)
     {
         _actionPoints -= cost;
         OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);

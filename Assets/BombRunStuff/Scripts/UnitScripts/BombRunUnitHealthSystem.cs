@@ -199,4 +199,13 @@ public class BombRunUnitHealthSystem : MonoBehaviour
         OnBodyPartFrozenStateChanged?.Invoke(this, bombRunUnitBodyPart.BodyPart);
         OnAnyBodyPartFrozenStateChanged?.Invoke(this, EventArgs.Empty);
     }
+    public bool AreAllBodyPartsFrozen()
+    {
+        return false;
+    }
+    public bool AreAnyBodyPartsFrozen()
+    {
+        return false;
+    }
 }
+

@@ -151,6 +151,7 @@ public class ShootAction : BaseAction
         List<GridPosition> validGridPositionList = new List<GridPosition>();
         //GridPosition unitGridPosition = _unit.GetGridPosition();
         GridPosition unitGridPosition = gridPosition;
+        
 
         for (int x = -_maxShootDistance; x <= _maxShootDistance; x++)
         {
@@ -158,7 +159,7 @@ public class ShootAction : BaseAction
             {
                 GridPosition offsetGridPosition = new GridPosition(x, y);
                 GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
-
+                Debug.Log("GetValidActionGridPositionList: " + testGridPosition);
                 // check to see if test position is the unit's current position. Skip if so because player can't move to the position they are already on
                 if (testGridPosition == unitGridPosition)
                 {
@@ -168,21 +169,40 @@ public class ShootAction : BaseAction
                 {
                     continue;
                 }
-                if (unitGridPosition == testGridPosition)
-                {
-                    // same position unit is already at
-                    continue;
-                }
+                // duplicate???
+                //if (unitGridPosition == testGridPosition)
+                //{
+                //    // same position unit is already at
+                //    continue;
+                //}
                 if (!LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition))
                 {
                     // no unit to shoot at
                     continue;
                 }
-                if (LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition).IsEnemy() == _unit.IsEnemy())
+
+                // save target unit
+                BombRunUnit testGridUnit = LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition);
+
+                // check the frozen state of the target to see if player can target any body parts
+                if (testGridUnit.IsEnemy() == _unit.IsEnemy())
                 {
-                    // no friendly fire... unless?
-                    continue;
+                    // can target friendly unit IF they are damaged?
+                    if (!testGridUnit.GetUnitHealthSystem().AreAnyBodyPartsFrozen())
+                    {
+                        continue;
+                    }
+
                 }
+                else
+                {
+                    // For enemy units, check if they are completely frozen? If so, skip?
+                    if (testGridUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen())
+                    {
+                        continue;
+                    }
+                }
+
                 // check the distance to the target grid position. This will be the distance assuming no walls or anything. If distance with that is greater than distance max, skip
                 int pathFindingDistanceMultiplier = 10;
                 if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > _maxShootDistance * pathFindingDistanceMultiplier)
@@ -547,7 +567,7 @@ public class ShootAction : BaseAction
     //}
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-        _onActionComplete = onActionComplete;
+        //_onActionComplete = onActionComplete;
 
         _state = State.Aiming;
         _stateTimer = _aimingStateTime;
@@ -562,13 +582,15 @@ public class ShootAction : BaseAction
         //TurnTowardTarget(_targetUnit.GetWorldPosition());
         //TurnTowardTarget(_targetUnitWorldPosition);
 
-        _isActive = true;
+        //_isActive = true;
 
         if (_requiresAmmo)
         {
             UseAmmo(this._ammoCost);
         }
-            
+
+        ActionStart(onActionComplete);
+
     }
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
