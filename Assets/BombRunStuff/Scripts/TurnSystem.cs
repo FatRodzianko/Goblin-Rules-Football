@@ -29,6 +29,9 @@ public class TurnSystem : MonoBehaviour
     }
     public void NextTurn()
     {
+        if (UnitActionSystem.Instance.GetIsBusy())
+            return;
+
         _turnNumber++;
         _isPlayerTurn = !_isPlayerTurn;
         OnTurnChanged?.Invoke(this, EventArgs.Empty);

@@ -16,6 +16,9 @@ public class UnitActionSystem : MonoBehaviour
 
     private bool _isBusy;
 
+    [Header("Sub Action Stuff")]
+    [SerializeField] private bool _waitingOnSubAction = false;
+
     // Events
     public event EventHandler<BombRunUnit> OnSelectedUnitChanged;
     public event EventHandler OnSelectedActionChanged;
@@ -85,6 +88,7 @@ public class UnitActionSystem : MonoBehaviour
 
         if (TryHandleSelectGridPosition())
             return;
+
         HandleSelectedAction();
     }
     private bool TryHandleUnitSelection()
@@ -163,7 +167,19 @@ public class UnitActionSystem : MonoBehaviour
         }
 
         SetBusy();
-        _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
+        if (_selectedAction.GetHasSubAction())
+        {
+            Debug.Log("HandleSelectedAction: " + _selectedAction.GetActionName() + " has a sub action. Taking sub action...");
+            _selectedAction.GetSubAction().TakeSubAction(mouseGridPosition, ClearBusy);
+        }
+        else
+        {
+            Debug.Log("HandleSelectedAction: " + _selectedAction.GetActionName() + " does not have a sub action.");
+            _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
+        }
+
+
+        
 
         OnActionStarted?.Invoke(this, EventArgs.Empty);
 
@@ -196,6 +212,7 @@ public class UnitActionSystem : MonoBehaviour
     }
     public void SetSelectedAction(BaseAction baseAction)
     {
+
         _selectedAction = baseAction;
         OnSelectedActionChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -206,6 +223,10 @@ public class UnitActionSystem : MonoBehaviour
     public BaseAction GetSelectedAction()
     {
         return _selectedAction;
+    }
+    public bool GetIsBusy()
+    {
+        return _isBusy;
     }
     private void SetBusy()
     {

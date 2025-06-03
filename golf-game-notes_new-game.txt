@@ -259,6 +259,30 @@ x Action to display an icon to show what body part affects them?
 - - - - - x create scriptable object for each body part (head, arms, legs)
 x Event when a body part's frozen state changes
 - - x actions will update action point cost as needed?
+Sub Actions
+- BaseAction has flag for "HasSubAction"
+- - - will check this when player takes an action. Does a sub action need to be performed first?
+- BaseSubAction script to contain logic and assets for subaction...
+- - - things like any GUI elements for user selecting something (Like what body part to shoot)
+- - - will need to be able to take new parameters from the player, and then pass those parameter's to the BaseAction's TakeAction function?
+- Use events to keep track of when a player starts a subaction, completes it, or cancels it
+- - - when sub action has started, ignore player engaging with other actions (make them unselectable?)
+- - - - - x set _isBusy to true?
+- - - - - x setting isBusy to true and just passing around the "ClearBusy" callback seems to work?
+- - - when sub action completes, call the base action's TakeAction?
+- - - - - - maybe create an async job to wait on the subaction. When that completes, either start the BaseAction's TakeAction or cancel action?
+- - - if subaction is cancelled (clicking away from sub action's GUI items?), don't do the current selected action and re-enable other actions to be selected?
+- Tests:
+x Test 1
+- - - have sub action start, and create event that it has started
+- - - - - - UnitActionSystem will wait for the sub action to complete before executing TakeAction
+- - - sub action will just start a 5 second timer. When timer ends, sub action completes
+- - - - - - Unit Action System listens for the subaction complete event, when it does, start current selected action's TakeAction
+x Test 2 (testing cancelling sub action)
+- - - sub action starts, and then listens for player keypresses
+- - - - - - one key to complete action ("a") and one to cancel action ("c")
+- - - UnitActionSystem will listen for the complete and cancel events
+- - - - - - when cancel event is triggered, re-enable other actions?
 
 ### Longer term tasks
 - When doing shoot action, prompt player to choose what body part to shoot before taking action

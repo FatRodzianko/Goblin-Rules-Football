@@ -80,6 +80,17 @@ public class BombRunUnit : MonoBehaviour
         }
         return null;
     }
+    public BaseAction GetActionByActionType(ActionType actionType)
+    {
+        for (int i = 0; i < _baseActionArray.Length; i++)
+        {
+            if (_baseActionArray[i].GetActionType() == actionType)
+            {
+                return _baseActionArray[i];
+            }
+        }
+        return null;
+    }
     public GridPosition GetGridPosition()
     {
         return _gridPosition;

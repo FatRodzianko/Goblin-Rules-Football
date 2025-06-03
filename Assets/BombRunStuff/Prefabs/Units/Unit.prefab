@@ -225,6 +225,57 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1 &724186349312388198
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5135917175814169154}
+  - component: {fileID: 6098609833336378707}
+  m_Layer: 11
+  m_Name: SubActions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5135917175814169154
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 724186349312388198}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3006723863001832530}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6098609833336378707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 724186349312388198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc7d8b424e7f8d94ea31b0dc5df1b622, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unit: {fileID: 0}
+  _parentActionType: 2
+  _parentAction: {fileID: 0}
+  _isActive: 0
+  _subActionPlayerNotificationText: 
+  _countDownLength: 5
+  _bodyPartToShoot: 0
 --- !u!1 &1097945920879885200
 GameObject:
   m_ObjectHideFlags: 0
@@ -927,6 +978,7 @@ Transform:
   - {fileID: 1719337278835388221}
   - {fileID: 702621649247112958}
   - {fileID: 2660348252855048050}
+  - {fileID: 5135917175814169154}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1030,10 +1082,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionType: 1
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: e5917e614c198a94aa34d711c31edc9d, type: 3}
   _actionBodyPart: 2
+  _hasSubAction: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1041,6 +1095,7 @@ MonoBehaviour:
   _remainingAmmo: 0
   _ammoCost: 0
   _hideWhenCantUse: 0
+  _subAction: {fileID: 0}
   _maxMoveDistance: 4
 --- !u!114 &4887323598526683332
 MonoBehaviour:
@@ -1056,10 +1111,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionType: 2
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 235fab481a567c44ca1574a2cee9b931, type: 3}
   _actionBodyPart: 1
+  _hasSubAction: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 1
   _requiresAmmo: 1
@@ -1067,6 +1124,7 @@ MonoBehaviour:
   _remainingAmmo: 0
   _ammoCost: 1
   _hideWhenCantUse: 0
+  _subAction: {fileID: 0}
   _maxShootDistance: 10
   _shotBlockerLayerMasks:
   - serializedVersion: 2
@@ -1091,10 +1149,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionType: 3
   _actionPointDefaultCost: 1
   _actionPointsCost: 2
   _actionSymbolSprite: {fileID: 21300000, guid: 14844317d65c4d8469e3e3862a79d298, type: 3}
   _actionBodyPart: 2
+  _hasSubAction: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1102,6 +1162,7 @@ MonoBehaviour:
   _remainingAmmo: 0
   _ammoCost: 0
   _hideWhenCantUse: 0
+  _subAction: {fileID: 0}
 --- !u!114 &3362271877576885837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1116,10 +1177,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionType: 4
   _actionPointDefaultCost: 1
   _actionPointsCost: 2
   _actionSymbolSprite: {fileID: 21300000, guid: e4fae6034bcdca14390523951abc0dbe, type: 3}
   _actionBodyPart: 2
+  _hasSubAction: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1127,6 +1190,7 @@ MonoBehaviour:
   _remainingAmmo: 0
   _ammoCost: 0
   _hideWhenCantUse: 0
+  _subAction: {fileID: 0}
   _maxReinforceDistance: 1
   _enemyNearbyDistance: 3
 --- !u!114 &4184348786050281194
@@ -1143,10 +1207,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionType: 5
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: f2cdd7d90789c824882003eb372b8618, type: 3}
   _actionBodyPart: 1
+  _hasSubAction: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1154,6 +1220,7 @@ MonoBehaviour:
   _remainingAmmo: 0
   _ammoCost: 0
   _hideWhenCantUse: 0
+  _subAction: {fileID: 0}
 --- !u!114 &2898562228658105131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1168,10 +1235,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionType: 6
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 95177d6dba8cb634e8b9977040bf3f44, type: 3}
   _actionBodyPart: 1
+  _hasSubAction: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 1
@@ -1179,6 +1248,7 @@ MonoBehaviour:
   _remainingAmmo: 0
   _ammoCost: 1
   _hideWhenCantUse: 0
+  _subAction: {fileID: 0}
   _maxThrowDistance: 12
   _grenadeProjectilePrefab: {fileID: 8449958251188467104, guid: 6da71e249ebcf6541a508c7537619a78, type: 3}
 --- !u!114 &4589616383332178742
@@ -1195,10 +1265,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionType: 7
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: d395f258769a207428224a76105b5ee8, type: 3}
   _actionBodyPart: 1
+  _hasSubAction: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1206,6 +1278,7 @@ MonoBehaviour:
   _remainingAmmo: 0
   _ammoCost: 0
   _hideWhenCantUse: 0
+  _subAction: {fileID: 0}
 --- !u!114 &1951318674019840855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1220,10 +1293,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionType: 8
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 43f5f3f3a0a869b4e9a942547883c2b2, type: 3}
   _actionBodyPart: 1
+  _hasSubAction: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1231,6 +1306,7 @@ MonoBehaviour:
   _remainingAmmo: 0
   _ammoCost: 0
   _hideWhenCantUse: 1
+  _subAction: {fileID: 0}
   _reloadTime: 1.5
   _reloadCounter: 0
 --- !u!1 &5004671053109487943

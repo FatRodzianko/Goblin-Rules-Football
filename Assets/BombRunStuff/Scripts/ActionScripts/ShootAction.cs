@@ -159,7 +159,7 @@ public class ShootAction : BaseAction
             {
                 GridPosition offsetGridPosition = new GridPosition(x, y);
                 GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
-                Debug.Log("GetValidActionGridPositionList: " + testGridPosition);
+                //Debug.Log("GetValidActionGridPositionList: " + testGridPosition);
                 // check to see if test position is the unit's current position. Skip if so because player can't move to the position they are already on
                 if (testGridPosition == unitGridPosition)
                 {
@@ -591,6 +591,10 @@ public class ShootAction : BaseAction
 
         ActionStart(onActionComplete);
 
+    }
+    public void TakeActionFromSubAction(GridPosition gridPosition, Action onActionComplete)
+    {
+        TakeAction(gridPosition, onActionComplete);
     }
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {

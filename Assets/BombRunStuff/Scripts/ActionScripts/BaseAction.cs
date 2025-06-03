@@ -3,6 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+public enum ActionType
+{
+    None,
+    Move,
+    Shoot,
+    Spin,
+    Defend,
+    Interact,
+    Grenade,
+    Sword,
+    Reload
+}
+
 public abstract class BaseAction : MonoBehaviour
 {
     //public class BaseParameters { } //this can be extended to have a "generic" base parameter for the TakeAction method
@@ -15,10 +28,12 @@ public abstract class BaseAction : MonoBehaviour
     protected Action _onActionComplete;
 
     [Header("Action Info")]
+    [SerializeField] protected ActionType _actionType;
     [SerializeField] protected int _actionPointDefaultCost = 1;
     [SerializeField] protected int _actionPointsCost = 1;
     [SerializeField] private Sprite _actionSymbolSprite;
     [SerializeField] private BodyPart _actionBodyPart;
+    [SerializeField] private bool _hasSubAction;
 
     [Header("Animation Stuff")]
     [SerializeField] protected BombRunUnitAnimator _bombRunUnitAnimator;
@@ -32,6 +47,9 @@ public abstract class BaseAction : MonoBehaviour
 
     [Header("UI Stuff")]
     [SerializeField] protected bool _hideWhenCantUse = false;
+
+    [Header("Sub Action Stuff")]
+    [SerializeField] private BaseSubAction _subAction;
 
     // Static Actions
     public static event EventHandler OnAnyActionStarted;
@@ -160,6 +178,22 @@ public abstract class BaseAction : MonoBehaviour
         }
 
     }
+    public bool GetHasSubAction()
+    {
+        return _hasSubAction;
+    }
+    public void SetHasSubAction(bool newHasSubAction)
+    {
+        this._hasSubAction = newHasSubAction;
+    }
+    public BaseSubAction GetSubAction()
+    {
+        return _subAction;
+    }
+    public void SetSubAction(BaseSubAction newSubAction)
+    {
+        this._subAction = newSubAction;
+    }
     public bool GetIsReloadable()
     {
         return _isReloadable;
@@ -231,6 +265,14 @@ public abstract class BaseAction : MonoBehaviour
     public void SetActionBodyPart(BodyPart bodyPart)
     {
         this._actionBodyPart = bodyPart;
+    }
+    public ActionType GetActionType()
+    {
+        return _actionType;
+    }
+    public void SetActionType(ActionType newActionType)
+    {
+        this._actionType = newActionType;
     }
     protected virtual void BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged(object sender, BodyPart bodyPart)
     {
