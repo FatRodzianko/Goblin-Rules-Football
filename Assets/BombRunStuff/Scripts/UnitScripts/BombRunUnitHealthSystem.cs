@@ -63,6 +63,10 @@ public class BombRunUnitHealthSystem : MonoBehaviour
             Die();
         }
     }
+    public void TakeDamageToBodyPart(BodyPart bodyPart)
+    {
+        FreezeBodyPart(bodyPart);
+    }
     private void Die()
     {
         OnDead?.Invoke(this, EventArgs.Empty);
@@ -172,6 +176,7 @@ public class BombRunUnitHealthSystem : MonoBehaviour
             case BodyPartFrozenState.FullFrozen:
                 break;
         }
+
         OnBodyPartFrozenStateChanged?.Invoke(this, bombRunUnitBodyPart.BodyPart);
         OnAnyBodyPartFrozenStateChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -201,10 +206,24 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     }
     public bool AreAllBodyPartsFrozen()
     {
-        return false;
+        foreach (BombRunUnitBodyPart bodyPart in this._bodyParts)
+        {
+            if (bodyPart.BodyPartFrozenState != BodyPartFrozenState.FullFrozen)
+            {
+                return false;
+            }
+        }
+        return true;
     }
     public bool AreAnyBodyPartsFrozen()
     {
+        foreach (BombRunUnitBodyPart bodyPart in this._bodyParts)
+        {
+            if (bodyPart.BodyPartFrozenState != BodyPartFrozenState.NotFrozen)
+            {
+                return true;
+            }
+        }
         return false;
     }
 }

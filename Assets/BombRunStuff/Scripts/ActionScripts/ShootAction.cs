@@ -31,6 +31,7 @@ public class ShootAction : BaseAction
     [SerializeField] private int _maxShootDistance = 10;
 
     private BombRunUnit _targetUnit;
+    private BodyPart _targetBodyPart;
     private Vector3 _targetUnitWorldPosition;
     private bool _canShootBullet = false;
 
@@ -199,6 +200,7 @@ public class ShootAction : BaseAction
                     // For enemy units, check if they are completely frozen? If so, skip?
                     if (testGridUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen())
                     {
+                        Debug.Log("Shoot Action: GetValidActionGridPositionList: all body parts frozen at: " + testGridPosition);
                         continue;
                     }
                 }
@@ -592,8 +594,9 @@ public class ShootAction : BaseAction
         ActionStart(onActionComplete);
 
     }
-    public void TakeActionFromSubAction(GridPosition gridPosition, Action onActionComplete)
+    public void TakeActionFromSubAction(GridPosition gridPosition, Action onActionComplete, BodyPart targetBodyPart)
     {
+        this._targetBodyPart = targetBodyPart;
         TakeAction(gridPosition, onActionComplete);
     }
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -629,7 +632,15 @@ public class ShootAction : BaseAction
     }
     public void ProjectileHitTarget()
     {
-        _targetUnit.Damage(35);
+        if (BombRunUnitManager.Instance.IsUnitAnEnemy(this._unit))
+        {
+            _targetUnit.Damage(35);
+        }
+        else
+        {
+            _targetUnit.DamageBodyPart(_targetBodyPart);
+        }
+        
     }
     int GetTargetUnitRemainingHealth(GridPosition gridPosition)
     {

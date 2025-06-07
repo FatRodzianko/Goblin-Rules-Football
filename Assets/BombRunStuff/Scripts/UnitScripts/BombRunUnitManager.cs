@@ -95,5 +95,9 @@ public class BombRunUnitManager : MonoBehaviour
     {
         return _enemyUnitList;
     }
+    public bool IsUnitAnEnemy(BombRunUnit unit)
+    {
+        return _enemyUnitList.Contains(unit);
+    }
 }
 

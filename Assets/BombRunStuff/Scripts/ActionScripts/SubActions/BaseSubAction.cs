@@ -33,11 +33,20 @@ public abstract class BaseSubAction : MonoBehaviour
         _parentAction.SetSubAction(this);
         _parentAction.SetHasSubAction(true);
     }
+    public BaseAction GetPartAction()
+    {
+        return _parentAction;
+    }
+    public GridPosition GetGridPosition()
+    {
+        return _gridPosition;
+    }
     public virtual void TakeSubAction(GridPosition gridPosition, Action onSubActionComplete)
     {
         this._gridPosition = gridPosition;
     }
     public abstract void TakeActionFromParentAction();
+    public abstract void DestroySpawnedObjects();
     protected void SubActionStart(Action onSubActionComplete)
     {
         Debug.Log("SubActionStart: " + this.name + " has started the sub action!");
@@ -53,6 +62,7 @@ public abstract class BaseSubAction : MonoBehaviour
         // pass this on to the parent action instead of ending it?
         //_onSubActionComplete();
 
+        DestroySpawnedObjects();
         OnAnySubActionCompleted?.Invoke(this, EventArgs.Empty);
         //_parentAction.TakeAction(this._gridPosition, _onSubActionComplete);
         TakeActionFromParentAction();
@@ -60,6 +70,9 @@ public abstract class BaseSubAction : MonoBehaviour
     protected void SubActionCancelled()
     {
         _isActive = false;
+
+        DestroySpawnedObjects();
+
         _onSubActionComplete();
 
         OnAnySubActionCancelled?.Invoke(this, EventArgs.Empty);

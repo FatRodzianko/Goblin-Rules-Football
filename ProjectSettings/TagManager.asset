@@ -67,6 +67,7 @@ TagManager:
   - BombRunWall
   - BombRunObstacle
   - WallObjectHolder
+  - ShootActionBodyPartSelection
   layers:
   - Default
   - TransparentFX

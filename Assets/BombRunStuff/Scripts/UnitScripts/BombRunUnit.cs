@@ -195,6 +195,10 @@ public class BombRunUnit : MonoBehaviour
         //}
         _healthSystem.TakeDamage(damage);
     }
+    public void DamageBodyPart(BodyPart bodyPart)
+    {
+        _healthSystem.TakeDamageToBodyPart(bodyPart);
+    }
     private void HealthSystem_OnDead(object sender, EventArgs e)
     {
         KillUnit();
