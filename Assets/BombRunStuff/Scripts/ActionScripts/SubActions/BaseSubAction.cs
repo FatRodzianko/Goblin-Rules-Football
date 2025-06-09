@@ -72,9 +72,13 @@ public abstract class BaseSubAction : MonoBehaviour
         _isActive = false;
 
         DestroySpawnedObjects();
+        OnAnySubActionCancelled?.Invoke(this, EventArgs.Empty);
 
         _onSubActionComplete();
-
-        OnAnySubActionCancelled?.Invoke(this, EventArgs.Empty);
+        
+    }
+    public BombRunUnit GetUnit()
+    {
+        return _unit;
     }
 }

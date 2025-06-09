@@ -72,17 +72,34 @@ public class ShootSubAction_SelectionOutlineScript : MonoBehaviour
         ClickedOn();
 
     }
-    public void SetDisabled(BodyPartFrozenState state)
+    public void SetDisabled(BodyPartFrozenState state, bool isTargetFriendly)
     {
-        Debug.Log("SetDisabled: " + this.name + " state: " + state.ToString());
-        if (state != BodyPartFrozenState.FullFrozen)
+        Debug.Log("SetDisabled: " + this.name + " state: " + state.ToString() + " is target a friendly unit? " + isTargetFriendly);
+
+        if (isTargetFriendly)
         {
-            this._isDisabled = false;
+            if (state != BodyPartFrozenState.NotFrozen)
+            {
+                this._isDisabled = false;
+            }
+            else
+            {
+                this._sprite.color = _disabled;
+            }
         }
         else
         {
-            this._sprite.color = _disabled;
+            if (state != BodyPartFrozenState.FullFrozen)
+            {
+                this._isDisabled = false;
+            }
+            else
+            {
+                this._sprite.color = _disabled;
+            }
         }
+
+        
 
     }
     void ClickedOn()

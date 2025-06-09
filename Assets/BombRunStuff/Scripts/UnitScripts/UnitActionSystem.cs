@@ -45,10 +45,15 @@ public class UnitActionSystem : MonoBehaviour
         SetSelectedUnit(_selectedUnit);
 
         BombRunUnit.OnAnyUnitDied += BombRunUnit_OnAnyUnitDied;
+        BaseSubAction.OnAnySubActionCancelled += BaseSubAction_OnAnySubActionCancelled;
     }
+
+    
+
     private void OnDisable()
     {
         BombRunUnit.OnAnyUnitDied -= BombRunUnit_OnAnyUnitDied;
+        BaseSubAction.OnAnySubActionCancelled -= BaseSubAction_OnAnySubActionCancelled;
     }
     private void Update()
     {
@@ -274,5 +279,9 @@ public class UnitActionSystem : MonoBehaviour
             }
 
         }
+    }
+    private void BaseSubAction_OnAnySubActionCancelled(object sender, EventArgs e)
+    {
+        //SetSelectedAction(null);
     }
 }

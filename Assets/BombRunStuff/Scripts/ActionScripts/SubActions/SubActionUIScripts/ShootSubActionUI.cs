@@ -50,7 +50,7 @@ public class ShootSubActionUI : MonoBehaviour
             {
                 if (_bodyPartToTransformMapping[i].BodyPart == bodyPartToSpriteObjectMapping.BodyPart)
                 {
-                    _bodyPartToTransformMapping[i].SelectionScript.SetDisabled(state);
+                    _bodyPartToTransformMapping[i].SelectionScript.SetDisabled(state, targetUnit.IsEnemy() == _shootSubAction.GetUnit().IsEnemy());
                 }
             }
         }
