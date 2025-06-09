@@ -34,6 +34,7 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] private Sprite _actionSymbolSprite;
     [SerializeField] private BodyPart _actionBodyPart;
     [SerializeField] private bool _hasSubAction;
+    [SerializeField] private bool _canTargetFriendlyUnits = false;
 
     [Header("Animation Stuff")]
     [SerializeField] protected BombRunUnitAnimator _bombRunUnitAnimator;
@@ -291,5 +292,13 @@ public abstract class BaseAction : MonoBehaviour
                 _actionPointsCost = int.MaxValue;
                 break;
         }
+    }
+    public bool CanTargetFriendlyUnits()
+    {
+        return _canTargetFriendlyUnits;
+    }
+    public void SetCanTargetFriendlyUnits(bool canTarget)
+    {
+        this._canTargetFriendlyUnits = canTarget;
     }
 }

@@ -278,6 +278,7 @@ MonoBehaviour:
   _bodyPartToShoot: 0
   _shootSubActionGUIPrefab: {fileID: 5592039492161522101, guid: 53c7e74d77c53ce4ab4fcfcca37bf3ac, type: 3}
   _shootSubActionGUIObject: {fileID: 0}
+  _shootSubActionGUIScript: {fileID: 0}
 --- !u!1 &1097945920879885200
 GameObject:
   m_ObjectHideFlags: 0
@@ -1090,6 +1091,7 @@ MonoBehaviour:
   _actionSymbolSprite: {fileID: 21300000, guid: e5917e614c198a94aa34d711c31edc9d, type: 3}
   _actionBodyPart: 2
   _hasSubAction: 0
+  _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1119,6 +1121,7 @@ MonoBehaviour:
   _actionSymbolSprite: {fileID: 21300000, guid: 235fab481a567c44ca1574a2cee9b931, type: 3}
   _actionBodyPart: 1
   _hasSubAction: 0
+  _canTargetFriendlyUnits: 1
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 1
   _requiresAmmo: 1
@@ -1157,6 +1160,7 @@ MonoBehaviour:
   _actionSymbolSprite: {fileID: 21300000, guid: 14844317d65c4d8469e3e3862a79d298, type: 3}
   _actionBodyPart: 2
   _hasSubAction: 0
+  _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1185,6 +1189,7 @@ MonoBehaviour:
   _actionSymbolSprite: {fileID: 21300000, guid: e4fae6034bcdca14390523951abc0dbe, type: 3}
   _actionBodyPart: 2
   _hasSubAction: 0
+  _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1215,6 +1220,7 @@ MonoBehaviour:
   _actionSymbolSprite: {fileID: 21300000, guid: f2cdd7d90789c824882003eb372b8618, type: 3}
   _actionBodyPart: 1
   _hasSubAction: 0
+  _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1243,6 +1249,7 @@ MonoBehaviour:
   _actionSymbolSprite: {fileID: 21300000, guid: 95177d6dba8cb634e8b9977040bf3f44, type: 3}
   _actionBodyPart: 1
   _hasSubAction: 0
+  _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 1
@@ -1273,6 +1280,7 @@ MonoBehaviour:
   _actionSymbolSprite: {fileID: 21300000, guid: d395f258769a207428224a76105b5ee8, type: 3}
   _actionBodyPart: 1
   _hasSubAction: 0
+  _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1301,6 +1309,7 @@ MonoBehaviour:
   _actionSymbolSprite: {fileID: 21300000, guid: 43f5f3f3a0a869b4e9a942547883c2b2, type: 3}
   _actionBodyPart: 1
   _hasSubAction: 0
+  _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0

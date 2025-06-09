@@ -127,13 +127,22 @@ public class UnitActionSystem : MonoBehaviour
                 return false;
             }
 
-            if (units.Any(x => x.IsEnemy()))
+            if (units.Any(x => x.IsEnemy() != _selectedUnit.IsEnemy()))
             {
+                Debug.Log("TryHandleSelectGridPosition: Clicked on Enemy Unit");
                 return false;
             }
 
 
             // later will need to check if multiple units are on a grid position. If so, expand those units to allow player to select individual units?
+            Debug.Log("TryHandleSelectGridPosition: Clicked on Friendly Unit");
+            if (_selectedAction.CanTargetFriendlyUnits())
+            {
+                if (_selectedAction.IsValidActionGridPosition(mouseGridPosition))
+                {
+                    return false;
+                }
+            }
             SetSelectedUnit(units[0]);
             return true;
         }

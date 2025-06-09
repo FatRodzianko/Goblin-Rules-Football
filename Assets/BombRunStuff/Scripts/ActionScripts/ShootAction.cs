@@ -638,7 +638,16 @@ public class ShootAction : BaseAction
         }
         else
         {
-            _targetUnit.DamageBodyPart(_targetBodyPart);
+            // if the target is a friendly unit, heal that bodypart. If an enemy, damage the body part
+            if (_targetUnit.IsEnemy() == _unit.IsEnemy())
+            {
+                _targetUnit.HealBodyPart(_targetBodyPart);
+            }
+            else
+            {
+                _targetUnit.DamageBodyPart(_targetBodyPart);
+            }
+            
         }
         
     }

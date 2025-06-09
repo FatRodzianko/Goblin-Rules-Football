@@ -67,6 +67,10 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     {
         FreezeBodyPart(bodyPart);
     }
+    public void HealDamageOnBodyPart(BodyPart bodyPart)
+    {
+        UnFreezeBodyPart(bodyPart);
+    }
     private void Die()
     {
         OnDead?.Invoke(this, EventArgs.Empty);

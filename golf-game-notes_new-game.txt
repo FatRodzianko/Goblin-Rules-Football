@@ -285,17 +285,20 @@ x Test 2 (testing cancelling sub action)
 - - - - - - when cancel event is triggered, re-enable other actions?
 
 # How to Let player select friendly unit with shoot action
-- Currently when performing an action, if the player clicks on a different friendly unit, they select that unit instead of performing the action on that unit
-- I want the shoot action to be able to target friendly units in order to "heal" them
+x Currently when performing an action, if the player clicks on a different friendly unit, they select that unit instead of performing the action on that unit
+x I want the shoot action to be able to target friendly units in order to "heal" them
 - - - with current setup, it is impossible to actually target a friendly unit
-- In UnitActionSystem, the TryHandleSelectGridPosition checks if there is a friendly unit on the grid position, if yes, instead of taking the action at that position, the friendly unit is now selected
-- - - Add a check to TryHandleSelectGridPosition to check the current selected action and see if it has "CanTargetFriendlyUnits" set to true
-- - - - - - if it is true, then check if the grid position is a valid grid position for the current action
-- - - - - - - - - if THAT is also true, then DO NOT select that action
+x In UnitActionSystem, the TryHandleSelectGridPosition checks if there is a friendly unit on the grid position, if yes, instead of taking the action at that position, the friendly unit is now selected
+- - x Add a check to TryHandleSelectGridPosition to check the current selected action and see if it has "CanTargetFriendlyUnits" set to true
+- - - - - x if it is true, then check if the grid position is a valid grid position for the current action
+- - - - - - - - x if THAT is also true, then DO NOT select that action
 - Need to make sure there is an obvious way to "cancel" your selected action?
-- - - so if you do want to select a unit instead of targetting one, you can cancel the action then select the unit?
-- - - if the player right clicks have the current action be set to null? or something like that?
+- -  so if you do want to select a unit instead of targetting one, you can cancel the action then select the unit?
+- - x if the player right clicks have the current action be set to null? or something like that?
 - - - - - - make sure to remove the grid highlights from the previous action when "cancelling" the action?
+- Add checks for the BodyPart choosing UI for friendly vs enemy units - will change what is "disabled" and allowed to be hit
+- - - can only target a friendly body part if it is half or full frozen. Cannot if not frozen
+- - - can only target an enemy body part if it is half or not frozen. Cannot if fully frozen
 
 ### Longer term tasks
 - When doing shoot action, prompt player to choose what body part to shoot before taking action
