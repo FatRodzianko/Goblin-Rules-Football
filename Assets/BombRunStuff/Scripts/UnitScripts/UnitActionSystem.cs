@@ -95,6 +95,7 @@ public class UnitActionSystem : MonoBehaviour
             return;
 
         HandleSelectedAction();
+        HandleCancelSelectedAction();
     }
     private bool TryHandleUnitSelection()
     {
@@ -141,13 +142,17 @@ public class UnitActionSystem : MonoBehaviour
 
             // later will need to check if multiple units are on a grid position. If so, expand those units to allow player to select individual units?
             Debug.Log("TryHandleSelectGridPosition: Clicked on Friendly Unit");
-            if (_selectedAction.CanTargetFriendlyUnits())
+            if (_selectedAction != null)
             {
-                if (_selectedAction.IsValidActionGridPosition(mouseGridPosition))
+                if (_selectedAction.CanTargetFriendlyUnits())
                 {
-                    return false;
+                    if (_selectedAction.IsValidActionGridPosition(mouseGridPosition))
+                    {
+                        return false;
+                    }
                 }
             }
+            
             SetSelectedUnit(units[0]);
             return true;
         }
@@ -213,6 +218,19 @@ public class UnitActionSystem : MonoBehaviour
         //        break;
         //}
         
+    }
+    private void HandleCancelSelectedAction()
+    {
+        if (_selectedAction == null)
+            return;
+        if (InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
+            return;
+        if (!InputManagerBombRun.Instance.IsRightMouseButtonDownThisFrame())
+            return;
+
+        // cancel the selected action by right clicking?
+        SetSelectedAction(null);
+
     }
     private void SetSelectedUnit(BombRunUnit unit)
     {

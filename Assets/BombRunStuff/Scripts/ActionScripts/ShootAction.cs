@@ -618,6 +618,28 @@ public class ShootAction : BaseAction
             _ActionValue = actionValue,
         };
     }
+    //public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    //{
+    //    BombRunUnit aiTarget = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+    //    if (aiTarget == null)
+    //    {
+    //        return new BombRunEnemyAIAction
+    //        {
+    //            _GridPosition = gridPosition,
+    //            _ActionValue = 0,
+    //        };
+    //    }
+
+    //    // get number of 
+
+
+    //    // placeholder
+    //    return new BombRunEnemyAIAction
+    //    {
+    //        _GridPosition = gridPosition,
+    //        _ActionValue = 1000,
+    //    };
+    //}
     public int GetMaxShootDistance()
     {
         return _maxShootDistance;

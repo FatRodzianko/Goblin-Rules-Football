@@ -6,4 +6,5 @@ public class BombRunEnemyAIAction
 {
     public GridPosition _GridPosition;
     public int _ActionValue;
+    public BodyPart _TargetBodyPart = BodyPart.Head;
 }
