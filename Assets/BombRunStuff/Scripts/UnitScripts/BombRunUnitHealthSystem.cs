@@ -17,7 +17,7 @@ public enum BodyPart
     Legs
 }
 [Serializable]
-public class BombRunUnitBodyPart
+public class BombRunUnitBodyPartAndFrozenState
 {
     public BodyPart BodyPart;
     public BodyPartFrozenState BodyPartFrozenState;
@@ -38,7 +38,7 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     [SerializeField] private int _maxHealth;
 
     [Header("Body Parts: Frozen State")]
-    [SerializeField] private List<BombRunUnitBodyPart> _bodyParts = new List<BombRunUnitBodyPart>();
+    [SerializeField] private List<BombRunUnitBodyPartAndFrozenState> _bodyPartsAndFrozenState = new List<BombRunUnitBodyPartAndFrozenState>();
     private bool _fullyFrozen = false;
 
     private void Awake()
@@ -91,15 +91,15 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     {
         return (float)_health / _maxHealth;
     }
-    public List<BombRunUnitBodyPart> GetAllBodyParts()
+    public List<BombRunUnitBodyPartAndFrozenState> GetAllBodyPartsAndFrozenState()
     {
-        return _bodyParts;
+        return _bodyPartsAndFrozenState;
     }
-    public BombRunUnitBodyPart GetSpecificBodyPart(BodyPart bodyPart)
+    public BombRunUnitBodyPartAndFrozenState GetSpecificBodyPart(BodyPart bodyPart)
     {
-        if (_bodyParts.Exists(x => x.BodyPart == bodyPart))
+        if (_bodyPartsAndFrozenState.Exists(x => x.BodyPart == bodyPart))
         {
-            return _bodyParts.First(x => x.BodyPart == bodyPart);
+            return _bodyPartsAndFrozenState.First(x => x.BodyPart == bodyPart);
         }
         else
         {
@@ -108,9 +108,9 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     }
     public BodyPartFrozenState GetBodyPartFrozenState(BodyPart bodyPart)
     {
-        if (_bodyParts.Exists(x => x.BodyPart == bodyPart))
+        if (_bodyPartsAndFrozenState.Exists(x => x.BodyPart == bodyPart))
         {
-            BombRunUnitBodyPart newBodyPart = _bodyParts.First(x => x.BodyPart == bodyPart);
+            BombRunUnitBodyPartAndFrozenState newBodyPart = _bodyPartsAndFrozenState.First(x => x.BodyPart == bodyPart);
             return newBodyPart.BodyPartFrozenState;
         }
         else
@@ -161,13 +161,13 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     public void FreezeBodyPart(BodyPart bodyPart)
     {
         Debug.Log("FreezeBodyPart: " + bodyPart.ToString());
-        if (!_bodyParts.Exists(x => x.BodyPart == bodyPart))
+        if (!_bodyPartsAndFrozenState.Exists(x => x.BodyPart == bodyPart))
         {
             Debug.Log("FreezeBodyPart: could not find body part: " + bodyPart.ToString());
             return;
         }
         
-        BombRunUnitBodyPart bombRunUnitBodyPart = _bodyParts.First(x => x.BodyPart == bodyPart);
+        BombRunUnitBodyPartAndFrozenState bombRunUnitBodyPart = _bodyPartsAndFrozenState.First(x => x.BodyPart == bodyPart);
 
         switch (bombRunUnitBodyPart.BodyPartFrozenState)
         {
@@ -187,12 +187,12 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     public void UnFreezeBodyPart(BodyPart bodyPart)
     {
         Debug.Log("UnFreezeBodyPart: " + bodyPart.ToString());
-        if (!_bodyParts.Exists(x => x.BodyPart == bodyPart))
+        if (!_bodyPartsAndFrozenState.Exists(x => x.BodyPart == bodyPart))
         {
             Debug.Log("UnFreezeBodyPart: could not find body part: " + bodyPart.ToString());
         }
 
-        BombRunUnitBodyPart bombRunUnitBodyPart = _bodyParts.First(x => x.BodyPart == bodyPart);
+        BombRunUnitBodyPartAndFrozenState bombRunUnitBodyPart = _bodyPartsAndFrozenState.First(x => x.BodyPart == bodyPart);
 
         switch (bombRunUnitBodyPart.BodyPartFrozenState)
         {
@@ -210,7 +210,7 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     }
     public bool AreAllBodyPartsFrozen()
     {
-        foreach (BombRunUnitBodyPart bodyPart in this._bodyParts)
+        foreach (BombRunUnitBodyPartAndFrozenState bodyPart in this._bodyPartsAndFrozenState)
         {
             if (bodyPart.BodyPartFrozenState != BodyPartFrozenState.FullFrozen)
             {
@@ -221,7 +221,7 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     }
     public bool AreAnyBodyPartsFrozen()
     {
-        foreach (BombRunUnitBodyPart bodyPart in this._bodyParts)
+        foreach (BombRunUnitBodyPartAndFrozenState bodyPart in this._bodyPartsAndFrozenState)
         {
             if (bodyPart.BodyPartFrozenState != BodyPartFrozenState.NotFrozen)
             {

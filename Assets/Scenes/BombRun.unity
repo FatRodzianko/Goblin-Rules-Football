@@ -20051,6 +20051,10 @@ PrefabInstance:
       propertyPath: _actionPoints
       value: 15
       objectReference: {fileID: 0}
+    - target: {fileID: 4506797595294261930, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: _bodyPartsAndFrozenState.Array.data[1].BodyPartFrozenState
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4944422538143551182, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_Name
       value: Unit (1)
@@ -23048,7 +23052,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7777778, y: 1}
+    m_SensorSize: {x: 1.7777779, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -23263,9 +23267,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0
-    width: 1
-    height: 1
+    y: 0.055555556
+    width: 0.33333334
+    height: 0.3333333
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 90

@@ -1064,7 +1064,7 @@ MonoBehaviour:
   _startingHealth: 100
   _health: 100
   _maxHealth: 0
-  _bodyParts:
+  _bodyPartsAndFrozenState:
   - BodyPart: 0
     BodyPartFrozenState: 0
   - BodyPart: 1

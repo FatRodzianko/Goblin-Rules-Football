@@ -244,6 +244,11 @@ x create a "wall object" that is just a rectangle collider
 - for grenades: freeze one "body part" for every unit that is in the blast radius?
 - - - if both legs are already frozen, freeze an arm. If both arms and legs are frozen, freeze head?
 - - - can also be used to unfreeze teammates if you hit them
+- - - to Heal a teammate, must first switch gun to "heal" mode
+- - - - - - this is an action you have to spend
+- - - - - - switch to heal, can target teammate. Shoot to heal
+- - - - - - to target an enemy again, you will need to spend another action point to switch to attack, then can target enemy
+- - - - - - A medic class that doesn't need to switch?
 
 
 ### Immediate Tasks:
@@ -283,6 +288,11 @@ x Test 2 (testing cancelling sub action)
 - - - - - - one key to complete action ("a") and one to cancel action ("c")
 - - - UnitActionSystem will listen for the complete and cancel events
 - - - - - - when cancel event is triggered, re-enable other actions?
+- AI logic for shooting with the body part stuff
+- - - Find unit with the most amount of half frozen body parts
+- - - - - - target that unit, choosing one of the half frozen body parts to fire against
+- - - need to change TakeAction to accept a body part? Or have TakeSubAction be a required function in all BaseActions?
+
 
 # How to Let player select friendly unit with shoot action
 x Currently when performing an action, if the player clicks on a different friendly unit, they select that unit instead of performing the action on that unit
@@ -292,16 +302,20 @@ x In UnitActionSystem, the TryHandleSelectGridPosition checks if there is a frie
 - - x Add a check to TryHandleSelectGridPosition to check the current selected action and see if it has "CanTargetFriendlyUnits" set to true
 - - - - - x if it is true, then check if the grid position is a valid grid position for the current action
 - - - - - - - - x if THAT is also true, then DO NOT select that action
-- Need to make sure there is an obvious way to "cancel" your selected action?
+x Need to make sure there is an obvious way to "cancel" your selected action?
 - -  so if you do want to select a unit instead of targetting one, you can cancel the action then select the unit?
 - - x if the player right clicks have the current action be set to null? or something like that?
-- - - - - - make sure to remove the grid highlights from the previous action when "cancelling" the action?
-- Add checks for the BodyPart choosing UI for friendly vs enemy units - will change what is "disabled" and allowed to be hit
-- - - can only target a friendly body part if it is half or full frozen. Cannot if not frozen
-- - - can only target an enemy body part if it is half or not frozen. Cannot if fully frozen
+- - - - - x make sure to remove the grid highlights from the previous action when "cancelling" the action?
+x Add checks for the BodyPart choosing UI for friendly vs enemy units - will change what is "disabled" and allowed to be hit
+- - x can only target a friendly body part if it is half or full frozen. Cannot if not frozen
+- - x can only target an enemy body part if it is half or not frozen. Cannot if fully frozen
+- Should change it so it is an action to switch between damage and healing shooting?
+- - - A new action switch firing modes. Takes 1 action point to switch from damage to heal
+- - - - - - arm body type
+- - - "Medic" unit doesn't have to switch?
 
 ### Longer term tasks
-- When doing shoot action, prompt player to choose what body part to shoot before taking action
+x When doing shoot action, prompt player to choose what body part to shoot before taking action
 - Add in a "cover" system
 - - - full cover if behind a wall or obstable that provides full coverage - can't hit that unit unless you flank them
 - - - half cover if behind a shorter half wall/obstable - can only hit arms or head, not legs
@@ -310,5 +324,24 @@ x In UnitActionSystem, the TryHandleSelectGridPosition checks if there is a frie
 - - - removes unit vision past that wall though?
 - Fog of war based on what units can "see"
 - - - ties this into the "vision cone" that's affected by head statussasdsdsdfsadafdasdaadadasda
+
+
+### Special unit/enemy types
+- To make the game less repetitive, will need special units/enemies to provide gameplay variety/force different play styles
+- types:
+- - - Swap places - can swap places with an opposing team's unit. Can act as a "sacrificial" lamb, swap themselves into the other team's units, and bring an enemy into their units area
+- - - - - - Some way to make them "strong" or take on lots of damage/tank?
+- - - - - - could make them ice explode if you freeze them? probably too much
+- - - - - - the swapping can also be used for recon/intel. Swap in, see the opposing team, swap out
+- - - attack dog
+- - - - - - moves fast. Can only melee
+- - - - - - just has legs and head, no arms?
+- - - - - - - - - or arms are just front legs, so you have to freeze them 4 times to completely stall movement?
+- - - miner
+- - - - - - can dig through walls to create new pathways
+- - - builder/engineer
+- - - - - - can build temporary barricades or bridges?
+- - - demo
+- - - - - - can block up barricades or other barriers that are destructible?
 
 768x432

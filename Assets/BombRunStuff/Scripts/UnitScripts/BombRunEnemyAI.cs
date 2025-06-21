@@ -117,7 +117,15 @@ public class BombRunEnemyAI : MonoBehaviour
         {
             // add if statement for checking for sub action? If yes, then call TakeActionFromSubAction with the bodypart provided
             // // in future should try and add a "generic" subaction parameter? So sub actions can ask for things other than just target body parts?
-            bestBaseAction.TakeAction(bestEnemyAIAction._GridPosition, onEnemyActionComplete);
+            if (bestBaseAction.GetHasSubAction())
+            {
+                bestBaseAction.TakeAction(bestEnemyAIAction._GridPosition, onEnemyActionComplete);
+            }
+            else
+            {
+                bestBaseAction.TakeAction(bestEnemyAIAction._GridPosition, onEnemyActionComplete);
+            }
+            
             return true;
         }
         else
