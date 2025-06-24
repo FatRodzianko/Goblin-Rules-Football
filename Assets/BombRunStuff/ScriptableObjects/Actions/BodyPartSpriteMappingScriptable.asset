@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: BodyPartSpriteMappingScriptable
   m_EditorClassIdentifier: 
   _bodyPartSpriteMappingDictionary:
-  - BodyPart: 0
-    Sprites: {fileID: 11400000, guid: e49e3d2a75cddc6488035980e252acef, type: 2}
   - BodyPart: 1
-    Sprites: {fileID: 11400000, guid: 9bb6c69f189961e4695c14551401fc8e, type: 2}
+    Sprites: {fileID: 11400000, guid: e49e3d2a75cddc6488035980e252acef, type: 2}
   - BodyPart: 2
+    Sprites: {fileID: 11400000, guid: 9bb6c69f189961e4695c14551401fc8e, type: 2}
+  - BodyPart: 3
     Sprites: {fileID: 11400000, guid: 5356bf421e4ed3a4580609aa2ecd02df, type: 2}

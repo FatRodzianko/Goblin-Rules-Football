@@ -111,7 +111,7 @@ public class MoveAction : BaseAction
     {
         _cachedValidActionList.Clear();
     }
-    public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
+    public override void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.None)
     {
         // Get the path to the end position
         List<GridPosition> pathGridPositionList =  PathFinding.Instance.FindPath(_unit.GetGridPosition(), gridPosition, out int pathLength, _maxMoveDistance);

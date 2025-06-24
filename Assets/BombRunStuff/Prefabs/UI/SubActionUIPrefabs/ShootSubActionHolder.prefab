@@ -218,18 +218,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scriptableBodyPartSpriteMapping: {fileID: 11400000, guid: 4cc55b46300939145a3e4cf59015b46e, type: 2}
   _bodyPartToTransformMapping:
-  - BodyPart: 0
-    SelectionScript: {fileID: 7296481511008990540}
   - BodyPart: 1
-    SelectionScript: {fileID: 7345317986277499094}
+    SelectionScript: {fileID: 7296481511008990540}
   - BodyPart: 2
+    SelectionScript: {fileID: 7345317986277499094}
+  - BodyPart: 3
     SelectionScript: {fileID: 3195493115961080280}
   _bodyPartToSpriteObjectMapping:
-  - BodyPart: 0
-    Sprite: {fileID: 4029865081827986253}
   - BodyPart: 1
-    Sprite: {fileID: 112513928640208243}
+    Sprite: {fileID: 4029865081827986253}
   - BodyPart: 2
+    Sprite: {fileID: 112513928640208243}
+  - BodyPart: 3
     Sprite: {fileID: 703396141548915228}
   _shootSubAction: {fileID: 0}
 --- !u!1 &1998099546897101470
@@ -422,7 +422,7 @@ MonoBehaviour:
   _notSelected: {r: 1, g: 1, b: 1, a: 0.2}
   _selected: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   _disabled: {r: 1, g: 0, b: 0, a: 1}
-  _bodyPart: 1
+  _bodyPart: 2
   _isDisabled: 1
 --- !u!61 &6066124927730128869
 BoxCollider2D:
@@ -640,7 +640,7 @@ MonoBehaviour:
   _notSelected: {r: 1, g: 1, b: 1, a: 0.2}
   _selected: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   _disabled: {r: 1, g: 0, b: 0, a: 1}
-  _bodyPart: 2
+  _bodyPart: 3
   _isDisabled: 1
 --- !u!61 &3528166678122583212
 BoxCollider2D:
@@ -800,5 +800,5 @@ MonoBehaviour:
   _notSelected: {r: 1, g: 1, b: 1, a: 0.2}
   _selected: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   _disabled: {r: 1, g: 0, b: 0, a: 1}
-  _bodyPart: 0
+  _bodyPart: 1
   _isDisabled: 1

@@ -567,9 +567,12 @@ public class ShootAction : BaseAction
     //        return false;
     //    }
     //}
-    public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
+    public override void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.Legs)
     {
         //_onActionComplete = onActionComplete;
+        Debug.Log("Shoot Action: TakeAction: Target Body Part: " + bodyPart);
+
+        this._targetBodyPart = bodyPart;
 
         _state = State.Aiming;
         _stateTimer = _aimingStateTime;
@@ -635,7 +638,15 @@ public class ShootAction : BaseAction
                 _ActionValue = 0,
             };
         }
-        
+        if (aiTarget.IsEnemy() == this._unit.IsEnemy())
+        {
+            return new BombRunEnemyAIAction
+            {
+                _GridPosition = gridPosition,
+                _ActionValue = 0,
+            };
+        }
+
 
         // Check if all body parts are frozen aka not a valid target
         BombRunUnitHealthSystem targetHealthSystem = aiTarget.GetUnitHealthSystem();
@@ -770,24 +781,32 @@ public class ShootAction : BaseAction
     }
     public void ProjectileHitTarget()
     {
-        if (BombRunUnitManager.Instance.IsUnitAnEnemy(this._unit))
+        //if (BombRunUnitManager.Instance.IsUnitAnEnemy(this._unit))
+        //{
+        //    _targetUnit.Damage(35);
+        //}
+        //else
+        //{
+        //    // if the target is a friendly unit, heal that bodypart. If an enemy, damage the body part
+        //    if (_targetUnit.IsEnemy() == _unit.IsEnemy())
+        //    {
+        //        _targetUnit.HealBodyPart(_targetBodyPart);
+        //    }
+        //    else
+        //    {
+        //        _targetUnit.DamageBodyPart(_targetBodyPart);
+        //    }            
+        //}
+        // if the target is a friendly unit, heal that bodypart. If an enemy, damage the body part
+        if (_targetUnit.IsEnemy() == _unit.IsEnemy())
         {
-            _targetUnit.Damage(35);
+            _targetUnit.HealBodyPart(_targetBodyPart);
         }
         else
         {
-            // if the target is a friendly unit, heal that bodypart. If an enemy, damage the body part
-            if (_targetUnit.IsEnemy() == _unit.IsEnemy())
-            {
-                _targetUnit.HealBodyPart(_targetBodyPart);
-            }
-            else
-            {
-                _targetUnit.DamageBodyPart(_targetBodyPart);
-            }
-            
+            _targetUnit.DamageBodyPart(_targetBodyPart);
         }
-        
+
     }
     int GetTargetUnitRemainingHealth(GridPosition gridPosition)
     {

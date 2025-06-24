@@ -81,7 +81,7 @@ public abstract class BaseAction : MonoBehaviour
         _unit.GetUnitHealthSystem().OnBodyPartFrozenStateChanged -= BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged;
     }
     public abstract string GetActionName();
-    public abstract void TakeAction(GridPosition gridPosition, Action onActionComplete);
+    public abstract void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.None);
     //public abstract void TakeAction(BaseParameters baseParameters, Action onActionComplete);
     public virtual bool IsValidActionGridPosition(GridPosition gridPosition)
     {

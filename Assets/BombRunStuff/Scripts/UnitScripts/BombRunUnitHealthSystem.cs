@@ -12,6 +12,7 @@ public enum BodyPartFrozenState
 }
 public enum BodyPart
 {
+    None,
     Head,
     Arms,
     Legs

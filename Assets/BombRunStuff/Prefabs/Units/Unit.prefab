@@ -1065,11 +1065,11 @@ MonoBehaviour:
   _health: 100
   _maxHealth: 0
   _bodyPartsAndFrozenState:
-  - BodyPart: 0
-    BodyPartFrozenState: 0
   - BodyPart: 1
     BodyPartFrozenState: 0
   - BodyPart: 2
+    BodyPartFrozenState: 0
+  - BodyPart: 3
     BodyPartFrozenState: 0
 --- !u!114 &5928444417147222519
 MonoBehaviour:
@@ -1535,11 +1535,11 @@ MonoBehaviour:
   _healthSystem: {fileID: 0}
   _scriptableBodyPartSpriteMapping: {fileID: 11400000, guid: 4cc55b46300939145a3e4cf59015b46e, type: 2}
   _bodyPartToSpriteObjectMapping:
-  - BodyPart: 0
-    Sprite: {fileID: 1776679360341671748}
   - BodyPart: 1
-    Sprite: {fileID: 4920457972292057431}
+    Sprite: {fileID: 1776679360341671748}
   - BodyPart: 2
+    Sprite: {fileID: 4920457972292057431}
+  - BodyPart: 3
     Sprite: {fileID: 4050893227328436707}
   _bodyPartSpriteHolder: {fileID: 3721147272319749096}
 --- !u!1 &8876794406186424813

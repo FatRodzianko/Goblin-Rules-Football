@@ -120,7 +120,12 @@ public class GrenadeProjectile : MonoBehaviour
         Debug.Log("DamageUnitsHitByGrenade: " + units.Count + " units at position: " + gridPosition.ToString());
         for (int x = 0; x < units.Count; x++)
         {
-            units[x].Damage(grenadeDamage);
+            //units[x].Damage(grenadeDamage);
+            List<BombRunUnitBodyPartAndFrozenState> bodyPartsAndFrozenStates = units[x].GetUnitHealthSystem().GetAllBodyPartsAndFrozenState();
+            foreach (BombRunUnitBodyPartAndFrozenState bodyPartAndFrozenState in bodyPartsAndFrozenStates)
+            {
+                units[x].DamageBodyPart(bodyPartAndFrozenState.BodyPart);
+            }
         }
     }
     private void DamageObstaclessHitByGrenade(BaseBombRunObstacle obstacle, GridPosition gridPosition)

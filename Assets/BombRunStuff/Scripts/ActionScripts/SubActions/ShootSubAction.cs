@@ -45,8 +45,9 @@ public class ShootSubAction : BaseSubAction
 
     public override void TakeActionFromParentAction()
     {
-        ShootAction shootAction = _parentAction as ShootAction;
-        shootAction.TakeActionFromSubAction(_gridPosition, _onSubActionComplete, _bodyPartToShoot);
+        //ShootAction shootAction = _parentAction as ShootAction;
+        //shootAction.TakeActionFromSubAction(_gridPosition, _onSubActionComplete, _bodyPartToShoot);
+        _parentAction.TakeAction(_gridPosition, _onSubActionComplete, _bodyPartToShoot);
     }
     void SpawnShootSubActionGUI()
     {

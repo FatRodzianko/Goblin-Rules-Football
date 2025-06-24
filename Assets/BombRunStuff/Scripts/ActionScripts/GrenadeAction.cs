@@ -69,7 +69,7 @@ public class GrenadeAction : BaseAction
         return validGridPositionList;
     }
 
-    public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
+    public override void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.None)
     {
         Debug.Log("TakeAction: Grenade Action");
         // Spawn the grenade projectile

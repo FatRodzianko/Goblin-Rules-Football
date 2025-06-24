@@ -191,11 +191,11 @@ MonoBehaviour:
   _actionButtonUI: {fileID: 6530650343774620344}
   _bodyPartType: 0
   _bodyPartToImageObjectMappingList:
-  - BodyPart: 0
-    Image: {fileID: 3135817623251438254}
   - BodyPart: 1
-    Image: {fileID: 5012114202483009236}
+    Image: {fileID: 3135817623251438254}
   - BodyPart: 2
+    Image: {fileID: 5012114202483009236}
+  - BodyPart: 3
     Image: {fileID: 7294732851377048672}
 --- !u!1 &2415257781689489062
 GameObject:
