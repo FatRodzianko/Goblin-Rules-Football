@@ -13,7 +13,8 @@ public enum ActionType
     Interact,
     Grenade,
     Sword,
-    Reload
+    Reload,
+    SwitchShootingMode
 }
 
 public abstract class BaseAction : MonoBehaviour

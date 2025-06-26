@@ -952,12 +952,13 @@ GameObject:
   - component: {fileID: 4506797595294261930}
   - component: {fileID: 5928444417147222519}
   - component: {fileID: 4887323598526683332}
+  - component: {fileID: 1951318674019840855}
+  - component: {fileID: 6393159762003104582}
   - component: {fileID: 396472657878469393}
   - component: {fileID: 3362271877576885837}
   - component: {fileID: 4184348786050281194}
   - component: {fileID: 2898562228658105131}
   - component: {fileID: 4589616383332178742}
-  - component: {fileID: 1951318674019840855}
   m_Layer: 11
   m_Name: Unit
   m_TagString: Goblin
@@ -1089,7 +1090,7 @@ MonoBehaviour:
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: e5917e614c198a94aa34d711c31edc9d, type: 3}
-  _actionBodyPart: 2
+  _actionBodyPart: 3
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
@@ -1119,7 +1120,7 @@ MonoBehaviour:
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 235fab481a567c44ca1574a2cee9b931, type: 3}
-  _actionBodyPart: 1
+  _actionBodyPart: 2
   _hasSubAction: 0
   _canTargetFriendlyUnits: 1
   _bombRunUnitAnimator: {fileID: 0}
@@ -1140,6 +1141,70 @@ MonoBehaviour:
     m_Bits: 2048
   _minDistanceToTravelThroughObstacle: 0.1
   _circleCastRadius: 0.2
+--- !u!114 &1951318674019840855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4944422538143551182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d25bf402383a64146838600c5e7dea5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unit: {fileID: 0}
+  _isActive: 0
+  _actionType: 8
+  _actionPointDefaultCost: 1
+  _actionPointsCost: 1
+  _actionSymbolSprite: {fileID: 21300000, guid: 43f5f3f3a0a869b4e9a942547883c2b2, type: 3}
+  _actionBodyPart: 2
+  _hasSubAction: 0
+  _canTargetFriendlyUnits: 0
+  _bombRunUnitAnimator: {fileID: 0}
+  _isReloadable: 0
+  _requiresAmmo: 0
+  _maxAmmo: 0
+  _remainingAmmo: 0
+  _ammoCost: 0
+  _hideWhenCantUse: 1
+  _subAction: {fileID: 0}
+  _reloadTime: 1.5
+  _reloadCounter: 0
+--- !u!114 &6393159762003104582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4944422538143551182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab164a7b85c9ae440972ed2f93f5445b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unit: {fileID: 0}
+  _isActive: 0
+  _actionType: 9
+  _actionPointDefaultCost: 1
+  _actionPointsCost: 1
+  _actionSymbolSprite: {fileID: 0}
+  _actionBodyPart: 0
+  _hasSubAction: 0
+  _canTargetFriendlyUnits: 0
+  _bombRunUnitAnimator: {fileID: 0}
+  _isReloadable: 0
+  _requiresAmmo: 0
+  _maxAmmo: 0
+  _remainingAmmo: 0
+  _ammoCost: 0
+  _hideWhenCantUse: 0
+  _subAction: {fileID: 0}
+  _actionName: Switch To Healing
+  _healingMode: 0
+  _switchModeTime: 1
+  _switchModeCounter: 0
 --- !u!114 &396472657878469393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1158,7 +1223,7 @@ MonoBehaviour:
   _actionPointDefaultCost: 1
   _actionPointsCost: 2
   _actionSymbolSprite: {fileID: 21300000, guid: 14844317d65c4d8469e3e3862a79d298, type: 3}
-  _actionBodyPart: 2
+  _actionBodyPart: 3
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
@@ -1187,7 +1252,7 @@ MonoBehaviour:
   _actionPointDefaultCost: 1
   _actionPointsCost: 2
   _actionSymbolSprite: {fileID: 21300000, guid: e4fae6034bcdca14390523951abc0dbe, type: 3}
-  _actionBodyPart: 2
+  _actionBodyPart: 3
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
@@ -1218,7 +1283,7 @@ MonoBehaviour:
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: f2cdd7d90789c824882003eb372b8618, type: 3}
-  _actionBodyPart: 1
+  _actionBodyPart: 2
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
@@ -1247,7 +1312,7 @@ MonoBehaviour:
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: 95177d6dba8cb634e8b9977040bf3f44, type: 3}
-  _actionBodyPart: 1
+  _actionBodyPart: 2
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
@@ -1278,7 +1343,7 @@ MonoBehaviour:
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 21300000, guid: d395f258769a207428224a76105b5ee8, type: 3}
-  _actionBodyPart: 1
+  _actionBodyPart: 2
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}
@@ -1289,37 +1354,6 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
---- !u!114 &1951318674019840855
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4944422538143551182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d25bf402383a64146838600c5e7dea5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _unit: {fileID: 0}
-  _isActive: 0
-  _actionType: 8
-  _actionPointDefaultCost: 1
-  _actionPointsCost: 1
-  _actionSymbolSprite: {fileID: 21300000, guid: 43f5f3f3a0a869b4e9a942547883c2b2, type: 3}
-  _actionBodyPart: 1
-  _hasSubAction: 0
-  _canTargetFriendlyUnits: 0
-  _bombRunUnitAnimator: {fileID: 0}
-  _isReloadable: 0
-  _requiresAmmo: 0
-  _maxAmmo: 0
-  _remainingAmmo: 0
-  _ammoCost: 0
-  _hideWhenCantUse: 1
-  _subAction: {fileID: 0}
-  _reloadTime: 1.5
-  _reloadCounter: 0
 --- !u!1 &5004671053109487943
 GameObject:
   m_ObjectHideFlags: 0

@@ -347,5 +347,11 @@ x When doing shoot action, prompt player to choose what body part to shoot befor
 - - - medic
 - - - - - - does not need to switch shooting type to heal. Can always heal units
 - - - - - - has special healing grenade that heals teammates. Doesn't damage enemies though?
+- - - gunner
+- - - - - - Can target more than one enemy with a shoot action
+- - - - - - must "deploy" their gun, like it's a machine gun or something
+- - - - - - cannot move while deployed
+- - - - - - deploying basically takes up one full turn?
+- - - - - - cannot switch to a healing mode. Can only do damage
 
 768x432
