@@ -12,6 +12,10 @@ public class SwitchShootingModeAction : BaseAction
     [SerializeField] private float _switchModeTime = 1f;
     [SerializeField] private float _switchModeCounter;
 
+
+    // events
+    public event EventHandler<bool> OnSwitchShootModeStarted;
+
     private void Update()
     {
         if (!_isActive)
@@ -60,6 +64,8 @@ public class SwitchShootingModeAction : BaseAction
     {
         _healingMode = !_healingMode;
         SetActionNameText(_healingMode);
+
+        OnSwitchShootModeStarted?.Invoke(this, _healingMode);
     }
     void SetActionNameText(bool healingMode)
     {

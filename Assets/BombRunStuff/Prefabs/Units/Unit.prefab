@@ -1141,6 +1141,7 @@ MonoBehaviour:
     m_Bits: 2048
   _minDistanceToTravelThroughObstacle: 0.1
   _circleCastRadius: 0.2
+  _healWhenShooting: 0
 --- !u!114 &1951318674019840855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1190,7 +1191,7 @@ MonoBehaviour:
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
   _actionSymbolSprite: {fileID: 0}
-  _actionBodyPart: 0
+  _actionBodyPart: 1
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
   _bombRunUnitAnimator: {fileID: 0}

@@ -45,6 +45,24 @@ public class ShootAction : BaseAction
     [SerializeField] private float _minDistanceToTravelThroughObstacle = 0.25f;
     [SerializeField] private float _circleCastRadius = 0.2f;
 
+    [Header("Healing Mode Stuff?")]
+    [SerializeField] private bool _healWhenShooting = false;
+    private bool _unitHasSwitchShootingActionMode = false;
+    private SwitchShootingModeAction _switchShootingModeAction;
+
+    protected override void Start()
+    {
+        base.Start();
+        CheckForSwitchShootingModeAction();
+    }
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        if (_unitHasSwitchShootingActionMode)
+        {
+            _switchShootingModeAction.OnSwitchShootModeStarted -= SwitchShootingModeAction_OnSwitchShootModeStarted;
+        }
+    }
     private void Update()
     {
         if (!_isActive)
@@ -822,5 +840,24 @@ public class ShootAction : BaseAction
 
         Debug.Log("GetTargetCountAtGridPosition: " + targetPosition.Count + " targets at: " + gridPosition);
         return targetPosition.Count;
+    }
+    void CheckForSwitchShootingModeAction()
+    {
+        _switchShootingModeAction = this._unit.GetAction<SwitchShootingModeAction>();
+        if (_switchShootingModeAction == null)
+            return;
+
+        _unitHasSwitchShootingActionMode = true;
+
+        _switchShootingModeAction.OnSwitchShootModeStarted += SwitchShootingModeAction_OnSwitchShootModeStarted;
+    }
+
+    private void SwitchShootingModeAction_OnSwitchShootModeStarted(object sender, bool healingMode)
+    {
+        _healWhenShooting = healingMode;
+    }
+    public bool GetHealWhenShooting()
+    {
+        return _healWhenShooting;
     }
 }
