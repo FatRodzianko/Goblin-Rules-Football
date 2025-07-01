@@ -22,6 +22,13 @@ public class ShootAction : BaseAction
         Shooting,
         Cooloff,
     }
+    public enum DamageMode
+    {
+        Damage,
+        Heal,
+        Medic
+    }
+
     private State _state;
     private float _stateTimer;
     private float _aimingStateTime = 0.5f;
@@ -158,7 +165,15 @@ public class ShootAction : BaseAction
     }
     public override string GetActionName()
     {
-        return "Shoot";
+        //return "Shoot";
+        return GetActionNameFromHealingMode();
+    }
+    string GetActionNameFromHealingMode()
+    {
+        if (_healWhenShooting)
+            return "Heal";
+        else
+            return "Shoot";
     }
     public override List<GridPosition> GetValidActionGridPositionList()
     {
@@ -204,10 +219,11 @@ public class ShootAction : BaseAction
                 BombRunUnit testGridUnit = LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition);
 
                 // check the frozen state of the target to see if player can target any body parts
+                // testGridUnit.IsEnemy() == _unit.IsEnemy() means units are on the same team
                 if (testGridUnit.IsEnemy() == _unit.IsEnemy())
                 {
                     // can target friendly unit IF they are damaged?
-                    if (!testGridUnit.GetUnitHealthSystem().AreAnyBodyPartsFrozen())
+                    if (!testGridUnit.GetUnitHealthSystem().AreAnyBodyPartsFrozen() || !_healWhenShooting)
                     {
                         continue;
                     }
@@ -216,7 +232,7 @@ public class ShootAction : BaseAction
                 else
                 {
                     // For enemy units, check if they are completely frozen? If so, skip?
-                    if (testGridUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen())
+                    if (testGridUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen() || _healWhenShooting)
                     {
                         Debug.Log("Shoot Action: GetValidActionGridPositionList: all body parts frozen at: " + testGridPosition);
                         continue;
@@ -656,6 +672,9 @@ public class ShootAction : BaseAction
                 _ActionValue = 0,
             };
         }
+
+        // add a check here for healing mode. If it is set to heal, call the HealingMode checks. If set to damage, call the Damage mode checks or whatever
+
         if (aiTarget.IsEnemy() == this._unit.IsEnemy())
         {
             return new BombRunEnemyAIAction
