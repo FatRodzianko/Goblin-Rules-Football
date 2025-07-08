@@ -18,10 +18,15 @@ public class UnitActionSystemUI : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnActionStarted += UnitActionSystem_OnActionStarted;
+        UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
+
         BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
+
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+
         BaseAction.OnAnyAmmoRemainingChanged += BaseAction_OnAnyAmmoRemainingChanged;
         BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
+
         BombRunUnitHealthSystem.OnAnyBodyPartFrozenStateChanged += BombRunUnitHealthSystem_OnAnyBodyPartFrozenStateChanged;
 
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
@@ -36,10 +41,15 @@ public class UnitActionSystemUI : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
         UnitActionSystem.Instance.OnSelectedActionChanged -= UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnActionStarted -= UnitActionSystem_OnActionStarted;
+        UnitActionSystem.Instance.OnBusyChanged -= UnitActionSystem_OnBusyChanged;
+
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
+
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
+
         BaseAction.OnAnyAmmoRemainingChanged -= BaseAction_OnAnyAmmoRemainingChanged;
         BaseAction.OnAnyActionCompleted -= BaseAction_OnAnyActionCompleted;
+
         BombRunUnitHealthSystem.OnAnyBodyPartFrozenStateChanged -= BombRunUnitHealthSystem_OnAnyBodyPartFrozenStateChanged;
     }
     private void CreateUnitActionButtons(BombRunUnit selectedUnit)
@@ -178,6 +188,10 @@ public class UnitActionSystemUI : MonoBehaviour
         {
             UpdateActionButtonBodyPartVisuals();
         }
+    }
+    private void UnitActionSystem_OnBusyChanged(object sender, bool actionBusy)
+    {
+        _actionButtonContainer.gameObject.SetActive(!actionBusy);
     }
 }
 

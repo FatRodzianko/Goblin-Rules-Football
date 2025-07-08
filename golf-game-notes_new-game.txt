@@ -310,9 +310,13 @@ x Add checks for the BodyPart choosing UI for friendly vs enemy units - will cha
 - - x can only target a friendly body part if it is half or full frozen. Cannot if not frozen
 - - x can only target an enemy body part if it is half or not frozen. Cannot if fully frozen
 - Should change it so it is an action to switch between damage and healing shooting?
-- - - A new action switch firing modes. Takes 1 action point to switch from damage to heal
-- - - - - - arm body type
+- - x A new action switch firing modes. Takes 1 action point to switch from damage to heal
+- - - - - x arm body type
 - - - "Medic" unit doesn't have to switch?
+- Add sub action to sword action
+- - - player chooses body part to target, then does double damage to that body part
+- - - - - - basically, a melee attack will always fully freeze the targeted body part
+
 
 ### Longer term tasks
 x When doing shoot action, prompt player to choose what body part to shoot before taking action
@@ -353,5 +357,9 @@ x When doing shoot action, prompt player to choose what body part to shoot befor
 - - - - - - cannot move while deployed
 - - - - - - deploying basically takes up one full turn?
 - - - - - - cannot switch to a healing mode. Can only do damage
+- - - berserker/melee
+- - - - - - melee damage - can fully freeze body parts in one hit
+- - - - - - more movement distance/speed than regular unit
+- - - - - - maybe has worse vision than a "scout" or something like that? Or make this the scout/recon unit
 
 768x432

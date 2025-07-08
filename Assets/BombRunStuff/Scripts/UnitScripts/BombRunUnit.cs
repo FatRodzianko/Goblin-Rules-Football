@@ -195,6 +195,13 @@ public class BombRunUnit : MonoBehaviour
         //}
         _healthSystem.TakeDamage(damage);
     }
+    public void DamageAllBodyParts()
+    {
+        foreach (BombRunUnitBodyPartAndFrozenState bodyPartAndFrozenState in this.GetUnitHealthSystem().GetAllBodyPartsAndFrozenState())
+        {
+            this.DamageBodyPart(bodyPartAndFrozenState.BodyPart);
+        }
+    }
     public void DamageBodyPart(BodyPart bodyPart)
     {
         _healthSystem.TakeDamageToBodyPart(bodyPart);

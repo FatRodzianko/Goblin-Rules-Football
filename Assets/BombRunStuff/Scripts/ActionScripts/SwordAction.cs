@@ -61,7 +61,8 @@ public class SwordAction : BaseAction
                 _state = State.SwiningSwordAfterHit;
                 float afterHitStateTime = 0.5f;
                 _stateTimer = afterHitStateTime;
-                _targetUnit.Damage(100);
+                //_targetUnit.Damage(100);
+                _targetUnit.DamageAllBodyParts();
                 OnAnySwordHit?.Invoke(this, EventArgs.Empty);
                 break;
             case State.SwiningSwordAfterHit:
