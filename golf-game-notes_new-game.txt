@@ -318,6 +318,7 @@ x Should change it so it is an action to switch between damage and healing shoot
 - - - - - - - - x create different prefab variants for the different unit types
 - - - - - - - - - - - x for now, just "normal" and "medic"
 - - - - - x Also create the "Grenade Type" enum for the grenade action, that gets passed to the grenade projectile so the game knows whether to heal or damage from the grenade
+- - - - - - - - - healing grenade should not blow up obstacles
 - Add sub action to sword action
 - - - player chooses body part to target, then does double damage to that body part
 - - - - - - basically, a melee attack will always fully freeze the targeted body part
