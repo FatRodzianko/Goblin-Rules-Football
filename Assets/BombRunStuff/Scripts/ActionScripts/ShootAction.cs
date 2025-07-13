@@ -22,12 +22,7 @@ public class ShootAction : BaseAction
         Shooting,
         Cooloff,
     }
-    public enum DamageMode
-    {
-        Damage,
-        Heal,
-        Medic
-    }
+
 
     private State _state;
     private float _stateTimer;
@@ -52,23 +47,23 @@ public class ShootAction : BaseAction
     [SerializeField] private float _minDistanceToTravelThroughObstacle = 0.25f;
     [SerializeField] private float _circleCastRadius = 0.2f;
 
-    [Header("Healing Mode Stuff?")]
-    [SerializeField] private bool _healWhenShooting = false;
-    private bool _unitHasSwitchShootingActionMode = false;
-    private SwitchShootingModeAction _switchShootingModeAction;
+    //[Header("Healing Mode Stuff?")]
+    //[SerializeField] private bool _healWhenShooting = false;
+    //private bool _unitHasSwitchShootingActionMode = false;
+    //private SwitchShootingModeAction _switchShootingModeAction;
 
     protected override void Start()
     {
         base.Start();
-        CheckForSwitchShootingModeAction();
+        //CheckForSwitchShootingModeAction();
     }
     protected override void OnDisable()
     {
         base.OnDisable();
-        if (_unitHasSwitchShootingActionMode)
-        {
-            _switchShootingModeAction.OnSwitchShootModeStarted -= SwitchShootingModeAction_OnSwitchShootModeStarted;
-        }
+        //if (_unitHasSwitchShootingActionMode)
+        //{
+        //    _switchShootingModeAction.OnSwitchShootModeStarted -= SwitchShootingModeAction_OnSwitchShootModeStarted;
+        //}
     }
     private void Update()
     {
@@ -170,10 +165,23 @@ public class ShootAction : BaseAction
     }
     string GetActionNameFromHealingMode()
     {
-        if (_healWhenShooting)
-            return "Heal";
-        else
-            return "Shoot";
+        //if (_healWhenShooting)
+        //    return "Heal";
+        //else
+        //    return "Shoot";
+        switch (_unit.GetDamageMode())
+        {
+            default:
+            case DamageMode.Damage:
+                return "Shoot";
+                break;
+            case DamageMode.Heal:
+                return "Heal";
+                break;            
+            case DamageMode.Medic:
+                return "Shoot\n/Heal";
+                break;
+        }
     }
     public override List<GridPosition> GetValidActionGridPositionList()
     {
@@ -223,7 +231,7 @@ public class ShootAction : BaseAction
                 if (testGridUnit.IsEnemy() == _unit.IsEnemy())
                 {
                     // can target friendly unit IF they are damaged?
-                    if (!testGridUnit.GetUnitHealthSystem().AreAnyBodyPartsFrozen() || !_healWhenShooting)
+                    if (!testGridUnit.GetUnitHealthSystem().AreAnyBodyPartsFrozen() || _unit.GetDamageMode() == DamageMode.Damage)
                     {
                         continue;
                     }
@@ -232,7 +240,7 @@ public class ShootAction : BaseAction
                 else
                 {
                     // For enemy units, check if they are completely frozen? If so, skip?
-                    if (testGridUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen() || _healWhenShooting)
+                    if (testGridUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen() || _unit.GetDamageMode() == DamageMode.Heal)
                     {
                         Debug.Log("Shoot Action: GetValidActionGridPositionList: all body parts frozen at: " + testGridPosition);
                         continue;
@@ -459,6 +467,7 @@ public class ShootAction : BaseAction
     //
     // NEWER 3/25/2025
     //
+
     private bool DoesShotHitWallOrObstacle(GridPosition unitPosition, GridPosition targetPosition)
     {
 
@@ -860,23 +869,23 @@ public class ShootAction : BaseAction
         Debug.Log("GetTargetCountAtGridPosition: " + targetPosition.Count + " targets at: " + gridPosition);
         return targetPosition.Count;
     }
-    void CheckForSwitchShootingModeAction()
-    {
-        _switchShootingModeAction = this._unit.GetAction<SwitchShootingModeAction>();
-        if (_switchShootingModeAction == null)
-            return;
+    //void CheckForSwitchShootingModeAction()
+    //{
+    //    _switchShootingModeAction = this._unit.GetAction<SwitchShootingModeAction>();
+    //    if (_switchShootingModeAction == null)
+    //        return;
 
-        _unitHasSwitchShootingActionMode = true;
+    //    _unitHasSwitchShootingActionMode = true;
 
-        _switchShootingModeAction.OnSwitchShootModeStarted += SwitchShootingModeAction_OnSwitchShootModeStarted;
-    }
+    //    _switchShootingModeAction.OnSwitchShootModeStarted += SwitchShootingModeAction_OnSwitchShootModeStarted;
+    //}
 
-    private void SwitchShootingModeAction_OnSwitchShootModeStarted(object sender, bool healingMode)
-    {
-        _healWhenShooting = healingMode;
-    }
-    public bool GetHealWhenShooting()
-    {
-        return _healWhenShooting;
-    }
+    //private void SwitchShootingModeAction_OnSwitchShootModeStarted(object sender, bool healingMode)
+    //{
+    //    _healWhenShooting = healingMode;
+    //}
+    //public bool GetHealWhenShooting()
+    //{
+    //    return _healWhenShooting;
+    //}
 }

@@ -3,6 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum UnitType
+{
+    Normal,
+    Medic,
+}
 public class BombRunUnit : MonoBehaviour
 {
     private const int ACTION_POINTS_MAX = 2;
@@ -14,11 +19,14 @@ public class BombRunUnit : MonoBehaviour
 
     // non-static events
     public event EventHandler<BaseAction> OnActionTaken;
+    public event EventHandler<DamageMode> OnDamageModeChanged;
 
     [Header("Unit Info")]
     //[SerializeField] private int _startingHealth = 100;
     //[SerializeField] private int _health;
+    [SerializeField] private UnitType _unitType;
     [SerializeField] private bool _isEnemy;
+    [SerializeField] private DamageMode _damageMode;
 
     [Header("Unit Health Stuff")]
     [SerializeField] private BombRunUnitHealthSystem _healthSystem;
@@ -210,6 +218,13 @@ public class BombRunUnit : MonoBehaviour
     {
         _healthSystem.HealDamageOnBodyPart(bodyPart);
     }
+    public void HealAllBodyParts()
+    {
+        foreach (BombRunUnitBodyPartAndFrozenState bodyPartAndFrozenState in this.GetUnitHealthSystem().GetAllBodyPartsAndFrozenState())
+        {
+            this.HealBodyPart(bodyPartAndFrozenState.BodyPart);
+        }
+    }
     private void HealthSystem_OnDead(object sender, EventArgs e)
     {
         KillUnit();
@@ -269,5 +284,23 @@ public class BombRunUnit : MonoBehaviour
     public int GetRemainingHealth()
     {
         return _healthSystem.GetHealth();
+    }
+    public UnitType GetUnitType()
+    {
+        return _unitType;
+    }
+    public DamageMode GetDamageMode()
+    {
+        return _damageMode;
+    }
+    public void SetDamageMode(DamageMode damageMode)
+    {
+        if (_unitType == UnitType.Medic)
+        {
+            _damageMode = DamageMode.Medic;
+            return;
+        }
+
+        _damageMode = damageMode;
     }
 }

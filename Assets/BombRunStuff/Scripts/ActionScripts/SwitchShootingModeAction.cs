@@ -65,7 +65,12 @@ public class SwitchShootingModeAction : BaseAction
         _healingMode = !_healingMode;
         SetActionNameText(_healingMode);
 
-        OnSwitchShootModeStarted?.Invoke(this, _healingMode);
+        //OnSwitchShootModeStarted?.Invoke(this, _healingMode);
+
+        if (_healingMode)
+            _unit.SetDamageMode(DamageMode.Heal);
+        else
+            _unit.SetDamageMode(DamageMode.Damage);
     }
     void SetActionNameText(bool healingMode)
     {

@@ -16,7 +16,12 @@ public enum ActionType
     Reload,
     SwitchShootingMode
 }
-
+public enum DamageMode
+{
+    Damage,
+    Heal,
+    Medic
+}
 public abstract class BaseAction : MonoBehaviour
 {
     //public class BaseParameters { } //this can be extended to have a "generic" base parameter for the TakeAction method

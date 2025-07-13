@@ -19,6 +19,7 @@ public class GrenadeProjectile : MonoBehaviour
     [SerializeField] private float _throwSpeed = 15f;
     [SerializeField] private int damageRadius = 1;
     [SerializeField] private int grenadeDamage = 69;
+    [SerializeField] private DamageMode _damageMode;
     
 
     [Header("Sprite Objects")]
@@ -68,9 +69,12 @@ public class GrenadeProjectile : MonoBehaviour
         //}
         MoveGrenadeOnTrajectory();
     }
-    public void Setup(GridPosition targetGridPosition, Action onGrenadeBehaviorComplete)
+    public void Setup(GridPosition targetGridPosition, Action onGrenadeBehaviorComplete, DamageMode damageMode)
     {
         this._onGrenadeBehaviorComplete = onGrenadeBehaviorComplete;
+        
+        _damageMode = damageMode;
+
         _targetWorldPosition = LevelGrid.Instance.GetWorldPosition(targetGridPosition);
         _targetGridPosition = targetGridPosition;
 
@@ -85,8 +89,6 @@ public class GrenadeProjectile : MonoBehaviour
         _totalDistance = Vector2.Distance(_positionXYZ, _targetWorldPosition);
         _timeInAir = _totalDistance / _throwSpeed;
         _trajectoryModifier = 1 / _timeInAir;
-
-        
     }
     private void StartGrenadeDamage()
     {
@@ -94,7 +96,52 @@ public class GrenadeProjectile : MonoBehaviour
         List<GridPosition> neighborGridPositons = LevelGrid.Instance.GetValidNeighborGridPositions(_targetGridPosition, damageRadius, true);
         Debug.Log("StartGrenadeDamage: neighborGridPositons: " + neighborGridPositons.Count.ToString() + " damageRadius: " + damageRadius.ToString());
         neighborGridPositons.Add(_targetGridPosition);
-        FindUnitsAndObstaclesHitByGrenade(neighborGridPositons);
+
+        List<GridPosition> positionsToDamage = RemoveNeighborPositionsBlockedByWall(neighborGridPositons, _targetGridPosition);
+        FindUnitsAndObstaclesHitByGrenade(positionsToDamage);
+    }
+    private List<GridPosition> RemoveNeighborPositionsBlockedByWall(List<GridPosition> neighborPositions, GridPosition start)
+    {
+        List<GridPosition> notBlocked = new List<GridPosition>();
+        if (neighborPositions.Count < 1)
+            return notBlocked;
+
+        foreach (GridPosition neighborPosition in neighborPositions)
+        {
+            if (!IsWallBetweenPoints(start, neighborPosition))
+            {
+                notBlocked.Add(neighborPosition);
+            }
+        }
+
+        return notBlocked;
+    }
+    private bool IsWallBetweenPoints(GridPosition start, GridPosition end)
+    {
+        Vector2 startPosition = LevelGrid.Instance.GetWorldPosition(start);
+        Vector2 endPosition = LevelGrid.Instance.GetWorldPosition(end);
+        Vector2 direction = (endPosition - startPosition).normalized;
+
+        float distance = Vector2.Distance(startPosition, endPosition);
+        RaycastHit2D[] hits = Physics2D.RaycastAll(startPosition, direction, distance);
+
+        if (hits.Length < 1)
+            return false;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider.CompareTag("BombRunWall"))
+                return true;
+            if (hits[i].collider.CompareTag("BombRunObstacle"))
+            {
+                if (!hits[i].collider.GetComponent<BaseBombRunObstacle>().IsDestructible())
+                {
+                    return true;
+                }
+            }
+        }
+
+        // hit some other collider but not a wall or obstacle
+        return false;
     }
     private void FindUnitsAndObstaclesHitByGrenade(List<GridPosition> gridPositions)
     {
@@ -117,6 +164,9 @@ public class GrenadeProjectile : MonoBehaviour
     {
         if (units.Count < 1)
             return;
+
+        bool _damageUnits = _damageMode == DamageMode.Damage;
+
         Debug.Log("DamageUnitsHitByGrenade: " + units.Count + " units at position: " + gridPosition.ToString());
         for (int x = 0; x < units.Count; x++)
         {
@@ -125,8 +175,11 @@ public class GrenadeProjectile : MonoBehaviour
             //foreach (BombRunUnitBodyPartAndFrozenState bodyPartAndFrozenState in bodyPartsAndFrozenStates)
             //{
             //    units[x].DamageBodyPart(bodyPartAndFrozenState.BodyPart);
-            //}
-            units[x].DamageAllBodyParts();
+            //}'
+            if(_damageUnits)
+                units[x].DamageAllBodyParts();
+            else
+                units[x].HealAllBodyParts();
         }
     }
     private void DamageObstaclessHitByGrenade(BaseBombRunObstacle obstacle, GridPosition gridPosition)

@@ -7,6 +7,14 @@ public class GrenadeAction : BaseAction
 {
     [SerializeField] private int _maxThrowDistance = 7;
     [SerializeField] private Transform _grenadeProjectilePrefab;
+    [SerializeField] DamageMode _damageMode;
+
+    protected override void Start()
+    {
+        base.Start();
+        GetGrenadeDamageMode();
+    }    
+
     private void Update()
     {
         if (!_isActive)
@@ -15,9 +23,24 @@ public class GrenadeAction : BaseAction
         }
 
     }
+    private void GetGrenadeDamageMode()
+    {
+        if (_unit.GetDamageMode() == DamageMode.Medic)
+            _damageMode = DamageMode.Heal;
+        else
+            _damageMode = DamageMode.Damage;
+    }
     public override string GetActionName()
     {
-        return "Grenade";
+        switch (_damageMode)
+        {
+            default:
+            case DamageMode.Damage:
+                return "Grenade";
+            case DamageMode.Heal:
+            case DamageMode.Medic:
+                return "Healing\nGrenade";
+        }
     }
 
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -75,7 +98,7 @@ public class GrenadeAction : BaseAction
         // Spawn the grenade projectile
         Transform grenadeProjectileTransform = Instantiate(_grenadeProjectilePrefab, _unit.GetWorldPosition(), Quaternion.identity);
         GrenadeProjectile grenadeProjectileScript = grenadeProjectileTransform.GetComponent<GrenadeProjectile>();
-        grenadeProjectileScript.Setup(gridPosition, OnGrenadeBehaviorComplete);
+        grenadeProjectileScript.Setup(gridPosition, OnGrenadeBehaviorComplete, _damageMode);
 
         ActionStart(onActionComplete);
 

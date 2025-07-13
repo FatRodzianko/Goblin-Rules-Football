@@ -391,8 +391,9 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _throwSpeed: 15
-  damageRadius: 3
+  damageRadius: 2
   grenadeDamage: 30
+  _damageMode: 0
   _grenadeSpriteObject: {fileID: 8449958250046593522}
   _grenadeShadowSpriteObject: {fileID: 3901150753579756658}
   _trajectoryPoints:

@@ -309,10 +309,15 @@ x Need to make sure there is an obvious way to "cancel" your selected action?
 x Add checks for the BodyPart choosing UI for friendly vs enemy units - will change what is "disabled" and allowed to be hit
 - - x can only target a friendly body part if it is half or full frozen. Cannot if not frozen
 - - x can only target an enemy body part if it is half or not frozen. Cannot if fully frozen
-- Should change it so it is an action to switch between damage and healing shooting?
+x Should change it so it is an action to switch between damage and healing shooting?
 - - x A new action switch firing modes. Takes 1 action point to switch from damage to heal
 - - - - - x arm body type
-- - - "Medic" unit doesn't have to switch?
+- - x "Medic" unit doesn't have to switch?
+- - - - - x medic unit will also have a "healing grenade" that heals teammates (and enemies if they are in the splash damage?)
+- - - - - x create "Unit Type" enum or something that all units have
+- - - - - - - - x create different prefab variants for the different unit types
+- - - - - - - - - - - x for now, just "normal" and "medic"
+- - - - - x Also create the "Grenade Type" enum for the grenade action, that gets passed to the grenade projectile so the game knows whether to heal or damage from the grenade
 - Add sub action to sword action
 - - - player chooses body part to target, then does double damage to that body part
 - - - - - - basically, a melee attack will always fully freeze the targeted body part
@@ -327,7 +332,8 @@ x When doing shoot action, prompt player to choose what body part to shoot befor
 - - - allows for full cover if unit is behind wall/obstacle that only provides half cover
 - - - removes unit vision past that wall though?
 - Fog of war based on what units can "see"
-- - - ties this into the "vision cone" that's affected by head statussasdsdsdfsadafdasdaadadasda
+- - - ties this into the "vision cone" that's affected by head status
+- Move ShootAction's DoesShotHitWallOrObstacle function to a static class like LevelGrid or GridSystem so that other functions/Actions/Whatever can access it and check for walls between two points?
 
 
 ### Special unit/enemy types
