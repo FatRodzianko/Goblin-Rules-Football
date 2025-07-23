@@ -12,6 +12,9 @@ public class SwitchShootingModeAction : BaseAction
     [SerializeField] private float _switchModeTime = 1f;
     [SerializeField] private float _switchModeCounter;
 
+    [SerializeField] private Sprite _switchToHealingModeSprite;
+    [SerializeField] private Sprite _switchToDamageModeSprite;
+
 
     // events
     public event EventHandler<bool> OnSwitchShootModeStarted;
@@ -26,7 +29,7 @@ public class SwitchShootingModeAction : BaseAction
         _switchModeCounter -= Time.deltaTime;
         if (_switchModeCounter <= 0)
         {
-            SwitchShootingMode();
+            //SwitchShootingMode();
             ActionComplete();
         }
     }
@@ -58,6 +61,7 @@ public class SwitchShootingModeAction : BaseAction
     {
         Debug.Log("TakeAction: Switch Shooting Mode");
         _switchModeCounter = _switchModeTime;
+        SwitchShootingMode();
         ActionStart(onActionComplete);
     }
     void SwitchShootingMode()
@@ -68,9 +72,21 @@ public class SwitchShootingModeAction : BaseAction
         //OnSwitchShootModeStarted?.Invoke(this, _healingMode);
 
         if (_healingMode)
+        {
             _unit.SetDamageMode(DamageMode.Heal);
+            //// setting the opposite because the _actionSymbolSprite is pulled by the UI as soon as the action starts, which is before this? Basically, preparing for the next time the mode is switched 
+            //_actionSymbolSprite = _switchToDamageModeSprite;
+
+            _actionSymbolSprite = _switchToHealingModeSprite;
+        }
         else
+        {
             _unit.SetDamageMode(DamageMode.Damage);
+            //_actionSymbolSprite = _switchToHealingModeSprite;
+
+            _actionSymbolSprite = _switchToDamageModeSprite;
+        }
+            
     }
     void SetActionNameText(bool healingMode)
     {

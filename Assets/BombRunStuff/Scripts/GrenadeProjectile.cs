@@ -152,6 +152,11 @@ public class GrenadeProjectile : MonoBehaviour
         {
             List<BombRunUnit> units = LevelGrid.Instance.GetUnitListAtGridPosition(gridPositions[i]);
             DamageUnitsHitByGrenade(units, gridPositions[i]);
+
+            // do not damage/explode destructible obstacles if this is a healing grenade?
+            if (_damageMode != DamageMode.Damage)
+                continue;
+
             if (LevelGrid.Instance.HasAnyObstacleOnGridPosition(gridPositions[i]))
             {
                 BaseBombRunObstacle obstacle = LevelGrid.Instance.GetObstacleAtGridPosition(gridPositions[i]);

@@ -20053,7 +20053,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4506797595294261930, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _bodyPartsAndFrozenState.Array.data[0].BodyPartFrozenState
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4506797595294261930, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _bodyPartsAndFrozenState.Array.data[1].BodyPartFrozenState

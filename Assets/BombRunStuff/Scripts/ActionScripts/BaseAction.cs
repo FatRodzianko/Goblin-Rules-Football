@@ -37,7 +37,7 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] protected ActionType _actionType;
     [SerializeField] protected int _actionPointDefaultCost = 1;
     [SerializeField] protected int _actionPointsCost = 1;
-    [SerializeField] private Sprite _actionSymbolSprite;
+    [SerializeField] protected Sprite _actionSymbolSprite;
     [SerializeField] private BodyPart _actionBodyPart;
     [SerializeField] private bool _hasSubAction;
     [SerializeField] private bool _canTargetFriendlyUnits = false;

@@ -1207,6 +1207,8 @@ MonoBehaviour:
   _healingMode: 0
   _switchModeTime: 1
   _switchModeCounter: 0
+  _switchToHealingModeSprite: {fileID: 21300000, guid: 6704d005d1017484893c81d83191693d, type: 3}
+  _switchToDamageModeSprite: {fileID: 21300000, guid: 858d8657eb3fbd04783bfe1d849fe161, type: 3}
 --- !u!114 &396472657878469393
 MonoBehaviour:
   m_ObjectHideFlags: 0
