@@ -20,6 +20,7 @@ public class SwordAction : BaseAction
     private BombRunUnit _targetUnit;
     private Vector3 _targetPosition;
     private Vector3 _unitPosition;
+    private BodyPart _targetBodyPart;
 
     // spinning stuff
     private float _totalSpinAmount;
@@ -62,7 +63,8 @@ public class SwordAction : BaseAction
                 float afterHitStateTime = 0.5f;
                 _stateTimer = afterHitStateTime;
                 //_targetUnit.Damage(100);
-                _targetUnit.DamageAllBodyParts();
+                DamageTarget();
+                
                 OnAnySwordHit?.Invoke(this, EventArgs.Empty);
                 break;
             case State.SwiningSwordAfterHit:
@@ -71,6 +73,20 @@ public class SwordAction : BaseAction
                 break;
         }
     }
+
+    private void DamageTarget()
+    {
+        if (_targetBodyPart == BodyPart.None)
+        {
+            _targetUnit.DamageAllBodyParts();
+            return;
+        }
+
+        // x2 damage from sword?
+        _targetUnit.DamageBodyPart(_targetBodyPart);
+        _targetUnit.DamageBodyPart(_targetBodyPart);
+    }
+
     public override string GetActionName()
     {
         return "Sword";
@@ -117,6 +133,10 @@ public class SwordAction : BaseAction
                 {
                     continue;
                 }
+                if (targetUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen())
+                {
+                    continue;
+                }
                 // calculate the distance to the grid position to make sure it is in the shooting radius. Right now the for loops form a big square around selected unit. This will make it more circular
                 //if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > _maxSwordDistance * 10)
                 //{
@@ -132,6 +152,8 @@ public class SwordAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.None)
     {
         Debug.Log("TakeAction: SwordAction");
+
+        _targetBodyPart = bodyPart;
 
         _totalSpinAmount = 0f;
         _state = State.SwingingSwordBeforeHit;

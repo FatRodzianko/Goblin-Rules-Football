@@ -98,9 +98,6 @@ public class ShootSubAction_SelectionOutlineScript : MonoBehaviour
                 this._sprite.color = _disabled;
             }
         }
-
-        
-
     }
     void ClickedOn()
     {

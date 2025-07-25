@@ -5,13 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[Serializable]
-public class BodyPartToShootSubAction_SelectionOutlineScriptMapping
-{
-    public BodyPart BodyPart;
-    public ShootSubAction_SelectionOutlineScript SelectionScript;
-}
-public class ShootSubActionUI : MonoBehaviour
+public class SwordSubActionUI : MonoBehaviour
 {
     [Header("Body Part Sprite References")]
     [SerializeField] private ScriptableBodyPartSpriteMapping _scriptableBodyPartSpriteMapping;
@@ -23,7 +17,7 @@ public class ShootSubActionUI : MonoBehaviour
     private Action<BodyPart> _onPlayerSelection;
 
     [SerializeField] private ShootSubAction _shootSubAction;
-    [SerializeField] private bool _canTargetNoneBodyPart = false;
+    
 
     private void Start()
     {
@@ -52,18 +46,6 @@ public class ShootSubActionUI : MonoBehaviour
                 if (_bodyPartToTransformMapping[i].BodyPart == bodyPartToSpriteObjectMapping.BodyPart)
                 {
                     _bodyPartToTransformMapping[i].SelectionScript.SetDisabled(state, targetUnit.IsEnemy() == _shootSubAction.GetUnit().IsEnemy());
-                }
-                if (_canTargetNoneBodyPart && _bodyPartToTransformMapping[i].BodyPart == BodyPart.None)
-                {
-                    // just making it so if all body parts are frozen, you cannot take this action. If any are not frozen, you can take the action
-                    if (targetUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen())
-                    {
-                        _bodyPartToTransformMapping[i].SelectionScript.SetDisabled(BodyPartFrozenState.FullFrozen, false);
-                    }
-                    else
-                    {
-                        _bodyPartToTransformMapping[i].SelectionScript.SetDisabled(BodyPartFrozenState.NotFrozen, false);
-                    }
                 }
             }
         }

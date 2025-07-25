@@ -235,6 +235,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5135917175814169154}
   - component: {fileID: 6098609833336378707}
+  - component: {fileID: 4719576239651644733}
   m_Layer: 11
   m_Name: SubActions
   m_TagString: Untagged
@@ -277,6 +278,28 @@ MonoBehaviour:
   _countDownLength: 5
   _bodyPartToShoot: 0
   _shootSubActionGUIPrefab: {fileID: 5592039492161522101, guid: 53c7e74d77c53ce4ab4fcfcca37bf3ac, type: 3}
+  _shootSubActionGUIObject: {fileID: 0}
+  _shootSubActionGUIScript: {fileID: 0}
+--- !u!114 &4719576239651644733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 724186349312388198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc7d8b424e7f8d94ea31b0dc5df1b622, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unit: {fileID: 0}
+  _parentActionType: 7
+  _parentAction: {fileID: 0}
+  _isActive: 0
+  _subActionPlayerNotificationText: 
+  _countDownLength: 0
+  _bodyPartToShoot: 0
+  _shootSubActionGUIPrefab: {fileID: 5592039492161522101, guid: b687ecb71cac08a468d45f87ef92537e, type: 3}
   _shootSubActionGUIObject: {fileID: 0}
   _shootSubActionGUIScript: {fileID: 0}
 --- !u!1 &1097945920879885200
