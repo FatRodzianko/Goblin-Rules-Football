@@ -323,6 +323,7 @@ x Should change it so it is an action to switch between damage and healing shoot
 - - - player chooses body part to target, then does double damage to that body part
 - - - - - - basically, a melee attack will always fully freeze the targeted body part
 - - - - - - or, have it be that the player chooses to damage one body part twice or all parts once?
+- - - - - - update UI offset of the body part selector so it isn't covering the target?
 
 
 ### Longer term tasks
