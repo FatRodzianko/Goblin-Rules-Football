@@ -58,7 +58,7 @@ public class ShootSubAction : BaseSubAction
 
         // add check to see when the object is off screen, and if so, flip the x offset it spawns at? If target is too far left, spawn UI object on right side of target instead of the left
 
-        _shootSubActionGUIObject.transform.position = new Vector3(targetPosition.x + localPosition.x, targetPosition.y, targetPosition.z);
+        _shootSubActionGUIObject.transform.position = new Vector3(targetPosition.x + localPosition.x, targetPosition.y + localPosition.y, targetPosition.z);
         _shootSubActionGUIScript = _shootSubActionGUIObject.GetComponent<ShootSubActionUI>();
         _shootSubActionGUIScript.InitializeShootSubActionUI(this);
         _shootSubActionGUIScript.SetPlayerSelectionCallback(PlayerSelectedBodyPart);
