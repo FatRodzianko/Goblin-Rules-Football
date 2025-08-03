@@ -22684,6 +22684,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1548380461}
   - component: {fileID: 1548380460}
+  - component: {fileID: 1548380462}
   m_Layer: 0
   m_Name: UnitManager
   m_TagString: Untagged
@@ -22703,6 +22704,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af7bea395123d624c8411e8f892f80a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _bombRunUnitActionValueManager: {fileID: 1548380462}
 --- !u!4 &1548380461
 Transform:
   m_ObjectHideFlags: 0
@@ -22718,6 +22720,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1548380462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548380459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 378f71f6048ae9a4f89948537a82bfad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unitTypeBodyPartActionValueMapping:
+  - UnitType: 2
+    UnitBodyPartActionValues: {fileID: 11400000, guid: 3ff36410e7779ad4b8ff5fc8f4c2dc52, type: 2}
+  _defaultUnitBodyPartActionValues: {fileID: 11400000, guid: e7ca8aa092e0d544dbca73aaa55e4c65, type: 2}
 --- !u!1001 &1556640784
 PrefabInstance:
   m_ObjectHideFlags: 0

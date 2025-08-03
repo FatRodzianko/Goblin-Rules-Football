@@ -11,6 +11,8 @@ public class BombRunUnitManager : MonoBehaviour
     private List<BombRunUnit> _friendlyUnitList = new List<BombRunUnit>();
     private List<BombRunUnit> _enemyUnitList = new List<BombRunUnit>();
 
+    [SerializeField] private BombRunUnitActionValueManager _bombRunUnitActionValueManager;
+
     private void Awake()
     {
         MakeInstance();
@@ -98,6 +100,10 @@ public class BombRunUnitManager : MonoBehaviour
     public bool IsUnitAnEnemy(BombRunUnit unit)
     {
         return _enemyUnitList.Contains(unit);
+    }
+    public int GetUnitBodyPartActionValue(UnitType unitType, BodyPart bodyPart)
+    {
+        return _bombRunUnitActionValueManager.GetUnitBodyPartActionValue(unitType, bodyPart);
     }
 }
 

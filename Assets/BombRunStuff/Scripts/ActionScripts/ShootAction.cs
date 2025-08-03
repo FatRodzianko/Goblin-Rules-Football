@@ -489,27 +489,27 @@ public class ShootAction : BaseAction
             {
                 for (int i = 0; i < hits.Length; i++)
                 {
-                    Debug.Log("DoesShotHitWallOrObstacle: hit " + hits[i].collider.name + " collider at: " + hits[i].point.ToString("0.00000000"));
+                    //Debug.Log("DoesShotHitWallOrObstacle: hit " + hits[i].collider.name + " collider at: " + hits[i].point.ToString("0.00000000"));
                     //hits[i].collider.bounds
                     // check if the hit is on a corner?
                     if (IsCornerHit(hits[i].point))
                     {
-                        Debug.Log("DoesShotHitWallOrObstacle: Hit corner of a collider at: " + hits[i].point.ToString());
+                        //Debug.Log("DoesShotHitWallOrObstacle: Hit corner of a collider at: " + hits[i].point.ToString());
                         // check to see if the shoot direction is moving away or toward the center of the hit collider
                         // if moving toward center of collider, it is a direct hit
                         // if moving away from center of collider, might be glancing blow on corner to ignore?
                         Vector2 directionToCenterOfCollider = ((Vector2)hits[i].collider.bounds.center - hits[i].point).normalized;
                         float angle = Vector2.Angle(directionToCenterOfCollider, shootDirection);
-                        Debug.Log("DoesShotHitWallOrObstacle: Angle of corner hit: " + angle.ToString() + " hit point: " + hits[i].point + " shoot direction: " + shootDirection + " direction from hitpoint to collider center: " + directionToCenterOfCollider);
+                        //Debug.Log("DoesShotHitWallOrObstacle: Angle of corner hit: " + angle.ToString() + " hit point: " + hits[i].point + " shoot direction: " + shootDirection + " direction from hitpoint to collider center: " + directionToCenterOfCollider);
 
                         if (angle < 45f)
                         {
-                            Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving TOWARD the collider. Corner hit into the wall. Wall hit?");
+                            //Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving TOWARD the collider. Corner hit into the wall. Wall hit?");
                             return true;
                         }
                         else
                         {
-                            Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving AWAY from the collider. Glancing corner hit? Checking for surrounding colliders...");
+                            //Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving AWAY from the collider. Glancing corner hit? Checking for surrounding colliders...");
                             RaycastHit2D[] circleCastHits = Physics2D.CircleCastAll(hits[i].point, _circleCastRadius, Vector2.zero, 0f, mask);
                             if (circleCastHits.Length > 0)
                             {
@@ -517,25 +517,25 @@ public class ShootAction : BaseAction
                                 {
                                     if (circleCastHits[z].collider != hits[i].collider)
                                     {
-                                        Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, but collider is near another collider. Should be blocked? Hit collider: " + hits[i].collider + " second collider: " + circleCastHits[z].collider.name);
+                                        //Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, but collider is near another collider. Should be blocked? Hit collider: " + hits[i].collider + " second collider: " + circleCastHits[z].collider.name);
                                         return true;
                                     }
                                 }
                             }
                             // if the code makes it here, no other collider was near the corner. Glancing blow to skip rest of checks with "continue?"    
-                            Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, AND no surrounding collider. Skipping this hit?");
+                            //Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, AND no surrounding collider. Skipping this hit?");
                             continue;                            
                         }
                     }
                     else
                     {
-                        Debug.Log("DoesShotHitWallOrObstacle: DID NOT Hit corner of a collider at: " + hits[i].point.ToString("0.0000000000"));
+                        //Debug.Log("DoesShotHitWallOrObstacle: DID NOT Hit corner of a collider at: " + hits[i].point.ToString("0.0000000000"));
                     }
                     
                     if (hits[i].collider.CompareTag("BombRunWall"))
                     {
                         //Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + LevelGrid.Instance.GetGridPositon(hits[i].point) + " Target position: " + targetPosition);
-                        Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + hits[i].point + " Target position: " + targetWorldPosition);
+                        //Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + hits[i].point + " Target position: " + targetWorldPosition);
                         return true;
                     }
                     if (hits[i].collider.CompareTag("BombRunObstacle"))
@@ -543,7 +543,7 @@ public class ShootAction : BaseAction
                         if (hits[i].collider.GetComponent<BaseBombRunObstacle>().GetObstacleCoverType() == ObstacleCoverType.Full)
                         {
                             //Debug.Log("DoesShotHitWallOrObstacle: Hit Obstacle with Full Cover. Obstacle position: " + LevelGrid.Instance.GetGridPositon(hits[i].point) + " Target position: " + targetPosition);
-                            Debug.Log("DoesShotHitWallOrObstacle: Hit Obstacle with Full Cover. Obstacle position: " + hits[i].point + " Target position: " + targetWorldPosition);
+                            //Debug.Log("DoesShotHitWallOrObstacle: Hit Obstacle with Full Cover. Obstacle position: " + hits[i].point + " Target position: " + targetWorldPosition);
                             return true;
                         }
                     }
@@ -557,7 +557,7 @@ public class ShootAction : BaseAction
                             }
                             if (hitGoblin != targetUnit)
                             {
-                                Debug.Log("DoesShotHitWallOrObstacle: Hit goblin that was not the target. Goblin position: " + hits[i].point + " Target position: " + targetWorldPosition);
+                                //Debug.Log("DoesShotHitWallOrObstacle: Hit goblin that was not the target. Goblin position: " + hits[i].point + " Target position: " + targetWorldPosition);
                                 return true;
                             }
                         }
@@ -806,6 +806,7 @@ public class ShootAction : BaseAction
         }
 
         // placeholder
+        Debug.Log("GetEnemyAIAction: Shoot Action: " + this._unit.name + ": Action Value: " + actionValue);
         return new BombRunEnemyAIAction
         {
             _GridPosition = gridPosition,

@@ -324,6 +324,19 @@ x Should change it so it is an action to switch between damage and healing shoot
 - - - - - - basically, a melee attack will always fully freeze the targeted body part
 - - - - - - or, have it be that the player chooses to damage one body part twice or all parts once?
 - - - - - - update UI offset of the body part selector so it isn't covering the target?
+- AI Action for switching from Damage/Heal Mode
+- - - check remaining action points versus action cast
+- - - - - - if only one action point left, or using the Switch action would use all remaining action points, set action value to -500?
+- - - get all available targets for shooting for both damage and healing
+- - - - - - compare total number of targets for each. For one with majority, give +100 action value, tie going to damage
+- - - - - - get health status of each target
+- - - - - - - - - for damage, count up every target that has at least one half frozen body part. +100 each
+- - - - - - - - - for heal, count up every target that has a half frozen body part as 50, fully frozen at 100
+- - - check damage mode of nearby teammates. If at least one is set to heal, -200. If there is a medic nearby, -500
+- - - compare action value of damage to action value of heal. 
+- - - - - - switch to mode with the higher value, if necessary
+- - - - - - - - - if unit is in damage mode, but heal has greater value, then switch
+- - - - - - - - - if unit is in damage mode, and damage has greater value, then don't switch. Set action value to 0
 
 
 ### Longer term tasks

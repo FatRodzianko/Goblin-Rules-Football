@@ -7,6 +7,7 @@ public enum UnitType
 {
     Normal,
     Medic,
+    Abnormal,
 }
 public class BombRunUnit : MonoBehaviour
 {

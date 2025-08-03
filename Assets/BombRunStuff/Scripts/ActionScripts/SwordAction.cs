@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -94,10 +95,139 @@ public class SwordAction : BaseAction
 
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
+        BombRunUnit aiTarget = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+        if (aiTarget == null)
+        {
+            return new BombRunEnemyAIAction
+            {
+                _GridPosition = gridPosition,
+                _ActionValue = 0,
+            };
+        }
+
+        // don't sword your own teammate
+        if (aiTarget.IsEnemy() == this._unit.IsEnemy())
+        {
+            return new BombRunEnemyAIAction
+            {
+                _GridPosition = gridPosition,
+                _ActionValue = 0,
+            };
+        }
+        // Check if all body parts are frozen aka not a valid target
+        BombRunUnitHealthSystem targetHealthSystem = aiTarget.GetUnitHealthSystem();
+        if (targetHealthSystem.AreAllBodyPartsFrozen())
+        {
+            Debug.Log("SwordAction: GetEnemyAIAction: All body parts for target at: " + gridPosition.ToString() + " are frozen");
+            return new BombRunEnemyAIAction
+            {
+                _GridPosition = gridPosition,
+                _ActionValue = 0,
+            };
+        }
+
+        // set initial action value to a base level of 1000, adjust to prioritize units that are closer
+        int actionValue = 1200;
+
+        // get unit's action points remaining. For the sword action prioritize this if it is the last remaining action?
+        if (_unit.GetActionPoints() <= 1)
+        {
+            actionValue += 100;
+        }
+        // target body part to save. Default to legs?
+        BombRunUnitBodyPartAndFrozenState targetBodyPartAndFrozenState = new BombRunUnitBodyPartAndFrozenState { BodyPart = BodyPart.Legs, BodyPartFrozenState = BodyPartFrozenState.NotFrozen };
+
+
+        // Check each body part to see if they are half frozen or not frozen. If half frozen, save as a possible target
+        List<BodyPart> notFrozenBodyParts = new List<BodyPart>();
+        List<BodyPart> halfFrozenBodyParts = new List<BodyPart>();
+        List<BodyPart> cannotTargetBodyParts = new List<BodyPart>();
+        List<BombRunUnitBodyPartAndFrozenState> targetBombRunUnitBodyPartAndFrozenStates = targetHealthSystem.GetAllBodyPartsAndFrozenState();
+        foreach (BombRunUnitBodyPartAndFrozenState x in targetBombRunUnitBodyPartAndFrozenStates)
+        {
+            if (x.BodyPartFrozenState == BodyPartFrozenState.HalfFrozen)
+            {
+                if (!halfFrozenBodyParts.Contains(x.BodyPart))
+                {
+                    Debug.Log("SwordAction: GetEnemyAIAction: Half frozen bodypart found for target at: " + gridPosition.ToString() + ": " + x.BodyPart.ToString());
+                    halfFrozenBodyParts.Add(x.BodyPart);
+                }
+            }
+            else if (x.BodyPartFrozenState == BodyPartFrozenState.NotFrozen)
+            {
+                if (!notFrozenBodyParts.Contains(x.BodyPart))
+                {
+                    Debug.Log("SwordAction: GetEnemyAIAction: NOT frozen bodypart found for target at: " + gridPosition.ToString() + ": " + x.BodyPart.ToString());
+                    notFrozenBodyParts.Add(x.BodyPart);
+                }
+            }
+            else if (x.BodyPartFrozenState == BodyPartFrozenState.FullFrozen)
+            {
+                cannotTargetBodyParts.Add(x.BodyPart);
+            }
+        }
+
+        // if any body parts are half frozen, use the "Body.None" target to target all body parts
+        if (halfFrozenBodyParts.Count > 0)
+        {
+            Debug.Log("SwordAction: GetEnemyAIAction: at least one half frozen body part. Will target 'BodyPart.None' to hit all body parts once");
+            targetBodyPartAndFrozenState.BodyPart = BodyPart.None;
+            targetBodyPartAndFrozenState.BodyPartFrozenState = BodyPartFrozenState.HalfFrozen;
+
+            // increase action value for each half frozen body part since that means you will fully freeze more bodyparts with this hit
+            actionValue += halfFrozenBodyParts.Count * 750;
+
+        }
+        else
+        {
+            // check for what body part to hit twice
+
+
+            // place holder:
+            // later check for the unit type and weigh different body parts for different unit types. Scouts target legs? Medics arms? or something?
+            // probably should have each unity type have a "AI Target Body Part" to just pull from
+
+            // Priority list is: Arms, then legs, then head?
+            if (!cannotTargetBodyParts.Contains(BodyPart.Arms))
+            {
+                targetBodyPartAndFrozenState.BodyPart = BodyPart.Arms;
+                targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == BodyPart.Arms).BodyPartFrozenState;
+            }
+            else if (!cannotTargetBodyParts.Contains(BodyPart.Legs))
+            {
+                targetBodyPartAndFrozenState.BodyPart = BodyPart.Legs;
+                targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == BodyPart.Legs).BodyPartFrozenState;
+            }
+            else
+            {
+                targetBodyPartAndFrozenState.BodyPart = BodyPart.Head;
+                targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == BodyPart.Head).BodyPartFrozenState;
+            }
+
+            // adjust the action value to prioritize BodyParts
+            // Pull the body part prioritization from GetUnitBodyPartActionValue so it is unity type specific?
+            actionValue += BombRunUnitManager.Instance.GetUnitBodyPartActionValue(aiTarget.GetUnitType(), targetBodyPartAndFrozenState.BodyPart);
+            //switch (targetBodyPartAndFrozenState.BodyPart)
+            //{
+            //    default:
+            //    case BodyPart.Arms:
+            //        actionValue += BombRunUnitManager.Instance.GetUnitBodyPartActionValue(aiTarget.GetUnitType(), targetBodyPartAndFrozenState.BodyPart);
+            //        break;
+            //    case BodyPart.Legs:
+            //        actionValue += 100;
+            //        break;
+            //    case BodyPart.Head:
+            //        actionValue += 50;
+            //        break;
+            //}
+        }
+
+        Debug.Log("GetEnemyAIAction: Sword Action: " + this._unit.name + ": Action Value: " + actionValue);
         return new BombRunEnemyAIAction
         {
             _GridPosition = gridPosition,
-            _ActionValue = 1000,
+            _ActionValue = actionValue,
+            _TargetBodyPart = targetBodyPartAndFrozenState.BodyPart,
         };
     }
 
