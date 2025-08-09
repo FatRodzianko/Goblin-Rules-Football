@@ -40,13 +40,195 @@ public class SwitchShootingModeAction : BaseAction
 
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
+        int actionValue = 0;
+        // skip for medics
+        if(_unit.GetUnitType() == UnitType.Medic)
+        {
+            return new BombRunEnemyAIAction
+            {
+                _GridPosition = this._unit.GetGridPosition(),
+                _ActionValue = actionValue,
+            };
+        }
+        // disincentivize taking this on your last action
+        if (_unit.GetActionPoints() <= 1 || _unit.GetUnitHealthSystem().GetBodyPartFrozenState(this._actionBodyPart) == BodyPartFrozenState.FullFrozen)
+        {
+            actionValue -= 500;
+        }
+
+        // get targets for damage mode and healing mode. Start by getting the shoot action
+        ShootAction shootAction = _unit.GetAction<ShootAction>();
+        if (shootAction == null)
+        {
+            return new BombRunEnemyAIAction
+            {
+                _GridPosition = this._unit.GetGridPosition(),
+                _ActionValue = actionValue,
+            };
+        }
+        // do this relative to the units current damage mode?
+        List<GridPosition> targetsForDamageMode = new List<GridPosition>();
+        List<GridPosition> targetsForHealMode = new List<GridPosition>();
+        DamageMode currentDamageMode = _unit.GetDamageMode();
+
+        // keep "score" for each damage mode to track which one is the better "option" over the other
+        int pointsForHeal = 0;
+        int pointsForDamage = 0;
+
+        // add points for mode that matches units current mode, to weight
+        if (currentDamageMode == DamageMode.Damage)
+        {
+            pointsForDamage += 100;
+        }
+        else
+        {
+            pointsForHeal += 100;
+        }
+
+        // reward the mode with the greatest number of targets
+        if (targetsForDamageMode.Count < targetsForHealMode.Count)
+        {
+            pointsForHeal += 100;
+        }
+        else
+        {
+            pointsForDamage += 100;
+        }
+
+        
+        // get list of targets for each healing mode
+        targetsForDamageMode = shootAction.GetValidActionGridPositionList(_unit.GetGridPosition(), true, DamageMode.Damage);
+        targetsForHealMode = shootAction.GetValidActionGridPositionList(_unit.GetGridPosition(), true, DamageMode.Heal);
+
+        // go through each target and check its health system to determine the "value" of the targets
+        pointsForDamage += GetValueOfTargetList(targetsForDamageMode, DamageMode.Damage);
+        pointsForHeal += GetValueOfTargetList(targetsForHealMode, DamageMode.Heal);
+
+        // get list of nearby teammates and check if any are medics or already in healing mode
+        List<BombRunUnit> nearbyTeammates = GetNearbyTeammates(_unit.GetGridPosition(), shootAction);
+        if (nearbyTeammates.Count > 0)
+        {
+            int numberOfDamageModeTeammates = 0;
+            foreach (BombRunUnit teammate in nearbyTeammates)
+            {
+                UnitType unitType = teammate.GetUnitType();
+                if (unitType == UnitType.Medic)
+                {
+                    pointsForHeal -= 500;
+                }
+                else if (teammate.GetDamageMode() == DamageMode.Heal)
+                {
+                    pointsForHeal -= 100;
+                }
+                else if (teammate.GetDamageMode() == DamageMode.Damage)
+                {
+                    numberOfDamageModeTeammates += 1;
+                }
+            }
+
+            if (numberOfDamageModeTeammates < 1)
+            {
+                pointsForDamage += 100;
+            }
+        }        
+
+
+        // check which damage mode currently has the highest value
+        DamageMode winningDamageMode = DamageMode.Damage;
+        int winningDamagePoints = pointsForDamage;
+        if (pointsForDamage < pointsForHeal)
+        {
+            winningDamageMode = DamageMode.Heal;
+            winningDamagePoints = pointsForHeal;
+        }
+
+        // if the winning damage is same as current damage mode, then return action with low value
+        if (winningDamageMode == currentDamageMode)
+        {
+            return new BombRunEnemyAIAction
+            {
+                _GridPosition = this._unit.GetGridPosition(),
+                _ActionValue = 0,
+            };
+        }
+
+        // if the return doesn't happen above, then return calculated action value by adding the winning mode's value
         return new BombRunEnemyAIAction
         {
             _GridPosition = this._unit.GetGridPosition(),
-            _ActionValue = 0,
+            _ActionValue = actionValue + winningDamagePoints,
         };
     }
+    private int GetValueOfTargetList(List<GridPosition> targets, DamageMode damageMode)
+    {
+        int valueOfTargets = 0;
 
+        foreach (GridPosition gridPosition in targets)
+        {
+            BombRunUnit target = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+            if (target == null)
+                continue;
+
+            BombRunUnitHealthSystem healthSystem = target.GetUnitHealthSystem();
+            List<BombRunUnitBodyPartAndFrozenState> allBodyPartsAndFrozenState = healthSystem.GetAllBodyPartsAndFrozenState();
+            foreach (BombRunUnitBodyPartAndFrozenState bodyPartFrozenState in allBodyPartsAndFrozenState)
+            {
+                if (damageMode == DamageMode.Damage)
+                {
+                    if (bodyPartFrozenState.BodyPartFrozenState == BodyPartFrozenState.HalfFrozen)
+                    {
+                        valueOfTargets += 100;
+                    }
+                }
+                else
+                {
+                    if (bodyPartFrozenState.BodyPartFrozenState == BodyPartFrozenState.HalfFrozen)
+                    {
+                        valueOfTargets += 50;
+                    }
+                    else if (bodyPartFrozenState.BodyPartFrozenState == BodyPartFrozenState.FullFrozen)
+                    {
+                        valueOfTargets += 100;
+                    }
+                }
+            }
+            
+        }
+        return valueOfTargets;
+    }
+    private List<BombRunUnit> GetNearbyTeammates(GridPosition gridPosition, ShootAction shootAction)
+    {
+        List<BombRunUnit> nearbyTeammates = new List<BombRunUnit>();
+
+        for (int x = -shootAction.GetMaxShootDistance(); x <= shootAction.GetMaxShootDistance(); x++)
+        {
+            for (int y = -shootAction.GetMaxShootDistance(); y <= shootAction.GetMaxShootDistance(); y++)
+            {
+                GridPosition offsetGridPosition = new GridPosition(x, y);
+                GridPosition testGridPosition = gridPosition + offsetGridPosition;
+
+                if (testGridPosition == gridPosition)
+                {
+                    continue;
+                }
+                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+                if (LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition))
+                {
+                    // save target unit
+                    BombRunUnit testGridUnit = LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition);
+                    if (testGridUnit.IsEnemy() == this._unit.IsEnemy())
+                    {
+                        nearbyTeammates.Add(testGridUnit);
+                    }
+                }
+            }
+        }
+
+        return nearbyTeammates;
+    }
     public override List<GridPosition> GetValidActionGridPositionList()
     {
         GridPosition unitGridPosition = _unit.GetGridPosition();

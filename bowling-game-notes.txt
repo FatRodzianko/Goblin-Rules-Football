@@ -1,0 +1,47 @@
+### Bowling Game:
+- super bowling lane starts at 222px and narrows to 66 px : 3.36 to 1
+- - - mine 128 to 70: 1.82 to one
+- - - should be down to 38 on mine??? or start at 235
+- Maybe use SNES resolution of 256x224?
+- - - or just halve current resolution to 384x216? 320x180? 640x360?
+Oil slick
+# simple way
+- 3 oil states: full saturated, half saturated, none
+- - -on "none" ball movement is affect by spin of the ball normally
+- - - on fully saturated, ball movement is completely unaffected by ball spin. Ball continues in the direction it entered saturated state in
+- - - on half saturated, ball movement is affect by spin of ball by half
+- ball "carries" oil from one area to the next as it rolls
+- floor is divided into sections, each with an oil "status" (full, half, none"
+- as ball goes down floor, it will hit a fully saturated area, and take some of that area's oil, and "drop it" onto the next section 
+- - - when ball enters a section, it takes a certain percentage of oil from the section, say 10%
+- - - - - - when the ball enters the next section, it drops off a certain percentage of the oil on the ball, say 80%
+- - - - - - eventually the ball will lose all its oil (or close to it) and no longer leave oil behind on new sections 
+- - - the section will eventually have enough oil added to it to change state: from no oil to half saturated
+- - - this will continue throughout a game, changing what sections have oil as the player plays
+- maybe break up the sections in two columns down the lane, a left and a right, so one side can have more oil than the other over time
+- - - players will be right/left handed (and possibly ambidextrous, with a penalty). Right handed can curve to the left easier, left handed curve ball to right easier
+- - - - - - so if right handed bowler starts in right side and always curves left toward the center, the right side will fill with oil, making it harder to keep throwing from same spot
+- - - signify amount of oil visually. Some sort of "oil slick" pattern that is different for each oil amount tier
+- - - - - - also have an "oil vision" ability that clearly marks oil levels
+- - - could also just have a small grid for the sections. Like a 5x10 grid or something, with colliders for each grid section to track when the ball enters and leaves a section 
+
+# more complex way
+- same as above but instead of having square sections or whatever, I actually draw streaks of oil
+
+Bowling the ball
+- player selects trajectory and then tries to hit it, like golf
+- player selects power/ speed, and also spin
+- - - spin applies curves to trajectory 
+- - - power will affect spin's curve. More power, wider curve. Less power, tighter curve
+- - - power will also be used for speed calculations for when the ball hits the pins 
+- after power/spin is selected, markers are put in two meters (power: up and down. Spin: side to side). Icon moves back and forth, players need to stop the icons on their markers to hit their bowl accurately
+- player stats affect how big the markers are?
+- - - player with "good spin" has a wide marker on the meter to hit their spin target, also wider meter overall. Wider meter means a wider curve is possible
+- - - power players same as above, but for power meter. Bugger power meter to indicate the player can bowl harder/faster
+
+Power ups
+- sniper - shoot down one pin to count toward your frame
+- Bomb - can knock down all pins if you "hit" the target. Player spins around in a circle with the bomb like a shot putter/hammer toss. Arrow will spin. Player has to press button to stop arrow straight ahead three times in a row to hit their lane
+- - - if player hits adjacent lane, it knocks over half the pins on that side
+- oil spill - place oil on specific section(s) to grease up an area (good for competitive?)
+- towel boy - cleanup and remove oil from specified section(s)

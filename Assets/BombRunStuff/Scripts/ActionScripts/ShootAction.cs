@@ -188,7 +188,7 @@ public class ShootAction : BaseAction
         GridPosition unitGridPosition = _unit.GetGridPosition();
         return GetValidActionGridPositionList(unitGridPosition);
     }
-    public List<GridPosition> GetValidActionGridPositionList(GridPosition gridPosition)
+    public List<GridPosition> GetValidActionGridPositionList(GridPosition gridPosition, bool specifyDamageMode = false, DamageMode specifiedDamageMode = DamageMode.Damage)
     {
         List<GridPosition> validGridPositionList = new List<GridPosition>();
         //GridPosition unitGridPosition = _unit.GetGridPosition();
@@ -226,12 +226,19 @@ public class ShootAction : BaseAction
                 // save target unit
                 BombRunUnit testGridUnit = LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition);
 
+                // checks for damage mode to use
+                DamageMode damageMode = _unit.GetDamageMode();
+                if (specifyDamageMode)
+                {
+                    damageMode = specifiedDamageMode;
+                }
+
                 // check the frozen state of the target to see if player can target any body parts
                 // testGridUnit.IsEnemy() == _unit.IsEnemy() means units are on the same team
                 if (testGridUnit.IsEnemy() == _unit.IsEnemy())
                 {
                     // can target friendly unit IF they are damaged?
-                    if (!testGridUnit.GetUnitHealthSystem().AreAnyBodyPartsFrozen() || _unit.GetDamageMode() == DamageMode.Damage)
+                    if (!testGridUnit.GetUnitHealthSystem().AreAnyBodyPartsFrozen() || damageMode == DamageMode.Damage)
                     {
                         continue;
                     }
@@ -240,7 +247,7 @@ public class ShootAction : BaseAction
                 else
                 {
                     // For enemy units, check if they are completely frozen? If so, skip?
-                    if (testGridUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen() || _unit.GetDamageMode() == DamageMode.Heal)
+                    if (testGridUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen() || damageMode == DamageMode.Heal)
                     {
                         Debug.Log("Shoot Action: GetValidActionGridPositionList: all body parts frozen at: " + testGridPosition);
                         continue;
