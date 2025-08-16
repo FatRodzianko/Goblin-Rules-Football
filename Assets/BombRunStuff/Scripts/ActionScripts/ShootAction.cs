@@ -689,8 +689,34 @@ public class ShootAction : BaseAction
             };
         }
 
-        // add a check here for healing mode. If it is set to heal, call the HealingMode checks. If set to damage, call the Damage mode checks or whatever
-
+        switch (_unit.GetDamageMode())
+        {
+            default:
+            case DamageMode.Damage:
+                return GetDamageAIAction(gridPosition, aiTarget);
+            case DamageMode.Heal:
+                return GetHealAIAction(gridPosition, aiTarget);
+            case DamageMode.Medic:
+                return GetMedicAIAction(gridPosition, aiTarget);
+        }
+    }
+    private BombRunEnemyAIAction GetMedicAIAction(GridPosition gridPosition, BombRunUnit aiTarget)
+    {
+        // check if target is friendly or an enemy. If friendly, do the heal check. If enemy, do the damage check
+        if (aiTarget.IsEnemy() == this._unit.IsEnemy())
+        {
+            BombRunEnemyAIAction healAction = GetHealAIAction(gridPosition, aiTarget);
+            healAction._ActionValue += 500;
+            return healAction;
+        }
+        else
+        {
+            return GetDamageAIAction(gridPosition, aiTarget);
+        }
+    }
+    private BombRunEnemyAIAction GetDamageAIAction(GridPosition gridPosition, BombRunUnit aiTarget)
+    {
+        // for damage action, cannot target friendly unit
         if (aiTarget.IsEnemy() == this._unit.IsEnemy())
         {
             return new BombRunEnemyAIAction
@@ -700,26 +726,25 @@ public class ShootAction : BaseAction
             };
         }
 
-
         // Check if all body parts are frozen aka not a valid target
         BombRunUnitHealthSystem targetHealthSystem = aiTarget.GetUnitHealthSystem();
         if (targetHealthSystem.AreAllBodyPartsFrozen())
         {
-            Debug.Log("ShootAction: GetEnemyAIAction: All body parts for target at: " + gridPosition.ToString() + " are frozen");
+            Debug.Log("Shoot Action: DamageAIAction: GetEnemyAIAction: All body parts for target at: " + gridPosition.ToString() + " are frozen");
             return new BombRunEnemyAIAction
             {
                 _GridPosition = gridPosition,
                 _ActionValue = 0,
             };
         }
-        
+
         // set initial action value to a base level of 1000, adjust to prioritize units that are closer
         int actionValue = 1000;
         int distanceToTarget = GridPosition.Distance(_unit.GetGridPosition(), gridPosition);
         actionValue += 100 / distanceToTarget;
 
         // target body part to save. Default to legs?
-        BombRunUnitBodyPartAndFrozenState targetBodyPartAndFrozenState = new BombRunUnitBodyPartAndFrozenState { BodyPart = BodyPart.Legs, BodyPartFrozenState = BodyPartFrozenState.NotFrozen};
+        BombRunUnitBodyPartAndFrozenState targetBodyPartAndFrozenState = new BombRunUnitBodyPartAndFrozenState { BodyPart = BodyPart.Legs, BodyPartFrozenState = BodyPartFrozenState.NotFrozen };
 
 
         // Check each body part to see if they are half frozen or not frozen. If half frozen, save as a possible target
@@ -732,7 +757,7 @@ public class ShootAction : BaseAction
             {
                 if (!halfFrozenBodyParts.Contains(x.BodyPart))
                 {
-                    Debug.Log("ShootAction: GetEnemyAIAction: Half frozen bodypart found for target at: " + gridPosition.ToString() + ": " + x.BodyPart.ToString());
+                    Debug.Log("Shoot Action: DamageAIAction: GetEnemyAIAction: Half frozen bodypart found for target at: " + gridPosition.ToString() + ": " + x.BodyPart.ToString());
                     halfFrozenBodyParts.Add(x.BodyPart);
                 }
             }
@@ -751,7 +776,7 @@ public class ShootAction : BaseAction
             {
                 if (!cannotTargetBodyParts.Contains(x.BodyPart))
                 {
-                    Debug.Log("ShootAction: GetEnemyAIAction: Only one body part to target for target at: " + gridPosition.ToString() + ": " + x.BodyPart.ToString());
+                    Debug.Log("Shoot Action: DamageAIAction: GetEnemyAIAction: Only one body part to target for target at: " + gridPosition.ToString() + ": " + x.BodyPart.ToString());
                     targetBodyPartAndFrozenState.BodyPart = x.BodyPart;
                     targetBodyPartAndFrozenState.BodyPartFrozenState = x.BodyPartFrozenState;
                     break;
@@ -762,7 +787,7 @@ public class ShootAction : BaseAction
         {
             if (halfFrozenBodyParts.Count == 1)
             {
-                Debug.Log("ShootAction: GetEnemyAIAction: Only one HALF FROZEN body part to target for target at: " + gridPosition.ToString() + ": " + halfFrozenBodyParts[0].ToString());
+                Debug.Log("Shoot Action: DamageAIAction: GetEnemyAIAction: Only one HALF FROZEN body part to target for target at: " + gridPosition.ToString() + ": " + halfFrozenBodyParts[0].ToString());
                 targetBodyPartAndFrozenState.BodyPart = halfFrozenBodyParts[0];
                 targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == halfFrozenBodyParts[0]).BodyPartFrozenState;
             }
@@ -812,8 +837,172 @@ public class ShootAction : BaseAction
                 break;
         }
 
-        // placeholder
-        Debug.Log("GetEnemyAIAction: Shoot Action: " + this._unit.name + ": Action Value: " + actionValue);
+        Debug.Log("GetEnemyAIAction: Shoot Action: DamageAIAction: " + this._unit.name + ": Action Value: " + actionValue);
+        return new BombRunEnemyAIAction
+        {
+            _GridPosition = gridPosition,
+            _ActionValue = actionValue,
+            _TargetBodyPart = targetBodyPartAndFrozenState.BodyPart,
+        };
+    }
+    private BombRunEnemyAIAction GetHealAIAction(GridPosition gridPosition, BombRunUnit aiTarget)
+    {
+        // for heal action, cannot target enemy unit
+        if (aiTarget.IsEnemy() != this._unit.IsEnemy())
+        {
+            return new BombRunEnemyAIAction
+            {
+                _GridPosition = gridPosition,
+                _ActionValue = 0,
+            };
+        }
+
+        // Check if no body parts are frozen aka not a valid target
+        BombRunUnitHealthSystem targetHealthSystem = aiTarget.GetUnitHealthSystem();
+        if (!targetHealthSystem.AreAnyBodyPartsFrozen())
+        {
+            Debug.Log("Shoot Action: HealAIAction: GetEnemyAIAction: No body parts for target at: " + gridPosition.ToString() + "");
+            return new BombRunEnemyAIAction
+            {
+                _GridPosition = gridPosition,
+                _ActionValue = 0,
+            };
+        }
+
+        // set initial action value to a base level of 1000, adjust to prioritize units that are closer
+        int actionValue = 1000;
+        int distanceToTarget = GridPosition.Distance(_unit.GetGridPosition(), gridPosition);
+        actionValue += 100 / distanceToTarget;
+
+        // target body part to save. Default to legs?
+        BombRunUnitBodyPartAndFrozenState targetBodyPartAndFrozenState = new BombRunUnitBodyPartAndFrozenState { BodyPart = BodyPart.Legs, BodyPartFrozenState = BodyPartFrozenState.NotFrozen };
+
+
+        // Check each body part to see if they are half frozen or full frozen
+        List<BodyPart> halfFrozenBodyParts = new List<BodyPart>();
+        List<BodyPart> fullFroznBodyParts = new List<BodyPart>();
+        List<BombRunUnitBodyPartAndFrozenState> targetBombRunUnitBodyPartAndFrozenStates = targetHealthSystem.GetAllBodyPartsAndFrozenState();
+        foreach (BombRunUnitBodyPartAndFrozenState x in targetBombRunUnitBodyPartAndFrozenStates)
+        {
+            if (x.BodyPartFrozenState == BodyPartFrozenState.HalfFrozen)
+            {
+                if (!halfFrozenBodyParts.Contains(x.BodyPart))
+                {
+                    Debug.Log("Shoot Action: HealAIAction: GetEnemyAIAction: Half frozen bodypart found for target (" + aiTarget.name + ") at: " + gridPosition.ToString() + ": " + x.BodyPart.ToString());
+                    halfFrozenBodyParts.Add(x.BodyPart);
+                }
+            }
+            else if (x.BodyPartFrozenState == BodyPartFrozenState.FullFrozen)
+            {
+                Debug.Log("Shoot Action: HealAIAction: GetEnemyAIAction: Full frozen bodypart found for target (" + aiTarget.name + ") at: " + gridPosition.ToString() + ": " + x.BodyPart.ToString());
+                fullFroznBodyParts.Add(x.BodyPart);
+            }
+        }
+
+        // increase the action value per injured body part
+        actionValue += 50 * (fullFroznBodyParts.Count + halfFrozenBodyParts.Count);
+
+        // check if there is only 1 available body part to target. If that is true, target that body part
+        if (fullFroznBodyParts.Count + halfFrozenBodyParts.Count == 1)
+        {
+            foreach (BombRunUnitBodyPartAndFrozenState x in targetBombRunUnitBodyPartAndFrozenStates)
+            {
+
+                if (fullFroznBodyParts.Contains(x.BodyPart))
+                {
+                    Debug.Log("Shoot Action: HealAIAction: GetEnemyAIAction: Only one body part to target for target (" + aiTarget.name + ") at: " + gridPosition.ToString() + ": " + x.BodyPart.ToString() + ":" + x.BodyPartFrozenState);
+                    targetBodyPartAndFrozenState.BodyPart = x.BodyPart;
+                    targetBodyPartAndFrozenState.BodyPartFrozenState = x.BodyPartFrozenState;
+                    break;
+                }
+                else if (halfFrozenBodyParts.Contains(x.BodyPart))
+                {
+                    Debug.Log("Shoot Action: HealAIAction: GetEnemyAIAction: Only one body part to target for target (" + aiTarget.name + ") at: " + gridPosition.ToString() + ": " + x.BodyPart.ToString() + ":" + x.BodyPartFrozenState);
+                    targetBodyPartAndFrozenState.BodyPart = x.BodyPart;
+                    targetBodyPartAndFrozenState.BodyPartFrozenState = x.BodyPartFrozenState;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if (fullFroznBodyParts.Count == 1)
+            {
+                Debug.Log("Shoot Action: HealAIAction: GetEnemyAIAction: Only one FULL FROZEN body part to target for target (" + aiTarget.name + ") at: " + gridPosition.ToString() + ": " + fullFroznBodyParts[0].ToString());
+                targetBodyPartAndFrozenState.BodyPart = fullFroznBodyParts[0];
+                targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == fullFroznBodyParts[0]).BodyPartFrozenState;
+            }
+            else
+            {
+                // place holder:
+                // later check for the unit type and weigh different body parts for different unit types. Scouts target legs? Medics arms? or something?
+                // probably should have each unity type have a "AI Target Body Part" to just pull from
+
+                // target full frozen body parts first
+                if (fullFroznBodyParts.Count > 0)
+                {
+                    // Priority list is: Arms, then legs, then head?
+                    if (fullFroznBodyParts.Contains(BodyPart.Arms))
+                    {
+                        targetBodyPartAndFrozenState.BodyPart = BodyPart.Arms;
+                        targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == BodyPart.Arms).BodyPartFrozenState;
+                    }
+                    else if (fullFroznBodyParts.Contains(BodyPart.Legs))
+                    {
+                        targetBodyPartAndFrozenState.BodyPart = BodyPart.Legs;
+                        targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == BodyPart.Legs).BodyPartFrozenState;
+                    }
+                    else
+                    {
+                        targetBodyPartAndFrozenState.BodyPart = BodyPart.Head;
+                        targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == BodyPart.Head).BodyPartFrozenState;
+                    }
+                }
+                else
+                {
+                    // Priority list is: Arms, then legs, then head?
+                    if (halfFrozenBodyParts.Contains(BodyPart.Arms))
+                    {
+                        targetBodyPartAndFrozenState.BodyPart = BodyPart.Arms;
+                        targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == BodyPart.Arms).BodyPartFrozenState;
+                    }
+                    else if (halfFrozenBodyParts.Contains(BodyPart.Legs))
+                    {
+                        targetBodyPartAndFrozenState.BodyPart = BodyPart.Legs;
+                        targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == BodyPart.Legs).BodyPartFrozenState;
+                    }
+                    else
+                    {
+                        targetBodyPartAndFrozenState.BodyPart = BodyPart.Head;
+                        targetBodyPartAndFrozenState.BodyPartFrozenState = targetBombRunUnitBodyPartAndFrozenStates.First(x => x.BodyPart == BodyPart.Head).BodyPartFrozenState;
+                    }
+                }
+
+            }
+        }
+
+        // adjust action value based on frozen state and body part?
+        if (targetBodyPartAndFrozenState.BodyPartFrozenState == BodyPartFrozenState.FullFrozen)
+        {
+            actionValue += 750;
+        }
+
+        switch (targetBodyPartAndFrozenState.BodyPart)
+        {
+            default:
+            case BodyPart.Arms:
+                actionValue += 150;
+                break;
+            case BodyPart.Legs:
+                actionValue += 100;
+                break;
+            case BodyPart.Head:
+                actionValue += 50;
+                break;
+        }
+
+
+        Debug.Log("GetEnemyAIAction: Shoot Action: HealAIAction: " + this._unit.name + ": Action Value: " + actionValue);
         return new BombRunEnemyAIAction
         {
             _GridPosition = gridPosition,

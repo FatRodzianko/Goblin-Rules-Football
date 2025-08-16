@@ -134,6 +134,7 @@ public abstract class BaseAction : MonoBehaviour
         if (enemyAIActionList.Count > 0)
         {
             // sort list by action value?
+            // later have a check for unit type so certain units favor certain actions, regardless of action value. Ex: Medic should always do a shoot/heal action if possible
             enemyAIActionList.Sort((BombRunEnemyAIAction a, BombRunEnemyAIAction b) => b._ActionValue - a._ActionValue);
             return enemyAIActionList[0];
         }

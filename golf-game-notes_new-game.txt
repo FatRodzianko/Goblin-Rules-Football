@@ -334,13 +334,17 @@ x Add sub action to sword action
 - - - Currently it only makes checks for damage mode, or at least only makes calculations based on target being an enemy you want to damage
 - - - create three new functions that all return an action value and a target body part
 - - - - - - Medic Mode Check
-- - - - - - - - - check if target is enemy or friendly. If friendly, run heal check. If enemy, run damage check
+- - - - - - - - x check if target is enemy or friendly. If friendly, run heal check. If enemy, run damage check
+- - - - - - - - x for heal check, add a bonus to the action value to make medics more likely to pick the heal action?
 - - - - - - if target is an enemy AND damage mode is damage
-- - - - - - - - - DamageMode check
-- - - - - - - - - - - - just use what is already there? But transfer to its own function
+- - - - - - - - x DamageMode check
+- - - - - - - - - - - x just use what is already there? But transfer to its own function
 - - - - - - if target is friendly AND damage mode is heal
-- - - - - - - - - Heal Mode Check
-- - - - - - - - - - - - weight to target fully frozen body parts, each body part given a priorty weight of its own
+- - - - - - - - x Heal Mode Check
+- - - - - - - - - - - x weight to target fully frozen body parts, each body part given a priorty weight of its own
+- Update GetBestEnemyAIAction
+- - - instead of just taking the action with the highest action value, maybe have a check for unit type and have certain unit types favor certain actions, regardless of action value.
+- - - - - - Ex: Medic should always do a shoot/heal action if possible
 
 ### Longer term tasks
 x When doing shoot action, prompt player to choose what body part to shoot before taking action
