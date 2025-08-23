@@ -4,7 +4,18 @@ using UnityEngine;
 
 public class BombRunUnitFieldOfView : MonoBehaviour
 {
+    [Header("FOV Parameters")]
+    [SerializeField] private int _rayCount = 50;
+    [SerializeField] private float _fov = 90f;
     [SerializeField] private MeshFilter _meshFilter;
+
+    [Header("Raycast stuff?")]
+    [SerializeField] private LayerMask _blockingLayers;
+    private Vector3 _origin = Vector3.zero;
+    private float _startingAngle = 0f;
+    private Mesh _mesh;
+
+
     [SerializeField] private BombRunUnit _unit;
     private void Awake()
     {
@@ -15,34 +26,48 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     }
     private void Start()
     {
-        Mesh mesh = new Mesh();
-        _meshFilter.mesh = mesh;
+        _mesh = new Mesh();
+        _meshFilter.mesh = _mesh;
+    }
+    private void LateUpdate()
+    {
+        
 
         // setup field of view parameters
-        float fov = 90f;
-        Vector3 origin = Vector3.zero;
-        int rayCount = 2;
+        //Vector3 origin = Vector3.zero;
+        _origin = _unit.transform.position;
         float angle = 0f;
-        float angleIncrease = fov / rayCount;
-        float viewDistance = _unit.GetSightRange() * 2;
+        float angleIncrease = _fov / _rayCount;
+        float viewDistance = _unit.GetSightRange() * LevelGrid.Instance.GetGridCellSize();
 
         // initialize the arrays
-        Vector3[] vertices = new Vector3[rayCount + 1 + 1];
+        Vector3[] vertices = new Vector3[_rayCount + 1 + 1];
         Vector2[] uv = new Vector2[vertices.Length];
-        int[] triangles = new int[rayCount * 3];
+        int[] triangles = new int[_rayCount * 3];
 
         // set the origin
-        vertices[0] = origin;
+        vertices[0] = _origin;
 
         // cycle through rays and add new vertex
         int vertexIndex = 1;
         int triangleIndex = 0;
-        for (int i = 0; i <= rayCount; i++)
+        for (int i = 0; i <= _rayCount; i++)
         {
-            Debug.Log("FieldOfView: Vertex index: " + vertexIndex.ToString() + " with max verticies: " + vertices.Length.ToString() + " for unit: " + _unit.name);
-            Vector3 vertex = origin + GetVectorFromAngle(angle) * viewDistance;
+            //Debug.Log("FieldOfView: Vertex index: " + vertexIndex.ToString() + " with max verticies: " + vertices.Length.ToString() + " for unit: " + _unit.name);
+            Vector3 vertex;
+            // raycast from origin and check for collisions
+            RaycastHit2D raycastHit2D = Physics2D.Raycast(_origin, GetVectorFromAngle(angle), viewDistance, _blockingLayers);
+
+            if (raycastHit2D.collider == null)
+            {
+                vertex = _origin + GetVectorFromAngle(angle) * viewDistance;
+            }
+            else
+            {
+                //Debug.Log("FieldOfView: raycast hit at: " + raycastHit2D.point.ToString() + " on " + raycastHit2D.collider.name);
+                vertex = raycastHit2D.point;
+            }
             vertices[vertexIndex] = vertex;
-            
 
             if (i > 0)
             {
@@ -58,14 +83,34 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             angle -= angleIncrease;
         }
 
-        mesh.vertices = vertices;
-        mesh.uv = uv;
-        mesh.triangles = triangles;
+        _mesh.vertices = vertices;
+        _mesh.uv = uv;
+        _mesh.triangles = triangles;
+
+        this.transform.position = Vector3.zero;
+    }
+    public void SetOrigin(Vector3 origin)
+    {
+        this._origin = origin;
+    }
+    public void SetAimDirection(Vector3 aimDirection)
+    {
+        _startingAngle = GetAngleFromVectorFloat(aimDirection) - _fov / 2f;
     }
     public Vector3 GetVectorFromAngle(float angle)
     {
         // angle = 0 -> 360
         float angleRad = angle * (Mathf.PI / 180f);
         return new Vector3(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
+    }
+    public float GetAngleFromVectorFloat(Vector3 dir)
+    {
+        dir = dir.normalized;
+        float n = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        if (n < 0)
+        {
+            n += 360;
+        }
+        return n;
     }
 }

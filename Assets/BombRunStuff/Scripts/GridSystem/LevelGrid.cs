@@ -192,4 +192,8 @@ public class LevelGrid : MonoBehaviour
     {
         return _height;
     }
+    public float GetGridCellSize()
+    {
+        return _cellSize;
+    }
 }

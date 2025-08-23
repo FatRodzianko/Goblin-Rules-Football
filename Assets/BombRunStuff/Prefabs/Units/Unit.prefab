@@ -672,7 +672,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968445246df6824448cd872e3501a4fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _rayCount: 15
+  _fov: 90
   _meshFilter: {fileID: 3444733318118800621}
+  _blockingLayers:
+    serializedVersion: 2
+    m_Bits: 1073741824
   _unit: {fileID: 3408740805264284271}
 --- !u!33 &3444733318118800621
 MeshFilter:

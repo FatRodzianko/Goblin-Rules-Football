@@ -19999,6 +19999,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 769879967131768992, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 769879967131768992, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: abdc3e3f250316544820a8197e3dfacb, type: 2}
+    - target: {fileID: 2692160834791816643, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2898562228658105131, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _maxThrowDistance
       value: 4
