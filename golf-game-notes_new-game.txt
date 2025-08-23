@@ -224,6 +224,8 @@ x create a "wall object" that is just a rectangle collider
 - - - - - - OR
 - - - - - - - - - one arm shot: double cost of all "arm" actions: Shooting, melee, throwing grenade, interacting with doors, etc...
 - - - - - - - - - shoot both arms: all "arm" actions are disabled
+- - - - - - actions related to the bomb will be related to arm. If the unit with the bomb has arms fully frozen, they drop the bomb
+- - - - - - - - - after bomb is dropped, it can be shot and blown up. Has two hit points like a body part, but CANNOT be "healed"/unfrozen
 - - - Head
 - - - - - - This one maybe a bit "tricky," but...
 - - - - - - shooting a unit's head fixes the characters "point of view"
@@ -357,6 +359,10 @@ x When doing shoot action, prompt player to choose what body part to shoot befor
 - Fog of war based on what units can "see"
 - - - ties this into the "vision cone" that's affected by head status
 - Move ShootAction's DoesShotHitWallOrObstacle function to a static class like LevelGrid or GridSystem so that other functions/Actions/Whatever can access it and check for walls between two points?
+- When the "Move Action" is selected, draw a line for the path to the point the mouse is over
+- - - may be computationally expensive...
+- - - will want to save the line points that are being drawn so when the player clicks, the unit takes those points that were shown
+- - - - - - this is in case there are two paths with the same path score, you don't want to draw the line for one and then when the player clicks, it takes the other equal valued path?
 
 
 ### Special unit/enemy types
@@ -392,3 +398,20 @@ x When doing shoot action, prompt player to choose what body part to shoot befor
 - - - - - - maybe has worse vision than a "scout" or something like that? Or make this the scout/recon unit
 
 768x432
+
+### fog of war
+- tutorials
+https://www.youtube.com/watch?v=vUYZiQ3C4hU - How to make Fog of War | How not to make tutorials
+https://www.youtube.com/watch?v=CSeUMTaNFYk - code monkey field of view effect
+https://www.youtube.com/watch?v=3-jPo2wzvdw - code monkey field of view effect for enemy units
+https://www.youtube.com/watch?v=wxVgIH0j8Wg - Generating A Hex Map With Fog Of War in Unity
+https://www.youtube.com/watch?v=GxtzC22d3Cw - Tutorial 3 : Fog of War
+https://www.youtube.com/watch?v=rQG9aUWarwE - field of view visualisation part 1 - sebastian lague
+https://www.youtube.com/watch?v=73Dc5JTCmKI - field of view visualisation part 2 - sebastian lague
+https://www.youtube.com/watch?v=TjFTgEpPnQg - RTS Game Tutorial | Unity | Episode 30 - Fog of War
+- Try to make it so if an enemy unit was in field of vision, but then player moves and can't see that unit any more, the enemy is still rendered in that spot until they are seen again
+- - - maybe display number of turns since that unit was seen above the enemy?
+- - - make the enemy blurred out, or changed to black/white/greyscale colors to indicate you don't see them any more
+- - - Fog of war manager that tracks what enemy units are visibile, and which ones are not
+- - - - - - when a unit is no longer visibile, manager spawns the greyscale object. tags it as the enemy unit that left field of vision
+- - - - - - when a unit is seen again, check against list of greyscale objects. If there is a greyscale object for the newly seen unit, delete the greyscale object

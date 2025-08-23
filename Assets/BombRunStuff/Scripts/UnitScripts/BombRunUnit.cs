@@ -28,6 +28,7 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] private UnitType _unitType;
     [SerializeField] private bool _isEnemy;
     [SerializeField] private DamageMode _damageMode;
+    [SerializeField] private int _sightRange = 10;
 
     [Header("Unit Health Stuff")]
     [SerializeField] private BombRunUnitHealthSystem _healthSystem;
@@ -303,5 +304,9 @@ public class BombRunUnit : MonoBehaviour
         }
 
         _damageMode = damageMode;
+    }
+    public int GetSightRange()
+    {
+        return _sightRange;
     }
 }

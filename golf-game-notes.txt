@@ -778,3 +778,7 @@ x some sort of controls UI to show the player how to use controls
 - - x Both tee markers placed?
 - - x Aim points and their positions
 - - - - - x show distance from tee off for each aim point?
+
+### Misc extras
+- Create a loading screen when building out tilemap for new holes?
+- - - https://www.youtube.com/watch?v=iXWFTgFNRdM - Designing a Loading Screen in Unity
