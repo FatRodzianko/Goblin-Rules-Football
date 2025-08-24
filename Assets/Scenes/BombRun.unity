@@ -20009,7 +20009,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: abdc3e3f250316544820a8197e3dfacb, type: 2}
     - target: {fileID: 2692160834791816643, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2898562228658105131, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _maxThrowDistance
@@ -20058,6 +20058,10 @@ PrefabInstance:
     - target: {fileID: 3006723863001832530, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3336434522842753539, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: _rayCount
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _actionPoints
@@ -23366,9 +23370,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0
-    width: 1
-    height: 1
+    y: 0.041666668
+    width: 0.25
+    height: 0.25
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 90

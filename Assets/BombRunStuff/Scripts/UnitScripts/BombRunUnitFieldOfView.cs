@@ -28,6 +28,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         _mesh = new Mesh();
         _meshFilter.mesh = _mesh;
+
+        //_startingAngle = GetAngleFromVectorFloat(new Vector3(-1, 0, 0));
     }
     private void LateUpdate()
     {
@@ -36,7 +38,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         // setup field of view parameters
         //Vector3 origin = Vector3.zero;
         _origin = _unit.transform.position;
-        float angle = 0f;
+
+        Vector3 dirToMouse = (LevelGrid.Instance.GetWorldPosition(MouseWorld.instance.GetCurrentMouseGridPosition()) - _origin).normalized;
+        SetAimDirection(dirToMouse);
+        float angle = _startingAngle;
         float angleIncrease = _fov / _rayCount;
         float viewDistance = _unit.GetSightRange() * LevelGrid.Instance.GetGridCellSize();
 
@@ -95,7 +100,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     }
     public void SetAimDirection(Vector3 aimDirection)
     {
-        _startingAngle = GetAngleFromVectorFloat(aimDirection) - _fov / 2f;
+        _startingAngle = GetAngleFromVectorFloat(aimDirection) + _fov / 2f;
     }
     public Vector3 GetVectorFromAngle(float angle)
     {
@@ -107,10 +112,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         dir = dir.normalized;
         float n = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        if (n < 0)
-        {
-            n += 360;
-        }
+        if (n < 0) n += 360;
         return n;
     }
 }
