@@ -1,22 +1,29 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BombRunUnitFieldOfView : MonoBehaviour
 {
+    [SerializeField] private BombRunUnit _unit;
+
     [Header("FOV Parameters")]
     [SerializeField] private int _rayCount = 50;
     [SerializeField] private float _fov = 90f;
     [SerializeField] private MeshFilter _meshFilter;
 
+    
     [Header("Raycast stuff?")]
     [SerializeField] private LayerMask _blockingLayers;
     private Vector3 _origin = Vector3.zero;
     private float _startingAngle = 0f;
     private Mesh _mesh;
 
+    [Header("Unit movement and other triggers for mesh creation")]
+    [SerializeField] private bool _isMoving = false;
 
-    [SerializeField] private BombRunUnit _unit;
+
+    
     private void Awake()
     {
         if (_meshFilter == null)
@@ -29,18 +36,54 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         _mesh = new Mesh();
         _meshFilter.mesh = _mesh;
 
-        //_startingAngle = GetAngleFromVectorFloat(new Vector3(-1, 0, 0));
+        // subscribe to events?
+        _unit.OnActionDirectionChanged += Unit_OnActionDirectionChanged;
+        if (_unit.TryGetComponent<MoveAction>(out MoveAction moveAction))
+        {
+            moveAction.OnStartMoving += MoveAction_OnStartMoving;
+            moveAction.OnStopMoving += MoveAction_OnStopMoving;
+        }
+
+        SetAimDirection(_unit.GetActionDirection());
+        UpdateFOVMesh();
+    }    
+
+    private void OnDisable()
+    {
+        _unit.OnActionDirectionChanged -= Unit_OnActionDirectionChanged;
+        if (_unit.TryGetComponent<MoveAction>(out MoveAction moveAction))
+        {
+            moveAction.OnStartMoving -= MoveAction_OnStartMoving;
+            moveAction.OnStopMoving -= MoveAction_OnStopMoving;
+        }
     }
+
+    private void MoveAction_OnStartMoving(object sender, EventArgs e)
+    {
+        _isMoving = true;
+    }
+    private void MoveAction_OnStopMoving(object sender, EventArgs e)
+    {
+        _isMoving = false;
+    }
+
+
     private void LateUpdate()
     {
-        
 
+        if (!_isMoving)
+            return;
+        UpdateFOVMesh();
+    }
+    private void UpdateFOVMesh()
+    {
         // setup field of view parameters
         //Vector3 origin = Vector3.zero;
         _origin = _unit.transform.position;
 
-        Vector3 dirToMouse = (LevelGrid.Instance.GetWorldPosition(MouseWorld.instance.GetCurrentMouseGridPosition()) - _origin).normalized;
-        SetAimDirection(dirToMouse);
+        // for testing: aim direction will be where mouse is relative to unit
+        //Vector3 dirToMouse = (LevelGrid.Instance.GetWorldPosition(MouseWorld.instance.GetCurrentMouseGridPosition()) - _origin).normalized;
+        //SetAimDirection(dirToMouse);
         float angle = _startingAngle;
         float angleIncrease = _fov / _rayCount;
         float viewDistance = _unit.GetSightRange() * LevelGrid.Instance.GetGridCellSize();
@@ -97,6 +140,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     public void SetOrigin(Vector3 origin)
     {
         this._origin = origin;
+    }
+    private void Unit_OnActionDirectionChanged(object sender, Vector2 actionDirection)
+    {
+        SetAimDirection(actionDirection);
     }
     public void SetAimDirection(Vector3 aimDirection)
     {

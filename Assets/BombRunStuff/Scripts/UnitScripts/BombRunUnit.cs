@@ -21,6 +21,7 @@ public class BombRunUnit : MonoBehaviour
     // non-static events
     public event EventHandler<BaseAction> OnActionTaken;
     public event EventHandler<DamageMode> OnDamageModeChanged;
+    public event EventHandler<Vector2> OnActionDirectionChanged;
 
     [Header("Unit Info")]
     //[SerializeField] private int _startingHealth = 100;
@@ -41,6 +42,9 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] private int _actionPoints = ACTION_POINTS_MAX;
     [SerializeField] private List<BaseAction> _actionsTakenThisTurn = new List<BaseAction>();
 
+    [Header("Action Information")]
+    [SerializeField] private Vector2 _actionDirection = Vector2.zero;
+
     [Header("Animation Stuff")]
     [SerializeField] private BombRunUnitAnimator _animator;
 
@@ -49,6 +53,14 @@ public class BombRunUnit : MonoBehaviour
         _baseActionArray = GetComponents<BaseAction>();
         if (_healthSystem == null)
             _healthSystem = GetComponent<BombRunUnitHealthSystem>();
+        if (_animator.GetSpriteFlipX())
+        {
+            SetActionDirection(new Vector2(-1, 0));
+        }
+        else
+        {
+            SetActionDirection(new Vector2(1, 0));
+        }
     }
     private void Start()
     {
@@ -308,5 +320,14 @@ public class BombRunUnit : MonoBehaviour
     public int GetSightRange()
     {
         return _sightRange;
+    }
+    public Vector2 GetActionDirection()
+    {
+        return _actionDirection;
+    }
+    public void SetActionDirection(Vector2 direction)
+    {
+        _actionDirection = direction;
+        OnActionDirectionChanged?.Invoke(this, _actionDirection);
     }
 }
