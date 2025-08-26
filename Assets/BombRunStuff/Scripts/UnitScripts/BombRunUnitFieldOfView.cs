@@ -144,6 +144,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     private void Unit_OnActionDirectionChanged(object sender, Vector2 actionDirection)
     {
         SetAimDirection(actionDirection);
+        if(!_isMoving)
+            UpdateFOVMesh();
     }
     public void SetAimDirection(Vector3 aimDirection)
     {

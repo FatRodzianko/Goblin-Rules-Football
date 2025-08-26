@@ -622,6 +622,7 @@ public class ShootAction : BaseAction
     {
         //_onActionComplete = onActionComplete;
         Debug.Log("Shoot Action: TakeAction: Target Body Part: " + bodyPart);
+        _unit.SetActionDirection(LevelGrid.Instance.GetWorldPosition(gridPosition) - LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition()));
 
         this._targetBodyPart = bodyPart;
 

@@ -327,7 +327,7 @@ public class BombRunUnit : MonoBehaviour
     }
     public void SetActionDirection(Vector2 direction)
     {
-        _actionDirection = direction;
+        _actionDirection = direction.normalized;
         OnActionDirectionChanged?.Invoke(this, _actionDirection);
     }
 }

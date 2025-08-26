@@ -95,6 +95,7 @@ public class GrenadeAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.None)
     {
         Debug.Log("TakeAction: Grenade Action");
+        _unit.SetActionDirection(LevelGrid.Instance.GetWorldPosition(gridPosition) - LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition()));
         // Spawn the grenade projectile
         Transform grenadeProjectileTransform = Instantiate(_grenadeProjectilePrefab, _unit.GetWorldPosition(), Quaternion.identity);
         GrenadeProjectile grenadeProjectileScript = grenadeProjectileTransform.GetComponent<GrenadeProjectile>();

@@ -63,9 +63,10 @@ public class MoveAction : BaseAction
             return;
 
         _targetPosition = _positionList[_currentPositionIndex];
-        if (Vector2.Distance(transform.position, _targetPosition) > _stoppingDistance)
+        Vector3 unitPosition = this.transform.position;
+        if (Vector2.Distance(unitPosition, _targetPosition) > _stoppingDistance)
         {
-            Vector3 moveDirection = (_targetPosition - this.transform.position).normalized;
+            Vector3 moveDirection = (_targetPosition - unitPosition).normalized;
 
             CheckIfSpriteShouldFlip(moveDirection);
 
@@ -81,6 +82,10 @@ public class MoveAction : BaseAction
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
                 //_onActionComplete();
                 ActionComplete();
+            }
+            else
+            {
+                _unit.SetActionDirection(_positionList[_currentPositionIndex] - LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition()));
             }
             
         }

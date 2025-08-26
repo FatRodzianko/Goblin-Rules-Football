@@ -282,6 +282,7 @@ public class SwordAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.None)
     {
         Debug.Log("TakeAction: SwordAction");
+        _unit.SetActionDirection(LevelGrid.Instance.GetWorldPosition(gridPosition) - LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition()));
 
         _targetBodyPart = bodyPart;
 
