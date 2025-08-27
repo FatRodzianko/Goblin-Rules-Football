@@ -149,7 +149,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     }
     public void SetAimDirection(Vector3 aimDirection)
     {
-        _startingAngle = GetAngleFromVectorFloat(aimDirection) + _fov / 2f;
+        _startingAngle = GetAngleFromVectorFloat(aimDirection.normalized, true) + _fov / 2f;
     }
     public Vector3 GetVectorFromAngle(float angle)
     {
@@ -157,11 +157,27 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         float angleRad = angle * (Mathf.PI / 180f);
         return new Vector3(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
     }
-    public float GetAngleFromVectorFloat(Vector3 dir)
+    public float GetAngleFromVectorFloat(Vector3 dir, bool forceEightDirections = false)
     {
         dir = dir.normalized;
         float n = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         if (n < 0) n += 360;
+
+        // https://www.reddit.com/r/Unity3D/comments/r2ykn2/new_unity_input_system_how_to_make_controller/
+        if (forceEightDirections)
+        {
+            n = Mathf.Round(n / 45.0f) * 45.0f;
+        }
+
         return n;
+    }
+    public Vector3 GetEightDirectionVector(Vector3 dir)
+    {
+        Vector3 newDirection = Vector3.zero;
+        if (dir.y > 0)
+        {
+            
+        }
+        return newDirection;
     }
 }

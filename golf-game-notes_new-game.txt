@@ -426,3 +426,5 @@ https://www.youtube.com/watch?v=TjFTgEpPnQg - RTS Game Tutorial | Unity | Episod
 - - - maybe only update the fov mesh every third frame or something? 
 - - - - - - have a running frame counter. If it is not divisible by 3, don't execute?
 - - - add event for wall object creation so the FOV mesh won't be created until those are all spawned?
+- convert action direction to 8 directions:
+- - - https://www.reddit.com/r/Unity2D/comments/10gbuqt/shooting_in_8_directions/
