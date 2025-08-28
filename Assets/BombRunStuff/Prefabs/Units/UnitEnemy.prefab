@@ -51,6 +51,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3336434522842753539, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: _meshRenderer
+      value: 
+      objectReference: {fileID: 2736487733719745571}
+    - target: {fileID: 3336434522842753539, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: _enemyFOVMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 07ee84ef4d51aba408bd1d2c73aad00f, type: 2}
+    - target: {fileID: 3336434522842753539, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: _friendlyFOVMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 4b6043eef17e6ef4f8d663ace3f8f17c, type: 2}
     - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _isEnemy
       value: 1
@@ -81,3 +93,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+--- !u!23 &2736487733719745571 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 769879967131768992, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+  m_PrefabInstance: {fileID: 3411156588788997251}
+  m_PrefabAsset: {fileID: 0}

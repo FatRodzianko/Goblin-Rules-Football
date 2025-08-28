@@ -22,8 +22,11 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     [Header("Unit movement and other triggers for mesh creation")]
     [SerializeField] private bool _isMoving = false;
 
+    [Header("FOV Materials and appearance")]
+    [SerializeField] private MeshRenderer _meshRenderer;
+    [SerializeField] private Material _friendlyFOVMaterial;
+    [SerializeField] private Material _enemyFOVMaterial;
 
-    
     private void Awake()
     {
         if (_meshFilter == null)
@@ -44,9 +47,14 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             moveAction.OnStopMoving += MoveAction_OnStopMoving;
         }
 
+        LevelGrid.Instance.OnWallsAndFloorsPlacedCompleted += LevelGrid_OnWallsAndFloorsPlacedCompleted;
+
+        SetFOVMaterial(_unit.IsEnemy());
         SetAimDirection(_unit.GetActionDirection());
         UpdateFOVMesh();
-    }    
+    }
+
+    
 
     private void OnDisable()
     {
@@ -56,8 +64,20 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             moveAction.OnStartMoving -= MoveAction_OnStartMoving;
             moveAction.OnStopMoving -= MoveAction_OnStopMoving;
         }
+        LevelGrid.Instance.OnWallsAndFloorsPlacedCompleted -= LevelGrid_OnWallsAndFloorsPlacedCompleted;
     }
+    private void SetFOVMaterial(bool isEnemy)
+    {
+        if (isEnemy)
+        {
+            _meshRenderer.material = _enemyFOVMaterial;
+        }
+        else
+        {
+            _meshRenderer.material = _friendlyFOVMaterial;
+        }
 
+    }
     private void MoveAction_OnStartMoving(object sender, EventArgs e)
     {
         _isMoving = true;
@@ -66,7 +86,11 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         _isMoving = false;
     }
-
+    private void LevelGrid_OnWallsAndFloorsPlacedCompleted(object sender, EventArgs e)
+    {
+        Debug.Log("LevelGrid_OnWallsAndFloorsPlacedCompleted: " + _unit.name);
+        UpdateFOVMesh();
+    }
 
     private void LateUpdate()
     {

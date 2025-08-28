@@ -19,6 +19,7 @@ public class LevelGrid : MonoBehaviour
 
     // events
     public event EventHandler OnAnyUnitMovedGridPosition;
+    public event EventHandler OnWallsAndFloorsPlacedCompleted;
 
     private void Awake()
     {
@@ -59,10 +60,14 @@ public class LevelGrid : MonoBehaviour
         // Set the tiles on the tile maps
         BombRunTileMapManager.Instance.SetGridSystem(_gridSystem);
         BombRunTileMapManager.Instance.AddFloorTilesFromGridSystem(_gridSystem);
+        OnWallsAndFloorsPlacedCompleted?.Invoke(this, EventArgs.Empty);
+        Debug.Log("LevelGrid: OnWallsAndFloorsPlacedCompleted: Invoked");
         BombRunTileMapManager.Instance.AddGridVisualDefaultFromGridSystem(_gridSystem);
 
         // Create the pathfinding grid
         PathFinding.Instance.Setup(_width, _height, _cellSize);
+
+
     }
     public void AddUnitAtGridPosition(GridPosition gridPosition, BombRunUnit unit)
     {

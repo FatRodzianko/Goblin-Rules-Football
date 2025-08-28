@@ -416,15 +416,24 @@ https://www.youtube.com/watch?v=TjFTgEpPnQg - RTS Game Tutorial | Unity | Episod
 - - - - - - when a unit is no longer visibile, manager spawns the greyscale object. tags it as the enemy unit that left field of vision
 - - - - - - when a unit is seen again, check against list of greyscale objects. If there is a greyscale object for the newly seen unit, delete the greyscale object
 - for field of view stuff
-- - - only update when the unit is moving
-- - - - - - create and listen to event for when your unit is moving. Then, call the field of view update function
+- - x only update when the unit is moving
+- - - - - x create and listen to event for when your unit is moving. Then, call the field of view update function
 - - - also update when a wall or obstacle is "changed" IE, door opened
 - - - - - - check all goblins within a range of the door that opened, tell them to update field of view
-- - - Set a "action direction" for each action. This will be used for the field of view
-- - - - - - when using Move, update action based on direction to next tile on the path
-- - - - - - for shoot/throw actions, get direction of target and convert to the 8 directions used
+- - x Set a "action direction" for each action. This will be used for the field of view
+- - - - - x when using Move, update action based on direction to next tile on the path
+- - - - - x for shoot/throw actions, get direction of target and convert to the 8 directions used
 - - - maybe only update the fov mesh every third frame or something? 
 - - - - - - have a running frame counter. If it is not divisible by 3, don't execute?
 - - - add event for wall object creation so the FOV mesh won't be created until those are all spawned?
 - convert action direction to 8 directions:
 - - - https://www.reddit.com/r/Unity2D/comments/10gbuqt/shooting_in_8_directions/
+
+### controlling execution flow of level initialization
+- Create some sort of "LevelInitializationManager," or whatever I name it, that kicks off the level initialization tasks in a specific order
+- - - Start with setting up the level environment
+- - - - - - Spawn floor tiles
+- - - - - - Spawn Wall tiles and Wall objects
+- - - - - - Spawn objects/Interactables
+- - - Setup the pathfinding grid
+- - - Then spawn units

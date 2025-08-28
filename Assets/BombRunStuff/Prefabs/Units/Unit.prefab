@@ -644,7 +644,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8226614046226594983
 Transform:
   m_ObjectHideFlags: 0
@@ -680,6 +680,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1073741824
   _isMoving: 0
+  _meshRenderer: {fileID: 769879967131768992}
+  _friendlyFOVMaterial: {fileID: 2100000, guid: 4b6043eef17e6ef4f8d663ace3f8f17c, type: 2}
+  _enemyFOVMaterial: {fileID: 2100000, guid: 07ee84ef4d51aba408bd1d2c73aad00f, type: 2}
 --- !u!33 &3444733318118800621
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -708,7 +711,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 07ee84ef4d51aba408bd1d2c73aad00f, type: 2}
+  - {fileID: 2100000, guid: 4b6043eef17e6ef4f8d663ace3f8f17c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
