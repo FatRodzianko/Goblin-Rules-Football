@@ -22,6 +22,8 @@ public class ActionGridVisualManager : MonoBehaviour
         Yellow,
         RedSoft
     }
+    public static ActionGridVisualManager Instance { get; private set; }
+
 
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _actionVisualsTileMap;
@@ -38,17 +40,31 @@ public class ActionGridVisualManager : MonoBehaviour
 
     [SerializeField] private List<GridVisualTypeColor> _gridVisualTypeColorList;
 
+    private void Awake()
+    {
+        MakeInstance();
+    }
+    void MakeInstance()
+    {
+        if (Instance != null)
+        {
+            Debug.Log("MakeInstance: more than one ActionGridVisualManager. Destroying...");
+            Destroy(this);
+            return;
+        }
+        Instance = this;
+    }
     private void Start()
     {
         // event subscriptions
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
 
-        // cache the grid system?
-        _gridSystem = LevelGrid.Instance.GetGridObjectGridSystem();
+        //// cache the grid system?
+        //_gridSystem = LevelGrid.Instance.GetGridObjectGridSystem();
 
-        // Update the action visuals for the initially selected unit and selected action
-        UpdateActionVisuals();
+        //// Update the action visuals for the initially selected unit and selected action
+        //UpdateActionVisuals();
     }
 
     
@@ -59,7 +75,15 @@ public class ActionGridVisualManager : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedActionChanged -= UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnBusyChanged -= UnitActionSystem_OnBusyChanged;
     }
-    
+    public void InitializeActionGridVisualManager()
+    {
+        // cache the grid system?
+        _gridSystem = LevelGrid.Instance.GetGridObjectGridSystem();
+
+        // Update the action visuals for the initially selected unit and selected action
+        UpdateActionVisuals();
+    }
+
 
     public void AddActionVisualToGridPosition(GridPosition gridPosition, Tile gridVisual, Color color)
     {

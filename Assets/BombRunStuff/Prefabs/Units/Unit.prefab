@@ -676,9 +676,12 @@ MonoBehaviour:
   _rayCount: 15
   _fov: 90
   _meshFilter: {fileID: 3444733318118800621}
-  _blockingLayers:
+  _blockingLayer:
     serializedVersion: 2
-    m_Bits: 1073741824
+    m_Bits: 1207959552
+  _obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 134217728
   _isMoving: 0
   _meshRenderer: {fileID: 769879967131768992}
   _friendlyFOVMaterial: {fileID: 2100000, guid: 4b6043eef17e6ef4f8d663ace3f8f17c, type: 2}
@@ -1139,6 +1142,7 @@ MonoBehaviour:
   _actionsTakenThisTurn: []
   _actionDirection: {x: 0, y: 0}
   _animator: {fileID: 5320209574301914813}
+  _bombRunUnitFieldOfView: {fileID: 3336434522842753539}
 --- !u!114 &7297105716296972232
 MonoBehaviour:
   m_ObjectHideFlags: 0

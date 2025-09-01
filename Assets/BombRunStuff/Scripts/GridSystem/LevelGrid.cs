@@ -25,16 +25,17 @@ public class LevelGrid : MonoBehaviour
     {
         MakeInstance();
 
-        if (_isHex)
-        {
-            _gridSystem = new GridSystemHex<GridObject>(_width, _height, _cellSize,
-            (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
-        }
-        else
-        {
-            _gridSystem = new GridSystem<GridObject>(_width, _height, _cellSize,
-            (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
-        }
+        //CreateLevelGrid();
+        //if (_isHex)
+        //{
+        //    _gridSystem = new GridSystemHex<GridObject>(_width, _height, _cellSize,
+        //    (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
+        //}
+        //else
+        //{
+        //    _gridSystem = new GridSystem<GridObject>(_width, _height, _cellSize,
+        //    (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
+        //}
         
 
 
@@ -57,17 +58,25 @@ public class LevelGrid : MonoBehaviour
     }
     private void Start()
     {
-        // Set the tiles on the tile maps
-        BombRunTileMapManager.Instance.SetGridSystem(_gridSystem);
-        BombRunTileMapManager.Instance.AddFloorTilesFromGridSystem(_gridSystem);
-        OnWallsAndFloorsPlacedCompleted?.Invoke(this, EventArgs.Empty);
-        Debug.Log("LevelGrid: OnWallsAndFloorsPlacedCompleted: Invoked");
-        BombRunTileMapManager.Instance.AddGridVisualDefaultFromGridSystem(_gridSystem);
+        
 
         // Create the pathfinding grid
-        PathFinding.Instance.Setup(_width, _height, _cellSize);
+        //PathFinding.Instance.Setup(_width, _height, _cellSize);
 
 
+    }
+    public void CreateLevelGrid()
+    {
+        if (_isHex)
+        {
+            _gridSystem = new GridSystemHex<GridObject>(_width, _height, _cellSize,
+            (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
+        }
+        else
+        {
+            _gridSystem = new GridSystem<GridObject>(_width, _height, _cellSize,
+            (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
+        }
     }
     public void AddUnitAtGridPosition(GridPosition gridPosition, BombRunUnit unit)
     {

@@ -135,6 +135,7 @@ public class BombRunTileMapManager : MonoBehaviour
     }
     private void UpdateWallAndObstaclePositionLists()
     {
+        Debug.Log("BombRunTileMapManageR: UpdateWallAndObstaclePositionLists");
         for (int x = 0; x < _gridSystem.GetWidth(); x++)
         {
             for (int y = 0; y < _gridSystem.GetHeight(); y++)

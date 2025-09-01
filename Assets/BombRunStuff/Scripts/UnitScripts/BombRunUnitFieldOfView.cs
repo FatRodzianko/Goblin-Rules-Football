@@ -11,10 +11,12 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     [SerializeField] private int _rayCount = 50;
     [SerializeField] private float _fov = 90f;
     [SerializeField] private MeshFilter _meshFilter;
+    private int _frameCounter = 0;
 
     
     [Header("Raycast stuff?")]
-    [SerializeField] private LayerMask _blockingLayers;
+    [SerializeField] private LayerMask _blockingLayer;
+    [SerializeField] private LayerMask _obstacleLayer;
     private Vector3 _origin = Vector3.zero;
     private float _startingAngle = 0f;
     private Mesh _mesh;
@@ -36,8 +38,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     }
     private void Start()
     {
-        _mesh = new Mesh();
-        _meshFilter.mesh = _mesh;
+        //_mesh = new Mesh();
+        //_meshFilter.mesh = _mesh;
 
         // subscribe to events?
         _unit.OnActionDirectionChanged += Unit_OnActionDirectionChanged;
@@ -49,9 +51,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         LevelGrid.Instance.OnWallsAndFloorsPlacedCompleted += LevelGrid_OnWallsAndFloorsPlacedCompleted;
 
-        SetFOVMaterial(_unit.IsEnemy());
-        SetAimDirection(_unit.GetActionDirection());
-        UpdateFOVMesh();
+        //SetFOVMaterial(_unit.IsEnemy());
+        //SetAimDirection(_unit.GetActionDirection());
+        //UpdateFOVMesh();
     }
 
     
@@ -65,6 +67,23 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             moveAction.OnStopMoving -= MoveAction_OnStopMoving;
         }
         LevelGrid.Instance.OnWallsAndFloorsPlacedCompleted -= LevelGrid_OnWallsAndFloorsPlacedCompleted;
+    }
+    public void InitializeFOV()
+    {
+        _mesh = new Mesh();
+        _meshFilter.mesh = _mesh;
+
+        SetFOVMaterial(_unit.IsEnemy());
+        SetAimDirection(_unit.GetActionDirection());
+        //UpdateFOVMesh();
+        StartCoroutine(DelayForWallCollidersToSpawn(0.25f));
+    }
+    
+    IEnumerator DelayForWallCollidersToSpawn(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        //Debug.Log("DelayForWallCollidersToSpawn: waited for " + waitTime);
+        UpdateFOVMesh();
     }
     private void SetFOVMaterial(bool isEnemy)
     {
@@ -98,6 +117,17 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         if (!_isMoving)
             return;
         UpdateFOVMesh();
+        //if (_frameCounter == 0)
+        //{
+        //    UpdateFOVMesh();
+        //}
+        //if (_frameCounter >= 2)
+        //{
+        //    _frameCounter = 0;
+        //    return;
+        //}
+        //_frameCounter++;
+        
     }
     private void UpdateFOVMesh()
     {
@@ -128,7 +158,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             //Debug.Log("FieldOfView: Vertex index: " + vertexIndex.ToString() + " with max verticies: " + vertices.Length.ToString() + " for unit: " + _unit.name);
             Vector3 vertex;
             // raycast from origin and check for collisions
-            RaycastHit2D raycastHit2D = Physics2D.Raycast(_origin, GetVectorFromAngle(angle), viewDistance, _blockingLayers);
+            RaycastHit2D raycastHit2D = Physics2D.Raycast(_origin, GetVectorFromAngle(angle), viewDistance, _blockingLayer);
 
             if (raycastHit2D.collider == null)
             {
@@ -137,8 +167,39 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             else
             {
                 //Debug.Log("FieldOfView: raycast hit at: " + raycastHit2D.point.ToString() + " on " + raycastHit2D.collider.name);
-                vertex = raycastHit2D.point;
+                //if (raycastHit2D.transform.gameObject.layer == _obstacleLayer)
+                //{
+                                       
+                    
+                //}
+
+                if (raycastHit2D.transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
+                {
+                    if (obstacle.IsWalkable())
+                    {
+                        vertex = _origin + GetVectorFromAngle(angle) * viewDistance;
+                    }
+                    else
+                    {
+                        if (obstacle.GetObstacleCoverType() == ObstacleCoverType.Full)
+                        {
+                            vertex = raycastHit2D.point;
+                        }
+                        else
+                        {
+                            vertex = _origin + GetVectorFromAngle(angle) * viewDistance;
+                        }
+                    }
+                }
+                else
+                {
+                    vertex = raycastHit2D.point;
+                }
+                //vertex = raycastHit2D.point;
             }
+
+
+
             vertices[vertexIndex] = vertex;
 
             if (i > 0)

@@ -48,6 +48,9 @@ public class BombRunUnit : MonoBehaviour
     [Header("Animation Stuff")]
     [SerializeField] private BombRunUnitAnimator _animator;
 
+    [Header("FOV Stuff?")]
+    [SerializeField] private BombRunUnitFieldOfView _bombRunUnitFieldOfView;
+
     private void Awake()
     {
         _baseActionArray = GetComponents<BaseAction>();
@@ -61,23 +64,41 @@ public class BombRunUnit : MonoBehaviour
         {
             SetActionDirection(new Vector2(1, 0));
         }
+
+        if (_bombRunUnitFieldOfView == null)
+        {
+            _bombRunUnitFieldOfView = this.transform.GetComponentInChildren<BombRunUnitFieldOfView>();
+        }
     }
     private void Start()
     {
-        _gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
-        Debug.Log("BombRunUnit: Start: " + this.name + ": Starting position at: " + _gridPosition.ToString());
-        LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
+        //_gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
+        //Debug.Log("BombRunUnit: Start: " + this.name + ": Starting position at: " + _gridPosition.ToString());
+        //LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
 
-        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
-        _healthSystem.OnDead += HealthSystem_OnDead;
+        //TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+        //_healthSystem.OnDead += HealthSystem_OnDead;
 
-        OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);        
+        //OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);        
     }
 
     private void OnDisable()
     {
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
         _healthSystem.OnDead -= HealthSystem_OnDead;
+    }
+    public void InitializeBombRunUnit()
+    {
+        _gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
+        Debug.Log("BombRunUnit: InitializeBombRunUnit: " + this.name + ": Starting position at: " + _gridPosition.ToString());
+        LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
+
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+        _healthSystem.OnDead += HealthSystem_OnDead;
+
+        _bombRunUnitFieldOfView.InitializeFOV();
+
+        OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
     }
     private void Update()
     {

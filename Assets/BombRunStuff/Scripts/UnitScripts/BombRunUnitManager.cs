@@ -37,6 +37,25 @@ public class BombRunUnitManager : MonoBehaviour
         BombRunUnit.OnAnyUnitSpawned -= BombRunUnit_OnAnyUnitSpawned;
         BombRunUnit.OnAnyUnitDied -= BombRunUnit_OnAnyUnitDied;
     }
+    public void InitializeBombRunUnits()
+    {
+        // Place holder for now. In a real game the units would be spawned from level parameters. Right now, just find the units that exist in the scene, then "initialize" them
+        //SpawnUnits();
+        FindAndInitializeAllUnits();
+    }
+    private void FindAndInitializeAllUnits()
+    {
+        GameObject[] units = GameObject.FindGameObjectsWithTag("Goblin");
+        if (units.Length == 0)
+        {
+            Debug.LogError("BombRunUnitManager: FindAndInitializeAllUnits: No units found?");
+            return;
+        }
+        for (int i = 0; i < units.Length; i++)
+        {
+            units[i].GetComponent<BombRunUnit>().InitializeBombRunUnit();
+        }
+    }
     private void BombRunUnit_OnAnyUnitSpawned(object sender, EventArgs e)
     {
         BombRunUnit unit = sender as BombRunUnit;

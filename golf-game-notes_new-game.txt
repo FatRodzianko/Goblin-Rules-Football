@@ -332,9 +332,9 @@ x Add sub action to sword action
 - - - - - x switch to mode with the higher value, if necessary
 - - - - - - - - x if unit is in damage mode, but heal has greater value, then switch
 - - - - - - - - x if unit is in damage mode, and damage has greater value, then don't switch. Set action value to 0
-- Update AI action on Shoot Action to check if it is damage mode or healing mode, and medic mode
-- - - Currently it only makes checks for damage mode, or at least only makes calculations based on target being an enemy you want to damage
-- - - create three new functions that all return an action value and a target body part
+x Update AI action on Shoot Action to check if it is damage mode or healing mode, and medic mode
+- - x Currently it only makes checks for damage mode, or at least only makes calculations based on target being an enemy you want to damage
+- - x create three new functions that all return an action value and a target body part
 - - - - - - Medic Mode Check
 - - - - - - - - x check if target is enemy or friendly. If friendly, run heal check. If enemy, run damage check
 - - - - - - - - x for heal check, add a bonus to the action value to make medics more likely to pick the heal action?
@@ -363,6 +363,8 @@ x When doing shoot action, prompt player to choose what body part to shoot befor
 - - - may be computationally expensive...
 - - - will want to save the line points that are being drawn so when the player clicks, the unit takes those points that were shown
 - - - - - - this is in case there are two paths with the same path score, you don't want to draw the line for one and then when the player clicks, it takes the other equal valued path?
+- minimap?
+- - - https://www.youtube.com/watch?v=narnR_WeJW8
 
 
 ### Special unit/enemy types
@@ -423,17 +425,18 @@ https://www.youtube.com/watch?v=TjFTgEpPnQg - RTS Game Tutorial | Unity | Episod
 - - x Set a "action direction" for each action. This will be used for the field of view
 - - - - - x when using Move, update action based on direction to next tile on the path
 - - - - - x for shoot/throw actions, get direction of target and convert to the 8 directions used
-- - - maybe only update the fov mesh every third frame or something? 
+- - x maybe only update the fov mesh every third frame or something? 
 - - - - - - have a running frame counter. If it is not divisible by 3, don't execute?
-- - - add event for wall object creation so the FOV mesh won't be created until those are all spawned?
+- - x add event for wall object creation so the FOV mesh won't be created until those are all spawned?
 - convert action direction to 8 directions:
 - - - https://www.reddit.com/r/Unity2D/comments/10gbuqt/shooting_in_8_directions/
 
 ### controlling execution flow of level initialization
-- Create some sort of "LevelInitializationManager," or whatever I name it, that kicks off the level initialization tasks in a specific order
-- - - Start with setting up the level environment
-- - - - - - Spawn floor tiles
-- - - - - - Spawn Wall tiles and Wall objects
-- - - - - - Spawn objects/Interactables
-- - - Setup the pathfinding grid
-- - - Then spawn units
+x Create some sort of "LevelInitializationManager," or whatever I name it, that kicks off the level initialization tasks in a specific order
+- - x Start with setting up the level environment
+- - - - - x Create level grid
+- - - - - x Spawn floor tiles
+- - - - - x Spawn Wall tiles and Wall objects
+- - - - - x Spawn objects/Interactables
+- - x Setup the pathfinding grid
+- - x Then spawn units
