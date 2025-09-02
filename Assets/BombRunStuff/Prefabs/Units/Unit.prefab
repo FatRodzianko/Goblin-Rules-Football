@@ -679,6 +679,11 @@ MonoBehaviour:
   _blockingLayer:
     serializedVersion: 2
     m_Bits: 1207959552
+  _blockingLayers:
+  - serializedVersion: 2
+    m_Bits: 1073741824
+  - serializedVersion: 2
+    m_Bits: 134217728
   _obstacleLayer:
     serializedVersion: 2
     m_Bits: 134217728

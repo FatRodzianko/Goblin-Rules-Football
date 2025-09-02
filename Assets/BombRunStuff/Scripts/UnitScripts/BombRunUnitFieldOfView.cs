@@ -16,6 +16,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     
     [Header("Raycast stuff?")]
     [SerializeField] private LayerMask _blockingLayer;
+    [SerializeField] private List<LayerMask> _blockingLayers = new List<LayerMask>();
     [SerializeField] private LayerMask _obstacleLayer;
     private Vector3 _origin = Vector3.zero;
     private float _startingAngle = 0f;
@@ -76,7 +77,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         SetFOVMaterial(_unit.IsEnemy());
         SetAimDirection(_unit.GetActionDirection());
         //UpdateFOVMesh();
-        StartCoroutine(DelayForWallCollidersToSpawn(0.25f));
+        if(isActiveAndEnabled)
+            StartCoroutine(DelayForWallCollidersToSpawn(0.25f));
     }
     
     IEnumerator DelayForWallCollidersToSpawn(float waitTime)
@@ -134,6 +136,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         // setup field of view parameters
         //Vector3 origin = Vector3.zero;
         _origin = _unit.transform.position;
+        //_origin = LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition());
 
         // for testing: aim direction will be where mouse is relative to unit
         //Vector3 dirToMouse = (LevelGrid.Instance.GetWorldPosition(MouseWorld.instance.GetCurrentMouseGridPosition()) - _origin).normalized;
@@ -156,47 +159,121 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         for (int i = 0; i <= _rayCount; i++)
         {
             //Debug.Log("FieldOfView: Vertex index: " + vertexIndex.ToString() + " with max verticies: " + vertices.Length.ToString() + " for unit: " + _unit.name);
-            Vector3 vertex;
-            // raycast from origin and check for collisions
-            RaycastHit2D raycastHit2D = Physics2D.Raycast(_origin, GetVectorFromAngle(angle), viewDistance, _blockingLayer);
+            Vector3 vectorFromAngle = GetVectorFromAngle(angle);
+            Vector3 vertex = _origin + vectorFromAngle * viewDistance;
 
-            if (raycastHit2D.collider == null)
+            float closestHitDistance = 0f;
+            bool firstIteration = true;
+            foreach (LayerMask layerMask in _blockingLayers)
             {
-                vertex = _origin + GetVectorFromAngle(angle) * viewDistance;
-            }
-            else
-            {
-                //Debug.Log("FieldOfView: raycast hit at: " + raycastHit2D.point.ToString() + " on " + raycastHit2D.collider.name);
-                //if (raycastHit2D.transform.gameObject.layer == _obstacleLayer)
-                //{
-                                       
-                    
-                //}
-
-                if (raycastHit2D.transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
+                RaycastHit2D raycastHit2D = Physics2D.Raycast(_origin, vectorFromAngle, viewDistance, layerMask);
+                if (raycastHit2D.collider == null)
+                    continue;
+                if (layerMask == _obstacleLayer)
                 {
-                    if (obstacle.IsWalkable())
+                    if (raycastHit2D.transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
                     {
-                        vertex = _origin + GetVectorFromAngle(angle) * viewDistance;
-                    }
-                    else
-                    {
-                        if (obstacle.GetObstacleCoverType() == ObstacleCoverType.Full)
+                        if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
                         {
-                            vertex = raycastHit2D.point;
-                        }
-                        else
-                        {
-                            vertex = _origin + GetVectorFromAngle(angle) * viewDistance;
+                            continue;
                         }
                     }
                 }
-                else
+                float newDistance = Vector2.Distance(_origin, raycastHit2D.point);
+                if (firstIteration)
                 {
+                    closestHitDistance = newDistance;
+                    vertex = raycastHit2D.point;
+                    firstIteration = false;
+                    continue;
+                }
+                if (newDistance <= closestHitDistance)
+                {
+                    closestHitDistance = newDistance;
                     vertex = raycastHit2D.point;
                 }
-                //vertex = raycastHit2D.point;
+                
             }
+
+            //// raycast from origin and check for collisions
+            //RaycastHit2D[] raycastHits2D = Physics2D.RaycastAll(_origin, vectorFromAngle, viewDistance, _blockingLayer);
+            //if (raycastHits2D.Length > 0)
+            //{
+            //    float closestHitDistance = 0f;
+            //    for (int j = 0; j < raycastHits2D.Length; j++)
+            //    {
+            //        if (raycastHits2D[j].transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
+            //        {
+            //            //Debug.Log("UpdateFOVMesh: Hit obstacle: " + raycastHits2D[j].collider.name);
+            //            if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
+            //            {
+            //                continue;
+            //            }
+            //        }
+
+            //        if (j == 0)
+            //        {
+            //            vertex = raycastHits2D[j].point;
+            //            if (raycastHits2D.Length > 1)
+            //            {
+            //                closestHitDistance = Vector2.Distance(_origin, raycastHits2D[j].point);
+            //            }
+            //            continue;
+            //        }
+            //        float newDistance = Vector2.Distance(_origin, raycastHits2D[j].point);
+            //        if (newDistance <= closestHitDistance)
+            //        {
+            //            if (raycastHits2D[j].collider.tag == "BombRunObstacle")
+            //            {
+            //                Debug.Break();   
+            //                continue;
+            //            }
+            //            closestHitDistance = newDistance;
+            //            vertex = raycastHits2D[j].point;
+            //        }
+
+            //    }
+            //}
+
+
+            //RaycastHit2D raycastHit2D = Physics2D.Raycast(_origin, vectorFromAngle, viewDistance, _blockingLayer);
+            //if (raycastHit2D.collider == null)
+            //{
+            //    vertex = _origin + GetVectorFromAngle(angle) * viewDistance;
+            //}
+            //else
+            //{
+            //    //Debug.Log("FieldOfView: raycast hit at: " + raycastHit2D.point.ToString() + " on " + raycastHit2D.collider.name);
+            //    //if (raycastHit2D.transform.gameObject.layer == _obstacleLayer)
+            //    //{
+
+
+            //    //}
+
+            //    if (raycastHit2D.transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
+            //    {
+            //        if (obstacle.IsWalkable())
+            //        {
+            //            vertex = _origin + GetVectorFromAngle(angle) * viewDistance;
+            //        }
+            //        else
+            //        {
+            //            if (obstacle.GetObstacleCoverType() == ObstacleCoverType.Full)
+            //            {
+            //                vertex = raycastHit2D.point;
+            //            }
+            //            else
+            //            {
+            //                vertex = _origin + GetVectorFromAngle(angle) * viewDistance;
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        vertex = raycastHit2D.point;
+            //    }
+            //vertex = raycastHit2D.point;
+            //}
 
 
 
