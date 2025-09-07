@@ -170,14 +170,21 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 RaycastHit2D raycastHit2D = Physics2D.Raycast(_origin, vectorFromAngle, viewDistance, layerMask);
                 if (raycastHit2D.collider == null)
                     continue;
-                if (layerMask == _obstacleLayer)
+                //if (layerMask == _obstacleLayer)
+                //{
+                //    if (raycastHit2D.transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
+                //    {
+                //        if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
+                //        {
+                //            continue;
+                //        }
+                //    }
+                //}
+                if (raycastHit2D.transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
                 {
-                    if (raycastHit2D.transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
+                    if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
                     {
-                        if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
-                        {
-                            continue;
-                        }
+                        continue;
                     }
                 }
                 float newDistance = Vector2.Distance(_origin, raycastHit2D.point);
@@ -279,10 +286,15 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         // check the angle from the player to the position. If it is outside of FOV, return false
         Vector3 directionToPosition = (position - unitPosition).normalized;
         SetAimDirection(_unit.GetActionDirection());
+        //Vector3 vectorFromAngle = GetVectorFromAngle(_startingAngle);
+        Vector3 vectorFromAngle = GetVectorFromAngle(GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
+        //float angle = Vector3.Angle(_unit.GetActionDirection(), directionToPosition);
+        float angle = Vector3.Angle(vectorFromAngle, directionToPosition);
         //if (Vector3.Angle(GetVectorFromAngle(_startingAngle), directionToPosition) > _fov / 2f)
-        if (Mathf.Abs(_startingAngle - GetAngleFromVectorFloat(directionToPosition)) > _fov / 2f)
+        //if (Mathf.Abs(_startingAngle - GetAngleFromVectorFloat(directionToPosition)) > _fov / 2f)
+        if (angle > _fov / 2f)
         {
-            Debug.Log("CanUnitSeePosition: " + this._unit.name + ": Position: " + position.ToString() + " is not in FOV: " + (_fov / 2f).ToString() + ":" + Vector3.Angle(GetVectorFromAngle(_startingAngle), directionToPosition).ToString());
+            Debug.Log("CanUnitSeePosition: " + this._unit.name + ": Position: " + position.ToString() + " is not in FOV: " + (_fov / 2f).ToString() + ":" + angle.ToString() + " starting angle: " + _startingAngle + " vector from starting angle: " + vectorFromAngle.ToString() + " unit action direction: " + _unit.GetActionDirection() + " angle from aim direction: " + GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
             return false;
         }
 
