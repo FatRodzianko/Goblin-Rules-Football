@@ -428,8 +428,8 @@ https://www.youtube.com/watch?v=TjFTgEpPnQg - RTS Game Tutorial | Unity | Episod
 - - x maybe only update the fov mesh every third frame or something? 
 - - - - - - have a running frame counter. If it is not divisible by 3, don't execute?
 - - x add event for wall object creation so the FOV mesh won't be created until those are all spawned?
-- convert action direction to 8 directions:
-- - - https://www.reddit.com/r/Unity2D/comments/10gbuqt/shooting_in_8_directions/
+x convert action direction to 8 directions:
+- - x https://www.reddit.com/r/Unity2D/comments/10gbuqt/shooting_in_8_directions/
 
 ### controlling execution flow of level initialization
 x Create some sort of "LevelInitializationManager," or whatever I name it, that kicks off the level initialization tasks in a specific order

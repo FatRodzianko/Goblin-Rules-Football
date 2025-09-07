@@ -8,8 +8,8 @@ public class BombRunUnitManager : MonoBehaviour
     public static BombRunUnitManager Instance { get; private set; }
 
     private List<BombRunUnit> _unitList = new List<BombRunUnit>();
-    private List<BombRunUnit> _friendlyUnitList = new List<BombRunUnit>();
-    private List<BombRunUnit> _enemyUnitList = new List<BombRunUnit>();
+    [SerializeField] private List<BombRunUnit> _friendlyUnitList = new List<BombRunUnit>();
+    [SerializeField] private List<BombRunUnit> _enemyUnitList = new List<BombRunUnit>();
 
     [SerializeField] private BombRunUnitActionValueManager _bombRunUnitActionValueManager;
 

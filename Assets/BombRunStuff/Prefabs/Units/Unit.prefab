@@ -687,6 +687,9 @@ MonoBehaviour:
   _obstacleLayer:
     serializedVersion: 2
     m_Bits: 134217728
+  _unitLayer:
+    serializedVersion: 2
+    m_Bits: 2048
   _isMoving: 0
   _meshRenderer: {fileID: 769879967131768992}
   _friendlyFOVMaterial: {fileID: 2100000, guid: 4b6043eef17e6ef4f8d663ace3f8f17c, type: 2}

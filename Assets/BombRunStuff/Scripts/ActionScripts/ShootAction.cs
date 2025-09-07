@@ -986,7 +986,7 @@ public class ShootAction : BaseAction
         // adjust action value based on frozen state and body part?
         if (targetBodyPartAndFrozenState.BodyPartFrozenState == BodyPartFrozenState.FullFrozen)
         {
-            actionValue += 750;
+            actionValue += 1000;
         }
 
         switch (targetBodyPartAndFrozenState.BodyPart)

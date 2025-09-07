@@ -17,6 +17,7 @@ public class BombRunUnit : MonoBehaviour
     public static event EventHandler OnAnyActionPointsChanged;
     public static event EventHandler OnAnyUnitSpawned;
     public static event EventHandler OnAnyUnitDied;
+    public static event EventHandler OnAnyUnitMovedGridPosition;
 
     // non-static events
     public event EventHandler<BaseAction> OnActionTaken;
@@ -109,7 +110,7 @@ public class BombRunUnit : MonoBehaviour
             GridPosition oldGridPosition = _gridPosition;
             _gridPosition = newGridPosition;
             LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
-            
+            OnAnyUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
         }
     }
     public T GetAction<T>() where T : BaseAction
@@ -350,5 +351,12 @@ public class BombRunUnit : MonoBehaviour
     {
         _actionDirection = direction.normalized;
         OnActionDirectionChanged?.Invoke(this, _actionDirection);
+    }
+    public bool CanUnitSeeThisPosition(GridPosition gridPosition)
+    {
+        bool canUnitSeeThisPosition = _bombRunUnitFieldOfView.CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
+        Debug.Log("CanUnitSeeThisPosition: " + this.name + " can see: " + gridPosition.ToString() +"?: " + canUnitSeeThisPosition);
+        //return _bombRunUnitFieldOfView.CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
+        return canUnitSeeThisPosition;
     }
 }
