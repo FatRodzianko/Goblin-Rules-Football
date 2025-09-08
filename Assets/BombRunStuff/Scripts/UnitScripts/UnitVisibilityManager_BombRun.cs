@@ -55,9 +55,12 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
         //{
         //    CheckIfMovedUnitCanBeSeen(unit, BombRunUnitManager.Instance.GetEnemyUnitList());
         //}
-        CheckIfMovedUnitCanBeSeen(unit);
+        if (!CheckIfMovedUnitCanBeSeen(unit))
+        {
+            RemoveUnitFromVisibilityList(unit);
+        }
     }
-    private bool CheckIfMovedUnitCanBeSeen(BombRunUnit unit, bool dontRemove = false)
+    private bool CheckIfMovedUnitCanBeSeen(BombRunUnit unit)
     {
         List<BombRunUnit> unitsToCheck = new List<BombRunUnit>();
         if (unit.IsEnemy())
@@ -85,9 +88,9 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             }
         }
 
-        // no units could see the moved unit
-        if(!dontRemove)
-            RemoveUnitFromVisibilityList(unit);
+        //// no units could see the moved unit
+        //if(!dontRemove)
+        //    RemoveUnitFromVisibilityList(unit);
         return false;
     }
     public void AddUnitToVisibilityList(BombRunUnit visibleUnit, BombRunUnit discoveringUnit)
@@ -141,7 +144,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             {
                 VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _visibileToPlayer.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
                 _visibileToPlayer.Remove(visibileUnitAndDiscoverer);
-                CheckIfMovedUnitCanBeSeen(visibleUnit, true);
+                CheckIfMovedUnitCanBeSeen(visibleUnit);
             }
         }
         else
@@ -150,7 +153,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             {
                 VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _visibileToEnemy.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
                 _visibileToEnemy.Remove(visibileUnitAndDiscoverer);
-                CheckIfMovedUnitCanBeSeen(visibleUnit, true);
+                CheckIfMovedUnitCanBeSeen(visibleUnit);
             }
         }
     }

@@ -21,7 +21,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     [SerializeField] private LayerMask _unitLayer;
     private Vector3 _origin = Vector3.zero;
     private float _startingAngle = 0f;
-    private Mesh _mesh;
+    
 
     [Header("Unit movement and other triggers for mesh creation")]
     [SerializeField] private bool _isMoving = false;
@@ -30,6 +30,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     [SerializeField] private MeshRenderer _meshRenderer;
     [SerializeField] private Material _friendlyFOVMaterial;
     [SerializeField] private Material _enemyFOVMaterial;
+    private Mesh _mesh;
+
+    [Header("Colliders and stuff")]
+    [SerializeField] private PolygonCollider2D _collider;
 
     private void Awake()
     {
@@ -151,8 +155,12 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         Vector2[] uv = new Vector2[vertices.Length];
         int[] triangles = new int[_rayCount * 3];
 
+        // initialize polygon collider points array
+        Vector2[] polygonColliderPoints = new Vector2[_rayCount + 1 + 1];
+
         // set the origin
         vertices[0] = _origin;
+        polygonColliderPoints[0] = _origin;
 
         // cycle through rays and add new vertex
         int vertexIndex = 1;
@@ -237,6 +245,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             }
 
             vertices[vertexIndex] = vertex;
+            polygonColliderPoints[vertexIndex] = vertex;
 
             if (i > 0)
             {
@@ -250,8 +259,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
             // See if any enemy units were seen?
             //spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
-            if (_frameCounter > 10 || !_isMoving)
-                spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
+            //if (_frameCounter > 10 || !_isMoving)
+            //    spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
             vertexIndex++;
             // increase angle for next loop. subtract to go clockwise
             angle -= angleIncrease;
@@ -261,12 +270,12 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         // Have a list of units spotted while moving. while isMoving is true, check to see if you spotted any new units. If so, add to new unit list, and update the UnitVisibilityManager with just that one unit?
         // when the unit stops moving, then submit to UnitCompletedFOVCheck? So it's only happening
         //UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
-        if (_frameCounter > 10 || !_isMoving)
-        {
-            UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
-            _frameCounter = 0;
-        }
-        _frameCounter++;
+        //if (_frameCounter > 10 || !_isMoving)
+        //{
+        //    UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
+        //    _frameCounter = 0;
+        //}
+        //_frameCounter++;
 
         _mesh.vertices = vertices;
         _mesh.uv = uv;
@@ -274,6 +283,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         _mesh.bounds = new Bounds(_origin, Vector3.one * 500f);
 
         this.transform.position = Vector3.zero;
+
+        _collider.SetPath(0, polygonColliderPoints);
     }
     private List<BombRunUnit> FindVisibleEnemyUnits(List<BombRunUnit> alreadySpottedGoblins, Vector2 origin, Vector2 direction, float distance)
     {
@@ -402,5 +413,29 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         Debug.Log("CanUnitSeePosition: " + this._unit.name + ":  can see Position: " + position.ToString());
         return true;
 
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Goblin"))
+        {
+            BombRunUnit unit = collision.GetComponent<BombRunUnit>();
+            if (unit.IsEnemy() != this._unit.IsEnemy())
+            {
+                //Debug.Log("BombRunUnitFieldOfView: OnTriggerEnter2D: Enemy unity spotted. Enemy unit: " + unit.name + " Spotter: " + this._unit.name) ;
+                UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
+            }
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Goblin"))
+        {
+            BombRunUnit unit = collision.GetComponent<BombRunUnit>();
+            if (unit.IsEnemy() != this._unit.IsEnemy())
+            {
+                //Debug.Log("BombRunUnitFieldOfView: OnTriggerExit2D: Enemy unity Left field of view. Enemy unit: " + unit.name + " Spotter: " + this._unit.name);
+                UnitVisibilityManager_BombRun.Instance.RemoveUnitFromVisibilityList(unit);
+            }
+        }
     }
 }

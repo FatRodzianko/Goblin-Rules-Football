@@ -638,6 +638,7 @@ GameObject:
   - component: {fileID: 3336434522842753539}
   - component: {fileID: 3444733318118800621}
   - component: {fileID: 769879967131768992}
+  - component: {fileID: 7753094812115045329}
   m_Layer: 11
   m_Name: FieldOfView
   m_TagString: Untagged
@@ -673,7 +674,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _unit: {fileID: 3408740805264284271}
-  _rayCount: 15
+  _rayCount: 30
   _fov: 90
   _meshFilter: {fileID: 3444733318118800621}
   _blockingLayer:
@@ -694,6 +695,7 @@ MonoBehaviour:
   _meshRenderer: {fileID: 769879967131768992}
   _friendlyFOVMaterial: {fileID: 2100000, guid: 4b6043eef17e6ef4f8d663ace3f8f17c, type: 2}
   _enemyFOVMaterial: {fileID: 2100000, guid: 07ee84ef4d51aba408bd1d2c73aad00f, type: 2}
+  _collider: {fileID: 7753094812115045329}
 --- !u!33 &3444733318118800621
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -744,6 +746,36 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!60 &7753094812115045329
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2692160834791816643}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 0, y: 1}
+      - {x: -0.95105654, y: 0.30901697}
+      - {x: -0.5877852, y: -0.80901706}
+      - {x: 0.58778536, y: -0.80901694}
+      - {x: 0.9510565, y: 0.30901712}
 --- !u!1 &3004601356711755004
 GameObject:
   m_ObjectHideFlags: 0
@@ -1100,6 +1132,7 @@ GameObject:
   - component: {fileID: 4184348786050281194}
   - component: {fileID: 2898562228658105131}
   - component: {fileID: 4589616383332178742}
+  - component: {fileID: 5071019595427909007}
   m_Layer: 11
   m_Name: Unit
   m_TagString: Goblin
@@ -1504,6 +1537,27 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+--- !u!50 &5071019595427909007
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4944422538143551182}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &5004671053109487943
 GameObject:
   m_ObjectHideFlags: 0
