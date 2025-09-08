@@ -22624,6 +22624,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Unit_Medic
       objectReference: {fileID: 0}
+    - target: {fileID: 6568846962603534430, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
+      propertyPath: _actionPoints
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 6763697857680715363, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
       propertyPath: m_RootOrder
       value: 19
@@ -24117,8 +24121,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85482cfcf2f7ab141b42b4f7d946ad31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _visibileToPlayer: []
-  _visibileToEnemy: []
 --- !u!1 &2138507406
 GameObject:
   m_ObjectHideFlags: 0

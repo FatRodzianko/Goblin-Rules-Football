@@ -157,6 +157,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         // cycle through rays and add new vertex
         int vertexIndex = 1;
         int triangleIndex = 0;
+
+        // track spotted goblins
+        List<BombRunUnit> spottedEnemyUnits = new List<BombRunUnit>();
         for (int i = 0; i <= _rayCount; i++)
         {
             //Debug.Log("FieldOfView: Vertex index: " + vertexIndex.ToString() + " with max verticies: " + vertices.Length.ToString() + " for unit: " + _unit.name);
@@ -167,8 +170,13 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             bool firstIteration = true;
             foreach (LayerMask layerMask in _blockingLayers)
             {
-                RaycastHit2D raycastHit2D = Physics2D.Raycast(_origin, vectorFromAngle, viewDistance, layerMask);
-                if (raycastHit2D.collider == null)
+                // Change to a Physics2D.RaycastAll because if there is an obstacle you skip over, you'll want to see if there are any other obstacles behind that
+                // for collision with walls, just end the for loop after the first one?
+                //RaycastHit2D raycastHit2D = Physics2D.Raycast(_origin, vectorFromAngle, viewDistance, layerMask);
+                RaycastHit2D[] raycastHits2D = Physics2D.RaycastAll(_origin, vectorFromAngle, viewDistance, layerMask);
+                //if (raycastHits2D.collider == null)
+                //    continue;
+                if (raycastHits2D.Length == 0)
                     continue;
                 //if (layerMask == _obstacleLayer)
                 //{
@@ -180,27 +188,52 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 //        }
                 //    }
                 //}
-                if (raycastHit2D.transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
+                Vector3 hitPoint = vertex;
+                for (int j = 0; j < raycastHits2D.Length; j++)
                 {
-                    if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
+                    if (raycastHits2D[j].collider.CompareTag("BombRunWall"))
                     {
-                        continue;
+                        hitPoint = raycastHits2D[j].point;
+                        break;
+                    }
+                    if (raycastHits2D[j].transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
+                    {
+                        if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
+                        {
+                            continue;
+                        }
+                        hitPoint = raycastHits2D[j].point;
+                        break;
                     }
                 }
-                float newDistance = Vector2.Distance(_origin, raycastHit2D.point);
+                float newDistance = Vector2.Distance(_origin, hitPoint);
                 if (firstIteration)
                 {
                     closestHitDistance = newDistance;
-                    vertex = raycastHit2D.point;
+                    vertex = hitPoint;
                     firstIteration = false;
                     continue;
                 }
                 if (newDistance <= closestHitDistance)
                 {
                     closestHitDistance = newDistance;
-                    vertex = raycastHit2D.point;
+                    vertex = hitPoint;
                 }
-                
+
+                //float newDistance = Vector2.Distance(_origin, raycastHits2D.point);
+                //if (firstIteration)
+                //{
+                //    closestHitDistance = newDistance;
+                //    vertex = raycastHits2D.point;
+                //    firstIteration = false;
+                //    continue;
+                //}
+                //if (newDistance <= closestHitDistance)
+                //{
+                //    closestHitDistance = newDistance;
+                //    vertex = raycastHits2D.point;
+                //}
+
             }
 
             vertices[vertexIndex] = vertex;
@@ -214,10 +247,26 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 // increase triangle index by 3, since we are adding 3 points every loop
                 triangleIndex += 3;
             }
+
+            // See if any enemy units were seen?
+            //spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
+            if (_frameCounter > 10 || !_isMoving)
+                spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
             vertexIndex++;
             // increase angle for next loop. subtract to go clockwise
             angle -= angleIncrease;
         }
+
+        // this ends up getting called way to often. Maybe have it so it's only called every so often?
+        // Have a list of units spotted while moving. while isMoving is true, check to see if you spotted any new units. If so, add to new unit list, and update the UnitVisibilityManager with just that one unit?
+        // when the unit stops moving, then submit to UnitCompletedFOVCheck? So it's only happening
+        //UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
+        if (_frameCounter > 10 || !_isMoving)
+        {
+            UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
+            _frameCounter = 0;
+        }
+        _frameCounter++;
 
         _mesh.vertices = vertices;
         _mesh.uv = uv;
@@ -225,6 +274,27 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         _mesh.bounds = new Bounds(_origin, Vector3.one * 500f);
 
         this.transform.position = Vector3.zero;
+    }
+    private List<BombRunUnit> FindVisibleEnemyUnits(List<BombRunUnit> alreadySpottedGoblins, Vector2 origin, Vector2 direction, float distance)
+    {
+        List<BombRunUnit> spottedGoblins = new List<BombRunUnit>();
+        spottedGoblins.AddRange(alreadySpottedGoblins);
+
+        RaycastHit2D[] raycastHits2D = Physics2D.RaycastAll(_origin, direction, distance, _unitLayer);
+        if (raycastHits2D.Length == 0)
+            return spottedGoblins;
+
+        for (int i = 0; i < raycastHits2D.Length; i++)
+        {
+            BombRunUnit unit = raycastHits2D[i].collider.GetComponent<BombRunUnit>();
+            if (unit.IsEnemy() == this._unit.IsEnemy())
+                continue;
+            if (!spottedGoblins.Contains(unit))
+            {
+                spottedGoblins.Add(unit);
+            }
+        }
+        return spottedGoblins;
     }
     public void SetOrigin(Vector3 origin)
     {
