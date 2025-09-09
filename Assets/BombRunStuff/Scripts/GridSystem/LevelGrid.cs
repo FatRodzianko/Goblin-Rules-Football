@@ -210,4 +210,29 @@ public class LevelGrid : MonoBehaviour
     {
         return _cellSize;
     }
+    public List<GridPosition> GetGridPositionsInRadius(GridPosition gridPosition, int radius)
+    {
+        List<GridPosition> gridPositionList = new List<GridPosition>();
+        for (int x = -radius; x <= radius; x++)
+        {
+            for (int y = -radius; y <= radius; y++)
+            {
+                GridPosition testGridPosition = gridPosition + new GridPosition(x, y);
+                if (testGridPosition == gridPosition)
+                {
+                    continue;
+                }
+                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+                if (LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > radius * 10)
+                {
+                    continue;
+                }
+                gridPositionList.Add(testGridPosition);
+            }
+        }
+        return gridPositionList;
+    }
 }

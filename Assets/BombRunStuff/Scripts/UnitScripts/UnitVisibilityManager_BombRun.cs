@@ -60,7 +60,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             RemoveUnitFromVisibilityList(unit);
         }
     }
-    private bool CheckIfMovedUnitCanBeSeen(BombRunUnit unit)
+    private bool CheckIfMovedUnitCanBeSeen(BombRunUnit unit, BombRunUnit skipUnit = null)
     {
         List<BombRunUnit> unitsToCheck = new List<BombRunUnit>();
         if (unit.IsEnemy())
@@ -81,7 +81,17 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
 
         foreach (BombRunUnit unitToCheck in unitsToCheck)
         {
-            if (unitToCheck.CanUnitSeeThisPosition(unit.GetGridPosition()))
+            if (skipUnit != null)
+            {
+                if (unitToCheck == skipUnit)
+                    continue;
+            }
+            //if (unitToCheck.CanUnitSeeThisPosition(unit.GetGridPosition()))
+            //{
+            //    AddUnitToVisibilityList(unit, unitToCheck);
+            //    return true;
+            //}
+            if (unitToCheck.CanUnitSeeThisUnit(unit))
             {
                 AddUnitToVisibilityList(unit, unitToCheck);
                 return true;
@@ -144,7 +154,11 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             {
                 VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _visibileToPlayer.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
                 _visibileToPlayer.Remove(visibileUnitAndDiscoverer);
-                CheckIfMovedUnitCanBeSeen(visibleUnit);
+                //Debug.Log("RemoveUnitFromVisibilityList: removing: " + visibleUnit.name);
+                //if (CheckIfMovedUnitCanBeSeen(visibleUnit))
+                //{
+                //    Debug.Log("RemoveUnitFromVisibilityList: CheckIfMovedUnitCanBeSeen: true for: " + visibleUnit.name) ;
+                //}
             }
         }
         else
@@ -153,8 +167,15 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             {
                 VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _visibileToEnemy.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
                 _visibileToEnemy.Remove(visibileUnitAndDiscoverer);
-                CheckIfMovedUnitCanBeSeen(visibleUnit);
+                //CheckIfMovedUnitCanBeSeen(visibleUnit);
             }
+        }
+    }
+    public void EnemyLeftObserverFOV(BombRunUnit enemyUnit, BombRunUnit observerUnit)
+    {
+        if (!CheckIfMovedUnitCanBeSeen(enemyUnit, observerUnit))
+        {
+            RemoveUnitFromVisibilityList(enemyUnit);
         }
     }
     public void UnitCompletedFOVCheck(BombRunUnit discoveringUnit, List<BombRunUnit> spottedUnits)

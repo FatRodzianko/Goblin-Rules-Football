@@ -35,6 +35,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     [Header("Colliders and stuff")]
     [SerializeField] private PolygonCollider2D _collider;
 
+    [Header("Visibile Units")]
+    List<BombRunUnit> _visibleUnits = new List<BombRunUnit>();
+
     private void Awake()
     {
         if (_meshFilter == null)
@@ -350,6 +353,14 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
         return newDirection;
     }
+    public bool IsPositionInFOVCollider(Vector3 position)
+    {
+        return _collider.OverlapPoint(position);
+    }
+    public bool CanUnitSeeThisUnit(BombRunUnit unit)
+    {
+        return _visibleUnits.Contains(unit);
+    }
     public bool CanUnitSeePosition(Vector3 position)
     {
         Vector3 unitPosition = _unit.transform.position;
@@ -423,6 +434,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             {
                 //Debug.Log("BombRunUnitFieldOfView: OnTriggerEnter2D: Enemy unity spotted. Enemy unit: " + unit.name + " Spotter: " + this._unit.name) ;
                 UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
+                if (!_visibleUnits.Contains(unit))
+                {
+                    _visibleUnits.Add(unit);
+                }
             }
         }
     }
@@ -434,7 +449,12 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             if (unit.IsEnemy() != this._unit.IsEnemy())
             {
                 //Debug.Log("BombRunUnitFieldOfView: OnTriggerExit2D: Enemy unity Left field of view. Enemy unit: " + unit.name + " Spotter: " + this._unit.name);
-                UnitVisibilityManager_BombRun.Instance.RemoveUnitFromVisibilityList(unit);
+                //UnitVisibilityManager_BombRun.Instance.RemoveUnitFromVisibilityList(unit);
+                UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
+                if (_visibleUnits.Contains(unit))
+                {
+                    _visibleUnits.Remove(unit);
+                }
             }
         }
     }

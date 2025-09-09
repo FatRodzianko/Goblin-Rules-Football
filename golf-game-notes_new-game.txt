@@ -430,6 +430,12 @@ https://www.youtube.com/watch?v=TjFTgEpPnQg - RTS Game Tutorial | Unity | Episod
 - - x add event for wall object creation so the FOV mesh won't be created until those are all spawned?
 x convert action direction to 8 directions:
 - - x https://www.reddit.com/r/Unity2D/comments/10gbuqt/shooting_in_8_directions/
+- Use Grid Positions for the "FOV"?
+- - - get the grid position radius based on the sight distance from Level Grid. This will be a circle of all grid positions X distance from unit's grid position
+- - - get the Min X/Y and Max X/Y positions relative to unit grid position and based on direction unit is looking toward
+- - - remove any position from the grid circle that doesn't fall into the min/ax x/y 
+- - - check distance to remaining grid positions based on LevelGrid.Instance.CalculateDistance. Remove any further than sight distance
+- - - do a ray cast to each remaining grid position, check for hits on obstacles. If there are, remove that position from visibility list
 
 ### controlling execution flow of level initialization
 x Create some sort of "LevelInitializationManager," or whatever I name it, that kicks off the level initialization tasks in a specific order

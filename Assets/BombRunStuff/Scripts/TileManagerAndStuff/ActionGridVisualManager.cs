@@ -146,27 +146,28 @@ public class ActionGridVisualManager : MonoBehaviour
     }
     private void ShowGridPositionRangeRadius(GridPosition gridPosition, int range, GridVisualType gridVisualType)
     {
-        List<GridPosition> gridPositionList = new List<GridPosition>();
-        for (int x = -range; x <= range; x++)
-        {
-            for (int y = -range; y <= range; y++)
-            {
-                GridPosition testGridPosition = gridPosition + new GridPosition(x, y);
-                if (testGridPosition == gridPosition)
-                {
-                    continue;
-                }
-                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
-                {
-                    continue;
-                }
-                if (LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > range * 10)
-                {
-                    continue;
-                }
-                gridPositionList.Add(testGridPosition);
-            }
-        }
+        List<GridPosition> gridPositionList = LevelGrid.Instance.GetGridPositionsInRadius(gridPosition, range);
+        //List<GridPosition> gridPositionList = new List<GridPosition>();
+        //for (int x = -range; x <= range; x++)
+        //{
+        //    for (int y = -range; y <= range; y++)
+        //    {
+        //        GridPosition testGridPosition = gridPosition + new GridPosition(x, y);
+        //        if (testGridPosition == gridPosition)
+        //        {
+        //            continue;
+        //        }
+        //        if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+        //        {
+        //            continue;
+        //        }
+        //        if (LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > range * 10)
+        //        {
+        //            continue;
+        //        }
+        //        gridPositionList.Add(testGridPosition);
+        //    }
+        //}
         ShowActionVisualsFromList(gridPositionList, gridVisualType);
     }
     public void ShowActionVisualsFromList(List<GridPosition> gridPositions, GridVisualType gridVisualType)

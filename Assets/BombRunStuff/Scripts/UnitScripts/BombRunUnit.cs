@@ -359,4 +359,11 @@ public class BombRunUnit : MonoBehaviour
         //return _bombRunUnitFieldOfView.CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
         return canUnitSeeThisPosition;
     }
+    public bool CanUnitSeeThisUnit(BombRunUnit unit)
+    {
+        bool canUnitSeeThisUnit = _bombRunUnitFieldOfView.CanUnitSeeThisUnit(unit);
+        Debug.Log("CanUnitSeeThisUnit: " + this.name + " can see: " +unit.name.ToString() + "?: " + canUnitSeeThisUnit);
+        //return _bombRunUnitFieldOfView.CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
+        return canUnitSeeThisUnit;
+    }
 }
