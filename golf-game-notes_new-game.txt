@@ -436,6 +436,8 @@ x convert action direction to 8 directions:
 - - - remove any position from the grid circle that doesn't fall into the min/ax x/y 
 - - - check distance to remaining grid positions based on LevelGrid.Instance.CalculateDistance. Remove any further than sight distance
 - - - do a ray cast to each remaining grid position, check for hits on obstacles. If there are, remove that position from visibility list
+- - - have each Goblin on a team track what grid positions they can see. When a goblin changes grid position, have it check what grid positions it can now see
+- - - - - - Then have UnitVisibilityManager get visibile grid positions from each goblin
 
 ### controlling execution flow of level initialization
 x Create some sort of "LevelInitializationManager," or whatever I name it, that kicks off the level initialization tasks in a specific order

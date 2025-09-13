@@ -97,6 +97,10 @@ public class BombRunUnit : MonoBehaviour
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         _healthSystem.OnDead += HealthSystem_OnDead;
 
+        // hide unit to start?
+        this.SetUnitVisibility(!this._isEnemy);
+
+
         _bombRunUnitFieldOfView.InitializeFOV();
 
         OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
@@ -365,5 +369,9 @@ public class BombRunUnit : MonoBehaviour
         Debug.Log("CanUnitSeeThisUnit: " + this.name + " can see: " +unit.name.ToString() + "?: " + canUnitSeeThisUnit);
         //return _bombRunUnitFieldOfView.CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
         return canUnitSeeThisUnit;
+    }
+    public void SetUnitVisibility(bool isVisible)
+    {
+        this._animator.SetUnitVisibility(isVisible);
     }
 }

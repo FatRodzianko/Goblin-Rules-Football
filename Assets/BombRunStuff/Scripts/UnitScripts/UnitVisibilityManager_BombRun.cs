@@ -10,6 +10,12 @@ public class VisibileUnitAndDiscoverer
     public BombRunUnit VisibileUnit; // the key of the dictionary
     public BombRunUnit Discoverer;
 }
+[Serializable]
+public class VisibleGridPositionsByUnit
+{
+    public BombRunUnit ObservingUnit;
+    public GridPosition VisibleGridPosition;
+}
 public class UnitVisibilityManager_BombRun : MonoBehaviour
 {
     public static UnitVisibilityManager_BombRun Instance { get; private set; }
@@ -19,6 +25,10 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     [Header("Unit Lists")]
     [SerializeField] private List<VisibileUnitAndDiscoverer> _visibileToPlayer = new List<VisibileUnitAndDiscoverer>(); 
     [SerializeField] private List<VisibileUnitAndDiscoverer> _visibileToEnemy = new List<VisibileUnitAndDiscoverer>();
+
+    [Header("Visibile Grid Positions")]
+    [SerializeField] private List<VisibleGridPositionsByUnit> _friendlyUnitVisibileGridPositions = new List<VisibleGridPositionsByUnit>();
+    [SerializeField] private List<VisibleGridPositionsByUnit> _enemyUnitVisibileGridPositions = new List<VisibleGridPositionsByUnit>();
 
     private void Awake()
     {
@@ -116,6 +126,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             {
                 VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = new VisibileUnitAndDiscoverer { VisibileUnit = visibleUnit, Discoverer = discoveringUnit };
                 _visibileToPlayer.Add(visibileUnitAndDiscoverer);
+                visibleUnit.SetUnitVisibility(true);
             }
         }
         else
@@ -154,6 +165,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             {
                 VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _visibileToPlayer.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
                 _visibileToPlayer.Remove(visibileUnitAndDiscoverer);
+                visibleUnit.SetUnitVisibility(false);
                 //Debug.Log("RemoveUnitFromVisibilityList: removing: " + visibleUnit.name);
                 //if (CheckIfMovedUnitCanBeSeen(visibleUnit))
                 //{

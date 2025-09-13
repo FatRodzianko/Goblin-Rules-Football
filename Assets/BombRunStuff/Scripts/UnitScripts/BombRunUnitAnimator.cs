@@ -110,4 +110,8 @@ public class BombRunUnitAnimator : MonoBehaviour
     {
         return _spriteRenderer.flipX;
     }
+    public void SetUnitVisibility(bool isVisible)
+    {
+        _spriteRenderer.enabled = isVisible;
+    }
 }
