@@ -23,6 +23,7 @@ public class BombRunUnit : MonoBehaviour
     public event EventHandler<BaseAction> OnActionTaken;
     public event EventHandler<DamageMode> OnDamageModeChanged;
     public event EventHandler<Vector2> OnActionDirectionChanged;
+    public event EventHandler OnThisUnitMovedGridPosition;
 
     [Header("Unit Info")]
     //[SerializeField] private int _startingHealth = 100;
@@ -114,6 +115,7 @@ public class BombRunUnit : MonoBehaviour
             GridPosition oldGridPosition = _gridPosition;
             _gridPosition = newGridPosition;
             LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
+            OnThisUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
             OnAnyUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -366,7 +368,7 @@ public class BombRunUnit : MonoBehaviour
     public bool CanUnitSeeThisUnit(BombRunUnit unit)
     {
         bool canUnitSeeThisUnit = _bombRunUnitFieldOfView.CanUnitSeeThisUnit(unit);
-        Debug.Log("CanUnitSeeThisUnit: " + this.name + " can see: " +unit.name.ToString() + "?: " + canUnitSeeThisUnit);
+        //Debug.Log("CanUnitSeeThisUnit: " + this.name + " can see: " +unit.name.ToString() + "?: " + canUnitSeeThisUnit);
         //return _bombRunUnitFieldOfView.CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
         return canUnitSeeThisUnit;
     }

@@ -18,6 +18,6 @@ public class GridDebugObject : MonoBehaviour
     }
     protected virtual void Update()
     {
-        SetDebugText();
+        //SetDebugText();
     }
 }

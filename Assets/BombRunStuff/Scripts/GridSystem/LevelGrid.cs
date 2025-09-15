@@ -78,6 +78,10 @@ public class LevelGrid : MonoBehaviour
             (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition)); // delegate function to GridSystem. The GridSystem (g) will be of type GridObject, and includes a GridPosition. This will create a new GridObject with the gridsystem and grid object
         }
     }
+    public void CreateDebugObjects()
+    {
+        _gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
+    }
     public void AddUnitAtGridPosition(GridPosition gridPosition, BombRunUnit unit)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
@@ -210,7 +214,7 @@ public class LevelGrid : MonoBehaviour
     {
         return _cellSize;
     }
-    public List<GridPosition> GetGridPositionsInRadius(GridPosition gridPosition, int radius)
+    public List<GridPosition> GetGridPositionsInRadius(GridPosition gridPosition, int radius, bool noWalls = false)
     {
         List<GridPosition> gridPositionList = new List<GridPosition>();
         for (int x = -radius; x <= radius; x++)
@@ -225,6 +229,13 @@ public class LevelGrid : MonoBehaviour
                 if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
                 {
                     continue;
+                }
+                if (noWalls)
+                {
+                    if (BombRunTileMapManager.Instance.IsWallOnThisPosition(testGridPosition))
+                    {
+                        continue;
+                    }
                 }
                 if (LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > radius * 10)
                 {

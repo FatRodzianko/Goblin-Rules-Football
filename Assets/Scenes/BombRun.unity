@@ -24209,6 +24209,10 @@ PrefabInstance:
       value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: _sightRange
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _actionPoints
       value: 100
       objectReference: {fileID: 0}

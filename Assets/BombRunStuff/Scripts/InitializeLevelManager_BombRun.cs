@@ -25,6 +25,7 @@ public class InitializeLevelManager_BombRun : MonoBehaviour
     {
         // create the grid system
         LevelGrid.Instance.CreateLevelGrid();
+
         Debug.Log("InitializeLevelManager_BombRun: LevelGrid GridSystem created");
 
         
