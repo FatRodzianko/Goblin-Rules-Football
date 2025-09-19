@@ -381,10 +381,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         {
             if (raycastHits2D[i].collider.CompareTag("BombRunWall"))
             {
-                //Debug.Log("CanUnitSeePosition: " + this._unit.name + ": Position: " + position.ToString() + " is a wall...");
                 return false;
             }
-            if (raycastHits2D[i].collider.gameObject.layer == _obstacleLayer)
+            if (raycastHits2D[i].collider.CompareTag("BombRunObstacle"))
             {
                 if (raycastHits2D[i].transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
                 {
