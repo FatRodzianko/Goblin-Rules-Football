@@ -145,20 +145,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     }
     public void RemoveUnitFromVisibilityList(BombRunUnit visibleUnit)
     {
-        //if (unit.IsEnemy())
-        //{
-        //    if (_visibileToPlayer.Contains(unit))
-        //    {
-        //        _visibileToPlayer.Remove(unit);
-        //    }
-        //}
-        //else
-        //{
-        //    if (_visibileToEnemy.Contains(unit))
-        //    {
-        //        _visibileToEnemy.Remove(unit);
-        //    }
-        //}
+
         if (visibleUnit.IsEnemy())
         {
             if (_visibileToPlayer.Exists(x => x.VisibileUnit == visibleUnit))

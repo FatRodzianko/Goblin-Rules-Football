@@ -431,23 +431,34 @@ https://www.youtube.com/watch?v=TjFTgEpPnQg - RTS Game Tutorial | Unity | Episod
 x convert action direction to 8 directions:
 - - x https://www.reddit.com/r/Unity2D/comments/10gbuqt/shooting_in_8_directions/
 - Use Grid Positions for the "FOV"?
-- - - get the grid position radius based on the sight distance from Level Grid. This will be a circle of all grid positions X distance from unit's grid position
-- - - get the Min X/Y and Max X/Y positions relative to unit grid position and based on direction unit is looking toward
-- - - remove any position from the grid circle that doesn't fall into the min/ax x/y 
-- - - check distance to remaining grid positions based on LevelGrid.Instance.CalculateDistance. Remove any further than sight distance
-- - - do a ray cast to each remaining grid position, check for hits on obstacles. If there are, remove that position from visibility list
+- - x get the grid position radius based on the sight distance from Level Grid. This will be a circle of all grid positions X distance from unit's grid position
+- - x get the Min X/Y and Max X/Y positions relative to unit grid position and based on direction unit is looking toward
+- - - - - x instead got the angle from the player's FOV angle to the grid position. If angle is outside FOV, ignore
+- - x remove any position from the grid circle that doesn't fall into the min/ax x/y 
+- - x check distance to remaining grid positions based on LevelGrid.Instance.CalculateDistance. Remove any further than sight distance
+- - x do a ray cast to each remaining grid position, check for hits on obstacles. If there are, remove that position from visibility list
 - - - have each Goblin on a team track what grid positions they can see. When a goblin changes grid position, have it check what grid positions it can now see
 - - - - - - Then have UnitVisibilityManager get visibile grid positions from each goblin
 - - - Logic?
-- - - - - - Listen for when Unit's GridPosition changes
-- - - - - - - - - Get the GetGridPositionsInRadius for the unit
-- - - - - - - - - Get only the grid positions that are in the vision cone
-- - - - - - - - - - - - Get direction from unit to each grid position
-- - - - - - - - - - - - check angle for that direction
-- - - - - - - - - - - - check if the angle is within the unit FOV? Should be able to find this in a previous function...
-- - - - - - - - - Get only GridPositions that are not too far away
-- - - - - - - - - - - - check distance to each remaining grid position. remove ones that are too far away
-- - - - - - - - - Cast ray to each remaining grid position. If not obstacle/wall hit, grid position is visible?
+- - - - - x Listen for when Unit's GridPosition changes
+- - - - - - - - x Get the GetGridPositionsInRadius for the unit
+- - - - - - - - x Get only the grid positions that are in the vision cone
+- - - - - - - - - - - x Get direction from unit to each grid position
+- - - - - - - - - - - x check angle for that direction
+- - - - - - - - - - - x check if the angle is within the unit FOV? Should be able to find this in a previous function...
+- - - - - - - - x Get only GridPositions that are not too far away
+- - - - - - - - - - - x check distance to each remaining grid position. remove ones that are too far away
+- - - - - - - - x Cast ray to each remaining grid position. If not obstacle/wall hit, grid position is visible?
+
+### Move to GridPosition based FOV
+- Get rid of old method
+- - - comment out all calls to update the old FOV mesh/collider?
+- Overload CanUnitSeePosition to take a GridPosition
+- - - have it calculate distance the same way that LevelGrid.GetGridPositionsInRadius does:
+- - - - - - LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > radius * 10
+- - - - - - also, change the "* 10" to a constant on LevelGrid, int pathFindingDistanceMultiplier = 10;
+- - - - - - - - - this is because pathfinding multiplied everything by 10 so it is all whole numbers
+
 
 ### controlling execution flow of level initialization
 x Create some sort of "LevelInitializationManager," or whatever I name it, that kicks off the level initialization tasks in a specific order

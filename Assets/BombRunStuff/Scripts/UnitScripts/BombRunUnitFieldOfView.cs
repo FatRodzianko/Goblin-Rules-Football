@@ -99,6 +99,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         yield return new WaitForSeconds(waitTime);
         //Debug.Log("DelayForWallCollidersToSpawn: waited for " + waitTime);
         UpdateFOVMesh();
+        GetVisibileGridPositions();
     }
     private void SetFOVMaterial(bool isEnemy)
     {
@@ -124,8 +125,22 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         Debug.Log("LevelGrid_OnWallsAndFloorsPlacedCompleted: " + _unit.name);
         UpdateFOVMesh();
+        GetVisibileGridPositions();
     }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            //Debug.Log("SPACE SPACE SPACE SPACE");
+            //GetVisibileGridPositions();
+            if (!this._unit.IsEnemy())
+                return;
 
+            bool canUnitSeePosition = CanUnitSeePosition(Vector3.zero);
+            Debug.Log("CanUnitSeeThisUnit: Can: " + this._unit + " see: " + Vector3.zero.ToString() + "? " + canUnitSeePosition);
+            GetVisibileGridPositions();
+        }
+    }
     private void LateUpdate()
     {
 
@@ -295,6 +310,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         SetAimDirection(actionDirection);
         if(!_isMoving)
             UpdateFOVMesh();
+        GetVisibileGridPositions();
     }
     public void SetAimDirection(Vector3 aimDirection)
     {
@@ -337,19 +353,25 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     }
     public bool CanUnitSeeThisUnit(BombRunUnit unit)
     {
-        return _visibleUnits.Contains(unit);
+        //return _visibleUnits.Contains(unit);
+        if (_visibleUnits.Contains(unit))
+            return true;
+        bool canUnitSeePosition = CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(unit.GetGridPosition()));
+        Debug.Log("CanUnitSeeThisUnit: Can: " + this._unit + " see: " + unit + "? " + canUnitSeePosition); 
+        return canUnitSeePosition;
     }
     public bool CanUnitSeePosition(Vector3 position)
     {
-        Vector3 unitPosition = _unit.transform.position;
-        //Vector3 unitPosition = LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition());
+        Debug.Log("CanUnitSeePosition: " + position.ToString());
+        //Vector3 unitPosition = _unit.transform.position;
+        Vector3 unitPosition = LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition());
 
         // check distance to position. If it is greater than the unit's view distance, return false
         float viewDistance = _unit.GetSightRange() * LevelGrid.Instance.GetGridCellSize();
         float distanceToPosition = Vector2.Distance(unitPosition, position);
         if (distanceToPosition > viewDistance)
         {
-            //Debug.Log("CanUnitSeePosition: " + this._unit.name + ": Position: " + position.ToString() + " is too far to see");
+            Debug.Log("CanUnitSeePosition: " + this._unit.name + ": Position: " + position.ToString() + " is too far to see");
             return false;
         }
 
@@ -364,7 +386,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         //if (Mathf.Abs(_startingAngle - GetAngleFromVectorFloat(directionToPosition)) > _fov / 2f)
         if (angle > _fov / 2f)
         {
-            //Debug.Log("CanUnitSeePosition: " + this._unit.name + ": Position: " + position.ToString() + " is not in FOV: " + (_fov / 2f).ToString() + ":" + angle.ToString() + " starting angle: " + _startingAngle + " vector from starting angle: " + vectorFromAngle.ToString() + " unit action direction: " + _unit.GetActionDirection() + " angle from aim direction: " + GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
+            Debug.Log("CanUnitSeePosition: " + this._unit.name + ": Position: " + position.ToString() + " is not in FOV: " + (_fov / 2f).ToString() + ":" + angle.ToString() + " starting angle: " + _startingAngle + " vector from starting angle: " + vectorFromAngle.ToString() + " unit action direction: " + _unit.GetActionDirection() + " angle from aim direction: " + GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
             return false;
         }
 
@@ -373,7 +395,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         // if the ray hit nothing, the position can be seen
         if (raycastHits2D.Length == 0)
         {
-            //Debug.Log("CanUnitSeePosition: " + this._unit.name + ":  can see Position: " + position.ToString() + " no colliders hit!");
+            Debug.Log("CanUnitSeePosition: " + this._unit.name + ":  can see Position: " + position.ToString() + " no colliders hit!");
             return true;
         }
             
@@ -402,7 +424,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 continue;
             }
         }
-        //Debug.Log("CanUnitSeePosition: " + this._unit.name + ":  can see Position: " + position.ToString());
+        Debug.Log("CanUnitSeePosition: " + this._unit.name + ":  can see Position: " + position.ToString());
         return true;
 
     }
@@ -414,7 +436,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             if (unit.IsEnemy() != this._unit.IsEnemy())
             {
                 //Debug.Log("BombRunUnitFieldOfView: OnTriggerEnter2D: Enemy unity spotted. Enemy unit: " + unit.name + " Spotter: " + this._unit.name) ;
-                UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
+                //UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
                 if (!_visibleUnits.Contains(unit))
                 {
                     //_visibleUnits.Add(unit);
@@ -431,7 +453,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             {
                 //Debug.Log("BombRunUnitFieldOfView: OnTriggerExit2D: Enemy unity Left field of view. Enemy unit: " + unit.name + " Spotter: " + this._unit.name);
                 //UnitVisibilityManager_BombRun.Instance.RemoveUnitFromVisibilityList(unit);
-                UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
+                //UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
                 if (_visibleUnits.Contains(unit))
                 {
                     //_visibleUnits.Remove(unit);
@@ -448,46 +470,44 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         // Get all grid positions in radius around unit
         List<GridPosition> gridRadius = LevelGrid.Instance.GetGridPositionsInRadius(_unit.GetGridPosition(), _unit.GetSightRange());
 
-        //
-        // OLD
-        //
-        //// Save positions that are inside the FOV
-        //List<GridPosition> insideFieldOfView = new List<GridPosition>();
-        //Vector3 unitPosition = LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition());/* _unit.GetWorldPosition();*/
-        //foreach (GridPosition gridPosition in gridRadius)
-        //{
-        //    if (IsGridPositionInViewCone(gridPosition, _aimDirectionAngle, unitPosition, _fov))
-        //    {
-        //        insideFieldOfView.Add(gridPosition);
-        //    }
-        //}
-        //// Check if the remaining positions are visible
-        //_visibleGridPositions.Clear();
-        //_visibleVector2Positions.Clear();
-        //foreach (GridPosition gridPosition in insideFieldOfView)
-        //{
-        //    if (CanUnitSeeGridPosition(gridPosition, unitPosition))
-        //    {
-        //        _visibleGridPositions.Add(gridPosition);
-        //        _visibleVector2Positions.Add(new Vector2(gridPosition.x, gridPosition.y));
-        //    }
-        //}
-        //
-        // OLD
-        //
-
         _visibleGridPositions.Clear();
         _visibleVector2Positions.Clear();
+        if (_visibleUnits.Count > 0)
+        {
+            foreach (BombRunUnit unit in _visibleUnits)
+            {
+                UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
+            }
+        }
+
         _visibleUnits.Clear();
         foreach (GridPosition gridPosition in gridRadius)
         {
-            if (CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition)))
+            
+            bool canUnitSeePosition = CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
+
+            // testing bullshit
+            if (new Vector2(gridPosition.x, gridPosition.y) == Vector2.zero)
+            {
+                if (this._unit.IsEnemy())
+                {
+                    Debug.Log("GetVisibileGridPositions: Can: " + this._unit + " see position: " + LevelGrid.Instance.GetWorldPosition(gridPosition) + "? " + canUnitSeePosition);
+                }
+            }
+            // testing bullshit
+
+            if (canUnitSeePosition)
             {
                 _visibleGridPositions.Add(gridPosition);
                 _visibleVector2Positions.Add(new Vector2(gridPosition.x, gridPosition.y));
                 if (LevelGrid.Instance.HasAnyUnitOnGridPosition(gridPosition))
-                {
-                    _visibleUnits.Add(LevelGrid.Instance.GetUnitAtGridPosition(gridPosition));
+                {                    
+                    BombRunUnit unit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+                    if (unit.IsEnemy() == this._unit.IsEnemy())
+                        continue;
+
+                    _visibleUnits.Add(unit);
+                    UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
                 }
             }
         }
