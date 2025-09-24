@@ -98,7 +98,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         yield return new WaitForSeconds(waitTime);
         //Debug.Log("DelayForWallCollidersToSpawn: waited for " + waitTime);
-        UpdateFOVMesh();
+        //UpdateFOVMesh();
         GetVisibileGridPositions();
     }
     private void SetFOVMaterial(bool isEnemy)
@@ -124,7 +124,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     private void LevelGrid_OnWallsAndFloorsPlacedCompleted(object sender, EventArgs e)
     {
         Debug.Log("LevelGrid_OnWallsAndFloorsPlacedCompleted: " + _unit.name);
-        UpdateFOVMesh();
+        //UpdateFOVMesh();
         GetVisibileGridPositions();
     }
     private void Update()
@@ -136,8 +136,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             if (!this._unit.IsEnemy())
                 return;
 
-            bool canUnitSeePosition = CanUnitSeePosition(Vector3.zero);
-            Debug.Log("CanUnitSeeThisUnit: Can: " + this._unit + " see: " + Vector3.zero.ToString() + "? " + canUnitSeePosition);
+            //bool canUnitSeePosition = CanUnitSeeWorldPosition(Vector3.zero);
+            bool canUnitSeePosition = CanUnitSeeGridPosition(new GridPosition(0,0));
+            Debug.Log("CanUnitSeeGridPosition: Can: " + this._unit + " see: " + Vector3.zero.ToString() + "? " + canUnitSeePosition);
             GetVisibileGridPositions();
         }
     }
@@ -146,7 +147,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         if (!_isMoving)
             return;
-        UpdateFOVMesh();
+        //UpdateFOVMesh();
         //if (_frameCounter == 0)
         //{
         //    UpdateFOVMesh();
@@ -158,6 +159,62 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         //}
         //_frameCounter++;
         
+    }
+    private void UpdateFOVMeshWithGridPositions(List<GridPosition> gridPositions)
+    {
+        // setup field of view parameters
+        _origin = _unit.transform.position;
+
+        // initialize the arrays
+        Vector3[] vertices = new Vector3[gridPositions.Count + 1 + 1];
+        Vector2[] uv = new Vector2[vertices.Length];
+        int[] triangles = new int[gridPositions.Count * 3];
+
+        // initialize polygon collider points array
+        Vector2[] polygonColliderPoints = new Vector2[gridPositions.Count + 1 + 1];
+
+        // set the origin
+        vertices[0] = _origin;
+        polygonColliderPoints[0] = _origin;
+
+        // cycle through rays and add new vertex
+        int vertexIndex = 1;
+        int triangleIndex = 0;
+
+        // cycle through the grid positions, add vertex for the grid position?
+        if (gridPositions.Count > 0)
+        {
+            for (int i = 0; i <= gridPositions.Count; i++)
+            {
+                Vector3 vertex = LevelGrid.Instance.GetWorldPosition(gridPositions[i]);
+
+
+                vertices[vertexIndex] = vertex;
+                polygonColliderPoints[vertexIndex] = vertex;
+
+                if (i > 0)
+                {
+                    // set the points of the triangle
+                    triangles[triangleIndex + 0] = 0;
+                    triangles[triangleIndex + 1] = vertexIndex - 1;
+                    triangles[triangleIndex + 2] = vertexIndex;
+                    // increase triangle index by 3, since we are adding 3 points every loop
+                    triangleIndex += 3;
+                }
+
+                vertexIndex++;
+            }
+        }
+        
+
+        _mesh.vertices = vertices;
+        _mesh.uv = uv;
+        _mesh.triangles = triangles;
+        _mesh.bounds = new Bounds(_origin, Vector3.one * 500f);
+
+        this.transform.position = Vector3.zero;
+
+        _collider.SetPath(0, polygonColliderPoints);
     }
     private void UpdateFOVMesh()
     {
@@ -309,7 +366,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         SetAimDirection(actionDirection);
         if(!_isMoving)
-            UpdateFOVMesh();
+            //UpdateFOVMesh();
         GetVisibileGridPositions();
     }
     public void SetAimDirection(Vector3 aimDirection)
@@ -356,13 +413,14 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         //return _visibleUnits.Contains(unit);
         if (_visibleUnits.Contains(unit))
             return true;
-        bool canUnitSeePosition = CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(unit.GetGridPosition()));
+        //bool canUnitSeePosition = CanUnitSeeWorldPosition(LevelGrid.Instance.GetWorldPosition(unit.GetGridPosition()));
+        bool canUnitSeePosition = CanUnitSeeGridPosition(unit.GetGridPosition());
         Debug.Log("CanUnitSeeThisUnit: Can: " + this._unit + " see: " + unit + "? " + canUnitSeePosition); 
         return canUnitSeePosition;
     }
-    public bool CanUnitSeePosition(Vector3 position)
+    public bool CanUnitSeeWorldPosition(Vector3 position)
     {
-        Debug.Log("CanUnitSeePosition: " + position.ToString());
+        //Debug.Log("CanUnitSeeWorldPosition: " + position.ToString());
         //Vector3 unitPosition = _unit.transform.position;
         Vector3 unitPosition = LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition());
 
@@ -371,7 +429,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         float distanceToPosition = Vector2.Distance(unitPosition, position);
         if (distanceToPosition > viewDistance)
         {
-            Debug.Log("CanUnitSeePosition: " + this._unit.name + ": Position: " + position.ToString() + " is too far to see");
+            //Debug.Log("CanUnitSeeWorldPosition: " + this._unit.name + ": Position: " + position.ToString() + " is too far to see");
             return false;
         }
 
@@ -386,7 +444,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         //if (Mathf.Abs(_startingAngle - GetAngleFromVectorFloat(directionToPosition)) > _fov / 2f)
         if (angle > _fov / 2f)
         {
-            Debug.Log("CanUnitSeePosition: " + this._unit.name + ": Position: " + position.ToString() + " is not in FOV: " + (_fov / 2f).ToString() + ":" + angle.ToString() + " starting angle: " + _startingAngle + " vector from starting angle: " + vectorFromAngle.ToString() + " unit action direction: " + _unit.GetActionDirection() + " angle from aim direction: " + GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
+            //Debug.Log("CanUnitSeeWorldPosition: " + this._unit.name + ": Position: " + position.ToString() + " is not in FOV: " + (_fov / 2f).ToString() + ":" + angle.ToString() + " starting angle: " + _startingAngle + " vector from starting angle: " + vectorFromAngle.ToString() + " unit action direction: " + _unit.GetActionDirection() + " angle from aim direction: " + GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
             return false;
         }
 
@@ -395,7 +453,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         // if the ray hit nothing, the position can be seen
         if (raycastHits2D.Length == 0)
         {
-            Debug.Log("CanUnitSeePosition: " + this._unit.name + ":  can see Position: " + position.ToString() + " no colliders hit!");
+            //Debug.Log("CanUnitSeeWorldPosition: " + this._unit.name + ":  can see Position: " + position.ToString() + " no colliders hit!");
             return true;
         }
             
@@ -424,7 +482,72 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 continue;
             }
         }
-        Debug.Log("CanUnitSeePosition: " + this._unit.name + ":  can see Position: " + position.ToString());
+        //Debug.Log("CanUnitSeeWorldPosition: " + this._unit.name + ":  can see Position: " + position.ToString());
+        return true;
+
+    }
+    public bool CanUnitSeeGridPosition(GridPosition targetGridPosition)
+    {
+        //Debug.Log("CanUnitSeeGridPosition (GridPosition): " + targetGridPosition.ToString());
+        Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition());
+        Vector3 targetWorldPosition = LevelGrid.Instance.GetWorldPosition(targetGridPosition);
+
+        // check distance to position. Use GridPosition Distance so it matches how LevelGrid.GetGridPositionsInRadius does it
+        int viewDistance = _unit.GetSightRange() * LevelGrid.Instance.GetPathFindingDistanceMultiplier();
+        int distanceToGridPosition = LevelGrid.Instance.CalculateDistance(_unit.GetGridPosition(), targetGridPosition);
+        if (distanceToGridPosition > viewDistance)
+        {
+            //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is too far to see");
+            return false;
+        }
+        float distanceToWorldPosition = Vector2.Distance(unitWorldPosition, targetWorldPosition);
+        // check the angle from the player to the position. If it is outside of FOV, return false
+        Vector3 directionToPosition = (targetWorldPosition - unitWorldPosition).normalized;
+        Vector3 vectorFromAngle = GetVectorFromAngle(_aimDirectionAngle);
+        float angle = Vector3.Angle(vectorFromAngle, directionToPosition);
+
+        if ((int)angle > (int)(_fov / 2f))
+        {
+            //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is not in FOV: " + (_fov / 2f).ToString("0.000000") + ":" + angle.ToString("0.000000") + " starting angle: " + _startingAngle + " vector from starting angle: " + vectorFromAngle.ToString() + " unit action direction: " + _unit.GetActionDirection() + " angle from aim direction: " + GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
+            return false;
+        }
+
+        // Do a raycast to see if there is anything between the position and the unit that would block vision
+        RaycastHit2D[] raycastHits2D = Physics2D.RaycastAll(unitWorldPosition, directionToPosition, distanceToWorldPosition);
+        // if the ray hit nothing, the position can be seen
+        if (raycastHits2D.Length == 0)
+        {
+            //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ":  can see Position: " + targetGridPosition.ToString() + " no colliders hit!");
+            return true;
+        }
+
+        for (int i = 0; i < raycastHits2D.Length; i++)
+        {
+            if (raycastHits2D[i].collider.CompareTag("BombRunWall"))
+            {
+                return false;
+            }
+            if (raycastHits2D[i].collider.CompareTag("BombRunObstacle"))
+            {
+                if (raycastHits2D[i].transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
+                {
+                    if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is blocked by an obstacle.");
+                        return false;
+                    }
+                }
+            }
+            if (raycastHits2D[i].collider.gameObject.layer == _unitLayer)
+            {
+                continue;
+            }
+        }
+        //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ":  can see Position: " + targetGridPosition.ToString());
         return true;
 
     }
@@ -483,18 +606,19 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         _visibleUnits.Clear();
         foreach (GridPosition gridPosition in gridRadius)
         {
-            
-            bool canUnitSeePosition = CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
 
-            // testing bullshit
-            if (new Vector2(gridPosition.x, gridPosition.y) == Vector2.zero)
-            {
-                if (this._unit.IsEnemy())
-                {
-                    Debug.Log("GetVisibileGridPositions: Can: " + this._unit + " see position: " + LevelGrid.Instance.GetWorldPosition(gridPosition) + "? " + canUnitSeePosition);
-                }
-            }
-            // testing bullshit
+            //bool canUnitSeePosition = CanUnitSeeWorldPosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
+            bool canUnitSeePosition = CanUnitSeeGridPosition(gridPosition);
+
+            //// testing bullshit
+            //if (new Vector2(gridPosition.x, gridPosition.y) == Vector2.zero)
+            //{
+            //    if (this._unit.IsEnemy())
+            //    {
+            //        Debug.Log("GetVisibileGridPositions: Can: " + this._unit + " see position: " + LevelGrid.Instance.GetWorldPosition(gridPosition) + "? " + canUnitSeePosition);
+            //    }
+            //}
+            //// testing bullshit
 
             if (canUnitSeePosition)
             {
@@ -511,6 +635,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 }
             }
         }
+        //UpdateFOVMeshWithGridPositions(_visibleGridPositions);
     }
 
     private List<GridPosition> GetGridPositionsInViewCone(List<GridPosition> gridPositions, Vector2 aimDirection)

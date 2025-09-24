@@ -453,11 +453,13 @@ x convert action direction to 8 directions:
 ### Move to GridPosition based FOV
 - Get rid of old method
 - - - comment out all calls to update the old FOV mesh/collider?
-- Overload CanUnitSeePosition to take a GridPosition
-- - - have it calculate distance the same way that LevelGrid.GetGridPositionsInRadius does:
-- - - - - - LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > radius * 10
-- - - - - - also, change the "* 10" to a constant on LevelGrid, int pathFindingDistanceMultiplier = 10;
-- - - - - - - - - this is because pathfinding multiplied everything by 10 so it is all whole numbers
+x Overload CanUnitSeePosition to take a GridPosition
+- - x have it calculate distance the same way that LevelGrid.GetGridPositionsInRadius does:
+- - - - - x LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > radius * 10
+- - - - - x also, change the "* 10" to a constant on LevelGrid, int pathFindingDistanceMultiplier = 10;
+- - - - - - - - x this is because pathfinding multiplied everything by 10 so it is all whole numbers
+- - - add a check for corners? CheckIfCornerIsHit = true, then check if the collision was a corner. If yes, then ignore
+- - - - - - and in future, check if the goblin is in cover around corner. If yes, cannot see/shoot that position
 
 
 ### controlling execution flow of level initialization

@@ -360,7 +360,8 @@ public class BombRunUnit : MonoBehaviour
     }
     public bool CanUnitSeeThisPosition(GridPosition gridPosition)
     {
-        bool canUnitSeeThisPosition = _bombRunUnitFieldOfView.CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
+        //bool canUnitSeeThisPosition = _bombRunUnitFieldOfView.CanUnitSeeWorldPosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
+        bool canUnitSeeThisPosition = _bombRunUnitFieldOfView.CanUnitSeeGridPosition(gridPosition);
         Debug.Log("CanUnitSeeThisPosition: " + this.name + " can see: " + gridPosition.ToString() +"?: " + canUnitSeeThisPosition);
         //return _bombRunUnitFieldOfView.CanUnitSeePosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
         return canUnitSeeThisPosition;

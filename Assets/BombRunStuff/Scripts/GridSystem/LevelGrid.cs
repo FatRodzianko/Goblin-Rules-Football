@@ -17,6 +17,9 @@ public class LevelGrid : MonoBehaviour
     [SerializeField] private int _height = 10;
     [SerializeField] private float _cellSize = 2f;
 
+    [SerializeField] private int _pathFindingDistanceMultiplier;
+
+
     // events
     public event EventHandler OnAnyUnitMovedGridPosition;
     public event EventHandler OnWallsAndFloorsPlacedCompleted;
@@ -58,11 +61,6 @@ public class LevelGrid : MonoBehaviour
     }
     private void Start()
     {
-        
-
-        // Create the pathfinding grid
-        //PathFinding.Instance.Setup(_width, _height, _cellSize);
-
 
     }
     public void CreateLevelGrid()
@@ -214,6 +212,14 @@ public class LevelGrid : MonoBehaviour
     {
         return _cellSize;
     }
+    public int GetPathFindingDistanceMultiplier()
+    {
+        return _pathFindingDistanceMultiplier;
+    }
+    public void SetPathFindingDistanceMultiplier(int multiplier)
+    {
+        this._pathFindingDistanceMultiplier = multiplier;
+    }
     public List<GridPosition> GetGridPositionsInRadius(GridPosition gridPosition, int radius, bool noWalls = false)
     {
         List<GridPosition> gridPositionList = new List<GridPosition>();
@@ -237,7 +243,8 @@ public class LevelGrid : MonoBehaviour
                         continue;
                     }
                 }
-                if (LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > radius * 10)
+                //if (LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > radius * 10)
+                if (LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > radius * this._pathFindingDistanceMultiplier)
                 {
                     continue;
                 }

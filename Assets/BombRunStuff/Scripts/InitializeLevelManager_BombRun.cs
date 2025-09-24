@@ -40,6 +40,7 @@ public class InitializeLevelManager_BombRun : MonoBehaviour
 
         // Create the pathfinding grid
         PathFinding.Instance.Setup(LevelGrid.Instance.GetGridWidth(), LevelGrid.Instance.GetGridHeight(), LevelGrid.Instance.GetGridCellSize());
+        LevelGrid.Instance.SetPathFindingDistanceMultiplier(PathFinding.Instance.GetPathFindingDistanceMultiplier());
 
         // InitializeActionGridVisualManager()
         ActionGridVisualManager.Instance.InitializeActionGridVisualManager();

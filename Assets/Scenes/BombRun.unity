@@ -20723,6 +20723,7 @@ MonoBehaviour:
   _width: 175
   _height: 100
   _cellSize: 2
+  _pathFindingDistanceMultiplier: 0
 --- !u!4 &468905859
 Transform:
   m_ObjectHideFlags: 0
@@ -22401,6 +22402,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gridDebugObjectPrefab: {fileID: 5961246192533329702, guid: 838a3689bbe402d4f8efbef254a70cfc, type: 3}
+  _pathFindingDistanceMultiplier: 10
 --- !u!4 &1271374884
 Transform:
   m_ObjectHideFlags: 0
@@ -22747,7 +22749,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6568846962603534430, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
       propertyPath: _actionPoints
-      value: 10
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 6763697857680715363, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
       propertyPath: m_RootOrder
@@ -24504,11 +24506,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3006723863001832530, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 18
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3006723863001832530, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3006723863001832530, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_LocalPosition.z
@@ -24544,7 +24546,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _actionPoints
-      value: 15
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 3774028933683333569, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_FlipX

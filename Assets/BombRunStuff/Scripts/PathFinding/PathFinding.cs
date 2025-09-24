@@ -20,6 +20,7 @@ public class PathFinding : MonoBehaviour
 
     // grid system
     protected GridSystem<PathNode> _gridSystem;
+    [SerializeField] protected int _pathFindingDistanceMultiplier = 10;
 
     // cache modified nodes from FindPath
     List<PathNode> _modifiedNodes = new List<PathNode>();
@@ -484,6 +485,14 @@ public class PathFinding : MonoBehaviour
     public Vector2 GetGridSize()
     {
         return new Vector2(_width, _height);
+    }
+    public int GetPathFindingDistanceMultiplier()
+    {
+        return _pathFindingDistanceMultiplier;
+    }
+    public void SetPathFindingDistanceMultiplier(int multiplier)
+    {
+        this._pathFindingDistanceMultiplier = multiplier;
     }
     public bool HasPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength, int maxMoveDistance = int.MaxValue)
     {
