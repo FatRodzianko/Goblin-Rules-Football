@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Threading.Tasks;
 
 public enum ActionType
 {
@@ -41,6 +42,7 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] protected BodyPart _actionBodyPart;
     [SerializeField] private bool _hasSubAction;
     [SerializeField] private bool _canTargetFriendlyUnits = false;
+    [SerializeField] private bool _canGetValidListAsTask = false;
 
     [Header("Animation Stuff")]
     [SerializeField] protected BombRunUnitAnimator _bombRunUnitAnimator;
@@ -93,6 +95,10 @@ public abstract class BaseAction : MonoBehaviour
     {
         List<GridPosition> validGridPositionList = GetValidActionGridPositionList();
         return validGridPositionList.Contains(gridPosition);
+    }
+    public async Task<List<GridPosition>> GetValidActionGridPositionListAsTask()
+    {
+        return await Task.Run(() => GetValidActionGridPositionList());
     }
     public abstract List<GridPosition> GetValidActionGridPositionList();
     public virtual int GetActionPointsCost()
@@ -307,5 +313,10 @@ public abstract class BaseAction : MonoBehaviour
     public void SetCanTargetFriendlyUnits(bool canTarget)
     {
         this._canTargetFriendlyUnits = canTarget;
+    }
+    public bool CanGetValidListAsTask()
+    {
+        return _canGetValidListAsTask;
+
     }
 }

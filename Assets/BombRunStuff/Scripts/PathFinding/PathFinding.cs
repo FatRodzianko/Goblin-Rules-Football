@@ -122,6 +122,11 @@ public class PathFinding : MonoBehaviour
     }
     public virtual List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength, int maxMoveDistance = int.MaxValue)
     {
+        if (startGridPosition == endGridPosition)
+        {
+            pathLength = 0;
+            return null;
+        }
         if (!LevelGrid.Instance.IsValidGridPosition(endGridPosition))
         {
             //Debug.Log("FindPath: " + endGridPosition.ToString() + " is not a valid position");
@@ -145,8 +150,6 @@ public class PathFinding : MonoBehaviour
             pathLength = 0;
             return null;
         }
-
-
 
         // cycle through all nodes and reset their state
         // todo: instead of iterating through every possible node and resetting it, instead track what nodes were updated in FindPath

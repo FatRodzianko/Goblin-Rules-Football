@@ -127,21 +127,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         //UpdateFOVMesh();
         GetVisibileGridPositions();
     }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            //Debug.Log("SPACE SPACE SPACE SPACE");
-            //GetVisibileGridPositions();
-            if (!this._unit.IsEnemy())
-                return;
-
-            //bool canUnitSeePosition = CanUnitSeeWorldPosition(Vector3.zero);
-            bool canUnitSeePosition = CanUnitSeeGridPosition(new GridPosition(0,0));
-            Debug.Log("CanUnitSeeGridPosition: Can: " + this._unit + " see: " + Vector3.zero.ToString() + "? " + canUnitSeePosition);
-            GetVisibileGridPositions();
-        }
-    }
     private void LateUpdate()
     {
 
@@ -410,12 +395,15 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     }
     public bool CanUnitSeeThisUnit(BombRunUnit unit)
     {
-        //return _visibleUnits.Contains(unit);
-        if (_visibleUnits.Contains(unit))
+        //if (_visibleUnits.Contains(unit))
+        //    return true;
+
+        if (_visibleGridPositions.Contains(unit.GetGridPosition()))
             return true;
-        //bool canUnitSeePosition = CanUnitSeeWorldPosition(LevelGrid.Instance.GetWorldPosition(unit.GetGridPosition()));
+
+        return false;
+
         bool canUnitSeePosition = CanUnitSeeGridPosition(unit.GetGridPosition());
-        Debug.Log("CanUnitSeeThisUnit: Can: " + this._unit + " see: " + unit + "? " + canUnitSeePosition); 
         return canUnitSeePosition;
     }
     public bool CanUnitSeeWorldPosition(Vector3 position)
@@ -607,18 +595,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         foreach (GridPosition gridPosition in gridRadius)
         {
 
-            //bool canUnitSeePosition = CanUnitSeeWorldPosition(LevelGrid.Instance.GetWorldPosition(gridPosition));
             bool canUnitSeePosition = CanUnitSeeGridPosition(gridPosition);
-
-            //// testing bullshit
-            //if (new Vector2(gridPosition.x, gridPosition.y) == Vector2.zero)
-            //{
-            //    if (this._unit.IsEnemy())
-            //    {
-            //        Debug.Log("GetVisibileGridPositions: Can: " + this._unit + " see position: " + LevelGrid.Instance.GetWorldPosition(gridPosition) + "? " + canUnitSeePosition);
-            //    }
-            //}
-            //// testing bullshit
 
             if (canUnitSeePosition)
             {
@@ -635,7 +612,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 }
             }
         }
-        //UpdateFOVMeshWithGridPositions(_visibleGridPositions);
     }
 
     private List<GridPosition> GetGridPositionsInViewCone(List<GridPosition> gridPositions, Vector2 aimDirection)

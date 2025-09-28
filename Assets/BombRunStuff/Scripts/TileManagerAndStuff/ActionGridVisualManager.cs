@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+
 
 
 public class ActionGridVisualManager : MonoBehaviour
@@ -31,6 +33,7 @@ public class ActionGridVisualManager : MonoBehaviour
 
     [Header("Grid Visual Tiles")]
     [SerializeField] private Tile _actionVisualTile;
+    [SerializeField] private bool _calculatingVisualGrid = false;
 
     [Header("Tile List")]
     [SerializeField] private List<GridPosition> _actionVisualPositions = new List<GridPosition>();
@@ -81,7 +84,7 @@ public class ActionGridVisualManager : MonoBehaviour
         _gridSystem = LevelGrid.Instance.GetGridObjectGridSystem();
 
         // Update the action visuals for the initially selected unit and selected action
-        UpdateActionVisuals();
+        //UpdateActionVisuals();
     }
 
 
@@ -172,6 +175,9 @@ public class ActionGridVisualManager : MonoBehaviour
     }
     public void ShowActionVisualsFromList(List<GridPosition> gridPositions, GridVisualType gridVisualType)
     {
+        if (gridPositions.Count == 0)
+            return;
+
         foreach (GridPosition gridPosition in gridPositions)
         {
             AddActionVisualToGridPosition(gridPosition, GetGridVisualTypeTile(gridVisualType), GetGridVisualTypeColor(gridVisualType));
@@ -197,9 +203,11 @@ public class ActionGridVisualManager : MonoBehaviour
         }
         UpdateActionVisuals();
     }
-    private void UpdateActionVisuals()
+    private async void UpdateActionVisuals()
     {
-        HideAllActionVisuals();
+        if (_calculatingVisualGrid)
+            return;
+        //HideAllActionVisuals();
 
         BombRunUnit selectedUnit = UnitActionSystem.Instance.GetSelectedUnit();
         BaseAction selectedAction = UnitActionSystem.Instance.GetSelectedAction();
@@ -208,6 +216,7 @@ public class ActionGridVisualManager : MonoBehaviour
         if (selectedAction == null)
         {
             Debug.Log("UpdateActionVisuals: selected action is null?");
+            HideAllActionVisuals();
             return;
         }
 
@@ -248,10 +257,25 @@ public class ActionGridVisualManager : MonoBehaviour
                 break;
         }
 
-        List<GridPosition> actionVisualPositions = selectedAction.GetValidActionGridPositionList();
+        // trying to use tasks for multithreading...
+        List<GridPosition> actionVisualPositions = new List<GridPosition>();
+        if (selectedAction.CanGetValidListAsTask())
+        {
+            _calculatingVisualGrid = true;
+            actionVisualPositions = await selectedAction.GetValidActionGridPositionListAsTask();
+        }
+        else
+        {
+            actionVisualPositions = selectedAction.GetValidActionGridPositionList();
+        }
+        // trying to use tasks for multithreading...
 
-        //ShowActionVisualsFromList(actionVisualPositions, _actionVisualTile, GetGridVisualTypeColor(gridVisualType));
+        //List<GridPosition> actionVisualPositions = selectedAction.GetValidActionGridPositionList();
+
+        // Hide the current action visuals, then add the new ones
+        HideAllActionVisuals();
         ShowActionVisualsFromList(actionVisualPositions, gridVisualType);
+        _calculatingVisualGrid = false;
     }
     private Color GetGridVisualTypeColor(GridVisualType gridVisualType)
     {
@@ -276,5 +300,9 @@ public class ActionGridVisualManager : MonoBehaviour
         }
         Debug.LogError("Could not find GetGridVisualTypeTile for GridVisualType: " + gridVisualType);
         return null;
+    }
+    public bool CalculatingVisualGrid()
+    {
+        return _calculatingVisualGrid;
     }
 }

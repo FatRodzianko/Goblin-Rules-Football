@@ -460,6 +460,13 @@ x Overload CanUnitSeePosition to take a GridPosition
 - - - - - - - - x this is because pathfinding multiplied everything by 10 so it is all whole numbers
 - - - add a check for corners? CheckIfCornerIsHit = true, then check if the collision was a corner. If yes, then ignore
 - - - - - - and in future, check if the goblin is in cover around corner. If yes, cannot see/shoot that position
+- Run the CanUnitSeeGridPosition/CanUnitSeeThisUnit checks to be async tasks
+- - - For the calls whenever a unit changes grid position, try to figure out how to run each as a task
+- - - hopefully that allows for it to occur over multiple frames, causing less frame drops?
+- - - Maybe use Task.Run to run an anonymous task
+- - - - - - https://gamedevbeginner.com/async-in-unity/
+- - - - - - https://stackoverflow.com/questions/33234614/how-to-return-a-result-from-an-async-task
+
 
 
 ### controlling execution flow of level initialization
@@ -471,3 +478,9 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 - - - - - x Spawn objects/Interactables
 - - x Setup the pathfinding grid
 - - x Then spawn units
+
+### Move Action optimization?
+- After a move, UpdateActionVisuals takes 304+ ms to execute
+- Almost all of this is from GetValidActionGridPositionList from MoveAction calculating all available move positions?
+- Can't call "ToString" from outside the main thread...
+- - - also can't do raycasts since "get_queriesHitTriggers" can only be called from the main thread

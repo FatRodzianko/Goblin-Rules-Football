@@ -176,6 +176,10 @@ public class UnitActionSystem : MonoBehaviour
         {
             return;
         }
+        if (ActionGridVisualManager.Instance.CalculatingVisualGrid())
+        {
+            return;
+        }
         if (!_selectedAction.IsValidActionGridPosition(mouseGridPosition))
         {
             return;

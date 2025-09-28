@@ -696,6 +696,8 @@ MonoBehaviour:
   _friendlyFOVMaterial: {fileID: 2100000, guid: 4b6043eef17e6ef4f8d663ace3f8f17c, type: 2}
   _enemyFOVMaterial: {fileID: 2100000, guid: 07ee84ef4d51aba408bd1d2c73aad00f, type: 2}
   _collider: {fileID: 7753094812115045329}
+  _visibleUnits: []
+  _visibleVector2Positions: []
 --- !u!33 &3444733318118800621
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1273,6 +1275,7 @@ MonoBehaviour:
   _actionBodyPart: 3
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
+  _canGetValidListAsTask: 1
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1303,6 +1306,7 @@ MonoBehaviour:
   _actionBodyPart: 2
   _hasSubAction: 0
   _canTargetFriendlyUnits: 1
+  _canGetValidListAsTask: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 1
   _requiresAmmo: 1
@@ -1342,6 +1346,7 @@ MonoBehaviour:
   _actionBodyPart: 2
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
+  _canGetValidListAsTask: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1373,6 +1378,7 @@ MonoBehaviour:
   _actionBodyPart: 1
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
+  _canGetValidListAsTask: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1408,6 +1414,7 @@ MonoBehaviour:
   _actionBodyPart: 3
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
+  _canGetValidListAsTask: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1437,6 +1444,7 @@ MonoBehaviour:
   _actionBodyPart: 3
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
+  _canGetValidListAsTask: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1468,6 +1476,7 @@ MonoBehaviour:
   _actionBodyPart: 2
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
+  _canGetValidListAsTask: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0
@@ -1497,6 +1506,7 @@ MonoBehaviour:
   _actionBodyPart: 2
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
+  _canGetValidListAsTask: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 1
@@ -1529,6 +1539,7 @@ MonoBehaviour:
   _actionBodyPart: 2
   _hasSubAction: 0
   _canTargetFriendlyUnits: 0
+  _canGetValidListAsTask: 0
   _bombRunUnitAnimator: {fileID: 0}
   _isReloadable: 0
   _requiresAmmo: 0

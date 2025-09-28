@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [Serializable]
@@ -13,7 +14,7 @@ public class VisibileUnitAndDiscoverer
 [Serializable]
 public class VisibleGridPositionsByUnit
 {
-    public BombRunUnit ObservingUnit;
+    public BombRunUnit Discoverer;
     public GridPosition VisibleGridPosition;
 }
 public class UnitVisibilityManager_BombRun : MonoBehaviour
@@ -23,8 +24,8 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     // list of visibile units for player
     // list of visibile units for enemy
     [Header("Unit Lists")]
-    [SerializeField] private List<VisibileUnitAndDiscoverer> _visibileToPlayer = new List<VisibileUnitAndDiscoverer>(); 
-    [SerializeField] private List<VisibileUnitAndDiscoverer> _visibileToEnemy = new List<VisibileUnitAndDiscoverer>();
+    [SerializeField] private List<VisibileUnitAndDiscoverer> _unitsVisibleToPlayer = new List<VisibileUnitAndDiscoverer>(); 
+    [SerializeField] private List<VisibileUnitAndDiscoverer> _unitsVisibileToEnemy = new List<VisibileUnitAndDiscoverer>();
 
     [Header("Visibile Grid Positions")]
     [SerializeField] private List<VisibleGridPositionsByUnit> _friendlyUnitVisibileGridPositions = new List<VisibleGridPositionsByUnit>();
@@ -57,19 +58,25 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     private void Unit_OnAnyUnitMovedGridPosition(object sender, EventArgs e)
     {
         BombRunUnit unit = sender as BombRunUnit;
-        //if (unit.IsEnemy())
-        //{
-        //    CheckIfMovedUnitCanBeSeen(unit, BombRunUnitManager.Instance.GetFriendlyUnitList());
-        //}
-        //else
-        //{
-        //    CheckIfMovedUnitCanBeSeen(unit, BombRunUnitManager.Instance.GetEnemyUnitList());
-        //}
+
         if (!CheckIfMovedUnitCanBeSeen(unit))
         {
             RemoveUnitFromVisibilityList(unit);
         }
+
     }
+    //private async void OnAnyUnitMovedGridPosition(BombRunUnit unit)
+    //{
+    //    bool canMovedUnitBeSeen = await CheckIfMovedUnitCanBeSeenAsTask(unit);
+    //    if (!canMovedUnitBeSeen)
+    //    {
+    //        RemoveUnitFromVisibilityList(unit);
+    //    }
+    //}
+    //private async Task<bool> CheckIfMovedUnitCanBeSeenAsTask(BombRunUnit unit, BombRunUnit skipUnit = null)
+    //{
+    //    return await Task.Run(() => CheckIfMovedUnitCanBeSeen(unit, skipUnit));
+    //}
     private bool CheckIfMovedUnitCanBeSeen(BombRunUnit unit, BombRunUnit skipUnit = null)
     {
         List<BombRunUnit> unitsToCheck = new List<BombRunUnit>();
@@ -96,11 +103,6 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
                 if (unitToCheck == skipUnit)
                     continue;
             }
-            //if (unitToCheck.CanUnitSeeThisPosition(unit.GetGridPosition()))
-            //{
-            //    AddUnitToVisibilityList(unit, unitToCheck);
-            //    return true;
-            //}
             if (unitToCheck.CanUnitSeeThisUnit(unit))
             {
                 AddUnitToVisibilityList(unit, unitToCheck);
@@ -108,38 +110,35 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             }
         }
 
-        //// no units could see the moved unit
-        //if(!dontRemove)
-        //    RemoveUnitFromVisibilityList(unit);
         return false;
     }
     public void AddUnitToVisibilityList(BombRunUnit visibleUnit, BombRunUnit discoveringUnit)
     {
         if (visibleUnit.IsEnemy())
         {
-            if (_visibileToPlayer.Exists(x => x.VisibileUnit == visibleUnit))
+            if (_unitsVisibleToPlayer.Exists(x => x.VisibileUnit == visibleUnit))
             {
-                VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _visibileToPlayer.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
+                VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _unitsVisibleToPlayer.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
                 visibileUnitAndDiscoverer.Discoverer = discoveringUnit;
             }
             else
             {
                 VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = new VisibileUnitAndDiscoverer { VisibileUnit = visibleUnit, Discoverer = discoveringUnit };
-                _visibileToPlayer.Add(visibileUnitAndDiscoverer);
+                _unitsVisibleToPlayer.Add(visibileUnitAndDiscoverer);
                 visibleUnit.SetUnitVisibility(true);
             }
         }
         else
         {
-            if (_visibileToEnemy.Exists(x => x.VisibileUnit == visibleUnit))
+            if (_unitsVisibileToEnemy.Exists(x => x.VisibileUnit == visibleUnit))
             {
-                VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _visibileToEnemy.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
+                VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _unitsVisibileToEnemy.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
                 visibileUnitAndDiscoverer.Discoverer = discoveringUnit;
             }
             else
             {
                 VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = new VisibileUnitAndDiscoverer { VisibileUnit = visibleUnit, Discoverer = discoveringUnit };
-                _visibileToEnemy.Add(visibileUnitAndDiscoverer);
+                _unitsVisibileToEnemy.Add(visibileUnitAndDiscoverer);
             }
         }
     }
@@ -148,25 +147,19 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
 
         if (visibleUnit.IsEnemy())
         {
-            if (_visibileToPlayer.Exists(x => x.VisibileUnit == visibleUnit))
+            if (_unitsVisibleToPlayer.Exists(x => x.VisibileUnit == visibleUnit))
             {
-                VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _visibileToPlayer.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
-                _visibileToPlayer.Remove(visibileUnitAndDiscoverer);
+                VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _unitsVisibleToPlayer.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
+                _unitsVisibleToPlayer.Remove(visibileUnitAndDiscoverer);
                 visibleUnit.SetUnitVisibility(false);
-                //Debug.Log("RemoveUnitFromVisibilityList: removing: " + visibleUnit.name);
-                //if (CheckIfMovedUnitCanBeSeen(visibleUnit))
-                //{
-                //    Debug.Log("RemoveUnitFromVisibilityList: CheckIfMovedUnitCanBeSeen: true for: " + visibleUnit.name) ;
-                //}
             }
         }
         else
         {
-            if (_visibileToEnemy.Exists(x => x.VisibileUnit == visibleUnit))
+            if (_unitsVisibileToEnemy.Exists(x => x.VisibileUnit == visibleUnit))
             {
-                VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _visibileToEnemy.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
-                _visibileToEnemy.Remove(visibileUnitAndDiscoverer);
-                //CheckIfMovedUnitCanBeSeen(visibleUnit);
+                VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _unitsVisibileToEnemy.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
+                _unitsVisibileToEnemy.Remove(visibileUnitAndDiscoverer);
             }
         }
     }
@@ -186,11 +179,11 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
         List<VisibileUnitAndDiscoverer> visibileUnitsToCheck = new List<VisibileUnitAndDiscoverer>();
         if (discoveringUnit.IsEnemy())
         {
-            visibileUnitsToCheck = _visibileToEnemy;
+            visibileUnitsToCheck = _unitsVisibileToEnemy;
         }
         else
         {
-            visibileUnitsToCheck = _visibileToPlayer;
+            visibileUnitsToCheck = _unitsVisibleToPlayer;
         }
 
         foreach (VisibileUnitAndDiscoverer visibileUnitAndDiscoverer in visibileUnitsToCheck)

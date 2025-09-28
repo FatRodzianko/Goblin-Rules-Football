@@ -155,7 +155,7 @@ public class MoveAction : BaseAction
     }
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        float startTime = Time.realtimeSinceStartup;
+        //float startTime = Time.realtimeSinceStartup;
         List<GridPosition> validGridPositionList = new List<GridPosition>();
         // For testing jobs?
         //List<GridPosition> gridPositionsToTest = new List<GridPosition>();
@@ -165,7 +165,7 @@ public class MoveAction : BaseAction
         if (_cachedValidActionList.ContainsKey(unitGridPosition))
         {
             Debug.Log("GetValidActionGridPositionList: repeating for grid position: " + unitGridPosition.ToString() + " returning cached list?");
-            Debug.Log("Time: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
+            //Debug.Log("Time: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
             return _cachedValidActionList[unitGridPosition];
         }
         _cachedValidActionList.Clear();
@@ -223,7 +223,7 @@ public class MoveAction : BaseAction
                 validGridPositionList.Add(testGridPosition);
             }
         }
-        Debug.Log("Time: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
+        //Debug.Log("Time: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
         _cachedValidActionList.Add(unitGridPosition, validGridPositionList);
 
         return validGridPositionList;
