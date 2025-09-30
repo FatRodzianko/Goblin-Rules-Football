@@ -380,31 +380,27 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         return n;
     }
-    public Vector3 GetEightDirectionVector(Vector3 dir)
-    {
-        Vector3 newDirection = Vector3.zero;
-        if (dir.y > 0)
-        {
-            
-        }
-        return newDirection;
-    }
     public bool IsPositionInFOVCollider(Vector3 position)
     {
         return _collider.OverlapPoint(position);
     }
     public bool CanUnitSeeThisUnit(BombRunUnit unit)
     {
+        return HasThisUnitSeenThisGridPosition(unit.GetGridPosition());
         //if (_visibleUnits.Contains(unit))
         //    return true;
 
-        if (_visibleGridPositions.Contains(unit.GetGridPosition()))
-            return true;
+        //if (_visibleGridPositions.Contains(unit.GetGridPosition()))
+        //    return true;
 
-        return false;
+        //return false;
 
-        bool canUnitSeePosition = CanUnitSeeGridPosition(unit.GetGridPosition());
-        return canUnitSeePosition;
+        //bool canUnitSeePosition = CanUnitSeeGridPosition(unit.GetGridPosition());
+        //return canUnitSeePosition;
+    }
+    public bool HasThisUnitSeenThisGridPosition(GridPosition gridPosition)
+    {
+        return _visibleGridPositions.Contains(gridPosition);
     }
     public bool CanUnitSeeWorldPosition(Vector3 position)
     {
@@ -539,39 +535,39 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         return true;
 
     }
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Goblin"))
-        {
-            BombRunUnit unit = collision.GetComponent<BombRunUnit>();
-            if (unit.IsEnemy() != this._unit.IsEnemy())
-            {
-                //Debug.Log("BombRunUnitFieldOfView: OnTriggerEnter2D: Enemy unity spotted. Enemy unit: " + unit.name + " Spotter: " + this._unit.name) ;
-                //UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
-                if (!_visibleUnits.Contains(unit))
-                {
-                    //_visibleUnits.Add(unit);
-                }
-            }
-        }
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Goblin"))
-        {
-            BombRunUnit unit = collision.GetComponent<BombRunUnit>();
-            if (unit.IsEnemy() != this._unit.IsEnemy())
-            {
-                //Debug.Log("BombRunUnitFieldOfView: OnTriggerExit2D: Enemy unity Left field of view. Enemy unit: " + unit.name + " Spotter: " + this._unit.name);
-                //UnitVisibilityManager_BombRun.Instance.RemoveUnitFromVisibilityList(unit);
-                //UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
-                if (_visibleUnits.Contains(unit))
-                {
-                    //_visibleUnits.Remove(unit);
-                }
-            }
-        }
-    }
+    //private void OnTriggerEnter2D(Collider2D collision)
+    //{
+    //    if (collision.CompareTag("Goblin"))
+    //    {
+    //        BombRunUnit unit = collision.GetComponent<BombRunUnit>();
+    //        if (unit.IsEnemy() != this._unit.IsEnemy())
+    //        {
+    //            //Debug.Log("BombRunUnitFieldOfView: OnTriggerEnter2D: Enemy unity spotted. Enemy unit: " + unit.name + " Spotter: " + this._unit.name) ;
+    //            //UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
+    //            if (!_visibleUnits.Contains(unit))
+    //            {
+    //                //_visibleUnits.Add(unit);
+    //            }
+    //        }
+    //    }
+    //}
+    //private void OnTriggerExit2D(Collider2D collision)
+    //{
+    //    if (collision.CompareTag("Goblin"))
+    //    {
+    //        BombRunUnit unit = collision.GetComponent<BombRunUnit>();
+    //        if (unit.IsEnemy() != this._unit.IsEnemy())
+    //        {
+    //            //Debug.Log("BombRunUnitFieldOfView: OnTriggerExit2D: Enemy unity Left field of view. Enemy unit: " + unit.name + " Spotter: " + this._unit.name);
+    //            //UnitVisibilityManager_BombRun.Instance.RemoveUnitFromVisibilityList(unit);
+    //            //UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
+    //            if (_visibleUnits.Contains(unit))
+    //            {
+    //                //_visibleUnits.Remove(unit);
+    //            }
+    //        }
+    //    }
+    //}
     private void Unit_OnThisUnitMovedGridPosition(object sender, EventArgs e)
     {
         GetVisibileGridPositions();
@@ -581,6 +577,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         // Get all grid positions in radius around unit
         List<GridPosition> gridRadius = LevelGrid.Instance.GetGridPositionsInRadius(_unit.GetGridPosition(), _unit.GetSightRange());
 
+        List<GridPosition> previousVisibileGridPositions = new List<GridPosition>();
+        previousVisibileGridPositions.AddRange(_visibleGridPositions);
         _visibleGridPositions.Clear();
         _visibleVector2Positions.Clear();
         if (_visibleUnits.Count > 0)
@@ -612,8 +610,13 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 }
             }
         }
+        //UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions, previousVisibileGridPositions);
+        UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions);
     }
-
+    public List<GridPosition> GetUnitsVisibileGridPositions()
+    {
+        return _visibleGridPositions;
+    }
     private List<GridPosition> GetGridPositionsInViewCone(List<GridPosition> gridPositions, Vector2 aimDirection)
     {
         List<GridPosition> gridPositionsInViewCone = new List<GridPosition>();

@@ -360,7 +360,7 @@ public class BombRunUnit : MonoBehaviour
     }
     public bool CanUnitSeeThisPosition(GridPosition gridPosition)
     {
-        bool canUnitSeeThisPosition = _bombRunUnitFieldOfView.CanUnitSeeGridPosition(gridPosition);
+        bool canUnitSeeThisPosition = _bombRunUnitFieldOfView.HasThisUnitSeenThisGridPosition(gridPosition);
         //Debug.Log("CanUnitSeeThisPosition: " + this.name + " can see: " + gridPosition.ToString() +"?: " + canUnitSeeThisPosition);
         return canUnitSeeThisPosition;
     }
@@ -373,5 +373,9 @@ public class BombRunUnit : MonoBehaviour
     public void SetUnitVisibility(bool isVisible)
     {
         this._animator.SetUnitVisibility(isVisible);
+    }
+    public List<GridPosition> GetUnitsVisibileGridPositions()
+    {
+        return _bombRunUnitFieldOfView.GetUnitsVisibileGridPositions();
     }
 }

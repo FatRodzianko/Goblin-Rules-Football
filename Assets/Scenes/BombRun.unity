@@ -22699,6 +22699,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _actionVisualsTileMap: {fileID: 2138507409}
   _actionVisualTile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
+  _calculatingVisualGrid: 0
   _gridVisualTypeColorList:
   - gridVisualType: 0
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -24168,11 +24169,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3006723863001832530, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 120
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3006723863001832530, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 42
+      value: 24
       objectReference: {fileID: 0}
     - target: {fileID: 3006723863001832530, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_LocalPosition.z
@@ -24349,10 +24350,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85482cfcf2f7ab141b42b4f7d946ad31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _visibileToPlayer: []
-  _visibileToEnemy: []
+  _unitsVisibleToPlayer: []
+  _unitsVisibileToEnemy: []
   _friendlyUnitVisibileGridPositions: []
   _enemyUnitVisibileGridPositions: []
+  _vector2PositionsVisibleToPlayer: []
+  _vector2PositionsVisibleToEnemy: []
 --- !u!1 &2138507406
 GameObject:
   m_ObjectHideFlags: 0

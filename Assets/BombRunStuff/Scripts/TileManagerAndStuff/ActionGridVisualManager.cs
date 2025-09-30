@@ -5,7 +5,14 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-
+public enum GridVisualType
+{
+    White,
+    Blue,
+    Red,
+    Yellow,
+    RedSoft
+}
 
 public class ActionGridVisualManager : MonoBehaviour
 {
@@ -16,14 +23,7 @@ public class ActionGridVisualManager : MonoBehaviour
         public Color color;
         public Tile tile;
     }
-    public enum GridVisualType
-    {
-        White,
-        Blue,
-        Red,
-        Yellow,
-        RedSoft
-    }
+    
     public static ActionGridVisualManager Instance { get; private set; }
 
 
@@ -150,27 +150,6 @@ public class ActionGridVisualManager : MonoBehaviour
     private void ShowGridPositionRangeRadius(GridPosition gridPosition, int range, GridVisualType gridVisualType)
     {
         List<GridPosition> gridPositionList = LevelGrid.Instance.GetGridPositionsInRadius(gridPosition, range);
-        //List<GridPosition> gridPositionList = new List<GridPosition>();
-        //for (int x = -range; x <= range; x++)
-        //{
-        //    for (int y = -range; y <= range; y++)
-        //    {
-        //        GridPosition testGridPosition = gridPosition + new GridPosition(x, y);
-        //        if (testGridPosition == gridPosition)
-        //        {
-        //            continue;
-        //        }
-        //        if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
-        //        {
-        //            continue;
-        //        }
-        //        if (LevelGrid.Instance.CalculateDistance(gridPosition, testGridPosition) > range * 10)
-        //        {
-        //            continue;
-        //        }
-        //        gridPositionList.Add(testGridPosition);
-        //    }
-        //}
         ShowActionVisualsFromList(gridPositionList, gridVisualType);
     }
     public void ShowActionVisualsFromList(List<GridPosition> gridPositions, GridVisualType gridVisualType)
@@ -221,6 +200,10 @@ public class ActionGridVisualManager : MonoBehaviour
         }
 
         GridVisualType gridVisualType;
+        GridVisualType gridRangeVisualType = GridVisualType.RedSoft;
+        int gridVisualRange = -1;
+        bool squareGridRange = false;
+
         switch (selectedAction)
         {
             default:
@@ -238,13 +221,17 @@ public class ActionGridVisualManager : MonoBehaviour
                 break;
             case SwordAction swordAction:
                 gridVisualType = GridVisualType.Red;
+                gridVisualRange = swordAction.GetMaxSwordDistance();
+                gridRangeVisualType = GridVisualType.RedSoft;
                 if (LevelGrid.Instance.GetGridObjectGridSystem().GetType() == typeof(GridSystemHex<GridObject>))
                 {
-                    ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
+                    //ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
+
                 }
                 else
                 {
-                    ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
+                    //ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
+                    squareGridRange = true;                    
                 }
                 
                 break;
@@ -253,7 +240,9 @@ public class ActionGridVisualManager : MonoBehaviour
                 break;
             case ShootAction shootAction:
                 gridVisualType = GridVisualType.Red;
-                ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), shootAction.GetMaxShootDistance(), GridVisualType.RedSoft);
+                //ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), shootAction.GetMaxShootDistance(), GridVisualType.RedSoft);
+                gridVisualRange = shootAction.GetMaxShootDistance();
+                gridRangeVisualType = GridVisualType.RedSoft;
                 break;
         }
 
@@ -262,6 +251,7 @@ public class ActionGridVisualManager : MonoBehaviour
         if (selectedAction.CanGetValidListAsTask())
         {
             _calculatingVisualGrid = true;
+            //Debug.Log("UpdateActionVisuals: Getting valid list as a task...");
             actionVisualPositions = await selectedAction.GetValidActionGridPositionListAsTask();
         }
         else
@@ -274,6 +264,18 @@ public class ActionGridVisualManager : MonoBehaviour
 
         // Hide the current action visuals, then add the new ones
         HideAllActionVisuals();
+        // Add the semi-transparent "Grid Range" visual indicators, if the action uses one?
+        if (gridVisualRange > 0)
+        {
+            if (squareGridRange)
+            {
+                ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), gridVisualRange, gridRangeVisualType);
+            }
+            else
+            {
+                ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), gridVisualRange, gridRangeVisualType);
+            }
+        }
         ShowActionVisualsFromList(actionVisualPositions, gridVisualType);
         _calculatingVisualGrid = false;
     }

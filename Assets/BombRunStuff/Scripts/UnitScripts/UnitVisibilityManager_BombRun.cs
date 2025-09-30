@@ -14,7 +14,7 @@ public class VisibileUnitAndDiscoverer
 [Serializable]
 public class VisibleGridPositionsByUnit
 {
-    public BombRunUnit Discoverer;
+    public BombRunUnit LastObservedBy;
     public GridPosition VisibleGridPosition;
 }
 public class UnitVisibilityManager_BombRun : MonoBehaviour
@@ -30,6 +30,12 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     [Header("Visibile Grid Positions")]
     [SerializeField] private List<VisibleGridPositionsByUnit> _friendlyUnitVisibileGridPositions = new List<VisibleGridPositionsByUnit>();
     [SerializeField] private List<VisibleGridPositionsByUnit> _enemyUnitVisibileGridPositions = new List<VisibleGridPositionsByUnit>();
+
+    [SerializeField] private List<GridPosition> _gridPositionsVisibleToPlayer = new List<GridPosition>();
+    [SerializeField] private List<GridPosition> _gridPositionsVisibleToEnemy = new List<GridPosition>();
+
+    [SerializeField] private List<Vector2> _vector2PositionsVisibleToPlayer = new List<Vector2>();
+    [SerializeField] private List<Vector2> _vector2PositionsVisibleToEnemy = new List<Vector2>();
 
     private void Awake()
     {
@@ -79,15 +85,16 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     //}
     private bool CheckIfMovedUnitCanBeSeen(BombRunUnit unit, BombRunUnit skipUnit = null)
     {
-        List<BombRunUnit> unitsToCheck = new List<BombRunUnit>();
-        if (unit.IsEnemy())
-        {
-            unitsToCheck.AddRange(BombRunUnitManager.Instance.GetFriendlyUnitList());
-        }
-        else
-        {
-            unitsToCheck.AddRange(BombRunUnitManager.Instance.GetEnemyUnitList());
-        }
+        //List<BombRunUnit> unitsToCheck = new List<BombRunUnit>();
+        //if (unit.IsEnemy())
+        //{
+        //    unitsToCheck.AddRange(BombRunUnitManager.Instance.GetFriendlyUnitList());
+        //}
+        //else
+        //{
+        //    unitsToCheck.AddRange(BombRunUnitManager.Instance.GetEnemyUnitList());
+        //}
+        List<BombRunUnit> unitsToCheck = GetUnitsEnemies(unit);
 
         if (unitsToCheck.Count == 0)
             return false;
@@ -213,6 +220,224 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
         foreach (BombRunUnit spottedUnit in newSpottedUnits)
         {
             AddUnitToVisibilityList(spottedUnit, discoveringUnit);
+        }
+    }
+    public void UnitUpdatedVisibleGridPositions(BombRunUnit discoveringUnit, List<GridPosition> newGridPositions)
+    {
+        List<VisibleGridPositionsByUnit> currentVisibleGridPositions = new List<VisibleGridPositionsByUnit>();
+        if (discoveringUnit.IsEnemy())
+        {
+            currentVisibleGridPositions = _enemyUnitVisibileGridPositions;
+        }
+        else
+        {
+            currentVisibleGridPositions = _friendlyUnitVisibileGridPositions;
+        }
+        // Find the positions that the discovering unit is the LastObservedByUnit
+        // Check those positions to see if any teammates can see them
+        // if they can, update that position's LastObservedBy
+        // if no teammates can see the position, add to RemoveFromVisibleListw
+        List<GridPosition> lastObservedByDiscoverer = currentVisibleGridPositions.FindAll(x => x.LastObservedBy == discoveringUnit).Select(o => o.VisibleGridPosition).ToList();
+        List<GridPosition> removeFromVisibleList = new List<GridPosition>();
+        if (lastObservedByDiscoverer.Count > 0)
+        {
+            List<BombRunUnit> teammates = GetUnitsTeammates(discoveringUnit);
+            foreach (GridPosition gridPosition in lastObservedByDiscoverer)
+            {
+                bool seenByTeammate = false;
+                foreach (BombRunUnit teammate in teammates)
+                {
+                    if (teammate == discoveringUnit)
+                        continue;
+
+                    if (teammate.CanUnitSeeThisPosition(gridPosition))
+                    {
+                        currentVisibleGridPositions.FirstOrDefault(x => x.VisibleGridPosition == gridPosition).LastObservedBy = teammate;
+                        seenByTeammate = true;
+                        break;
+                    }
+                }
+                if (seenByTeammate)
+                {
+                    removeFromVisibleList.Add(gridPosition);
+                }
+            }
+        }
+
+        
+    }
+    public void UpdateTeamsVisibleGridPositions(BombRunUnit unit, List<GridPosition> unitsVisibleGridPositions)
+    {
+        List<BombRunUnit> teammates = GetUnitsTeammates(unit);
+        List<GridPosition> newGridPositions = new List<GridPosition>();
+        newGridPositions.AddRange(unitsVisibleGridPositions);
+
+        List<GridPosition> previousGridPositions = GetTeamsVisibileGridPositions(unit);
+
+        foreach (BombRunUnit teammate in teammates)
+        {
+            if (teammate == unit)
+            {
+                continue;
+            }
+            newGridPositions.AddRange(teammate.GetUnitsVisibileGridPositions());
+        }
+
+        List<GridPosition> newGridPositionsUnique = newGridPositions.Distinct().ToList();
+        List<GridPosition> teamVisibilityList = new List<GridPosition>();
+        teamVisibilityList.AddRange(GetTeamsVisibileGridPositions(unit));
+
+        // add and remove lists to send to the fog of war tilemap manager to update tiles as needed
+        List<GridPosition> removeFromVisibleGridPositions = new List<GridPosition>();
+        List<GridPosition> addToVisibileGridPosition = new List<GridPosition>();
+        foreach (GridPosition gridPosition in teamVisibilityList)
+        {
+            if (!newGridPositionsUnique.Contains(gridPosition))
+            {
+                removeFromVisibleGridPositions.Add(gridPosition);
+            }
+        }
+        foreach (GridPosition gridPosition in newGridPositionsUnique)
+        {
+            if (!teamVisibilityList.Contains(gridPosition))
+            {
+                addToVisibileGridPosition.Add(gridPosition);
+            }
+        }
+
+        if (unit.IsEnemy())
+        {
+            _gridPositionsVisibleToEnemy.Clear();
+            _gridPositionsVisibleToEnemy.AddRange(newGridPositionsUnique);
+            _vector2PositionsVisibleToEnemy.Clear();
+            foreach (GridPosition gridPosition in newGridPositionsUnique)
+            {
+                _vector2PositionsVisibleToEnemy.Add(new Vector2(gridPosition.x, gridPosition.y));
+            }
+        }
+        else
+        {
+            _gridPositionsVisibleToPlayer.Clear();
+            _gridPositionsVisibleToPlayer.AddRange(newGridPositionsUnique);
+            _vector2PositionsVisibleToPlayer.Clear();
+            foreach (GridPosition gridPosition in newGridPositionsUnique)
+            {
+                _vector2PositionsVisibleToPlayer.Add(new Vector2(gridPosition.x, gridPosition.y));
+            }
+        }
+
+    }
+    public void UpdateTeamsVisibleGridPositions(BombRunUnit unit, List<GridPosition> newVisibleGridPositions, List<GridPosition> previousVisibleGridPositions)
+    {
+        
+        // get team's visibleGridPositionList
+        List<GridPosition> teamVisibilityList = new List<GridPosition>();
+        teamVisibilityList.AddRange(GetTeamsVisibileGridPositions(unit));// GetTeamsVisibileGridPositions(unit);
+        Debug.Log("UpdateTeamsVisibleGridPositions: " + unit + " newVisibleGridPosition.Count: " + newVisibleGridPositions.Count() + " previousVisibleGridPosition.Count: " + previousVisibleGridPositions.Count() + " teamVisibilityList.Count: " + teamVisibilityList.Count());
+        List<GridPosition> removeFromVisibleGridPositions = new List<GridPosition>();
+        removeFromVisibleGridPositions.AddRange(previousVisibleGridPositions);
+        List<GridPosition> addToVisibileGridPosition = new List<GridPosition>();
+        // Go through each previousVisibleGridPosition, check if in newVisibleGridPosition. If it is NOT, add to removeFromVisibleGridPositions
+        foreach (GridPosition gridPosition in previousVisibleGridPositions)
+        {
+            // // if position from previousVisibleGridPosition IS in newVisibleGridPosition, remove from newVisibleGridPosition since we know those are already in the team's visibleGridPosition list?
+            if (newVisibleGridPositions.Contains(gridPosition))
+            {
+                newVisibleGridPositions.Remove(gridPosition);
+                removeFromVisibleGridPositions.Remove(gridPosition);
+            }            
+        }
+
+        // check each removeFromVisibleGridPositions against each teammate's HasThisUnitSeenThisGridPosition. If true, remove from removeFromVisibleGridPositions
+        List<GridPosition> checkIfTeammatesCanSee = new List<GridPosition>();
+        checkIfTeammatesCanSee.AddRange(removeFromVisibleGridPositions);
+        List<BombRunUnit> teammates = GetUnitsTeammates(unit);
+        foreach (GridPosition gridPosition in checkIfTeammatesCanSee)
+        {
+            foreach (BombRunUnit teammate in teammates)
+            {
+                if (teammate == unit)
+                    continue;
+                if (teammate.CanUnitSeeThisPosition(gridPosition))
+                {
+                    removeFromVisibleGridPositions.Remove(gridPosition);
+                    break;
+                }
+            }
+        }
+        // next, go through newVisibleGridPosition and check against team's visibleGridPositionList
+        foreach (GridPosition gridPosition in newVisibleGridPositions)
+        {
+            // // if it is already in visibleGridPositionList, ignore
+            // // if it is NOT in visibleGridPositionList, add to addToVisibileGridPosition
+            if (!teamVisibilityList.Contains(gridPosition))
+            {
+                addToVisibileGridPosition.Add(gridPosition);
+            }
+        }
+
+        // remove removeFromVisibleGridPositions from team's visibleGridPositionList
+        foreach (GridPosition gridPosition in removeFromVisibleGridPositions)
+        {
+            teamVisibilityList.Remove(gridPosition);
+        }
+        // add addToVisibileGridPosition to team's visibleGridPositionList
+        foreach (GridPosition gridPosition in addToVisibileGridPosition)
+        {
+            teamVisibilityList.Add(gridPosition);
+        }
+        if (unit.IsEnemy())
+        {
+            _gridPositionsVisibleToEnemy.Clear();
+            _gridPositionsVisibleToEnemy.AddRange(teamVisibilityList);
+            _vector2PositionsVisibleToEnemy.Clear();
+            foreach (GridPosition gridPosition in teamVisibilityList)
+            {
+                _vector2PositionsVisibleToEnemy.Add(new Vector2(gridPosition.x, gridPosition.y));
+            }
+        }
+        else
+        {
+            _gridPositionsVisibleToPlayer.Clear();
+            _gridPositionsVisibleToPlayer.AddRange(teamVisibilityList);
+            _vector2PositionsVisibleToPlayer.Clear();
+            foreach (GridPosition gridPosition in teamVisibilityList)
+            {
+                _vector2PositionsVisibleToPlayer.Add(new Vector2(gridPosition.x, gridPosition.y));
+            }
+        }
+    }
+    private List<GridPosition> GetTeamsVisibileGridPositions(BombRunUnit unit)
+    {
+        if (unit.IsEnemy())
+        {
+            return _gridPositionsVisibleToEnemy;
+        }
+        else
+        {
+            return _gridPositionsVisibleToPlayer;
+        }
+    }
+    private List<BombRunUnit> GetUnitsTeammates(BombRunUnit unit)
+    {
+        if (unit.IsEnemy())
+        {
+            return BombRunUnitManager.Instance.GetEnemyUnitList();
+        }
+        else
+        {
+            return BombRunUnitManager.Instance.GetFriendlyUnitList();
+        }
+    }
+    private List<BombRunUnit> GetUnitsEnemies(BombRunUnit unit)
+    {
+        if (unit.IsEnemy())
+        {
+            return BombRunUnitManager.Instance.GetFriendlyUnitList();
+        }
+        else
+        {
+            return BombRunUnitManager.Instance.GetEnemyUnitList();
         }
     }
 }

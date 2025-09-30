@@ -44,6 +44,12 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] private bool _canTargetFriendlyUnits = false;
     [SerializeField] private bool _canGetValidListAsTask = false;
 
+    [Header("Action Grid Visuals")]
+    [SerializeField] GridVisualType _gridRangeVisualType = GridVisualType.RedSoft;
+    [SerializeField] int _gridVisualRange = -1;
+    [SerializeField] bool _squareGridRange = false;
+    [SerializeField] bool _showGridVisualRange = false;
+
     [Header("Animation Stuff")]
     [SerializeField] protected BombRunUnitAnimator _bombRunUnitAnimator;
 
@@ -318,5 +324,21 @@ public abstract class BaseAction : MonoBehaviour
     {
         return _canGetValidListAsTask;
 
+    }
+    public GridVisualType GridRangeVisualType()
+    {
+        return _gridRangeVisualType;
+    }
+    public int GridVisualRange()
+    {
+        return _gridVisualRange;
+    }
+    public bool SquareGridRange()
+    {
+        return _squareGridRange;
+    }
+    public bool ShowGridVisualRange()
+    {
+        return _showGridVisualRange;
     }
 }
