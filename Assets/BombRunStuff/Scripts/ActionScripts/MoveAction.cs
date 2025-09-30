@@ -120,16 +120,7 @@ public class MoveAction : BaseAction
     {
         // Get the path to the end position
         List<GridPosition> pathGridPositionList =  PathFinding.Instance.FindPath(_unit.GetGridPosition(), gridPosition, out int pathLength, _maxMoveDistance);
-        //List<GridPosition> pathGridPositionList = PathFinding.Instance.FindPathDots(_unit.GetGridPosition(), gridPosition, out int pathLength);
 
-        //string pathString = "";
-        //for (int i = 0; i < pathGridPositionList.Count; i++)
-        //{
-        //    pathString += i.ToString() + ": " + pathGridPositionList[i].ToString() + " ";
-        //}
-        //Debug.Log("PathFinding: Setup test path: " + pathString);
-
-        //Debug.Log("MoveAction: TakeAction: Path starting at: " + _unit.GetGridPosition() + " and ending at: " + gridPosition + ": path length: " + pathLength + " and now the path: " + pathString);
         _currentPositionIndex = 0;
         _positionList = new List<Vector3>();
 
@@ -147,10 +138,7 @@ public class MoveAction : BaseAction
             _positionList.Add(LevelGrid.Instance.GetWorldPosition(pathGridPosition));
         }
 
-        //_onActionComplete = onActionComplete;
-        //_isActive = true;
         ActionStart(onActionComplete);
-
         OnStartMoving?.Invoke(this, EventArgs.Empty);
     }
     public override List<GridPosition> GetValidActionGridPositionList()

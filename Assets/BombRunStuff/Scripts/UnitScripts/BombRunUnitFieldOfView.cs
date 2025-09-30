@@ -22,6 +22,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     private Vector3 _origin = Vector3.zero;
     private float _startingAngle = 0f;
     private float _aimDirectionAngle = 0f;
+    [SerializeField] private Vector2 _aimDirectionVector = Vector2.zero;
     
 
     [Header("Unit movement and other triggers for mesh creation")]
@@ -350,14 +351,18 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     private void Unit_OnActionDirectionChanged(object sender, Vector2 actionDirection)
     {
         SetAimDirection(actionDirection);
-        if(!_isMoving)
+        if (!_isMoving)
+        {
             //UpdateFOVMesh();
+        }
         GetVisibileGridPositions();
     }
     public void SetAimDirection(Vector3 aimDirection)
     {
+        // convert to angle set to 8 direction movement
         _aimDirectionAngle = GetAngleFromVectorFloat(aimDirection.normalized, true);
         _startingAngle = _aimDirectionAngle + _fov / 2f;
+        _aimDirectionVector = GetVectorFromAngle(_aimDirectionAngle);
     }
     
     public Vector3 GetVectorFromAngle(float angle)
@@ -487,7 +492,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         float distanceToWorldPosition = Vector2.Distance(unitWorldPosition, targetWorldPosition);
         // check the angle from the player to the position. If it is outside of FOV, return false
         Vector3 directionToPosition = (targetWorldPosition - unitWorldPosition).normalized;
-        Vector3 vectorFromAngle = GetVectorFromAngle(_aimDirectionAngle);
+        //Vector3 vectorFromAngle = GetVectorFromAngle(_aimDirectionAngle);
+        Vector3 vectorFromAngle = _aimDirectionVector;
         float angle = Vector3.Angle(vectorFromAngle, directionToPosition);
 
         if ((int)angle > (int)(_fov / 2f))
@@ -507,6 +513,11 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         for (int i = 0; i < raycastHits2D.Length; i++)
         {
+            // I think this will let you see the grid position that a wall or obstacle is on? Before the Fog Of War would never be revealed on walls...
+            if (Vector2.Distance(targetWorldPosition, raycastHits2D[i].point) <= Mathf.Sqrt(LevelGrid.Instance.GetGridCellSize()))
+            {
+                return true;
+            }
             if (raycastHits2D[i].collider.CompareTag("BombRunWall"))
             {
                 return false;
@@ -590,6 +601,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
 
         _visibleUnits.Clear();
+        _visibleGridPositions.Add(this._unit.GetGridPosition());
+        //_visibleGridPositions.AddRange(GetAdjacentGridPositions(this._unit.GetGridPosition()));
         foreach (GridPosition gridPosition in gridRadius)
         {
 
@@ -612,6 +625,69 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
         //UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions, previousVisibileGridPositions);
         UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions);
+    }
+    private List<GridPosition> GetAdjacentGridPositions(GridPosition gridPosition)
+    {
+        List<GridPosition> adjacentGridPositions = new List<GridPosition>();
+
+        if (_aimDirectionVector == Vector2.right || _aimDirectionVector == Vector2.left)
+        {
+            GridPosition gridPosition1 = new GridPosition(gridPosition.x, gridPosition.y + 1);
+            if (LevelGrid.Instance.IsValidGridPosition(gridPosition1))
+            {
+                adjacentGridPositions.Add(gridPosition1);
+            }
+
+            GridPosition gridPosition2 = new GridPosition(gridPosition.x, gridPosition.y - 1);
+            if (LevelGrid.Instance.IsValidGridPosition(gridPosition2))
+            {
+                adjacentGridPositions.Add(gridPosition2);
+            }
+        }
+        else if (_aimDirectionVector == Vector2.up || _aimDirectionVector == Vector2.down)
+        {
+            GridPosition gridPosition1 = new GridPosition(gridPosition.x + 1, gridPosition.y);
+            if (LevelGrid.Instance.IsValidGridPosition(gridPosition1))
+            {
+                adjacentGridPositions.Add(gridPosition1);
+            }
+
+            GridPosition gridPosition2 = new GridPosition(gridPosition.x - 1, gridPosition.y);
+            if (LevelGrid.Instance.IsValidGridPosition(gridPosition2))
+            {
+                adjacentGridPositions.Add(gridPosition2);
+            }
+        }
+        else if (_aimDirectionVector == (new Vector2(1,1)).normalized || _aimDirectionVector == (new Vector2(-1, -1)).normalized)
+        {
+            GridPosition gridPosition1 = new GridPosition(gridPosition.x - 1, gridPosition.y + 1);
+            if (LevelGrid.Instance.IsValidGridPosition(gridPosition1))
+            {
+                adjacentGridPositions.Add(gridPosition1);
+            }
+
+            GridPosition gridPosition2 = new GridPosition(gridPosition.x + 1, gridPosition.y - 1);
+            if (LevelGrid.Instance.IsValidGridPosition(gridPosition2))
+            {
+                adjacentGridPositions.Add(gridPosition2);
+            }
+        }
+        else if (_aimDirectionVector == (new Vector2(-1, 1)).normalized || _aimDirectionVector == (new Vector2(1, -1)).normalized)
+        {
+            GridPosition gridPosition1 = new GridPosition(gridPosition.x - 1, gridPosition.y - 1);
+            if (LevelGrid.Instance.IsValidGridPosition(gridPosition1))
+            {
+                adjacentGridPositions.Add(gridPosition1);
+            }
+
+            GridPosition gridPosition2 = new GridPosition(gridPosition.x + 1, gridPosition.y + 1);
+            if (LevelGrid.Instance.IsValidGridPosition(gridPosition2))
+            {
+                adjacentGridPositions.Add(gridPosition2);
+            }
+        }
+
+        return adjacentGridPositions;
     }
     public List<GridPosition> GetUnitsVisibileGridPositions()
     {

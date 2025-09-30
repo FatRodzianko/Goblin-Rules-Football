@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,11 @@ public class FogOfWarTileMapManager : MonoBehaviour
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _blackoutFogOfWarTileMap;
     [SerializeField] private Tilemap _greyedOutFogOfWarTileMap;
+    [SerializeField] private Tilemap _enemyFogOfWarTileMap;
+
+    [Header("Tiles")]
+    [SerializeField] private Tile _fogOfWarTile;
+    [SerializeField] private Tile _fogOfWarWhiteTile;
 
 
     private void Awake()
@@ -29,12 +35,39 @@ public class FogOfWarTileMapManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
+        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
+
+        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionVisibleToEnemy += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToEnemy;
+        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToEnemy += UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToEnemy;
+    }   
+
+    private void OnDisable()
+    {
+        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
+        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
+
+        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionVisibleToEnemy -= UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToEnemy;
+        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToEnemy -= UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToEnemy;
+    }
+    private void UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer(object sender, GridPosition e)
+    {
+        _greyedOutFogOfWarTileMap.SetTile(new Vector3Int(e.x, e.y, 0), _fogOfWarTile);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer(object sender, GridPosition e)
     {
-        
+        _greyedOutFogOfWarTileMap.SetTile(new Vector3Int(e.x, e.y, 0), null);
+        _blackoutFogOfWarTileMap.SetTile(new Vector3Int(e.x, e.y, 0), null);
     }
+    private void UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToEnemy(object sender, GridPosition e)
+    {
+        _enemyFogOfWarTileMap.SetTile(new Vector3Int(e.x, e.y, 0), null);
+    }
+
+    private void UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToEnemy(object sender, GridPosition e)
+    {
+        _enemyFogOfWarTileMap.SetTile(new Vector3Int(e.x, e.y, 0), _fogOfWarWhiteTile);
+    }
+
 }

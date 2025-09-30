@@ -37,6 +37,13 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     [SerializeField] private List<Vector2> _vector2PositionsVisibleToPlayer = new List<Vector2>();
     [SerializeField] private List<Vector2> _vector2PositionsVisibleToEnemy = new List<Vector2>();
 
+    // events?
+    public event EventHandler<GridPosition> OnMakeGridPositionVisibleToPlayer;
+    public event EventHandler<GridPosition> OnMakeGridPositionNotVisibleToPlayer;
+
+    public event EventHandler<GridPosition> OnMakeGridPositionVisibleToEnemy;
+    public event EventHandler<GridPosition> OnMakeGridPositionNotVisibleToEnemy;
+
     private void Awake()
     {
         MakeInstance();
@@ -314,6 +321,17 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             {
                 _vector2PositionsVisibleToEnemy.Add(new Vector2(gridPosition.x, gridPosition.y));
             }
+
+            // update the tile maps by call event on the remove list
+            foreach (GridPosition gridPosition in removeFromVisibleGridPositions)
+            {
+                OnMakeGridPositionNotVisibleToEnemy?.Invoke(this, gridPosition);
+            }
+            // update the tile maps by call event on the add list
+            foreach (GridPosition gridPosition in addToVisibileGridPosition)
+            {
+                OnMakeGridPositionVisibleToEnemy?.Invoke(this, gridPosition);
+            }
         }
         else
         {
@@ -324,7 +342,18 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             {
                 _vector2PositionsVisibleToPlayer.Add(new Vector2(gridPosition.x, gridPosition.y));
             }
+            // update the tile maps by call event on the remove list
+            foreach (GridPosition gridPosition in removeFromVisibleGridPositions)
+            {
+                OnMakeGridPositionNotVisibleToPlayer?.Invoke(this, gridPosition);
+            }
+            // update the tile maps by call event on the add list
+            foreach (GridPosition gridPosition in addToVisibileGridPosition)
+            {
+                OnMakeGridPositionVisibleToPlayer?.Invoke(this, gridPosition);
+            }
         }
+
 
     }
     public void UpdateTeamsVisibleGridPositions(BombRunUnit unit, List<GridPosition> newVisibleGridPositions, List<GridPosition> previousVisibleGridPositions)
@@ -406,6 +435,10 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
                 _vector2PositionsVisibleToPlayer.Add(new Vector2(gridPosition.x, gridPosition.y));
             }
         }
+    }
+    private void UpdateTileMapVisibility(BombRunUnit unit, List<GridPosition> makeNotVisible, List<GridPosition> makeVisible)
+    {
+        // make tiles not visible
     }
     private List<GridPosition> GetTeamsVisibileGridPositions(BombRunUnit unit)
     {
