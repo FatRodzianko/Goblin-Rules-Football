@@ -64,10 +64,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
 
         LevelGrid.Instance.OnWallsAndFloorsPlacedCompleted += LevelGrid_OnWallsAndFloorsPlacedCompleted;
-
-        //SetFOVMaterial(_unit.IsEnemy());
-        //SetAimDirection(_unit.GetActionDirection());
-        //UpdateFOVMesh();
+        BaseBombRunObstacle.OnAnyObstacleCoverTypeChanged += BombRunObstacle_OnAnyObstacleCoverTypeChanged;
     }
 
     
@@ -82,6 +79,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             moveAction.OnStopMoving -= MoveAction_OnStopMoving;
         }
         LevelGrid.Instance.OnWallsAndFloorsPlacedCompleted -= LevelGrid_OnWallsAndFloorsPlacedCompleted;
+        BaseBombRunObstacle.OnAnyObstacleCoverTypeChanged -= BombRunObstacle_OnAnyObstacleCoverTypeChanged;
     }
     public void InitializeFOV()
     {
@@ -407,6 +405,14 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         return _visibleGridPositions.Contains(gridPosition);
     }
+    private void BombRunObstacle_OnAnyObstacleCoverTypeChanged(object sender, GridPosition e)
+    {
+        if (HasThisUnitSeenThisGridPosition(e))
+        {
+            Debug.Log("BombRunObstacle_OnAnyObstacleCoverTypeChanged: updating position: " + e + " for: " + this._unit);
+            GetVisibileGridPositions();
+        }
+    }
     public bool CanUnitSeeWorldPosition(Vector3 position)
     {
         //Debug.Log("CanUnitSeeWorldPosition: " + position.ToString());
@@ -532,7 +538,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     }
                     else
                     {
-                        //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is blocked by an obstacle.");
+                        Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is blocked by an obstacle.");
                         return false;
                     }
                 }
@@ -603,6 +609,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         _visibleUnits.Clear();
         _visibleGridPositions.Add(this._unit.GetGridPosition());
         //_visibleGridPositions.AddRange(GetAdjacentGridPositions(this._unit.GetGridPosition()));
+        List<GridPosition> gridRadiusNotInView = new List<GridPosition>();
+        gridRadiusNotInView.AddRange(gridRadius);
         foreach (GridPosition gridPosition in gridRadius)
         {
 
@@ -610,6 +618,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
             if (canUnitSeePosition)
             {
+                gridRadiusNotInView.Remove(gridPosition);
                 _visibleGridPositions.Add(gridPosition);
                 _visibleVector2Positions.Add(new Vector2(gridPosition.x, gridPosition.y));
                 if (LevelGrid.Instance.HasAnyUnitOnGridPosition(gridPosition))
@@ -624,7 +633,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             }
         }
         //UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions, previousVisibileGridPositions);
-        UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions);
+        UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions, gridRadiusNotInView);
     }
     private List<GridPosition> GetAdjacentGridPositions(GridPosition gridPosition)
     {

@@ -31,7 +31,7 @@ public class PathFinding : MonoBehaviour
     //[SerializeField] PathFindingFindValidPositionJob _pathFindingFindValidPositionJob;
 
     // events
-    public event EventHandler IsWalkableUpdated;
+    public event EventHandler<GridPosition> IsWalkableUpdated;
 
     private void Awake()
     {
@@ -475,7 +475,7 @@ public class PathFinding : MonoBehaviour
     public void SetIsWalkableGridPosition(GridPosition gridPosition, bool isWalkable)
     {
         _gridSystem.GetGridObject(gridPosition).SetIsWalkable(isWalkable);
-        IsWalkableUpdated?.Invoke(this, EventArgs.Empty);
+        IsWalkableUpdated?.Invoke(this, gridPosition);
     }
     public int GetGridWidth()
     {

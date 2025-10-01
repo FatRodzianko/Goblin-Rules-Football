@@ -19,6 +19,7 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
 
     // Actions
     public static event EventHandler<GridPosition> OnAnyObstacleDestroyed;
+    public static event EventHandler<GridPosition> OnAnyObstacleCoverTypeChanged;
 
     private void Start()
     {
@@ -59,6 +60,7 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
     public void SetObstacleCoverType(ObstacleCoverType newCoverType)
     {
         this._obstacleCoverType = newCoverType;
+        OnAnyObstacleCoverTypeChanged?.Invoke(this, LevelGrid.Instance.GetGridPositon(this.transform.position));
     }
     public ObstacleCoverType GetObstacleCoverType()
     {

@@ -49,7 +49,7 @@ public class MoveAction : BaseAction
         PathFinding.Instance.IsWalkableUpdated -= PathFinding_IsWalkableUpdated;
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
     }
-    private void PathFinding_IsWalkableUpdated(object sender, EventArgs e)
+    private void PathFinding_IsWalkableUpdated(object sender, GridPosition gridPosition)
     {
         ResetCachedValidPositionList();
     }

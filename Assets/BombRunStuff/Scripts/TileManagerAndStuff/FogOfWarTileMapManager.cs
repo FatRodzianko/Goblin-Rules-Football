@@ -52,6 +52,7 @@ public class FogOfWarTileMapManager : MonoBehaviour
     }
     private void UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer(object sender, GridPosition e)
     {
+        _blackoutFogOfWarTileMap.SetTile(new Vector3Int(e.x, e.y, 0), null);
         _greyedOutFogOfWarTileMap.SetTile(new Vector3Int(e.x, e.y, 0), _fogOfWarTile);
     }
 
