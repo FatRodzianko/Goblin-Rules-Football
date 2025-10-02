@@ -374,6 +374,10 @@ public class BombRunUnit : MonoBehaviour
     {
         this._animator.SetUnitVisibility(isVisible);
     }
+    public bool GetUnitVisibility()
+    {
+        return this._animator.GetUnitVisibility();
+    }
     public List<GridPosition> GetUnitsVisibileGridPositions()
     {
         return _bombRunUnitFieldOfView.GetUnitsVisibileGridPositions();

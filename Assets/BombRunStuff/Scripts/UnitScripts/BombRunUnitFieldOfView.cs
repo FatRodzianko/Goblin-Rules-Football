@@ -538,7 +538,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is blocked by an obstacle.");
+                        //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is blocked by an obstacle.");
                         return false;
                     }
                 }
