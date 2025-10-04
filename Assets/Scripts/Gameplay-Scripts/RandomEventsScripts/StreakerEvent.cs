@@ -60,10 +60,10 @@ public class StreakerEvent : NetworkBehaviour
     {
         if (isServer)
         {
-            Debug.Log("OnTriggerEnter2D for StreakerEvent: " + this.name);
+            //Debug.Log("OnTriggerEnter2D for StreakerEvent: " + this.name);
             if (collision.tag == "Goblin")
             {
-                Debug.Log("StreakerEvent: collided with goblin named: " + collision.transform.name);
+                //Debug.Log("StreakerEvent: collided with goblin named: " + collision.transform.name);
                 uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
 
                 GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
@@ -87,18 +87,18 @@ public class StreakerEvent : NetworkBehaviour
     }
     public void StartAnimation()
     {
-        Debug.Log("StartAnimation for streaker event");
+        //Debug.Log("StartAnimation for streaker event");
         // Get where the Goblin has spawned. Top half of the field versus the bottom half
         Vector3 eventPosition = this.transform.position;
         if (eventPosition.y >= -0.6f)
         {
-            Debug.Log("Streaker-goblin StartAnimation: Goblin is on top half of field");
+            //Debug.Log("Streaker-goblin StartAnimation: Goblin is on top half of field");
             spawnPoint = new Vector3(eventPosition.x, topY, 0f);
             finalDestination = new Vector3(eventPosition.x, bottomY, 0f);
         }
         else
         {
-            Debug.Log("Streaker-goblin StartAnimation: Goblin is on bottom half of field");
+            //Debug.Log("Streaker-goblin StartAnimation: Goblin is on bottom half of field");
             spawnPoint = new Vector3(eventPosition.x, bottomY, 0f);
             finalDestination = new Vector3(eventPosition.x, topY, 0f);
         }

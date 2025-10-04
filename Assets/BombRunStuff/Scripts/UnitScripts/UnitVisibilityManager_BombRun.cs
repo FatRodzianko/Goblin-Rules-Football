@@ -44,6 +44,9 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     public event EventHandler<GridPosition> OnMakeGridPositionVisibleToEnemy;
     public event EventHandler<GridPosition> OnMakeGridPositionNotVisibleToEnemy;
 
+    public event EventHandler<BombRunUnit> OnEnemyUnitBecameVisible;
+    public event EventHandler<BombRunUnit> OnEnemyUnitBecameInVisible;
+
     private void Awake()
     {
         MakeInstance();
@@ -61,11 +64,18 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     private void Start()
     {
         // Change this so the event is fired from the BombRunUnit script and the unit is pased in the event? So the UnitVisibilityManager script will know what unit actually moved, and use their grid position for the checks?
-       BombRunUnit.OnAnyUnitMovedGridPosition += Unit_OnAnyUnitMovedGridPosition;
+        BombRunUnit.OnAnyUnitMovedGridPosition += Unit_OnAnyUnitMovedGridPosition;
+        this.OnEnemyUnitBecameVisible += UnitVisibilityManager_BombRun_OnEnemyUnitBecameVisible;
+        this.OnEnemyUnitBecameInVisible += UnitVisibilityManager_BombRun_OnEnemyUnitBecameInVisible;
     }
+
+    
+
     private void OnDisable()
     {
         BombRunUnit.OnAnyUnitMovedGridPosition -= Unit_OnAnyUnitMovedGridPosition;
+        this.OnEnemyUnitBecameVisible -= UnitVisibilityManager_BombRun_OnEnemyUnitBecameVisible;
+        this.OnEnemyUnitBecameInVisible -= UnitVisibilityManager_BombRun_OnEnemyUnitBecameInVisible;
     }
 
     private void Unit_OnAnyUnitMovedGridPosition(object sender, EventArgs e)
@@ -141,6 +151,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
                 _unitsVisibleToPlayer.Add(visibileUnitAndDiscoverer);
                 visibleUnit.SetUnitVisibility(true);
             }
+            OnEnemyUnitBecameVisible?.Invoke(this, visibleUnit);
         }
         else
         {
@@ -166,6 +177,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
                 VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _unitsVisibleToPlayer.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
                 _unitsVisibleToPlayer.Remove(visibileUnitAndDiscoverer);
                 visibleUnit.SetUnitVisibility(false);
+                OnEnemyUnitBecameInVisible?.Invoke(this, visibleUnit);
             }
         }
         else
@@ -339,6 +351,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             //{
             //    OnMakeGridPositionVisibleToEnemy?.Invoke(this, gridPosition);
             //}
+            //UpdateEnemyUnitVisibility(GetUnitsEnemies(unit)[0]);
         }
         else
         {
@@ -361,8 +374,6 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             }
             UpdateEnemyUnitVisibility(unit);
         }
-
-
     }
     public void UpdateEnemyUnitVisibility(BombRunUnit unit)
     {
@@ -395,6 +406,56 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             OnMakeGridPositionVisibleToEnemy?.Invoke(this, gridPosition);
         }
 
+    }
+    private void UnitVisibilityManager_BombRun_OnEnemyUnitBecameInVisible(object sender, BombRunUnit unit)
+    {
+        //List<BombRunUnit> teammates = new List<BombRunUnit>();
+        //teammates.AddRange(GetUnitsTeammates(unit));
+
+        //List<GridPosition> teammateVisibleGridPositions = new List<GridPosition>();
+        //foreach (BombRunUnit teammate in teammates)
+        //{
+        //    if (teammate == unit)
+        //    {
+        //        continue;
+        //    }
+
+        //    if (teammate.GetUnitVisibility())
+        //    {
+        //        teammateVisibleGridPositions.AddRange(teammate.GetUnitsVisibileGridPositions());
+        //    }
+        //}
+
+        //if (teammateVisibleGridPositions.Count == 0)
+        //{
+        //    return;
+        //}
+        //List<GridPosition> teammateVisibleGridPositionsUnique = teammateVisibleGridPositions.Distinct().ToList();
+        //List<GridPosition> unitVisibleGridPositions = unit.GetUnitsVisibileGridPositions();
+        //List<GridPosition> enemyVisibleGridPositionsToRemove = new List<GridPosition>();
+        //enemyVisibleGridPositionsToRemove.AddRange(unitVisibleGridPositions);
+
+
+        //foreach (GridPosition gridPosition in unitVisibleGridPositions)
+        //{
+        //    if (teammateVisibleGridPositionsUnique.Contains(gridPosition))
+        //    {
+        //        enemyVisibleGridPositionsToRemove.Remove(gridPosition);
+        //    }
+        //}
+
+        //foreach (GridPosition gridPosition in enemyVisibleGridPositionsToRemove)
+        //{
+        //    OnMakeGridPositionNotVisibleToEnemy?.Invoke(this, gridPosition);
+        //}
+    }
+
+    private void UnitVisibilityManager_BombRun_OnEnemyUnitBecameVisible(object sender, BombRunUnit unit)
+    {      
+        //foreach (GridPosition gridPosition in unit.GetUnitsVisibileGridPositions())
+        //{
+        //    OnMakeGridPositionVisibleToEnemy?.Invoke(this, gridPosition);
+        //}
     }
     //public void UpdateTeamsVisibleGridPositions(BombRunUnit unit, List<GridPosition> newVisibleGridPositions, List<GridPosition> previousVisibleGridPositions)
     //{

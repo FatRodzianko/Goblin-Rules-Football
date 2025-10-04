@@ -484,3 +484,8 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 - Almost all of this is from GetValidActionGridPositionList from MoveAction calculating all available move positions?
 - Can't call "ToString" from outside the main thread...
 - - - also can't do raycasts since "get_queriesHitTriggers" can only be called from the main thread
+
+### Unity security update stuff...
+# current versions of unity for games (before the security update):
+- Goblin Rules Football - 2021.3.10f1
+- StalksStalksStalks - 2019.4.13.f1
