@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,12 @@ public class UnitSelectedVisual : MonoBehaviour
     [SerializeField] private Sprite _notSelectedShadowSprite;
     [SerializeField] private Sprite _selectedShadowSprite;
 
+    private void Awake()
+    {
+        _unit.OnUnitVisibilityChanged += Unit_OnUnitVisibilityChanged;
+    }
+
+    
     private void Start()
     {
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChange;
@@ -27,6 +34,7 @@ public class UnitSelectedVisual : MonoBehaviour
     private void OnDisable()
     {
         UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChange;
+        _unit.OnUnitVisibilityChanged -= Unit_OnUnitVisibilityChanged;
     }
     private void UnitActionSystem_OnSelectedUnitChange(object sender, BombRunUnit unit)
     {
@@ -51,4 +59,10 @@ public class UnitSelectedVisual : MonoBehaviour
             _unitSpriteRenderer.material = _notSelectedMaterial;
         }
     }
+    private void Unit_OnUnitVisibilityChanged(object sender, bool isVisible)
+    {
+        //Debug.Log("UnitSelectedVisual: " + _unit.name + " isVisible: " + isVisible);
+        _shadowSpriteRenderer.enabled = isVisible;
+    }
+
 }

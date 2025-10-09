@@ -20222,7 +20222,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _sightRange
-      value: 20
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _actionPoints
@@ -33097,7 +33097,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 499015226548175057, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 16
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 499015226548175057, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -33139,9 +33139,17 @@ PrefabInstance:
       propertyPath: _actionPointsCost
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6501409079014098316, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7766671696441578061, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_Name
       value: UnitEnemy (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324460112503461452, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9011927230685996404, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: _actionPointsCost

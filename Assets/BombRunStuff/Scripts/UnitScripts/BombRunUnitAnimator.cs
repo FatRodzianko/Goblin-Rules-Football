@@ -31,6 +31,7 @@ public class BombRunUnitAnimator : MonoBehaviour
             shootAction.OnStartShooting += ShootAction_OnStartShooting;
             shootAction.OnStopShooting += ShootAction_OnStopShooting;
         }
+        _unit.OnUnitVisibilityChanged += Unit_OnUnitVisibilityChanged;
     }
 
    
@@ -47,6 +48,7 @@ public class BombRunUnitAnimator : MonoBehaviour
             shootAction.OnStartShooting -= ShootAction_OnStartShooting;
             shootAction.OnStopShooting -= ShootAction_OnStopShooting;
         }
+        _unit.OnUnitVisibilityChanged -= Unit_OnUnitVisibilityChanged;
     }
 
     private void MoveAction_OnStartMoving(object sender, EventArgs e)
@@ -117,5 +119,9 @@ public class BombRunUnitAnimator : MonoBehaviour
     public bool GetUnitVisibility()
     {
         return _spriteRenderer.enabled;
+    }
+    private void Unit_OnUnitVisibilityChanged(object sender, bool isVisible)
+    {
+        SetUnitVisibility(isVisible);
     }
 }

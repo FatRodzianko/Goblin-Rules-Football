@@ -30,6 +30,7 @@ public class BombRunUnitWorldUI : MonoBehaviour
 
     private void Start()
     {
+        _unit.OnUnitVisibilityChanged += Unit_OnUnitVisibilityChanged;
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         _unit.OnActionTaken += Unit_OnActionTaken;
         BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
@@ -46,9 +47,9 @@ public class BombRunUnitWorldUI : MonoBehaviour
     }
 
     
-
     private void OnDisable()
     {
+        _unit.OnUnitVisibilityChanged -= Unit_OnUnitVisibilityChanged;
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
         _healthSystem.OnTakeDamage -= HealthSystem_OnTakeDamage;
@@ -108,6 +109,40 @@ public class BombRunUnitWorldUI : MonoBehaviour
                 bodyPartToSpriteObjectMapping.Sprite.sprite = scriptableBodyPartSprites.GetSpriteForState(state);
             }
         }
+    }
+    private void Unit_OnUnitVisibilityChanged(object sender, bool isVisible)
+    {
+        SetBodyPartHealthUIVisibility(isVisible);
+        SetActionPointTextVisibility(isVisible);
+    }
+    void SetBodyPartHealthUIVisibility(bool isVisible)
+    {
+        foreach (Transform transform in _bodyPartSpriteHolder)
+        {
+            try
+            {
+                transform.GetComponent<SpriteRenderer>().enabled = isVisible;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("SetBodyPartHealthUIVisibility: error: " + e);
+            }
+        }
+    }
+    void SetActionPointTextVisibility(bool isVisible)
+    {
+        try
+        {
+            _actionPointsText.GetComponent<MeshRenderer>().enabled = isVisible;
+        }
+        catch (Exception e)
+        {
+            Debug.Log("SetActionPointTextVisibility: error: " + e);
+        }
+    }
+    void SetActionSymbolSpriteVisibility(bool isVisible)
+    {
+        _actionSymbolSpriteRenderer.enabled = isVisible;    
     }
 
 }

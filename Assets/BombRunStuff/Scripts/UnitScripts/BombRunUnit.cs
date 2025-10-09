@@ -24,6 +24,7 @@ public class BombRunUnit : MonoBehaviour
     public event EventHandler<DamageMode> OnDamageModeChanged;
     public event EventHandler<Vector2> OnActionDirectionChanged;
     public event EventHandler OnThisUnitMovedGridPosition;
+    public event EventHandler<bool> OnUnitVisibilityChanged;
 
     [Header("Unit Info")]
     //[SerializeField] private int _startingHealth = 100;
@@ -372,7 +373,9 @@ public class BombRunUnit : MonoBehaviour
     }
     public void SetUnitVisibility(bool isVisible)
     {
-        this._animator.SetUnitVisibility(isVisible);
+        //Debug.Log("SetUnitVisibility: " + this.name + " isVisible: " + isVisible);
+        //this._animator.SetUnitVisibility(isVisible);
+        OnUnitVisibilityChanged?.Invoke(this, isVisible);
     }
     public bool GetUnitVisibility()
     {
