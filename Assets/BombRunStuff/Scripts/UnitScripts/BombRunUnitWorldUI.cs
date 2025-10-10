@@ -114,6 +114,7 @@ public class BombRunUnitWorldUI : MonoBehaviour
     {
         SetBodyPartHealthUIVisibility(isVisible);
         SetActionPointTextVisibility(isVisible);
+        SetActionSymbolSpriteVisibility(isVisible);
     }
     void SetBodyPartHealthUIVisibility(bool isVisible)
     {

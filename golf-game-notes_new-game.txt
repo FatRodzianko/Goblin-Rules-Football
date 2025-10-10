@@ -449,6 +449,16 @@ x convert action direction to 8 directions:
 - - - - - - - - x Get only GridPositions that are not too far away
 - - - - - - - - - - - x check distance to each remaining grid position. remove ones that are too far away
 - - - - - - - - x Cast ray to each remaining grid position. If not obstacle/wall hit, grid position is visible?
+- Have Goblins render on top of FOG if they are visibile
+- - - add sprite mask to all units
+- - - will need to update the "FlipSprite" logic
+- - - - - - instead of changing _spriteRenderer.flipX, will need to set the X value of scale to -1 or 1?
+- - - have sprite mask update for each new sprite in an animation?
+- - - when unit is invisible, have sprite mask disabled
+- - - should probably create new script for bomb run unit sprite mask manager or something? Have it listen to events for visibility changes, changes in unit sprite direction, changes to the sprite being used?
+- - - - - - could also probably have it as its own child object, instead of on the unitSprite object?
+- - - - - - - - - only "need" to do this if I don't want to change the _spriteRenderer.flipX, and instead have the spritemask object listen for changes to that and change its X scale value accordingly
+
 
 ### Move to GridPosition based FOV
 - Get rid of old method
