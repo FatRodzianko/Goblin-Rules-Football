@@ -8,6 +8,7 @@ public class BombRunUnitAnimator : MonoBehaviour
     [SerializeField] private BombRunUnit _unit;
     [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer _spriteRenderer;
+    [SerializeField] private SpriteMask _spriteMask;
 
     [Header("Prefabs")]
     [SerializeField] private Transform _shootProjectilePrefab;
@@ -32,9 +33,14 @@ public class BombRunUnitAnimator : MonoBehaviour
             shootAction.OnStopShooting += ShootAction_OnStopShooting;
         }
         _unit.OnUnitVisibilityChanged += Unit_OnUnitVisibilityChanged;
+        _spriteRenderer.RegisterSpriteChangeCallback(UnitSpriteChanged);
     }
 
-   
+    private void UnitSpriteChanged(SpriteRenderer spriteRenderer)
+    {
+        _spriteMask.sprite = spriteRenderer.sprite;
+    }
+
 
     private void OnDisable()
     {
@@ -101,20 +107,30 @@ public class BombRunUnitAnimator : MonoBehaviour
 
     public void FlipSprite(bool flipSprite)
     {
-        if (_spriteRenderer.flipX != flipSprite)
+        //if (_spriteRenderer.flipX != flipSprite)
+        //{
+        //    _spriteRenderer.flipX = flipSprite;
+        //    _shootPoint.x = _shootPoint.x * -1;
+        //}
+        Vector3 currentScale = this.transform.localScale;
+        if ((currentScale.x < 0) != flipSprite)
         {
-            _spriteRenderer.flipX = flipSprite;
+            //_spriteRenderer.flipX = flipSprite;
+
+            currentScale.x *= -1;
+            this.transform.localScale = currentScale;
             _shootPoint.x = _shootPoint.x * -1;
         }
-            
     }
     public bool GetSpriteFlipX()
     {
-        return _spriteRenderer.flipX;
+        return (this.transform.localScale.x < 0);
+        //return _spriteRenderer.flipX;
     }
     public void SetUnitVisibility(bool isVisible)
     {
         _spriteRenderer.enabled = isVisible;
+        _spriteMask.enabled = isVisible;
     }
     public bool GetUnitVisibility()
     {

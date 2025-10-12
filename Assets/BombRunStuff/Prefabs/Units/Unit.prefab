@@ -1952,6 +1952,7 @@ MonoBehaviour:
   _unit: {fileID: 3408740805264284271}
   _animator: {fileID: 2261695523738932377}
   _spriteRenderer: {fileID: 3774028933683333569}
+  _spriteMask: {fileID: 2186479288814106386}
   _shootProjectilePrefab: {fileID: 6527801240750598869, guid: a9e4d5d120043af429184696ec5f8786, type: 3}
   _shootPoint: {x: 0.1875, y: 1.34375, z: 0}
 --- !u!331 &2186479288814106386
