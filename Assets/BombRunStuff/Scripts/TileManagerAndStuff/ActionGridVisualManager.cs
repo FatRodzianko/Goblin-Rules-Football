@@ -276,6 +276,15 @@ public class ActionGridVisualManager : MonoBehaviour
                 ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), gridVisualRange, gridRangeVisualType);
             }
         }
+        List<GridPosition> actionVisualPositionsUnitCantSee = new List<GridPosition>();
+        actionVisualPositionsUnitCantSee.AddRange(actionVisualPositions);
+        foreach (GridPosition gridPosition in actionVisualPositionsUnitCantSee)
+        {
+            if (!selectedUnit.CanSpendActionPointsToTakeAction(selectedAction, gridPosition))
+            {
+                actionVisualPositions.Remove(gridPosition);
+            }
+        }
         ShowActionVisualsFromList(actionVisualPositions, gridVisualType);
         _calculatingVisualGrid = false;
     }

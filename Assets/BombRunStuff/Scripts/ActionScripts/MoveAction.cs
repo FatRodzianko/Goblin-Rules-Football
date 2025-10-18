@@ -68,7 +68,7 @@ public class MoveAction : BaseAction
         {
             Vector3 moveDirection = (_targetPosition - unitPosition).normalized;
 
-            CheckIfSpriteShouldFlip(moveDirection);
+            //CheckIfSpriteShouldFlip(moveDirection);
 
             transform.position += moveDirection * _moveSpeed * Time.deltaTime;
         }

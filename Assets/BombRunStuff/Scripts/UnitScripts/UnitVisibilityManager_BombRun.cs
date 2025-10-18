@@ -516,6 +516,10 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     {
         // make tiles not visible
     }
+    public bool CanUnitTeamSeeGridPosition(BombRunUnit unit, GridPosition gridPosition)
+    {
+        return GetTeamsVisibileGridPositions(unit).Contains(gridPosition);
+    }
     private List<GridPosition> GetTeamsVisibileGridPositions(BombRunUnit unit)
     {
         if (unit.IsEnemy())

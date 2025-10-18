@@ -184,7 +184,7 @@ public class UnitActionSystem : MonoBehaviour
         {
             return;
         }
-        if (!_selectedUnit.TrySpendActionPointsToTakeAction(_selectedAction))
+        if (!_selectedUnit.TrySpendActionPointsToTakeAction(_selectedAction, mouseGridPosition))
         {
             return;
         }

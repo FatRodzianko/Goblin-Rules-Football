@@ -80,7 +80,7 @@ public class ShootAction : BaseAction
                 if (_aiming)
                 {
                     //SpinSprite();
-                    TurnTowardTarget(_targetUnitWorldPosition);
+                    //TurnTowardTarget(_targetUnitWorldPosition);
                     // add animation for unit to get into shooting position. If kneeling, stand up? Hold gun to shoulder, whatever
                     // once that animation completes, then set _aiming = false to go to NextState?
                 }

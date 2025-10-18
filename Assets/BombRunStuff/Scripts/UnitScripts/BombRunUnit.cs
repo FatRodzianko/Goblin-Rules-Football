@@ -154,9 +154,9 @@ public class BombRunUnit : MonoBehaviour
     {
         return _baseActionArray;
     }
-    public bool TrySpendActionPointsToTakeAction(BaseAction baseAction)
+    public bool TrySpendActionPointsToTakeAction(BaseAction baseAction, GridPosition actionPostion)
     {
-        if (CanSpendActionPointsToTakeAction(baseAction))
+        if (CanSpendActionPointsToTakeAction(baseAction, actionPostion))
         {
             //SpendActionPoints(baseAction.GetActionPointsCost());
             //AddActionTakenThisTurn(baseAction);
@@ -170,30 +170,14 @@ public class BombRunUnit : MonoBehaviour
     public bool CanSpendActionPointsToTakeAction(BaseAction baseAction)
     {
         // re-write to call the CanTakeAction function from the base action? That way all actions can have custom logic for whether a player can take the action or not?
-        return baseAction.CanTakeAction(_actionPoints);
-        //if (_actionPoints >= baseAction.GetActionPointsCost())
-        //{
-        //    if (baseAction.GetRequiresAmmo())
-        //    {
-        //        if (baseAction.GetRemainingAmmo() > 0)
-        //        {
-        //            return true;
-        //        }
-        //        else
-        //        {
-        //            Debug.Log("CanSpendActionPointsToTakeAction: Action requires ammo: " + baseAction.GetRequiresAmmo() + " and ammo  remaining: " + baseAction.GetRemainingAmmo());
-        //            return false;
-        //        }
-        //    }
-        //    else 
-        //    {
-        //        return true;
-        //    }
-        //}
-        //else
-        //{
-        //    return false;
-        //}
+        return baseAction.CanTakeAction(_actionPoints, this.GetGridPosition());
+
+    }
+    public bool CanSpendActionPointsToTakeAction(BaseAction baseAction, GridPosition actionPosition)
+    {
+        // re-write to call the CanTakeAction function from the base action? That way all actions can have custom logic for whether a player can take the action or not?
+        return baseAction.CanTakeAction(_actionPoints, actionPosition);
+
     }
     public void SpendActionPoints(int cost)
     {
@@ -356,6 +340,11 @@ public class BombRunUnit : MonoBehaviour
     }
     public void SetActionDirection(Vector2 direction)
     {
+        if (this._healthSystem.GetBodyPartFrozenState(BodyPart.Head) == BodyPartFrozenState.FullFrozen)
+        {
+            Debug.Log("SetActionDirection: Cannot change aim direction because head is frozen");
+            return;
+        }
         _actionDirection = direction.normalized;
         OnActionDirectionChanged?.Invoke(this, _actionDirection);
     }

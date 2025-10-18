@@ -500,3 +500,18 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 # current versions of unity for games (before the security update):
 - Goblin Rules Football - 2021.3.10f1
 - StalksStalksStalks - 2019.4.13.f1
+
+### Create scriptable objects For Unit Types and Actions
+- Each "type" of unit will have a scriptable object, like "Base Unit," "Medic," etc.
+- - - units attributes will be built out from this scriptable object. also its sprites and stuff
+- - - will contain list of base actions as a list of scriptable objects
+- Each Action will have its scriptable object container thing as well
+- - - will out the attributes of the action, if there are any
+- - - when unit is spawned, it will build out its available actions based on the list of scrtiple object actions it has
+- - - - - - will allow for each unit type/class to have custom actions built in. Should be easier to manage than the prefab variant stuff
+
+### Next Steps to focus on:
+- For the Visible Grid position checks, add checks for corners and to allow for units to see around them?
+- Add in the cover system for the "defend" action
+- - - main benefit is: CAN NOT be seen around cornrers
+- - - can also hide behind partial obstacles to not be seen?

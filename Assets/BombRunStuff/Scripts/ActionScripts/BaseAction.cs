@@ -23,6 +23,12 @@ public enum DamageMode
     Heal,
     Medic
 }
+public enum VisionTypeRequired
+{
+    None,
+    Team,
+    Unit
+}
 public abstract class BaseAction : MonoBehaviour
 {
     //public class BaseParameters { } //this can be extended to have a "generic" base parameter for the TakeAction method
@@ -43,6 +49,8 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] private bool _hasSubAction;
     [SerializeField] private bool _canTargetFriendlyUnits = false;
     [SerializeField] private bool _canGetValidListAsTask = false;
+    //[SerializeField] private bool _requiresVision = true;
+    [SerializeField] private VisionTypeRequired _visionTypeRequired = VisionTypeRequired.None;
 
     [Header("Action Grid Visuals")]
     [SerializeField] GridVisualType _gridRangeVisualType = GridVisualType.RedSoft;
@@ -158,7 +166,7 @@ public abstract class BaseAction : MonoBehaviour
 
     }
     public abstract BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
-    public virtual bool CanTakeAction(int actionPointsAvailable)
+    public virtual bool CanTakeAction(int actionPointsAvailable, GridPosition actionPosition)
     {
         //if (actionPointsAvailable >= _actionPointsCost)
         //{
@@ -173,6 +181,30 @@ public abstract class BaseAction : MonoBehaviour
         // Check if the applicable body part is frozen. If so, cannot take the action
         if (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(_actionBodyPart) == BodyPartFrozenState.FullFrozen)
             return false;
+
+        if (!DoesUnitHaveVisionRequiredForActionPosition(actionPosition))
+        {
+            return false;
+        }
+        //if (this._visionTypeRequired != VisionTypeRequired.None && _unit.GetUnitHealthSystem().GetBodyPartFrozenState(BodyPart.Head) == BodyPartFrozenState.FullFrozen)
+        //{
+        //    Debug.Log("CanTakeAction: action requires vision and head is frozen.");
+        //    switch (this._visionTypeRequired)
+        //    {
+        //        case VisionTypeRequired.Unit:
+        //            if (!_unit.CanUnitSeeThisPosition(actionPosition))
+        //            {
+        //                return false;
+        //            }
+        //            break;
+        //        case VisionTypeRequired.Team:
+        //            if (!UnitVisibilityManager_BombRun.Instance.CanUnitTeamSeeGridPosition(_unit, actionPosition))
+        //            {
+        //                return false;
+        //            }
+        //            break;
+        //    }                      
+        //}
 
         if (actionPointsAvailable >= _actionPointsCost)
         {
@@ -197,6 +229,34 @@ public abstract class BaseAction : MonoBehaviour
             return false;
         }
 
+    }
+    private bool DoesUnitHaveVisionRequiredForActionPosition(GridPosition actionPosition)
+    {
+        if (this._visionTypeRequired == VisionTypeRequired.None)
+        {
+            return true;
+        }
+        if (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(BodyPart.Head) != BodyPartFrozenState.FullFrozen)
+        {
+            return true;
+        }
+        Debug.Log("CanTakeAction: action requires vision and head is frozen.");
+        switch (this._visionTypeRequired)
+        {
+            case VisionTypeRequired.Unit:
+                if (!_unit.CanUnitSeeThisPosition(actionPosition))
+                {
+                    return false;
+                }
+                break;
+            case VisionTypeRequired.Team:
+                if (!UnitVisibilityManager_BombRun.Instance.CanUnitTeamSeeGridPosition(_unit, actionPosition))
+                {
+                    return false;
+                }
+                break;
+        }
+        return true;
     }
     public bool GetHasSubAction()
     {

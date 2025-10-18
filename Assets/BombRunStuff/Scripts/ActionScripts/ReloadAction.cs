@@ -66,7 +66,7 @@ public class ReloadAction : BaseAction
         _reloadCounter = _reloadTime;
         ActionStart(onActionComplete);
     }
-    public override bool CanTakeAction(int actionPointsAvailable)
+    public override bool CanTakeAction(int actionPointsAvailable, GridPosition actionPosition)
     {
         if (actionPointsAvailable >= _actionPointsCost)
         {

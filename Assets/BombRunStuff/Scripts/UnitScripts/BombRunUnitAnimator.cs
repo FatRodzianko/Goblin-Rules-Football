@@ -33,8 +33,11 @@ public class BombRunUnitAnimator : MonoBehaviour
             shootAction.OnStopShooting += ShootAction_OnStopShooting;
         }
         _unit.OnUnitVisibilityChanged += Unit_OnUnitVisibilityChanged;
+        _unit.OnActionDirectionChanged += Unit_OnActionDirectionChanged;
         _spriteRenderer.RegisterSpriteChangeCallback(UnitSpriteChanged);
     }
+
+    
 
     private void UnitSpriteChanged(SpriteRenderer spriteRenderer)
     {
@@ -55,6 +58,7 @@ public class BombRunUnitAnimator : MonoBehaviour
             shootAction.OnStopShooting -= ShootAction_OnStopShooting;
         }
         _unit.OnUnitVisibilityChanged -= Unit_OnUnitVisibilityChanged;
+        _unit.OnActionDirectionChanged -= Unit_OnActionDirectionChanged;
     }
 
     private void MoveAction_OnStartMoving(object sender, EventArgs e)
@@ -104,7 +108,17 @@ public class BombRunUnitAnimator : MonoBehaviour
         Debug.Log("ShootAction_OnStartShooting: " + _unit.name);
         _animator.SetTrigger("Shoot");
     }
-
+    private void Unit_OnActionDirectionChanged(object sender, Vector2 e)
+    {
+        if (_unit.GetActionDirection().x < 0)
+        {
+            FlipSprite(true);
+        }
+        else
+        {
+            FlipSprite(false);
+        }
+    }
     public void FlipSprite(bool flipSprite)
     {
         //if (_spriteRenderer.flipX != flipSprite)
