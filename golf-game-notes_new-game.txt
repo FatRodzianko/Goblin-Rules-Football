@@ -511,6 +511,27 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 - - - - - - will allow for each unit type/class to have custom actions built in. Should be easier to manage than the prefab variant stuff
 
 ### Next Steps to focus on:
+- Add a "Look At" action
+- - - changes unit's current "action direction" to the direction you click
+- - - - - - available positions should just be the eight directions around the unit
+- - - - - - should be able to choose any direction even if it is not a "valid" grid position? that might cause issues....
+- - - no action cost. Unit/player should always be able to perform this action, unless their head is frozen
+- After Look At action is created, remove the thing in UpdateTeamsVisibleGridPositions that makes the units "GridRadius" be the partially obscured fog of ware
+- - - only make grid positions that have actually been seen visible
+- - - or, at least, check each position in the gridRadiusNotVisibile and make sure a wall is not blocking it?
+- - - - - - this would be like "unit could see this if they faced that direction, but currently aren't" check?
+- Update the grid cursor so it doesn't always "skip" grid positions that have a wall on them
+- - - only "skip" the wall position if the player has already seen that wall position?
+- - - - - - would require marking grid positions as "been seen by player" or something to make this check easier
+- - - - - - - - - when a position becomes visibile, fire off event. The LevelGrid listens, then updates that grid position to "been seen"
+- - - would also need to update valid grid position checks for moving
+- - - - - - a play can select a position to move to that they can't currently "see." Skipping walls as valid grid positions for the grid cursor 
+            means a player could try and click on a wall. This will fail the move action check, so the player could deduce the layout of walls by 
+			by not being able to make a valid move
+- - - - - - in that scenario, would need to find the nearest "Valid position" to where the player clicked?
+- - - - - - - - - Cast ray from that wall position to the player
+- - - - - - - - - find the first point the ray hits that isn't a wall position (floor tilemap will need a collider?)
+- - - - - - - - - find the grid position that corresponds to that ray cast hit, and make that the move action's grid position?
 - For the Visible Grid position checks, add checks for corners and to allow for units to see around them?
 - Add in the cover system for the "defend" action
 - - - main benefit is: CAN NOT be seen around cornrers

@@ -1127,6 +1127,7 @@ GameObject:
   - component: {fileID: 7297105716296972232}
   - component: {fileID: 3220647545044700835}
   - component: {fileID: 4506797595294261930}
+  - component: {fileID: 3974599502414891548}
   - component: {fileID: 5928444417147222519}
   - component: {fileID: 4887323598526683332}
   - component: {fileID: 1951318674019840855}
@@ -1256,6 +1257,43 @@ MonoBehaviour:
     BodyPartFrozenState: 0
   - BodyPart: 3
     BodyPartFrozenState: 0
+--- !u!114 &3974599502414891548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4944422538143551182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2fc0c5abd853d045b995dc5a6fb838f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unit: {fileID: 0}
+  _isActive: 0
+  _actionType: 0
+  _actionPointDefaultCost: 0
+  _actionPointsCost: 0
+  _actionSymbolSprite: {fileID: 0}
+  _actionBodyPart: 1
+  _hasSubAction: 0
+  _canTargetFriendlyUnits: 1
+  _canGetValidListAsTask: 0
+  _visionTypeRequired: 0
+  _gridRangeVisualType: 3
+  _gridVisualRange: -1
+  _squareGridRange: 0
+  _showGridVisualRange: 0
+  _bombRunUnitAnimator: {fileID: 0}
+  _isReloadable: 0
+  _requiresAmmo: 0
+  _maxAmmo: 0
+  _remainingAmmo: 0
+  _ammoCost: 0
+  _hideWhenCantUse: 0
+  _subAction: {fileID: 0}
+  _timer: 0
+  _lookAtDelay: 0.5
 --- !u!114 &5928444417147222519
 MonoBehaviour:
   m_ObjectHideFlags: 0
