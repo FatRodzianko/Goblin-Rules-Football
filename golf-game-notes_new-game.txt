@@ -511,15 +511,16 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 - - - - - - will allow for each unit type/class to have custom actions built in. Should be easier to manage than the prefab variant stuff
 
 ### Next Steps to focus on:
-- Add a "Look At" action
-- - - changes unit's current "action direction" to the direction you click
-- - - - - - available positions should just be the eight directions around the unit
-- - - - - - should be able to choose any direction even if it is not a "valid" grid position? that might cause issues....
-- - - no action cost. Unit/player should always be able to perform this action, unless their head is frozen
+x Add a "Look At" action
+- - x changes unit's current "action direction" to the direction you click
+- - - - - x available positions should just be the eight directions around the unit
+- - - - - x should be able to choose any direction even if it is not a "valid" grid position? that might cause issues....
+- - x no action cost. Unit/player should always be able to perform this action, unless their head is frozen
 - After Look At action is created, remove the thing in UpdateTeamsVisibleGridPositions that makes the units "GridRadius" be the partially obscured fog of ware
 - - - only make grid positions that have actually been seen visible
 - - - or, at least, check each position in the gridRadiusNotVisibile and make sure a wall is not blocking it?
 - - - - - - this would be like "unit could see this if they faced that direction, but currently aren't" check?
+- - - The 8 grid positions surrounding the unit should always be either visible or greyed out?
 - Update the grid cursor so it doesn't always "skip" grid positions that have a wall on them
 - - - only "skip" the wall position if the player has already seen that wall position?
 - - - - - - would require marking grid positions as "been seen by player" or something to make this check easier
@@ -536,3 +537,10 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 - Add in the cover system for the "defend" action
 - - - main benefit is: CAN NOT be seen around cornrers
 - - - can also hide behind partial obstacles to not be seen?
+- Have the UnitVisibilty manager show "last seen location" of units that you lose visibility on
+- - - when an enemy unit is no longer visible, spawn a placeholder black/white sprite on the enemy at their last known position
+- - - track what enemy units have a placeholder sprites spawn
+- - - - - - dictionary of grid position and enemy unit?
+- - - - - - when an enemy becomes visibile, check the placeholder tracker. If that unit has a spawned place holder, remove it?
+- - - - - - also, when the placeholder position is now visibile, if there is a placeholder sprite there, remove it?
+- - - maybe this isn't such a great idea?

@@ -10,6 +10,7 @@ public class GridObject
     private List<BombRunUnit> _unitList = new List<BombRunUnit>();
     private BaseBombRunObstacle _obstacle;
     private IInteractable _interactable;
+    private bool _seenByPlayer;
 
     public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
     {
@@ -117,6 +118,14 @@ public class GridObject
     public bool HasAnyInteractable()
     {
         return _interactable != null;
+    }
+    public bool SeenByPlayer()
+    {
+        return _seenByPlayer;
+    }
+    public void SetSeenByPlayer(bool seenByPlayer)
+    {
+        this._seenByPlayer = seenByPlayer;
     }
 }
 

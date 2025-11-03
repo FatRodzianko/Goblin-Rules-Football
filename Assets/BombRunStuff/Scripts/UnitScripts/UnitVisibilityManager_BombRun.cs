@@ -38,8 +38,8 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     [SerializeField] private List<Vector2> _vector2PositionsVisibleToEnemy = new List<Vector2>();
 
     // events?
-    public event EventHandler<GridPosition> OnMakeGridPositionVisibleToPlayer;
-    public event EventHandler<GridPosition> OnMakeGridPositionNotVisibleToPlayer;
+    public static event EventHandler<GridPosition> OnMakeGridPositionVisibleToPlayer;
+    public static event EventHandler<GridPosition> OnMakeGridPositionNotVisibleToPlayer;
 
     public event EventHandler<GridPosition> OnMakeGridPositionVisibleToEnemy;
     public event EventHandler<GridPosition> OnMakeGridPositionNotVisibleToEnemy;

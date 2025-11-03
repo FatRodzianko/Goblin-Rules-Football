@@ -35,8 +35,10 @@ public class FogOfWarTileMapManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
-        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
+        //UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
+        UnitVisibilityManager_BombRun.OnMakeGridPositionVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
+        //UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
+        UnitVisibilityManager_BombRun.OnMakeGridPositionNotVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
 
         UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionVisibleToEnemy += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToEnemy;
         UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToEnemy += UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToEnemy;
@@ -48,8 +50,10 @@ public class FogOfWarTileMapManager : MonoBehaviour
 
     private void OnDisable()
     {
-        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
-        UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
+        //UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
+        UnitVisibilityManager_BombRun.OnMakeGridPositionVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
+        //UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
+        UnitVisibilityManager_BombRun.OnMakeGridPositionNotVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
 
         UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionVisibleToEnemy -= UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToEnemy;
         UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToEnemy -= UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToEnemy;

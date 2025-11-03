@@ -61,8 +61,13 @@ public class LevelGrid : MonoBehaviour
     }
     private void Start()
     {
-
+        UnitVisibilityManager_BombRun.OnMakeGridPositionVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
     }
+    private void OnDisable()
+    {
+        UnitVisibilityManager_BombRun.OnMakeGridPositionVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
+    }
+
     public void CreateLevelGrid()
     {
         if (_isHex)
@@ -252,5 +257,19 @@ public class LevelGrid : MonoBehaviour
             }
         }
         return gridPositionList;
+    }
+    private void UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer(object sender, GridPosition e)
+    {
+        SetSeenByPlayer(e);
+    }
+    private void SetSeenByPlayer(GridPosition gridPosition)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        gridObject.SetSeenByPlayer(true);
+    }
+    public bool GetSeenByPlayer(GridPosition gridPosition)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        return gridObject.SeenByPlayer();
     }
 }
