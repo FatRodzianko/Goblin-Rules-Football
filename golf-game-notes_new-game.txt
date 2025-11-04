@@ -520,11 +520,13 @@ x Add a "Look At" action
 - - - only make grid positions that have actually been seen visible
 - - - or, at least, check each position in the gridRadiusNotVisibile and make sure a wall is not blocking it?
 - - - - - - this would be like "unit could see this if they faced that direction, but currently aren't" check?
-- - - The 8 grid positions surrounding the unit should always be either visible or greyed out?
+- - x The 8 grid positions surrounding the unit should always be either visible or greyed out?
+- - - - - - go back to the two tiles to the side of unit to be visible, the units near periphery vision
+- - - - - - so 3 adjacent tiles are visible from the FOV, two from the "periphery," then the remaining 3 are not visible but greyed out?
 - Update the grid cursor so it doesn't always "skip" grid positions that have a wall on them
-- - - only "skip" the wall position if the player has already seen that wall position?
-- - - - - - would require marking grid positions as "been seen by player" or something to make this check easier
-- - - - - - - - - when a position becomes visibile, fire off event. The LevelGrid listens, then updates that grid position to "been seen"
+- - x only "skip" the wall position if the player has already seen that wall position?
+- - - - - x would require marking grid positions as "been seen by player" or something to make this check easier
+- - - - - - - - x when a position becomes visibile, fire off event. The LevelGrid listens, then updates that grid position to "been seen"
 - - - would also need to update valid grid position checks for moving
 - - - - - - a play can select a position to move to that they can't currently "see." Skipping walls as valid grid positions for the grid cursor 
             means a player could try and click on a wall. This will fail the move action check, so the player could deduce the layout of walls by 

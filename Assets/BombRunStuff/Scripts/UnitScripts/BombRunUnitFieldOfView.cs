@@ -509,50 +509,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
 
         return DoesUnitHaveLineOfSightToPosition(unitWorldPosition, targetWorldPosition, directionToPosition, distanceToWorldPosition);
-
-        //// Do a raycast to see if there is anything between the position and the unit that would block vision
-        //RaycastHit2D[] raycastHits2D = Physics2D.RaycastAll(unitWorldPosition, directionToPosition, distanceToWorldPosition);
-        //// if the ray hit nothing, the position can be seen
-        //if (raycastHits2D.Length == 0)
-        //{
-        //    //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ":  can see Position: " + targetGridPosition.ToString() + " no colliders hit!");
-        //    return true;
-        //}
-
-        //for (int i = 0; i < raycastHits2D.Length; i++)
-        //{
-        //    // I think this will let you see the grid position that a wall or obstacle is on? Before the Fog Of War would never be revealed on walls...
-        //    if (Vector2.Distance(targetWorldPosition, raycastHits2D[i].point) <= Mathf.Sqrt(LevelGrid.Instance.GetGridCellSize()))
-        //    {
-        //        return true;
-        //    }
-        //    if (raycastHits2D[i].collider.CompareTag("BombRunWall"))
-        //    {
-        //        return false;
-        //    }
-        //    if (raycastHits2D[i].collider.CompareTag("BombRunObstacle"))
-        //    {
-        //        if (raycastHits2D[i].transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
-        //        {
-        //            if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
-        //            {
-        //                continue;
-        //            }
-        //            else
-        //            {
-        //                //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is blocked by an obstacle.");
-        //                return false;
-        //            }
-        //        }
-        //    }
-        //    if (raycastHits2D[i].collider.gameObject.layer == _unitLayer)
-        //    {
-        //        continue;
-        //    }
-        //}
-        ////Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ":  can see Position: " + targetGridPosition.ToString());
-        //return true;
-
     }
     private bool DoesUnitHaveLineOfSightToPosition(Vector3 startPosition, Vector3 targetPosition,Vector3 direction, float distance)
     {
@@ -655,7 +611,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         _visibleGridPositions.Add(this._unit.GetGridPosition());
         //_visibleGridPositions.AddRange(GetAdjacentGridPositions(this._unit.GetGridPosition()));
         List<GridPosition> gridRadiusNotInView = new List<GridPosition>();
-        gridRadiusNotInView.AddRange(gridRadius);
+        //gridRadiusNotInView.AddRange(gridRadius);
+        gridRadiusNotInView.AddRange(GetSurroundingGridPositions(this._unit.GetGridPosition()));
         foreach (GridPosition gridPosition in gridRadius)
         {
 
@@ -742,6 +699,24 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
 
         return adjacentGridPositions;
+    }
+    private List<GridPosition> GetSurroundingGridPositions(GridPosition gridPosition)
+    {
+        List<GridPosition> surroundingGridPositions = new List<GridPosition>();
+
+        // From the player's starting position, cycle through the grid in the x and z axises and check if a valid grid position exists there.
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                if (x == 0 && y == 0)
+                    continue;
+                GridPosition offsetGridPosition = new GridPosition(x, y);
+                GridPosition testGridPosition = gridPosition + offsetGridPosition;
+                surroundingGridPositions.Add(testGridPosition);
+            }
+        }
+        return surroundingGridPositions;
     }
     public List<GridPosition> GetUnitsVisibileGridPositions()
     {
