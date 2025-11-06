@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 public class UnitActionSystem : MonoBehaviour
 {
     public static UnitActionSystem Instance { get; private set; }
+    public static EventHandler OnPlayerClickInvalidPosition;
 
 
     [SerializeField] private BombRunUnit _selectedUnit;
@@ -64,35 +65,13 @@ public class UnitActionSystem : MonoBehaviour
             return;
         }
 
-        //if (InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
-        //{
-        //    //if (TryHandleUnitSelection())
-        //    //    return;
-
-        //    if (TryHandleSelectGridPosition())
-        //        return;
-
-
-        //    GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
-        //    if (_selectedUnit.GetMoveAction().IsValidActionGridPosition(mouseGridPosition))
-        //    {
-        //        _selectedUnit.GetMoveAction().Move(mouseGridPosition, ClearBusy);
-        //        SetBusy();
-        //    }
-        //    //_selectedUnit.GetMoveAction().Move(MouseWorld.GetPosition());
-        //}
-
-        //if (InputManagerBombRun.Instance.IsRightMouseButtonDownThisFrame())
-        //{
-        //    _selectedUnit.GetSpinAction().Spin(ClearBusy);
-        //    SetBusy();
-        //}
-
         if (EventSystem.current.IsPointerOverGameObject())
             return;
 
         if (TryHandleSelectGridPosition())
+        {
             return;
+        }            
 
         HandleSelectedAction();
         HandleCancelSelectedAction();
@@ -150,6 +129,7 @@ public class UnitActionSystem : MonoBehaviour
                     {
                         return false;
                     }
+                    
                 }
             }
             
@@ -182,7 +162,24 @@ public class UnitActionSystem : MonoBehaviour
         }
         if (!_selectedAction.IsValidActionGridPosition(mouseGridPosition))
         {
-            return;
+            // first, check if grid position has been seen by player. If yes, standard "invalid action"
+            // If not, check if action "CanTakeActionInFogOfWar." If not, standard invalid action
+            // If action can CanTakeActionInFogOfWar, then get new valid grid position for the action from the action
+            if (!_selectedAction.CanTakeActionInFogOfWar())
+            {
+                OnPlayerClickInvalidPosition?.Invoke(this, EventArgs.Empty);
+                return;
+            }
+            else
+            {
+                if (LevelGrid.Instance.GetSeenByPlayer(mouseGridPosition))
+                {
+                    OnPlayerClickInvalidPosition?.Invoke(this, EventArgs.Empty);
+                    return;                    
+                }
+                mouseGridPosition = _selectedAction.GetNearestValidGridPosition(mouseGridPosition);
+            }
+
         }
         if (!_selectedUnit.TrySpendActionPointsToTakeAction(_selectedAction, mouseGridPosition))
         {

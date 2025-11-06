@@ -51,6 +51,7 @@ public abstract class BaseAction : MonoBehaviour
     [SerializeField] private bool _canGetValidListAsTask = false;
     //[SerializeField] private bool _requiresVision = true;
     [SerializeField] private VisionTypeRequired _visionTypeRequired = VisionTypeRequired.None;
+    [SerializeField] private bool _canTakeActionInFogOfWar = false;
 
     [Header("Action Grid Visuals")]
     [SerializeField] GridVisualType _gridRangeVisualType = GridVisualType.RedSoft;
@@ -168,15 +169,6 @@ public abstract class BaseAction : MonoBehaviour
     public abstract BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
     public virtual bool CanTakeAction(int actionPointsAvailable, GridPosition actionPosition)
     {
-        //if (actionPointsAvailable >= _actionPointsCost)
-        //{
-        //    return true;
-        //}
-
-        //else
-        //{
-        //    return false;
-        //}
 
         // Check if the applicable body part is frozen. If so, cannot take the action
         if (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(_actionBodyPart) == BodyPartFrozenState.FullFrozen)
@@ -186,25 +178,6 @@ public abstract class BaseAction : MonoBehaviour
         {
             return false;
         }
-        //if (this._visionTypeRequired != VisionTypeRequired.None && _unit.GetUnitHealthSystem().GetBodyPartFrozenState(BodyPart.Head) == BodyPartFrozenState.FullFrozen)
-        //{
-        //    Debug.Log("CanTakeAction: action requires vision and head is frozen.");
-        //    switch (this._visionTypeRequired)
-        //    {
-        //        case VisionTypeRequired.Unit:
-        //            if (!_unit.CanUnitSeeThisPosition(actionPosition))
-        //            {
-        //                return false;
-        //            }
-        //            break;
-        //        case VisionTypeRequired.Team:
-        //            if (!UnitVisibilityManager_BombRun.Instance.CanUnitTeamSeeGridPosition(_unit, actionPosition))
-        //            {
-        //                return false;
-        //            }
-        //            break;
-        //    }                      
-        //}
 
         if (actionPointsAvailable >= _actionPointsCost)
         {
@@ -257,6 +230,11 @@ public abstract class BaseAction : MonoBehaviour
                 break;
         }
         return true;
+    }
+    public virtual GridPosition GetNearestValidGridPosition(GridPosition gridPosition)
+    {
+        Debug.Log("GetNearestValidGridPosition");
+        return gridPosition;
     }
     public bool GetHasSubAction()
     {
@@ -400,5 +378,13 @@ public abstract class BaseAction : MonoBehaviour
     public bool ShowGridVisualRange()
     {
         return _showGridVisualRange;
+    }
+    public bool CanTakeActionInFogOfWar()
+    {
+        return _canTakeActionInFogOfWar;
+    }
+    public void SetCanTakeActionInFogOfWar(bool canTakeActionInFogOfWar)
+    {
+        this._canTakeActionInFogOfWar = canTakeActionInFogOfWar;
     }
 }
