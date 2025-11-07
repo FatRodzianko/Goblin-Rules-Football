@@ -362,7 +362,12 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         _startingAngle = _aimDirectionAngle + _fov / 2f;
         _aimDirectionVector = GetVectorFromAngle(_aimDirectionAngle);
     }
-    
+    public Vector3 ConvertDirectionToAngleVector(Vector3 direction, bool forceEightDirections)
+    {
+        // Convert the director to an angle?
+        float angle = GetAngleFromVectorFloat(direction.normalized, forceEightDirections);
+        return GetVectorFromAngle(angle);
+    }
     public Vector3 GetVectorFromAngle(float angle)
     {
         // angle = 0 -> 360
@@ -500,15 +505,33 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         Vector3 directionToPosition = (targetWorldPosition - unitWorldPosition).normalized;
         //Vector3 vectorFromAngle = GetVectorFromAngle(_aimDirectionAngle);
         Vector3 vectorFromAngle = _aimDirectionVector;
-        float angle = Vector3.Angle(vectorFromAngle, directionToPosition);
 
-        if ((int)angle > (int)(_fov / 2f))
+        //float angle = Vector3.Angle(vectorFromAngle, directionToPosition);
+
+        //if ((int)angle > (int)(_fov / 2f))
+        //{
+        //    //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is not in FOV: " + (_fov / 2f).ToString("0.000000") + ":" + angle.ToString("0.000000") + " starting angle: " + _startingAngle + " vector from starting angle: " + vectorFromAngle.ToString() + " unit action direction: " + _unit.GetActionDirection() + " angle from aim direction: " + GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
+        //    return false;
+        //}
+
+        if (!IsGridPositionWithinFOV(directionToPosition, _fov, vectorFromAngle))
         {
-            //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is not in FOV: " + (_fov / 2f).ToString("0.000000") + ":" + angle.ToString("0.000000") + " starting angle: " + _startingAngle + " vector from starting angle: " + vectorFromAngle.ToString() + " unit action direction: " + _unit.GetActionDirection() + " angle from aim direction: " + GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
             return false;
         }
 
         return DoesUnitHaveLineOfSightToPosition(unitWorldPosition, targetWorldPosition, directionToPosition, distanceToWorldPosition);
+    }
+    public bool IsGridPositionWithinFOV(Vector3 directionToTarget, float fovAngle, Vector3 directionForAngleComparison)
+    {
+        // Get the angle of the direction to the target relative to the direction for comparison 
+        // the "direction for comparison" is the center of the FOV, basically.
+        float angle = Vector3.Angle(directionForAngleComparison, directionToTarget);
+        // check if the angle between target vector and "direction for comparison" falls within the FOV cone
+        if ((int)angle > (int)(fovAngle / 2f))
+        {
+            return false;
+        }
+        return true;
     }
     private bool DoesUnitHaveLineOfSightToPosition(Vector3 startPosition, Vector3 targetPosition,Vector3 direction, float distance)
     {

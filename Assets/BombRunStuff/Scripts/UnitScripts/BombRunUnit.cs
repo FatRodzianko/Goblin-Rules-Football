@@ -374,4 +374,8 @@ public class BombRunUnit : MonoBehaviour
     {
         return _bombRunUnitFieldOfView.GetUnitsVisibileGridPositions();
     }
+    public BombRunUnitFieldOfView GetBombRunUnitFieldOfView()
+    {
+        return _bombRunUnitFieldOfView;
+    }
 }
