@@ -546,3 +546,5 @@ x Add a "Look At" action
 - - - - - - when an enemy becomes visibile, check the placeholder tracker. If that unit has a spawned place holder, remove it?
 - - - - - - also, when the placeholder position is now visibile, if there is a placeholder sprite there, remove it?
 - - - maybe this isn't such a great idea?
+- How to show grid visuals over fog of war?
+- - - make the grid visual and grid action visual higher in the sorting layer, so they are above the 

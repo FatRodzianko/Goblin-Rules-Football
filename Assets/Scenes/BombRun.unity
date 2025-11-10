@@ -13550,6 +13550,10 @@ PrefabInstance:
       propertyPath: _actionPointsCost
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9011927230685996404, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
+      propertyPath: _canTakeActionInFogOfWar
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
 --- !u!1 &383578431
@@ -13704,7 +13708,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &405019299
 Transform:
   m_ObjectHideFlags: 0
@@ -51090,6 +51094,10 @@ PrefabInstance:
       propertyPath: _actionPointsCost
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9011927230685996404, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
+      propertyPath: _canTakeActionInFogOfWar
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
 --- !u!1 &1193913606
@@ -52293,6 +52301,10 @@ PrefabInstance:
       propertyPath: _actionPointsCost
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9011927230685996404, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
+      propertyPath: _canTakeActionInFogOfWar
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
 --- !u!1001 &1729890823
@@ -52393,6 +52405,10 @@ PrefabInstance:
     - target: {fileID: 9011927230685996404, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: _actionPointsCost
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9011927230685996404, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
+      propertyPath: _canTakeActionInFogOfWar
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
@@ -53393,6 +53409,10 @@ PrefabInstance:
     - target: {fileID: 2446868888152888870, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
       propertyPath: m_LocalScale.x
       value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2747597061732830150, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
+      propertyPath: _canTakeActionInFogOfWar
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3528959723832376575, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
       propertyPath: m_Name

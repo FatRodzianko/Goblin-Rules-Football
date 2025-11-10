@@ -15,7 +15,8 @@ public enum ActionType
     Grenade,
     Sword,
     Reload,
-    SwitchShootingMode
+    SwitchShootingMode,
+    LookAt
 }
 public enum DamageMode
 {

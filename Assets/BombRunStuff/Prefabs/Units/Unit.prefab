@@ -1271,7 +1271,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
-  _actionType: 0
+  _actionType: 10
   _actionPointDefaultCost: 0
   _actionPointsCost: 0
   _actionSymbolSprite: {fileID: 0}
@@ -1280,6 +1280,7 @@ MonoBehaviour:
   _canTargetFriendlyUnits: 1
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
+  _canTakeActionInFogOfWar: 0
   _gridRangeVisualType: 3
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1317,6 +1318,7 @@ MonoBehaviour:
   _canTargetFriendlyUnits: 0
   _canGetValidListAsTask: 1
   _visionTypeRequired: 0
+  _canTakeActionInFogOfWar: 1
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1353,6 +1355,7 @@ MonoBehaviour:
   _canTargetFriendlyUnits: 1
   _canGetValidListAsTask: 0
   _visionTypeRequired: 2
+  _canTakeActionInFogOfWar: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1398,6 +1401,7 @@ MonoBehaviour:
   _canTargetFriendlyUnits: 0
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
+  _canTakeActionInFogOfWar: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1435,6 +1439,7 @@ MonoBehaviour:
   _canTargetFriendlyUnits: 0
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
+  _canTakeActionInFogOfWar: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1476,6 +1481,7 @@ MonoBehaviour:
   _canTargetFriendlyUnits: 0
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
+  _canTakeActionInFogOfWar: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1511,6 +1517,7 @@ MonoBehaviour:
   _canTargetFriendlyUnits: 0
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
+  _canTakeActionInFogOfWar: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1548,6 +1555,7 @@ MonoBehaviour:
   _canTargetFriendlyUnits: 0
   _canGetValidListAsTask: 0
   _visionTypeRequired: 2
+  _canTakeActionInFogOfWar: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1583,6 +1591,7 @@ MonoBehaviour:
   _canTargetFriendlyUnits: 0
   _canGetValidListAsTask: 0
   _visionTypeRequired: 1
+  _canTakeActionInFogOfWar: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1621,6 +1630,7 @@ MonoBehaviour:
   _canTargetFriendlyUnits: 0
   _canGetValidListAsTask: 0
   _visionTypeRequired: 2
+  _canTakeActionInFogOfWar: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0

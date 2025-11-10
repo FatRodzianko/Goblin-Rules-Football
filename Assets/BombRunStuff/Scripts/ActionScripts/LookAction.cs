@@ -34,7 +34,7 @@ public class LookAction : BaseAction
         return new BombRunEnemyAIAction
         {
             _GridPosition = gridPosition,
-            _ActionValue = 0
+            _ActionValue = -10000
 
         };
     }

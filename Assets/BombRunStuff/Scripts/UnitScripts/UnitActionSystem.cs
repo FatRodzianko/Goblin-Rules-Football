@@ -177,7 +177,9 @@ public class UnitActionSystem : MonoBehaviour
                     OnPlayerClickInvalidPosition?.Invoke(this, EventArgs.Empty);
                     return;                    
                 }
+                Debug.Log("HandleSelectedAction: GetNearestValidGridPosition: OLD mouse grid position: " + mouseGridPosition);
                 mouseGridPosition = _selectedAction.GetNearestValidGridPosition(mouseGridPosition);
+                Debug.Log("HandleSelectedAction: GetNearestValidGridPosition: NEW mouse grid position: " + mouseGridPosition);
             }
 
         }

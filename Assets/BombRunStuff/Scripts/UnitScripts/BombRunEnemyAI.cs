@@ -76,9 +76,10 @@ public class BombRunEnemyAI : MonoBehaviour
     }
     private bool TryTakeEnemyAIAction(Action onEnemyActionComplete)
     {
-        Debug.Log("TakeEnemyAIAction: ");
+        
         foreach (BombRunUnit enemyUnit in BombRunUnitManager.Instance.GetEnemyUnitList())
         {
+            Debug.Log("TakeEnemyAIAction: " + enemyUnit.name);
             if (TryTakeEnemyAIAction(enemyUnit, onEnemyActionComplete))
             {
                 return true;
@@ -92,6 +93,10 @@ public class BombRunEnemyAI : MonoBehaviour
         BaseAction bestBaseAction = null;
         foreach (BaseAction baseAction in enemyUnit.GetBaseActionArray())
         {
+            if (baseAction.GetActionType() == ActionType.LookAt)
+            {
+                continue;
+            }
             if (!enemyUnit.CanSpendActionPointsToTakeAction(baseAction))
             {
                 // enemy cannot afford action
@@ -108,6 +113,7 @@ public class BombRunEnemyAI : MonoBehaviour
                 BombRunEnemyAIAction testEnemyAIAction = baseAction.GetBestEnemyAIAction();
                 if (testEnemyAIAction != null && testEnemyAIAction._ActionValue > bestEnemyAIAction._ActionValue)
                 {
+                    Debug.Log("TryTakeEnemyAIAction: current bestEnemyAIAction action value is: " + bestEnemyAIAction._ActionValue + " new test enemy ai action ("+ baseAction.GetActionName() +  ") value is: " + testEnemyAIAction._ActionValue);
                     bestEnemyAIAction = testEnemyAIAction;
                     bestBaseAction = baseAction;
                 }

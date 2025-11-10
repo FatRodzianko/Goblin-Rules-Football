@@ -347,5 +347,69 @@ public class MoveAction : BaseAction
         yield return new WaitForSeconds(2f);
         _onActionComplete();
     }
+    public override GridPosition GetNearestValidGridPosition(GridPosition targetGridPosition)
+    {
+        //Debug.Log("GetNearestValidGridPosition: MoveAction: " + targetGridPosition);
+        GridPosition nearestPosition = targetGridPosition;
+        GridPosition unitGridPosition = _unit.GetGridPosition();
+        List<GridPosition> gridPositionList = new List<GridPosition>();
 
+        if (_cachedValidActionList.ContainsKey(unitGridPosition))
+        {
+            if (_cachedValidActionList[unitGridPosition].Count == 0)
+            {
+                //Debug.Log("GetNearestValidGridPosition: MoveAction: _cachedValidActionList's grid position list is empty for: " + unitGridPosition + " no valid moves?");
+                return nearestPosition;
+            }
+            gridPositionList.AddRange(_cachedValidActionList[unitGridPosition]);
+        }
+        else
+        {
+            //Debug.Log("GetNearestValidGridPosition: MoveAction: _cachedValidActionList is empty. Calculate the grid position list for unit's current position?");
+            gridPositionList.AddRange(GetValidActionGridPositionList());
+        }
+
+        if (gridPositionList.Count == 0)
+        {
+            Debug.Log("GetNearestValidGridPosition: MoveAction: no valid move positions? gridPositionList is empty. target position: " + targetGridPosition);
+            return nearestPosition;
+        }
+        BombRunUnitFieldOfView bombRunUnitFieldOfView = _unit.GetBombRunUnitFieldOfView();
+        Vector3 targetWorldPosition = LevelGrid.Instance.GetWorldPosition(targetGridPosition);
+        Vector3 unitWorldPosition = _unit.GetWorldPosition();
+        Vector3 directionToTargetWorldPosition = bombRunUnitFieldOfView.ConvertDirectionToAngleVector((targetWorldPosition - unitWorldPosition), true);
+        float fovAngle = 90f; // just for testing now? grab this from somewhere else eventually?
+        bool firstPositionInFOVFound = false;
+        //float distanceToUnitTargetPosition = Vector2.Distance(targetWorldPosition, _unit.GetWorldPosition());
+        float closestDistance = 0f;
+
+        foreach (GridPosition testGridPosition in gridPositionList)
+        {
+            Vector3 testWorldPosition = LevelGrid.Instance.GetWorldPosition(testGridPosition);
+            Vector3 directionToTestPosition = (testWorldPosition - unitWorldPosition).normalized;
+            
+            if (bombRunUnitFieldOfView.IsGridPositionWithinFOV(directionToTestPosition, fovAngle, directionToTargetWorldPosition))
+            {
+                //Debug.Log("GetNearestValidGridPosition: MoveAction: IN FIELD OF VIEW: Test Position: " + testGridPosition + " direction to test position: " + directionToTestPosition + " fov angle: " + fovAngle + " direction to target grid position: " + directionToTargetWorldPosition);
+                if (!firstPositionInFOVFound)
+                {
+                    //Debug.Log("GetNearestValidGridPosition: MoveAction: First test position check. Test position: " + testGridPosition);
+                    nearestPosition = testGridPosition;
+                    closestDistance = Vector2.Distance(targetWorldPosition, testWorldPosition);
+                    firstPositionInFOVFound = true;
+
+                }
+
+                float testPositionDistance = Vector2.Distance(targetWorldPosition, testWorldPosition);
+                if (testPositionDistance < closestDistance)
+                {
+                    //Debug.Log("GetNearestValidGridPosition: MoveAction: NEW closest test position check. Test position: " + testGridPosition);
+                    nearestPosition = testGridPosition;
+                    closestDistance = testPositionDistance;
+                }
+            }
+        }
+
+        return nearestPosition;
+    }
 }
