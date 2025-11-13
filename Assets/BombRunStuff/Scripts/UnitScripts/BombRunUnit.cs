@@ -49,7 +49,7 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] private Vector2 _actionDirection = Vector2.zero;
 
     [Header("Animation Stuff")]
-    [SerializeField] private BombRunUnitAnimator _animator;
+    [SerializeField] private BombRunUnitAnimator _bombRunUnitAnimator;
 
     [Header("FOV Stuff?")]
     [SerializeField] private BombRunUnitFieldOfView _bombRunUnitFieldOfView;
@@ -59,7 +59,7 @@ public class BombRunUnit : MonoBehaviour
         _baseActionArray = GetComponents<BaseAction>();
         if (_healthSystem == null)
             _healthSystem = GetComponent<BombRunUnitHealthSystem>();
-        if (_animator.GetSpriteFlipX())
+        if (_bombRunUnitAnimator.GetSpriteFlipX())
         {
             SetActionDirection(new Vector2(-1, 0));
         }
@@ -277,28 +277,28 @@ public class BombRunUnit : MonoBehaviour
     }
     public BombRunUnitAnimator GetUnitAnimator()
     {
-        if (_animator == null)
+        if (_bombRunUnitAnimator == null)
         {
             FindAnimatorScript();
         }
-        return _animator;
+        return _bombRunUnitAnimator;
     }
     private void FindAnimatorScript()
     {
         if (TryGetComponent<BombRunUnitAnimator>(out BombRunUnitAnimator animator))
         {
-            _animator = animator;
+            _bombRunUnitAnimator = animator;
         }
 
         // if not found on parent, try children
-        if (_animator == null)
+        if (_bombRunUnitAnimator == null)
         {
             Transform[] allChildren = GetComponentsInChildren<Transform>();
             for (int i = 0; i < allChildren.Length; i++)
             {
                 if (allChildren[i].TryGetComponent<BombRunUnitAnimator>(out BombRunUnitAnimator childAnimator))
                 {
-                    _animator = childAnimator;
+                    _bombRunUnitAnimator = childAnimator;
                     break;
                 }
             }
@@ -368,7 +368,7 @@ public class BombRunUnit : MonoBehaviour
     }
     public bool GetUnitVisibility()
     {
-        return this._animator.GetUnitVisibility();
+        return this._bombRunUnitAnimator.GetUnitVisibility();
     }
     public List<GridPosition> GetUnitsVisibileGridPositions()
     {
@@ -377,5 +377,9 @@ public class BombRunUnit : MonoBehaviour
     public BombRunUnitFieldOfView GetBombRunUnitFieldOfView()
     {
         return _bombRunUnitFieldOfView;
+    }
+    public Sprite GetCurrentSprite()
+    {
+        return _bombRunUnitAnimator.GetCurrentSprite();
     }
 }

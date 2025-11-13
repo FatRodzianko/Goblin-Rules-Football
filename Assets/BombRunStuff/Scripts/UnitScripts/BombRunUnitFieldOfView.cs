@@ -622,13 +622,15 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         previousVisibileGridPositions.AddRange(_visibleGridPositions);
         _visibleGridPositions.Clear();
         _visibleVector2Positions.Clear();
-        if (_visibleUnits.Count > 0)
-        {
-            foreach (BombRunUnit unit in _visibleUnits)
-            {
-                UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
-            }
-        }
+        //if (_visibleUnits.Count > 0)
+        //{
+        //    foreach (BombRunUnit unit in _visibleUnits)
+        //    {
+        //        UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
+        //    }
+        //}
+        List<BombRunUnit> previouslyVisibleUnitsToRemoveFromVisibility = new List<BombRunUnit>();
+        previouslyVisibleUnitsToRemoveFromVisibility.AddRange(_visibleUnits);
 
         _visibleUnits.Clear();
         _visibleGridPositions.Add(this._unit.GetGridPosition());
@@ -653,9 +655,14 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                         continue;
 
                     _visibleUnits.Add(unit);
+                    previouslyVisibleUnitsToRemoveFromVisibility.Remove(unit);
                     UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
                 }
             }
+        }
+        foreach (BombRunUnit unit in previouslyVisibleUnitsToRemoveFromVisibility)
+        {
+            UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
         }
         //UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions, previousVisibileGridPositions);
         UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions, gridRadiusNotInView);

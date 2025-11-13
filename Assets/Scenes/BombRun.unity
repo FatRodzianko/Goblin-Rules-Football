@@ -53526,6 +53526,7 @@ MonoBehaviour:
   _enemyUnitVisibileGridPositions: []
   _vector2PositionsVisibleToPlayer: []
   _vector2PositionsVisibleToEnemy: []
+  _invisibleUnitPlaceHolderPrefab: {fileID: 6422261272446741381, guid: 40ec6ec1f89ccdf41b4c4351d68866b4, type: 3}
 --- !u!1 &2138507406
 GameObject:
   m_ObjectHideFlags: 0

@@ -154,4 +154,8 @@ public class BombRunUnitAnimator : MonoBehaviour
     {
         SetUnitVisibility(isVisible);
     }
+    public Sprite GetCurrentSprite()
+    {
+        return _spriteRenderer.sprite;
+    }
 }

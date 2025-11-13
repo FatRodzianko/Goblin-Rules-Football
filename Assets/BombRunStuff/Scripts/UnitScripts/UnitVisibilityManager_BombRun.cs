@@ -37,6 +37,10 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     [SerializeField] private List<Vector2> _vector2PositionsVisibleToPlayer = new List<Vector2>();
     [SerializeField] private List<Vector2> _vector2PositionsVisibleToEnemy = new List<Vector2>();
 
+    [Header("Invisible Unit Placeholder stuff")]
+    [SerializeField] private Transform _invisibleUnitPlaceHolderPrefab;
+    private Dictionary<BombRunUnit, Vector3> _invisibleUnitPlaceHolderDictionary = new Dictionary<BombRunUnit, Vector3>();
+
     // events?
     public static event EventHandler<GridPosition> OnMakeGridPositionVisibleToPlayer;
     public static event EventHandler<GridPosition> OnMakeGridPositionNotVisibleToPlayer;
@@ -86,6 +90,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
 
         if (!CheckIfMovedUnitCanBeSeen(unit))
         {
+            Debug.Log("Unit_OnAnyUnitMovedGridPosition: Removing Unit from Visibility");
             RemoveUnitFromVisibilityList(unit);
         }
 
@@ -104,15 +109,6 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     //}
     private bool CheckIfMovedUnitCanBeSeen(BombRunUnit unit, BombRunUnit skipUnit = null)
     {
-        //List<BombRunUnit> unitsToCheck = new List<BombRunUnit>();
-        //if (unit.IsEnemy())
-        //{
-        //    unitsToCheck.AddRange(BombRunUnitManager.Instance.GetFriendlyUnitList());
-        //}
-        //else
-        //{
-        //    unitsToCheck.AddRange(BombRunUnitManager.Instance.GetEnemyUnitList());
-        //}
         List<BombRunUnit> unitsToCheck = GetUnitsEnemies(unit);
 
         if (unitsToCheck.Count == 0)
@@ -171,7 +167,6 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     }
     public void RemoveUnitFromVisibilityList(BombRunUnit visibleUnit)
     {
-
         if (visibleUnit.IsEnemy())
         {
             if (_unitsVisibleToPlayer.Exists(x => x.VisibileUnit == visibleUnit))
@@ -195,54 +190,55 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     {
         if (!CheckIfMovedUnitCanBeSeen(enemyUnit, observerUnit))
         {
+            Debug.Log("EnemyLeftObserverFOV: Removing Unit from Visibility");
             RemoveUnitFromVisibilityList(enemyUnit);
         }
     }
-    public void UnitCompletedFOVCheck(BombRunUnit discoveringUnit, List<BombRunUnit> spottedUnits)
-    {
-        // remove any units this unit previously discovered but isn't in it's new list of spotted units
-        List<BombRunUnit> newSpottedUnits = new List<BombRunUnit>();
-        newSpottedUnits.AddRange(spottedUnits);
-        List<BombRunUnit> unitsToRemove = new List<BombRunUnit>();
-        List<VisibileUnitAndDiscoverer> visibileUnitsToCheck = new List<VisibileUnitAndDiscoverer>();
-        if (discoveringUnit.IsEnemy())
-        {
-            visibileUnitsToCheck = _unitsVisibileToEnemy;
-        }
-        else
-        {
-            visibileUnitsToCheck = _unitsVisibleToPlayer;
-        }
+    //public void UnitCompletedFOVCheck(BombRunUnit discoveringUnit, List<BombRunUnit> spottedUnits)
+    //{
+    //    // remove any units this unit previously discovered but isn't in it's new list of spotted units
+    //    List<BombRunUnit> newSpottedUnits = new List<BombRunUnit>();
+    //    newSpottedUnits.AddRange(spottedUnits);
+    //    List<BombRunUnit> unitsToRemove = new List<BombRunUnit>();
+    //    List<VisibileUnitAndDiscoverer> visibileUnitsToCheck = new List<VisibileUnitAndDiscoverer>();
+    //    if (discoveringUnit.IsEnemy())
+    //    {
+    //        visibileUnitsToCheck = _unitsVisibileToEnemy;
+    //    }
+    //    else
+    //    {
+    //        visibileUnitsToCheck = _unitsVisibleToPlayer;
+    //    }
 
-        foreach (VisibileUnitAndDiscoverer visibileUnitAndDiscoverer in visibileUnitsToCheck)
-        {
-            if (visibileUnitAndDiscoverer.Discoverer == discoveringUnit)
-            {
-                if (spottedUnits.Contains(visibileUnitAndDiscoverer.VisibileUnit))
-                {
-                    newSpottedUnits.Remove(visibileUnitAndDiscoverer.VisibileUnit);
-                }
-                else
-                {
-                    //RemoveUnitFromVisibilityList(visibileUnitAndDiscoverer.VisibileUnit);
-                    unitsToRemove.Add(visibileUnitAndDiscoverer.VisibileUnit);
-                }
-            }
-        }
-        if (unitsToRemove.Count > 0)
-        {
-            foreach (BombRunUnit unitToRemove in unitsToRemove)
-            {
-                RemoveUnitFromVisibilityList(unitToRemove);
-            }
-        }
-        if (newSpottedUnits.Count == 0)
-            return;
-        foreach (BombRunUnit spottedUnit in newSpottedUnits)
-        {
-            AddUnitToVisibilityList(spottedUnit, discoveringUnit);
-        }
-    }
+    //    foreach (VisibileUnitAndDiscoverer visibileUnitAndDiscoverer in visibileUnitsToCheck)
+    //    {
+    //        if (visibileUnitAndDiscoverer.Discoverer == discoveringUnit)
+    //        {
+    //            if (spottedUnits.Contains(visibileUnitAndDiscoverer.VisibileUnit))
+    //            {
+    //                newSpottedUnits.Remove(visibileUnitAndDiscoverer.VisibileUnit);
+    //            }
+    //            else
+    //            {
+    //                //RemoveUnitFromVisibilityList(visibileUnitAndDiscoverer.VisibileUnit);
+    //                unitsToRemove.Add(visibileUnitAndDiscoverer.VisibileUnit);
+    //            }
+    //        }
+    //    }
+    //    if (unitsToRemove.Count > 0)
+    //    {
+    //        foreach (BombRunUnit unitToRemove in unitsToRemove)
+    //        {
+    //            RemoveUnitFromVisibilityList(unitToRemove);
+    //        }
+    //    }
+    //    if (newSpottedUnits.Count == 0)
+    //        return;
+    //    foreach (BombRunUnit spottedUnit in newSpottedUnits)
+    //    {
+    //        AddUnitToVisibilityList(spottedUnit, discoveringUnit);
+    //    }
+    //}
     public void UnitUpdatedVisibleGridPositions(BombRunUnit discoveringUnit, List<GridPosition> newGridPositions)
     {
         List<VisibleGridPositionsByUnit> currentVisibleGridPositions = new List<VisibleGridPositionsByUnit>();
@@ -425,12 +421,29 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     }
     private void UnitVisibilityManager_BombRun_OnEnemyUnitBecameInVisible(object sender, BombRunUnit unit)
     {
+        Debug.Log("UnitVisibilityManager_BombRun_OnEnemyUnitBecameInVisible: unit: " + unit.name + " became invisible at: " + unit.GetGridPosition());
+        Debug.Break();
+
+        //if (_invisibleUnitPlaceHolderDictionary.ContainsKey(unit))
+        //{
+            
+        //}
+        //Vector3 spawnPosition = unit.GetWorldPosition();
+        //Sprite spriteToSpawn = unit.GetCurrentSprite();
+
 
     }
-
+    private void UpdateInvisibleUnitPlaceHolders()
+    {
+        
+    }
     private void UnitVisibilityManager_BombRun_OnEnemyUnitBecameVisible(object sender, BombRunUnit unit)
     {      
 
+    }
+    private void RemoveFromInvisibleUnitPlaceHolderDictionary(BombRunUnit unit)
+    {
+        
     }
     //public void UpdateTeamsVisibleGridPositions(BombRunUnit unit, List<GridPosition> newVisibleGridPositions, List<GridPosition> previousVisibleGridPositions)
     //{
