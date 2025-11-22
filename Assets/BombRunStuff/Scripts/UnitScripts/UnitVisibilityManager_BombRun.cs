@@ -39,7 +39,8 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
 
     [Header("Invisible Unit Placeholder stuff")]
     [SerializeField] private Transform _invisibleUnitPlaceHolderPrefab;
-    private Dictionary<BombRunUnit, Vector3> _invisibleUnitPlaceHolderDictionary = new Dictionary<BombRunUnit, Vector3>();
+    private Dictionary<BombRunUnit, GridPosition> _invisibleUnitPlaceHolderGridPositionDictionary = new Dictionary<BombRunUnit, GridPosition>();
+    private Dictionary<BombRunUnit, Transform> _invisibleUnitPlaceHolderTransformnDictionary = new Dictionary<BombRunUnit, Transform>();
 
     // events?
     public static event EventHandler<GridPosition> OnMakeGridPositionVisibleToPlayer;
@@ -422,15 +423,40 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     private void UnitVisibilityManager_BombRun_OnEnemyUnitBecameInVisible(object sender, BombRunUnit unit)
     {
         Debug.Log("UnitVisibilityManager_BombRun_OnEnemyUnitBecameInVisible: unit: " + unit.name + " became invisible at: " + unit.GetGridPosition());
-        Debug.Break();
+        //Debug.Break();
 
         //if (_invisibleUnitPlaceHolderDictionary.ContainsKey(unit))
         //{
-            
-        //}
-        //Vector3 spawnPosition = unit.GetWorldPosition();
-        //Sprite spriteToSpawn = unit.GetCurrentSprite();
 
+        //}
+
+        SpawnInvisibleUnitPlaceHolder(unit);
+
+    }
+    private void SpawnInvisibleUnitPlaceHolder(BombRunUnit unit)
+    {
+        if (unit == null)
+        {
+            return;
+        }
+
+        // Get Invisible Unit spawn position
+        Vector3 spawnPosition = LevelGrid.Instance.GetWorldPosition(unit.GetGridPosition());
+        if (unit.GetUnitAnimationState() == UnitAnimationState.Moving)
+        {
+            spawnPosition = unit.GetWorldPosition();
+        }
+
+        // spawn the invisilbe unit placeholder
+        Transform invibleUnitPlaceHolderObject = Instantiate(_invisibleUnitPlaceHolderPrefab, spawnPosition, Quaternion.identity, this.transform);
+
+        // update the invisible unit placeholder
+        BombRunUnit_InvisibleUnitPlaceHolder invisibleUnitPlaceHolderScript = invibleUnitPlaceHolderObject.GetComponent<BombRunUnit_InvisibleUnitPlaceHolder>();
+        invisibleUnitPlaceHolderScript.InitializeInvisibleUnitPlaceHolder(unit);
+
+        // save placeholder to dictionaries so it can be deleted as needed?
+        _invisibleUnitPlaceHolderTransformnDictionary.Add(unit, invibleUnitPlaceHolderObject);
+        _invisibleUnitPlaceHolderGridPositionDictionary.Add(unit, unit.GetGridPosition());
 
     }
     private void UpdateInvisibleUnitPlaceHolders()
@@ -438,12 +464,26 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
         
     }
     private void UnitVisibilityManager_BombRun_OnEnemyUnitBecameVisible(object sender, BombRunUnit unit)
-    {      
-
+    {
+        RemoveFromInvisibleUnitPlaceHolderDictionary(unit);
     }
     private void RemoveFromInvisibleUnitPlaceHolderDictionary(BombRunUnit unit)
     {
-        
+        Transform unitPlaceHolderToDelete = null;
+        if (_invisibleUnitPlaceHolderTransformnDictionary.ContainsKey(unit))
+        {
+            unitPlaceHolderToDelete = _invisibleUnitPlaceHolderTransformnDictionary[unit];
+            _invisibleUnitPlaceHolderTransformnDictionary.Remove(unit);
+        }
+        if (_invisibleUnitPlaceHolderGridPositionDictionary.ContainsKey(unit))
+        {
+            _invisibleUnitPlaceHolderGridPositionDictionary.Remove(unit);
+        }
+
+        if (unitPlaceHolderToDelete != null)
+        {
+            GameObject.Destroy(unitPlaceHolderToDelete.gameObject);
+        }
     }
     //public void UpdateTeamsVisibleGridPositions(BombRunUnit unit, List<GridPosition> newVisibleGridPositions, List<GridPosition> previousVisibleGridPositions)
     //{

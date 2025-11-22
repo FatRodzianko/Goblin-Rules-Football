@@ -382,4 +382,12 @@ public class BombRunUnit : MonoBehaviour
     {
         return _bombRunUnitAnimator.GetCurrentSprite();
     }
+    public UnitAnimationState GetUnitAnimationState()
+    {
+        return _bombRunUnitAnimator.GetUnitAnimationState();
+    }
+    public bool GetSpriteFlipX()
+    {
+        return _bombRunUnitAnimator.GetSpriteFlipX();
+    }
 }

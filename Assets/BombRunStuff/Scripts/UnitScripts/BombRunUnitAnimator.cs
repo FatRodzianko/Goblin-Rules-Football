@@ -2,6 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+public enum UnitAnimationState
+{
+    None,
+    Idle,
+    Moving,
+    Shooting,
+}
 
 public class BombRunUnitAnimator : MonoBehaviour
 {
@@ -15,6 +22,9 @@ public class BombRunUnitAnimator : MonoBehaviour
 
     [Header("Shooting")]
     [SerializeField] private Vector3 _shootPoint;
+
+    [Header("Unit Animation State?")]
+    [SerializeField] private UnitAnimationState _unitAnimationState = UnitAnimationState.None;
 
     private void Awake()
     {
@@ -35,6 +45,8 @@ public class BombRunUnitAnimator : MonoBehaviour
         _unit.OnUnitVisibilityChanged += Unit_OnUnitVisibilityChanged;
         _unit.OnActionDirectionChanged += Unit_OnActionDirectionChanged;
         _spriteRenderer.RegisterSpriteChangeCallback(UnitSpriteChanged);
+
+        this._unitAnimationState = UnitAnimationState.Idle;
     }
 
     
@@ -65,14 +77,22 @@ public class BombRunUnitAnimator : MonoBehaviour
     {
         Debug.Log("MoveAction_OnStartMoving: " + _unit.name);
         _animator.SetBool("IsWalking", true);
+        this._unitAnimationState = UnitAnimationState.Moving;
     }
     private void MoveAction_OnStopMoving(object sender, EventArgs e)
     {
         _animator.SetBool("IsWalking", false);
+        if (_unitAnimationState == UnitAnimationState.Moving)
+        {
+            this._unitAnimationState = UnitAnimationState.Idle;
+        }
     }
     private void ShootAction_OnStopShooting(object sender, EventArgs e)
     {
-        
+        if (_unitAnimationState == UnitAnimationState.Shooting)
+        {
+            this._unitAnimationState = UnitAnimationState.Idle;
+        }
     }
     public void FireShootProjectile()
     {
@@ -107,6 +127,7 @@ public class BombRunUnitAnimator : MonoBehaviour
     {
         Debug.Log("ShootAction_OnStartShooting: " + _unit.name);
         _animator.SetTrigger("Shoot");
+        this._unitAnimationState = UnitAnimationState.Shooting;
     }
     private void Unit_OnActionDirectionChanged(object sender, Vector2 e)
     {
@@ -157,5 +178,9 @@ public class BombRunUnitAnimator : MonoBehaviour
     public Sprite GetCurrentSprite()
     {
         return _spriteRenderer.sprite;
+    }
+    public UnitAnimationState GetUnitAnimationState()
+    {
+        return _unitAnimationState;
     }
 }
