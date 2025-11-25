@@ -7,6 +7,7 @@ public class BombRunUnit_InvisibleUnitPlaceHolder : MonoBehaviour
     [SerializeField] private BombRunUnit _unit;
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private SpriteMask _spriteMask;
+    [SerializeField] private float _alphaValue;
 
     public void InitializeInvisibleUnitPlaceHolder(BombRunUnit unit)
     {
@@ -15,8 +16,13 @@ public class BombRunUnit_InvisibleUnitPlaceHolder : MonoBehaviour
         this._spriteRenderer.sprite = sprite;
         this._spriteMask.sprite = sprite;
 
+
+
         // get color of sprite
         // set alpha of sprite to 0.5 or something to make it transparent
+        Color newColor = this._spriteRenderer.color;
+        newColor.a = _alphaValue;
+        this._spriteRenderer.color = newColor;
 
         if (unit.GetSpriteFlipX())
         {

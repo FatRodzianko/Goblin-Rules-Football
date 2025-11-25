@@ -552,4 +552,6 @@ x Add a "Look At" action
 - Move the "Invisible Unit Placeholder" spawning/despawning into its own manager?
 - - - InvisibleUnitPlaceHolder_Manager listens for events of units becoming invisible and visible, as well as when grid positions become visible
 - - - - - - when unit becomes visible, remove any placeholders for that unit
-- - - - - - when a grid position becomes visibile, check if any placeholders are associated with that grid position. If they are, remove them?  
+- - - - - - when a grid position becomes visibile, check if any placeholders are associated with that grid position. If they are, remove them?
+- make a shader to make sprites black and white?
+- - - https://www.youtube.com/watch?v=6CoXC3TEu24  
