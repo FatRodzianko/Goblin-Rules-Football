@@ -17,8 +17,6 @@ public class BombRunUnit_InvisibleUnitPlaceHolder : MonoBehaviour
         this._spriteMask.sprite = sprite;
 
 
-
-        // get color of sprite
         // set alpha of sprite to 0.5 or something to make it transparent
         Color newColor = this._spriteRenderer.color;
         newColor.a = _alphaValue;
