@@ -16,6 +16,7 @@ public class FogOfWarTileMapManager : MonoBehaviour
     [Header("Tiles")]
     [SerializeField] private Tile _fogOfWarTile;
     [SerializeField] private Tile _fogOfWarWhiteTile;
+    [SerializeField] private Tile _enemyVisibleGridTile;
 
 
     private void Awake()
@@ -78,7 +79,7 @@ public class FogOfWarTileMapManager : MonoBehaviour
 
     private void UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToEnemy(object sender, GridPosition e)
     {
-        _enemyFogOfWarTileMap.SetTile(new Vector3Int(e.x, e.y, 0), _fogOfWarWhiteTile);
+        _enemyFogOfWarTileMap.SetTile(new Vector3Int(e.x, e.y, 0), _enemyVisibleGridTile);
     }
     private void UnitVisibilityManager_BombRun_OnEnemyFovVisibleChanged(object sender, List<GridPosition> gridPositions)
     {
@@ -90,7 +91,7 @@ public class FogOfWarTileMapManager : MonoBehaviour
 
         foreach (GridPosition gridPosition in gridPositions)
         {
-            _enemyFogOfWarTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _fogOfWarWhiteTile);
+            _enemyFogOfWarTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _enemyVisibleGridTile);
         }
     }
 }

@@ -553,5 +553,20 @@ x How to show grid visuals over fog of war?
 - - - InvisibleUnitPlaceHolder_Manager listens for events of units becoming invisible and visible, as well as when grid positions become visible
 - - - - - x when unit becomes visible, remove any placeholders for that unit
 - - - - - - when a grid position becomes visibile, check if any placeholders are associated with that grid position. If they are, remove them?
+- - x How to make it manager independent?
+- - - - - x Each unit will have its own "placeholder" object that it spawns when it is made invisible
+- - - - - x Unit will listen to static events from the UnitVisibilityManager for:
+- - - - - - - - x OnAnyUnitBecomeVisible and OnAnyUnitBecomeInvisible
+- - - - - - - - - - - x this should already be the case
+- - - - - - - - - - - x This wasn't alreadthe case, so I added it
+- - - - - - - - x OnAnyGridPosition become visible
+- - - - - - - - - - - x This should be an event on the placeholder sprite object, not the unit? Units don't need this event?
+- - - - - - When these events trigger, check:
+- - - - - - - - x OnAnyUnitBecomeVisible: If the unit that became visible is this unit, remove any placeholder sprites
+- - - - - - - - x OnAnyUnitBecomeInvisible: if the unit that became invisible is this unit, spawn placeholder sprite at unit's current grid position
+- - - - - - - - - - - x Sanity check to see if any placeholder objects already exist for this unit. If yes, delete old placeholder objects
+- - - - - - - - - - - x Don't make the place holder sprite a child of the unit. This prevents the placeholder sprite from moving as the unit moves
+- - - - - - - - x OnAnyGridPositionBecomeVisibile: if placeholder sprite object is on this grid position, delete the placeholder sprite object
+
 x make a shader to make sprites black and white?
 - - x https://www.youtube.com/watch?v=6CoXC3TEu24  

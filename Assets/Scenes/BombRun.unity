@@ -51834,6 +51834,7 @@ MonoBehaviour:
   _enemyFogOfWarTileMap: {fileID: 93511864}
   _fogOfWarTile: {fileID: 11400000, guid: 0aeb92c7bdaaf4d4db150682b9545947, type: 2}
   _fogOfWarWhiteTile: {fileID: 11400000, guid: 6dab0f225b446c74895fe76aa30e310c, type: 2}
+  _enemyVisibleGridTile: {fileID: 11400000, guid: 6868f8864742758468c42e7150678f68, type: 2}
 --- !u!1001 &1536326559
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -53526,7 +53527,6 @@ MonoBehaviour:
   _enemyUnitVisibileGridPositions: []
   _vector2PositionsVisibleToPlayer: []
   _vector2PositionsVisibleToEnemy: []
-  _invisibleUnitPlaceHolderPrefab: {fileID: 6422261272446741381, guid: 40ec6ec1f89ccdf41b4c4351d68866b4, type: 3}
 --- !u!1 &2138507406
 GameObject:
   m_ObjectHideFlags: 0

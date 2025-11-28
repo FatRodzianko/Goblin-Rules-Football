@@ -183,4 +183,8 @@ public class BombRunUnitAnimator : MonoBehaviour
     {
         return _unitAnimationState;
     }
+    public SpriteRenderer GetSpriteRenderer()
+    {
+        return _spriteRenderer;
+    }
 }

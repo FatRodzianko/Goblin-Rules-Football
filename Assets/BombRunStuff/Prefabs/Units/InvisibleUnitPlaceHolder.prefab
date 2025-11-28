@@ -152,4 +152,4 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _spriteRenderer: {fileID: 6422261272446741380}
   _spriteMask: {fileID: 5353027366480903540}
-  _alphaValue: 0.75
+  _alphaValue: 0.66

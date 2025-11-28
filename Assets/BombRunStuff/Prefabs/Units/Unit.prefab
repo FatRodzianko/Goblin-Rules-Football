@@ -459,7 +459,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: 9743e61f14458444f8724bbad982a461, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -615,7 +615,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: 11992b51136bb574fa7eeb91f47bd468, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -852,7 +852,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: e5917e614c198a94aa34d711c31edc9d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.78431374}
   m_FlipX: 0
@@ -942,7 +942,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 5
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &6688039537235266255
 MonoBehaviour:
@@ -1187,8 +1187,10 @@ MonoBehaviour:
   _actionPoints: 2
   _actionsTakenThisTurn: []
   _actionDirection: {x: 0, y: 0}
-  _animator: {fileID: 5320209574301914813}
+  _bombRunUnitAnimator: {fileID: 5320209574301914813}
   _bombRunUnitFieldOfView: {fileID: 3336434522842753539}
+  _invisibleUnitPlaceHolderObjectPrefab: {fileID: 6422261272446741381, guid: 40ec6ec1f89ccdf41b4c4351d68866b4, type: 3}
+  _invisibleUnitPlaceHolder: {fileID: 0}
 --- !u!114 &7297105716296972232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1812,7 +1814,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: 918772699e6cf7d4db96321f53840e0d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -2012,6 +2014,7 @@ MonoBehaviour:
   _spriteMask: {fileID: 2186479288814106386}
   _shootProjectilePrefab: {fileID: 6527801240750598869, guid: a9e4d5d120043af429184696ec5f8786, type: 3}
   _shootPoint: {x: 0.1875, y: 1.34375, z: 0}
+  _unitAnimationState: 0
 --- !u!331 &2186479288814106386
 SpriteMask:
   m_ObjectHideFlags: 0

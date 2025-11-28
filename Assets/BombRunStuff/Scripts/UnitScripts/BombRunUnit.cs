@@ -54,11 +54,19 @@ public class BombRunUnit : MonoBehaviour
     [Header("FOV Stuff?")]
     [SerializeField] private BombRunUnitFieldOfView _bombRunUnitFieldOfView;
 
+    [Header("Fog of War Place Holder Object Stuff")]
+    [SerializeField] Transform _invisibleUnitPlaceHolderObjectPrefab;
+    [SerializeField] BombRunUnit_InvisibleUnitPlaceHolder _invisibleUnitPlaceHolder;
+
     private void Awake()
     {
         _baseActionArray = GetComponents<BaseAction>();
         if (_healthSystem == null)
             _healthSystem = GetComponent<BombRunUnitHealthSystem>();
+        if (_bombRunUnitAnimator == null)
+        {
+            _bombRunUnitAnimator = this.GetComponent<BombRunUnitAnimator>();
+        }
         if (_bombRunUnitAnimator.GetSpriteFlipX())
         {
             SetActionDirection(new Vector2(-1, 0));
@@ -83,12 +91,18 @@ public class BombRunUnit : MonoBehaviour
         //_healthSystem.OnDead += HealthSystem_OnDead;
 
         //OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);        
+
+        UnitVisibilityManager_BombRun.OnAnyUnitBecameVisibile += UnitVisibilityManager_BombRun_OnAnyUnitBecameVisibile;
+        UnitVisibilityManager_BombRun.OnAnyUnitBecameInVisibile += UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile;
     }
 
     private void OnDisable()
     {
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
         _healthSystem.OnDead -= HealthSystem_OnDead;
+
+        UnitVisibilityManager_BombRun.OnAnyUnitBecameVisibile += UnitVisibilityManager_BombRun_OnAnyUnitBecameVisibile;
+        UnitVisibilityManager_BombRun.OnAnyUnitBecameInVisibile += UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile;
     }
     public void InitializeBombRunUnit()
     {
@@ -382,6 +396,10 @@ public class BombRunUnit : MonoBehaviour
     {
         return _bombRunUnitAnimator.GetCurrentSprite();
     }
+    public SpriteRenderer GetSpriteRenderer()
+    {
+        return _bombRunUnitAnimator.GetSpriteRenderer();
+    }
     public UnitAnimationState GetUnitAnimationState()
     {
         return _bombRunUnitAnimator.GetUnitAnimationState();
@@ -390,4 +408,73 @@ public class BombRunUnit : MonoBehaviour
     {
         return _bombRunUnitAnimator.GetSpriteFlipX();
     }
+    private void UnitVisibilityManager_BombRun_OnAnyUnitBecameVisibile(object sender, BombRunUnit unit)
+    {
+        // for multiplayer, check if this unit is owned by the local player. For now, just have it check if it is an enemy or not?
+        if (!this._isEnemy)
+        {
+            return;
+        }
+        if (this == unit)
+        {
+            //Debug.Log("UnitVisibilityManager_BombRun_OnAnyUnitBecameVisibile: " + this.name + " became visibile");
+            DestroyInvisibleUnitPlaceHolder();
+        }
+    }
+    private void UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile(object sender, BombRunUnit unit)
+    {
+        // for multiplayer, check if this unit is owned by the local player. For now, just have it check if it is an enemy or not?
+        if (!this._isEnemy)
+        {
+            return;
+        }
+
+        if (this == unit)
+        {
+            //Debug.Log("UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile: " + unit.name + " become INVISIBLE");
+            DestroyInvisibleUnitPlaceHolder();
+            SpawnInvisibleUnitPlaceHolder();
+        }
+    }
+    private void InvisibleUnitPlaceHolder_OnGridPositionBecameVisible(object sender, EventArgs e)
+    {
+        DestroyInvisibleUnitPlaceHolder();
+    }
+    private void SpawnInvisibleUnitPlaceHolder()
+    {
+        // Get Invisible Unit spawn position
+        Vector3 spawnPosition = LevelGrid.Instance.GetWorldPosition(this.GetGridPosition());
+        if (this.GetUnitAnimationState() == UnitAnimationState.Moving)
+        {
+            spawnPosition = this.GetWorldPosition();
+        }
+
+        // spawn the invisilbe unit placeholder
+        Transform invibleUnitPlaceHolderObject = Instantiate(_invisibleUnitPlaceHolderObjectPrefab, spawnPosition, Quaternion.identity);
+        _invisibleUnitPlaceHolder = invibleUnitPlaceHolderObject.GetComponent<BombRunUnit_InvisibleUnitPlaceHolder>();
+        _invisibleUnitPlaceHolder.InitializeInvisibleUnitPlaceHolder(this);
+
+        // event to destroy placeholder object if its grid position is seen
+        _invisibleUnitPlaceHolder.OnGridPositionBecameVisible += InvisibleUnitPlaceHolder_OnGridPositionBecameVisible;
+    }    
+
+    private void DestroyInvisibleUnitPlaceHolder()
+    {
+        try
+        {
+            if (this._invisibleUnitPlaceHolder != null)
+            {
+                _invisibleUnitPlaceHolder.OnGridPositionBecameVisible -= InvisibleUnitPlaceHolder_OnGridPositionBecameVisible;
+                GameObject.Destroy(_invisibleUnitPlaceHolder.gameObject);
+            }
+            this._invisibleUnitPlaceHolder = null;
+        }
+        catch (Exception e)
+        {
+            Debug.Log("DestroyInvisibleUnitPlaceHolder: " + e);
+        }
+        
+    }
+    
+    
 }
