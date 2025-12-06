@@ -10,7 +10,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     [Header("FOV Parameters")]
     [SerializeField] private int _rayCount = 50;
     [SerializeField] private float _fov = 90f;
-    [SerializeField] private MeshFilter _meshFilter;
+    //[SerializeField] private MeshFilter _meshFilter;
     private int _frameCounter = 0;
 
     
@@ -28,14 +28,14 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     [Header("Unit movement and other triggers for mesh creation")]
     [SerializeField] private bool _isMoving = false;
 
-    [Header("FOV Materials and appearance")]
-    [SerializeField] private MeshRenderer _meshRenderer;
-    [SerializeField] private Material _friendlyFOVMaterial;
-    [SerializeField] private Material _enemyFOVMaterial;
-    private Mesh _mesh;
+    //[Header("FOV Materials and appearance")]
+    //[SerializeField] private MeshRenderer _meshRenderer;
+    //[SerializeField] private Material _friendlyFOVMaterial;
+    //[SerializeField] private Material _enemyFOVMaterial;
+    //private Mesh _mesh;
 
-    [Header("Colliders and stuff")]
-    [SerializeField] private PolygonCollider2D _collider;
+    //[Header("Colliders and stuff")]
+    //[SerializeField] private PolygonCollider2D _collider;
 
     [Header("Visibile Units")]
     [SerializeField] private List<BombRunUnit> _visibleUnits = new List<BombRunUnit>();
@@ -44,8 +44,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
     private void Awake()
     {
-        if (_meshFilter == null)
-            this._meshFilter = this.GetComponent<MeshFilter>();
+        //if (_meshFilter == null)
+        //    this._meshFilter = this.GetComponent<MeshFilter>();
         if (_unit == null)
             this._unit = this.transform.parent.GetComponent<BombRunUnit>();
     }
@@ -83,10 +83,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     }
     public void InitializeFOV()
     {
-        _mesh = new Mesh();
-        _meshFilter.mesh = _mesh;
+        //_mesh = new Mesh();
+        //_meshFilter.mesh = _mesh;
 
-        SetFOVMaterial(_unit.IsEnemy());
+        //SetFOVMaterial(_unit.IsEnemy());
         SetAimDirection(_unit.GetActionDirection());
         //UpdateFOVMesh();
         if(isActiveAndEnabled)
@@ -100,18 +100,18 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         //UpdateFOVMesh();
         GetVisibileGridPositions();
     }
-    private void SetFOVMaterial(bool isEnemy)
-    {
-        if (isEnemy)
-        {
-            _meshRenderer.material = _enemyFOVMaterial;
-        }
-        else
-        {
-            _meshRenderer.material = _friendlyFOVMaterial;
-        }
+    //private void SetFOVMaterial(bool isEnemy)
+    //{
+    //    if (isEnemy)
+    //    {
+    //        _meshRenderer.material = _enemyFOVMaterial;
+    //    }
+    //    else
+    //    {
+    //        _meshRenderer.material = _friendlyFOVMaterial;
+    //    }
 
-    }
+    //}
     private void MoveAction_OnStartMoving(object sender, EventArgs e)
     {
         _isMoving = true;
@@ -144,183 +144,183 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         //_frameCounter++;
         
     }
-    private void UpdateFOVMeshWithGridPositions(List<GridPosition> gridPositions)
-    {
-        // setup field of view parameters
-        _origin = _unit.transform.position;
+    //private void UpdateFOVMeshWithGridPositions(List<GridPosition> gridPositions)
+    //{
+    //    // setup field of view parameters
+    //    _origin = _unit.transform.position;
 
-        // initialize the arrays
-        Vector3[] vertices = new Vector3[gridPositions.Count + 1 + 1];
-        Vector2[] uv = new Vector2[vertices.Length];
-        int[] triangles = new int[gridPositions.Count * 3];
+    //    // initialize the arrays
+    //    Vector3[] vertices = new Vector3[gridPositions.Count + 1 + 1];
+    //    Vector2[] uv = new Vector2[vertices.Length];
+    //    int[] triangles = new int[gridPositions.Count * 3];
 
-        // initialize polygon collider points array
-        Vector2[] polygonColliderPoints = new Vector2[gridPositions.Count + 1 + 1];
+    //    // initialize polygon collider points array
+    //    Vector2[] polygonColliderPoints = new Vector2[gridPositions.Count + 1 + 1];
 
-        // set the origin
-        vertices[0] = _origin;
-        polygonColliderPoints[0] = _origin;
+    //    // set the origin
+    //    vertices[0] = _origin;
+    //    polygonColliderPoints[0] = _origin;
 
-        // cycle through rays and add new vertex
-        int vertexIndex = 1;
-        int triangleIndex = 0;
+    //    // cycle through rays and add new vertex
+    //    int vertexIndex = 1;
+    //    int triangleIndex = 0;
 
-        // cycle through the grid positions, add vertex for the grid position?
-        if (gridPositions.Count > 0)
-        {
-            for (int i = 0; i <= gridPositions.Count; i++)
-            {
-                Vector3 vertex = LevelGrid.Instance.GetWorldPosition(gridPositions[i]);
+    //    // cycle through the grid positions, add vertex for the grid position?
+    //    if (gridPositions.Count > 0)
+    //    {
+    //        for (int i = 0; i <= gridPositions.Count; i++)
+    //        {
+    //            Vector3 vertex = LevelGrid.Instance.GetWorldPosition(gridPositions[i]);
 
 
-                vertices[vertexIndex] = vertex;
-                polygonColliderPoints[vertexIndex] = vertex;
+    //            vertices[vertexIndex] = vertex;
+    //            polygonColliderPoints[vertexIndex] = vertex;
 
-                if (i > 0)
-                {
-                    // set the points of the triangle
-                    triangles[triangleIndex + 0] = 0;
-                    triangles[triangleIndex + 1] = vertexIndex - 1;
-                    triangles[triangleIndex + 2] = vertexIndex;
-                    // increase triangle index by 3, since we are adding 3 points every loop
-                    triangleIndex += 3;
-                }
+    //            if (i > 0)
+    //            {
+    //                // set the points of the triangle
+    //                triangles[triangleIndex + 0] = 0;
+    //                triangles[triangleIndex + 1] = vertexIndex - 1;
+    //                triangles[triangleIndex + 2] = vertexIndex;
+    //                // increase triangle index by 3, since we are adding 3 points every loop
+    //                triangleIndex += 3;
+    //            }
 
-                vertexIndex++;
-            }
-        }
+    //            vertexIndex++;
+    //        }
+    //    }
         
 
-        _mesh.vertices = vertices;
-        _mesh.uv = uv;
-        _mesh.triangles = triangles;
-        _mesh.bounds = new Bounds(_origin, Vector3.one * 500f);
+    //    _mesh.vertices = vertices;
+    //    _mesh.uv = uv;
+    //    _mesh.triangles = triangles;
+    //    _mesh.bounds = new Bounds(_origin, Vector3.one * 500f);
 
-        this.transform.position = Vector3.zero;
+    //    this.transform.position = Vector3.zero;
 
-        _collider.SetPath(0, polygonColliderPoints);
-    }
-    private void UpdateFOVMesh()
-    {
-        // setup field of view parameters
-        _origin = _unit.transform.position;
+    //    _collider.SetPath(0, polygonColliderPoints);
+    //}
+    //private void UpdateFOVMesh()
+    //{
+    //    // setup field of view parameters
+    //    _origin = _unit.transform.position;
 
-        // for testing: aim direction will be where mouse is relative to unit
-        float angle = _startingAngle;
-        float angleIncrease = _fov / _rayCount;
-        float viewDistance = _unit.GetSightRange() * LevelGrid.Instance.GetGridCellSize();
+    //    // for testing: aim direction will be where mouse is relative to unit
+    //    float angle = _startingAngle;
+    //    float angleIncrease = _fov / _rayCount;
+    //    float viewDistance = _unit.GetSightRange() * LevelGrid.Instance.GetGridCellSize();
 
-        // initialize the arrays
-        Vector3[] vertices = new Vector3[_rayCount + 1 + 1];
-        Vector2[] uv = new Vector2[vertices.Length];
-        int[] triangles = new int[_rayCount * 3];
+    //    // initialize the arrays
+    //    Vector3[] vertices = new Vector3[_rayCount + 1 + 1];
+    //    Vector2[] uv = new Vector2[vertices.Length];
+    //    int[] triangles = new int[_rayCount * 3];
 
-        // initialize polygon collider points array
-        Vector2[] polygonColliderPoints = new Vector2[_rayCount + 1 + 1];
+    //    // initialize polygon collider points array
+    //    Vector2[] polygonColliderPoints = new Vector2[_rayCount + 1 + 1];
 
-        // set the origin
-        vertices[0] = _origin;
-        polygonColliderPoints[0] = _origin;
+    //    // set the origin
+    //    vertices[0] = _origin;
+    //    polygonColliderPoints[0] = _origin;
 
-        // cycle through rays and add new vertex
-        int vertexIndex = 1;
-        int triangleIndex = 0;
+    //    // cycle through rays and add new vertex
+    //    int vertexIndex = 1;
+    //    int triangleIndex = 0;
 
-        // track spotted goblins
-        List<BombRunUnit> spottedEnemyUnits = new List<BombRunUnit>();
-        for (int i = 0; i <= _rayCount; i++)
-        {
-            //Debug.Log("FieldOfView: Vertex index: " + vertexIndex.ToString() + " with max verticies: " + vertices.Length.ToString() + " for unit: " + _unit.name);
-            Vector3 vectorFromAngle = GetVectorFromAngle(angle);
-            Vector3 vertex = _origin + vectorFromAngle * viewDistance;
+    //    // track spotted goblins
+    //    List<BombRunUnit> spottedEnemyUnits = new List<BombRunUnit>();
+    //    for (int i = 0; i <= _rayCount; i++)
+    //    {
+    //        //Debug.Log("FieldOfView: Vertex index: " + vertexIndex.ToString() + " with max verticies: " + vertices.Length.ToString() + " for unit: " + _unit.name);
+    //        Vector3 vectorFromAngle = GetVectorFromAngle(angle);
+    //        Vector3 vertex = _origin + vectorFromAngle * viewDistance;
 
-            float closestHitDistance = 0f;
-            bool firstIteration = true;
-            foreach (LayerMask layerMask in _blockingLayers)
-            {
-                // Change to a Physics2D.RaycastAll because if there is an obstacle you skip over, you'll want to see if there are any other obstacles behind that
-                // for collision with walls, just end the for loop after the first one?
-                RaycastHit2D[] raycastHits2D = Physics2D.RaycastAll(_origin, vectorFromAngle, viewDistance, layerMask);
+    //        float closestHitDistance = 0f;
+    //        bool firstIteration = true;
+    //        foreach (LayerMask layerMask in _blockingLayers)
+    //        {
+    //            // Change to a Physics2D.RaycastAll because if there is an obstacle you skip over, you'll want to see if there are any other obstacles behind that
+    //            // for collision with walls, just end the for loop after the first one?
+    //            RaycastHit2D[] raycastHits2D = Physics2D.RaycastAll(_origin, vectorFromAngle, viewDistance, layerMask);
 
-                if (raycastHits2D.Length == 0)
-                    continue;
+    //            if (raycastHits2D.Length == 0)
+    //                continue;
 
-                Vector3 hitPoint = vertex;
-                for (int j = 0; j < raycastHits2D.Length; j++)
-                {
-                    if (raycastHits2D[j].collider.CompareTag("BombRunWall"))
-                    {
-                        hitPoint = raycastHits2D[j].point;
-                        break;
-                    }
-                    if (raycastHits2D[j].transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
-                    {
-                        if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
-                        {
-                            continue;
-                        }
-                        hitPoint = raycastHits2D[j].point;
-                        break;
-                    }
-                }
-                float newDistance = Vector2.Distance(_origin, hitPoint);
-                if (firstIteration)
-                {
-                    closestHitDistance = newDistance;
-                    vertex = hitPoint;
-                    firstIteration = false;
-                    continue;
-                }
-                if (newDistance <= closestHitDistance)
-                {
-                    closestHitDistance = newDistance;
-                    vertex = hitPoint;
-                }
+    //            Vector3 hitPoint = vertex;
+    //            for (int j = 0; j < raycastHits2D.Length; j++)
+    //            {
+    //                if (raycastHits2D[j].collider.CompareTag("BombRunWall"))
+    //                {
+    //                    hitPoint = raycastHits2D[j].point;
+    //                    break;
+    //                }
+    //                if (raycastHits2D[j].transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
+    //                {
+    //                    if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
+    //                    {
+    //                        continue;
+    //                    }
+    //                    hitPoint = raycastHits2D[j].point;
+    //                    break;
+    //                }
+    //            }
+    //            float newDistance = Vector2.Distance(_origin, hitPoint);
+    //            if (firstIteration)
+    //            {
+    //                closestHitDistance = newDistance;
+    //                vertex = hitPoint;
+    //                firstIteration = false;
+    //                continue;
+    //            }
+    //            if (newDistance <= closestHitDistance)
+    //            {
+    //                closestHitDistance = newDistance;
+    //                vertex = hitPoint;
+    //            }
 
-            }
+    //        }
 
-            vertices[vertexIndex] = vertex;
-            polygonColliderPoints[vertexIndex] = vertex;
+    //        vertices[vertexIndex] = vertex;
+    //        polygonColliderPoints[vertexIndex] = vertex;
 
-            if (i > 0)
-            {
-                // set the points of the triangle
-                triangles[triangleIndex + 0] = 0;
-                triangles[triangleIndex + 1] = vertexIndex - 1;
-                triangles[triangleIndex + 2] = vertexIndex;
-                // increase triangle index by 3, since we are adding 3 points every loop
-                triangleIndex += 3;
-            }
+    //        if (i > 0)
+    //        {
+    //            // set the points of the triangle
+    //            triangles[triangleIndex + 0] = 0;
+    //            triangles[triangleIndex + 1] = vertexIndex - 1;
+    //            triangles[triangleIndex + 2] = vertexIndex;
+    //            // increase triangle index by 3, since we are adding 3 points every loop
+    //            triangleIndex += 3;
+    //        }
 
-            // See if any enemy units were seen?
-            //spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
-            //if (_frameCounter > 10 || !_isMoving)
-            //    spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
-            vertexIndex++;
-            // increase angle for next loop. subtract to go clockwise
-            angle -= angleIncrease;
-        }
+    //        // See if any enemy units were seen?
+    //        //spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
+    //        //if (_frameCounter > 10 || !_isMoving)
+    //        //    spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
+    //        vertexIndex++;
+    //        // increase angle for next loop. subtract to go clockwise
+    //        angle -= angleIncrease;
+    //    }
 
-        // this ends up getting called way to often. Maybe have it so it's only called every so often?
-        // Have a list of units spotted while moving. while isMoving is true, check to see if you spotted any new units. If so, add to new unit list, and update the UnitVisibilityManager with just that one unit?
-        // when the unit stops moving, then submit to UnitCompletedFOVCheck? So it's only happening
-        //UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
-        //if (_frameCounter > 10 || !_isMoving)
-        //{
-        //    UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
-        //    _frameCounter = 0;
-        //}
-        //_frameCounter++;
+    //    // this ends up getting called way to often. Maybe have it so it's only called every so often?
+    //    // Have a list of units spotted while moving. while isMoving is true, check to see if you spotted any new units. If so, add to new unit list, and update the UnitVisibilityManager with just that one unit?
+    //    // when the unit stops moving, then submit to UnitCompletedFOVCheck? So it's only happening
+    //    //UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
+    //    //if (_frameCounter > 10 || !_isMoving)
+    //    //{
+    //    //    UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
+    //    //    _frameCounter = 0;
+    //    //}
+    //    //_frameCounter++;
 
-        _mesh.vertices = vertices;
-        _mesh.uv = uv;
-        _mesh.triangles = triangles;
-        _mesh.bounds = new Bounds(_origin, Vector3.one * 500f);
+    //    _mesh.vertices = vertices;
+    //    _mesh.uv = uv;
+    //    _mesh.triangles = triangles;
+    //    _mesh.bounds = new Bounds(_origin, Vector3.one * 500f);
 
-        this.transform.position = Vector3.zero;
+    //    this.transform.position = Vector3.zero;
 
-        _collider.SetPath(0, polygonColliderPoints);
-    }
+    //    _collider.SetPath(0, polygonColliderPoints);
+    //}
     private List<BombRunUnit> FindVisibleEnemyUnits(List<BombRunUnit> alreadySpottedGoblins, Vector2 origin, Vector2 direction, float distance)
     {
         List<BombRunUnit> spottedGoblins = new List<BombRunUnit>();
@@ -388,10 +388,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         return n;
     }
-    public bool IsPositionInFOVCollider(Vector3 position)
-    {
-        return _collider.OverlapPoint(position);
-    }
+    //public bool IsPositionInFOVCollider(Vector3 position)
+    //{
+    //    return _collider.OverlapPoint(position);
+    //}
     public bool CanUnitSeeThisUnit(BombRunUnit unit)
     {
         return HasThisUnitSeenThisGridPosition(unit.GetGridPosition());

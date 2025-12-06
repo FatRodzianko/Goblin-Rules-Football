@@ -32,7 +32,7 @@ public class SelectedTileVisualManager : MonoBehaviour
 
         if (BombRunTileMapManager.Instance.IsWallOnThisPosition(gridPosition))
         {
-            if (UnitActionSystem.Instance.GetSelectedAction().GetActionType() != ActionType.LookAt)
+            if (UnitActionSystem.Instance.GetSelectedAction() == null || UnitActionSystem.Instance.GetSelectedAction().GetActionType() != ActionType.LookAt)
             {
                 if (LevelGrid.Instance.GetSeenByPlayer(gridPosition))
                 {
@@ -48,7 +48,7 @@ public class SelectedTileVisualManager : MonoBehaviour
     }
     private void UnitActionSystem_OnPlayerClickInvalidPosition(object sender, EventArgs e)
     {        
-        StartCoroutine(FlashSelectedTileIndicator(_invalidActionColor, _selectedTileVisualTileMap.color));
+        StartCoroutine(FlashSelectedTileIndicator(_invalidActionColor, Color.white));
     }
     private IEnumerator FlashSelectedTileIndicator(Color newColor, Color oldColor)
     {

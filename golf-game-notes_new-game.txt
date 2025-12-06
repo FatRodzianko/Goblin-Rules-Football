@@ -536,23 +536,38 @@ x Add a "Look At" action
 - - - - - - - - - find the first point the ray hits that isn't a wall position (floor tilemap will need a collider?)
 - - - - - - - - - find the grid position that corresponds to that ray cast hit, and make that the move action's grid position?
 - For the Visible Grid position checks, add checks for corners and to allow for units to see around them?
+- - - this check already exists in the ShootAction script
+- - - - - - one thing to note about that is that a goblin also blocks a shot
+- - - - - - So, create a new function that can be referenced by other scripts/actions that checks if a unit can "see" a grid position (already have that?)
+- - - - - - If the grid position can be seen, then the ShootAction will make a secondary check to see if a goblin is blocking the shot's path
+- - - - - - - - - if it is, the grid position is not a valid shootaction target
+- - - - - - - - - this shouldn't be too much to calculate, since while it does calculate another raycast, ShootAction's would only calculate it for nearby enemy goblins, which would be limited in number
+- - - - - - - - - - - - or just have a "are goblins in the way" option for the function. If true, check if goblins block the line of sight to grid position. If option is false, skip goblin check?
 - Add in the cover system for the "defend" action
-- - - main benefit is: CAN NOT be seen around cornrers
+- - - main benefit is: CAN NOT be seen around cornrers.
 - - - can also hide behind partial obstacles to not be seen?
-- Have the UnitVisibilty manager show "last seen location" of units that you lose visibility on
-- - - when an enemy unit is no longer visible, spawn a placeholder black/white sprite on the enemy at their last known position
-- - - track what enemy units have a placeholder sprites spawn
-- - - - - - dictionary of grid position and enemy unit?
-- - - - - - when an enemy becomes visibile, check the placeholder tracker. If that unit has a spawned place holder, remove it?
-- - - - - - also, when the placeholder position is now visibile, if there is a placeholder sprite there, remove it?
-- - - maybe this isn't such a great idea?
+x Have the UnitVisibilty manager show "last seen location" of units that you lose visibility on
+- - x when an enemy unit is no longer visible, spawn a placeholder black/white sprite on the enemy at their last known position
+- - x track what enemy units have a placeholder sprites spawn
+- - - - - x dictionary of grid position and enemy unit?
+- - - - - x when an enemy becomes visibile, check the placeholder tracker. If that unit has a spawned place holder, remove it?
+- - - - - x also, when the placeholder position is now visibile, if there is a placeholder sprite there, remove it?
+- - x maybe this isn't such a great idea?
+- - - when an enemy shoots and the player can hear it (check distance from shooting enemy to all player units. 
+      Check if there is a path (as in grid path) from shooting enemy to player unit. If yes, and that shooting enemy is not visible,
+	  spawn placeholder sprite to "reveal" that shooting enemy position
+- - - - - - maybe just make the grid position the shooting enemy fired from "visible" to that unit? 
+            So it's added to their visible grid position list
+			The shooting enemy would then be revealed to the player. If the player moves the unit that spotted the enemy, or takes any other action
+			that changes visibility, then the shooting enemy will no longer be , unless the action results in that shooting enemy being visible
+			under normal visibility checks
 x How to show grid visuals over fog of war?
 - - x make the grid visual and grid action visual higher in the sorting layer, so they are above the
 
 - Move the "Invisible Unit Placeholder" spawning/despawning into its own manager?
 - - - InvisibleUnitPlaceHolder_Manager listens for events of units becoming invisible and visible, as well as when grid positions become visible
 - - - - - x when unit becomes visible, remove any placeholders for that unit
-- - - - - - when a grid position becomes visibile, check if any placeholders are associated with that grid position. If they are, remove them?
+- - - - - x when a grid position becomes visibile, check if any placeholders are associated with that grid position. If they are, remove them?
 - - x How to make it manager independent?
 - - - - - x Each unit will have its own "placeholder" object that it spawns when it is made invisible
 - - - - - x Unit will listen to static events from the UnitVisibilityManager for:

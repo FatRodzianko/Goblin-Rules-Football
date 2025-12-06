@@ -637,9 +637,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8226614046226594983}
   - component: {fileID: 3336434522842753539}
-  - component: {fileID: 3444733318118800621}
-  - component: {fileID: 769879967131768992}
-  - component: {fileID: 7753094812115045329}
   m_Layer: 11
   m_Name: FieldOfView
   m_TagString: Untagged
@@ -677,7 +674,6 @@ MonoBehaviour:
   _unit: {fileID: 3408740805264284271}
   _rayCount: 30
   _fov: 90
-  _meshFilter: {fileID: 3444733318118800621}
   _blockingLayer:
     serializedVersion: 2
     m_Bits: 1207959552
@@ -694,92 +690,8 @@ MonoBehaviour:
     m_Bits: 2048
   _aimDirectionVector: {x: 0, y: 0}
   _isMoving: 0
-  _meshRenderer: {fileID: 769879967131768992}
-  _friendlyFOVMaterial: {fileID: 2100000, guid: 4b6043eef17e6ef4f8d663ace3f8f17c, type: 2}
-  _enemyFOVMaterial: {fileID: 2100000, guid: 07ee84ef4d51aba408bd1d2c73aad00f, type: 2}
-  _collider: {fileID: 7753094812115045329}
   _visibleUnits: []
   _visibleVector2Positions: []
---- !u!33 &3444733318118800621
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2692160834791816643}
-  m_Mesh: {fileID: 0}
---- !u!23 &769879967131768992
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2692160834791816643}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 4b6043eef17e6ef4f8d663ace3f8f17c, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!60 &7753094812115045329
-PolygonCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2692160834791816643}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 0, y: 1}
-      - {x: -0.95105654, y: 0.30901697}
-      - {x: -0.5877852, y: -0.80901706}
-      - {x: 0.58778536, y: -0.80901694}
-      - {x: 0.9510565, y: 0.30901712}
 --- !u!1 &3004601356711755004
 GameObject:
   m_ObjectHideFlags: 0

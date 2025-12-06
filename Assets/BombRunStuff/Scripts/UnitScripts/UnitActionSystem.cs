@@ -172,6 +172,11 @@ public class UnitActionSystem : MonoBehaviour
             }
             else
             {
+                if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
+                {
+                    OnPlayerClickInvalidPosition?.Invoke(this, EventArgs.Empty);
+                    return;
+                }
                 if (LevelGrid.Instance.GetSeenByPlayer(mouseGridPosition))
                 {
                     OnPlayerClickInvalidPosition?.Invoke(this, EventArgs.Empty);

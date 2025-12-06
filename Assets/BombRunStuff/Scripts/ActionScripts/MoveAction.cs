@@ -90,6 +90,20 @@ public class MoveAction : BaseAction
             
         }
     }
+    protected override void BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged(object sender, BodyPart bodyPart)
+    {
+        base.BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged(sender, bodyPart);
+
+        if (bodyPart == BodyPart.Legs)
+        {
+            if (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(bodyPart) != BodyPartFrozenState.FullFrozen)
+            {
+                ResetCachedValidPositionList();
+            }
+            
+        }
+
+    }
     private void CheckIfSpriteShouldFlip(Vector3 moveDirection)
     {
         if (moveDirection.x < 0)
