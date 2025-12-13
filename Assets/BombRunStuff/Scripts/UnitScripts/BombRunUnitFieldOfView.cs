@@ -596,6 +596,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
         return false;
     }
+    //
+    // OLD CORNER DETECTION BASED ON HOW SHOOT ACTION DID IT
+    //
     //private bool DoesCornerHitStopVision(Vector2 unitPosition, Vector2 hitPoint, Vector2 centerOfCollider,Collider2D collider, Vector2 direction)
     //{
     //    //Debug.Log("DoesShotHitWallOrObstacle: Hit corner of a collider at: " + hits[i].point.ToString());
@@ -634,6 +637,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     //        return false;
     //    }
     //}
+    //
+    // OLD CORNER DETECTION BASED ON HOW SHOOT ACTION DID IT
+    //
     private bool DoesCornerHitStopVision(Vector2 unitPosition, Vector2 hitPoint, Vector2 centerOfCollider, Collider2D collider, Vector2 direction)
     {
         // move raycast along the line of sight direction by two pixels. if circle cast is no longer in a collider, it is a glancing blow?
@@ -660,7 +666,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log("DoesCornerHitStopVision: Hit obstacle at: " + hitPoint);
+                        //Debug.Log("DoesCornerHitStopVision: Hit obstacle at: " + hitPoint);
                         return true;
                     }
                 }
@@ -736,7 +742,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         List<GridPosition> gridRadiusNotInView = new List<GridPosition>();
         //gridRadiusNotInView.AddRange(gridRadius);
         gridRadiusNotInView.AddRange(GetSurroundingGridPositions(this._unit.GetGridPosition()));
-        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        
+        //var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        
         foreach (GridPosition gridPosition in gridRadius)
         {
             
@@ -760,8 +768,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 }
             }
         }
-        stopwatch.Stop();
-        Debug.Log("GetVisibileGridPositions: time take: " + stopwatch.ElapsedTicks.ToString());
+        //stopwatch.Stop();
+        //Debug.Log("GetVisibileGridPositions: time take: " + stopwatch.ElapsedTicks.ToString());
         foreach (BombRunUnit unit in previouslyVisibleUnitsToRemoveFromVisibility)
         {
             UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
