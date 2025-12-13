@@ -27,6 +27,7 @@ public class DefendAction : BaseAction
         //_onActionComplete = onActionComplete;
         //_isActive = true;
         ActionStart(onActionComplete);
+        _unit.SetUnitState(UnitState.Defending);
         FinishAction();
     }
     private void FinishAction()

@@ -13167,7 +13167,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _sightRange
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _actionPoints
@@ -13213,7 +13213,7 @@ GameObject:
   - component: {fileID: 220632125}
   m_Layer: 24
   m_Name: Floor
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -51842,6 +51842,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2446868888152888870, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 2747597061732830150, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
       propertyPath: _maxMoveDistance
       value: 10
@@ -52248,7 +52252,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 499015226548175057, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 499015226548175057, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -53753,6 +53757,10 @@ PrefabInstance:
     - target: {fileID: 6166125511920968727, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_LocalScale.x
       value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6166125511920968727, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6166125511920968727, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_LocalPosition.z

@@ -689,6 +689,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   _aimDirectionVector: {x: 0, y: 0}
+  _circleCastRadius: 0.2
+  _tileMapLayer:
+    serializedVersion: 2
+    m_Bits: 16777216
   _isMoving: 0
   _visibleUnits: []
   _visibleVector2Positions: []
@@ -1094,6 +1098,7 @@ MonoBehaviour:
   _isEnemy: 0
   _damageMode: 0
   _sightRange: 10
+  _unitState: 1
   _healthSystem: {fileID: 4506797595294261930}
   _baseActionArray: []
   _actionPoints: 2

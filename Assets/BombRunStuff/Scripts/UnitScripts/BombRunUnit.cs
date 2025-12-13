@@ -9,6 +9,14 @@ public enum UnitType
     Medic,
     Abnormal,
 }
+public enum UnitState
+{
+    None,
+    Idle,
+    Moving,
+    Attacking,
+    Defending
+}
 public class BombRunUnit : MonoBehaviour
 {
     private const int ACTION_POINTS_MAX = 2;
@@ -25,6 +33,8 @@ public class BombRunUnit : MonoBehaviour
     public event EventHandler<Vector2> OnActionDirectionChanged;
     public event EventHandler OnThisUnitMovedGridPosition;
     public event EventHandler<bool> OnUnitVisibilityChanged;
+    public event EventHandler<UnitState> OnUnitStateChanged;
+
 
     [Header("Unit Info")]
     //[SerializeField] private int _startingHealth = 100;
@@ -33,6 +43,9 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] private bool _isEnemy;
     [SerializeField] private DamageMode _damageMode;
     [SerializeField] private int _sightRange = 10;
+
+    [Header("Unit State")]
+    [SerializeField] private UnitState _unitState = UnitState.Idle;
 
     [Header("Unit Health Stuff")]
     [SerializeField] private BombRunUnitHealthSystem _healthSystem;
@@ -278,17 +291,6 @@ public class BombRunUnit : MonoBehaviour
 
         OnAnyUnitDied?.Invoke(this, EventArgs.Empty);
     }
-    public SpinAction GetSpinAction()
-    {
-        for (int i = 0; i < _baseActionArray.Length; i++)
-        {
-            if (_baseActionArray[i] is SpinAction)
-            {
-                return (SpinAction)_baseActionArray[i];
-            }
-        }
-        return null;
-    }
     public BombRunUnitAnimator GetUnitAnimator()
     {
         if (_bombRunUnitAnimator == null)
@@ -475,6 +477,13 @@ public class BombRunUnit : MonoBehaviour
         }
         
     }
-    
+    public UnitState GetUnitState()
+    {
+        return _unitState;
+    }
+    public void SetUnitState(UnitState unitState)
+    {
+        this._unitState = unitState;
+    }
     
 }

@@ -23,7 +23,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     private float _startingAngle = 0f;
     private float _aimDirectionAngle = 0f;
     [SerializeField] private Vector2 _aimDirectionVector = Vector2.zero;
-    
+    [SerializeField] private float _circleCastRadius = 0.2f;
+
 
     [Header("Unit movement and other triggers for mesh creation")]
     [SerializeField] private bool _isMoving = false;
@@ -503,17 +504,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         float distanceToWorldPosition = Vector2.Distance(unitWorldPosition, targetWorldPosition);
         // check the angle from the player to the position. If it is outside of FOV, return false
         Vector3 directionToPosition = (targetWorldPosition - unitWorldPosition).normalized;
-        //Vector3 vectorFromAngle = GetVectorFromAngle(_aimDirectionAngle);
         Vector3 vectorFromAngle = _aimDirectionVector;
-
-        //float angle = Vector3.Angle(vectorFromAngle, directionToPosition);
-
-        //if ((int)angle > (int)(_fov / 2f))
-        //{
-        //    //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is not in FOV: " + (_fov / 2f).ToString("0.000000") + ":" + angle.ToString("0.000000") + " starting angle: " + _startingAngle + " vector from starting angle: " + vectorFromAngle.ToString() + " unit action direction: " + _unit.GetActionDirection() + " angle from aim direction: " + GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
-        //    return false;
-        //}
-
         if (!IsGridPositionWithinFOV(directionToPosition, _fov, vectorFromAngle))
         {
             return false;
@@ -553,6 +544,16 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             }
             if (raycastHits2D[i].collider.CompareTag("BombRunWall"))
             {
+                // check if it was a corner hit?
+                if (IsCornerHit(raycastHits2D[i].point))
+                {
+                    if (DoesCornerHitStopVision(startPosition, raycastHits2D[i].point, raycastHits2D[i].collider.bounds.center, raycastHits2D[i].collider, direction))
+                    {
+                        return false;
+                    }
+                    //Debug.Log("DoesUnitHaveLineOfSightToPosition: " + this._unit.name + "'s vision hit corner at: " + raycastHits2D[i].point + " from: " + startPosition);
+                    continue;
+                }
                 return false;
             }
             if (raycastHits2D[i].collider.CompareTag("BombRunObstacle"))
@@ -565,16 +566,113 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     }
                     else
                     {
+                        // check if it was a corner hit?
+                        if (IsCornerHit(raycastHits2D[i].point))
+                        {
+                            if (DoesCornerHitStopVision(startPosition, raycastHits2D[i].point, raycastHits2D[i].collider.bounds.center, raycastHits2D[i].collider, direction))
+                            {
+                                return false;
+                            }
+                            //Debug.Log("DoesUnitHaveLineOfSightToPosition: " + this._unit.name + "'s vision hit corner at: " + raycastHits2D[i].point + " from: " + startPosition);
+                            continue;
+                        }
                         return false;
                     }
                 }
             }
             if (raycastHits2D[i].collider.gameObject.layer == _unitLayer)
             {
+                Debug.Log("DoesUnitHaveLineOfSightToPosition: " + this._unit.name + "'s vision hit something in the 'unit layer' at: " + raycastHits2D[i].point + " from: " + startPosition + " unit layer object: " + raycastHits2D[i].collider.name);
                 continue;
             }
         }
         return true;
+    }
+    private bool IsCornerHit(Vector2 hitPoint)
+    {
+        if ((hitPoint.x + 1) % 2 == 0 && (hitPoint.y + 1) % 2 == 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    //private bool DoesCornerHitStopVision(Vector2 unitPosition, Vector2 hitPoint, Vector2 centerOfCollider,Collider2D collider, Vector2 direction)
+    //{
+    //    //Debug.Log("DoesShotHitWallOrObstacle: Hit corner of a collider at: " + hits[i].point.ToString());
+    //    // check to see if the shoot direction is moving away or toward the center of the hit collider
+    //    // if moving toward center of collider, it is a direct hit
+    //    // if moving away from center of collider, might be glancing blow on corner to ignore?
+    //    Vector2 directionToCenterOfCollider = (centerOfCollider - hitPoint).normalized;
+    //    float angle = Vector2.Angle(directionToCenterOfCollider, direction);
+    //    //Debug.Log("DoesShotHitWallOrObstacle: Angle of corner hit: " + angle.ToString() + " hit point: " + hits[i].point + " shoot direction: " + shootDirection + " direction from hitpoint to collider center: " + directionToCenterOfCollider);
+
+    //    if (angle < 45f)
+    //    {
+    //        //Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving TOWARD the collider. Corner hit into the wall. Wall hit?");
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        //Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving AWAY from the collider. Glancing corner hit? Checking for surrounding colliders...");
+    //        RaycastHit2D[] circleCastHits = Physics2D.CircleCastAll(hitPoint, _circleCastRadius, Vector2.zero, 0f);
+    //        if (circleCastHits.Length > 0)
+    //        {
+    //            for (int i = 0; i < circleCastHits.Length; i++)
+    //            {
+    //                if (!circleCastHits[i].collider.CompareTag("BombRunWall") || !circleCastHits[i].collider.CompareTag("BombRunObstacle"))
+    //                    continue;
+
+    //                if (circleCastHits[i].collider != collider)
+    //                {
+    //                    //Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, but collider is near another collider. Should be blocked? Hit collider: " + hits[i].collider + " second collider: " + circleCastHits[z].collider.name);
+    //                    return true;
+    //                }
+    //            }
+    //        }
+    //        // if the code makes it here, no other collider was near the corner. Glancing blow to skip rest of checks with "continue?"    
+    //        //Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, AND no surrounding collider. Skipping this hit?");
+    //        return false;
+    //    }
+    //}
+    private bool DoesCornerHitStopVision(Vector2 unitPosition, Vector2 hitPoint, Vector2 centerOfCollider, Collider2D collider, Vector2 direction)
+    {
+        // move raycast along the line of sight direction by two pixels. if circle cast is no longer in a collider, it is a glancing blow?
+        Vector3 newTestPosition = hitPoint + (direction * 0.0625f * 2);
+        RaycastHit2D[] raycastHits = Physics2D.RaycastAll(newTestPosition, Vector2.zero, 0f);
+        if (raycastHits.Length > 0)
+        {
+            for (int i = 0; i < raycastHits.Length; i++)
+            {
+                if (raycastHits[i].collider == collider)
+                {
+                    return true;
+                }
+                if (raycastHits[i].collider.CompareTag("BombRunWall"))
+                {
+                    return true;
+                }
+                if (raycastHits[i].collider.CompareTag("BombRunObstacle"))
+                {
+                    BaseBombRunObstacle obstacle = raycastHits[i].collider.GetComponent<BaseBombRunObstacle>();
+                    if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        Debug.Log("DoesCornerHitStopVision: Hit obstacle at: " + hitPoint);
+                        return true;
+                    }
+                }
+                //else if(!raycastHits[i].collider.CompareTag("Floor") || raycastHits[i].collider.CompareTag("BombRunWall"))
+                //{
+                //    Debug.Log("DoesCornerHitStopVision: Hit non-obstacle collider at: " + hitPoint + " collider: " + raycastHits[i].collider.name + " collider layer?: " + raycastHits[i].collider.gameObject.layer);
+                //    return true;
+                //}
+            }
+        }
+
+        return false;
     }
     //private void OnTriggerEnter2D(Collider2D collision)
     //{
@@ -638,9 +736,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         List<GridPosition> gridRadiusNotInView = new List<GridPosition>();
         //gridRadiusNotInView.AddRange(gridRadius);
         gridRadiusNotInView.AddRange(GetSurroundingGridPositions(this._unit.GetGridPosition()));
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         foreach (GridPosition gridPosition in gridRadius)
         {
-
+            
             bool canUnitSeePosition = CanUnitSeeGridPosition(gridPosition);
 
             if (canUnitSeePosition)
@@ -650,6 +749,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 _visibleVector2Positions.Add(new Vector2(gridPosition.x, gridPosition.y));
                 if (LevelGrid.Instance.HasAnyUnitOnGridPosition(gridPosition))
                 {
+                    // Check here if the unit is defending or not? If they are, check to see if this unit is in a position to see the defending unit around the obtacles/walls they are hiding behind
                     BombRunUnit unit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
                     if (unit.IsEnemy() == this._unit.IsEnemy())
                         continue;
@@ -660,6 +760,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 }
             }
         }
+        stopwatch.Stop();
+        Debug.Log("GetVisibileGridPositions: time take: " + stopwatch.ElapsedTicks.ToString());
         foreach (BombRunUnit unit in previouslyVisibleUnitsToRemoveFromVisibility)
         {
             UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);

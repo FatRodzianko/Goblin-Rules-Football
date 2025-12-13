@@ -512,8 +512,18 @@ public class ShootAction : BaseAction
 
                         if (angle < 45f)
                         {
-                            //Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving TOWARD the collider. Corner hit into the wall. Wall hit?");
-                            return true;
+                            if (hits[i].collider.CompareTag("BombRunObstacle"))
+                            {
+                                if (hits[i].collider.GetComponent<BaseBombRunObstacle>().GetObstacleCoverType() == ObstacleCoverType.Full)
+                                {
+                                    Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving TOWARD the collider. Corner hit into the obstacle. Obstacle hit? Hit collider: " + hits[i].collider + " collider hit point: " + hits[i].point + " target position: " + targetWorldPosition + " unit position: " + unitWorldPosition);
+                                    return true;
+                                }
+                            }
+                            else
+                            {
+                                return true;
+                            }
                         }
                         else
                         {
@@ -525,7 +535,7 @@ public class ShootAction : BaseAction
                                 {
                                     if (circleCastHits[z].collider != hits[i].collider)
                                     {
-                                        //Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, but collider is near another collider. Should be blocked? Hit collider: " + hits[i].collider + " second collider: " + circleCastHits[z].collider.name);
+                                        Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, but collider is near another collider. Should be blocked? Hit collider: " + hits[i].collider + " second collider: " + circleCastHits[z].collider.name);
                                         return true;
                                     }
                                 }
@@ -543,7 +553,7 @@ public class ShootAction : BaseAction
                     if (hits[i].collider.CompareTag("BombRunWall"))
                     {
                         //Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + LevelGrid.Instance.GetGridPositon(hits[i].point) + " Target position: " + targetPosition);
-                        //Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + hits[i].point + " Target position: " + targetWorldPosition);
+                        Debug.Log("DoesShotHitWallOrObstacle: Hit Wall. Wall position: " + hits[i].point + " Target position: " + targetWorldPosition);
                         return true;
                     }
                     if (hits[i].collider.CompareTag("BombRunObstacle"))
@@ -551,7 +561,7 @@ public class ShootAction : BaseAction
                         if (hits[i].collider.GetComponent<BaseBombRunObstacle>().GetObstacleCoverType() == ObstacleCoverType.Full)
                         {
                             //Debug.Log("DoesShotHitWallOrObstacle: Hit Obstacle with Full Cover. Obstacle position: " + LevelGrid.Instance.GetGridPositon(hits[i].point) + " Target position: " + targetPosition);
-                            //Debug.Log("DoesShotHitWallOrObstacle: Hit Obstacle with Full Cover. Obstacle position: " + hits[i].point + " Target position: " + targetWorldPosition);
+                            Debug.Log("DoesShotHitWallOrObstacle: Hit Obstacle with Full Cover. Obstacle position: " + hits[i].point + " Target position: " + targetWorldPosition);
                             return true;
                         }
                     }
@@ -565,7 +575,7 @@ public class ShootAction : BaseAction
                             }
                             if (hitGoblin != targetUnit)
                             {
-                                //Debug.Log("DoesShotHitWallOrObstacle: Hit goblin that was not the target. Goblin position: " + hits[i].point + " Target position: " + targetWorldPosition);
+                                Debug.Log("DoesShotHitWallOrObstacle: Hit goblin that was not the target. Goblin position: " + hits[i].point + " Target position: " + targetWorldPosition);
                                 return true;
                             }
                         }
