@@ -91,6 +91,9 @@ public class FogOfWarTileMapManager : MonoBehaviour
 
         foreach (GridPosition gridPosition in gridPositions)
         {
+            if (LevelGrid.Instance.HasWallOnGridPosition(gridPosition))
+                continue;
+
             _enemyFogOfWarTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _enemyVisibleGridTile);
         }
     }

@@ -591,7 +591,7 @@ public class ShootAction : BaseAction
     }
     private bool IsCornerHit(Vector2 hitPoint)
     {
-        if ((hitPoint.x + 1) % 2 == 0 && (hitPoint.y + 1) % 2 == 0)
+        if ((decimal)(hitPoint.x + 1) % 2 == 0 && (decimal)(hitPoint.y + 1) % 2 == 0)
         {
             return true;
         }

@@ -535,8 +535,8 @@ x Add a "Look At" action
 - - - - - - - - - Cast ray from that wall position to the player
 - - - - - - - - - find the first point the ray hits that isn't a wall position (floor tilemap will need a collider?)
 - - - - - - - - - find the grid position that corresponds to that ray cast hit, and make that the move action's grid position?
-- For the Visible Grid position checks, add checks for corners and to allow for units to see around them?
-- - - this check already exists in the ShootAction script
+x For the Visible Grid position checks, add checks for corners and to allow for units to see around them?
+- - x this check already exists in the ShootAction script
 - - - - - - one thing to note about that is that a goblin also blocks a shot
 - - - - - - So, create a new function that can be referenced by other scripts/actions that checks if a unit can "see" a grid position (already have that?)
 - - - - - - If the grid position can be seen, then the ShootAction will make a secondary check to see if a goblin is blocking the shot's path
@@ -553,7 +553,8 @@ x Add a "Look At" action
                   and the vector between defending unit and opposing unit
 - - - - - - - - - if angle is greater than 90 (or greater than 90 but less than 270?), the opposing unit can see the defending unit
 - - - - - - - - - - - - if not, then opposing unit cannot see the defending unit
-- - - a unit can take cover "behind" multiple ajacent objects
+- - - a unit can take cover "behind" multiple ajacent objects (or maybe not? Might be better to have player choose what the are defending "against,"
+      like the unit has to press their body up against the wall/obstacle they are defending behind)
 - - - - - - track the grid position of each object the unit is covered by while in defense/hunkered down
 - - - - - - when checking if an opposing unit can see the defending unit, check the angles for ALL grid positions the unit is defended by
 - - - - - - - - - if the opposing unit passes the "can see" check for ANY ONE of the defend grid positions, then the defending unit can be seen
@@ -564,6 +565,10 @@ x Add a "Look At" action
 - - - - - - Check to see if the grenade can "see" the target units. Check for walls and obstacles that would block damage
 - - - - - - - - - Right now grenades to 1 damage to each body part. Maybe have a check if there is a partial obstacle between target and grenade,
                   AND the target is not defending, then don't damage the target's legs. Only their arms and head that are above the obstacle?
+- - - Check if defend is a possible action:
+- - - - - - check the four adjacent grid positions (north, south, east, west), if any are a wall, full obstacle, or partial obstacle, defend action is available
+- - - The "Valid Grid Positions" to choose are the grid position you defend "against" aka the wall the unit presses up against?
+
 - Update ShootAction to check for partial obstacles between shooter and target
 - - - if there is a partial obstacle, the target can be shot at, but their legs cannot be targetted. Only their arms/head
 - - - - - - But also think this should only matter if the target is right next to the partial obstacle?
@@ -607,3 +612,6 @@ x How to show grid visuals over fog of war?
 
 x make a shader to make sprites black and white?
 - - x https://www.youtube.com/watch?v=6CoXC3TEu24  
+
+# CRT effect without shader/shader graph?
+- https://www.youtube.com/watch?v=49KVkXXpFB4

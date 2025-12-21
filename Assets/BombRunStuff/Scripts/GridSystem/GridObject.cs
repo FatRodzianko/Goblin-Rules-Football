@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,13 @@ public class GridObject
     private BaseBombRunObstacle _obstacle;
     private IInteractable _interactable;
     private bool _seenByPlayer;
+    private bool _visibleToPlayer;
+
+    private bool _wall = false;
+
+    // events
+    public event EventHandler OnSeenByPlayer;
+    public event EventHandler<bool> OnVisibleToPlayerChanged;
 
     public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
     {
@@ -125,7 +133,28 @@ public class GridObject
     }
     public void SetSeenByPlayer(bool seenByPlayer)
     {
+        if (this._seenByPlayer)
+            return;
+
         this._seenByPlayer = seenByPlayer;
+        OnSeenByPlayer?.Invoke(this, EventArgs.Empty);
+    }
+    public void SetVisibleToPlayer(bool visibleToPlayer)
+    {
+        this._visibleToPlayer = visibleToPlayer;
+        OnVisibleToPlayerChanged?.Invoke(this, this._visibleToPlayer);
+    }
+    public bool GetVisibleToPlayer()
+    {
+        return _visibleToPlayer;
+    }
+    public void SetHasAnyWall(bool hasAnyWall)
+    {
+        this._wall = hasAnyWall;
+    }
+    public bool HasAnyWall()
+    {
+        return _wall;
     }
 }
 

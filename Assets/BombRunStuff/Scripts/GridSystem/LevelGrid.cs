@@ -62,10 +62,12 @@ public class LevelGrid : MonoBehaviour
     private void Start()
     {
         UnitVisibilityManager_BombRun.OnMakeGridPositionVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
+        UnitVisibilityManager_BombRun.OnMakeGridPositionNotVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
     }
     private void OnDisable()
     {
         UnitVisibilityManager_BombRun.OnMakeGridPositionVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
+        UnitVisibilityManager_BombRun.OnMakeGridPositionNotVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
     }
 
     public void CreateLevelGrid()
@@ -258,18 +260,48 @@ public class LevelGrid : MonoBehaviour
         }
         return gridPositionList;
     }
-    private void UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer(object sender, GridPosition e)
+    private void UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer(object sender, GridPosition gridPosition)
     {
-        SetSeenByPlayer(e);
+        if (!IsValidGridPosition(gridPosition))
+            return;
+
+        SetSeenByPlayer(gridPosition);
+        SetVisibleToPlayer(gridPosition, true);
+    }
+    private void UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer(object sender, GridPosition gridPosition)
+    {
+        if (!IsValidGridPosition(gridPosition))
+            return;
+
+        SetVisibleToPlayer(gridPosition, false);
     }
     private void SetSeenByPlayer(GridPosition gridPosition)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.SetSeenByPlayer(true);
     }
+    private void SetVisibleToPlayer(GridPosition gridPosition, bool visibleToPlayer)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        gridObject.SetVisibleToPlayer(visibleToPlayer);
+    }
     public bool GetSeenByPlayer(GridPosition gridPosition)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         return gridObject.SeenByPlayer();
+    }
+    public bool HasWallOnGridPosition(GridPosition gridPosition)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        return gridObject.HasAnyWall();
+    }
+    public void SetWallOnGridPosition(GridPosition gridPosition, bool hasWall)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        gridObject.SetHasAnyWall(hasWall);
+    }
+    public GridObject GetGridObjectAtPosition(GridPosition gridPosition)
+    {
+        return _gridSystem.GetGridObject(gridPosition);
     }
 }

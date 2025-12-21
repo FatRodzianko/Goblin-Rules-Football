@@ -144,7 +144,9 @@ public class BombRunTileMapManager : MonoBehaviour
                 if (_wallTileMap.HasTile(newPosition))
                 {
                     //Debug.Log("UpdateWallAndObstaclePositionLists: found wall tile at: " + x.ToString() + ", " + y.ToString());
-                    _wallTilePositions.Add(new GridPosition(x, y));
+                    GridPosition newGridPosition = new GridPosition(x, y);
+                    _wallTilePositions.Add(newGridPosition);
+                    LevelGrid.Instance.SetWallOnGridPosition(newGridPosition, true);
                     SpawnWallObject(newPosition);
                 }
                 if (_obstaclesTileMap.HasTile(newPosition))
@@ -265,6 +267,7 @@ public class BombRunTileMapManager : MonoBehaviour
         if (!IsWallOnThisPosition(gridPosition))
         {
             _wallTilePositions.Add(gridPosition);
+            LevelGrid.Instance.SetWallOnGridPosition(gridPosition, true);
         }
     }
     public List<GridPosition> GetFloorGridPositions()

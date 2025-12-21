@@ -6,6 +6,7 @@ using UnityEngine;
 public abstract class BaseBombRunObstacle : MonoBehaviour
 {
     [SerializeField] private GridPosition _gridPosition;
+    [SerializeField] private GridObject _gridObject;
 
     [Header("Obstacle Properties")]
     [SerializeField] private bool _isDestructible = false;
@@ -24,7 +25,14 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
     private void Start()
     {
         _gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
+        //_gridObject = LevelGrid.Instance.GetGridObjectAtPosition(_gridPosition);
+        //if (_gridObject != null)
+        //{
+        //    _gridObject.OnSeenByPlayer += GridObject_OnSeenByPlayer;
+        //}
     }
+    
+
     public void SetGridPosition(GridPosition gridPosition)
     {
         this._gridPosition = gridPosition;
@@ -76,4 +84,8 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
 
         OnAnyObstacleDestroyed?.Invoke(this, _gridPosition);
     }
+    //private void GridObject_OnSeenByPlayer(object sender, EventArgs e)
+    //{
+    //    _trackVisibilityToPlayer = true;
+    //}
 }

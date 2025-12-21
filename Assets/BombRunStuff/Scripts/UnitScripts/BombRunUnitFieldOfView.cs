@@ -492,13 +492,14 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         //Debug.Log("CanUnitSeeGridPosition (GridPosition): " + targetGridPosition.ToString());
         Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition());
         Vector3 targetWorldPosition = LevelGrid.Instance.GetWorldPosition(targetGridPosition);
+        //Debug.Log("CanUnitSeeGridPosition (WordPosition): " + targetWorldPosition.ToString());
 
         // check distance to position. Use GridPosition Distance so it matches how LevelGrid.GetGridPositionsInRadius does it
         int viewDistance = _unit.GetSightRange() * LevelGrid.Instance.GetPathFindingDistanceMultiplier();
         int distanceToGridPosition = LevelGrid.Instance.CalculateDistance(_unit.GetGridPosition(), targetGridPosition);
         if (distanceToGridPosition > viewDistance)
         {
-            //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetGridPosition.ToString() + " is too far to see");
+            //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetWorldPosition.ToString() + " is too far to see");
             return false;
         }
         float distanceToWorldPosition = Vector2.Distance(unitWorldPosition, targetWorldPosition);
@@ -507,6 +508,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         Vector3 vectorFromAngle = _aimDirectionVector;
         if (!IsGridPositionWithinFOV(directionToPosition, _fov, vectorFromAngle))
         {
+            //Debug.Log("CanUnitSeeGridPosition: " + this._unit.name + ": Position: " + targetWorldPosition.ToString() + " is not within the FOV");
             return false;
         }
 
@@ -549,11 +551,13 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 {
                     if (DoesCornerHitStopVision(startPosition, raycastHits2D[i].point, raycastHits2D[i].collider.bounds.center, raycastHits2D[i].collider, direction))
                     {
+                        //Debug.Log("DoesUnitHaveLineOfSightToPosition: Corner hit at: " + raycastHits2D[i].point + ". Blocking vision for target position: " + targetPosition);
                         return false;
                     }
                     //Debug.Log("DoesUnitHaveLineOfSightToPosition: " + this._unit.name + "'s vision hit corner at: " + raycastHits2D[i].point + " from: " + startPosition);
                     continue;
                 }
+                //Debug.Log("DoesUnitHaveLineOfSightToPosition: Wall hit at: " + raycastHits2D[i].point.ToString("0.000000000000") + ". Blocking vision for target position: " + targetPosition);
                 return false;
             }
             if (raycastHits2D[i].collider.CompareTag("BombRunObstacle"))
@@ -571,11 +575,13 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                         {
                             if (DoesCornerHitStopVision(startPosition, raycastHits2D[i].point, raycastHits2D[i].collider.bounds.center, raycastHits2D[i].collider, direction))
                             {
+                                //Debug.Log("DoesUnitHaveLineOfSightToPosition: Corner hit at: " + raycastHits2D[i].point + ". Blocking vision for target position: " + targetPosition);
                                 return false;
                             }
                             //Debug.Log("DoesUnitHaveLineOfSightToPosition: " + this._unit.name + "'s vision hit corner at: " + raycastHits2D[i].point + " from: " + startPosition);
                             continue;
                         }
+                        //Debug.Log("DoesUnitHaveLineOfSightToPosition: Obstacle hit at: " + raycastHits2D[i].point + ". Blocking vision for target position: " + targetPosition);
                         return false;
                     }
                 }
@@ -590,7 +596,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     }
     private bool IsCornerHit(Vector2 hitPoint)
     {
-        if ((hitPoint.x + 1) % 2 == 0 && (hitPoint.y + 1) % 2 == 0)
+        if (((decimal)hitPoint.x + 1) % 2 == 0 && ((decimal)hitPoint.y + 1) % 2 == 0)
         {
             return true;
         }
@@ -599,7 +605,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     //
     // OLD CORNER DETECTION BASED ON HOW SHOOT ACTION DID IT
     //
-    //private bool DoesCornerHitStopVision(Vector2 unitPosition, Vector2 hitPoint, Vector2 centerOfCollider,Collider2D collider, Vector2 direction)
+    //private bool DoesCornerHitStopVision(Vector2 unitPosition, Vector2 hitPoint, Vector2 centerOfCollider, Collider2D collider, Vector2 direction)
     //{
     //    //Debug.Log("DoesShotHitWallOrObstacle: Hit corner of a collider at: " + hits[i].point.ToString());
     //    // check to see if the shoot direction is moving away or toward the center of the hit collider
@@ -651,10 +657,12 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             {
                 if (raycastHits[i].collider == collider)
                 {
+                    Debug.Log("DoesCornerHitStopVision: Hit own collider at: " + hitPoint);
                     return true;
                 }
                 if (raycastHits[i].collider.CompareTag("BombRunWall"))
                 {
+                    Debug.Log("DoesCornerHitStopVision: Hit wall at: " + hitPoint);
                     return true;
                 }
                 if (raycastHits[i].collider.CompareTag("BombRunObstacle"))
@@ -666,7 +674,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     }
                     else
                     {
-                        //Debug.Log("DoesCornerHitStopVision: Hit obstacle at: " + hitPoint);
+                        Debug.Log("DoesCornerHitStopVision: Hit obstacle at: " + hitPoint);
                         return true;
                     }
                 }

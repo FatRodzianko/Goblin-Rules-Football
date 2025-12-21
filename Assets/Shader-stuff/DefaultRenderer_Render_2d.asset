@@ -26,7 +26,7 @@ MonoBehaviour:
     dstTextureId: _BlitPassTexture
     dstTextureObject: {fileID: 0}
     overrideGraphicsFormat: 0
-    graphicsFormat: 8
+    graphicsFormat: 52
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
