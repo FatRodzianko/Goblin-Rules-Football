@@ -610,6 +610,10 @@ x How to show grid visuals over fog of war?
 - - - - - - - - - - - x Don't make the place holder sprite a child of the unit. This prevents the placeholder sprite from moving as the unit moves
 - - - - - - - - x OnAnyGridPositionBecomeVisibile: if placeholder sprite object is on this grid position, delete the placeholder sprite object
 
+- Update the Obstacle Visibility script so the event subscriptions to the GridObject are on the BaseObstacle script
+- - - then, the Obstacle_Visibility script, or any other script needing it, can subscribe to an event from the BaseObstacle script
+      to track visibility to the player?
+
 x make a shader to make sprites black and white?
 - - x https://www.youtube.com/watch?v=6CoXC3TEu24  
 

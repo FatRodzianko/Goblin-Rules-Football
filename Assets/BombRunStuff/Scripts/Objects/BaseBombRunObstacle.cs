@@ -18,21 +18,35 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
     [Header("Obstacle Cover")]
     [SerializeField] private ObstacleCoverType _obstacleCoverType;
 
-    // Actions
+    // Static Events
     public static event EventHandler<GridPosition> OnAnyObstacleDestroyed;
     public static event EventHandler<GridPosition> OnAnyObstacleCoverTypeChanged;
 
-    private void Start()
+    public event EventHandler OnSeenByPlayer;
+    public event EventHandler<bool> OnVisibleToPlayerChanged;
+
+    protected virtual void Start()
     {
         _gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
-        //_gridObject = LevelGrid.Instance.GetGridObjectAtPosition(_gridPosition);
-        //if (_gridObject != null)
-        //{
-        //    _gridObject.OnSeenByPlayer += GridObject_OnSeenByPlayer;
-        //}
+        _gridObject = LevelGrid.Instance.GetGridObjectAtPosition(_gridPosition);
+        if (_gridObject != null)
+        {
+            _gridObject.OnSeenByPlayer += GridObject_OnSeenByPlayer;
+        }
     }
-    
 
+    private void GridObject_OnSeenByPlayer(object sender, EventArgs e)
+    {
+        OnSeenByPlayer?.Invoke(this, EventArgs.Empty);
+        if (_gridObject != null)
+        {
+            _gridObject.OnVisibleToPlayerChanged += GridObject_OnVisibleToPlayerChanged;
+        }
+    }
+    private void GridObject_OnVisibleToPlayerChanged(object sender, bool isVisibleToPlayer)
+    {
+        OnVisibleToPlayerChanged?.Invoke(this, isVisibleToPlayer);
+    }
     public void SetGridPosition(GridPosition gridPosition)
     {
         this._gridPosition = gridPosition;
@@ -84,8 +98,4 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
 
         OnAnyObstacleDestroyed?.Invoke(this, _gridPosition);
     }
-    //private void GridObject_OnSeenByPlayer(object sender, EventArgs e)
-    //{
-    //    _trackVisibilityToPlayer = true;
-    //}
 }

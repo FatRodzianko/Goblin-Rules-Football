@@ -14,8 +14,9 @@ public class BombRunDoor : BaseBombRunObstacle, IInteractable
     private bool _isActive;
     private float _timer;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         _gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
     }
     private void Update()
