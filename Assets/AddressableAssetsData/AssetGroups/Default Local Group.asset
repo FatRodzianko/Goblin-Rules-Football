@@ -149,6 +149,42 @@ MonoBehaviour:
     m_Address: Assets/SFX/Music/more-than-brick.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 637e9a22dc408b248b5380684748581c
+    m_Address: Assets/SFX/Music/29_the-obeisant-man.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4f03be400e6c3e049a5c0494b9e7516b
+    m_Address: Assets/SFX/Music/30_two-fingers-deep.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c14900b30ebc46543855365b6ba1c5a6
+    m_Address: Assets/SFX/Music/31_office-drugs.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 82a83da153c242646801507cd48b2bec
+    m_Address: Assets/SFX/Music/32_cheap-beliefs-for-a-free-society.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4030cbcc5439fb949b08229c06151b03
+    m_Address: Assets/SFX/Music/33_wandering-in-the-wicka-wild-wild-wildnerness-mkii-soviet.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b9958966e3b69e8418b72f6e21ffc7cb
+    m_Address: Assets/SFX/Music/34_your-son-in-the-abstract.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 9db23bae33b88b749a62e553502a9b71
+    m_Address: Assets/SFX/Music/35_wonderful-tranquilizer-for-your-minds-eye.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b9764028ebecc5149abf75b40daad1d4
+    m_Address: Assets/SFX/Music/36_spice-in-your-juice.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 604c09897de209449a886cd4725d89b9
+    m_Address: Assets/SFX/Music/37_the-gruesome-low-end.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

@@ -8,6 +8,7 @@ public class RenderFeaturesManager : MonoBehaviour
 {
     public static RenderFeaturesManager instance;
     [SerializeField] ScriptableRendererFeature feature;
+    [SerializeField] Volume _globalVolume;
 
     private void Awake()
     {
@@ -36,5 +37,6 @@ public class RenderFeaturesManager : MonoBehaviour
     {
         Debug.Log("EnableRetroCRT: " + enable.ToString());
         feature.SetActive(enable);
+        _globalVolume.enabled = enable;
     }
 }
