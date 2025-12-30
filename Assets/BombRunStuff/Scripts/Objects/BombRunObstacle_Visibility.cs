@@ -16,17 +16,22 @@ public class BombRunObstacle_Visibility : MonoBehaviour
     private void Start()
     {
         _obstacle.OnVisibleToPlayerChanged += Obstacle_OnVisibleToPlayerChanged;
+        _spriteRenderer.RegisterSpriteChangeCallback(SpriteChanged);
     }
+
+    
+
     private void OnDisable()
     {
         _obstacle.OnVisibleToPlayerChanged -= Obstacle_OnVisibleToPlayerChanged;
+        _spriteRenderer.UnregisterSpriteChangeCallback(SpriteChanged);
     }
 
     private void Obstacle_OnVisibleToPlayerChanged(object sender, bool isVisibleToPlayer)
     {
         if (isVisibleToPlayer)
         {
-            Debug.Log("Obstacle_OnVisibleToPlayerChanged: for " + this.name + " changing sprite to: " + _spriteRenderer.sprite.name);
+            //Debug.Log("Obstacle_OnVisibleToPlayerChanged: for " + this.name + " changing sprite to: " + _spriteRenderer.sprite.name);
             _spriteMask.sprite = _spriteRenderer.sprite;
             _spriteMask.enabled = true;
         }
@@ -34,5 +39,9 @@ public class BombRunObstacle_Visibility : MonoBehaviour
         {
             _spriteMask.enabled = false;
         }
+    }
+    private void SpriteChanged(SpriteRenderer spriteRenderer)
+    {
+        _spriteMask.sprite = spriteRenderer.sprite;
     }
 }

@@ -157,6 +157,7 @@ public class ShootAction : BaseAction
             TargetUnit = _targetUnit,
             ShootingUnit = _unit
         });
+        _unit.SetUnitState(UnitState.Attacking);
         //_targetUnit.Damage(35);
     }
     public override string GetActionName()
@@ -254,7 +255,10 @@ public class ShootAction : BaseAction
                         continue;
                     }
                 }
-
+                if (_unit.GetBombRunUnitFieldOfView().IsUnitInvisibleFromDefending(testGridUnit))
+                {
+                    continue;
+                }
                 // check the distance to the target grid position. This will be the distance assuming no walls or anything. If distance with that is greater than distance max, skip
                 int pathFindingDistanceMultiplier = 10;
                 if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > _maxShootDistance * pathFindingDistanceMultiplier)

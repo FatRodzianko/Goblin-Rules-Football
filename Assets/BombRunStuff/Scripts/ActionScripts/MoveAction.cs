@@ -44,8 +44,9 @@ public class MoveAction : BaseAction
         BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
     }
 
-    private void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
         PathFinding.Instance.IsWalkableUpdated -= PathFinding_IsWalkableUpdated;
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
     }
@@ -80,6 +81,7 @@ public class MoveAction : BaseAction
             {
                 //_isActive = false;
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
+                _unit.SetUnitState(UnitState.Idle);
                 //_onActionComplete();
                 ActionComplete();
             }
@@ -154,6 +156,7 @@ public class MoveAction : BaseAction
 
         ActionStart(onActionComplete);
         OnStartMoving?.Invoke(this, EventArgs.Empty);
+        _unit.SetUnitState(UnitState.Moving);
     }
     public override List<GridPosition> GetValidActionGridPositionList()
     {

@@ -484,6 +484,6 @@ public class BombRunUnit : MonoBehaviour
     public void SetUnitState(UnitState unitState)
     {
         this._unitState = unitState;
+        OnUnitStateChanged?.Invoke(this, this._unitState);
     }
-    
 }

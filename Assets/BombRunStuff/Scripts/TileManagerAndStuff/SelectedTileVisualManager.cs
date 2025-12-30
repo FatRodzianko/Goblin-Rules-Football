@@ -32,13 +32,42 @@ public class SelectedTileVisualManager : MonoBehaviour
 
         if (BombRunTileMapManager.Instance.IsWallOnThisPosition(gridPosition))
         {
-            if (UnitActionSystem.Instance.GetSelectedAction() == null || UnitActionSystem.Instance.GetSelectedAction().GetActionType() != ActionType.LookAt)
+            if (UnitActionSystem.Instance.GetSelectedAction() == null)
             {
                 if (LevelGrid.Instance.GetSeenByPlayer(gridPosition))
                 {
                     return;
                 }
-            }           
+            }
+            else
+            {
+                //if (UnitActionSystem.Instance.GetSelectedAction().GetActionType() != ActionType.LookAt)
+                //{
+                //    if (LevelGrid.Instance.GetSeenByPlayer(gridPosition))
+                //    {
+                //        return;
+                //    }
+                //}
+                switch (UnitActionSystem.Instance.GetSelectedAction().GetActionType())
+                {
+                    case ActionType.LookAt:
+                        break;
+                    case ActionType.Defend:
+                        if (!UnitActionSystem.Instance.GetSelectedAction().GetValidActionGridPositionList().Contains(gridPosition))
+                        {
+                            return;
+                        }
+                        break;
+                    default:
+                        if (LevelGrid.Instance.GetSeenByPlayer(gridPosition))
+                        {
+                            return;
+                        }
+                        break;
+                }
+            }
+            
+            
             
         }
         _selectedTileVisualTileMap.SetTile(new Vector3Int(_currentSelectedGridPosition.x, _currentSelectedGridPosition.y, 0), null);

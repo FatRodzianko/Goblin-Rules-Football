@@ -108,6 +108,17 @@ public class GridSystem<TGridObject>
         }
         return neighborGridPositions;
     }
+    public virtual List<GridPosition> GetDefensePositions(GridPosition gridPosition)
+    {
+        List<GridPosition> defensePositions = new List<GridPosition>();
+
+        defensePositions.Add(new GridPosition(gridPosition.x + 1, gridPosition.y + 0));
+        defensePositions.Add(new GridPosition(gridPosition.x - 1, gridPosition.y + 0));
+        defensePositions.Add(new GridPosition(gridPosition.x + 0, gridPosition.y + 1));
+        defensePositions.Add(new GridPosition(gridPosition.x + 0, gridPosition.y - 1));
+
+        return defensePositions;
+    }
     public virtual int CalculateDistance(GridPosition a, GridPosition b)
     {
         //GridPosition gridPositionDistance = a - b;

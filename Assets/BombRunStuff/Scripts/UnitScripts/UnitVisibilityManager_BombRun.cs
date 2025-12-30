@@ -111,7 +111,15 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     //{
     //    return await Task.Run(() => CheckIfMovedUnitCanBeSeen(unit, skipUnit));
     //}
-    private bool CheckIfMovedUnitCanBeSeen(BombRunUnit unit, BombRunUnit skipUnit = null)
+    public void CheckIfUnitCanBeSeenByOpposingTeam(BombRunUnit unit)
+    {
+        if (!CheckIfMovedUnitCanBeSeen(unit))
+        {
+            Debug.Log("CheckIfUnitCanBeSeenByOpposingTeam: Removing Unit from Visibility");
+            RemoveUnitFromVisibilityList(unit);
+        }
+    }
+    public bool CheckIfMovedUnitCanBeSeen(BombRunUnit unit, BombRunUnit skipUnit = null)
     {
         List<BombRunUnit> unitsToCheck = GetUnitsEnemies(unit);
 
@@ -120,7 +128,6 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
 
         if (unit == null)
             return false;
-
 
         foreach (BombRunUnit unitToCheck in unitsToCheck)
         {

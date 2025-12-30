@@ -690,9 +690,6 @@ MonoBehaviour:
     m_Bits: 2048
   _aimDirectionVector: {x: 0, y: 0}
   _circleCastRadius: 0.2
-  _tileMapLayer:
-    serializedVersion: 2
-    m_Bits: 16777216
   _isMoving: 0
   _visibleUnits: []
   _visibleVector2Positions: []
@@ -1451,6 +1448,7 @@ MonoBehaviour:
   _subAction: {fileID: 0}
   _maxReinforceDistance: 1
   _enemyNearbyDistance: 3
+  _positionDefendingFromVector2Int: {x: 0, y: 0}
 --- !u!114 &4184348786050281194
 MonoBehaviour:
   m_ObjectHideFlags: 0

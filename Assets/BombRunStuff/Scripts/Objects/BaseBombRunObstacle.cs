@@ -24,6 +24,8 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
 
     public event EventHandler OnSeenByPlayer;
     public event EventHandler<bool> OnVisibleToPlayerChanged;
+    public static event EventHandler<GridPosition> OnThisObstacleDestroyed;
+    public static event EventHandler<ObstacleCoverType> OnThisObstacleCoverTypeChanged;
 
     protected virtual void Start()
     {

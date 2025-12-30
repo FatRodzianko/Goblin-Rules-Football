@@ -95,7 +95,7 @@ public class GrenadeProjectile : MonoBehaviour
         // get list of neighbor grid positions for the blast radius
         List<GridPosition> neighborGridPositons = LevelGrid.Instance.GetValidNeighborGridPositions(_targetGridPosition, damageRadius, true);
         Debug.Log("StartGrenadeDamage: neighborGridPositons: " + neighborGridPositons.Count.ToString() + " damageRadius: " + damageRadius.ToString());
-        neighborGridPositons.Add(_targetGridPosition);
+        //neighborGridPositons.Add(_targetGridPosition);
 
         List<GridPosition> positionsToDamage = RemoveNeighborPositionsBlockedByWall(neighborGridPositons, _targetGridPosition);
         FindUnitsAndObstaclesHitByGrenade(positionsToDamage);

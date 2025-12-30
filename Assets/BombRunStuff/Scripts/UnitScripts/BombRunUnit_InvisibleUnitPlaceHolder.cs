@@ -18,7 +18,6 @@ public class BombRunUnit_InvisibleUnitPlaceHolder : MonoBehaviour
     {
         UnitVisibilityManager_BombRun.OnMakeGridPositionVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
     }
-
     
 
     private void OnDisable()
@@ -53,7 +52,18 @@ public class BombRunUnit_InvisibleUnitPlaceHolder : MonoBehaviour
         {
             Debug.Log("UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer: GridPosition (" + gridPosition + ") is now visible. Destroying " + name + "...");
             //GameObject.Destroy(this.gameObject);
-            OnGridPositionBecameVisible?.Invoke(this, EventArgs.Empty);
+            if (this._unit.GetUnitState() == UnitState.Defending)
+            {
+                if (UnitVisibilityManager_BombRun.Instance.CheckIfMovedUnitCanBeSeen(this._unit))
+                {
+                    OnGridPositionBecameVisible?.Invoke(this, EventArgs.Empty);
+                }
+            }
+            else
+            {
+                OnGridPositionBecameVisible?.Invoke(this, EventArgs.Empty);
+            }
+                       
         }
     }
 }

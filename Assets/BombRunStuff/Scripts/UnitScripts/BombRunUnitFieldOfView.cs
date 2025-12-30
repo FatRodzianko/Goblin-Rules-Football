@@ -395,7 +395,17 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     //}
     public bool CanUnitSeeThisUnit(BombRunUnit unit)
     {
-        return HasThisUnitSeenThisGridPosition(unit.GetGridPosition());
+        //return HasThisUnitSeenThisGridPosition(unit.GetGridPosition());
+        // first check if this unit is defending. If it is, then do the checks to see if the unit has the correct angle to see a defending unit?
+        bool canUnitSeeThisUnit = HasThisUnitSeenThisGridPosition(unit.GetGridPosition());
+        if (canUnitSeeThisUnit)
+        {
+            if (IsUnitInvisibleFromDefending(unit))
+            {
+                canUnitSeeThisUnit = false;
+            }
+        }
+        return canUnitSeeThisUnit;
         //if (_visibleUnits.Contains(unit))
         //    return true;
 
@@ -411,11 +421,11 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         return _visibleGridPositions.Contains(gridPosition);
     }
-    private void BombRunObstacle_OnAnyObstacleCoverTypeChanged(object sender, GridPosition e)
+    private void BombRunObstacle_OnAnyObstacleCoverTypeChanged(object sender, GridPosition gridPosition)
     {
-        if (HasThisUnitSeenThisGridPosition(e))
+        if (HasThisUnitSeenThisGridPosition(gridPosition))
         {
-            Debug.Log("BombRunObstacle_OnAnyObstacleCoverTypeChanged: updating position: " + e + " for: " + this._unit);
+            Debug.Log("BombRunObstacle_OnAnyObstacleCoverTypeChanged: updating position: " + gridPosition + " for: " + this._unit);
             GetVisibileGridPositions();
         }
     }
@@ -657,12 +667,12 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             {
                 if (raycastHits[i].collider == collider)
                 {
-                    Debug.Log("DoesCornerHitStopVision: Hit own collider at: " + hitPoint);
+                    //Debug.Log("DoesCornerHitStopVision: Hit own collider at: " + hitPoint);
                     return true;
                 }
                 if (raycastHits[i].collider.CompareTag("BombRunWall"))
                 {
-                    Debug.Log("DoesCornerHitStopVision: Hit wall at: " + hitPoint);
+                    //Debug.Log("DoesCornerHitStopVision: Hit wall at: " + hitPoint);
                     return true;
                 }
                 if (raycastHits[i].collider.CompareTag("BombRunObstacle"))
@@ -674,7 +684,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log("DoesCornerHitStopVision: Hit obstacle at: " + hitPoint);
+                        //Debug.Log("DoesCornerHitStopVision: Hit obstacle at: " + hitPoint);
                         return true;
                     }
                 }
@@ -770,6 +780,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     if (unit.IsEnemy() == this._unit.IsEnemy())
                         continue;
 
+                    if (IsUnitInvisibleFromDefending(unit))
+                        continue;
+
                     _visibleUnits.Add(unit);
                     previouslyVisibleUnitsToRemoveFromVisibility.Remove(unit);
                     UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
@@ -784,6 +797,28 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
         //UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions, previousVisibileGridPositions);
         UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions, gridRadiusNotInView);
+    }
+    public bool IsUnitInvisibleFromDefending(BombRunUnit unit)
+    {
+        bool isUnitInvisibleFromDefending = false;
+
+        if (unit.GetUnitState() != UnitState.Defending)
+            return false;
+
+        DefendAction defendAction = (DefendAction)unit.GetActionByActionType(ActionType.Defend);
+
+        Vector2 defendDirection = (LevelGrid.Instance.GetWorldPosition(defendAction.GetPositionDefendingFrom()) - LevelGrid.Instance.GetWorldPosition(unit.GetGridPosition())).normalized;
+        Vector2 diretionToTargetUnit = (LevelGrid.Instance.GetWorldPosition(this._unit.GetGridPosition()) - LevelGrid.Instance.GetWorldPosition(unit.GetGridPosition())).normalized;
+
+        float angle = Vector3.Angle(defendDirection, diretionToTargetUnit);
+        Debug.Log("IsUnitInvisibleFromDefending: Angle between defending unit: " + unit.name + " (" + defendDirection.ToString() + ") and this unit: " + this._unit.name + " (" + diretionToTargetUnit.ToString() + ") is: " + angle.ToString());
+        if (angle < 90)
+        {
+            Debug.Log("IsUnitInvisibleFromDefending: " + unit.name + " is invisible to: " + this._unit.name + " because of defending?");
+            isUnitInvisibleFromDefending = true;
+        }
+
+        return isUnitInvisibleFromDefending;
     }
     private List<GridPosition> GetAdjacentGridPositions(GridPosition gridPosition)
     {

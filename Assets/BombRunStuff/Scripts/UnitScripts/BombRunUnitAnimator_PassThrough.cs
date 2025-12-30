@@ -18,4 +18,8 @@ public class BombRunUnitAnimator_PassThrough : MonoBehaviour
     {
         _bombRunUnitAnimator.FireShootProjectile();
     }
+    public void AttackAnimationComplete()
+    {
+        _bombRunUnitAnimator.AttackAnimationComplete();
+    }
 }

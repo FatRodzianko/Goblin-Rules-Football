@@ -565,9 +565,9 @@ x For the Visible Grid position checks, add checks for corners and to allow for 
 - - - - - - Check to see if the grenade can "see" the target units. Check for walls and obstacles that would block damage
 - - - - - - - - - Right now grenades to 1 damage to each body part. Maybe have a check if there is a partial obstacle between target and grenade,
                   AND the target is not defending, then don't damage the target's legs. Only their arms and head that are above the obstacle?
-- - - Check if defend is a possible action:
-- - - - - - check the four adjacent grid positions (north, south, east, west), if any are a wall, full obstacle, or partial obstacle, defend action is available
-- - - The "Valid Grid Positions" to choose are the grid position you defend "against" aka the wall the unit presses up against?
+- - x Check if defend is a possible action:
+- - - - - x check the four adjacent grid positions (north, south, east, west), if any are a wall, full obstacle, or partial obstacle, defend action is available
+- - x The "Valid Grid Positions" to choose are the grid position you defend "against" aka the wall the unit presses up against?
 
 - Update ShootAction to check for partial obstacles between shooter and target
 - - - if there is a partial obstacle, the target can be shot at, but their legs cannot be targetted. Only their arms/head
@@ -618,4 +618,4 @@ x make a shader to make sprites black and white?
 - - x https://www.youtube.com/watch?v=6CoXC3TEu24  
 
 # CRT effect without shader/shader graph?
-- https://www.youtube.com/watch?v=49KVkXXpFB4
+x https://www.youtube.com/watch?v=49KVkXXpFB4

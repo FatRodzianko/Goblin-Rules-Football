@@ -8,6 +8,7 @@ public enum UnitAnimationState
     Idle,
     Moving,
     Shooting,
+    Defending,
 }
 
 public class BombRunUnitAnimator : MonoBehaviour
@@ -32,19 +33,22 @@ public class BombRunUnitAnimator : MonoBehaviour
         {
             _unit = this.transform.parent.GetComponent<BombRunUnit>();
         }
-        if (transform.parent.TryGetComponent<MoveAction>(out MoveAction moveAction))
-        {
-            moveAction.OnStartMoving += MoveAction_OnStartMoving;
-            moveAction.OnStopMoving += MoveAction_OnStopMoving;
-        }
-        if (transform.parent.TryGetComponent<ShootAction>(out ShootAction shootAction))
-        {
-            shootAction.OnStartShooting += ShootAction_OnStartShooting;
-            shootAction.OnStopShooting += ShootAction_OnStopShooting;
-        }
+        //if (transform.parent.TryGetComponent<MoveAction>(out MoveAction moveAction))
+        //{
+        //    moveAction.OnStartMoving += MoveAction_OnStartMoving;
+        //    moveAction.OnStopMoving += MoveAction_OnStopMoving;
+        //}
+        //if (transform.parent.TryGetComponent<ShootAction>(out ShootAction shootAction))
+        //{
+        //    shootAction.OnStartShooting += ShootAction_OnStartShooting;
+        //    shootAction.OnStopShooting += ShootAction_OnStopShooting;
+        //}
         _unit.OnUnitVisibilityChanged += Unit_OnUnitVisibilityChanged;
         _unit.OnActionDirectionChanged += Unit_OnActionDirectionChanged;
         _spriteRenderer.RegisterSpriteChangeCallback(UnitSpriteChanged);
+        _unit.OnUnitStateChanged += Unit_OnUnitStateChanged;
+
+
 
         this._unitAnimationState = UnitAnimationState.Idle;
     }
@@ -59,39 +63,82 @@ public class BombRunUnitAnimator : MonoBehaviour
 
     private void OnDisable()
     {
-        if (transform.parent.TryGetComponent<MoveAction>(out MoveAction moveAction))
-        {
-            moveAction.OnStartMoving -= MoveAction_OnStartMoving;
-            moveAction.OnStopMoving -= MoveAction_OnStopMoving;
-        }
-        if (transform.parent.TryGetComponent<ShootAction>(out ShootAction shootAction))
-        {
-            shootAction.OnStartShooting -= ShootAction_OnStartShooting;
-            shootAction.OnStopShooting -= ShootAction_OnStopShooting;
-        }
+        //if (transform.parent.TryGetComponent<MoveAction>(out MoveAction moveAction))
+        //{
+        //    moveAction.OnStartMoving -= MoveAction_OnStartMoving;
+        //    moveAction.OnStopMoving -= MoveAction_OnStopMoving;
+        //}
+        //if (transform.parent.TryGetComponent<ShootAction>(out ShootAction shootAction))
+        //{
+        //    shootAction.OnStartShooting -= ShootAction_OnStartShooting;
+        //    shootAction.OnStopShooting -= ShootAction_OnStopShooting;
+        //}
+        
         _unit.OnUnitVisibilityChanged -= Unit_OnUnitVisibilityChanged;
         _unit.OnActionDirectionChanged -= Unit_OnActionDirectionChanged;
+        _unit.OnUnitStateChanged -= Unit_OnUnitStateChanged;
+        _spriteRenderer.UnregisterSpriteChangeCallback(UnitSpriteChanged);
     }
 
-    private void MoveAction_OnStartMoving(object sender, EventArgs e)
+    //private void MoveAction_OnStartMoving(object sender, EventArgs e)
+    //{
+    //    Debug.Log("MoveAction_OnStartMoving: " + _unit.name);
+    //    //_animator.SetBool("IsWalking", true);
+    //    _animator.SetTrigger("Walk");
+    //    this._unitAnimationState = UnitAnimationState.Moving;
+    //}
+    //private void MoveAction_OnStopMoving(object sender, EventArgs e)
+    //{
+    //    //_animator.SetBool("IsWalking", false);
+    //    _animator.SetTrigger("Idle");
+    //    if (_unitAnimationState == UnitAnimationState.Moving)
+    //    {
+    //        this._unitAnimationState = UnitAnimationState.Idle;
+    //    }
+    //}
+    public void AttackAnimationComplete()
     {
-        Debug.Log("MoveAction_OnStartMoving: " + _unit.name);
-        _animator.SetBool("IsWalking", true);
-        this._unitAnimationState = UnitAnimationState.Moving;
+        Debug.Log("BombRunUnitAnimator: AttackAnimationComplete");
+        //if (_unitAnimationState == UnitAnimationState.Shooting)
+        //{
+        //    this._unitAnimationState = UnitAnimationState.Idle;
+        //}
+        _unit.SetUnitState(UnitState.Idle);
     }
-    private void MoveAction_OnStopMoving(object sender, EventArgs e)
+    //private void ShootAction_OnStopShooting(object sender, EventArgs e)
+    //{
+    //    Debug.Log("BombRunUnitAnimator: ShootAction_OnStopShooting");
+    //    if (_unitAnimationState == UnitAnimationState.Shooting)
+    //    {
+    //        this._unitAnimationState = UnitAnimationState.Idle;
+    //    }
+    //}
+    private void Unit_OnUnitStateChanged(object sender, UnitState unitState)
     {
-        _animator.SetBool("IsWalking", false);
-        if (_unitAnimationState == UnitAnimationState.Moving)
+        //if (unitState == UnitState.Idle && this._unitAnimationState != UnitAnimationState.Idle)
+        //{
+        //    // create animation for unit "losing" their defense position later? For now, just set to idle?
+        //    _animator.SetTrigger("Idle");
+        //}
+        Debug.Log("Unit_OnUnitStateChanged: " + unitState.ToString());
+        switch (unitState)
         {
-            this._unitAnimationState = UnitAnimationState.Idle;
-        }
-    }
-    private void ShootAction_OnStopShooting(object sender, EventArgs e)
-    {
-        if (_unitAnimationState == UnitAnimationState.Shooting)
-        {
-            this._unitAnimationState = UnitAnimationState.Idle;
+            case UnitState.Moving:
+                _animator.SetTrigger("Walk");
+                this._unitAnimationState = UnitAnimationState.Moving;
+                break;
+            case UnitState.Defending:
+                _animator.SetTrigger("Defend");
+                this._unitAnimationState = UnitAnimationState.Defending;
+                break;
+            case UnitState.Attacking:
+                _animator.SetTrigger("Shoot");
+                this._unitAnimationState = UnitAnimationState.Shooting;
+                break;
+            case UnitState.Idle:
+                _animator.SetTrigger("Idle");
+                this._unitAnimationState = UnitAnimationState.Idle;
+                break;
         }
     }
     public void FireShootProjectile()

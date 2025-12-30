@@ -159,6 +159,10 @@ public class LevelGrid : MonoBehaviour
         }
         return validNeighborPositions;
     }
+    public List<GridPosition> GetDefensePositions(GridPosition gridPosition)
+    {
+        return _gridSystem.GetDefensePositions(gridPosition);
+    }
     public void AddObstacleAtGridPosition(GridPosition gridPosition, BaseBombRunObstacle obstacle)
     {
         Debug.Log("AddObstacleAtGridPosition: adding: " + obstacle.name + " to: " + gridPosition.ToString());

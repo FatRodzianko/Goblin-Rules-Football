@@ -34,7 +34,7 @@ AnimationClip:
     - time: 1.0666667
       value: {fileID: -1852395179, guid: 4ab1972d93139ee488f08e2cf0f543e4, type: 3}
     - time: 1.2
-      value: {fileID: -1852395179, guid: 4ab1972d93139ee488f08e2cf0f543e4, type: 3}
+      value: {fileID: -2172426, guid: 4ab1972d93139ee488f08e2cf0f543e4, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -61,7 +61,7 @@ AnimationClip:
     - {fileID: -650069903, guid: 4ab1972d93139ee488f08e2cf0f543e4, type: 3}
     - {fileID: -575204645, guid: 4ab1972d93139ee488f08e2cf0f543e4, type: 3}
     - {fileID: -1852395179, guid: 4ab1972d93139ee488f08e2cf0f543e4, type: 3}
-    - {fileID: -1852395179, guid: 4ab1972d93139ee488f08e2cf0f543e4, type: 3}
+    - {fileID: -2172426, guid: 4ab1972d93139ee488f08e2cf0f543e4, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -89,6 +89,13 @@ AnimationClip:
   m_Events:
   - time: 0.4
     functionName: FireShootProjectile
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.2
+    functionName: AttackAnimationComplete
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

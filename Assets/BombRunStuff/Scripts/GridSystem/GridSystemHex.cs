@@ -119,6 +119,10 @@ public class GridSystemHex<TGridObject> : GridSystem<TGridObject>
         }        
         return neighborGridPositions;
     }
+    public override List<GridPosition> GetDefensePositions(GridPosition gridPosition)
+    {
+        return GetNeighborGridPositions(gridPosition);
+    }
     public override int CalculateDistance(GridPosition a, GridPosition b)
     {
         //// from: https://www.redblobgames.com/grids/hexagons/#distances
