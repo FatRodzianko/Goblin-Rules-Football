@@ -574,8 +574,34 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             {
                 if (raycastHits2D[i].transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
                 {
-                    if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
+                    if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() == ObstacleCoverType.None)
                     {
+                        continue;
+                    }
+                    else if (obstacle.GetObstacleCoverType() == ObstacleCoverType.Partial)
+                    {
+                        if (this._unit.GetUnitState() == UnitState.Defending)
+                        {
+                            if (_unit.GetUnitState() == UnitState.Defending)
+                            {
+                                DefendAction defendAction = (DefendAction)_unit.GetActionByActionType(ActionType.Defend);
+                                if (obstacle.GetGridPosition() == defendAction.GetPositionDefendingFrom())
+                                {
+                                    // check if it was a corner hit?
+                                    if (IsCornerHit(raycastHits2D[i].point))
+                                    {
+                                        if (DoesCornerHitStopVision(startPosition, raycastHits2D[i].point, raycastHits2D[i].collider.bounds.center, raycastHits2D[i].collider, direction))
+                                        {
+                                            //Debug.Log("DoesUnitHaveLineOfSightToPosition: Corner hit at: " + raycastHits2D[i].point + ". Blocking vision for target position: " + targetPosition);
+                                            return false;
+                                        }
+                                        //Debug.Log("DoesUnitHaveLineOfSightToPosition: " + this._unit.name + "'s vision hit corner at: " + raycastHits2D[i].point + " from: " + startPosition);
+                                        continue;
+                                    }
+                                    return false;
+                                }
+                            }
+                        }
                         continue;
                     }
                     else
@@ -603,6 +629,13 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             }
         }
         return true;
+    }
+    private bool IsCornerHitAndBlockVision(Vector2 unitPosition, Vector2 hitPoint, Vector2 centerOfCollider, Collider2D collider, Vector2 direction)
+    {
+        if (!IsCornerHit(hitPoint))
+            return false;
+
+        return DoesCornerHitStopVision(unitPosition, hitPoint, centerOfCollider, collider, direction);
     }
     private bool IsCornerHit(Vector2 hitPoint)
     {
@@ -678,6 +711,26 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 if (raycastHits[i].collider.CompareTag("BombRunObstacle"))
                 {
                     BaseBombRunObstacle obstacle = raycastHits[i].collider.GetComponent<BaseBombRunObstacle>();
+                    //if (obstacle.IsWalkable())
+                    //{
+                    //    continue;
+                    //}
+                    //else if (obstacle.GetObstacleCoverType() == ObstacleCoverType.None)
+                    //{
+                    //    continue;
+                    //}
+                    //else if (obstacle.GetObstacleCoverType() == ObstacleCoverType.Partial)
+                    //{
+                    //    if (_unit.GetUnitState() == UnitState.Defending)
+                    //    {
+                    //        DefendAction defendAction = (DefendAction)_unit.GetActionByActionType(ActionType.Defend);
+                    //        if (obstacle.GetGridPosition() == defendAction.GetPositionDefendingFrom())
+                    //        {
+                    //            return true;
+                    //        }
+                    //    }
+                    //    continue;
+                    //}
                     if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
                     {
                         continue;
@@ -819,6 +872,29 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
 
         return isUnitInvisibleFromDefending;
+    }
+    public bool CanGridPositionSeeDefendingUnit(GridPosition gridPosition)
+    {
+        bool canGridPositionSeeDefendingUnit = true;
+
+        if (this._unit.GetUnitState() != UnitState.Defending)
+            return true;
+
+        DefendAction defendAction = (DefendAction)this._unit.GetActionByActionType(ActionType.Defend);
+
+        Vector2 defendDirection = (LevelGrid.Instance.GetWorldPosition(defendAction.GetPositionDefendingFrom()) - LevelGrid.Instance.GetWorldPosition(this._unit.GetGridPosition())).normalized;
+        Vector2 diretionToTarget = (LevelGrid.Instance.GetWorldPosition(gridPosition) - LevelGrid.Instance.GetWorldPosition(this._unit.GetGridPosition())).normalized;
+
+        float angle = Vector3.Angle(defendDirection, diretionToTarget);
+        Debug.Log("CanGridPositionSeeDefendingUnit: Angle: " + angle.ToString());
+        if (angle < 90)
+        {
+            Debug.Log("CanGridPositionSeeDefendingUnit: " + this._unit.name + " is invisible to: " + gridPosition.ToString() + " because of defending?");
+            canGridPositionSeeDefendingUnit = false;
+        }
+
+
+        return canGridPositionSeeDefendingUnit;
     }
     private List<GridPosition> GetAdjacentGridPositions(GridPosition gridPosition)
     {

@@ -544,27 +544,29 @@ x For the Visible Grid position checks, add checks for corners and to allow for 
 - - - - - - - - - this shouldn't be too much to calculate, since while it does calculate another raycast, ShootAction's would only calculate it for nearby enemy goblins, which would be limited in number
 - - - - - - - - - - - - or just have a "are goblins in the way" option for the function. If true, check if goblins block the line of sight to grid position. If option is false, skip goblin check?
 - Add in the cover system for the "defend" action
-- - - main benefit is: CAN NOT be seen around cornrers.
-- - - can also hide behind partial obstacles to not be seen?
+- - x main benefit is: CAN NOT be seen around cornrers.
+- - x can also hide behind partial obstacles to not be seen?
 - - - For a unit that has taken cover to be seen:
-- - - - - - Get Vector between defending unit and the obstacle/wall that they are taking cover behind
-- - - - - - an opposing unit must be greater than parrallel to see the defending unit
-- - - - - - - - - get vector from opposing unit to the defending unit. Get angle between the defending unit's vector to its defense object(s)
+- - - - - x Get Vector between defending unit and the obstacle/wall that they are taking cover behind
+- - - - - x an opposing unit must be greater than parrallel to see the defending unit
+- - - - - - - - x get vector from opposing unit to the defending unit. Get angle between the defending unit's vector to its defense object(s)
                   and the vector between defending unit and opposing unit
-- - - - - - - - - if angle is greater than 90 (or greater than 90 but less than 270?), the opposing unit can see the defending unit
-- - - - - - - - - - - - if not, then opposing unit cannot see the defending unit
-- - - a unit can take cover "behind" multiple ajacent objects (or maybe not? Might be better to have player choose what the are defending "against,"
+- - - - - - - - x if angle is greater than 90 (or greater than 90 but less than 270?), the opposing unit can see the defending unit
+- - - - - - - - - - - x if not, then opposing unit cannot see the defending unit
+- - x a unit can take cover "behind" multiple ajacent objects (or maybe not? Might be better to have player choose what the are defending "against,"
       like the unit has to press their body up against the wall/obstacle they are defending behind)
-- - - - - - track the grid position of each object the unit is covered by while in defense/hunkered down
-- - - - - - when checking if an opposing unit can see the defending unit, check the angles for ALL grid positions the unit is defended by
-- - - - - - - - - if the opposing unit passes the "can see" check for ANY ONE of the defend grid positions, then the defending unit can be seen
-- - - ShootAction will need to first check if the target is defending/hunkered down
-- - - - - - if the target is defending, check if the shooting unit can "see" the defending unit (this will likely be done already? By general unit visibility)
+- - - - - x track the grid position of each object the unit is covered by while in defense/hunkered down
+- - - - - x when checking if an opposing unit can see the defending unit, check the angles for ALL grid positions the unit is defended by
+- - - - - - - - x if the opposing unit passes the "can see" check for ANY ONE of the defend grid positions, then the defending unit can be seen
+- - x ShootAction will need to first check if the target is defending/hunkered down
+- - - - - x if the target is defending, check if the shooting unit can "see" the defending unit (this will likely be done already? By general unit visibility)
 - - - Grenade damage will need to take defending units into account when dealing damage
 - - - - - - Find all units to damage in the grenades radius
 - - - - - - Check to see if the grenade can "see" the target units. Check for walls and obstacles that would block damage
 - - - - - - - - - Right now grenades to 1 damage to each body part. Maybe have a check if there is a partial obstacle between target and grenade,
                   AND the target is not defending, then don't damage the target's legs. Only their arms and head that are above the obstacle?
+- - - - - - Need to update "IsWallBetweenPoints" in GrenadeProjectile to check for corners?
+- - - - - - - - - hopefully can reuse from FieldOfView calculations?
 - - x Check if defend is a possible action:
 - - - - - x check the four adjacent grid positions (north, south, east, west), if any are a wall, full obstacle, or partial obstacle, defend action is available
 - - x The "Valid Grid Positions" to choose are the grid position you defend "against" aka the wall the unit presses up against?
@@ -610,8 +612,8 @@ x How to show grid visuals over fog of war?
 - - - - - - - - - - - x Don't make the place holder sprite a child of the unit. This prevents the placeholder sprite from moving as the unit moves
 - - - - - - - - x OnAnyGridPositionBecomeVisibile: if placeholder sprite object is on this grid position, delete the placeholder sprite object
 
-- Update the Obstacle Visibility script so the event subscriptions to the GridObject are on the BaseObstacle script
-- - - then, the Obstacle_Visibility script, or any other script needing it, can subscribe to an event from the BaseObstacle script
+x Update the Obstacle Visibility script so the event subscriptions to the GridObject are on the BaseObstacle script
+- - x then, the Obstacle_Visibility script, or any other script needing it, can subscribe to an event from the BaseObstacle script
       to track visibility to the player?
 
 x make a shader to make sprites black and white?

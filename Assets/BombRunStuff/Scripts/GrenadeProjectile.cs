@@ -140,6 +140,7 @@ public class GrenadeProjectile : MonoBehaviour
             }
         }
 
+
         // hit some other collider but not a wall or obstacle
         return false;
     }
@@ -181,6 +182,13 @@ public class GrenadeProjectile : MonoBehaviour
             //{
             //    units[x].DamageBodyPart(bodyPartAndFrozenState.BodyPart);
             //}'
+            if (units[x].GetUnitState() == UnitState.Defending)
+            {
+                if (!units[x].GetBombRunUnitFieldOfView().CanGridPositionSeeDefendingUnit(_targetGridPosition))
+                {
+                    continue;
+                }
+            }
             if(_damageUnits)
                 units[x].DamageAllBodyParts();
             else
