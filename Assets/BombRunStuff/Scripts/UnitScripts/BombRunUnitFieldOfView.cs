@@ -524,6 +524,15 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         return DoesUnitHaveLineOfSightToPosition(unitWorldPosition, targetWorldPosition, directionToPosition, distanceToWorldPosition);
     }
+    public bool CanGridPositionSeeGridPosition(GridPosition startGridPosition, GridPosition targetGridPosition)
+    {
+        Vector3 startWorldPosition = LevelGrid.Instance.GetWorldPosition(startGridPosition);
+        Vector3 targetWorldPosition = LevelGrid.Instance.GetWorldPosition(targetGridPosition);
+        Vector2 direction = (targetWorldPosition - startWorldPosition).normalized;
+        float distance = Vector2.Distance(startWorldPosition, targetWorldPosition);
+
+        return DoesUnitHaveLineOfSightToPosition(startWorldPosition, targetWorldPosition, direction, distance);
+    }
     public bool IsGridPositionWithinFOV(Vector3 directionToTarget, float fovAngle, Vector3 directionForAngleComparison)
     {
         // Get the angle of the direction to the target relative to the direction for comparison 
@@ -581,26 +590,23 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     else if (obstacle.GetObstacleCoverType() == ObstacleCoverType.Partial)
                     {
                         if (this._unit.GetUnitState() == UnitState.Defending)
-                        {
-                            if (_unit.GetUnitState() == UnitState.Defending)
+                        {                            
+                            DefendAction defendAction = (DefendAction)_unit.GetActionByActionType(ActionType.Defend);
+                            if (obstacle.GetGridPosition() == defendAction.GetPositionDefendingFrom())
                             {
-                                DefendAction defendAction = (DefendAction)_unit.GetActionByActionType(ActionType.Defend);
-                                if (obstacle.GetGridPosition() == defendAction.GetPositionDefendingFrom())
+                                // check if it was a corner hit?
+                                if (IsCornerHit(raycastHits2D[i].point))
                                 {
-                                    // check if it was a corner hit?
-                                    if (IsCornerHit(raycastHits2D[i].point))
+                                    if (DoesCornerHitStopVision(startPosition, raycastHits2D[i].point, raycastHits2D[i].collider.bounds.center, raycastHits2D[i].collider, direction))
                                     {
-                                        if (DoesCornerHitStopVision(startPosition, raycastHits2D[i].point, raycastHits2D[i].collider.bounds.center, raycastHits2D[i].collider, direction))
-                                        {
-                                            //Debug.Log("DoesUnitHaveLineOfSightToPosition: Corner hit at: " + raycastHits2D[i].point + ". Blocking vision for target position: " + targetPosition);
-                                            return false;
-                                        }
-                                        //Debug.Log("DoesUnitHaveLineOfSightToPosition: " + this._unit.name + "'s vision hit corner at: " + raycastHits2D[i].point + " from: " + startPosition);
-                                        continue;
+                                        //Debug.Log("DoesUnitHaveLineOfSightToPosition: Corner hit at: " + raycastHits2D[i].point + ". Blocking vision for target position: " + targetPosition);
+                                        return false;
                                     }
-                                    return false;
+                                    //Debug.Log("DoesUnitHaveLineOfSightToPosition: " + this._unit.name + "'s vision hit corner at: " + raycastHits2D[i].point + " from: " + startPosition);
+                                    continue;
                                 }
-                            }
+                                return false;
+                            }                            
                         }
                         continue;
                     }

@@ -34,6 +34,9 @@ public class GrenadeProjectile : MonoBehaviour
     private float _totalDistance;
     [SerializeField] private Vector3 _positionXYZ = Vector3.zero;
 
+    [Header("Unit")]
+    [SerializeField] private BombRunUnit _throwingUnit;
+
 
     private Action _onGrenadeBehaviorComplete;
 
@@ -69,9 +72,11 @@ public class GrenadeProjectile : MonoBehaviour
         //}
         MoveGrenadeOnTrajectory();
     }
-    public void Setup(GridPosition targetGridPosition, Action onGrenadeBehaviorComplete, DamageMode damageMode)
+    public void Setup(GridPosition targetGridPosition, Action onGrenadeBehaviorComplete, DamageMode damageMode, BombRunUnit unit)
     {
         this._onGrenadeBehaviorComplete = onGrenadeBehaviorComplete;
+
+        this._throwingUnit = unit;
         
         _damageMode = damageMode;
 
@@ -118,31 +123,36 @@ public class GrenadeProjectile : MonoBehaviour
     }
     private bool IsWallBetweenPoints(GridPosition start, GridPosition end)
     {
-        Vector2 startPosition = LevelGrid.Instance.GetWorldPosition(start);
-        Vector2 endPosition = LevelGrid.Instance.GetWorldPosition(end);
-        Vector2 direction = (endPosition - startPosition).normalized;
+        return !_throwingUnit.GetBombRunUnitFieldOfView().CanGridPositionSeeGridPosition(start, end);
+        //Vector2 startPosition = LevelGrid.Instance.GetWorldPosition(start);
+        //Vector2 endPosition = LevelGrid.Instance.GetWorldPosition(end);
+        //Vector2 direction = (endPosition - startPosition).normalized;
 
-        float distance = Vector2.Distance(startPosition, endPosition);
-        RaycastHit2D[] hits = Physics2D.RaycastAll(startPosition, direction, distance);
+        //float distance = Vector2.Distance(startPosition, endPosition);
+        //RaycastHit2D[] hits = Physics2D.RaycastAll(startPosition, direction, distance);
 
-        if (hits.Length < 1)
-            return false;
-        for (int i = 0; i < hits.Length; i++)
-        {
-            if (hits[i].collider.CompareTag("BombRunWall"))
-                return true;
-            if (hits[i].collider.CompareTag("BombRunObstacle"))
-            {
-                if (!hits[i].collider.GetComponent<BaseBombRunObstacle>().IsDestructible())
-                {
-                    return true;
-                }
-            }
-        }
+        //if (hits.Length < 1)
+        //    return false;
+        //for (int i = 0; i < hits.Length; i++)
+        //{
+        //    if (hits[i].collider.CompareTag("BombRunWall"))
+        //        return true;
+        //    if (hits[i].collider.CompareTag("BombRunObstacle"))
+        //    {
+        //        if (hits[i].collider.GetComponent<BaseBombRunObstacle>().IsWalkable())
+        //        {
+        //            continue;
+        //        }
+        //        if (!hits[i].collider.GetComponent<BaseBombRunObstacle>().IsDestructible())
+        //        {
+        //            return true;
+        //        }
+        //    }
+        //}
 
 
-        // hit some other collider but not a wall or obstacle
-        return false;
+        //// hit some other collider but not a wall or obstacle
+        //return false;
     }
     private void FindUnitsAndObstaclesHitByGrenade(List<GridPosition> gridPositions)
     {

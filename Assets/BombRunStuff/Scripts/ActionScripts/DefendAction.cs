@@ -107,7 +107,7 @@ public class DefendAction : BaseAction
         //_onActionComplete = onActionComplete;
         //_isActive = true;
         ActionStart(onActionComplete);
-        _unit.SetUnitState(UnitState.Defending);
+        //_unit.SetUnitState(UnitState.Defending);
 
         this._positionDefendingFrom = gridPosition;
         this._positionDefendingFromVector2Int = new Vector2Int(gridPosition.x, gridPosition.y);

@@ -76,6 +76,12 @@ public abstract class BaseAction : MonoBehaviour
     [Header("Sub Action Stuff")]
     [SerializeField] private BaseSubAction _subAction;
 
+    [Header("Unit State Changes")]
+    [SerializeField] protected bool _changeUnitStateOnStartAction = false;
+    [SerializeField] protected bool _changeUnitStateOnCompleteAction = false;
+    [SerializeField] protected UnitState _unitStateOnStartAction = UnitState.Idle;
+    [SerializeField] protected UnitState _unitStateOnCompleteAction = UnitState.Idle;
+
     // Static Actions
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
@@ -129,12 +135,22 @@ public abstract class BaseAction : MonoBehaviour
         this._unit.SpendActionPoints(this._actionPointsCost);
         this._unit.AddActionTakenThisTurn(this);
 
+        if (this._changeUnitStateOnStartAction)
+        {
+            this._unit.SetUnitState(this._unitStateOnStartAction);
+        }
+
         OnAnyActionStarted?.Invoke(this, EventArgs.Empty);
     }
     protected void ActionComplete()
     {
         _isActive = false;
         _onActionComplete();
+
+        if (this._changeUnitStateOnCompleteAction)
+        {
+            this._unit.SetUnitState(this._unitStateOnCompleteAction);
+        }
 
         OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
     }

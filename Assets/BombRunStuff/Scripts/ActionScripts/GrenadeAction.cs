@@ -99,7 +99,7 @@ public class GrenadeAction : BaseAction
         // Spawn the grenade projectile
         Transform grenadeProjectileTransform = Instantiate(_grenadeProjectilePrefab, _unit.GetWorldPosition(), Quaternion.identity);
         GrenadeProjectile grenadeProjectileScript = grenadeProjectileTransform.GetComponent<GrenadeProjectile>();
-        grenadeProjectileScript.Setup(gridPosition, OnGrenadeBehaviorComplete, _damageMode);
+        grenadeProjectileScript.Setup(gridPosition, OnGrenadeBehaviorComplete, _damageMode, this._unit);
 
         ActionStart(onActionComplete);
 

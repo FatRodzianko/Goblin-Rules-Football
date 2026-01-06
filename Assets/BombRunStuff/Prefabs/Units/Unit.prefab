@@ -1209,6 +1209,10 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _changeUnitStateOnStartAction: 0
+  _changeUnitStateOnCompleteAction: 0
+  _unitStateOnStartAction: 1
+  _unitStateOnCompleteAction: 1
   _timer: 0
   _lookAtDelay: 0.5
 --- !u!114 &5928444417147222519
@@ -1247,6 +1251,10 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _changeUnitStateOnStartAction: 1
+  _changeUnitStateOnCompleteAction: 1
+  _unitStateOnStartAction: 2
+  _unitStateOnCompleteAction: 1
   _maxMoveDistance: 4
 --- !u!114 &4887323598526683332
 MonoBehaviour:
@@ -1284,6 +1292,10 @@ MonoBehaviour:
   _ammoCost: 1
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _changeUnitStateOnStartAction: 1
+  _changeUnitStateOnCompleteAction: 1
+  _unitStateOnStartAction: 3
+  _unitStateOnCompleteAction: 1
   _maxShootDistance: 10
   _shotBlockerLayerMasks:
   - serializedVersion: 2
@@ -1330,6 +1342,10 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 1
   _subAction: {fileID: 0}
+  _changeUnitStateOnStartAction: 0
+  _changeUnitStateOnCompleteAction: 0
+  _unitStateOnStartAction: 1
+  _unitStateOnCompleteAction: 1
   _reloadTime: 1.5
   _reloadCounter: 0
 --- !u!114 &6393159762003104582
@@ -1368,6 +1384,10 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _changeUnitStateOnStartAction: 0
+  _changeUnitStateOnCompleteAction: 0
+  _unitStateOnStartAction: 1
+  _unitStateOnCompleteAction: 1
   _actionName: Switch To Healing
   _healingMode: 0
   _switchModeTime: 1
@@ -1410,6 +1430,10 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _changeUnitStateOnStartAction: 0
+  _changeUnitStateOnCompleteAction: 0
+  _unitStateOnStartAction: 1
+  _unitStateOnCompleteAction: 1
 --- !u!114 &3362271877576885837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1446,6 +1470,10 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _changeUnitStateOnStartAction: 1
+  _changeUnitStateOnCompleteAction: 0
+  _unitStateOnStartAction: 4
+  _unitStateOnCompleteAction: 1
   _maxReinforceDistance: 1
   _enemyNearbyDistance: 3
   _positionDefendingFromVector2Int: {x: 0, y: 0}
@@ -1485,6 +1513,10 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _changeUnitStateOnStartAction: 0
+  _changeUnitStateOnCompleteAction: 0
+  _unitStateOnStartAction: 1
+  _unitStateOnCompleteAction: 1
 --- !u!114 &2898562228658105131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1521,6 +1553,10 @@ MonoBehaviour:
   _ammoCost: 1
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _changeUnitStateOnStartAction: 1
+  _changeUnitStateOnCompleteAction: 1
+  _unitStateOnStartAction: 7
+  _unitStateOnCompleteAction: 1
   _maxThrowDistance: 12
   _grenadeProjectilePrefab: {fileID: 8449958251188467104, guid: 6da71e249ebcf6541a508c7537619a78, type: 3}
   _damageMode: 0
@@ -1560,6 +1596,10 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _changeUnitStateOnStartAction: 1
+  _changeUnitStateOnCompleteAction: 1
+  _unitStateOnStartAction: 5
+  _unitStateOnCompleteAction: 1
 --- !u!50 &5071019595427909007
 Rigidbody2D:
   serializedVersion: 4

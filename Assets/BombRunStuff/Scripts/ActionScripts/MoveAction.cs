@@ -81,7 +81,7 @@ public class MoveAction : BaseAction
             {
                 //_isActive = false;
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
-                _unit.SetUnitState(UnitState.Idle);
+                //_unit.SetUnitState(UnitState.Idle);
                 //_onActionComplete();
                 ActionComplete();
             }
@@ -156,7 +156,7 @@ public class MoveAction : BaseAction
 
         ActionStart(onActionComplete);
         OnStartMoving?.Invoke(this, EventArgs.Empty);
-        _unit.SetUnitState(UnitState.Moving);
+        //_unit.SetUnitState(UnitState.Moving);
     }
     public override List<GridPosition> GetValidActionGridPositionList()
     {

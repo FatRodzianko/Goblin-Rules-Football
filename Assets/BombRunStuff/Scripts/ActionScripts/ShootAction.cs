@@ -157,7 +157,7 @@ public class ShootAction : BaseAction
             TargetUnit = _targetUnit,
             ShootingUnit = _unit
         });
-        _unit.SetUnitState(UnitState.Attacking);
+        //_unit.SetUnitState(UnitState.Attacking);
         //_targetUnit.Damage(35);
     }
     public override string GetActionName()

@@ -15,7 +15,10 @@ public enum UnitState
     Idle,
     Moving,
     Attacking,
-    Defending
+    Defending,
+    Melee,
+    Shooting,
+    Throwing
 }
 public class BombRunUnit : MonoBehaviour
 {
