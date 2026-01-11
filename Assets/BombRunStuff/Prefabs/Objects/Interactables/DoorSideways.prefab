@@ -123,6 +123,8 @@ MonoBehaviour:
   _obstacle: {fileID: 6359947295081794852}
   _spriteRenderer: {fileID: 6539029415007913335}
   _spriteMask: {fileID: 2285622349339259722}
+  _shadowSpriteRenderer: {fileID: 0}
+  _invisibleObjectPlaceHolderPrefab: {fileID: 6422261272446741381, guid: 260b0685e8bb3e74b909e79e69392ea9, type: 3}
 --- !u!331 &2285622349339259722
 SpriteMask:
   m_ObjectHideFlags: 0

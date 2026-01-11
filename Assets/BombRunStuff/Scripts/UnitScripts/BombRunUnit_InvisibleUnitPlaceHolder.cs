@@ -14,6 +14,8 @@ public class BombRunUnit_InvisibleUnitPlaceHolder : MonoBehaviour
     [SerializeField] private float _alphaValue;
     private GridPosition _gridPostion;
 
+    
+
     private void Start()
     {
         UnitVisibilityManager_BombRun.OnMakeGridPositionVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
@@ -52,13 +54,19 @@ public class BombRunUnit_InvisibleUnitPlaceHolder : MonoBehaviour
         {
             Debug.Log("UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer: GridPosition (" + gridPosition + ") is now visible. Destroying " + name + "...");
             //GameObject.Destroy(this.gameObject);
-            if (this._unit.GetUnitState() == UnitState.Defending)
+            // check if the unit is still at this grid position.
+            // If the unit is at this grid position, check if the unit is defending
+            // if the unit is defending, check if that defending unit can be seen
+            if (this._unit.GetGridPosition() == gridPosition)
             {
-                if (UnitVisibilityManager_BombRun.Instance.CheckIfMovedUnitCanBeSeen(this._unit))
+                if (this._unit.GetUnitState() == UnitState.Defending)
                 {
-                    OnGridPositionBecameVisible?.Invoke(this, EventArgs.Empty);
+                    if (UnitVisibilityManager_BombRun.Instance.CheckIfMovedUnitCanBeSeen(this._unit))
+                    {
+                        OnGridPositionBecameVisible?.Invoke(this, EventArgs.Empty);
+                    }
                 }
-            }
+            }            
             else
             {
                 OnGridPositionBecameVisible?.Invoke(this, EventArgs.Empty);

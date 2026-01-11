@@ -491,7 +491,7 @@ public class ShootAction : BaseAction
 
         float distance = Vector2.Distance(unitWorldPosition, targetWorldPosition);
 
-        Debug.Log("DoesShotHitWallOrObstacle: shooter position: " + unitWorldPosition + " target position: " + targetWorldPosition);
+        //Debug.Log("DoesShotHitWallOrObstacle: shooter position: " + unitWorldPosition + " target position: " + targetWorldPosition);
 
         foreach (LayerMask mask in _shotBlockerLayerMasks)
         {

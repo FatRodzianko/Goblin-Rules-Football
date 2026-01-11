@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GreyScale_Sprite_Material
+  m_Name: GreyScale_Sprite_Material_LessGrey
   m_Shader: {fileID: -6465566751694194690, guid: bab2aca572e6f1644ba32c2e48a17e47, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -38,6 +38,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _GreyLevel: 3
+    - _GreyLevel: 3.82
     m_Colors: []
   m_BuildTextureStacks: []

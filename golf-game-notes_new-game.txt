@@ -543,7 +543,7 @@ x For the Visible Grid position checks, add checks for corners and to allow for 
 - - - - - - - - - if it is, the grid position is not a valid shootaction target
 - - - - - - - - - this shouldn't be too much to calculate, since while it does calculate another raycast, ShootAction's would only calculate it for nearby enemy goblins, which would be limited in number
 - - - - - - - - - - - - or just have a "are goblins in the way" option for the function. If true, check if goblins block the line of sight to grid position. If option is false, skip goblin check?
-- Add in the cover system for the "defend" action
+x Add in the cover system for the "defend" action
 - - x main benefit is: CAN NOT be seen around cornrers.
 - - x can also hide behind partial obstacles to not be seen?
 - - - For a unit that has taken cover to be seen:
@@ -602,7 +602,7 @@ x How to show grid visuals over fog of war?
 - - - - - x Unit will listen to static events from the UnitVisibilityManager for:
 - - - - - - - - x OnAnyUnitBecomeVisible and OnAnyUnitBecomeInvisible
 - - - - - - - - - - - x this should already be the case
-- - - - - - - - - - - x This wasn't alreadthe case, so I added it
+- - - - - - - - - - - x This wasn't already the case, so I added it
 - - - - - - - - x OnAnyGridPosition become visible
 - - - - - - - - - - - x This should be an event on the placeholder sprite object, not the unit? Units don't need this event?
 - - - - - - When these events trigger, check:

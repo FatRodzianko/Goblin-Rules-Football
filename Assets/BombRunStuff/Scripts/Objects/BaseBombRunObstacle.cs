@@ -12,11 +12,14 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
     [SerializeField] private bool _isDestructible = false;
     [SerializeField] private bool _isInteractable = false;
     [SerializeField] private bool _isWalkable = false;
+    [SerializeField] private bool _isVisibleToPlayer = false;
 
     [SerializeField] private BombRunObstacleType _bombRunObstacleType;
 
     [Header("Obstacle Cover")]
     [SerializeField] private ObstacleCoverType _obstacleCoverType;
+
+    
 
     // Static Events
     public static event EventHandler<GridPosition> OnAnyObstacleDestroyed;
@@ -24,8 +27,9 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
 
     public event EventHandler OnSeenByPlayer;
     public event EventHandler<bool> OnVisibleToPlayerChanged;
-    public static event EventHandler<GridPosition> OnThisObstacleDestroyed;
-    public static event EventHandler<ObstacleCoverType> OnThisObstacleCoverTypeChanged;
+
+    public event EventHandler<GridPosition> OnThisObstacleDestroyed;
+    public event EventHandler<ObstacleCoverType> OnThisObstacleCoverTypeChanged;
 
     protected virtual void Start()
     {
@@ -45,8 +49,21 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
             _gridObject.OnVisibleToPlayerChanged += GridObject_OnVisibleToPlayerChanged;
         }
     }
+    private void OnDisable()
+    {
+        if (_gridObject != null)
+        {
+            _gridObject.OnSeenByPlayer += GridObject_OnSeenByPlayer;
+            _gridObject.OnVisibleToPlayerChanged -= GridObject_OnVisibleToPlayerChanged;
+        }
+    }
     private void GridObject_OnVisibleToPlayerChanged(object sender, bool isVisibleToPlayer)
     {
+        
+        if (this._isVisibleToPlayer == isVisibleToPlayer)
+            return;
+        Debug.Log("GridObject_OnVisibleToPlayerChanged: " + this.name + ":" + isVisibleToPlayer);
+        this._isVisibleToPlayer = isVisibleToPlayer;
         OnVisibleToPlayerChanged?.Invoke(this, isVisibleToPlayer);
     }
     public void SetGridPosition(GridPosition gridPosition)
@@ -97,7 +114,7 @@ public abstract class BaseBombRunObstacle : MonoBehaviour
     public void DestroyObstacle()
     {
         Destroy(this.gameObject);
-
+        OnThisObstacleDestroyed?.Invoke(this, _gridPosition);
         OnAnyObstacleDestroyed?.Invoke(this, _gridPosition);
     }
 }

@@ -49,6 +49,9 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     public static event EventHandler<BombRunUnit> OnAnyUnitBecameVisibile;
     public static event EventHandler<BombRunUnit> OnAnyUnitBecameInVisibile;
 
+    public static event EventHandler<BaseBombRunObstacle> OnAnyObstacleBecameVisible;
+    public static event EventHandler<BaseBombRunObstacle> OnAnyObstacleBecameInVisible;
+
     public event EventHandler<GridPosition> OnMakeGridPositionVisibleToEnemy;
     public event EventHandler<GridPosition> OnMakeGridPositionNotVisibleToEnemy;
 

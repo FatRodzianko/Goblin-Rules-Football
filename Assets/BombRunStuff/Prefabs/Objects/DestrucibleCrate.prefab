@@ -251,9 +251,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _obstacle: {fileID: 417569609976739657}
-  _trackVisibilityToPlayer: 0
   _spriteRenderer: {fileID: 5012286597766624627}
   _spriteMask: {fileID: 1832380384913465840}
+  _shadowSpriteRenderer: {fileID: 5012286597895555899}
+  _invisibleObjectPlaceHolderPrefab: {fileID: 6422261272446741381, guid: 260b0685e8bb3e74b909e79e69392ea9, type: 3}
 --- !u!1 &5012286597895555901
 GameObject:
   m_ObjectHideFlags: 0

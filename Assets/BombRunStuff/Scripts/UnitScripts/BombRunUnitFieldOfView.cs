@@ -846,6 +846,12 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     previouslyVisibleUnitsToRemoveFromVisibility.Remove(unit);
                     UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
                 }
+                if (LevelGrid.Instance.HasAnyObstacleOnGridPosition(gridPosition))
+                {
+                    
+                }
+
+                previousVisibileGridPositions.Remove(gridPosition);
             }
         }
         //stopwatch.Stop();
@@ -870,15 +876,28 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         Vector2 diretionToTargetUnit = (LevelGrid.Instance.GetWorldPosition(this._unit.GetGridPosition()) - LevelGrid.Instance.GetWorldPosition(unit.GetGridPosition())).normalized;
 
         float angle = Vector3.Angle(defendDirection, diretionToTargetUnit);
-        Debug.Log("IsUnitInvisibleFromDefending: Angle between defending unit: " + unit.name + " (" + defendDirection.ToString() + ") and this unit: " + this._unit.name + " (" + diretionToTargetUnit.ToString() + ") is: " + angle.ToString());
+        //Debug.Log("IsUnitInvisibleFromDefending: Angle between defending unit: " + unit.name + " (" + defendDirection.ToString() + ") and this unit: " + this._unit.name + " (" + diretionToTargetUnit.ToString() + ") is: " + angle.ToString());
         if (angle < 90)
         {
-            Debug.Log("IsUnitInvisibleFromDefending: " + unit.name + " is invisible to: " + this._unit.name + " because of defending?");
+            //Debug.Log("IsUnitInvisibleFromDefending: " + unit.name + " is invisible to: " + this._unit.name + " because of defending?");
             isUnitInvisibleFromDefending = true;
         }
 
         return isUnitInvisibleFromDefending;
     }
+    //public bool IsDefendingGridPositionVisibile(GridPosition defendingUnitPosition, GridPosition defendingFromPosition, GridPosition seenFromPosition)
+    //{
+    //    bool isDefendingGridPositionVisible = false;
+    //    float angle = Vector3.Angle(defendDirection, diretionToTargetUnit);
+    //    Debug.Log("IsDefendingGridPositionVisibile: Angle between defending unit: " + unit.name + " (" + defendDirection.ToString() + ") and this unit: " + this._unit.name + " (" + diretionToTargetUnit.ToString() + ") is: " + angle.ToString());
+    //    if (angle < 90)
+    //    {
+    //        Debug.Log("IsDefendingGridPositionVisibile: " + unit.name + " is invisible to: " + this._unit.name + " because of defending?");
+    //        isDefendingGridPositionVisible = true;
+    //    }
+
+    //    return isDefendingGridPositionVisible;
+    //}
     public bool CanGridPositionSeeDefendingUnit(GridPosition gridPosition)
     {
         bool canGridPositionSeeDefendingUnit = true;
