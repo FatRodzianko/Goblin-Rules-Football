@@ -505,10 +505,21 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 - Each "type" of unit will have a scriptable object, like "Base Unit," "Medic," etc.
 - - - units attributes will be built out from this scriptable object. also its sprites and stuff
 - - - will contain list of base actions as a list of scriptable objects
+- - - if I ever make the "body mod upgrades" thing, then a list of the unit's "inventory" of body mods/upgrades
+- - - - - - List of scriptable objects for the body mods to then add to the unit's "inventory" or something?
 - Each Action will have its scriptable object container thing as well
-- - - will out the attributes of the action, if there are any
+- - - fill out the attributes of the action, if there are any
 - - - when unit is spawned, it will build out its available actions based on the list of scrtiple object actions it has
 - - - - - - will allow for each unit type/class to have custom actions built in. Should be easier to manage than the prefab variant stuff
+- The Body Mods/Upgrades should have scriptable objects as well
+- - - mod/upgrade type
+- - - what body part it affects or is attached to? (so you can limit number of mods per body part?)
+- - - what attribute on the unit is modified and by how much?
+# Spawning Units
+- Will have a "unit spawner" that spawns the units for the player and enemy? (or the two/more different teams?)
+- - - For each team, have a list of the unit scriptable objects to spawn for each team
+- - - determine spawn location
+- - - - - - have player select their spawn location within a set number of allowed "spaces"?
 
 ### Next Steps to focus on:
 x Add a "Look At" action
@@ -523,7 +534,7 @@ x Add a "Look At" action
 - - x The 8 grid positions surrounding the unit should always be either visible or greyed out?
 - - - - - - go back to the two tiles to the side of unit to be visible, the units near periphery vision
 - - - - - - so 3 adjacent tiles are visible from the FOV, two from the "periphery," then the remaining 3 are not visible but greyed out?
-- Update the grid cursor so it doesn't always "skip" grid positions that have a wall on them
+x Update the grid cursor so it doesn't always "skip" grid positions that have a wall on them
 - - x only "skip" the wall position if the player has already seen that wall position?
 - - - - - x would require marking grid positions as "been seen by player" or something to make this check easier
 - - - - - - - - x when a position becomes visibile, fire off event. The LevelGrid listens, then updates that grid position to "been seen"
@@ -593,7 +604,7 @@ x Have the UnitVisibilty manager show "last seen location" of units that you los
 x How to show grid visuals over fog of war?
 - - x make the grid visual and grid action visual higher in the sorting layer, so they are above the
 
-- Move the "Invisible Unit Placeholder" spawning/despawning into its own manager?
+x Move the "Invisible Unit Placeholder" spawning/despawning into its own manager?
 - - - InvisibleUnitPlaceHolder_Manager listens for events of units becoming invisible and visible, as well as when grid positions become visible
 - - - - - x when unit becomes visible, remove any placeholders for that unit
 - - - - - x when a grid position becomes visibile, check if any placeholders are associated with that grid position. If they are, remove them?
@@ -611,6 +622,10 @@ x How to show grid visuals over fog of war?
 - - - - - - - - - - - x Sanity check to see if any placeholder objects already exist for this unit. If yes, delete old placeholder objects
 - - - - - - - - - - - x Don't make the place holder sprite a child of the unit. This prevents the placeholder sprite from moving as the unit moves
 - - - - - - - - x OnAnyGridPositionBecomeVisibile: if placeholder sprite object is on this grid position, delete the placeholder sprite object
+x Update obstacle visibility stuff so that it also spawns a "place holder" object when not visibile
+- - x hopefully can follow the same logic as the unit placeholder stuff
+- - - maybe try and "genericize" it so both units/objects can use the same script
+- - - - - - so there's just a "PlaceHolder" object script/class that handles the placeholder being visibile and when it should be destroyed?
 
 x Update the Obstacle Visibility script so the event subscriptions to the GridObject are on the BaseObstacle script
 - - x then, the Obstacle_Visibility script, or any other script needing it, can subscribe to an event from the BaseObstacle script

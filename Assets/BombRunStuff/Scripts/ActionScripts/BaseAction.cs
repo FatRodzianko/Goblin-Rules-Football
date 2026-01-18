@@ -230,7 +230,7 @@ public abstract class BaseAction : MonoBehaviour
         {
             return true;
         }
-        Debug.Log("CanTakeAction: action requires vision and head is frozen.");
+        Debug.Log("CanTakeAction: action requires vision and head is frozen. (" + _unit.name + ")");
         switch (this._visionTypeRequired)
         {
             case VisionTypeRequired.Unit:

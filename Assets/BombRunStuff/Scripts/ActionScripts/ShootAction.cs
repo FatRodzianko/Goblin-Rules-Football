@@ -254,6 +254,18 @@ public class ShootAction : BaseAction
                         Debug.Log("Shoot Action: GetValidActionGridPositionList: all body parts frozen at: " + testGridPosition);
                         continue;
                     }
+
+                    // check to see if the enemy unit has been seen yet. If not, not a valid target
+                    if (!testGridUnit.HasUnitBeenSeenYet())
+                    {
+                        continue;
+                    }
+
+                    // check if the enemy unit is at the same position that they were last seen at? If the unit has moved from that position, they cannot be targeted?
+                    if (testGridUnit.GetGridPosition() != testGridUnit.LastSeenAtGridPosition())
+                    {
+                        continue;
+                    }
                 }
                 if (_unit.GetBombRunUnitFieldOfView().IsUnitInvisibleFromDefending(testGridUnit))
                 {

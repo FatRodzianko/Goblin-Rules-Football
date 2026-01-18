@@ -846,10 +846,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     previouslyVisibleUnitsToRemoveFromVisibility.Remove(unit);
                     UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
                 }
-                if (LevelGrid.Instance.HasAnyObstacleOnGridPosition(gridPosition))
-                {
-                    
-                }
 
                 previousVisibileGridPositions.Remove(gridPosition);
             }

@@ -41,6 +41,8 @@ public class ShootSubAction : BaseSubAction
         _timer = _countDownLength;
         SubActionStart(onSubActionComplete);
         SpawnShootSubActionGUI();
+
+        _unit.SetActionDirection(LevelGrid.Instance.GetWorldPosition(gridPosition) - LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition()));
     }
 
     public override void TakeActionFromParentAction()

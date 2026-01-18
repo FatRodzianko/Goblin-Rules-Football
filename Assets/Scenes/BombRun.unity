@@ -13043,7 +13043,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4506797595294261930, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: _bodyPartsAndFrozenState.Array.data[1].BodyPartFrozenState
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4944422538143551182, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_Name
@@ -50990,6 +50990,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1287326152840003113, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
+      propertyPath: _bodyPartsAndFrozenState.Array.data[1].BodyPartFrozenState
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1960991674939053378, guid: de1f65fc6affc6c459cc6c1c7ec3c72f, type: 3}
       propertyPath: m_FlipX
       value: 0
@@ -53357,7 +53361,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6568846962603534430, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
       propertyPath: _sightRange
-      value: 10
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6763697857680715363, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
       propertyPath: m_RootOrder
@@ -53369,7 +53373,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6763697857680715363, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 19
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 6763697857680715363, guid: 5ff1a2584df217d4db540842f6e2d4c8, type: 3}
       propertyPath: m_LocalPosition.z

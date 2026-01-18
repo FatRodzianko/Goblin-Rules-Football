@@ -74,6 +74,12 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] Transform _invisibleUnitPlaceHolderObjectPrefab;
     [SerializeField] BombRunUnit_InvisibleUnitPlaceHolder _invisibleUnitPlaceHolder;
 
+    [Header("Unit Visibility Stuff")]
+    [SerializeField] private bool _hasUnitBeenSeen = false;
+    [SerializeField] private Vector2Int _lastSeenAtVector2Position = new Vector2Int(-1, -1); 
+    private GridPosition _lastSeenAtGridPosition;
+
+
     private void Awake()
     {
         _baseActionArray = GetComponents<BaseAction>();
@@ -488,5 +494,25 @@ public class BombRunUnit : MonoBehaviour
     {
         this._unitState = unitState;
         OnUnitStateChanged?.Invoke(this, this._unitState);
+    }
+    public bool HasUnitBeenSeenYet()
+    {
+        return _hasUnitBeenSeen;
+    }
+    public void SetHasUnitBeenSeen(bool hasUnitBeenSeen)
+    {
+        this._hasUnitBeenSeen = hasUnitBeenSeen;
+    }
+    public GridPosition LastSeenAtGridPosition()
+    {
+        return _lastSeenAtGridPosition;
+    }
+    public void UnitSeenByEnemyUnit()
+    {
+        if (!_hasUnitBeenSeen)
+            _hasUnitBeenSeen = true;
+
+        this._lastSeenAtGridPosition = this._gridPosition;
+        this._lastSeenAtVector2Position = new Vector2Int(_gridPosition.x, _gridPosition.y);
     }
 }

@@ -145,7 +145,6 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
                 return true;
             }
         }
-
         return false;
     }
     public void AddUnitToVisibilityList(BombRunUnit visibleUnit, BombRunUnit discoveringUnit)
@@ -179,6 +178,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
                 _unitsVisibileToEnemy.Add(visibileUnitAndDiscoverer);
             }
         }
+        visibleUnit.UnitSeenByEnemyUnit();
     }
     public void RemoveUnitFromVisibilityList(BombRunUnit visibleUnit)
     {
