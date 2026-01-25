@@ -489,6 +489,7 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 - - - - - x Spawn objects/Interactables
 - - x Setup the pathfinding grid
 - - x Then spawn units
+- - - - - - need to create the unit spawner first and unit scriptable objects...
 
 ### Move Action optimization?
 - After a move, UpdateActionVisuals takes 304+ ms to execute
@@ -507,6 +508,7 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 - - - will contain list of base actions as a list of scriptable objects
 - - - if I ever make the "body mod upgrades" thing, then a list of the unit's "inventory" of body mods/upgrades
 - - - - - - List of scriptable objects for the body mods to then add to the unit's "inventory" or something?
+- - - create a generic "unit" prefab that all this is applied to?
 - Each Action will have its scriptable object container thing as well
 - - - fill out the attributes of the action, if there are any
 - - - when unit is spawned, it will build out its available actions based on the list of scrtiple object actions it has
@@ -520,6 +522,8 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 - - - For each team, have a list of the unit scriptable objects to spawn for each team
 - - - determine spawn location
 - - - - - - have player select their spawn location within a set number of allowed "spaces"?
+- - - - - - for the CPU units, have pre-defined spots for spawning?
+
 
 ### Next Steps to focus on:
 x Add a "Look At" action

@@ -10,33 +10,19 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     [Header("FOV Parameters")]
     [SerializeField] private int _rayCount = 50;
     [SerializeField] private float _fov = 90f;
-    //[SerializeField] private MeshFilter _meshFilter;
-    private int _frameCounter = 0;
 
     
     [Header("Raycast stuff?")]
-    [SerializeField] private LayerMask _blockingLayer;
-    [SerializeField] private List<LayerMask> _blockingLayers = new List<LayerMask>();
     [SerializeField] private LayerMask _obstacleLayer;
     [SerializeField] private LayerMask _unitLayer;
     private Vector3 _origin = Vector3.zero;
     private float _startingAngle = 0f;
     private float _aimDirectionAngle = 0f;
     [SerializeField] private Vector2 _aimDirectionVector = Vector2.zero;
-    [SerializeField] private float _circleCastRadius = 0.2f;
 
 
     [Header("Unit movement and other triggers for mesh creation")]
     [SerializeField] private bool _isMoving = false;
-
-    //[Header("FOV Materials and appearance")]
-    //[SerializeField] private MeshRenderer _meshRenderer;
-    //[SerializeField] private Material _friendlyFOVMaterial;
-    //[SerializeField] private Material _enemyFOVMaterial;
-    //private Mesh _mesh;
-
-    //[Header("Colliders and stuff")]
-    //[SerializeField] private PolygonCollider2D _collider;
 
     [Header("Visibile Units")]
     [SerializeField] private List<BombRunUnit> _visibleUnits = new List<BombRunUnit>();
@@ -45,15 +31,11 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
     private void Awake()
     {
-        //if (_meshFilter == null)
-        //    this._meshFilter = this.GetComponent<MeshFilter>();
         if (_unit == null)
             this._unit = this.transform.parent.GetComponent<BombRunUnit>();
     }
     private void Start()
     {
-        //_mesh = new Mesh();
-        //_meshFilter.mesh = _mesh;
 
         // subscribe to events?
         _unit.OnActionDirectionChanged += Unit_OnActionDirectionChanged;
@@ -84,12 +66,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     }
     public void InitializeFOV()
     {
-        //_mesh = new Mesh();
-        //_meshFilter.mesh = _mesh;
-
-        //SetFOVMaterial(_unit.IsEnemy());
         SetAimDirection(_unit.GetActionDirection());
-        //UpdateFOVMesh();
         if(isActiveAndEnabled)
             StartCoroutine(DelayForWallCollidersToSpawn(0.25f));
     }
@@ -98,21 +75,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         yield return new WaitForSeconds(waitTime);
         //Debug.Log("DelayForWallCollidersToSpawn: waited for " + waitTime);
-        //UpdateFOVMesh();
         GetVisibileGridPositions();
     }
-    //private void SetFOVMaterial(bool isEnemy)
-    //{
-    //    if (isEnemy)
-    //    {
-    //        _meshRenderer.material = _enemyFOVMaterial;
-    //    }
-    //    else
-    //    {
-    //        _meshRenderer.material = _friendlyFOVMaterial;
-    //    }
-
-    //}
     private void MoveAction_OnStartMoving(object sender, EventArgs e)
     {
         _isMoving = true;
@@ -124,7 +88,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     private void LevelGrid_OnWallsAndFloorsPlacedCompleted(object sender, EventArgs e)
     {
         Debug.Log("LevelGrid_OnWallsAndFloorsPlacedCompleted: " + _unit.name);
-        //UpdateFOVMesh();
         GetVisibileGridPositions();
     }
     private void LateUpdate()
@@ -132,196 +95,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         if (!_isMoving)
             return;
-        //UpdateFOVMesh();
-        //if (_frameCounter == 0)
-        //{
-        //    UpdateFOVMesh();
-        //}
-        //if (_frameCounter >= 2)
-        //{
-        //    _frameCounter = 0;
-        //    return;
-        //}
-        //_frameCounter++;
         
     }
-    //private void UpdateFOVMeshWithGridPositions(List<GridPosition> gridPositions)
-    //{
-    //    // setup field of view parameters
-    //    _origin = _unit.transform.position;
-
-    //    // initialize the arrays
-    //    Vector3[] vertices = new Vector3[gridPositions.Count + 1 + 1];
-    //    Vector2[] uv = new Vector2[vertices.Length];
-    //    int[] triangles = new int[gridPositions.Count * 3];
-
-    //    // initialize polygon collider points array
-    //    Vector2[] polygonColliderPoints = new Vector2[gridPositions.Count + 1 + 1];
-
-    //    // set the origin
-    //    vertices[0] = _origin;
-    //    polygonColliderPoints[0] = _origin;
-
-    //    // cycle through rays and add new vertex
-    //    int vertexIndex = 1;
-    //    int triangleIndex = 0;
-
-    //    // cycle through the grid positions, add vertex for the grid position?
-    //    if (gridPositions.Count > 0)
-    //    {
-    //        for (int i = 0; i <= gridPositions.Count; i++)
-    //        {
-    //            Vector3 vertex = LevelGrid.Instance.GetWorldPosition(gridPositions[i]);
-
-
-    //            vertices[vertexIndex] = vertex;
-    //            polygonColliderPoints[vertexIndex] = vertex;
-
-    //            if (i > 0)
-    //            {
-    //                // set the points of the triangle
-    //                triangles[triangleIndex + 0] = 0;
-    //                triangles[triangleIndex + 1] = vertexIndex - 1;
-    //                triangles[triangleIndex + 2] = vertexIndex;
-    //                // increase triangle index by 3, since we are adding 3 points every loop
-    //                triangleIndex += 3;
-    //            }
-
-    //            vertexIndex++;
-    //        }
-    //    }
-        
-
-    //    _mesh.vertices = vertices;
-    //    _mesh.uv = uv;
-    //    _mesh.triangles = triangles;
-    //    _mesh.bounds = new Bounds(_origin, Vector3.one * 500f);
-
-    //    this.transform.position = Vector3.zero;
-
-    //    _collider.SetPath(0, polygonColliderPoints);
-    //}
-    //private void UpdateFOVMesh()
-    //{
-    //    // setup field of view parameters
-    //    _origin = _unit.transform.position;
-
-    //    // for testing: aim direction will be where mouse is relative to unit
-    //    float angle = _startingAngle;
-    //    float angleIncrease = _fov / _rayCount;
-    //    float viewDistance = _unit.GetSightRange() * LevelGrid.Instance.GetGridCellSize();
-
-    //    // initialize the arrays
-    //    Vector3[] vertices = new Vector3[_rayCount + 1 + 1];
-    //    Vector2[] uv = new Vector2[vertices.Length];
-    //    int[] triangles = new int[_rayCount * 3];
-
-    //    // initialize polygon collider points array
-    //    Vector2[] polygonColliderPoints = new Vector2[_rayCount + 1 + 1];
-
-    //    // set the origin
-    //    vertices[0] = _origin;
-    //    polygonColliderPoints[0] = _origin;
-
-    //    // cycle through rays and add new vertex
-    //    int vertexIndex = 1;
-    //    int triangleIndex = 0;
-
-    //    // track spotted goblins
-    //    List<BombRunUnit> spottedEnemyUnits = new List<BombRunUnit>();
-    //    for (int i = 0; i <= _rayCount; i++)
-    //    {
-    //        //Debug.Log("FieldOfView: Vertex index: " + vertexIndex.ToString() + " with max verticies: " + vertices.Length.ToString() + " for unit: " + _unit.name);
-    //        Vector3 vectorFromAngle = GetVectorFromAngle(angle);
-    //        Vector3 vertex = _origin + vectorFromAngle * viewDistance;
-
-    //        float closestHitDistance = 0f;
-    //        bool firstIteration = true;
-    //        foreach (LayerMask layerMask in _blockingLayers)
-    //        {
-    //            // Change to a Physics2D.RaycastAll because if there is an obstacle you skip over, you'll want to see if there are any other obstacles behind that
-    //            // for collision with walls, just end the for loop after the first one?
-    //            RaycastHit2D[] raycastHits2D = Physics2D.RaycastAll(_origin, vectorFromAngle, viewDistance, layerMask);
-
-    //            if (raycastHits2D.Length == 0)
-    //                continue;
-
-    //            Vector3 hitPoint = vertex;
-    //            for (int j = 0; j < raycastHits2D.Length; j++)
-    //            {
-    //                if (raycastHits2D[j].collider.CompareTag("BombRunWall"))
-    //                {
-    //                    hitPoint = raycastHits2D[j].point;
-    //                    break;
-    //                }
-    //                if (raycastHits2D[j].transform.TryGetComponent<BaseBombRunObstacle>(out BaseBombRunObstacle obstacle))
-    //                {
-    //                    if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
-    //                    {
-    //                        continue;
-    //                    }
-    //                    hitPoint = raycastHits2D[j].point;
-    //                    break;
-    //                }
-    //            }
-    //            float newDistance = Vector2.Distance(_origin, hitPoint);
-    //            if (firstIteration)
-    //            {
-    //                closestHitDistance = newDistance;
-    //                vertex = hitPoint;
-    //                firstIteration = false;
-    //                continue;
-    //            }
-    //            if (newDistance <= closestHitDistance)
-    //            {
-    //                closestHitDistance = newDistance;
-    //                vertex = hitPoint;
-    //            }
-
-    //        }
-
-    //        vertices[vertexIndex] = vertex;
-    //        polygonColliderPoints[vertexIndex] = vertex;
-
-    //        if (i > 0)
-    //        {
-    //            // set the points of the triangle
-    //            triangles[triangleIndex + 0] = 0;
-    //            triangles[triangleIndex + 1] = vertexIndex - 1;
-    //            triangles[triangleIndex + 2] = vertexIndex;
-    //            // increase triangle index by 3, since we are adding 3 points every loop
-    //            triangleIndex += 3;
-    //        }
-
-    //        // See if any enemy units were seen?
-    //        //spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
-    //        //if (_frameCounter > 10 || !_isMoving)
-    //        //    spottedEnemyUnits.AddRange(FindVisibleEnemyUnits(spottedEnemyUnits, _origin, vectorFromAngle, Vector2.Distance(_origin, vertex) - 0.1f)); // the -0.1f is to make it so the ray won't go all the way to this hit object? In event unit and obstacle are overlapping at exact point? idk
-    //        vertexIndex++;
-    //        // increase angle for next loop. subtract to go clockwise
-    //        angle -= angleIncrease;
-    //    }
-
-    //    // this ends up getting called way to often. Maybe have it so it's only called every so often?
-    //    // Have a list of units spotted while moving. while isMoving is true, check to see if you spotted any new units. If so, add to new unit list, and update the UnitVisibilityManager with just that one unit?
-    //    // when the unit stops moving, then submit to UnitCompletedFOVCheck? So it's only happening
-    //    //UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
-    //    //if (_frameCounter > 10 || !_isMoving)
-    //    //{
-    //    //    UnitVisibilityManager_BombRun.Instance.UnitCompletedFOVCheck(this._unit, spottedEnemyUnits);
-    //    //    _frameCounter = 0;
-    //    //}
-    //    //_frameCounter++;
-
-    //    _mesh.vertices = vertices;
-    //    _mesh.uv = uv;
-    //    _mesh.triangles = triangles;
-    //    _mesh.bounds = new Bounds(_origin, Vector3.one * 500f);
-
-    //    this.transform.position = Vector3.zero;
-
-    //    _collider.SetPath(0, polygonColliderPoints);
-    //}
     private List<BombRunUnit> FindVisibleEnemyUnits(List<BombRunUnit> alreadySpottedGoblins, Vector2 origin, Vector2 direction, float distance)
     {
         List<BombRunUnit> spottedGoblins = new List<BombRunUnit>();
@@ -352,7 +127,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         SetAimDirection(actionDirection);
         if (!_isMoving)
         {
-            //UpdateFOVMesh();
+            
         }
         GetVisibileGridPositions();
     }
@@ -389,13 +164,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         return n;
     }
-    //public bool IsPositionInFOVCollider(Vector3 position)
-    //{
-    //    return _collider.OverlapPoint(position);
-    //}
     public bool CanUnitSeeThisUnit(BombRunUnit unit)
     {
-        //return HasThisUnitSeenThisGridPosition(unit.GetGridPosition());
         // first check if this unit is defending. If it is, then do the checks to see if the unit has the correct angle to see a defending unit?
         bool canUnitSeeThisUnit = HasThisUnitSeenThisGridPosition(unit.GetGridPosition());
         if (canUnitSeeThisUnit)
@@ -406,16 +176,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
             }
         }
         return canUnitSeeThisUnit;
-        //if (_visibleUnits.Contains(unit))
-        //    return true;
-
-        //if (_visibleGridPositions.Contains(unit.GetGridPosition()))
-        //    return true;
-
-        //return false;
-
-        //bool canUnitSeePosition = CanUnitSeeGridPosition(unit.GetGridPosition());
-        //return canUnitSeePosition;
     }
     public bool HasThisUnitSeenThisGridPosition(GridPosition gridPosition)
     {
@@ -432,7 +192,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     public bool CanUnitSeeWorldPosition(Vector3 position)
     {
         //Debug.Log("CanUnitSeeWorldPosition: " + position.ToString());
-        //Vector3 unitPosition = _unit.transform.position;
         Vector3 unitPosition = LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition());
 
         // check distance to position. If it is greater than the unit's view distance, return false
@@ -446,13 +205,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         // check the angle from the player to the position. If it is outside of FOV, return false
         Vector3 directionToPosition = (position - unitPosition).normalized;
-        //SetAimDirection(_unit.GetActionDirection());
         Vector3 vectorFromAngle = GetVectorFromAngle(_aimDirectionAngle);
-        //Vector3 vectorFromAngle = GetVectorFromAngle(GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
-        //float angle = Vector3.Angle(_unit.GetActionDirection(), directionToPosition);
         float angle = Vector3.Angle(vectorFromAngle, directionToPosition);
-        //if (Vector3.Angle(GetVectorFromAngle(_startingAngle), directionToPosition) > _fov / 2f)
-        //if (Mathf.Abs(_startingAngle - GetAngleFromVectorFloat(directionToPosition)) > _fov / 2f)
+
         if (angle > _fov / 2f)
         {
             //Debug.Log("CanUnitSeeWorldPosition: " + this._unit.name + ": Position: " + position.ToString() + " is not in FOV: " + (_fov / 2f).ToString() + ":" + angle.ToString() + " starting angle: " + _startingAngle + " vector from starting angle: " + vectorFromAngle.ToString() + " unit action direction: " + _unit.GetActionDirection() + " angle from aim direction: " + GetAngleFromVectorFloat(_unit.GetActionDirection(), true));
@@ -651,50 +406,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
         return false;
     }
-    //
-    // OLD CORNER DETECTION BASED ON HOW SHOOT ACTION DID IT
-    //
-    //private bool DoesCornerHitStopVision(Vector2 unitPosition, Vector2 hitPoint, Vector2 centerOfCollider, Collider2D collider, Vector2 direction)
-    //{
-    //    //Debug.Log("DoesShotHitWallOrObstacle: Hit corner of a collider at: " + hits[i].point.ToString());
-    //    // check to see if the shoot direction is moving away or toward the center of the hit collider
-    //    // if moving toward center of collider, it is a direct hit
-    //    // if moving away from center of collider, might be glancing blow on corner to ignore?
-    //    Vector2 directionToCenterOfCollider = (centerOfCollider - hitPoint).normalized;
-    //    float angle = Vector2.Angle(directionToCenterOfCollider, direction);
-    //    //Debug.Log("DoesShotHitWallOrObstacle: Angle of corner hit: " + angle.ToString() + " hit point: " + hits[i].point + " shoot direction: " + shootDirection + " direction from hitpoint to collider center: " + directionToCenterOfCollider);
-
-    //    if (angle < 45f)
-    //    {
-    //        //Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving TOWARD the collider. Corner hit into the wall. Wall hit?");
-    //        return true;
-    //    }
-    //    else
-    //    {
-    //        //Debug.Log("DoesShotHitWallOrObstacle: angle indicates ray is moving AWAY from the collider. Glancing corner hit? Checking for surrounding colliders...");
-    //        RaycastHit2D[] circleCastHits = Physics2D.CircleCastAll(hitPoint, _circleCastRadius, Vector2.zero, 0f);
-    //        if (circleCastHits.Length > 0)
-    //        {
-    //            for (int i = 0; i < circleCastHits.Length; i++)
-    //            {
-    //                if (!circleCastHits[i].collider.CompareTag("BombRunWall") || !circleCastHits[i].collider.CompareTag("BombRunObstacle"))
-    //                    continue;
-
-    //                if (circleCastHits[i].collider != collider)
-    //                {
-    //                    //Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, but collider is near another collider. Should be blocked? Hit collider: " + hits[i].collider + " second collider: " + circleCastHits[z].collider.name);
-    //                    return true;
-    //                }
-    //            }
-    //        }
-    //        // if the code makes it here, no other collider was near the corner. Glancing blow to skip rest of checks with "continue?"    
-    //        //Debug.Log("DoesShotHitWallOrObstacle: Glancing cornder hit, AND no surrounding collider. Skipping this hit?");
-    //        return false;
-    //    }
-    //}
-    //
-    // OLD CORNER DETECTION BASED ON HOW SHOOT ACTION DID IT
-    //
     private bool DoesCornerHitStopVision(Vector2 unitPosition, Vector2 hitPoint, Vector2 centerOfCollider, Collider2D collider, Vector2 direction)
     {
         // move raycast along the line of sight direction by two pixels. if circle cast is no longer in a collider, it is a glancing blow?
@@ -717,26 +428,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 if (raycastHits[i].collider.CompareTag("BombRunObstacle"))
                 {
                     BaseBombRunObstacle obstacle = raycastHits[i].collider.GetComponent<BaseBombRunObstacle>();
-                    //if (obstacle.IsWalkable())
-                    //{
-                    //    continue;
-                    //}
-                    //else if (obstacle.GetObstacleCoverType() == ObstacleCoverType.None)
-                    //{
-                    //    continue;
-                    //}
-                    //else if (obstacle.GetObstacleCoverType() == ObstacleCoverType.Partial)
-                    //{
-                    //    if (_unit.GetUnitState() == UnitState.Defending)
-                    //    {
-                    //        DefendAction defendAction = (DefendAction)_unit.GetActionByActionType(ActionType.Defend);
-                    //        if (obstacle.GetGridPosition() == defendAction.GetPositionDefendingFrom())
-                    //        {
-                    //            return true;
-                    //        }
-                    //    }
-                    //    continue;
-                    //}
                     if (obstacle.IsWalkable() || obstacle.GetObstacleCoverType() != ObstacleCoverType.Full)
                     {
                         continue;
@@ -747,49 +438,11 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                         return true;
                     }
                 }
-                //else if(!raycastHits[i].collider.CompareTag("Floor") || raycastHits[i].collider.CompareTag("BombRunWall"))
-                //{
-                //    Debug.Log("DoesCornerHitStopVision: Hit non-obstacle collider at: " + hitPoint + " collider: " + raycastHits[i].collider.name + " collider layer?: " + raycastHits[i].collider.gameObject.layer);
-                //    return true;
-                //}
             }
         }
 
         return false;
     }
-    //private void OnTriggerEnter2D(Collider2D collision)
-    //{
-    //    if (collision.CompareTag("Goblin"))
-    //    {
-    //        BombRunUnit unit = collision.GetComponent<BombRunUnit>();
-    //        if (unit.IsEnemy() != this._unit.IsEnemy())
-    //        {
-    //            //Debug.Log("BombRunUnitFieldOfView: OnTriggerEnter2D: Enemy unity spotted. Enemy unit: " + unit.name + " Spotter: " + this._unit.name) ;
-    //            //UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
-    //            if (!_visibleUnits.Contains(unit))
-    //            {
-    //                //_visibleUnits.Add(unit);
-    //            }
-    //        }
-    //    }
-    //}
-    //private void OnTriggerExit2D(Collider2D collision)
-    //{
-    //    if (collision.CompareTag("Goblin"))
-    //    {
-    //        BombRunUnit unit = collision.GetComponent<BombRunUnit>();
-    //        if (unit.IsEnemy() != this._unit.IsEnemy())
-    //        {
-    //            //Debug.Log("BombRunUnitFieldOfView: OnTriggerExit2D: Enemy unity Left field of view. Enemy unit: " + unit.name + " Spotter: " + this._unit.name);
-    //            //UnitVisibilityManager_BombRun.Instance.RemoveUnitFromVisibilityList(unit);
-    //            //UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
-    //            if (_visibleUnits.Contains(unit))
-    //            {
-    //                //_visibleUnits.Remove(unit);
-    //            }
-    //        }
-    //    }
-    //}
     private void Unit_OnThisUnitMovedGridPosition(object sender, EventArgs e)
     {
         GetVisibileGridPositions();
@@ -803,13 +456,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         previousVisibileGridPositions.AddRange(_visibleGridPositions);
         _visibleGridPositions.Clear();
         _visibleVector2Positions.Clear();
-        //if (_visibleUnits.Count > 0)
-        //{
-        //    foreach (BombRunUnit unit in _visibleUnits)
-        //    {
-        //        UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
-        //    }
-        //}
+
         List<BombRunUnit> previouslyVisibleUnitsToRemoveFromVisibility = new List<BombRunUnit>();
         previouslyVisibleUnitsToRemoveFromVisibility.AddRange(_visibleUnits);
 
@@ -856,7 +503,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         {
             UnitVisibilityManager_BombRun.Instance.EnemyLeftObserverFOV(unit, this._unit);
         }
-        //UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions, previousVisibileGridPositions);
         UnitVisibilityManager_BombRun.Instance.UpdateTeamsVisibleGridPositions(this._unit, _visibleGridPositions, gridRadiusNotInView);
     }
     public bool IsUnitInvisibleFromDefending(BombRunUnit unit)
@@ -881,19 +527,6 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         return isUnitInvisibleFromDefending;
     }
-    //public bool IsDefendingGridPositionVisibile(GridPosition defendingUnitPosition, GridPosition defendingFromPosition, GridPosition seenFromPosition)
-    //{
-    //    bool isDefendingGridPositionVisible = false;
-    //    float angle = Vector3.Angle(defendDirection, diretionToTargetUnit);
-    //    Debug.Log("IsDefendingGridPositionVisibile: Angle between defending unit: " + unit.name + " (" + defendDirection.ToString() + ") and this unit: " + this._unit.name + " (" + diretionToTargetUnit.ToString() + ") is: " + angle.ToString());
-    //    if (angle < 90)
-    //    {
-    //        Debug.Log("IsDefendingGridPositionVisibile: " + unit.name + " is invisible to: " + this._unit.name + " because of defending?");
-    //        isDefendingGridPositionVisible = true;
-    //    }
-
-    //    return isDefendingGridPositionVisible;
-    //}
     public bool CanGridPositionSeeDefendingUnit(GridPosition gridPosition)
     {
         bool canGridPositionSeeDefendingUnit = true;

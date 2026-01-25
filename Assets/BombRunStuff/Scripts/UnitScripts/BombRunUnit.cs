@@ -251,20 +251,13 @@ public class BombRunUnit : MonoBehaviour
 
         OnActionTaken?.Invoke(this, action);
     }
+    public void SetIsEnemy(bool isEnemy)
+    {
+        this._isEnemy = isEnemy;
+    }
     public bool IsEnemy()
     {
         return _isEnemy;
-    }
-    public void Damage(int damage)
-    {
-        //Debug.Log("Damage: " + damage);
-        //_health -= damage;
-
-        //if (_health <= 0)
-        //{
-        //    KillUnit();
-        //}
-        _healthSystem.TakeDamage(damage);
     }
     public void DamageAllBodyParts()
     {
@@ -337,6 +330,10 @@ public class BombRunUnit : MonoBehaviour
     {
         return _healthSystem.GetHealth();
     }
+    public void SetUnitType(UnitType unitType)
+    {
+        _unitType = unitType;
+    }
     public UnitType GetUnitType()
     {
         return _unitType;
@@ -354,6 +351,10 @@ public class BombRunUnit : MonoBehaviour
         }
 
         _damageMode = damageMode;
+    }
+    public void SetUnitSightRange(int sightRange)
+    {
+        this._sightRange = sightRange;
     }
     public int GetSightRange()
     {
@@ -514,5 +515,9 @@ public class BombRunUnit : MonoBehaviour
 
         this._lastSeenAtGridPosition = this._gridPosition;
         this._lastSeenAtVector2Position = new Vector2Int(_gridPosition.x, _gridPosition.y);
+    }
+    public void SetUnitAnimatorController(RuntimeAnimatorController animatorController)
+    {
+        this._bombRunUnitAnimator.SetUnitAnimatorController(animatorController);
     }
 }

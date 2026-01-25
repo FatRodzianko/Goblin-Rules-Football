@@ -47,23 +47,6 @@ public class BombRunUnitHealthSystem : MonoBehaviour
         _health = _startingHealth;
         _maxHealth = _startingHealth;
     }
-    public void TakeDamage(int damageAmount)
-    {
-        //_health -= damageAmount;
-
-        if (_fullyFrozen)
-            TestUnFreezeBodyPart();
-        else
-            TestFreezeBodyPart();
-
-        OnTakeDamage?.Invoke(this, EventArgs.Empty);
-
-        if (_health <= 0)
-        {
-            _health = 0;
-            Die();
-        }
-    }
     public void TakeDamageToBodyPart(BodyPart bodyPart)
     {
         FreezeBodyPart(bodyPart);

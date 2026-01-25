@@ -33,16 +33,7 @@ public class BombRunUnitAnimator : MonoBehaviour
         {
             _unit = this.transform.parent.GetComponent<BombRunUnit>();
         }
-        //if (transform.parent.TryGetComponent<MoveAction>(out MoveAction moveAction))
-        //{
-        //    moveAction.OnStartMoving += MoveAction_OnStartMoving;
-        //    moveAction.OnStopMoving += MoveAction_OnStopMoving;
-        //}
-        //if (transform.parent.TryGetComponent<ShootAction>(out ShootAction shootAction))
-        //{
-        //    shootAction.OnStartShooting += ShootAction_OnStartShooting;
-        //    shootAction.OnStopShooting += ShootAction_OnStopShooting;
-        //}
+
         _unit.OnUnitVisibilityChanged += Unit_OnUnitVisibilityChanged;
         _unit.OnActionDirectionChanged += Unit_OnActionDirectionChanged;
         _spriteRenderer.RegisterSpriteChangeCallback(UnitSpriteChanged);
@@ -63,16 +54,7 @@ public class BombRunUnitAnimator : MonoBehaviour
 
     private void OnDisable()
     {
-        //if (transform.parent.TryGetComponent<MoveAction>(out MoveAction moveAction))
-        //{
-        //    moveAction.OnStartMoving -= MoveAction_OnStartMoving;
-        //    moveAction.OnStopMoving -= MoveAction_OnStopMoving;
-        //}
-        //if (transform.parent.TryGetComponent<ShootAction>(out ShootAction shootAction))
-        //{
-        //    shootAction.OnStartShooting -= ShootAction_OnStartShooting;
-        //    shootAction.OnStopShooting -= ShootAction_OnStopShooting;
-        //}
+
         
         _unit.OnUnitVisibilityChanged -= Unit_OnUnitVisibilityChanged;
         _unit.OnActionDirectionChanged -= Unit_OnActionDirectionChanged;
@@ -80,46 +62,17 @@ public class BombRunUnitAnimator : MonoBehaviour
         _spriteRenderer.UnregisterSpriteChangeCallback(UnitSpriteChanged);
     }
 
-    //private void MoveAction_OnStartMoving(object sender, EventArgs e)
-    //{
-    //    Debug.Log("MoveAction_OnStartMoving: " + _unit.name);
-    //    //_animator.SetBool("IsWalking", true);
-    //    _animator.SetTrigger("Walk");
-    //    this._unitAnimationState = UnitAnimationState.Moving;
-    //}
-    //private void MoveAction_OnStopMoving(object sender, EventArgs e)
-    //{
-    //    //_animator.SetBool("IsWalking", false);
-    //    _animator.SetTrigger("Idle");
-    //    if (_unitAnimationState == UnitAnimationState.Moving)
-    //    {
-    //        this._unitAnimationState = UnitAnimationState.Idle;
-    //    }
-    //}
+
     public void AttackAnimationComplete()
     {
         Debug.Log("BombRunUnitAnimator: AttackAnimationComplete");
-        //if (_unitAnimationState == UnitAnimationState.Shooting)
-        //{
-        //    this._unitAnimationState = UnitAnimationState.Idle;
-        //}
+
         _unit.SetUnitState(UnitState.Idle);
     }
-    //private void ShootAction_OnStopShooting(object sender, EventArgs e)
-    //{
-    //    Debug.Log("BombRunUnitAnimator: ShootAction_OnStopShooting");
-    //    if (_unitAnimationState == UnitAnimationState.Shooting)
-    //    {
-    //        this._unitAnimationState = UnitAnimationState.Idle;
-    //    }
-    //}
+
     private void Unit_OnUnitStateChanged(object sender, UnitState unitState)
     {
-        //if (unitState == UnitState.Idle && this._unitAnimationState != UnitAnimationState.Idle)
-        //{
-        //    // create animation for unit "losing" their defense position later? For now, just set to idle?
-        //    _animator.SetTrigger("Idle");
-        //}
+
         Debug.Log("Unit_OnUnitStateChanged: " + unitState.ToString());
         switch (unitState)
         {
@@ -154,7 +107,6 @@ public class BombRunUnitAnimator : MonoBehaviour
 
         shootProjectileScript.OnProjectileHitTarget += ShootProjectile_OnProjectileHitTarget;
 
-        //shootProjectileScript.Setup(shootAction.TargetUnit.GetWorldPosition());
         shootProjectileScript.Setup(shootAction.GetTargetUnitWorldPosition());
     }
 
@@ -189,11 +141,7 @@ public class BombRunUnitAnimator : MonoBehaviour
     }
     public void FlipSprite(bool flipSprite)
     {
-        //if (_spriteRenderer.flipX != flipSprite)
-        //{
-        //    _spriteRenderer.flipX = flipSprite;
-        //    _shootPoint.x = _shootPoint.x * -1;
-        //}
+
         Vector3 currentScale = this.transform.localScale;
         if ((currentScale.x < 0) != flipSprite)
         {
@@ -207,7 +155,6 @@ public class BombRunUnitAnimator : MonoBehaviour
     public bool GetSpriteFlipX()
     {
         return (this.transform.localScale.x < 0);
-        //return _spriteRenderer.flipX;
     }
     public void SetUnitVisibility(bool isVisible)
     {
@@ -233,5 +180,9 @@ public class BombRunUnitAnimator : MonoBehaviour
     public SpriteRenderer GetSpriteRenderer()
     {
         return _spriteRenderer;
+    }
+    public void SetUnitAnimatorController(RuntimeAnimatorController animatorController)
+    {
+        this._animator.runtimeAnimatorController = animatorController;
     }
 }

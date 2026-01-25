@@ -20,7 +20,7 @@ public class BombRunUnitWorldUI : MonoBehaviour
     [SerializeField] private TextMeshPro _actionPointsText;
 
     [Header("Health Bar (old)")]
-    [SerializeField] private Image _healthBarImage;
+    //[SerializeField] private Image _healthBarImage;
     [SerializeField] private BombRunUnitHealthSystem _healthSystem;
 
     [Header("Body Part Sprites")]
@@ -43,7 +43,6 @@ public class BombRunUnitWorldUI : MonoBehaviour
 
         ResetActionSymbolSprite();
         UpdateActionPointsText();
-        UpdateHealthBar();
     }
 
     
@@ -88,11 +87,7 @@ public class BombRunUnitWorldUI : MonoBehaviour
     }
     private void HealthSystem_OnTakeDamage(object sender, EventArgs e)
     {
-        UpdateHealthBar();
-    }
-    private void UpdateHealthBar()
-    {
-        _healthBarImage.fillAmount = _healthSystem.GetHealthPercentRemaining();
+        
     }
     private void HealthSystem_OnBodyPartFrozenStateChanged(object sender, BodyPart bodyPart)
     {
