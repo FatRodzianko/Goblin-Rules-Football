@@ -52646,6 +52646,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unitsToSpawn:
   - {fileID: 11400000, guid: 0acce8732825f0a44b168224b941aca7, type: 2}
+  - {fileID: 11400000, guid: a4cfeb454d50f304cb558336a875cbac, type: 2}
+  - {fileID: 11400000, guid: a4cfeb454d50f304cb558336a875cbac, type: 2}
   - {fileID: 11400000, guid: 0acce8732825f0a44b168224b941aca7, type: 2}
 --- !u!1001 &1842552396
 PrefabInstance:

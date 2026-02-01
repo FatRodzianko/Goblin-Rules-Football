@@ -504,8 +504,9 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 
 ### Create scriptable objects For Unit Types and Actions
 - Each "type" of unit will have a scriptable object, like "Base Unit," "Medic," etc.
-- - - units attributes will be built out from this scriptable object. also its sprites and stuff
-- - - will contain list of base actions as a list of scriptable objects
+- - x units attributes will be built out from this scriptable object. also its sprites and stuff
+- - x will contain list of base actions as a list of scriptable objects
+- - - - - x seems like I can't actually do this. Just use prefab variants with the different actions attached to the gameobject instead...
 - - - if I ever make the "body mod upgrades" thing, then a list of the unit's "inventory" of body mods/upgrades
 - - - - - - List of scriptable objects for the body mods to then add to the unit's "inventory" or something?
 - - - create a generic "unit" prefab that all this is applied to?
@@ -523,6 +524,17 @@ x Create some sort of "LevelInitializationManager," or whatever I name it, that 
 - - - determine spawn location
 - - - - - - have player select their spawn location within a set number of allowed "spaces"?
 - - - - - - for the CPU units, have pre-defined spots for spawning?
+
+- Have the player choose where to spawn
+- - - After the level initializer creates the grid and the spawns the tilemap, prompt player to spawn their units
+- - - Define an area of all positions a player can choose to spawn to. aka set the starting location
+- - - - - - make sure no fog of war blocking vision of the spawning area
+- - - user has list of units to spawn
+- - - - - - at first just have the player go through the list of units one at a time in sequential order to choose spawn location
+- - - - - - eventually show list of portraits to the side. Player clicks what unit they want to spawn
+- - - after a unit has been placed, they CAN be moved again
+- - - don't update unit vision / fog of war when spawning. Just use placeholder sprites until spawn locations are chosen
+- - - player confirms when they're done choosing spawn locations
 
 
 ### Next Steps to focus on:

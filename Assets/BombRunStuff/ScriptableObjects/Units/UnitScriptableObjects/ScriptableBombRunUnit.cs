@@ -9,7 +9,6 @@ public class ScriptableBombRunUnit : ScriptableObject
     [SerializeField] private UnitType _unitType;
     [SerializeField] private DamageMode _defaultDamageMode;
     [SerializeField] private int _sightRange;
-    //[SerializeField] private List<ScriptableBaseActions> _actionList = new List<ScriptableBaseActions>();
 
     [SerializeField] private RuntimeAnimatorController _animatorController;
 

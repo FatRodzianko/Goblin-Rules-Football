@@ -10,12 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe207e4e3c214cb46ab66b923e7df705, type: 3}
-  m_Name: BaseScriptableUnit
+  m_Name: MedicScriptableUnit
   m_EditorClassIdentifier: 
-  _unitPrefab: {fileID: 3344586741870958865, guid: 59481b5b44b87f4428bff04f96c7ed8d, type: 3}
-  _unitType: 0
-  _defaultDamageMode: 0
-  _sightRange: 10
-  _actionList:
-  - {fileID: 0}
+  _unitPrefab: {fileID: 4474029029155536354, guid: 5aefdcc9958df6c4d82d0e9dfb71beaa, type: 3}
+  _unitType: 1
+  _defaultDamageMode: 2
+  _sightRange: 7
   _animatorController: {fileID: 9100000, guid: 92673fe8c911b324f96104c8981826c9, type: 2}
