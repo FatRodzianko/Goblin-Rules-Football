@@ -8,23 +8,36 @@ public class BombRunUnitSpawner : MonoBehaviour
 
     private void Start()
     {
+        
+    }
+    public void SpawnUnits()
+    {
+        Debug.Log("BombRunUnitSpawner: SpawnUnits");
         int count = 0;
         foreach (ScriptableBombRunUnit unit in _unitsToSpawn)
         {
-            Transform unitTransform = Instantiate(unit.UnitPrefab());
-            BombRunUnit unitScript = unitTransform.GetComponent<BombRunUnit>();
-
-            unitScript.SetUnitType(unit.UnitType());
-            unitScript.SetDamageMode(unit.DamageMode());
-            unitScript.SetUnitSightRange(unit.SightRange());
-            unitScript.SetIsEnemy(count % 2 == 1);
-
-            unitTransform.position = new Vector3((count + 10) * 2, (count + 10) * 2, 0f);
-
-            unitTransform.gameObject.name = "TestSpawnUnit_" + count;
-
+            GridPosition gridPosition = new GridPosition((count + 10), (count + 10));
+            SpawnUnit(unit, gridPosition, count % 2 == 1, count);
             count++;
 
         }
+    }
+    private void SpawnUnit(ScriptableBombRunUnit unit, GridPosition gridPosition, bool isEnemy, int count = 0)
+    {
+        
+        Transform unitTransform = Instantiate(unit.UnitPrefab());
+        BombRunUnit unitScript = unitTransform.GetComponent<BombRunUnit>();
+
+        unitScript.SetUnitType(unit.UnitType());
+        unitScript.SetDamageMode(unit.DamageMode());
+        unitScript.SetUnitSightRange(unit.SightRange());
+        unitScript.SetIsEnemy(isEnemy);
+
+        unitTransform.position = LevelGrid.Instance.GetWorldPosition(gridPosition);
+        unitTransform.gameObject.name = "TestSpawnUnit_" + count;
+
+        Debug.Log("BombRunUnitSpawner: SpawnUnit: " + unitTransform.gameObject.name + " : " + gridPosition);
+
+        unitScript.InitializeBombRunUnit();
     }
 }

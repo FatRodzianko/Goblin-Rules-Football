@@ -7,11 +7,12 @@ public class BombRunUnitManager : MonoBehaviour
 {
     public static BombRunUnitManager Instance { get; private set; }
 
-    private List<BombRunUnit> _unitList = new List<BombRunUnit>();
+    private List<BombRunUnit> _allUnitList = new List<BombRunUnit>();
     [SerializeField] private List<BombRunUnit> _friendlyUnitList = new List<BombRunUnit>();
     [SerializeField] private List<BombRunUnit> _enemyUnitList = new List<BombRunUnit>();
 
     [SerializeField] private BombRunUnitActionValueManager _bombRunUnitActionValueManager;
+    [SerializeField] private BombRunUnitSpawner _unitSpawner;
 
     private void Awake()
     {
@@ -39,9 +40,14 @@ public class BombRunUnitManager : MonoBehaviour
     }
     public void InitializeBombRunUnits()
     {
+        Debug.Log("BombRunUnitManager: InitializeBombRunUnits");
         // Place holder for now. In a real game the units would be spawned from level parameters. Right now, just find the units that exist in the scene, then "initialize" them
-        //SpawnUnits();
-        FindAndInitializeAllUnits();
+        SpawnUnits();
+        //FindAndInitializeAllUnits();
+    }
+    private void SpawnUnits()
+    {
+        _unitSpawner.SpawnUnits();
     }
     private void FindAndInitializeAllUnits()
     {
@@ -60,9 +66,9 @@ public class BombRunUnitManager : MonoBehaviour
     {
         BombRunUnit unit = sender as BombRunUnit;
 
-        if (!_unitList.Contains(unit))
+        if (!_allUnitList.Contains(unit))
         {
-            _unitList.Add(unit);
+            _allUnitList.Add(unit);
         }
 
         if (unit.IsEnemy())
@@ -84,9 +90,9 @@ public class BombRunUnitManager : MonoBehaviour
     {
         BombRunUnit unit = sender as BombRunUnit;
 
-        if (_unitList.Contains(unit))
+        if (_allUnitList.Contains(unit))
         {
-            _unitList.Remove(unit);
+            _allUnitList.Remove(unit);
         }
 
         if (unit.IsEnemy())
@@ -104,9 +110,9 @@ public class BombRunUnitManager : MonoBehaviour
             }
         }
     }
-    public List<BombRunUnit> GetUnitList()
+    public List<BombRunUnit> GetAllUnitList()
     {
-        return _unitList;
+        return _allUnitList;
     }
     public List<BombRunUnit> GetFriendlyUnitList()
     {

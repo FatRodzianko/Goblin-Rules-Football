@@ -39,13 +39,17 @@ public class BombRunUnitAnimator : MonoBehaviour
         _spriteRenderer.RegisterSpriteChangeCallback(UnitSpriteChanged);
         _unit.OnUnitStateChanged += Unit_OnUnitStateChanged;
 
-
-
         this._unitAnimationState = UnitAnimationState.Idle;
     }
+    private void Start()
+    {
 
-    
-
+    }
+    public void InitializeUnitSprite()
+    {
+        //Debug.Log("InitializeUnitSprite: " + this._spriteRenderer.sprite.name);
+        UnitSpriteChanged(this._spriteRenderer);
+    }
     private void UnitSpriteChanged(SpriteRenderer spriteRenderer)
     {
         _spriteMask.sprite = spriteRenderer.sprite;

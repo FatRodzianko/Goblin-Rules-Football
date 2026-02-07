@@ -58,6 +58,16 @@ public class UnitActionSystem : MonoBehaviour
     }
     private void Update()
     {
+        // Change what happens on mouse click based on current game state? Or only have this work on the "Gameplay" game state?
+        switch (GameplayManager_BombRun.Instance.GameState())
+        {
+            case GameState_BombRun.None:
+                return;
+            case GameState_BombRun.InitializeWorld:
+                //return;
+                break;
+        }
+
         if (_isBusy)
             return;
         if (!TurnSystem.Instance.IsPlayerTurn())
@@ -106,6 +116,14 @@ public class UnitActionSystem : MonoBehaviour
 
         if (units.Count > 0)
         {
+            if (_selectedUnit == null)
+            {
+                if (units.Any(x => !x.IsEnemy()))
+                {
+                    SetSelectedUnit(units.First(x => !x.IsEnemy()));
+                    return true;
+                }
+            }
             // don't re-select the unit if it is already selected
             if (_selectedUnit == units[0])
             {

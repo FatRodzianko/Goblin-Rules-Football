@@ -135,13 +135,19 @@ public class BombRunUnit : MonoBehaviour
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         _healthSystem.OnDead += HealthSystem_OnDead;
 
+        _bombRunUnitAnimator.InitializeUnitSprite();
+
         // hide unit to start?
-        this.SetUnitVisibility(!this._isEnemy);
+        //this.SetUnitVisibility(!this._isEnemy);       
 
 
-        _bombRunUnitFieldOfView.InitializeFOV();
+        //_bombRunUnitFieldOfView.InitializeFOV();
 
         OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
+    }
+    public void InitializeFOV()
+    {
+        _bombRunUnitFieldOfView.InitializeFOV();
     }
     private void Update()
     {
