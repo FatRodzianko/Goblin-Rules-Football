@@ -37,11 +37,11 @@ public class PlayerMessageManager_BombRun : MonoBehaviour
         }
         Instance = this;
     }
-    public void PromptPlayerToChooseUnitSpawnLocations()
-    {
-        ShowGamePromptForPlayer("Choose Spawn Location For Your Units", 0f);
-    }
-    private void ShowGamePromptForPlayer(string message, float duration)
+    //public void PromptPlayerToChooseUnitSpawnLocations()
+    //{
+    //    ShowGamePromptForPlayer("Choose Spawn Location For Your Units", 0f);
+    //}
+    public void ShowGamePromptForPlayer(string message, float duration)
     {
         OnShowGamePromptForPlayer?.Invoke(this, new PlayerMeassgeEventArgs_BombRun(message, duration));
     }

@@ -19,10 +19,10 @@ public class PlayerMessage_GamePromptsUI : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            HideGamePromptUI();
-        }
+        //if (Input.GetKeyDown(KeyCode.K))
+        //{
+        //    HideGamePromptUI();
+        //}
     }
 
     private void OnDisable()
@@ -39,7 +39,8 @@ public class PlayerMessage_GamePromptsUI : MonoBehaviour
     }
     private void PlayerMessageManager_BombRun_OnHideGamePromptForPlayer(object sender, EventArgs e)
     {
-        HideGamePromptUI();    }
+        HideGamePromptUI();    
+    }
     private void HideGamePromptUI()
     {
         _backgroundImage.gameObject.SetActive(false);

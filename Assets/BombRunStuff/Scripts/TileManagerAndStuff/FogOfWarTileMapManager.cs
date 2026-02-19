@@ -45,6 +45,8 @@ public class FogOfWarTileMapManager : MonoBehaviour
         UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToEnemy += UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToEnemy;
 
         UnitVisibilityManager_BombRun.Instance.OnEnemyFovVisibleChanged += UnitVisibilityManager_BombRun_OnEnemyFovVisibleChanged;
+
+        LevelGrid.Instance.OnValidSpawnPositionsDefined += LevelGrid_OnValidSpawnPositionsDefined;
     }
 
     
@@ -60,7 +62,12 @@ public class FogOfWarTileMapManager : MonoBehaviour
         UnitVisibilityManager_BombRun.Instance.OnMakeGridPositionNotVisibleToEnemy -= UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToEnemy;
 
         UnitVisibilityManager_BombRun.Instance.OnEnemyFovVisibleChanged -= UnitVisibilityManager_BombRun_OnEnemyFovVisibleChanged;
+
+        LevelGrid.Instance.OnValidSpawnPositionsDefined -= LevelGrid_OnValidSpawnPositionsDefined;
     }
+
+    
+
     private void UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer(object sender, GridPosition e)
     {
         _blackoutFogOfWarTileMap.SetTile(new Vector3Int(e.x, e.y, 0), null);
@@ -95,6 +102,14 @@ public class FogOfWarTileMapManager : MonoBehaviour
                 continue;
 
             _enemyFogOfWarTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _enemyVisibleGridTile);
+        }
+    }
+    private void LevelGrid_OnValidSpawnPositionsDefined(object sender, EventArgs e)
+    {
+        foreach (GridPosition gridPosition in LevelGrid.Instance.GetValidSpawnPositions())
+        {
+            _blackoutFogOfWarTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), null);
+            _greyedOutFogOfWarTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _fogOfWarTile);
         }
     }
 }

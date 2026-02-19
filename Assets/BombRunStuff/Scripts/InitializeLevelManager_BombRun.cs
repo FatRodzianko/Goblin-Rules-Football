@@ -10,6 +10,9 @@ public class InitializeLevelManager_BombRun : MonoBehaviour
 
     // static events
     public static event EventHandler OnInitializationBegin;
+    public static event EventHandler OnInitializationEnd;
+    public static event EventHandler OnSetSpawnSetSpawnLocationBegin;
+
     private void Awake()
     {
         MakeInstance();
@@ -31,9 +34,7 @@ public class InitializeLevelManager_BombRun : MonoBehaviour
         // create the grid system
         LevelGrid.Instance.CreateLevelGrid();
 
-        Debug.Log("InitializeLevelManager_BombRun: LevelGrid GridSystem created");
-
-        
+        Debug.Log("InitializeLevelManager_BombRun: LevelGrid GridSystem created");        
 
         // Set the tiles on the tile maps
         //LevelGrid.Instance.SetTilesOnTileMaps();
@@ -51,13 +52,17 @@ public class InitializeLevelManager_BombRun : MonoBehaviour
         ActionGridVisualManager.Instance.InitializeActionGridVisualManager();
         Debug.Log("InitializeLevelManager_BombRun: ActionGridVisualManager action grid visuals initialized");
 
-        // Prompt player to choose pawn location for units
-        PlayerMessageManager_BombRun.Instance.PromptPlayerToChooseUnitSpawnLocations();
+        OnInitializationEnd?.Invoke(this, EventArgs.Empty);
 
-        // "Spawn" all the units for the map
-        BombRunUnitManager.Instance.InitializeBombRunUnits();
 
-        // Update visibility for all units? Calculate their current FOVs and what they can see?
-        UnitVisibilityManager_BombRun.Instance.InitializeFOVForAllUnits(BombRunUnitManager.Instance.GetAllUnitList());
+        //// Prompt player to choose pawn location for units
+        ////PlayerMessageManager_BombRun.Instance.PromptPlayerToChooseUnitSpawnLocations();
+        //OnSetSpawnSetSpawnLocationBegin?.Invoke(this, EventArgs.Empty);
+
+        //// "Spawn" all the units for the map
+        //BombRunUnitManager.Instance.InitializeBombRunUnits();
+
+        //// Update visibility for all units? Calculate their current FOVs and what they can see?
+        //UnitVisibilityManager_BombRun.Instance.InitializeFOVForAllUnits(BombRunUnitManager.Instance.GetAllUnitList());
     }
 }

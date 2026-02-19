@@ -24,7 +24,15 @@ public class GameplayManager_BombRun : MonoBehaviour
         MakeInstance();
 
         InitializeLevelManager_BombRun.OnInitializationBegin += InitializeLevelManager_BombRun_OnInitializationBegin;
-    }   
+        InitializeLevelManager_BombRun.OnInitializationEnd += InitializeLevelManager_BombRun_OnInitializationEnd;
+    }
+    private void OnDisable()
+    {
+        InitializeLevelManager_BombRun.OnInitializationBegin -= InitializeLevelManager_BombRun_OnInitializationBegin;
+        InitializeLevelManager_BombRun.OnInitializationEnd -= InitializeLevelManager_BombRun_OnInitializationEnd;
+    }
+
+    
 
     void MakeInstance()
     {
@@ -43,6 +51,11 @@ public class GameplayManager_BombRun : MonoBehaviour
     private void InitializeLevelManager_BombRun_OnInitializationBegin(object sender, EventArgs e)
     {
         _gameState = GameState_BombRun.InitializeWorld;
+        OnGameStateChanged?.Invoke(this, _gameState);
+    }
+    private void InitializeLevelManager_BombRun_OnInitializationEnd(object sender, EventArgs e)
+    {
+        _gameState = GameState_BombRun.SetSpawnLocation;
         OnGameStateChanged?.Invoke(this, _gameState);
     }
 }

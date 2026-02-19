@@ -112,6 +112,73 @@ public class UnitActionSystem : MonoBehaviour
         if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
             return false;
 
+        switch (GameplayManager_BombRun.Instance.GameState())
+        {
+            case GameState_BombRun.None:
+                return false;
+            case GameState_BombRun.InitializeWorld:
+                return false;
+            case GameState_BombRun.SetSpawnLocation:
+                return TryHandleSelectGridPosition_SetSpawnLocation(mouseGridPosition);
+            case GameState_BombRun.Gameplay:
+                return TryHandleSelectGridPosition_Gameplay(mouseGridPosition);
+
+        }
+
+        return false;
+        //List<BombRunUnit> units = LevelGrid.Instance.GetUnitListAtGridPosition(mouseGridPosition);
+
+        //if (units.Count > 0)
+        //{
+        //    if (_selectedUnit == null)
+        //    {
+        //        if (units.Any(x => !x.IsEnemy()))
+        //        {
+        //            SetSelectedUnit(units.First(x => !x.IsEnemy()));
+        //            return true;
+        //        }
+        //    }
+        //    // don't re-select the unit if it is already selected
+        //    if (_selectedUnit == units[0])
+        //    {
+        //        return false;
+        //    }
+
+        //    if (units.Any(x => x.IsEnemy() != _selectedUnit.IsEnemy()))
+        //    {
+        //        Debug.Log("TryHandleSelectGridPosition: Clicked on Enemy Unit");
+        //        return false;
+        //    }
+
+
+        //    // later will need to check if multiple units are on a grid position. If so, expand those units to allow player to select individual units?
+        //    Debug.Log("TryHandleSelectGridPosition: Clicked on Friendly Unit");
+        //    if (_selectedAction != null)
+        //    {
+        //        if (_selectedAction.CanTargetFriendlyUnits())
+        //        {
+        //            if (_selectedAction.IsValidActionGridPosition(mouseGridPosition))
+        //            {
+        //                return false;
+        //            }
+                    
+        //        }
+        //    }
+            
+        //    SetSelectedUnit(units[0]);
+        //    return true;
+        //}
+        //else
+        //{
+        //    return false;
+        //}
+    }
+    private bool TryHandleSelectGridPosition_SetSpawnLocation(GridPosition mouseGridPosition)
+    {
+        return false;
+    }
+    private bool TryHandleSelectGridPosition_Gameplay(GridPosition mouseGridPosition)
+    {
         List<BombRunUnit> units = LevelGrid.Instance.GetUnitListAtGridPosition(mouseGridPosition);
 
         if (units.Count > 0)
@@ -147,10 +214,10 @@ public class UnitActionSystem : MonoBehaviour
                     {
                         return false;
                     }
-                    
+
                 }
             }
-            
+
             SetSelectedUnit(units[0]);
             return true;
         }

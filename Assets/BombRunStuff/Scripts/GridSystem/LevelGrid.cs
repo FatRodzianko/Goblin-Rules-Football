@@ -19,10 +19,14 @@ public class LevelGrid : MonoBehaviour
 
     [SerializeField] private int _pathFindingDistanceMultiplier;
 
+    private List<GridPosition> _validSpawnPositions = new List<GridPosition>();
+
 
     // events
     public event EventHandler OnAnyUnitMovedGridPosition;
     public event EventHandler OnWallsAndFloorsPlacedCompleted;
+
+    public event EventHandler OnValidSpawnPositionsDefined;
 
     private void Awake()
     {
@@ -63,12 +67,18 @@ public class LevelGrid : MonoBehaviour
     {
         UnitVisibilityManager_BombRun.OnMakeGridPositionVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
         UnitVisibilityManager_BombRun.OnMakeGridPositionNotVisibleToPlayer += UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
+
+        GameplayManager_BombRun.OnGameStateChanged += GameplayManager_BombRun_OnGameStateChanged;
     }
     private void OnDisable()
     {
         UnitVisibilityManager_BombRun.OnMakeGridPositionVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionVisibleToPlayer;
         UnitVisibilityManager_BombRun.OnMakeGridPositionNotVisibleToPlayer -= UnitVisibilityManager_BombRun_OnMakeGridPositionNotVisibleToPlayer;
+
+        GameplayManager_BombRun.OnGameStateChanged -= GameplayManager_BombRun_OnGameStateChanged;
     }
+
+    
 
     public void CreateLevelGrid()
     {
@@ -307,5 +317,58 @@ public class LevelGrid : MonoBehaviour
     public GridObject GetGridObjectAtPosition(GridPosition gridPosition)
     {
         return _gridSystem.GetGridObject(gridPosition);
+    }
+    private void GameplayManager_BombRun_OnGameStateChanged(object sender, GameState_BombRun gameState)
+    {
+        switch (gameState)
+        {
+            case GameState_BombRun.SetSpawnLocation:
+                DefineValidSpawnLocations();
+                break;
+        }
+    }
+    private void DefineValidSpawnLocations()
+    {
+        Debug.Log("LevelGrid: DefineValidSpawnLocations");
+        for (int x = 0; x < 10; x++)
+        {
+            for (int y = 0; y < 10; y++)
+            {
+                GridPosition gridPosition = new GridPosition(x, y);
+                //_validSpawnPositions.Add(gridPosition);
+
+                if (x == 0 || y == 0)
+                {
+                    _validSpawnPositions.Add(gridPosition);
+                }
+                else if (x == 1 && y == 1)
+                {
+                    _validSpawnPositions.Add(gridPosition);
+                }
+                else if (!HasWallOnGridPosition(gridPosition) && !HasAnyObstacleOnGridPosition(gridPosition))
+                {
+                    if (PathFinding.Instance.HasPath(new GridPosition(1, 1), gridPosition, out int pathLength, 22))
+                    {
+                        _validSpawnPositions.Add(gridPosition);
+                    }
+                    
+                }
+                else
+                {
+                    _validSpawnPositions.Add(gridPosition);
+                }
+                //else if (PathFinding.Instance.HasPath(new GridPosition(1, 1), gridPosition, out int pathLength, 20))
+                //{
+                //    _validSpawnPositions.Add(gridPosition);
+                //}
+
+            }
+        }
+
+        OnValidSpawnPositionsDefined?.Invoke(this, EventArgs.Empty);
+    }
+    public List<GridPosition> GetValidSpawnPositions()
+    {
+        return _validSpawnPositions;
     }
 }
