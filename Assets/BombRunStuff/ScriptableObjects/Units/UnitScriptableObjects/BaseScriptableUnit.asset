@@ -15,7 +15,5 @@ MonoBehaviour:
   _unitPrefab: {fileID: 3344586741870958865, guid: 59481b5b44b87f4428bff04f96c7ed8d, type: 3}
   _unitType: 0
   _defaultDamageMode: 0
-  _sightRange: 10
-  _actionList:
-  - {fileID: 0}
+  _sightRange: 4
   _animatorController: {fileID: 9100000, guid: 92673fe8c911b324f96104c8981826c9, type: 2}

@@ -29,6 +29,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     private List<GridPosition> _visibleGridPositions = new List<GridPosition>();
     [SerializeField] private List<Vector2> _visibleVector2Positions = new List<Vector2>();
 
+    [SerializeField] private bool _isGameplayMode = false;
+
     private void Awake()
     {
         if (_unit == null)
@@ -48,6 +50,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
         LevelGrid.Instance.OnWallsAndFloorsPlacedCompleted += LevelGrid_OnWallsAndFloorsPlacedCompleted;
         BaseBombRunObstacle.OnAnyObstacleCoverTypeChanged += BombRunObstacle_OnAnyObstacleCoverTypeChanged;
+
+        GameplayManager_BombRun.OnGameStateChanged += GameplayManager_BombRun_OnGameStateChanged;
     }
 
     
@@ -63,7 +67,22 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         }
         LevelGrid.Instance.OnWallsAndFloorsPlacedCompleted -= LevelGrid_OnWallsAndFloorsPlacedCompleted;
         BaseBombRunObstacle.OnAnyObstacleCoverTypeChanged -= BombRunObstacle_OnAnyObstacleCoverTypeChanged;
+
+        GameplayManager_BombRun.OnGameStateChanged -= GameplayManager_BombRun_OnGameStateChanged;
     }
+
+    private void GameplayManager_BombRun_OnGameStateChanged(object sender, GameState_BombRun gameState)
+    {
+        if (gameState == GameState_BombRun.Gameplay)
+        {
+            _isGameplayMode = true;
+        }
+        else
+        {
+            _isGameplayMode = false;
+        }
+    }
+
     public void InitializeFOV()
     {
         SetAimDirection(_unit.GetActionDirection());
@@ -449,6 +468,9 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     }
     private void GetVisibileGridPositions()
     {
+        if (!_isGameplayMode)
+            return;
+
         // Get all grid positions in radius around unit
         List<GridPosition> gridRadius = LevelGrid.Instance.GetGridPositionsInRadius(_unit.GetGridPosition(), _unit.GetSightRange());
 

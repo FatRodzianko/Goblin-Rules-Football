@@ -371,4 +371,8 @@ public class LevelGrid : MonoBehaviour
     {
         return _validSpawnPositions;
     }
+    public bool IsPositionAValidSpawnPosition(GridPosition position)
+    {
+        return _validSpawnPositions.Contains(position);
+    }
 }

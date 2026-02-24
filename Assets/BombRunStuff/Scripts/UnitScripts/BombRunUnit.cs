@@ -158,6 +158,7 @@ public class BombRunUnit : MonoBehaviour
             GridPosition oldGridPosition = _gridPosition;
             _gridPosition = newGridPosition;
             LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
+
             OnThisUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
             OnAnyUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
         }
@@ -525,5 +526,14 @@ public class BombRunUnit : MonoBehaviour
     public void SetUnitAnimatorController(RuntimeAnimatorController animatorController)
     {
         this._bombRunUnitAnimator.SetUnitAnimatorController(animatorController);
+    }
+    public void MoveUnitPosition(GridPosition gridPosition)
+    {
+        if (!LevelGrid.Instance.IsValidGridPosition(gridPosition))
+        {
+            return;
+        }
+        
+        this.transform.position = LevelGrid.Instance.GetWorldPosition(gridPosition);
     }
 }

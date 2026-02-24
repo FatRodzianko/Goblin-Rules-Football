@@ -25,10 +25,42 @@ public class TurnSystemUI : MonoBehaviour
         UpdateTurnText();
         UpdateEnemyTurnVisual();
         UpdateEndTurnButtonVisibility();
+
+        GameplayManager_BombRun.OnGameStateChanged += GameplayManager_BombRun_OnGameStateChanged;
     }
     private void OnDisable()
     {
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
+        GameplayManager_BombRun.OnGameStateChanged -= GameplayManager_BombRun_OnGameStateChanged;
+    }
+
+    private void GameplayManager_BombRun_OnGameStateChanged(object sender, GameState_BombRun gameState)
+    {
+        switch (gameState)
+        {
+            case GameState_BombRun.Gameplay:
+                ShowTurnUI();
+                break;
+            default:
+                HideTurnUI();
+                break;
+        }
+    }
+    private void HideTurnUI()
+    {
+        _turnNumberText.gameObject.SetActive(false);
+        _endTurnButton.gameObject.SetActive(false);
+        _enemyTurnVisualGameObject.SetActive(false);
+    }
+    private void ShowTurnUI()
+    {
+        _turnNumberText.gameObject.SetActive(true);
+        _endTurnButton.gameObject.SetActive(true);
+        _enemyTurnVisualGameObject.SetActive(true);
+
+        UpdateTurnText();
+        UpdateEnemyTurnVisual();
+        UpdateEndTurnButtonVisibility();
     }
     private void UpdateTurnText()
     {

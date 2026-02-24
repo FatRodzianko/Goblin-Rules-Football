@@ -602,11 +602,11 @@ x Add in the cover system for the "defend" action
 - - - - - x Have this get calculated by LevelGrid
 - - - - - - - - x Just hard code some positions for now? Like from 0,0 to 10,10 or something
 - - x Have the "fog of war" tiles removed for those "valid" grid positions so the player can see them
-- - - When player clicks on an empty grid position, and there is no "selected unit", spawn a unit there
-- - - - - - keep spawning units at grid positions until they have placed all units
-- - - If player clicks on a unit, select that unit
-- - - - - - if a player clicks on a grid position AND has a selected unit, move the selected unit to that grid position
-- - - - - - - - - make sure a unit doesn't already exist at that position before moving them
+- - x When player clicks on an empty grid position, and there is no "selected unit", spawn a unit there
+- - - - - x keep spawning units at grid positions until they have placed all units
+- - x If player clicks on a unit, select that unit
+- - - - - x if a player clicks on a grid position AND has a selected unit, move the selected unit to that grid position
+- - - - - - - - x make sure a unit doesn't already exist at that position before moving them
 - - - Right click will deselect a unit, if any are
 - - - When a unit is placed, or moved, deselect any "selected" units. So the next click will be to either place a new unit or to select a new unit
 - - - After player has placed all units, prompt them to confirm unit spawn positions

@@ -25,6 +25,7 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler OnSelectedActionChanged;
     public event EventHandler<bool> OnBusyChanged;
     public event EventHandler OnActionStarted;
+    public event EventHandler<GridPosition> OnSpawnLocationSelected;
 
     private void Awake()
     {
@@ -81,10 +82,11 @@ public class UnitActionSystem : MonoBehaviour
         if (TryHandleSelectGridPosition())
         {
             return;
-        }            
+        }
 
-        HandleSelectedAction();
-        HandleCancelSelectedAction();
+        // moved to the TryHandleSelectGridPosition function for when TryHandleSelectGridPosition_Gameplay return false;
+        //HandleSelectedAction();
+        //HandleCancelSelectedAction();
     }
     private bool TryHandleUnitSelection()
     {
@@ -119,9 +121,26 @@ public class UnitActionSystem : MonoBehaviour
             case GameState_BombRun.InitializeWorld:
                 return false;
             case GameState_BombRun.SetSpawnLocation:
-                return TryHandleSelectGridPosition_SetSpawnLocation(mouseGridPosition);
+                if (TryHandleSelectGridPosition_SetSpawnLocation(mouseGridPosition))
+                {
+                    return true;
+                }
+                else
+                {
+                    OnPlayerClickInvalidPosition?.Invoke(this, EventArgs.Empty);
+                    return false;
+                } 
             case GameState_BombRun.Gameplay:
-                return TryHandleSelectGridPosition_Gameplay(mouseGridPosition);
+                if (TryHandleSelectGridPosition_Gameplay(mouseGridPosition))
+                {
+                    return true;
+                }
+                else
+                {
+                    HandleSelectedAction();
+                    HandleCancelSelectedAction();
+                }
+                break;
 
         }
 
@@ -175,6 +194,66 @@ public class UnitActionSystem : MonoBehaviour
     }
     private bool TryHandleSelectGridPosition_SetSpawnLocation(GridPosition mouseGridPosition)
     {
+        if (!LevelGrid.Instance.IsPositionAValidSpawnPosition(mouseGridPosition))
+        {
+            return false;
+        }
+        if (LevelGrid.Instance.HasWallOnGridPosition(mouseGridPosition))
+        {
+            return false;
+        }
+        if (LevelGrid.Instance.HasAnyObstacleOnGridPosition(mouseGridPosition))
+        {
+            return false;
+        }
+
+        if (LevelGrid.Instance.HasAnyUnitOnGridPosition(mouseGridPosition))
+        {
+            List<BombRunUnit> units = LevelGrid.Instance.GetUnitListAtGridPosition(mouseGridPosition);
+            if (units.Count > 0)
+            {
+                Debug.Log("TryHandleSelectGridPosition_SetSpawnLocation: Units at position: " + mouseGridPosition + "? Yes");
+                if (_selectedUnit == null)
+                {
+                    if (units.Any(x => !x.IsEnemy()))
+                    {
+                        SetSelectedUnit(units.First(x => !x.IsEnemy()));
+                        return true;
+                    }
+                }
+                // don't re-select the unit if it is already selected
+                if (_selectedUnit == units[0])
+                {
+                    return false;
+                }
+                if (units.Any(x => x.IsEnemy() != _selectedUnit.IsEnemy()))
+                {
+                    Debug.Log("TryHandleSelectGridPosition: Clicked on Enemy Unit");
+                    return false;
+                }
+            }
+            SetSelectedUnit(units[0]);
+            return true;
+        }
+        else
+        {
+            // if there is no unit on this grid position, check:
+            // if the player already has a selected unit. If not spawn unit at that position
+            if (_selectedUnit == null)
+            {
+                Debug.Log("TryHandleSelectGridPosition_SetSpawnLocation: No unit selected. Spawn unit at: " + mouseGridPosition);
+                OnSpawnLocationSelected?.Invoke(this, mouseGridPosition);
+                return true;
+                
+            }
+            // if player had a unit selected, move selected unit to this space
+            else
+            {
+                _selectedUnit.MoveUnitPosition(mouseGridPosition);
+                SetSelectedUnit(null);
+                return true;
+            }
+        }
         return false;
     }
     private bool TryHandleSelectGridPosition_Gameplay(GridPosition mouseGridPosition)
@@ -331,7 +410,7 @@ public class UnitActionSystem : MonoBehaviour
     private void SetSelectedUnit(BombRunUnit unit)
     {
         this._selectedUnit = unit;
-        if (_selectedUnit != null)
+        if (_selectedUnit != null && GameplayManager_BombRun.Instance.GameState() == GameState_BombRun.Gameplay)
         {
             SetSelectedAction(unit.GetAction<MoveAction>());
         }

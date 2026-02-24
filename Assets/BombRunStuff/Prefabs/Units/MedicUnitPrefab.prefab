@@ -51,6 +51,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3724573470053682306, guid: 59481b5b44b87f4428bff04f96c7ed8d, type: 3}
+      propertyPath: m_Color.b
+      value: 0.12156534
+      objectReference: {fileID: 0}
+    - target: {fileID: 3724573470053682306, guid: 59481b5b44b87f4428bff04f96c7ed8d, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3724573470053682306, guid: 59481b5b44b87f4428bff04f96c7ed8d, type: 3}
+      propertyPath: m_Color.r
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4849887093471726477, guid: 59481b5b44b87f4428bff04f96c7ed8d, type: 3}
       propertyPath: m_Name
       value: MedicUnitPrefab

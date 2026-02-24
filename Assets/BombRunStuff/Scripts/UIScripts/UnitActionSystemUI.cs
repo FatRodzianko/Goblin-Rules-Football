@@ -13,6 +13,8 @@ public class UnitActionSystemUI : MonoBehaviour
 
     private List<ActionButtonUI> _actionButtonUIList = new List<ActionButtonUI>();
 
+    private bool _isGameplayMode = false;
+
     private void Start()
     {
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
@@ -28,6 +30,8 @@ public class UnitActionSystemUI : MonoBehaviour
         BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
 
         BombRunUnitHealthSystem.OnAnyBodyPartFrozenStateChanged += BombRunUnitHealthSystem_OnAnyBodyPartFrozenStateChanged;
+
+        GameplayManager_BombRun.OnGameStateChanged += GameplayManager_BombRun_OnGameStateChanged;
 
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();
@@ -51,7 +55,22 @@ public class UnitActionSystemUI : MonoBehaviour
         BaseAction.OnAnyActionCompleted -= BaseAction_OnAnyActionCompleted;
 
         BombRunUnitHealthSystem.OnAnyBodyPartFrozenStateChanged -= BombRunUnitHealthSystem_OnAnyBodyPartFrozenStateChanged;
+
+        GameplayManager_BombRun.OnGameStateChanged -= GameplayManager_BombRun_OnGameStateChanged;
     }
+
+    private void GameplayManager_BombRun_OnGameStateChanged(object sender, GameState_BombRun gameState)
+    {
+        if (gameState == GameState_BombRun.Gameplay)
+        {
+            _isGameplayMode = true;
+        }
+        else
+        {
+            _isGameplayMode = false;
+        }
+    }
+
     private void CreateUnitActionButtons(BombRunUnit selectedUnit)
     {
         // destroy the old button game objects
@@ -103,6 +122,12 @@ public class UnitActionSystemUI : MonoBehaviour
         //CreateUnitActionButtons(unit);
         //UpdateSelectedActionVisual();
         //UpdateActionPoints();
+
+        if (!_isGameplayMode)
+        {
+            return;
+        }
+
         UpdateActionItems();
     }
     private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
