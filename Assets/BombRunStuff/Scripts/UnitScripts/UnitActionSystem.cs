@@ -83,6 +83,10 @@ public class UnitActionSystem : MonoBehaviour
         {
             return;
         }
+        if (TryHandleRightClickPressed())
+        {
+            return;
+        }
 
         // moved to the TryHandleSelectGridPosition function for when TryHandleSelectGridPosition_Gameplay return false;
         //HandleSelectedAction();
@@ -138,7 +142,7 @@ public class UnitActionSystem : MonoBehaviour
                 else
                 {
                     HandleSelectedAction();
-                    HandleCancelSelectedAction();
+                    //HandleCancelSelectedAction();
                 }
                 break;
 
@@ -305,6 +309,40 @@ public class UnitActionSystem : MonoBehaviour
             return false;
         }
     }
+    private bool TryHandleRightClickPressed()
+    {
+        if (InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
+        {
+            return false;
+        }
+
+        if (!InputManagerBombRun.Instance.IsRightMouseButtonDownThisFrame())
+        {
+            return false;
+        }
+
+        switch (GameplayManager_BombRun.Instance.GameState())
+        {
+            case GameState_BombRun.None:
+                return false;
+            case GameState_BombRun.InitializeWorld:
+                return false;
+            case GameState_BombRun.SetSpawnLocation:
+                if (TryHandleRightClickPressed_SetSpawnLocation())
+                {
+                    return true;
+                }
+                break;
+            case GameState_BombRun.Gameplay:
+                if (TryHandleRightClickPressed_Gameplay())
+                {
+                    return true;
+                }
+                break;
+        }
+
+        return false;
+    }
     private void HandleSelectedAction()
     {
         if (!InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
@@ -370,10 +408,7 @@ public class UnitActionSystem : MonoBehaviour
         {
             Debug.Log("HandleSelectedAction: " + _selectedAction.GetActionName() + " does not have a sub action.");
             _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
-        }
-
-
-        
+        }        
 
         OnActionStarted?.Invoke(this, EventArgs.Empty);
 
@@ -394,17 +429,33 @@ public class UnitActionSystem : MonoBehaviour
         //}
         
     }
-    private void HandleCancelSelectedAction()
+    private bool TryHandleRightClickPressed_SetSpawnLocation()
+    {
+        if (_selectedUnit != null)
+        {
+            SetSelectedUnit(null);
+            return true;
+        }
+        return false;
+    }
+    private bool TryHandleRightClickPressed_Gameplay()
+    {
+        if (HandleCancelSelectedAction())
+            return true;
+        return false;
+    }
+    private bool HandleCancelSelectedAction()
     {
         if (_selectedAction == null)
-            return;
+            return false;
         if (InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
-            return;
+            return false;
         if (!InputManagerBombRun.Instance.IsRightMouseButtonDownThisFrame())
-            return;
+            return false;
 
         // cancel the selected action by right clicking?
         SetSelectedAction(null);
+        return true;
 
     }
     private void SetSelectedUnit(BombRunUnit unit)
@@ -415,7 +466,7 @@ public class UnitActionSystem : MonoBehaviour
             SetSelectedAction(unit.GetAction<MoveAction>());
         }
         OnSelectedUnitChanged?.Invoke(this, _selectedUnit);
-        Debug.Log("SetSelectedUnit: " + unit);        
+        Debug.Log("SetSelectedUnit: " + unit);
     }
     public void SetSelectedAction(BaseAction baseAction)
     {

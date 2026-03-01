@@ -230,6 +230,7 @@ public class ShootAction : BaseAction
 
                 // checks for damage mode to use
                 DamageMode damageMode = _unit.GetDamageMode();
+                Debug.Log("Shoot Action: GetValidActionGridPositionList: " + _unit.name + " Damage mode: " + _unit.GetDamageMode());
                 if (specifyDamageMode)
                 {
                     damageMode = specifiedDamageMode;
@@ -251,7 +252,7 @@ public class ShootAction : BaseAction
                     // For enemy units, check if they are completely frozen? If so, skip?
                     if (testGridUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen() || damageMode == DamageMode.Heal)
                     {
-                        Debug.Log("Shoot Action: GetValidActionGridPositionList: all body parts frozen at: " + testGridPosition);
+                        Debug.Log("Shoot Action: GetValidActionGridPositionList: all body parts frozen? " + testGridUnit.GetUnitHealthSystem().AreAllBodyPartsFrozen() + " at: " + testGridPosition + " for unit: " + testGridUnit.name + " damage mode is: " + damageMode + " for this unit: " + _unit.name);
                         continue;
                     }
 
@@ -710,13 +711,14 @@ public class ShootAction : BaseAction
         BombRunUnit aiTarget = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         if (aiTarget == null)
         {
+            Debug.Log("GetEnemyAIAction: Shoot Action: aiTarget is null at: " + gridPosition);
             return new BombRunEnemyAIAction
             {
                 _GridPosition = gridPosition,
                 _ActionValue = 0,
             };
         }
-
+        Debug.Log("GetEnemyAIAction: Shoot Action: aiTarget is " + aiTarget.name + " at: " + gridPosition + " damage mode is: " + _unit.GetDamageMode() + " for: " + _unit.name);
         switch (_unit.GetDamageMode())
         {
             default:
@@ -747,6 +749,7 @@ public class ShootAction : BaseAction
         // for damage action, cannot target friendly unit
         if (aiTarget.IsEnemy() == this._unit.IsEnemy())
         {
+            Debug.Log("Shoot Action: DamageAIAction: GetEnemyAIAction: aiTarget is null for target at: " + gridPosition.ToString() + "");
             return new BombRunEnemyAIAction
             {
                 _GridPosition = gridPosition,

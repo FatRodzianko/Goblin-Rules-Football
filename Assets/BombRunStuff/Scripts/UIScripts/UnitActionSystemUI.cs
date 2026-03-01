@@ -13,7 +13,7 @@ public class UnitActionSystemUI : MonoBehaviour
 
     private List<ActionButtonUI> _actionButtonUIList = new List<ActionButtonUI>();
 
-    private bool _isGameplayMode = false;
+    [SerializeField] private bool _isGameplayMode = false;
 
     private void Start()
     {

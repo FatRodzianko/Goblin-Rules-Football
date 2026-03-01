@@ -35,6 +35,8 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         if (_unit == null)
             this._unit = this.transform.parent.GetComponent<BombRunUnit>();
+
+        GameplayManager_BombRun.OnGameStateChanged += GameplayManager_BombRun_OnGameStateChanged;
     }
     private void Start()
     {
@@ -51,7 +53,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         LevelGrid.Instance.OnWallsAndFloorsPlacedCompleted += LevelGrid_OnWallsAndFloorsPlacedCompleted;
         BaseBombRunObstacle.OnAnyObstacleCoverTypeChanged += BombRunObstacle_OnAnyObstacleCoverTypeChanged;
 
-        GameplayManager_BombRun.OnGameStateChanged += GameplayManager_BombRun_OnGameStateChanged;
+        
     }
 
     

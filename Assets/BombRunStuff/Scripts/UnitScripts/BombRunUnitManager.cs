@@ -7,7 +7,7 @@ public class BombRunUnitManager : MonoBehaviour
 {
     public static BombRunUnitManager Instance { get; private set; }
 
-    private List<BombRunUnit> _allUnitList = new List<BombRunUnit>();
+    [SerializeField] private List<BombRunUnit> _allUnitList = new List<BombRunUnit>();
     [SerializeField] private List<BombRunUnit> _friendlyUnitList = new List<BombRunUnit>();
     [SerializeField] private List<BombRunUnit> _enemyUnitList = new List<BombRunUnit>();
 
@@ -38,6 +38,9 @@ public class BombRunUnitManager : MonoBehaviour
         BombRunUnit.OnAnyUnitSpawned -= BombRunUnit_OnAnyUnitSpawned;
         BombRunUnit.OnAnyUnitDied -= BombRunUnit_OnAnyUnitDied;
     }
+
+    
+
     public void InitializeBombRunUnits()
     {
         Debug.Log("BombRunUnitManager: InitializeBombRunUnits");
@@ -110,6 +113,7 @@ public class BombRunUnitManager : MonoBehaviour
             }
         }
     }
+
     public List<BombRunUnit> GetAllUnitList()
     {
         return _allUnitList;
@@ -130,5 +134,6 @@ public class BombRunUnitManager : MonoBehaviour
     {
         return _bombRunUnitActionValueManager.GetUnitBodyPartActionValue(unitType, bodyPart);
     }
+
 }
 

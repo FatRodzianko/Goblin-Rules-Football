@@ -26,13 +26,17 @@ public class GameplayManager_BombRun : MonoBehaviour
         InitializeLevelManager_BombRun.OnInitializationBegin += InitializeLevelManager_BombRun_OnInitializationBegin;
         InitializeLevelManager_BombRun.OnInitializationEnd += InitializeLevelManager_BombRun_OnInitializationEnd;
     }
+    private void Start()
+    {
+        BombRunUnitSpawner.OnSpawnLocationsFinalized += BombRunUnitSpawner_OnSpawnLocationsFinalized;
+    }
     private void OnDisable()
     {
         InitializeLevelManager_BombRun.OnInitializationBegin -= InitializeLevelManager_BombRun_OnInitializationBegin;
         InitializeLevelManager_BombRun.OnInitializationEnd -= InitializeLevelManager_BombRun_OnInitializationEnd;
-    }
 
-    
+        BombRunUnitSpawner.OnSpawnLocationsFinalized -= BombRunUnitSpawner_OnSpawnLocationsFinalized;
+    }    
 
     void MakeInstance()
     {
@@ -56,6 +60,11 @@ public class GameplayManager_BombRun : MonoBehaviour
     private void InitializeLevelManager_BombRun_OnInitializationEnd(object sender, EventArgs e)
     {
         _gameState = GameState_BombRun.SetSpawnLocation;
+        OnGameStateChanged?.Invoke(this, _gameState);
+    }
+    private void BombRunUnitSpawner_OnSpawnLocationsFinalized(object sender, EventArgs e)
+    {
+        _gameState = GameState_BombRun.Gameplay;
         OnGameStateChanged?.Invoke(this, _gameState);
     }
 }

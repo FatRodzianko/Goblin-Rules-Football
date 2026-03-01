@@ -80,6 +80,8 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
         BombRunUnit.OnAnyUnitMovedGridPosition += Unit_OnAnyUnitMovedGridPosition;
         this.OnEnemyUnitBecameVisible += UnitVisibilityManager_BombRun_OnEnemyUnitBecameVisible;
         this.OnEnemyUnitBecameInVisible += UnitVisibilityManager_BombRun_OnEnemyUnitBecameInVisible;
+
+        BombRunUnitSpawner.OnSpawnLocationsFinalized += BombRunUnitSpawner_OnSpawnLocationsFinalized;
     }
 
     
@@ -89,7 +91,11 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
         BombRunUnit.OnAnyUnitMovedGridPosition -= Unit_OnAnyUnitMovedGridPosition;
         this.OnEnemyUnitBecameVisible -= UnitVisibilityManager_BombRun_OnEnemyUnitBecameVisible;
         this.OnEnemyUnitBecameInVisible -= UnitVisibilityManager_BombRun_OnEnemyUnitBecameInVisible;
+
+        BombRunUnitSpawner.OnSpawnLocationsFinalized -= BombRunUnitSpawner_OnSpawnLocationsFinalized;
     }
+
+    
 
     private void Unit_OnAnyUnitMovedGridPosition(object sender, EventArgs e)
     {
@@ -101,6 +107,12 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
             RemoveUnitFromVisibilityList(unit);
         }
 
+    }
+    private void BombRunUnitSpawner_OnSpawnLocationsFinalized(object sender, EventArgs e)
+    {
+        Debug.Log("BombRunUnitSpawner_OnSpawnLocationsFinalized: All unit count: " + BombRunUnitManager.Instance.GetAllUnitList().Count);
+        InitializeUnitVisibilityToPlayer(BombRunUnitManager.Instance.GetAllUnitList());
+        InitializeFOVForAllUnits(BombRunUnitManager.Instance.GetAllUnitList());
     }
     //private async void OnAnyUnitMovedGridPosition(BombRunUnit unit)
     //{
@@ -114,6 +126,13 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     //{
     //    return await Task.Run(() => CheckIfMovedUnitCanBeSeen(unit, skipUnit));
     //}
+    public void InitializeUnitVisibilityToPlayer(List<BombRunUnit> units)
+    {
+        foreach (BombRunUnit unit in units)
+        {
+            unit.SetUnitVisibility(!unit.IsEnemy());
+        }
+    }
     public void InitializeFOVForAllUnits(List<BombRunUnit> units)
     {
         foreach (BombRunUnit unit in units)

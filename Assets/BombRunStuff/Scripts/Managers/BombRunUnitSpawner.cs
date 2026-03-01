@@ -9,7 +9,8 @@ public class BombRunUnitSpawner : MonoBehaviour
     [SerializeField] private int _numberOfUnitsSpawned = 0;
 
     // static events
-    public static event EventHandler SpawnLocationSelectedForAllPlayerUnits;
+    public static event EventHandler OnSpawnLocationSelectedForAllPlayerUnits;
+    public static event EventHandler OnSpawnLocationsFinalized;
     private void Awake()
     {
         GameplayManager_BombRun.OnGameStateChanged += GameplayManager_BombRun_OnGameStateChanged;
@@ -18,11 +19,13 @@ public class BombRunUnitSpawner : MonoBehaviour
     private void Start()
     {
         UnitActionSystem.Instance.OnSpawnLocationSelected += UnitActionSystem_OnSpawnLocationSelected;
+        UnitSpawningUI.OnUnitSpawnUIStartGameButtonPressed += UnitSpawningUI_OnUnitSpawnUIStartGameButtonPressed;
     }
     private void OnDisable()
     {
         GameplayManager_BombRun.OnGameStateChanged -= GameplayManager_BombRun_OnGameStateChanged;
         UnitActionSystem.Instance.OnSpawnLocationSelected -= UnitActionSystem_OnSpawnLocationSelected;
+        UnitSpawningUI.OnUnitSpawnUIStartGameButtonPressed -= UnitSpawningUI_OnUnitSpawnUIStartGameButtonPressed;
     }
 
     
@@ -68,8 +71,9 @@ public class BombRunUnitSpawner : MonoBehaviour
 
         if (!DoesPlayerHaveMoreUnitsToSpawn())
         {
-            SpawnLocationSelectedForAllPlayerUnits?.Invoke(this, EventArgs.Empty);
+            OnSpawnLocationSelectedForAllPlayerUnits?.Invoke(this, EventArgs.Empty);
             Debug.Log("SpawnLocationSelected: Player has spawned all their units");
+            PlayerMessageManager_BombRun.Instance.ShowGamePromptForPlayer("All Units Spawned. Finalize Positions Before Starting Game", 0f);
         }
     }
     private void SpawnUnit(ScriptableBombRunUnit unit, GridPosition gridPosition, bool isEnemy, int count = 0)
@@ -86,8 +90,34 @@ public class BombRunUnitSpawner : MonoBehaviour
         unitTransform.position = LevelGrid.Instance.GetWorldPosition(gridPosition);
         unitTransform.gameObject.name = "TestSpawnUnit_" + count;
 
+        if (isEnemy)
+        {
+            unitTransform.gameObject.name = "Enemy_" + unitTransform.gameObject.name;
+            unitScript.SetActionDirection(new Vector2(-1, 0));
+        }
+
         Debug.Log("BombRunUnitSpawner: SpawnUnit: " + unitTransform.gameObject.name + " : " + gridPosition);
 
         unitScript.InitializeBombRunUnit();
+    }
+    private void UnitSpawningUI_OnUnitSpawnUIStartGameButtonPressed(object sender, EventArgs e)
+    {
+        // Spawn enemy units first, then finalize/end the SetSpawnLocation game state
+        SpawnEnemyUnits();
+        OnSpawnLocationsFinalized?.Invoke(this, EventArgs.Empty);
+    }
+    private void SpawnEnemyUnits()
+    {
+        List<GridPosition> spawnPositions = LevelGrid.Instance.GetEnemySpawnPositions();
+        int spawnLimit = _unitsToSpawn.Count;
+        if (spawnLimit > spawnPositions.Count)
+        {
+            spawnLimit = spawnPositions.Count;
+        }
+
+        for (int i = 0; i < spawnLimit; i++)
+        {
+            SpawnUnit(_unitsToSpawn[i], spawnPositions[i], true, i);
+        }
     }
 }

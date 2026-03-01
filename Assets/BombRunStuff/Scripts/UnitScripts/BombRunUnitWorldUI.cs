@@ -43,6 +43,8 @@ public class BombRunUnitWorldUI : MonoBehaviour
 
         ResetActionSymbolSprite();
         UpdateActionPointsText();
+
+        UnitVisibilityChanged(!_unit.IsEnemy());
     }
 
     
@@ -106,6 +108,11 @@ public class BombRunUnitWorldUI : MonoBehaviour
         }
     }
     private void Unit_OnUnitVisibilityChanged(object sender, bool isVisible)
+    {
+        Debug.Log("Unit_OnUnitVisibilityChanged: " + this.transform.parent.name);
+        UnitVisibilityChanged(isVisible);
+    }
+    private void UnitVisibilityChanged(bool isVisible)
     {
         SetBodyPartHealthUIVisibility(isVisible);
         SetActionPointTextVisibility(isVisible);

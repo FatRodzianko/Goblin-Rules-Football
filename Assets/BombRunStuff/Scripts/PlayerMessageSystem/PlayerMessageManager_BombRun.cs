@@ -37,16 +37,44 @@ public class PlayerMessageManager_BombRun : MonoBehaviour
         }
         Instance = this;
     }
-    //public void PromptPlayerToChooseUnitSpawnLocations()
-    //{
-    //    ShowGamePromptForPlayer("Choose Spawn Location For Your Units", 0f);
-    //}
+    private void Start()
+    {
+        BombRunUnitSpawner.OnSpawnLocationsFinalized += BombRunUnitSpawner_OnSpawnLocationsFinalized;
+    }
+    private void OnDisable()
+    {
+        BombRunUnitSpawner.OnSpawnLocationsFinalized -= BombRunUnitSpawner_OnSpawnLocationsFinalized;
+    }
+
+    private void BombRunUnitSpawner_OnSpawnLocationsFinalized(object sender, EventArgs e)
+    {
+        HideGamePromptForPlayer();
+    }
+
     public void ShowGamePromptForPlayer(string message, float duration)
     {
         OnShowGamePromptForPlayer?.Invoke(this, new PlayerMeassgeEventArgs_BombRun(message, duration));
     }
-    private void HideGamePromptForPlayer()
+    public void HideGamePromptForPlayer()
     {
         OnHideGamePromptForPlayer?.Invoke(this, EventArgs.Empty);
+    }
+    private void FlashColorOfText( int numberOfFlashes)
+    {
+        
+    }
+    private IEnumerator FlashMessageText(int numberOfFlashes)
+    {
+        int flashes = numberOfFlashes;
+        if (flashes < 1)
+            flashes = 1;
+
+        Debug.Log("FlashMessageText: Flashes: " + flashes);
+        for (int i = 0; i < flashes; i++)
+        {
+
+            yield return new WaitForSeconds(0.25f);
+        }
+        
     }
 }

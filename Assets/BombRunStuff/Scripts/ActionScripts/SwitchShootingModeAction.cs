@@ -94,6 +94,7 @@ public class SwitchShootingModeAction : BaseAction
         {
             pointsForDamage += 100;
         }
+        
 
         
         // get list of targets for each healing mode
@@ -133,6 +134,7 @@ public class SwitchShootingModeAction : BaseAction
         }        
 
 
+
         // check which damage mode currently has the highest value
         DamageMode winningDamageMode = DamageMode.Damage;
         int winningDamagePoints = pointsForDamage;
@@ -141,6 +143,8 @@ public class SwitchShootingModeAction : BaseAction
             winningDamageMode = DamageMode.Heal;
             winningDamagePoints = pointsForHeal;
         }
+
+        Debug.Log("GetEnemyAIAction: " + _unit.name + ": Damange Mode: " + currentDamageMode + " Number of targets for damage: " + targetsForDamageMode.Count + " Total points for damage: " + pointsForDamage + " Winning damage mode: " + winningDamageMode);
 
         // if the winning damage is same as current damage mode, then return action with low value
         if (winningDamageMode == currentDamageMode)

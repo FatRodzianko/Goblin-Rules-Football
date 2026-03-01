@@ -111,6 +111,10 @@ public class BombRunEnemyAI : MonoBehaviour
             else
             {
                 BombRunEnemyAIAction testEnemyAIAction = baseAction.GetBestEnemyAIAction();
+                if (baseAction.GetActionType() == ActionType.Shoot)
+                {
+                    Debug.Log("TryTakeEnemyAIAction: Shoot Action for " + enemyUnit.name);
+                }
                 if (testEnemyAIAction != null && testEnemyAIAction._ActionValue > bestEnemyAIAction._ActionValue)
                 {
                     Debug.Log("TryTakeEnemyAIAction: current bestEnemyAIAction action value is: " + bestEnemyAIAction._ActionValue + " new test enemy ai action ("+ baseAction.GetActionName() +  ") value is: " + testEnemyAIAction._ActionValue);

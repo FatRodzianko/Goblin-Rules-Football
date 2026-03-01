@@ -20,6 +20,7 @@ public class LevelGrid : MonoBehaviour
     [SerializeField] private int _pathFindingDistanceMultiplier;
 
     private List<GridPosition> _validSpawnPositions = new List<GridPosition>();
+    private List<GridPosition> _enemySpawnPositions = new List<GridPosition>();
 
 
     // events
@@ -374,5 +375,20 @@ public class LevelGrid : MonoBehaviour
     public bool IsPositionAValidSpawnPosition(GridPosition position)
     {
         return _validSpawnPositions.Contains(position);
+    }
+    private void DefineEnemySpawnPositions()
+    {
+        // for now, just hardcode positions. Later, these positions will be from the map data or some sort of data store for enemy positions
+        _enemySpawnPositions.Add(new GridPosition(13, 9));
+        _enemySpawnPositions.Add(new GridPosition(5, 8));
+        _enemySpawnPositions.Add(new GridPosition(11, 1));
+        
+        _enemySpawnPositions.Add(new GridPosition(6, 12));
+        
+    }
+    public List<GridPosition> GetEnemySpawnPositions()
+    {
+        DefineEnemySpawnPositions();
+        return _enemySpawnPositions;
     }
 }
