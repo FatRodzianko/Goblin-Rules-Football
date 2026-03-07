@@ -5,12 +5,15 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ScriptableBombRunUnit", menuName = "BombRun/Units/New Scriptable Unit")]
 public class ScriptableBombRunUnit : ScriptableObject
 {
+    [Header("Unit Info")]
     [SerializeField] private Transform _unitPrefab;
     [SerializeField] private UnitType _unitType;
     [SerializeField] private DamageMode _defaultDamageMode;
     [SerializeField] private int _sightRange;
 
+    [Header("Unit Visuals")]
     [SerializeField] private RuntimeAnimatorController _animatorController;
+    [SerializeField] private Sprite _unitPortrait;
 
     public Transform UnitPrefab()
     {
@@ -31,6 +34,10 @@ public class ScriptableBombRunUnit : ScriptableObject
     public RuntimeAnimatorController AnimatorController()
     {
         return _animatorController;
+    }
+    public Sprite UnitPortrait()
+    {
+        return _unitPortrait;
     }
 
 }

@@ -3,14 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public class OnCreateUIObjectForUnitToSpawnEventArgs : EventArgs
+{
+    public ScriptableBombRunUnit ScriptableBombRunUnit;
+    public int Index;
+}
+
 public class BombRunUnitSpawner : MonoBehaviour
 {
     [SerializeField] private List<ScriptableBombRunUnit> _unitsToSpawn = new List<ScriptableBombRunUnit>();
+    [SerializeField] private List<int> _unitIndexesAlreadySpawned = new List<int>();
     [SerializeField] private int _numberOfUnitsSpawned = 0;
+    [SerializeField] private int _unitToSpawnIndex = 0;
 
     // static events
     public static event EventHandler OnSpawnLocationSelectedForAllPlayerUnits;
     public static event EventHandler OnSpawnLocationsFinalized;
+
+    // for creating UI stuff?
+    public static event EventHandler<OnCreateUIObjectForUnitToSpawnEventArgs> OnCreateUIObjectForUnitToSpawn;
+    public static event EventHandler<int> OnSpawnedUnitAtIndex;
+
     private void Awake()
     {
         GameplayManager_BombRun.OnGameStateChanged += GameplayManager_BombRun_OnGameStateChanged;
@@ -20,12 +33,14 @@ public class BombRunUnitSpawner : MonoBehaviour
     {
         UnitActionSystem.Instance.OnSpawnLocationSelected += UnitActionSystem_OnSpawnLocationSelected;
         UnitSpawningUI.OnUnitSpawnUIStartGameButtonPressed += UnitSpawningUI_OnUnitSpawnUIStartGameButtonPressed;
+        UnitSpawningButtonUI.OnPlayerClickedUnitSpawnButton += UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
     }
     private void OnDisable()
     {
         GameplayManager_BombRun.OnGameStateChanged -= GameplayManager_BombRun_OnGameStateChanged;
         UnitActionSystem.Instance.OnSpawnLocationSelected -= UnitActionSystem_OnSpawnLocationSelected;
         UnitSpawningUI.OnUnitSpawnUIStartGameButtonPressed -= UnitSpawningUI_OnUnitSpawnUIStartGameButtonPressed;
+        UnitSpawningButtonUI.OnPlayerClickedUnitSpawnButton -= UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
     }
 
     
@@ -35,23 +50,38 @@ public class BombRunUnitSpawner : MonoBehaviour
         if (gameState == GameState_BombRun.SetSpawnLocation)
         {
             PromptPlayerToSpawnUnits();
+            CreateUnitSpawnUIObjects();
         }
     }
     private void PromptPlayerToSpawnUnits()
     {
         PlayerMessageManager_BombRun.Instance.ShowGamePromptForPlayer("Choose Spawn Location For Your Units", 0f);
     }
-    public void SpawnUnits()
+    private void CreateUnitSpawnUIObjects()
     {
-        Debug.Log("BombRunUnitSpawner: SpawnUnits");
-        int count = 0;
+        int index = 0;
         foreach (ScriptableBombRunUnit unit in _unitsToSpawn)
         {
-            GridPosition gridPosition = new GridPosition((count + 10), (count + 10));
-            SpawnUnit(unit, gridPosition, count % 2 == 1, count);
-            count++;
+            OnCreateUIObjectForUnitToSpawn?.Invoke(this, new OnCreateUIObjectForUnitToSpawnEventArgs
+            {
+                ScriptableBombRunUnit = unit,
+                Index = index
+            });
+
+            index++;
         }
     }
+    //public void SpawnUnits()
+    //{
+    //    Debug.Log("BombRunUnitSpawner: SpawnUnits");
+    //    int count = 0;
+    //    foreach (ScriptableBombRunUnit unit in _unitsToSpawn)
+    //    {
+    //        GridPosition gridPosition = new GridPosition((count + 10), (count + 10));
+    //        SpawnUnit(unit, gridPosition, count % 2 == 1, count);
+    //        count++;
+    //    }
+    //}
     private void UnitActionSystem_OnSpawnLocationSelected(object sender, GridPosition gridPosition)
     {
         if (!DoesPlayerHaveMoreUnitsToSpawn())
@@ -66,8 +96,25 @@ public class BombRunUnitSpawner : MonoBehaviour
     }
     public void SpawnLocationSelected(GridPosition gridPosition)
     {
-        SpawnUnit(_unitsToSpawn[_numberOfUnitsSpawned], gridPosition, false, _numberOfUnitsSpawned);
+        if (_unitToSpawnIndex < 0)
+        {
+            return;
+        }
+        if (_unitToSpawnIndex > _unitsToSpawn.Count - 1)
+        {
+            return;
+        }
+        if (_unitIndexesAlreadySpawned.Contains(_unitToSpawnIndex))
+        {
+            return;
+        }
+
+        SpawnUnit(_unitsToSpawn[_unitToSpawnIndex], gridPosition, false, _numberOfUnitsSpawned);
         _numberOfUnitsSpawned++;
+        _unitIndexesAlreadySpawned.Add(_unitToSpawnIndex);
+        OnSpawnedUnitAtIndex?.Invoke(this, _unitToSpawnIndex);
+
+        SelectUnitToSpawnByIndex(-1);
 
         if (!DoesPlayerHaveMoreUnitsToSpawn())
         {
@@ -119,5 +166,16 @@ public class BombRunUnitSpawner : MonoBehaviour
         {
             SpawnUnit(_unitsToSpawn[i], spawnPositions[i], true, i);
         }
+    }
+    private void UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton(object sender, int index)
+    {
+        SelectUnitToSpawnByIndex(index);
+    }
+    public void SelectUnitToSpawnByIndex(int index)
+    {
+        if (index > _unitsToSpawn.Count - 1)
+            return;
+
+        _unitToSpawnIndex = index;
     }
 }

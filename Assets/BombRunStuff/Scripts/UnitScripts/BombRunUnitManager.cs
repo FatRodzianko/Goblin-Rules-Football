@@ -45,13 +45,13 @@ public class BombRunUnitManager : MonoBehaviour
     {
         Debug.Log("BombRunUnitManager: InitializeBombRunUnits");
         // Place holder for now. In a real game the units would be spawned from level parameters. Right now, just find the units that exist in the scene, then "initialize" them
-        SpawnUnits();
+        //SpawnUnits();
         //FindAndInitializeAllUnits();
     }
-    private void SpawnUnits()
-    {
-        _unitSpawner.SpawnUnits();
-    }
+    //private void SpawnUnits()
+    //{
+    //    _unitSpawner.SpawnUnits();
+    //}
     private void FindAndInitializeAllUnits()
     {
         GameObject[] units = GameObject.FindGameObjectsWithTag("Goblin");

@@ -612,6 +612,20 @@ x Add in the cover system for the "defend" action
 - - x When a unit is placed, or moved, deselect any "selected" units. So the next click will be to either place a new unit or to select a new unit
 - - x After player has placed all units, prompt them to confirm unit spawn positions
 - - - - - x after the spawn positions are confirmed, end the SetSpawnLocation phase of the game
+# Unit Spawner UI
+- - x display the "portrait" of each goblin waiting to be spawned on the side
+- - - - - x portrait will come from the ScriptableUnit object
+- - x Create a UI object with the portrait and a script
+- - - - - x script will store what its "index" is
+- - - - - - - - x the index will tie that UI object to a specific ScriptableUnit object. The index in the UnitsToSpawn list will be what 
+                  will match the UI object's "index" so the game knows what unit is being selected to spawn
+- - x When a UI Object is selected, highlight it
+- - - - - x Track the "Currently Selected UI Object?"
+- - - When an already spawned unit is selected, unselect any spawn unit UI objects
+- - - - - - and reset the tracking index on UnitSpawner to -1
+- - - When a player right clicks, deselect any any spawn unit UI objects
+- - - - - - have an event for UnitActionSystem detecting a right click. Unit spawner will subscribe to event when it is the Unit Spawning phase
+            then will unsubscribe when the game phase changes
 
 - Update ShootAction to check for partial obstacles between shooter and target
 - - - if there is a partial obstacle, the target can be shot at, but their legs cannot be targetted. Only their arms/head

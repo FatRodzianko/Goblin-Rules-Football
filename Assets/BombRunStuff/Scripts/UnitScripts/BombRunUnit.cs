@@ -5,7 +5,7 @@ using UnityEngine;
 
 public enum UnitType
 {
-    Normal,
+    Grunt,
     Medic,
     Abnormal,
 }
