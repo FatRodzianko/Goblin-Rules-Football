@@ -623,9 +623,13 @@ x Add in the cover system for the "defend" action
 - - - - - x Track the "Currently Selected UI Object?"
 - - - When an already spawned unit is selected, unselect any spawn unit UI objects
 - - - - - - and reset the tracking index on UnitSpawner to -1
-- - - When a player right clicks, deselect any any spawn unit UI objects
-- - - - - - have an event for UnitActionSystem detecting a right click. Unit spawner will subscribe to event when it is the Unit Spawning phase
-            then will unsubscribe when the game phase changes
+- - x When a player right clicks, deselect any any spawn unit UI objects
+- - - - - x have an event for UnitActionSystem detecting a right click. Unit spawner will subscribe to event when it is the Unit Spawning phase
+            then will unsubscribe when the game phase 
+- - - Make sure that when a unit on the grid is selected, and the player clicks a UI portrait to spawn, to de-select the selected unit
+- - - - - - Have an event on the button script for when they are clicked on. UnitActionSystem will subscribe during SelectSpawn phase,
+            will SetSelectedUnit(null) when that is done
+- - - - - - Will have to remember to ignore the OnUnitSelected event on the UI button when the new selected unit is null?
 
 - Update ShootAction to check for partial obstacles between shooter and target
 - - - if there is a partial obstacle, the target can be shot at, but their legs cannot be targetted. Only their arms/head

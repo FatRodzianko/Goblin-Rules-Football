@@ -26,6 +26,7 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler<bool> OnBusyChanged;
     public event EventHandler OnActionStarted;
     public event EventHandler<GridPosition> OnSpawnLocationSelected;
+    public event EventHandler OnPlayerRightClicked;
 
     private void Awake()
     {
@@ -85,6 +86,7 @@ public class UnitActionSystem : MonoBehaviour
         }
         if (TryHandleRightClickPressed())
         {
+
             return;
         }
 
@@ -321,6 +323,9 @@ public class UnitActionSystem : MonoBehaviour
             return false;
         }
 
+        // For anything listening to right click events?
+        OnPlayerRightClicked?.Invoke(this, EventArgs.Empty);
+
         switch (GameplayManager_BombRun.Instance.GameState())
         {
             case GameState_BombRun.None:
@@ -431,6 +436,7 @@ public class UnitActionSystem : MonoBehaviour
     }
     private bool TryHandleRightClickPressed_SetSpawnLocation()
     {
+
         if (_selectedUnit != null)
         {
             SetSelectedUnit(null);

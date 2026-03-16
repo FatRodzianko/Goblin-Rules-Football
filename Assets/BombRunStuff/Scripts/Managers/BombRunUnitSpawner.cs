@@ -34,6 +34,8 @@ public class BombRunUnitSpawner : MonoBehaviour
         UnitActionSystem.Instance.OnSpawnLocationSelected += UnitActionSystem_OnSpawnLocationSelected;
         UnitSpawningUI.OnUnitSpawnUIStartGameButtonPressed += UnitSpawningUI_OnUnitSpawnUIStartGameButtonPressed;
         UnitSpawningButtonUI.OnPlayerClickedUnitSpawnButton += UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
+
+        
     }
     private void OnDisable()
     {
@@ -41,6 +43,9 @@ public class BombRunUnitSpawner : MonoBehaviour
         UnitActionSystem.Instance.OnSpawnLocationSelected -= UnitActionSystem_OnSpawnLocationSelected;
         UnitSpawningUI.OnUnitSpawnUIStartGameButtonPressed -= UnitSpawningUI_OnUnitSpawnUIStartGameButtonPressed;
         UnitSpawningButtonUI.OnPlayerClickedUnitSpawnButton -= UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
+
+        UnitActionSystem.Instance.OnPlayerRightClicked -= UnitActionSystem_OnPlayerRightClicked;
+        UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
     }
 
     
@@ -51,8 +56,18 @@ public class BombRunUnitSpawner : MonoBehaviour
         {
             PromptPlayerToSpawnUnits();
             CreateUnitSpawnUIObjects();
+            //UnitActionSystem.Instance.OnPlayerRightClicked += UnitActionSystem_OnPlayerRightClicked;
+            UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
+        }
+        else
+        {
+            UnitActionSystem.Instance.OnPlayerRightClicked -= UnitActionSystem_OnPlayerRightClicked;
+            UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
         }
     }
+
+    
+
     private void PromptPlayerToSpawnUnits()
     {
         PlayerMessageManager_BombRun.Instance.ShowGamePromptForPlayer("Choose Spawn Location For Your Units", 0f);
@@ -177,5 +192,14 @@ public class BombRunUnitSpawner : MonoBehaviour
             return;
 
         _unitToSpawnIndex = index;
+    }
+    private void UnitActionSystem_OnPlayerRightClicked(object sender, EventArgs e)
+    {
+        SelectUnitToSpawnByIndex(-1);
+    }
+    private void UnitActionSystem_OnSelectedUnitChanged(object sender, BombRunUnit unit
+        )
+    {
+        SelectUnitToSpawnByIndex(-1);
     }
 }
