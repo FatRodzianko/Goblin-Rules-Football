@@ -49,14 +49,16 @@ public class UnitActionSystem : MonoBehaviour
 
         BombRunUnit.OnAnyUnitDied += BombRunUnit_OnAnyUnitDied;
         BaseSubAction.OnAnySubActionCancelled += BaseSubAction_OnAnySubActionCancelled;
-    }
 
-    
+        GameplayManager_BombRun.OnGameStateChanged += GameplayManager_BombRun_OnGameStateChanged;
+    }
 
     private void OnDisable()
     {
         BombRunUnit.OnAnyUnitDied -= BombRunUnit_OnAnyUnitDied;
         BaseSubAction.OnAnySubActionCancelled -= BaseSubAction_OnAnySubActionCancelled;
+
+        GameplayManager_BombRun.OnGameStateChanged -= GameplayManager_BombRun_OnGameStateChanged;
     }
     private void Update()
     {
@@ -94,6 +96,20 @@ public class UnitActionSystem : MonoBehaviour
         //HandleSelectedAction();
         //HandleCancelSelectedAction();
     }
+    private void GameplayManager_BombRun_OnGameStateChanged(object sender, GameState_BombRun gameState)
+    {
+        if (gameState == GameState_BombRun.SetSpawnLocation)
+        {
+            UnitSpawningButtonUI.OnPlayerClickedUnitSpawnButton += UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
+        }
+        else
+        {
+            UnitSpawningButtonUI.OnPlayerClickedUnitSpawnButton -= UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
+        }
+    }
+
+    
+
     private bool TryHandleUnitSelection()
     {
         
@@ -197,6 +213,13 @@ public class UnitActionSystem : MonoBehaviour
         //{
         //    return false;
         //}
+    }
+    private void UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton(object sender, int e)
+    {
+        if (_selectedUnit != null)
+        {
+            SetSelectedUnit(null);
+        }
     }
     private bool TryHandleSelectGridPosition_SetSpawnLocation(GridPosition mouseGridPosition)
     {

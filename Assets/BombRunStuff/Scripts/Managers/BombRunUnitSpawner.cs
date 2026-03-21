@@ -56,7 +56,7 @@ public class BombRunUnitSpawner : MonoBehaviour
         {
             PromptPlayerToSpawnUnits();
             CreateUnitSpawnUIObjects();
-            //UnitActionSystem.Instance.OnPlayerRightClicked += UnitActionSystem_OnPlayerRightClicked;
+            UnitActionSystem.Instance.OnPlayerRightClicked += UnitActionSystem_OnPlayerRightClicked;
             UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         }
         else
@@ -195,11 +195,15 @@ public class BombRunUnitSpawner : MonoBehaviour
     }
     private void UnitActionSystem_OnPlayerRightClicked(object sender, EventArgs e)
     {
+        Debug.Log("BombRunUnitSpawner: UnitActionSystem_OnPlayerRightClicked");
         SelectUnitToSpawnByIndex(-1);
     }
-    private void UnitActionSystem_OnSelectedUnitChanged(object sender, BombRunUnit unit
-        )
+    private void UnitActionSystem_OnSelectedUnitChanged(object sender, BombRunUnit unit)
     {
+        if (unit == null)
+        {
+            return;
+        }
         SelectUnitToSpawnByIndex(-1);
     }
 }

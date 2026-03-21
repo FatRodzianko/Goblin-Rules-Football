@@ -82,6 +82,7 @@ public class UnitSpawningButtonUI : MonoBehaviour, IPointerEnterHandler, IPointe
     }
     private void PlayerClickedOnOtherButton()
     {
+        Debug.Log("UnitSpawningButtonUI: PlayerClickedOnOtherButton");
         this._isSelected = false;
         //this._outline.effectColor = Color.black;
         this._backgroundImage.color = Color.black;
@@ -92,10 +93,17 @@ public class UnitSpawningButtonUI : MonoBehaviour, IPointerEnterHandler, IPointe
     }
     private void UnitActionSystem_OnPlayerRightClicked(object sender, EventArgs e)
     {
+        Debug.Log("UnitSpawningButtonUI: UnitActionSystem_OnPlayerRightClicked");
         PlayerClickedOnOtherButton();
     }
     private void UnitActionSystem_OnSelectedUnitChanged(object sender, BombRunUnit unit)
     {
+        if (unit == null)
+        {
+            Debug.Log("UnitSpawningButtonUI: UnitActionSystem_OnSelectedUnitChanged. Unit is null");
+            return;
+        }
+        Debug.Log("UnitSpawningButtonUI: UnitActionSystem_OnSelectedUnitChanged. Unit is not null. Unit: " + unit);
         PlayerClickedOnOtherButton();
     }
     //Detect if the Cursor starts to pass over the GameObject

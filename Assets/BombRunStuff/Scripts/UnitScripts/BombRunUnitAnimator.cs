@@ -164,6 +164,10 @@ public class BombRunUnitAnimator : MonoBehaviour
     {
         _spriteRenderer.enabled = isVisible;
         _spriteMask.enabled = isVisible;
+        if (isVisible)
+        {
+            this._spriteMask.sprite = this._spriteRenderer.sprite;
+        }
     }
     public bool GetUnitVisibility()
     {
@@ -172,6 +176,7 @@ public class BombRunUnitAnimator : MonoBehaviour
     private void Unit_OnUnitVisibilityChanged(object sender, bool isVisible)
     {
         SetUnitVisibility(isVisible);
+        
     }
     public Sprite GetCurrentSprite()
     {
