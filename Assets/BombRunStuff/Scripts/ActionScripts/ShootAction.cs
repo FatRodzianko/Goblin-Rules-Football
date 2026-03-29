@@ -57,6 +57,7 @@ public class ShootAction : BaseAction
         base.Start();
         //CheckForSwitchShootingModeAction();
         _maxShootDistance = _unit.GetSightRange();
+        this._gridVisualRange = _maxShootDistance;
     }
     protected override void OnDisable()
     {

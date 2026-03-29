@@ -42,6 +42,9 @@ public class MoveAction : BaseAction
         base.Start();
         PathFinding.Instance.IsWalkableUpdated += PathFinding_IsWalkableUpdated;
         BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
+
+        this._maxMoveDistance = _unit.GetMaxMoveDistance();
+        this._gridVisualRange = this._maxMoveDistance;
     }
 
     protected override void OnDisable()

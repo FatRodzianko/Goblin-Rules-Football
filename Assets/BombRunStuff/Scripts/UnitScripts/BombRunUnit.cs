@@ -8,6 +8,7 @@ public enum UnitType
     Grunt,
     Medic,
     Abnormal,
+    Scout
 }
 public enum UnitState
 {
@@ -46,6 +47,7 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] private bool _isEnemy;
     [SerializeField] private DamageMode _damageMode;
     [SerializeField] private int _sightRange = 10;
+    [SerializeField] private int _maxMoveDistance = 0;
 
     [Header("Unit State")]
     [SerializeField] private UnitState _unitState = UnitState.Idle;
@@ -366,6 +368,18 @@ public class BombRunUnit : MonoBehaviour
     public int GetSightRange()
     {
         return _sightRange;
+    }
+    public void SetUnitMaxMoveDistance(int maxMoveDistance)
+    {
+        this._maxMoveDistance = maxMoveDistance;   
+    }
+    public int GetMaxMoveDistance()
+    {
+        return this._maxMoveDistance;
+    }
+    private void UpdateMoveActionMoveDistance()
+    {
+        
     }
     public Vector2 GetActionDirection()
     {

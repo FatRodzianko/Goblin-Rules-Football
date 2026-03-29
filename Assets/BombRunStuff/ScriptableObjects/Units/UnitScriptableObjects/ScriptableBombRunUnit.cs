@@ -10,6 +10,7 @@ public class ScriptableBombRunUnit : ScriptableObject
     [SerializeField] private UnitType _unitType;
     [SerializeField] private DamageMode _defaultDamageMode;
     [SerializeField] private int _sightRange;
+    [SerializeField] private int _maxMoveDistance;
 
     [Header("Unit Visuals")]
     [SerializeField] private RuntimeAnimatorController _animatorController;
@@ -38,6 +39,10 @@ public class ScriptableBombRunUnit : ScriptableObject
     public Sprite UnitPortrait()
     {
         return _unitPortrait;
+    }
+    public int MaxMoveDistance()
+    {
+        return _maxMoveDistance;
     }
 
 }

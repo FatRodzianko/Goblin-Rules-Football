@@ -112,4 +112,12 @@ public class FogOfWarTileMapManager : MonoBehaviour
             _greyedOutFogOfWarTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), _fogOfWarTile);
         }
     }
+    public bool IsPositionInFogOfWar(GridPosition gridPosition)
+    {
+        if (_blackoutFogOfWarTileMap.HasTile(new Vector3Int(gridPosition.x, gridPosition.y)))
+        {
+            return true;
+        }
+        return false;
+    }
 }

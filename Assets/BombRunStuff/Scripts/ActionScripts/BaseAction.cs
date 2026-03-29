@@ -56,9 +56,10 @@ public abstract class BaseAction : MonoBehaviour
 
     [Header("Action Grid Visuals")]
     [SerializeField] GridVisualType _gridRangeVisualType = GridVisualType.RedSoft;
-    [SerializeField] int _gridVisualRange = -1;
+    [SerializeField] protected int _gridVisualRange = -1;
     [SerializeField] bool _squareGridRange = false;
     [SerializeField] bool _showGridVisualRange = false;
+    [SerializeField] bool _showGridVisualRangeOnFogOfWarOnly = false;
 
     [Header("Animation Stuff")]
     [SerializeField] protected BombRunUnitAnimator _bombRunUnitAnimator;
@@ -395,6 +396,10 @@ public abstract class BaseAction : MonoBehaviour
     public bool ShowGridVisualRange()
     {
         return _showGridVisualRange;
+    }
+    public bool ShowGridVisualRangeOnFogOfWarOnly()
+    {
+        return _showGridVisualRangeOnFogOfWarOnly;
     }
     public bool CanTakeActionInFogOfWar()
     {

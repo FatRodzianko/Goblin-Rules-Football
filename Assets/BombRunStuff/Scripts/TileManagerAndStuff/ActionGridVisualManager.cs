@@ -11,7 +11,8 @@ public enum GridVisualType
     Blue,
     Red,
     Yellow,
-    RedSoft
+    RedSoft,
+    WhiteSoft
 }
 
 public class ActionGridVisualManager : MonoBehaviour
@@ -29,6 +30,7 @@ public class ActionGridVisualManager : MonoBehaviour
 
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _actionVisualsTileMap;
+    [SerializeField] private Tilemap _actionGridVisualsAboveFogOfWarTileMap;
 
 
     [Header("Grid Visual Tiles")]
@@ -37,6 +39,7 @@ public class ActionGridVisualManager : MonoBehaviour
 
     [Header("Tile List")]
     [SerializeField] private List<GridPosition> _actionVisualPositions = new List<GridPosition>();
+    [SerializeField] private List<GridPosition> _actionVisualPositionsAboveFogOfWar = new List<GridPosition>();
 
     [Header("Grid System Stuff")]
     [SerializeField] private GridSystem<GridObject> _gridSystem;
@@ -95,9 +98,20 @@ public class ActionGridVisualManager : MonoBehaviour
         _actionVisualsTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), gridVisual);
         _actionVisualPositions.Add(gridPosition);
     }
+    public void AddActionVisualToGridPositionAboveFogOfWar(GridPosition gridPosition, Tile gridVisual, Color color)
+    {
+        gridVisual.color = color;
+        _actionGridVisualsAboveFogOfWarTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), null);
+        _actionGridVisualsAboveFogOfWarTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), gridVisual);
+        _actionVisualPositionsAboveFogOfWar.Add(gridPosition);
+    }
     public void RemoveActionVisualToGridPosition(GridPosition gridPosition)
     {
         _actionVisualsTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), null);
+    }
+    public void RemoveActionVisualToGridPositionAboveFogOfWar(GridPosition gridPosition)
+    {
+        _actionGridVisualsAboveFogOfWarTileMap.SetTile(new Vector3Int(gridPosition.x, gridPosition.y, 0), null);
     }
     private void ShowGridPositionRange(GridPosition gridPosition, int range, GridVisualType gridVisualType)
     {
@@ -147,10 +161,35 @@ public class ActionGridVisualManager : MonoBehaviour
         }
         ShowActionVisualsFromList(gridPositionList, gridVisualType);
     }
+    private List<GridPosition> GetGridPositionForSquareVisualRange(GridPosition gridPosition, int range)
+    {
+        List<GridPosition> gridPositionList = new List<GridPosition>();
+        for (int x = -range; x <= range; x++)
+        {
+            for (int y = -range; y <= range; y++)
+            {
+                GridPosition testGridPosition = gridPosition + new GridPosition(x, y);
+                if (testGridPosition == gridPosition)
+                {
+                    continue;
+                }
+                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+                gridPositionList.Add(testGridPosition);
+            }
+        }
+        return gridPositionList;
+    }
     private void ShowGridPositionRangeRadius(GridPosition gridPosition, int range, GridVisualType gridVisualType)
     {
         List<GridPosition> gridPositionList = LevelGrid.Instance.GetGridPositionsInRadius(gridPosition, range);
         ShowActionVisualsFromList(gridPositionList, gridVisualType);
+    }
+    private List<GridPosition> GetGridPositionForVisualRange(GridPosition gridPosition, int range)
+    {
+        return LevelGrid.Instance.GetGridPositionsInRadius(gridPosition, range);
     }
     public void ShowActionVisualsFromList(List<GridPosition> gridPositions, GridVisualType gridVisualType)
     {
@@ -162,6 +201,19 @@ public class ActionGridVisualManager : MonoBehaviour
             AddActionVisualToGridPosition(gridPosition, GetGridVisualTypeTile(gridVisualType), GetGridVisualTypeColor(gridVisualType));
         }
     }
+    public void ShowActionVisualsFromListOnFogOfWarOnly(List<GridPosition> gridPositions, GridVisualType gridVisualType)
+    {
+        if (gridPositions.Count == 0)
+            return;
+
+        foreach (GridPosition gridPosition in gridPositions)
+        {
+            if (!FogOfWarTileMapManager.Instance.IsPositionInFogOfWar(gridPosition))
+                continue;
+
+            AddActionVisualToGridPositionAboveFogOfWar(gridPosition, GetGridVisualTypeTile(gridVisualType), GetGridVisualTypeColor(gridVisualType));
+        }
+    }
     public void HideAllActionVisuals()
     {
         foreach (GridPosition gridPosition in _actionVisualPositions)
@@ -169,6 +221,11 @@ public class ActionGridVisualManager : MonoBehaviour
             RemoveActionVisualToGridPosition(gridPosition);
         }
         _actionVisualPositions.Clear();
+        foreach (GridPosition gridPosition in _actionVisualPositionsAboveFogOfWar)
+        {
+            RemoveActionVisualToGridPositionAboveFogOfWar(gridPosition);
+        }
+        _actionVisualPositionsAboveFogOfWar.Clear();
     }
     private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
     {
@@ -199,16 +256,20 @@ public class ActionGridVisualManager : MonoBehaviour
             return;
         }
 
-        GridVisualType gridVisualType;
-        GridVisualType gridRangeVisualType = GridVisualType.RedSoft;
-        int gridVisualRange = -1;
-        bool squareGridRange = false;
+        GridVisualType gridVisualType = GridVisualType.White; 
+        GridVisualType gridRangeVisualType = GridVisualType.WhiteSoft;
+        bool showGridVisualRange = selectedAction.ShowGridVisualRange();
+        int gridVisualRange = selectedAction.GridVisualRange();
+        bool squareGridRange = selectedAction.SquareGridRange();
+        bool showGridVisualRangeOnFogOfWarOnly = selectedAction.ShowGridVisualRangeOnFogOfWarOnly();
 
         switch (selectedAction)
         {
-            default:
+            //default:
             case MoveAction moveAction:
                 gridVisualType = GridVisualType.White;
+                //gridVisualRange = moveAction.GetMaxMoveDistance();
+                gridRangeVisualType = GridVisualType.WhiteSoft;
                 break;
             case SpinAction spinAction:
                 gridVisualType = GridVisualType.Blue;
@@ -221,7 +282,7 @@ public class ActionGridVisualManager : MonoBehaviour
                 break;
             case SwordAction swordAction:
                 gridVisualType = GridVisualType.Red;
-                gridVisualRange = swordAction.GetMaxSwordDistance();
+                //gridVisualRange = swordAction.GetMaxSwordDistance();
                 gridRangeVisualType = GridVisualType.RedSoft;
                 if (LevelGrid.Instance.GetGridObjectGridSystem().GetType() == typeof(GridSystemHex<GridObject>))
                 {
@@ -241,7 +302,7 @@ public class ActionGridVisualManager : MonoBehaviour
             case ShootAction shootAction:
                 gridVisualType = GridVisualType.Red;
                 //ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), shootAction.GetMaxShootDistance(), GridVisualType.RedSoft);
-                gridVisualRange = shootAction.GetMaxShootDistance();
+                //gridVisualRange = shootAction.GetMaxShootDistance();
                 gridRangeVisualType = GridVisualType.RedSoft;
                 break;
         }
@@ -265,16 +326,35 @@ public class ActionGridVisualManager : MonoBehaviour
         // Hide the current action visuals, then add the new ones
         HideAllActionVisuals();
         // Add the semi-transparent "Grid Range" visual indicators, if the action uses one?
-        if (gridVisualRange > 0)
+        if (showGridVisualRange && selectedUnit.GetActionPoints() > 0)
         {
+            List<GridPosition> gridPositionsForVisualRange = new List<GridPosition>();
             if (squareGridRange)
             {
-                ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), gridVisualRange, gridRangeVisualType);
+                gridPositionsForVisualRange.AddRange(GetGridPositionForSquareVisualRange(selectedUnit.GetGridPosition(), gridVisualRange));
             }
             else
             {
-                ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), gridVisualRange, gridRangeVisualType);
+                gridPositionsForVisualRange.AddRange(GetGridPositionForVisualRange(selectedUnit.GetGridPosition(), gridVisualRange));
             }
+
+            if (showGridVisualRangeOnFogOfWarOnly)
+            {
+                ShowActionVisualsFromListOnFogOfWarOnly(gridPositionsForVisualRange, gridRangeVisualType);
+            }
+            else
+            {
+                ShowActionVisualsFromList(gridPositionsForVisualRange, gridRangeVisualType);
+            }
+            //if (squareGridRange)
+            //{
+            //    ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), gridVisualRange, gridRangeVisualType);
+            //}
+            //else
+            //{
+            //    ShowGridPositionRangeRadius(selectedUnit.GetGridPosition(), gridVisualRange, gridRangeVisualType);
+            //}
+
         }
         List<GridPosition> actionVisualPositionsUnitCantSee = new List<GridPosition>();
         actionVisualPositionsUnitCantSee.AddRange(actionVisualPositions);

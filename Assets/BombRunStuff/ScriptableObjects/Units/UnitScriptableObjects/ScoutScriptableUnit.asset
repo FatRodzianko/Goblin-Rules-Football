@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe207e4e3c214cb46ab66b923e7df705, type: 3}
-  m_Name: BaseScriptableUnit
+  m_Name: ScoutScriptableUnit
   m_EditorClassIdentifier: 
-  _unitPrefab: {fileID: 3344586741870958865, guid: 59481b5b44b87f4428bff04f96c7ed8d, type: 3}
-  _unitType: 0
+  _unitPrefab: {fileID: 2593749005598891395, guid: d82d5b25ca59dec46b0f140eeebf7841, type: 3}
+  _unitType: 3
   _defaultDamageMode: 0
   _sightRange: 8
-  _maxMoveDistance: 5
+  _maxMoveDistance: 10
   _animatorController: {fileID: 9100000, guid: 92673fe8c911b324f96104c8981826c9, type: 2}
-  _unitPortrait: {fileID: 21300000, guid: 80aa7b665a3cc184c869182ca58fe2f1, type: 3}
+  _unitPortrait: {fileID: 21300000, guid: 0ccfdb0427f572c449ab274fc6523205, type: 3}
