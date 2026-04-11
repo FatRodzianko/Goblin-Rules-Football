@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 
 [CreateAssetMenu(fileName = "ScriptableBombRunUnit", menuName = "BombRun/Units/New Scriptable Unit")]
 public class ScriptableBombRunUnit : ScriptableObject
@@ -15,6 +17,8 @@ public class ScriptableBombRunUnit : ScriptableObject
     [Header("Unit Visuals")]
     [SerializeField] private RuntimeAnimatorController _animatorController;
     [SerializeField] private Sprite _unitPortrait;
+
+    
 
     public Transform UnitPrefab()
     {

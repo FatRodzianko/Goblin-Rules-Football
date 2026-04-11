@@ -640,6 +640,14 @@ x Add in the cover system for the "defend" action
 - - - - x find the nearest valid movement position based on direction to player. 
 - - x Similar thing to the above is already done when player clicks on a tile to move too that is in fog of war and too far to move to. Should be able to repurpose that
 - - - - - - didn't even need to "reuse" the thing that lets you do a move action into fog of war. Just works (I think)
+# Selected Unit UI
+x Have some sort of UI thing that shows what your currently selected unit is
+- - x At the top of the screen, shows the portrait of the currently selected unit
+- - - - - x save the unit portrait from the ScriptableBombRunUnit used during unit spawning
+- - x Update whenever unit is selected
+- - - - - x if the selected unit is null, show no image
+- - x Make the portrait a button
+- - - - - x When button is clicked, center camera on the currently selected unit (or do nothing if selected unit is null)
 
 ### CURRENT TASKS
 # Have enemy positions revealed by "sound" of actions if player can hear
@@ -674,6 +682,21 @@ x Add in the cover system for the "defend" action
 - - - - - - - - - - - - - - - - - - Next turn, unit with faulty upgrade has legs unfrozen. Can take leg actions this turn (but NO bonus from the faulty leg upgrade)
 - - - - - - - - - - - - - - - - - - If faulty leg upgrade is not removed, the unit's legs will be frozen again at the end of the turn
 - - - This could introduce the "hacker" class that can hack other unit's body mods to make them faulty?
+- - - inventory items will be at least two different main "types"
+- - - - - - Body Mod
+- - - - - - Body Mod Components
+- - - Each inventory item type may have sub types or something
+- - - - - - particularly for the Body Mod Components. Different component sub types will be used to make different types of body mods?
+- - - - - - - - - "wiring," "chips", "batteries", whatever
+- Necessary info for the Body Mods (what to put in the scriptable objects?
+- - - Name
+- - - Body Part
+- - - Stat to Buff (move distance, vision distance, fov angle, total action points, whatever)
+- - - Stat Buff Amount
+- - - - - - Maybe for the "State to Buff" and "Stat Buff Amount" make it a dictionary so body mods can affect more than one stat?
+- - - image of body mod
+- - - Description of item
+
 ### END CURRENT TASKS
 
 - Update ShootAction to check for partial obstacles between shooter and target
@@ -725,3 +748,15 @@ x make a shader to make sprites black and white?
 
 # CRT effect without shader/shader graph?
 x https://www.youtube.com/watch?v=49KVkXXpFB4
+
+### Inventory system tutorials:
+#  The 3 ways to make inventory items in Unity 
+https://www.youtube.com/watch?v=pmBv0Cagx_o
+#  Inventory System in Unity based on Scriptable Objects - P1 (he yells)
+https://www.youtube.com/watch?v=xGNBjHG2Oss&list=PLcRSafycjWFegXSGBBf4fqIKWkHDw_G8D
+#  Unity3D - Scriptable Object Inventory System | Part 1 
+https://www.youtube.com/watch?v=_IqTeruf3-s&list=PLJWSdH2kAe_Ij7d7ZFR2NIW8QCJE74CyT
+# Flexible INVENTORY SYSTEM in Unity with Events and Scriptable Objects (short?)
+https://www.youtube.com/watch?v=geq7lQSBDAE
+#  Unity INVENTORY: A Definitive Tutorial
+https://www.youtube.com/watch?v=oJAE6CbsQQA

@@ -145,6 +145,7 @@ public class BombRunUnitSpawner : MonoBehaviour
         BombRunUnit unitScript = unitTransform.GetComponent<BombRunUnit>();
 
         unitScript.SetUnitType(unit.UnitType());
+        unitScript.SetUnitPortrait(unit.UnitPortrait());
         unitScript.SetDamageMode(unit.DamageMode());
         unitScript.SetUnitSightRange(unit.SightRange());
         unitScript.SetUnitMaxMoveDistance(unit.MaxMoveDistance());

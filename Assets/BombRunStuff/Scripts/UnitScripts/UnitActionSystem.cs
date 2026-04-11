@@ -106,6 +106,10 @@ public class UnitActionSystem : MonoBehaviour
         {
             UnitSpawningButtonUI.OnPlayerClickedUnitSpawnButton -= UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
         }
+        if (gameState == GameState_BombRun.Gameplay)
+        {
+            SetSelectedUnit(null);
+        }
     }
 
     

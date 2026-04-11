@@ -12,6 +12,7 @@ public class TurnSystemUI : MonoBehaviour
     [SerializeField] private Button _endTurnButton;
     [SerializeField] private TextMeshProUGUI _turnNumberText;
     [SerializeField] private GameObject _enemyTurnVisualGameObject;
+    [SerializeField] private GameObject _currentSelectedUnitHolder;
 
     private void Start()
     {
@@ -51,12 +52,14 @@ public class TurnSystemUI : MonoBehaviour
         _turnNumberText.gameObject.SetActive(false);
         _endTurnButton.gameObject.SetActive(false);
         _enemyTurnVisualGameObject.SetActive(false);
+        _currentSelectedUnitHolder.SetActive(false);
     }
     private void ShowTurnUI()
     {
         _turnNumberText.gameObject.SetActive(true);
         _endTurnButton.gameObject.SetActive(true);
         _enemyTurnVisualGameObject.SetActive(true);
+        _currentSelectedUnitHolder.SetActive(true);
 
         UpdateTurnText();
         UpdateEnemyTurnVisual();

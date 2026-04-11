@@ -48,6 +48,7 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] private DamageMode _damageMode;
     [SerializeField] private int _sightRange = 10;
     [SerializeField] private int _maxMoveDistance = 0;
+    [SerializeField] private Sprite _unitPortrait;
 
     [Header("Unit State")]
     [SerializeField] private UnitState _unitState = UnitState.Idle;
@@ -549,5 +550,16 @@ public class BombRunUnit : MonoBehaviour
         }
         
         this.transform.position = LevelGrid.Instance.GetWorldPosition(gridPosition);
+    }
+    public Sprite GetUnitPortrait()
+    {
+        return _unitPortrait;
+    }
+    public void SetUnitPortrait(Sprite sprite)
+    {
+        if (sprite == null)
+            return;
+
+        this._unitPortrait = sprite;
     }
 }
