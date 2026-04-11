@@ -688,6 +688,14 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - Each inventory item type may have sub types or something
 - - - - - - particularly for the Body Mod Components. Different component sub types will be used to make different types of body mods?
 - - - - - - - - - "wiring," "chips", "batteries", whatever
+- - - An inventory item may have "sub items" that it contains
+- - - - - - Ex: a Body Mod item will have a list of the components it is made of as "sub items"
+- - - - - - - - - So, when the player loots a frozen player to steal their Body Mods, they'll have the option to extract the base components
+				  from the body mod instead of ripping out the whole mod
+- - - - - - - - - Unit's skill at "hacking" or something will determine what sub components can be harvested, and how many of them?
+- - - - - - - - - - - - Good hacker can retrieve all components, poor hacker only a few
+- - - - - - - - - - - - Each component and component type will have a "retrieval difficulty" stat that is compared to unit's "hacking" stat
+						Hacking stat has to equal or exceed component retrieval difficulty in order for unit to be able to retrieve the component
 - Necessary info for the Body Mods (what to put in the scriptable objects?
 - - - Name
 - - - Body Part
