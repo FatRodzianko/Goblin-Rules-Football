@@ -30,6 +30,7 @@ public class BombRunUnit : MonoBehaviour
     public static event EventHandler OnAnyUnitSpawned;
     public static event EventHandler OnAnyUnitDied;
     public static event EventHandler OnAnyUnitMovedGridPosition;
+    public static event EventHandler<ActionMadeNoiseEventArgs> OnAnyUnitActionMadeNoise;
 
     // non-static events
     public event EventHandler<BaseAction> OnActionTaken;
@@ -49,6 +50,7 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] private int _sightRange = 10;
     [SerializeField] private int _maxMoveDistance = 0;
     [SerializeField] private Sprite _unitPortrait;
+    [SerializeField] private float _hearingSensitivity;
 
     [Header("Unit State")]
     [SerializeField] private UnitState _unitState = UnitState.Idle;
@@ -119,15 +121,19 @@ public class BombRunUnit : MonoBehaviour
 
         UnitVisibilityManager_BombRun.OnAnyUnitBecameVisibile += UnitVisibilityManager_BombRun_OnAnyUnitBecameVisibile;
         UnitVisibilityManager_BombRun.OnAnyUnitBecameInVisibile += UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile;
+        UnitNoiseHearingManager.OnAnyUnitWasHeard += UnitNoiseHearingManager_OnAnyUnitWasHeard;
     }
+
+    
 
     private void OnDisable()
     {
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
         _healthSystem.OnDead -= HealthSystem_OnDead;
 
-        UnitVisibilityManager_BombRun.OnAnyUnitBecameVisibile += UnitVisibilityManager_BombRun_OnAnyUnitBecameVisibile;
-        UnitVisibilityManager_BombRun.OnAnyUnitBecameInVisibile += UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile;
+        UnitVisibilityManager_BombRun.OnAnyUnitBecameVisibile -= UnitVisibilityManager_BombRun_OnAnyUnitBecameVisibile;
+        UnitVisibilityManager_BombRun.OnAnyUnitBecameInVisibile -= UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile;
+        UnitNoiseHearingManager.OnAnyUnitWasHeard -= UnitNoiseHearingManager_OnAnyUnitWasHeard;
     }
     public void InitializeBombRunUnit()
     {
@@ -154,9 +160,17 @@ public class BombRunUnit : MonoBehaviour
     }
     private void Update()
     {
-        GridPosition newGridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
+        Vector3 currentPosition = this.transform.position;
+        // check if transform position is on the corner of a grid. If so, don't update GridPosition, since the GetGridPosition gets
+        if (IsCurrentPositionACornerOfGrid(currentPosition))
+        {
+            return;
+        }
+
+        GridPosition newGridPosition = LevelGrid.Instance.GetGridPositon(currentPosition);
         if (newGridPosition != _gridPosition)
         {
+            Debug.Log("BombRunUnit: " + this.name + " New grid position at: " + newGridPosition + " from transform position of: " + transform.position);
             // unit changed grid position
             GridPosition oldGridPosition = _gridPosition;
             _gridPosition = newGridPosition;
@@ -165,6 +179,24 @@ public class BombRunUnit : MonoBehaviour
             OnThisUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
             OnAnyUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
         }
+    }
+    private bool IsCurrentPositionACornerOfGrid(Vector3 currentPosition)
+    {
+        if (currentPosition.x % 1 == 0)
+        {
+            if ((int)currentPosition.x % LevelGrid.Instance.GetGridCellSize() != 0)
+            {
+                return true;
+            }
+        }
+        if (currentPosition.y % 1 == 0)
+        {
+            if ((int)currentPosition.y % LevelGrid.Instance.GetGridCellSize() != 0)
+            {
+                return true;
+            }
+        }
+        return false;
     }
     public T GetAction<T>() where T : BaseAction
     {
@@ -410,7 +442,7 @@ public class BombRunUnit : MonoBehaviour
     }
     public void SetUnitVisibility(bool isVisible)
     {
-        //Debug.Log("SetUnitVisibility: " + this.name + " isVisible: " + isVisible);
+        Debug.Log("SetUnitVisibility: " + this.name + " isVisible: " + isVisible);
         //this._animator.SetUnitVisibility(isVisible);
         OnUnitVisibilityChanged?.Invoke(this, isVisible);
     }
@@ -456,6 +488,21 @@ public class BombRunUnit : MonoBehaviour
         }
     }
     private void UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile(object sender, BombRunUnit unit)
+    {
+        // for multiplayer, check if this unit is owned by the local player. For now, just have it check if it is an enemy or not?
+        if (!this._isEnemy)
+        {
+            return;
+        }
+
+        if (this == unit)
+        {
+            //Debug.Log("UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile: " + unit.name + " become INVISIBLE");
+            DestroyInvisibleUnitPlaceHolder();
+            SpawnInvisibleUnitPlaceHolder();
+        }
+    }
+    private void UnitNoiseHearingManager_OnAnyUnitWasHeard(object sender, BombRunUnit unit)
     {
         // for multiplayer, check if this unit is owned by the local player. For now, just have it check if it is an enemy or not?
         if (!this._isEnemy)
@@ -561,5 +608,22 @@ public class BombRunUnit : MonoBehaviour
             return;
 
         this._unitPortrait = sprite;
+    }
+    public void ActionMadeNoise(GridPosition actionGridPosition, int noiseDistance)
+    {
+        OnAnyUnitActionMadeNoise?.Invoke(this, new ActionMadeNoiseEventArgs
+        {
+            NoiseMakingUnit = this,
+            ActionGridPosition = actionGridPosition,
+            NoiseDistance = noiseDistance
+        });
+    }
+    public float GetHearingSensitivity()
+    {
+        return _hearingSensitivity;
+    }
+    public void SetHearingSensitivity(float newSensitivity)
+    {
+        this._hearingSensitivity = newSensitivity;
     }
 }

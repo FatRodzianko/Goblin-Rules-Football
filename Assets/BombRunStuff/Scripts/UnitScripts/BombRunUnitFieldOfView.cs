@@ -196,11 +196,35 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                 canUnitSeeThisUnit = false;
             }
         }
+
+        if (canUnitSeeThisUnit)
+        {
+            AddEnemyUnitToVisibleUnits(unit);
+        }
+        else
+        {
+            RemoveEnemyUnitToVisibleUnits(unit);
+        }
+
         return canUnitSeeThisUnit;
     }
     public bool HasThisUnitSeenThisGridPosition(GridPosition gridPosition)
     {
         return _visibleGridPositions.Contains(gridPosition);
+    }
+    private void AddEnemyUnitToVisibleUnits(BombRunUnit unit)
+    {
+        if (!_visibleUnits.Contains(unit))
+        {
+            _visibleUnits.Add(unit);
+        }
+    }
+    private void RemoveEnemyUnitToVisibleUnits(BombRunUnit unit)
+    {
+        if (_visibleUnits.Contains(unit))
+        {
+            _visibleUnits.Remove(unit);
+        }
     }
     private void BombRunObstacle_OnAnyObstacleCoverTypeChanged(object sender, GridPosition gridPosition)
     {
@@ -494,8 +518,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         //var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         
         foreach (GridPosition gridPosition in gridRadius)
-        {
-            
+        {            
             bool canUnitSeePosition = CanUnitSeeGridPosition(gridPosition);
 
             if (canUnitSeePosition)
@@ -517,10 +540,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
                     previouslyVisibleUnitsToRemoveFromVisibility.Remove(unit);
                     UnitVisibilityManager_BombRun.Instance.AddUnitToVisibilityList(unit, this._unit);
                 }
-
                 previousVisibileGridPositions.Remove(gridPosition);
             }
         }
+
         //stopwatch.Stop();
         //Debug.Log("GetVisibileGridPositions: time take: " + stopwatch.ElapsedTicks.ToString());
         foreach (BombRunUnit unit in previouslyVisibleUnitsToRemoveFromVisibility)

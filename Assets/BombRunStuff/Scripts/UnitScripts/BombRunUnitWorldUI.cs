@@ -109,7 +109,7 @@ public class BombRunUnitWorldUI : MonoBehaviour
     }
     private void Unit_OnUnitVisibilityChanged(object sender, bool isVisible)
     {
-        Debug.Log("Unit_OnUnitVisibilityChanged: " + this.transform.parent.name);
+        Debug.Log("Unit_OnUnitVisibilityChanged: " + this.transform.parent.name + isVisible);
         UnitVisibilityChanged(isVisible);
     }
     private void UnitVisibilityChanged(bool isVisible)

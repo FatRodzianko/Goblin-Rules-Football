@@ -208,10 +208,13 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     }
     public void RemoveUnitFromVisibilityList(BombRunUnit visibleUnit)
     {
+        Debug.Log("RemoveUnitFromVisibilityList: " + visibleUnit + " is enemy? " + visibleUnit.IsEnemy());
         if (visibleUnit.IsEnemy())
         {
+            //Debug.Log("RemoveUnitFromVisibilityList: " + visibleUnit + " is enemy");
             if (_unitsVisibleToPlayer.Exists(x => x.VisibileUnit == visibleUnit))
             {
+                //Debug.Log("RemoveUnitFromVisibilityList: " + visibleUnit + " found in _unitsVisibleToPlayer");
                 VisibileUnitAndDiscoverer visibileUnitAndDiscoverer = _unitsVisibleToPlayer.FirstOrDefault(x => x.VisibileUnit == visibleUnit);
                 _unitsVisibleToPlayer.Remove(visibileUnitAndDiscoverer);
                 visibleUnit.SetUnitVisibility(false);
@@ -232,7 +235,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     {
         if (!CheckIfMovedUnitCanBeSeen(enemyUnit, observerUnit))
         {
-            Debug.Log("EnemyLeftObserverFOV: Removing Unit from Visibility");
+            Debug.Log("EnemyLeftObserverFOV: Removing Unit from Visibility: " + enemyUnit.name);
             RemoveUnitFromVisibilityList(enemyUnit);
         }
     }
@@ -461,6 +464,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     }
     private void UnitVisibilityManager_BombRun_OnEnemyUnitBecameVisible(object sender, BombRunUnit unit)
     {
+        Debug.Log("UnitVisibilityManager_BombRun_OnEnemyUnitBecameVisible: unit: " + unit.name + " became VISIBLE at: " + unit.GetGridPosition());
         RemoveFromInvisibleUnitPlaceHolderDictionary(unit);
     }
     private void RemoveFromInvisibleUnitPlaceHolderDictionary(BombRunUnit unit)

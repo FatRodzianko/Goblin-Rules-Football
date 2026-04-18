@@ -30,6 +30,12 @@ public enum VisionTypeRequired
     Team,
     Unit
 }
+public class ActionMadeNoiseEventArgs: EventArgs
+{
+    public BombRunUnit NoiseMakingUnit;
+    public GridPosition ActionGridPosition;
+    public int NoiseDistance;
+}
 public abstract class BaseAction : MonoBehaviour
 {
     //public class BaseParameters { } //this can be extended to have a "generic" base parameter for the TakeAction method
@@ -53,6 +59,10 @@ public abstract class BaseAction : MonoBehaviour
     //[SerializeField] private bool _requiresVision = true;
     [SerializeField] private VisionTypeRequired _visionTypeRequired = VisionTypeRequired.None;
     [SerializeField] private bool _canTakeActionInFogOfWar = false;
+
+    [Header("Noise Info")]
+    [SerializeField] protected bool _makesNoise = false;
+    [SerializeField] protected int _noiseDistance = 0;
 
     [Header("Action Grid Visuals")]
     [SerializeField] GridVisualType _gridRangeVisualType = GridVisualType.RedSoft;
@@ -88,6 +98,7 @@ public abstract class BaseAction : MonoBehaviour
     public static event EventHandler OnAnyActionCompleted;
     public static event EventHandler OnAnyReloadableFired;
     public static event EventHandler OnAnyAmmoRemainingChanged;
+    public static event EventHandler<ActionMadeNoiseEventArgs> OnAnyActionMakesNoise;
 
     // Non-static Actions
 
@@ -408,5 +419,9 @@ public abstract class BaseAction : MonoBehaviour
     public void SetCanTakeActionInFogOfWar(bool canTakeActionInFogOfWar)
     {
         this._canTakeActionInFogOfWar = canTakeActionInFogOfWar;
+    }
+    public BombRunUnit GetUnit()
+    {
+        return this._unit;
     }
 }

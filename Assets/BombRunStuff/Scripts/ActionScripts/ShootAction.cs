@@ -23,7 +23,6 @@ public class ShootAction : BaseAction
         Cooloff,
     }
 
-
     private State _state;
     private float _stateTimer;
     private float _aimingStateTime = 0.5f;
@@ -158,6 +157,13 @@ public class ShootAction : BaseAction
             TargetUnit = _targetUnit,
             ShootingUnit = _unit
         });
+        //OnAnyActionMakesNoise?.Invoke(this, new ActionMadeNoiseEventArgs
+        //{
+        //    NoiseMakingUnit = this._unit,
+        //    ActionGridPosition = this._unit.GetGridPosition(),
+        //    NoiseDistance = this._noiseDistance
+        //});
+        this._unit.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
         //_unit.SetUnitState(UnitState.Attacking);
         //_targetUnit.Damage(35);
     }
@@ -231,7 +237,7 @@ public class ShootAction : BaseAction
 
                 // checks for damage mode to use
                 DamageMode damageMode = _unit.GetDamageMode();
-                Debug.Log("Shoot Action: GetValidActionGridPositionList: " + _unit.name + " Damage mode: " + _unit.GetDamageMode());
+                //Debug.Log("Shoot Action: GetValidActionGridPositionList: " + _unit.name + " Damage mode: " + _unit.GetDamageMode());
                 if (specifyDamageMode)
                 {
                     damageMode = specifiedDamageMode;
@@ -1095,7 +1101,7 @@ public class ShootAction : BaseAction
     {
         List<GridPosition> targetPosition = GetValidActionGridPositionList(gridPosition);
 
-        Debug.Log("GetTargetCountAtGridPosition: " + targetPosition.Count + " targets at: " + gridPosition);
+        //Debug.Log("GetTargetCountAtGridPosition: " + targetPosition.Count + " targets at: " + gridPosition);
         return targetPosition.Count;
     }
     //void CheckForSwitchShootingModeAction()

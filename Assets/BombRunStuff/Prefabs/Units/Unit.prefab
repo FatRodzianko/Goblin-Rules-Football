@@ -1087,6 +1087,8 @@ MonoBehaviour:
   _damageMode: 0
   _sightRange: 10
   _maxMoveDistance: 0
+  _unitPortrait: {fileID: 0}
+  _hearingSensitivity: 1
   _unitState: 1
   _healthSystem: {fileID: 4506797595294261930}
   _baseActionArray: []
@@ -1191,6 +1193,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
   _canTakeActionInFogOfWar: 0
+  _makesNoise: 0
+  _noiseDistance: 0
   _gridRangeVisualType: 3
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1234,6 +1238,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 1
   _visionTypeRequired: 0
   _canTakeActionInFogOfWar: 1
+  _makesNoise: 0
+  _noiseDistance: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1276,6 +1282,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 2
   _canTakeActionInFogOfWar: 0
+  _makesNoise: 1
+  _noiseDistance: 10
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1327,6 +1335,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
   _canTakeActionInFogOfWar: 0
+  _makesNoise: 0
+  _noiseDistance: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1370,6 +1380,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
   _canTakeActionInFogOfWar: 0
+  _makesNoise: 0
+  _noiseDistance: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1417,6 +1429,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
   _canTakeActionInFogOfWar: 0
+  _makesNoise: 0
+  _noiseDistance: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1458,6 +1472,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
   _canTakeActionInFogOfWar: 0
+  _makesNoise: 0
+  _noiseDistance: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1502,6 +1518,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 2
   _canTakeActionInFogOfWar: 0
+  _makesNoise: 0
+  _noiseDistance: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1543,6 +1561,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 1
   _canTakeActionInFogOfWar: 0
+  _makesNoise: 0
+  _noiseDistance: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1587,6 +1607,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 2
   _canTakeActionInFogOfWar: 0
+  _makesNoise: 0
+  _noiseDistance: 0
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 1

@@ -17,5 +17,6 @@ MonoBehaviour:
   _defaultDamageMode: 0
   _sightRange: 8
   _maxMoveDistance: 10
+  _hearingSensitivity: 1.2
   _animatorController: {fileID: 9100000, guid: 92673fe8c911b324f96104c8981826c9, type: 2}
   _unitPortrait: {fileID: 21300000, guid: 0ccfdb0427f572c449ab274fc6523205, type: 3}

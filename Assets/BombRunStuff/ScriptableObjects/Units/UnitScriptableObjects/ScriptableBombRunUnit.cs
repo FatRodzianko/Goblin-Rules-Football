@@ -13,6 +13,7 @@ public class ScriptableBombRunUnit : ScriptableObject
     [SerializeField] private DamageMode _defaultDamageMode;
     [SerializeField] private int _sightRange;
     [SerializeField] private int _maxMoveDistance;
+    [SerializeField] private float _hearingSensitivity = 1.0f;
 
     [Header("Unit Visuals")]
     [SerializeField] private RuntimeAnimatorController _animatorController;
@@ -47,6 +48,10 @@ public class ScriptableBombRunUnit : ScriptableObject
     public int MaxMoveDistance()
     {
         return _maxMoveDistance;
+    }
+    public float HearingSensitivity()
+    {
+        return _hearingSensitivity;
     }
 
 }

@@ -662,6 +662,53 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - The shooting enemy would then be revealed to the player. If the player moves the unit that spotted the enemy, or takes any other action
 			that changes visibility, then the shooting enemy will no longer be visible, unless the action results in that shooting enemy being visible
 			under normal visibility checks
+- - - Actions will have a "makes noise" parameter, and a "noise distance" (how loud it is) parameter as well
+- - - - - - when the action is taken, check if it makes noise
+- - - - - - if yes, get the noise distance
+- - - - - - Get the Grid Radius for that noise distance
+- - - - - - - - - check if there are any units from the opposing team on a Grid Radius grid position
+- - - - - - - - - if yes, check path to the opposing unit from the grid position the action was performed from
+- - - - - - - - - - - - if path length is less than noise distance, then the action was heard by that unit
+- - - - - - - - - - - - if path length is greater than noise distance, then action was not heard by that unit
+- - - - - - Some actions, like move, will need to perform this check multiple times at each grid position the action is taken place at
+- - - - - - ADVANCED: Noise can travel through solid walls and obstacles, but it is diminished
+- - - - - - - - - maybe add a movement cost to walls/obstacles in A*, but only for noise calculations?
+- - - - - - - - - - - - Like the value to move into a wall position is 3x the normal value to move to a position or something
+- - - Maybe have a "hearing" stat for units (hearing distance)
+- - - - - - When checking if a unit can "hear" an action, check what the unit's "hearing distance" is
+- - - - - - - - - If the distance from the unit making the sound is greater than the hearing unit's "hearing distance," than the action wasn't heard?
+- - - - - - Maybe do this for the sound checks:
+- - - - - - - - - Unit takes action that makes noise
+- - - - - - - - - Get all units from the opposing team, calculate distance to the unit that made noise
+- - - - - - - - - Take the action's "Noise Distance" value and multiple by the hearing unit's "Hearing Sensitivity" multiplier
+- - - - - - - - - - - - If distance between unit making noise and listening unit is greater than the Noise Distance x Hearing Sensitivity, action was not heard
+- - - - - - - - - - - - Ex: Unit takes action with Noise Distance of 10. Listening unit has hearing sensitivity of 1.25
+                        Listening unit can hear the action noise from 12.5 distance away (round up to 13?)
+						However, distance between unit making noise and listening unit is 15. Action is not heard?
+- - - - - - - - - REMEMBER: LevelGrid.CalculateDistance is the distance ignoring walls and obstacles. Even if listening unit is not too far away to
+                  hear the action noise, calculate the path from the unit making noise to listening unit. If the PATH LENGTH is greater than the
+				  Noise Distance x Hearing Sensitivity, action was not heard
+- - - static event on Unit that sends noise distance
+- - - - - - function to invoke event is called by baseaction
+- - - - - - baseaction provides noise distance
+- - - - - - Anything subscribed to event will get the noise making unit as the sender, and the noise distance as the parameter?
+- - - - - - - - - BombRunUnit noiseMakingUnit = sender as BombRunUnit?
+- - - - - - or just have it on the action. Added GetUnit to BaseAction so any subscriber should be able to get the action's unit info?
+# Create something like a "Unit Base Parameters" class that is used to store unit's base stats?
+- - - Or like a "Unit Stat Manager" class/script
+- - - Referenced by things like BombRunUnit class to get unit's stats
+- - - Tracks stats for things like
+- - - - - - Sight Distance
+- - - - - - Movement Distance
+- - - - - - Hearing Sensitivity
+- - - - - - Sight FOV?
+- - - - - - Noise Dampening/Noise multiplier (per body part?)
+- - - Ex: BombRunUnit needs to get the unit's current sight distance
+- - - - - - Gets value from something like UnitStatsManager.SightDistance()
+- - - - - - - - - SightDistance will calculate units current sight distance by taking the unit's base stat for Sight Distance, then adding modifiers
+- - - - - - - - - - - - modifers can be items, body mods, failed body mods that hurt stats, injuries (?), whatever
+- - - (GOAL) Stats can be saved to a JSON file so they can be reloaded by the player in a new play session
+- - - I guess this would work as a scriptable object? idk really I forget how those work for storing data at runtime
 # "Body Mods" and unit inventory?
 - - - Have "upgrades" that can made to each goblin unit
 - - - from random junk/loot found throughout levels

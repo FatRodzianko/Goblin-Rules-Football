@@ -149,6 +149,7 @@ public class BombRunUnitSpawner : MonoBehaviour
         unitScript.SetDamageMode(unit.DamageMode());
         unitScript.SetUnitSightRange(unit.SightRange());
         unitScript.SetUnitMaxMoveDistance(unit.MaxMoveDistance());
+        unitScript.SetHearingSensitivity(unit.HearingSensitivity());
         unitScript.SetIsEnemy(isEnemy);
 
         unitTransform.position = LevelGrid.Instance.GetWorldPosition(gridPosition);

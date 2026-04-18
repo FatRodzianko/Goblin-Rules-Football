@@ -75,6 +75,10 @@ PrefabInstance:
       propertyPath: m_WasSpriteAssigned
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4887323598526683332, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: _noiseDistance
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4944422538143551182, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_Name
       value: BaseUnitPrefab
