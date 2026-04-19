@@ -653,18 +653,18 @@ x Have some sort of UI thing that shows what your currently selected unit is
 # Have enemy positions revealed by "sound" of actions if player can hear
 # Example, enemy that isn't currently visible does the shoot action. This action will make a certain amount of "noise" that other units can hear and use determine their location
 # other actions will also "make noise," such as movement. (Add "sneak" movement later? Maybe only for certain classes or from certain items/shoe types?)
-- - - when an enemy shoots check if any player units can hear it 
-- - - - - - check distance from shooting enemy to all player units.
-- - - - - - Check if there is a path (as in grid path) from shooting enemy to player unit. Length of path cannot exceed a "noise distance" of the action
-- - - - - - - - - If yes, and that shooting enemy is not visible, spawn placeholder sprite to "reveal" that shooting enemy position
+- - x when an enemy shoots check if any player units can hear it 
+- - - - - x check distance from shooting enemy to all player units.
+- - - - - x Check if there is a path (as in grid path) from shooting enemy to player unit. Length of path cannot exceed a "noise distance" of the action
+- - - - - - - - x If yes, and that shooting enemy is not visible, spawn placeholder sprite to "reveal" that shooting enemy position
 - - - Instead of placeholders, maybe just make the grid position the shooting enemy fired from "visible" to that unit? 
 - - - - - - So it's added to their visible grid position list
 - - - - - - The shooting enemy would then be revealed to the player. If the player moves the unit that spotted the enemy, or takes any other action
 			that changes visibility, then the shooting enemy will no longer be visible, unless the action results in that shooting enemy being visible
 			under normal visibility checks
 - - - Actions will have a "makes noise" parameter, and a "noise distance" (how loud it is) parameter as well
-- - - - - - when the action is taken, check if it makes noise
-- - - - - - if yes, get the noise distance
+- - - - - x when the action is taken, check if it makes noise
+- - - - - x if yes, get the noise distance
 - - - - - - Get the Grid Radius for that noise distance
 - - - - - - - - - check if there are any units from the opposing team on a Grid Radius grid position
 - - - - - - - - - if yes, check path to the opposing unit from the grid position the action was performed from
@@ -674,18 +674,18 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - ADVANCED: Noise can travel through solid walls and obstacles, but it is diminished
 - - - - - - - - - maybe add a movement cost to walls/obstacles in A*, but only for noise calculations?
 - - - - - - - - - - - - Like the value to move into a wall position is 3x the normal value to move to a position or something
-- - - Maybe have a "hearing" stat for units (hearing distance)
+- - x Maybe have a "hearing" stat for units (hearing distance)
 - - - - - - When checking if a unit can "hear" an action, check what the unit's "hearing distance" is
 - - - - - - - - - If the distance from the unit making the sound is greater than the hearing unit's "hearing distance," than the action wasn't heard?
-- - - - - - Maybe do this for the sound checks:
-- - - - - - - - - Unit takes action that makes noise
-- - - - - - - - - Get all units from the opposing team, calculate distance to the unit that made noise
-- - - - - - - - - Take the action's "Noise Distance" value and multiple by the hearing unit's "Hearing Sensitivity" multiplier
-- - - - - - - - - - - - If distance between unit making noise and listening unit is greater than the Noise Distance x Hearing Sensitivity, action was not heard
-- - - - - - - - - - - - Ex: Unit takes action with Noise Distance of 10. Listening unit has hearing sensitivity of 1.25
+- - - - - x Maybe do this for the sound checks:
+- - - - - - - - x Unit takes action that makes noise
+- - - - - - - - x Get all units from the opposing team, calculate distance to the unit that made noise
+- - - - - - - - x Take the action's "Noise Distance" value and multiple by the hearing unit's "Hearing Sensitivity" multiplier
+- - - - - - - - - - - x If distance between unit making noise and listening unit is greater than the Noise Distance x Hearing Sensitivity, action was not heard
+- - - - - - - - - - - x Ex: Unit takes action with Noise Distance of 10. Listening unit has hearing sensitivity of 1.25
                         Listening unit can hear the action noise from 12.5 distance away (round up to 13?)
 						However, distance between unit making noise and listening unit is 15. Action is not heard?
-- - - - - - - - - REMEMBER: LevelGrid.CalculateDistance is the distance ignoring walls and obstacles. Even if listening unit is not too far away to
+- - - - - - - - x REMEMBER: LevelGrid.CalculateDistance is the distance ignoring walls and obstacles. Even if listening unit is not too far away to
                   hear the action noise, calculate the path from the unit making noise to listening unit. If the PATH LENGTH is greater than the
 				  Noise Distance x Hearing Sensitivity, action was not heard
 - - - static event on Unit that sends noise distance
@@ -694,6 +694,15 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - Anything subscribed to event will get the noise making unit as the sender, and the noise distance as the parameter?
 - - - - - - - - - BombRunUnit noiseMakingUnit = sender as BombRunUnit?
 - - - - - - or just have it on the action. Added GetUnit to BaseAction so any subscriber should be able to get the action's unit info?
+- - - Add UI indicator for actions to show which ones make noise
+- - - - - - Mute symbol if it makes no noise?
+- - - - - - Speaker icon if it does make noise
+- - - - - - - - - Speaker icon to indicate how "loud" an action may be
+- - - - - - - - -  []<| - speaker? looks like a camera, but for example purposes...
+- - - - - - - - - []<| ) - low volume
+- - - - - - - - - []<| )) - medium volume
+- - - - - - - - - []<| ))) - high volume
+- - - - - - - - - Maybe have the ")" symbols greyed out if the volume doesn't reach that threshold?
 # Create something like a "Unit Base Parameters" class that is used to store unit's base stats?
 - - - Or like a "Unit Stat Manager" class/script
 - - - Referenced by things like BombRunUnit class to get unit's stats
