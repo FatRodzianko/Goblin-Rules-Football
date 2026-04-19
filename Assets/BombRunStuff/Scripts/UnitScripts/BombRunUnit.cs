@@ -83,6 +83,7 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] private bool _hasUnitBeenSeen = false;
     [SerializeField] private Vector2Int _lastSeenAtVector2Position = new Vector2Int(-1, -1); 
     private GridPosition _lastSeenAtGridPosition;
+    [SerializeField] private Vector2Int _currentVector2Position = new Vector2Int(-1, -1);
 
 
     private void Awake()
@@ -162,10 +163,12 @@ public class BombRunUnit : MonoBehaviour
     {
         Vector3 currentPosition = this.transform.position;
         // check if transform position is on the corner of a grid. If so, don't update GridPosition, since the GetGridPosition gets
-        if (IsCurrentPositionACornerOfGrid(currentPosition))
-        {
-            return;
-        }
+        //if (IsCurrentPositionACornerOfGrid(currentPosition))
+        //{
+        //    return;
+        //}
+
+        // maybe have it check if the unit is moving. If the unit is moving, and the new position isn't in the _positionList from MoveAction, ignore?
 
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPositon(currentPosition);
         if (newGridPosition != _gridPosition)
@@ -174,6 +177,8 @@ public class BombRunUnit : MonoBehaviour
             // unit changed grid position
             GridPosition oldGridPosition = _gridPosition;
             _gridPosition = newGridPosition;
+            _currentVector2Position.x = _gridPosition.x;
+            _currentVector2Position.y = _gridPosition.y;
             LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
 
             OnThisUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
@@ -189,9 +194,25 @@ public class BombRunUnit : MonoBehaviour
                 return true;
             }
         }
+        else
+        {
+            var x = currentPosition.x - Math.Truncate(currentPosition.x);
+            if (x >= 0.98f || x <= 0.02f)
+            {
+                return true;
+            }
+        }
         if (currentPosition.y % 1 == 0)
         {
             if ((int)currentPosition.y % LevelGrid.Instance.GetGridCellSize() != 0)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            var y = currentPosition.y - Math.Truncate(currentPosition.y);
+            if (y >= 0.98f || y <= 0.02f)
             {
                 return true;
             }
@@ -525,6 +546,7 @@ public class BombRunUnit : MonoBehaviour
     {
         // Get Invisible Unit spawn position
         Vector3 spawnPosition = LevelGrid.Instance.GetWorldPosition(this.GetGridPosition());
+        Debug.Log("SpawnInvisibleUnitPlaceHolder: Spawning placeholder for: " + this.name + " at World position: " + spawnPosition + " from grid position: " + this.GetGridPosition());
         if (this.GetUnitAnimationState() == UnitAnimationState.Moving)
         {
             spawnPosition = this.GetWorldPosition();

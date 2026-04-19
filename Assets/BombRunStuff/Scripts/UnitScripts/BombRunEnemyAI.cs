@@ -134,6 +134,7 @@ public class BombRunEnemyAI : MonoBehaviour
             }
             else
             {
+                Debug.Log("TryTakeEnemyAIAction: unit " + enemyUnit.name + " is taking action: " + bestBaseAction.GetActionName() + " at grid position: " + bestEnemyAIAction._GridPosition);
                 bestBaseAction.TakeAction(bestEnemyAIAction._GridPosition, onEnemyActionComplete);
             }
             

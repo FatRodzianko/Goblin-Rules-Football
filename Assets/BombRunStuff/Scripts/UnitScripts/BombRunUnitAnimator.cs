@@ -77,7 +77,7 @@ public class BombRunUnitAnimator : MonoBehaviour
     private void Unit_OnUnitStateChanged(object sender, UnitState unitState)
     {
 
-        Debug.Log("Unit_OnUnitStateChanged: " + unitState.ToString());
+        Debug.Log("Unit_OnUnitStateChanged: " + unitState.ToString() + " for: " + this._unit.name);
         switch (unitState)
         {
             case UnitState.Moving:
@@ -110,8 +110,9 @@ public class BombRunUnitAnimator : MonoBehaviour
         ShootProjectile shootProjectileScript = shootProjectile.GetComponent<ShootProjectile>();
 
         shootProjectileScript.OnProjectileHitTarget += ShootProjectile_OnProjectileHitTarget;
-
         shootProjectileScript.Setup(shootAction.GetTargetUnitWorldPosition());
+
+
     }
 
     private void ShootProjectile_OnProjectileHitTarget(object sender, EventArgs e)

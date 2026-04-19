@@ -153,6 +153,10 @@ public abstract class BaseAction : MonoBehaviour
         }
 
         OnAnyActionStarted?.Invoke(this, EventArgs.Empty);
+        if (this._makesNoise)
+        {
+            this._unit.ActionMadeNoise(_unit.GetGridPosition(), this._noiseDistance);
+        }
     }
     protected void ActionComplete()
     {

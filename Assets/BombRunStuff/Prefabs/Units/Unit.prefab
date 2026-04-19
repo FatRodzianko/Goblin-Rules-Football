@@ -1238,8 +1238,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 1
   _visionTypeRequired: 0
   _canTakeActionInFogOfWar: 1
-  _makesNoise: 0
-  _noiseDistance: 0
+  _makesNoise: 1
+  _noiseDistance: 4
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1283,7 +1283,7 @@ MonoBehaviour:
   _visionTypeRequired: 2
   _canTakeActionInFogOfWar: 0
   _makesNoise: 1
-  _noiseDistance: 10
+  _noiseDistance: 5
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0

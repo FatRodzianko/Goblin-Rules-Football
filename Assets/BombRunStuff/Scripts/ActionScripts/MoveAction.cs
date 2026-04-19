@@ -27,9 +27,9 @@ public class MoveAction : BaseAction
 
     [Header("Moving")]
     [SerializeField] private int _maxMoveDistance = 4;
-    private List<Vector3> _positionList;
+    [SerializeField] private List<Vector3> _positionList;
     private Vector3 _targetPosition;
-    private int _currentPositionIndex = 0;
+    [SerializeField] private int _currentPositionIndex = 0;
     private float _moveSpeed = 4f;
     private float _stoppingDistance = 0.05f;
     
@@ -78,6 +78,8 @@ public class MoveAction : BaseAction
         }
         else
         {
+            
+            this._unit.ActionMadeNoise(LevelGrid.Instance.GetGridPositon(_targetPosition), this._noiseDistance);
             _currentPositionIndex++;
             // check if the position index is larger than the position list. If so, action has completed
             if (_currentPositionIndex >= _positionList.Count())
@@ -90,9 +92,11 @@ public class MoveAction : BaseAction
             }
             else
             {
+                Debug.Log("MoveAction: " + this._unit.name + " will now move to move to: " + _positionList[_currentPositionIndex]);
                 _unit.SetActionDirection(_positionList[_currentPositionIndex] - LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition()));
             }
             
+
         }
     }
     protected override void BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged(object sender, BodyPart bodyPart)
@@ -141,7 +145,8 @@ public class MoveAction : BaseAction
         List<GridPosition> pathGridPositionList =  PathFinding.Instance.FindPath(_unit.GetGridPosition(), gridPosition, out int pathLength, _maxMoveDistance);
 
         _currentPositionIndex = 0;
-        _positionList = new List<Vector3>();
+        //_positionList = new List<Vector3>();
+        _positionList.Clear();
 
         if (pathGridPositionList == null)
         {
@@ -156,6 +161,7 @@ public class MoveAction : BaseAction
         {
             _positionList.Add(LevelGrid.Instance.GetWorldPosition(pathGridPosition));
         }
+        Debug.Log("TakeAction: MoveAction: " + this._unit.name + " will move to: " + _positionList[0]) ;
 
         ActionStart(onActionComplete);
         OnStartMoving?.Invoke(this, EventArgs.Empty);

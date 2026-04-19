@@ -163,7 +163,10 @@ public class ShootAction : BaseAction
         //    ActionGridPosition = this._unit.GetGridPosition(),
         //    NoiseDistance = this._noiseDistance
         //});
-        this._unit.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
+
+        //Debug.Break();
+        //this._unit.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
+
         //_unit.SetUnitState(UnitState.Attacking);
         //_targetUnit.Damage(35);
     }
@@ -610,7 +613,7 @@ public class ShootAction : BaseAction
             }
         }
 
-        Debug.Log("DoesShotHitWallOrObstacle: No walls or obstacles hit for position: " + targetWorldPosition);
+        //Debug.Log("DoesShotHitWallOrObstacle: No walls or obstacles hit for position: " + targetWorldPosition);
         return false;
     }
     private bool IsCornerHit(Vector2 hitPoint)

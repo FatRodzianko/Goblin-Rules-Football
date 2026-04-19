@@ -235,7 +235,7 @@ public class UnitVisibilityManager_BombRun : MonoBehaviour
     {
         if (!CheckIfMovedUnitCanBeSeen(enemyUnit, observerUnit))
         {
-            Debug.Log("EnemyLeftObserverFOV: Removing Unit from Visibility: " + enemyUnit.name);
+            Debug.Log("EnemyLeftObserverFOV: Removing Unit from " + observerUnit.name + "'s Visibility: " + enemyUnit.name);
             RemoveUnitFromVisibilityList(enemyUnit);
         }
     }
