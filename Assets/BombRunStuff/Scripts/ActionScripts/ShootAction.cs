@@ -1063,6 +1063,10 @@ public class ShootAction : BaseAction
     {
         return _targetUnitWorldPosition;
     }
+    public void ProjectileFired()
+    {
+        this.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
+    }
     public void ProjectileHitTarget()
     {
         //if (BombRunUnitManager.Instance.IsUnitAnEnemy(this._unit))

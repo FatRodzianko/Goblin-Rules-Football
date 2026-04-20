@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58a0a9e220b56894bb7b47f0eb9a7c0f, type: 3}
+  m_Name: NoiseUIMapping
+  m_EditorClassIdentifier: 
+  _noiseThresholdMappings:
+  - NoiseLevel: 0
+    VolumeThreshold: 0
+  - NoiseLevel: 1
+    VolumeThreshold: 1
+  - NoiseLevel: 2
+    VolumeThreshold: 4
+  - NoiseLevel: 3
+    VolumeThreshold: 7
+  _noiseLevelUISpriteMappings:
+  - NoiseLevel: 0
+    Sprite: {fileID: 21300000, guid: 9d158c55f7bb49a4d90421235c436bf5, type: 3}
+  - NoiseLevel: 1
+    Sprite: {fileID: 21300000, guid: af04434355db5cb4bad3ec568da620b0, type: 3}
+  - NoiseLevel: 2
+    Sprite: {fileID: 21300000, guid: 7cd95f25fb66c5a4d8645d67265e06fc, type: 3}
+  - NoiseLevel: 3
+    Sprite: {fileID: 21300000, guid: cddcba04fae777547b5e4ac18f1f2cea, type: 3}

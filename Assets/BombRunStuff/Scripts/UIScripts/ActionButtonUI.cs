@@ -18,6 +18,10 @@ public class ActionButtonUI : MonoBehaviour
     [Header("Ammo Stuff")]
     [SerializeField] private TextMeshProUGUI _remainingAmmoText;
 
+    [Header("Action Noise")]
+    [SerializeField] private ScriptableNoiseUIMapping _scriptableNoiseUIMapping;
+    [SerializeField] private Image _actionNoiseIconImage;
+
     private BaseAction _baseAction;
 
     public void SetBaseAction(BaseAction baseAction)
@@ -28,6 +32,8 @@ public class ActionButtonUI : MonoBehaviour
         _button.onClick.AddListener(() => {
             UnitActionSystem.Instance.SetSelectedAction(baseAction);
         });
+
+        UpdateActionNoiseIcon();
     }
 
     public void UpdateSelectedActionVisual()
@@ -65,6 +71,16 @@ public class ActionButtonUI : MonoBehaviour
     public void UpdateBodyPartSpriteIndicator()
     {
         _actionButtonBodyPartSpriteHolderScript.UpdateBodyPartImage();
+    }
+    private void UpdateActionNoiseIcon()
+    {
+        if (!_baseAction.MakesNoise())
+        {
+            _actionNoiseIconImage.sprite = _scriptableNoiseUIMapping.GetSpriteFromNoiseVolume(0);
+            return;
+        }
+
+        _actionNoiseIconImage.sprite = _scriptableNoiseUIMapping.GetSpriteFromNoiseVolume(_baseAction.NoiseDistance());
     }
 
 }

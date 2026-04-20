@@ -18,6 +18,7 @@ public class ReloadAction : BaseAction
         if (_reloadCounter <= 0)
         {
             ReloadWeapons();
+            this.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
             ActionComplete();
         }
     }

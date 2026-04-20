@@ -1101,6 +1101,7 @@ MonoBehaviour:
   _invisibleUnitPlaceHolder: {fileID: 0}
   _hasUnitBeenSeen: 0
   _lastSeenAtVector2Position: {x: -1, y: -1}
+  _currentVector2Position: {x: -1, y: -1}
 --- !u!114 &7297105716296972232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1239,7 +1240,7 @@ MonoBehaviour:
   _visionTypeRequired: 0
   _canTakeActionInFogOfWar: 1
   _makesNoise: 1
-  _noiseDistance: 4
+  _noiseDistance: 8
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1258,6 +1259,8 @@ MonoBehaviour:
   _unitStateOnStartAction: 2
   _unitStateOnCompleteAction: 1
   _maxMoveDistance: 4
+  _positionList: []
+  _currentPositionIndex: 0
 --- !u!114 &4887323598526683332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1283,7 +1286,7 @@ MonoBehaviour:
   _visionTypeRequired: 2
   _canTakeActionInFogOfWar: 0
   _makesNoise: 1
-  _noiseDistance: 5
+  _noiseDistance: 8
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1335,8 +1338,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 0
   _canTakeActionInFogOfWar: 0
-  _makesNoise: 0
-  _noiseDistance: 0
+  _makesNoise: 1
+  _noiseDistance: 3
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1518,8 +1521,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 2
   _canTakeActionInFogOfWar: 0
-  _makesNoise: 0
-  _noiseDistance: 0
+  _makesNoise: 1
+  _noiseDistance: 2
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1561,8 +1564,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 1
   _canTakeActionInFogOfWar: 0
-  _makesNoise: 0
-  _noiseDistance: 0
+  _makesNoise: 1
+  _noiseDistance: 4
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1607,8 +1610,8 @@ MonoBehaviour:
   _canGetValidListAsTask: 0
   _visionTypeRequired: 2
   _canTakeActionInFogOfWar: 0
-  _makesNoise: 0
-  _noiseDistance: 0
+  _makesNoise: 1
+  _noiseDistance: 2
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 1

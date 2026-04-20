@@ -74,6 +74,7 @@ public class InteractAction : BaseAction
         interactable.Interact(OnInteractComplete);
 
         ActionStart(onActionComplete);
+        this.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
     }
     private void OnInteractComplete()
     {

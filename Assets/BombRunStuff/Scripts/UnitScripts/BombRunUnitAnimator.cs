@@ -112,7 +112,7 @@ public class BombRunUnitAnimator : MonoBehaviour
         shootProjectileScript.OnProjectileHitTarget += ShootProjectile_OnProjectileHitTarget;
         shootProjectileScript.Setup(shootAction.GetTargetUnitWorldPosition());
 
-
+        shootAction.ProjectileFired();
     }
 
     private void ShootProjectile_OnProjectileHitTarget(object sender, EventArgs e)

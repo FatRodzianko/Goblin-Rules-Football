@@ -71,6 +71,7 @@ public class SwordAction : BaseAction
                 DamageTarget();
                 
                 OnAnySwordHit?.Invoke(this, EventArgs.Empty);
+                this.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
                 break;
             case State.SwiningSwordAfterHit:
                 OnSwordActionCompleted?.Invoke(this, EventArgs.Empty);

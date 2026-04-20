@@ -107,6 +107,8 @@ public class GrenadeAction : BaseAction
         {
             UseAmmo(this._ammoCost);
         }
+
+        this.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
     }
     private void OnGrenadeBehaviorComplete()
     {

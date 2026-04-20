@@ -153,10 +153,10 @@ public abstract class BaseAction : MonoBehaviour
         }
 
         OnAnyActionStarted?.Invoke(this, EventArgs.Empty);
-        if (this._makesNoise)
-        {
-            this._unit.ActionMadeNoise(_unit.GetGridPosition(), this._noiseDistance);
-        }
+        //if (this._makesNoise)
+        //{
+        //    this._unit.ActionMadeNoise(_unit.GetGridPosition(), this._noiseDistance);
+        //}
     }
     protected void ActionComplete()
     {
@@ -427,5 +427,25 @@ public abstract class BaseAction : MonoBehaviour
     public BombRunUnit GetUnit()
     {
         return this._unit;
+    }
+    public void ActionMadeNoise(GridPosition actionGridPosition, int noiseDistance)
+    {
+        this._unit.ActionMadeNoise(actionGridPosition, noiseDistance);
+    }
+    public bool MakesNoise()
+    {
+        return _makesNoise;
+    }
+    public void SetMakesNoise(bool makesNoise)
+    {
+        this._makesNoise = makesNoise;
+    }
+    public int NoiseDistance()
+    {
+        return _noiseDistance;
+    }
+    public void SetNoiseDistance(int noiseDistance)
+    {
+        this._noiseDistance = noiseDistance;
     }
 }

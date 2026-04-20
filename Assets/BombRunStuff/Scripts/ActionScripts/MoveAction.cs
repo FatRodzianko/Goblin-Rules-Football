@@ -79,7 +79,8 @@ public class MoveAction : BaseAction
         else
         {
             
-            this._unit.ActionMadeNoise(LevelGrid.Instance.GetGridPositon(_targetPosition), this._noiseDistance);
+            this.ActionMadeNoise(LevelGrid.Instance.GetGridPositon(_targetPosition), this._noiseDistance);
+
             _currentPositionIndex++;
             // check if the position index is larger than the position list. If so, action has completed
             if (_currentPositionIndex >= _positionList.Count())
@@ -165,6 +166,9 @@ public class MoveAction : BaseAction
 
         ActionStart(onActionComplete);
         OnStartMoving?.Invoke(this, EventArgs.Empty);
+
+        ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
+
         //_unit.SetUnitState(UnitState.Moving);
     }
     public override List<GridPosition> GetValidActionGridPositionList()
