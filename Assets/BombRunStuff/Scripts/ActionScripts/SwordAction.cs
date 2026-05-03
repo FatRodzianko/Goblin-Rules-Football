@@ -33,8 +33,9 @@ public class SwordAction : BaseAction
 
     public static event EventHandler OnAnySwordHit;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         this._gridVisualRange = _maxSwordDistance;
     }
     private void Update()

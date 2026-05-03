@@ -665,12 +665,12 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - Actions will have a "makes noise" parameter, and a "noise distance" (how loud it is) parameter as well
 - - - - - x when the action is taken, check if it makes noise
 - - - - - x if yes, get the noise distance
-- - - - - - Get the Grid Radius for that noise distance
-- - - - - - - - - check if there are any units from the opposing team on a Grid Radius grid position
-- - - - - - - - - if yes, check path to the opposing unit from the grid position the action was performed from
-- - - - - - - - - - - - if path length is less than noise distance, then the action was heard by that unit
-- - - - - - - - - - - - if path length is greater than noise distance, then action was not heard by that unit
-- - - - - - Some actions, like move, will need to perform this check multiple times at each grid position the action is taken place at
+- - - - - x Get the Grid Radius for that noise distance
+- - - - - - - - x check if there are any units from the opposing team on a Grid Radius grid position
+- - - - - - - - x if yes, check path to the opposing unit from the grid position the action was performed from
+- - - - - - - - - - - x if path length is less than noise distance, then the action was heard by that unit
+- - - - - - - - - - - x if path length is greater than noise distance, then action was not heard by that unit
+- - - - - x Some actions, like move, will need to perform this check multiple times at each grid position the action is taken place at
 - - - - - - ADVANCED: Noise can travel through solid walls and obstacles, but it is diminished
 - - - - - - - - - maybe add a movement cost to walls/obstacles in A*, but only for noise calculations?
 - - - - - - - - - - - - Like the value to move into a wall position is 3x the normal value to move to a position or something
@@ -703,6 +703,13 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - - - x []<| )) - medium volume
 - - - - - - - - x []<| ))) - high volume
 - - - - - - - - x Maybe have the ")" symbols greyed out if the volume doesn't reach that threshold?
+- - - maybe have some sort of "ripple" effect on the level grid to indicate where sounds are traveling?
+- - - - - - the mostly transparent "grid" that you see over everything could have the grid squares "ripple" starting out from the action grid position
+- - - - - - - - - animated tiles or something?
+- - - - - - The ripple effect shows for all of your unit actions
+- - - - - - - - - to help player know how loud they are being
+- - - - - - Ripple effect for enemy unit actions only if they can be heard
+- - - - - - This is probably a lot harder to figure out than I imagine lol
 # Make the ActionButton UI objects at least twice as big
 - - - Will allow for the Sprite UI elements, like the BodyPart map and the action noise volume, can be set to "set to native size"
 - - - - - - this looks so much better than it does right now with odd looking "pixels" that are all different sizes
@@ -774,7 +781,7 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - Body Part
 - - - Stat to Buff (move distance, vision distance, fov angle, total action points, whatever)
 - - - Stat Buff Amount
-- - - - - - Maybe for the "State to Buff" and "Stat Buff Amount" make it a dictionary so body mods can affect more than one stat?
+- - - - - - Maybe for the "Stat to Buff" and "Stat Buff Amount" make it a dictionary so body mods can affect more than one stat?
 - - - image of body mod
 - - - Description of item
 
