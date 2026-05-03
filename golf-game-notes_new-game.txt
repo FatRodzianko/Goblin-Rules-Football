@@ -714,6 +714,7 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - Will allow for the Sprite UI elements, like the BodyPart map and the action noise volume, can be set to "set to native size"
 - - - - - - this looks so much better than it does right now with odd looking "pixels" that are all different sizes
 - - - the UI is just generally cramped and could be larger. will make things more legible
+- - x looks bad when doubled in size so I reverted back to original size, but might just do it anyway? Or just ignore. The UI is "good enough" for this stage
 # "Alternative Actions" for actions
 - - - All actions can have an "Alt" action
 - - - - - - Ex: "Sneak" as an alt action for "Move"
