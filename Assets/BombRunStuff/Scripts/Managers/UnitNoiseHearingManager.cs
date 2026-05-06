@@ -46,14 +46,6 @@ public class UnitNoiseHearingManager : MonoBehaviour
                 break;
             }
         }
-
-        //foreach (BombRunUnit unit in unitsCloseEnoughToHear)
-        //{
-        //    if (CanSoundTravelToListeningUnit())
-        //    {
-        //        break;
-        //    }
-        //}
     }
     private bool IsUnitCloseEnoughToHearNoise(GridPosition noiseStartPosition, GridPosition listeningUnitPosition, int noiseDistance, float listeningUnitHearingSensitivity)
     {

@@ -51329,15 +51329,39 @@ Tilemap:
   m_Enabled: 1
   m_Tiles: {}
   m_AnimatedTiles: {}
-  m_TileAssetArray: []
-  m_TileSpriteArray: []
-  m_TileMatrixArray: []
-  m_TileColorArray: []
+  m_TileAssetArray:
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  m_TileSpriteArray:
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  m_TileMatrixArray:
+  - m_RefCount: 0
+    m_Data:
+      e00: 0
+      e01: 0
+      e02: 1.4495531e+10
+      e03: 1.4495531e+10
+      e10: 0
+      e11: 0
+      e12: 6.91e-43
+      e13: 6.91e-43
+      e20: -0.019554853
+      e21: 1e-45
+      e22: -1.9915974e-28
+      e23: -1.2104279e-19
+      e30: 4.5904e-41
+      e31: 0
+      e32: 6.91e-43
+      e33: 6.94e-43
+  m_TileColorArray:
+  - m_RefCount: 0
+    m_Data: {r: NaN, g: NaN, b: NaN, a: NaN}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 0.19607843}
   m_Origin: {x: 0, y: 0, z: 0}
-  m_Size: {x: 0, y: 0, z: 1}
+  m_Size: {x: 10, y: 9, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -52500,6 +52524,7 @@ GameObject:
   - component: {fileID: 1494887100}
   - component: {fileID: 1494887101}
   - component: {fileID: 1494887102}
+  - component: {fileID: 1494887103}
   m_Layer: 0
   m_Name: TileMapManager
   m_TagString: Untagged
@@ -52631,6 +52656,21 @@ MonoBehaviour:
   _fogOfWarTile: {fileID: 11400000, guid: 0aeb92c7bdaaf4d4db150682b9545947, type: 2}
   _fogOfWarWhiteTile: {fileID: 11400000, guid: 6dab0f225b446c74895fe76aa30e310c, type: 2}
   _enemyVisibleGridTile: {fileID: 11400000, guid: 6868f8864742758468c42e7150678f68, type: 2}
+--- !u!114 &1494887103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494887096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4d050cb479b7be4e82fa5e7dbb6013b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gridVisualTileMap: {fileID: 946836224}
+  _bombRunTileMapManager: {fileID: 1494887097}
+  _fogOfWarTileMapManager: {fileID: 1494887102}
 --- !u!1001 &1536326559
 PrefabInstance:
   m_ObjectHideFlags: 0

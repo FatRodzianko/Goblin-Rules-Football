@@ -134,6 +134,10 @@ public class BombRunUnitManager : MonoBehaviour
     {
         return _bombRunUnitActionValueManager.GetUnitBodyPartActionValue(unitType, bodyPart);
     }
+    public bool IsUnitOwnedByPlayer(BombRunUnit unit)
+    {
+        return _friendlyUnitList.Contains(unit);
+    }
 
 }
 

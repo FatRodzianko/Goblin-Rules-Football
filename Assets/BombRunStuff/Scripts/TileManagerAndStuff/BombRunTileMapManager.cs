@@ -286,4 +286,8 @@ public class BombRunTileMapManager : MonoBehaviour
     {
         return _bombRunObstacleManager.IsObstacleAtGridPosition(gridPosition);
     }
+    public void AnimateNoiseTiles(List<GridPosition> gridPositions)
+    {
+        Debug.Log("BombRunTileMapManager: AnimateNoiseTiles: " + gridPositions.Count);
+    }
 }
