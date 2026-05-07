@@ -25,7 +25,8 @@ public class BombRunTileMapManager : MonoBehaviour
 
     [Header("Grid Visual Tiles")]
     [SerializeField] private Tile _gridVisualDefaulTile;
-    [SerializeField] private Tile _actionVisualTile;    
+    [SerializeField] private Tile _actionVisualTile;
+    [SerializeField] private GameObject _gridNoiseVisualIndicatorObject;
 
     [Header("Tile List")]
     [SerializeField] private List<GridPosition> _floorTilePositions = new List<GridPosition>();
@@ -288,6 +289,10 @@ public class BombRunTileMapManager : MonoBehaviour
     }
     public void AnimateNoiseTiles(List<GridPosition> gridPositions)
     {
-        Debug.Log("BombRunTileMapManager: AnimateNoiseTiles: " + gridPositions.Count);
+        foreach (GridPosition gridPosition in gridPositions)
+        {
+            Instantiate(_gridNoiseVisualIndicatorObject, LevelGrid.Instance.GetWorldPosition(gridPosition), Quaternion.identity, this.transform);
+        }
+
     }
 }

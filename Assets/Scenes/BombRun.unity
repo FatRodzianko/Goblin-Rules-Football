@@ -52553,6 +52553,7 @@ MonoBehaviour:
   _wallTile: {fileID: 11400000, guid: 8d28aa6e8220e944f93c5313f6fa2965, type: 2}
   _gridVisualDefaulTile: {fileID: 11400000, guid: 554219682278b0a458e54714ce076199, type: 2}
   _actionVisualTile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
+  _gridNoiseVisualIndicatorObject: {fileID: 9083731438183017183, guid: 2d5f3e491661d22449d76e56ae6b9085, type: 3}
   _bombRunObstacleManager: {fileID: 1494887101}
   _wallObjectHolder: {fileID: 11492959}
   _wallObjectPrefab: {fileID: 4081284152493014567, guid: d0f262c1ffa7fdc46922c82c8246b040, type: 3}
