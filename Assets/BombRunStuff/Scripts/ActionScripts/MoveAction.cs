@@ -167,7 +167,7 @@ public class MoveAction : BaseAction
         ActionStart(onActionComplete);
         OnStartMoving?.Invoke(this, EventArgs.Empty);
 
-        ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
+        //ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
 
         //_unit.SetUnitState(UnitState.Moving);
     }

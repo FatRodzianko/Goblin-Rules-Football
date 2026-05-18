@@ -18,7 +18,7 @@ public class ReloadAction : BaseAction
         if (_reloadCounter <= 0)
         {
             ReloadWeapons();
-            this.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
+            
             ActionComplete();
         }
     }
@@ -65,6 +65,7 @@ public class ReloadAction : BaseAction
     {
         Debug.Log("TakeAction: ReloadAction");
         _reloadCounter = _reloadTime;
+        this.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
         ActionStart(onActionComplete);
     }
     public override bool CanTakeAction(int actionPointsAvailable, GridPosition actionPosition)

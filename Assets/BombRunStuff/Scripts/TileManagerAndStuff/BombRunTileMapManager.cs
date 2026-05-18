@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -291,8 +292,9 @@ public class BombRunTileMapManager : MonoBehaviour
     {
         foreach (GridPosition gridPosition in gridPositions)
         {
-            Instantiate(_gridNoiseVisualIndicatorObject, LevelGrid.Instance.GetWorldPosition(gridPosition), Quaternion.identity, this.transform);
+            Instantiate(_gridNoiseVisualIndicatorObject, LevelGrid.Instance.GetWorldPosition(gridPosition), Quaternion.identity, this.transform
+                );
         }
-
     }
+
 }

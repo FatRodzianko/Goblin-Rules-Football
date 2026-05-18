@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-
+[Serializable]
 public class NoiseVisualIndicatorParameters
 {
     public GridPosition NoiseGridPosition;
@@ -28,6 +28,9 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
 
     [Header("Fog of War")]
     [SerializeField] private FogOfWarTileMapManager _fogOfWarTileMapManager;
+
+    [Header("Noise animation?")]
+    [SerializeField] private float _animationDelay = 0.025f;
 
     private void Start()
     {
@@ -59,6 +62,7 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
     }
     private void StartActionMadeNoiseVisuals(GridPosition startingGridPosition, int noiseDistance)
     {
+        Debug.Log("StartActionMadeNoiseVisuals: Start position: " + startingGridPosition.ToString() + " noise distance: " + noiseDistance);
         List<GridPosition> noiseRadiusGridPositions = LevelGrid.Instance.GetGridPositionsInRadius(startingGridPosition, noiseDistance);
         if (noiseRadiusGridPositions.Count < 1)
             return;
@@ -73,7 +77,9 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
             // otherwise it could show player where walls/objects they haven't seen yet are?
             if (_fogOfWarTileMapManager.IsPositionInFogOfWar(noiseGridPosition))
             {
-                noiseGridPositionsByDistance.Add(new NoiseVisualIndicatorParameters(noiseGridPosition, LevelGrid.Instance.CalculateDistance(startingGridPosition, noiseGridPosition)));
+                int fogOfWarDistance = LevelGrid.Instance.CalculateDistance(startingGridPosition, noiseGridPosition) / PathFinding.Instance.GetPathFindingDistanceMultiplier();
+                noiseGridPositionsByDistance.Add(new NoiseVisualIndicatorParameters(noiseGridPosition, fogOfWarDistance));
+                //Debug.Log("StartActionMadeNoiseVisuals: Position in fog of war at: " + noiseGridPosition + " distance of: " + fogOfWarDistance);
                 continue;
             }
 
@@ -93,8 +99,11 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
         }
 
         //sort the dictionary by the distance?
-        noiseGridPositionsByDistance.OrderBy(x => x.NoiseDistance);
-        StartCoroutine(AnimateNoiseTiles(noiseGridPositionsByDistance, noiseDistance));
+        //noiseGridPositionsByDistance.OrderBy(x => x.NoiseDistance);
+        //StartCoroutine(AnimateNoiseTiles(noiseGridPositionsByDistance.OrderBy(x => x.NoiseDistance).ToList(), noiseDistance * PathFinding.Instance.GetPathFindingDistanceMultiplier()));
+        StartCoroutine(AnimateNoiseTiles(noiseGridPositionsByDistance.OrderBy(x => x.NoiseDistance).ToList(), noiseDistance));
+        //_bombRunTileMapManager.AnimateAllNoiseTiles(noiseGridPositionsByDistance.OrderBy(x => x.NoiseDistance).ToList(), noiseDistance, _animationDelay);
+        //_bombRunTileMapManager.AnimateAllNoiseTiles(noiseGridPositionsByDistance.OrderBy(x => x.NoiseDistance).ToList(), noiseDistance * PathFinding.Instance.GetPathFindingDistanceMultiplier(), _animationDelay);
     }
     IEnumerator AnimateNoiseTiles(List<NoiseVisualIndicatorParameters> noiseGridPositionsByDistance, int maxNoiseDistance)
     {
@@ -103,7 +112,8 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
         if (maxNoiseDistance < 1)
             yield break;
 
-        for (int i = 1; i < maxNoiseDistance; i++)
+        //Debug.Break();
+        for (int i = 1; i <= maxNoiseDistance; i++)
         {
             List<GridPosition> gridPositions = noiseGridPositionsByDistance.Where(x => x.NoiseDistance == i).Select(x => x.NoiseGridPosition).ToList();
             if (gridPositions.Count < 1)
@@ -113,7 +123,8 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
 
             _bombRunTileMapManager.AnimateNoiseTiles(gridPositions);
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(_animationDelay);
+            //yield return new WaitForSeconds(0.15f);
         }        
     }
 }

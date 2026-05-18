@@ -430,6 +430,7 @@ public abstract class BaseAction : MonoBehaviour
     }
     public void ActionMadeNoise(GridPosition actionGridPosition, int noiseDistance)
     {
+        Debug.Log("ActionMadeNoise: " + this._unit.name + " made noise at: " + actionGridPosition.ToString() + " with noise distance of: " + noiseDistance);
         this._unit.ActionMadeNoise(actionGridPosition, noiseDistance);
     }
     public bool MakesNoise()

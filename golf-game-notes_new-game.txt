@@ -703,13 +703,13 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - - - x []<| )) - medium volume
 - - - - - - - - x []<| ))) - high volume
 - - - - - - - - x Maybe have the ")" symbols greyed out if the volume doesn't reach that threshold?
-- - - maybe have some sort of "ripple" effect on the level grid to indicate where sounds are traveling?
-- - - - - - the mostly transparent "grid" that you see over everything could have the grid squares "ripple" starting out from the action grid position
-- - - - - - - - - animated tiles or something?
-- - - - - - The ripple effect shows for all of your unit actions
-- - - - - - - - - to help player know how loud they are being
-- - - - - - Ripple effect for enemy unit actions only if they can be heard
-- - - - - - This is probably a lot harder to figure out than I imagine lol
+- - x maybe have some sort of "ripple" effect on the level grid to indicate where sounds are traveling?
+- - - - - x the mostly transparent "grid" that you see over everything could have the grid squares "ripple" starting out from the action grid position
+- - - - - - - - x animated tiles or something?
+- - - - - x The ripple effect shows for all of your unit actions
+- - - - - - - - x to help player know how loud they are being
+- - - - - x Ripple effect for enemy unit actions only if they can be heard
+- - - - - x This is probably a lot harder to figure out than I imagine lol
 # Make the ActionButton UI objects at least twice as big
 - - - Will allow for the Sprite UI elements, like the BodyPart map and the action noise volume, can be set to "set to native size"
 - - - - - - this looks so much better than it does right now with odd looking "pixels" that are all different sizes
@@ -728,6 +728,56 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - - - - For actions with no Alt Action, there is just the one square that is always highlighted
 - - - - - - - - - For actions with one or more Alt Actions, there is another square/icon above the Action button. The "current" one highlighted
 - - - - - - - - - " [x] [ ] [ ] " - something like that above the action button
+# AI Unit "States" for actions to take
+- - - States will be things like
+- - - - - - patrol
+- - - - - - investigate
+- - - - - - attack/fight
+- - - - - - Alert?/Defend?
+- - - - - - Call for Help?
+- - - AI units will have a typical "path" they patrol, walking back and forth and looking around
+- - - - - - actions focused on move, look around, whatever
+- - - If a player unit is spotted, they will determine if they should fight, call for back up???
+- - - The attack/fight state will be that a player unit has been spotted and must be attacked
+- - - - - - AI will engage in the fight, focusing on actions like shoot/grenade/melee
+- - - - - - - - - find positions to move to for fighting advantage?
+- - - "Investigate" would be an AI unit heard some noise that could be a player unit, will try and figure out what it is
+- - - - - - Things to hear like footsteps, shooting, grenades, door opening/closing
+- - - - - - - - - Make it so actions like shooting and grenade also make a noise where the shot hits and grenade explodes
+- - - - - - - - - - - - Example for shooting: The player shoots EnemyA. EnemyB is near Enemy A. EnemyB is too far away to hear the "gunshot"
+                        from the player, but does hear the shot hitting EnemyA. EnemyB then starts to look around for the shooter, but does not
+						necessisarily know where the shot was from
+- - - - - - - - - - - - Same with grenade. Enemy will be unlikely to hear the player actually throwing the grenade, will hear the explosion
+- - - - - - - - - - - - - - - Hear grenade explosion -> go figure out where it was throw from
+- - - A lot of the "investigate" states may first start in the "Alert" phase?
+- - - - - - Enemy hears something that catches their attention. They are first "alert," hunker down to defend themselves
+- - - - - - after checking immediate surroundings, move to investigate to find source of what alerted them?
+- - - - - - maybe inform other enemy units that "something was heard/seen at x,y position"
+- - - When an enemy ai unit is attacked or in trouble, they can "call for help" to other enemy units who may not be able to see that they are in trouble
+- - - - - - Ex: EnemyA is by themselves. Player finds EnemyA, shoots them once in the arms. Next turn, EnemyA "calls for help" over radio.
+            Now all Enemy units have EnemyA's position as a "danger" or "to investigate" position. So, even if EnemyA is killed/completely frozen
+			while the enemy teammates cannot see them, the enemy teammates will know to investigate EnemyA's last reported postion that they called 
+			for help from. One or more Enemy teammates then investigate EnemyA's status/need for help
+- - - - - - Make it so "call for help" is a head action. So, freezing an enemy units head is more valuable since if you completely freeze the head
+            the enemy unit can't call for help, and you can finish them off without anyone being alerted, so no enemies will investigate what happened
+			to the enemy you attacked
+- - - - - - - - - Make it same cost as other actions. 1 action point when unfrozen, 2 when half frozen?
+# Multiplayer gameplay (lol)
+- - - Either have it be attack/defend, or both teams have bases to attack and defend
+- - - For attack/defend
+- - - - - - Attackers will be trying to place a bomb in a bomb site
+- - - - - - Defenders defending bombsite
+- - - - - - There will be multiple bombsites, with multiple paths to the bombsites
+- - - - - - - - - Defenders will need to decide how to allocate defenders. intentionally more sites than can be easily defended
+- - - - - - - - - - - - Say, 5 defenders for 3 (or 4?) bombsites
+- - - - - - - - - Try to incentivize defenders to only have one or none of their units camping site
+- - - - - - - - - - - - form "search parties" or hunting groups to find the attackers
+- - - - - - - - - - - - try and find the attacking units as they are scouting/ searching for the bomb sites
+- - - - - - Attackers should hopefully have "scouts" out trying to find defender weaknesses and paths to bombsites
+- - - - - - Defenders will have a fully revealed "map" that is in the grey fog of war
+- - - - - - Attackers have a completely blacked out map. Everything is under black fog of war until they reveal it
+- - - - - - so defenders have advantage of map knowledge, but weakness in that they have multiple sites to defend
+- - - - - - attackers have advantage of only needing to suceed once at one site of their choosing, but they must first find it
 # Create something like a "Unit Base Parameters" class that is used to store unit's base stats?
 - - - Or like a "Unit Stat Manager" class/script
 - - - Referenced by things like BombRunUnit class to get unit's stats
