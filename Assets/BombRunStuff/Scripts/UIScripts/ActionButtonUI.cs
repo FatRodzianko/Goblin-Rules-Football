@@ -22,6 +22,11 @@ public class ActionButtonUI : MonoBehaviour
     [SerializeField] private ScriptableNoiseUIMapping _scriptableNoiseUIMapping;
     [SerializeField] private Image _actionNoiseIconImage;
 
+    [Header("Alt Action Stuff")]
+    [SerializeField] private Transform _altActionButtonsHolder;
+    [SerializeField] private Transform _altActionButtonPrefab;
+    [SerializeField] private List<AltActionButtonUI> _altActionButtons = new List<AltActionButtonUI>();
+
     private BaseAction _baseAction;
 
     public void SetBaseAction(BaseAction baseAction)
@@ -33,6 +38,7 @@ public class ActionButtonUI : MonoBehaviour
             UnitActionSystem.Instance.SetSelectedAction(baseAction);
         });
 
+        UpdateAltActions();
         UpdateActionNoiseIcon();
     }
 
@@ -82,5 +88,41 @@ public class ActionButtonUI : MonoBehaviour
 
         _actionNoiseIconImage.sprite = _scriptableNoiseUIMapping.GetSpriteFromNoiseVolume(_baseAction.NoiseDistance());
     }
+    private void UpdateAltActions()
+    {
+        if (!_baseAction.GetHasAltAction())
+        {
+            _altActionButtonsHolder.gameObject.SetActive(false);
+            return;
+        }
 
+        _altActionButtonsHolder.gameObject.SetActive(true);
+        DestroyAltActionButtons();
+        SpawnAltActionButtons();
+    }
+    private void DestroyAltActionButtons()
+    {
+        if (_altActionButtons.Count > 0)
+        {
+            foreach (AltActionButtonUI button in _altActionButtons)
+            {
+                Destroy(button);
+            }
+        }
+        _altActionButtons.Clear();
+    }
+    private void SpawnAltActionButtons()
+    {
+        int numberOfAltActions = _baseAction.GetNumberOfAltActions();
+        for (int i = 0; i < numberOfAltActions + 1; i++)
+        {
+            Transform altActionButton = Instantiate(_altActionButtonPrefab, _altActionButtonsHolder.transform);
+            AltActionButtonUI altActionButtonUI = altActionButton.GetComponent<AltActionButtonUI>();
+            altActionButtonUI.InitializeAltActionButton(this._baseAction, i, this);
+        }
+    }
+    public void AltButtonClicked()
+    {
+        UnitActionSystem.Instance.SetSelectedAction(this._baseAction);
+    }
 }

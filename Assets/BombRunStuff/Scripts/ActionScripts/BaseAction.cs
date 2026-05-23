@@ -108,7 +108,9 @@ public abstract class BaseAction : MonoBehaviour
     public static event EventHandler<ActionMadeNoiseEventArgs> OnAnyActionMakesNoise;
 
     // Non-static Actions
-
+    public event EventHandler<bool> OnHasAltActionChanged;
+    public event EventHandler<int> OnAltActionIndexChanged;
+    public event EventHandler OnNumberOfAltActionsChanged;
 
     protected virtual void Awake()
     {
@@ -299,6 +301,86 @@ public abstract class BaseAction : MonoBehaviour
     public void SetSubAction(BaseSubAction newSubAction)
     {
         this._subAction = newSubAction;
+    }
+    public bool GetHasAltAction()
+    {
+        return _hasAltAction;
+    }
+    public int GetNumberOfAltActions()
+    {
+        return _altActions.Count;
+    }
+    public void SetHasAltAction(bool newHasSubAction)
+    {
+        this._hasAltAction = newHasSubAction;
+        this.OnHasAltActionChanged?.Invoke(this, _hasAltAction);
+    }
+    public List<BaseAltAction> GetAltActions()
+    {
+        return _altActions;
+    }
+    public BaseAltAction GetAltActionAtIndex(int index)
+    {
+        // remember, alt actions does not include the base parent action. So, the count of altActions will be 1 less than the total number of actions
+        // Base action is always index 0. First altAction would be index 1, but in the altActions list, it would be index 0 of the list
+        if (index > (_altActions.Count))
+            return null;
+
+        return _altActions[index - 1];
+    }
+    public int GetIndexForAltAction(BaseAltAction altAction)
+    {
+        if (_altActions.Contains(altAction))
+        {
+            for (int i = 0; i < _altActions.Count; i++)
+            {
+                if (_altActions[i] == altAction)
+                {
+                    return i + 1;
+                }
+            }
+        }
+
+        return -1;
+    }
+    public void AddAltActionToAltActionList(BaseAltAction altAction)
+    {
+        if (_altActions.Contains(altAction))
+            return;
+        _altActions.Add(altAction);
+        this.OnNumberOfAltActionsChanged?.Invoke(this, EventArgs.Empty);
+    }
+    public void RemoveAltActionFromAltActionList(BaseAltAction altAction)
+    {
+        if (_altActions.Contains(altAction))
+        {
+            _altActions.Remove(altAction);
+            this.OnNumberOfAltActionsChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+    public void SetAltActionAtIndex(BaseAltAction newAltAction, int index)
+    {
+        // remember, alt actions does not include the base parent action. So, the count of altActions will be 1 less than the total number of actions
+        // Base action is always index 0. First altAction would be index 1, but in the altActions list, it would be index 0 of the list
+        if (index > (_altActions.Count))
+            return;
+
+        this._altActions[index - 1] = newAltAction;
+    }
+    public int GetAltActionIndex()
+    {
+        return _altActionIndex;
+    }
+    public void SetAltActionIndex(int index)
+    {
+        // remember, alt actions does not include the base parent action. So, the count of altActions will be 1 less than the total number of actions
+        // Base action is always index 0. First altAction would be index 1, but in the altActions list, it would be index 0 of the list
+        if (index > (_altActions.Count))
+            return;
+
+        _altActionIndex = index;
+
+        this.OnAltActionIndexChanged?.Invoke(this, _altActionIndex);
     }
     public bool GetIsReloadable()
     {

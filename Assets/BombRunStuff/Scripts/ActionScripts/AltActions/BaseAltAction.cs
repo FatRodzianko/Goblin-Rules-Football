@@ -17,11 +17,17 @@ public class BaseAltAction : MonoBehaviour
     private void Start()
     {
         _parentAction = _unit.GetActionByActionType(_parentActionType);
-        UpdateActionName();
+        if (_parentAction == null)
+            return;
+        _parentAction.AddAltActionToAltActionList(this);
+        _parentAction.SetHasAltAction(true);
+        _parentAction.AddAltActionToAltActionList(this);
+
     }
     private void UpdateActionName()
     {
         _parentAction.SetActionName(_altActionName);
     }
+
 
 }
