@@ -48,6 +48,7 @@ public abstract class BaseAction : MonoBehaviour
     protected Action _onActionComplete;
 
     [Header("Action Info")]
+    [SerializeField] protected string _actionName;
     [SerializeField] protected ActionType _actionType;
     [SerializeField] protected int _actionPointDefaultCost = 1;
     [SerializeField] protected int _actionPointsCost = 1;
@@ -87,6 +88,12 @@ public abstract class BaseAction : MonoBehaviour
     [Header("Sub Action Stuff")]
     [SerializeField] private BaseSubAction _subAction;
 
+    [Header("Alt Action Stuff")]
+    [SerializeField] protected bool _hasAltAction = false;
+    [SerializeField] protected int _altActionIndex = 0;
+    [SerializeField] protected List<BaseAltAction> _altActions = new List<BaseAltAction>();
+
+
     [Header("Unit State Changes")]
     [SerializeField] protected bool _changeUnitStateOnStartAction = false;
     [SerializeField] protected bool _changeUnitStateOnCompleteAction = false;
@@ -122,7 +129,15 @@ public abstract class BaseAction : MonoBehaviour
     {
         _unit.GetUnitHealthSystem().OnBodyPartFrozenStateChanged -= BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged;
     }
-    public abstract string GetActionName();
+    //public abstract string GetActionName();
+    public virtual string GetActionName()
+    {
+        return _actionName;
+    }
+    public virtual void SetActionName(string newName)
+    {
+        this._actionName = newName;
+    }
     public abstract void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.None);
     //public abstract void TakeAction(BaseParameters baseParameters, Action onActionComplete);
     public virtual bool IsValidActionGridPosition(GridPosition gridPosition)

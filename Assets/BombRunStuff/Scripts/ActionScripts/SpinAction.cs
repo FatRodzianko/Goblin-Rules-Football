@@ -44,10 +44,10 @@ public class SpinAction : BaseAction
         //_isActive = true;
         ActionStart(onActionComplete);
     }
-    public override string GetActionName()
-    {
-        return "Spin";
-    }
+    //public override string GetActionName()
+    //{
+    //    return "Spin";
+    //}
     public override List<GridPosition> GetValidActionGridPositionList()
     {
         GridPosition unitGridPosition = _unit.GetGridPosition();

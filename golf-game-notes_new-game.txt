@@ -728,6 +728,11 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - - - - For actions with no Alt Action, there is just the one square that is always highlighted
 - - - - - - - - - For actions with one or more Alt Actions, there is another square/icon above the Action button. The "current" one highlighted
 - - - - - - - - - " [x] [ ] [ ] " - something like that above the action button
+- - - Alternative Actions should only modify parameters for the base action
+- - - - - - "Sneak" halves the max move distance of MoveAction, and lowers the NoiseDistance of move distance
+- - - - - - - - - Everything else is the same as a normal Move Action
+- - - - - - "Double Tap" is a ShootAction alt action that halves shoot distance and allows you to shoot two body parts
+- - - - - - - - - will need to modify the ShootSubAction to allow for multiple body part selections....
 # AI Unit "States" for actions to take
 - - - States will be things like
 - - - - - - patrol

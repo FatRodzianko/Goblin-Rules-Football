@@ -166,10 +166,6 @@ public class MoveAction : BaseAction
 
         ActionStart(onActionComplete);
         OnStartMoving?.Invoke(this, EventArgs.Empty);
-
-        //ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
-
-        //_unit.SetUnitState(UnitState.Moving);
     }
     public override List<GridPosition> GetValidActionGridPositionList()
     {
@@ -249,10 +245,10 @@ public class MoveAction : BaseAction
         //return validGridPositionList.OrderBy(gp => GridPosition.Distance(unitGridPosition, gp)).ToList();
     }
 
-    public override string GetActionName()
-    {
-        return "Move";
-    }
+    //public override string GetActionName()
+    //{
+    //    return "Move";
+    //}
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         int actionValue = 0;

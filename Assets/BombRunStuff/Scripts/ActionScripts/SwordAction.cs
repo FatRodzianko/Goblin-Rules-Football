@@ -94,10 +94,10 @@ public class SwordAction : BaseAction
         _targetUnit.DamageBodyPart(_targetBodyPart);
     }
 
-    public override string GetActionName()
-    {
-        return "Sword";
-    }
+    //public override string GetActionName()
+    //{
+    //    return "Sword";
+    //}
 
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {

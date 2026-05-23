@@ -30,10 +30,10 @@ public class DefendAction : BaseAction
 
         _unit.OnUnitStateChanged -= Unit_OnUnitStateChanged;
     }
-    public override string GetActionName()
-    {
-        return "Defend";
-    }
+    //public override string GetActionName()
+    //{
+    //    return "Defend";
+    //}
 
     public override List<GridPosition> GetValidActionGridPositionList()
     {

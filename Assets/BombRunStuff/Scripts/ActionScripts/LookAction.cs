@@ -24,10 +24,10 @@ public class LookAction : BaseAction
         }
 
     }
-    public override string GetActionName()
-    {
-        return "Look At";
-    }
+    //public override string GetActionName()
+    //{
+    //    return "Look At";
+    //}
 
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {

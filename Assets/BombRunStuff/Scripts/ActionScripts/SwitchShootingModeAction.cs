@@ -6,7 +6,7 @@ using UnityEngine;
 public class SwitchShootingModeAction : BaseAction
 {
     [Header("Switch Shooting Mode")]
-    [SerializeField] private string _actionName = "Switch To Healing";
+    //[SerializeField] private string _actionName = "Switch To Healing";
     [SerializeField] private bool _healingMode = false;
 
     [SerializeField] private float _switchModeTime = 1f;
@@ -33,10 +33,10 @@ public class SwitchShootingModeAction : BaseAction
             ActionComplete();
         }
     }
-    public override string GetActionName()
-    {
-        return _actionName;
-    }
+    //public override string GetActionName()
+    //{
+    //    return _actionName;
+    //}
 
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {

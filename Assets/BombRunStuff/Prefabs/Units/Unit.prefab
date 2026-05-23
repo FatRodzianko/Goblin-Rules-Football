@@ -471,6 +471,55 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1636655045978777828
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2518243286030907425}
+  - component: {fileID: 3704813632318438341}
+  m_Layer: 11
+  m_Name: AltActions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2518243286030907425
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1636655045978777828}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3006723863001832530}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3704813632318438341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1636655045978777828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab25baadde3ab654c8e56e3584f4a6ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unit: {fileID: 3408740805264284271}
+  _parentActionType: 1
+  _parentAction: {fileID: 0}
+  _altActionName: Sneak
+  _actionType: 1
 --- !u!1 &1929892282204359245
 GameObject:
   m_ObjectHideFlags: 0
@@ -1067,6 +1116,7 @@ Transform:
   - {fileID: 2660348252855048050}
   - {fileID: 5135917175814169154}
   - {fileID: 8226614046226594983}
+  - {fileID: 2518243286030907425}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1184,6 +1234,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionName: Look At
   _actionType: 10
   _actionPointDefaultCost: 0
   _actionPointsCost: 0
@@ -1209,6 +1260,9 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _hasAltAction: 0
+  _altActionIndex: 0
+  _altActions: []
   _changeUnitStateOnStartAction: 0
   _changeUnitStateOnCompleteAction: 0
   _unitStateOnStartAction: 1
@@ -1229,6 +1283,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionName: Move
   _actionType: 1
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1254,6 +1309,9 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _hasAltAction: 0
+  _altActionIndex: 0
+  _altActions: []
   _changeUnitStateOnStartAction: 1
   _changeUnitStateOnCompleteAction: 1
   _unitStateOnStartAction: 2
@@ -1275,6 +1333,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionName: Shoot
   _actionType: 2
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1300,6 +1359,9 @@ MonoBehaviour:
   _ammoCost: 1
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _hasAltAction: 0
+  _altActionIndex: 0
+  _altActions: []
   _changeUnitStateOnStartAction: 1
   _changeUnitStateOnCompleteAction: 1
   _unitStateOnStartAction: 3
@@ -1328,6 +1390,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionName: Reload
   _actionType: 8
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1353,6 +1416,9 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 1
   _subAction: {fileID: 0}
+  _hasAltAction: 0
+  _altActionIndex: 0
+  _altActions: []
   _changeUnitStateOnStartAction: 0
   _changeUnitStateOnCompleteAction: 0
   _unitStateOnStartAction: 1
@@ -1373,6 +1439,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionName: Switch To Healing
   _actionType: 9
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1398,6 +1465,9 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _hasAltAction: 0
+  _altActionIndex: 0
+  _altActions: []
   _changeUnitStateOnStartAction: 0
   _changeUnitStateOnCompleteAction: 0
   _unitStateOnStartAction: 1
@@ -1422,6 +1492,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionName: Spin
   _actionType: 3
   _actionPointDefaultCost: 1
   _actionPointsCost: 2
@@ -1447,6 +1518,9 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _hasAltAction: 0
+  _altActionIndex: 0
+  _altActions: []
   _changeUnitStateOnStartAction: 0
   _changeUnitStateOnCompleteAction: 0
   _unitStateOnStartAction: 1
@@ -1465,6 +1539,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionName: Defend
   _actionType: 4
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1490,6 +1565,9 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _hasAltAction: 0
+  _altActionIndex: 0
+  _altActions: []
   _changeUnitStateOnStartAction: 1
   _changeUnitStateOnCompleteAction: 0
   _unitStateOnStartAction: 4
@@ -1511,6 +1589,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionName: Interact
   _actionType: 5
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1536,6 +1615,9 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _hasAltAction: 0
+  _altActionIndex: 0
+  _altActions: []
   _changeUnitStateOnStartAction: 0
   _changeUnitStateOnCompleteAction: 0
   _unitStateOnStartAction: 1
@@ -1554,6 +1636,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionName: Grenade
   _actionType: 6
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1579,6 +1662,9 @@ MonoBehaviour:
   _ammoCost: 1
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _hasAltAction: 0
+  _altActionIndex: 0
+  _altActions: []
   _changeUnitStateOnStartAction: 1
   _changeUnitStateOnCompleteAction: 1
   _unitStateOnStartAction: 7
@@ -1600,6 +1686,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unit: {fileID: 0}
   _isActive: 0
+  _actionName: Sword
   _actionType: 7
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1625,6 +1712,9 @@ MonoBehaviour:
   _ammoCost: 0
   _hideWhenCantUse: 0
   _subAction: {fileID: 0}
+  _hasAltAction: 0
+  _altActionIndex: 0
+  _altActions: []
   _changeUnitStateOnStartAction: 1
   _changeUnitStateOnCompleteAction: 1
   _unitStateOnStartAction: 5

@@ -11,10 +11,10 @@ public class InteractAction : BaseAction
         if (!_isActive)
             return;
     }
-    public override string GetActionName()
-    {
-        return "Interact";
-    }
+    //public override string GetActionName()
+    //{
+    //    return "Interact";
+    //}
 
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
