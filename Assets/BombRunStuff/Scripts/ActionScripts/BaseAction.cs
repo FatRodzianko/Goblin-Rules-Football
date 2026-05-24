@@ -49,6 +49,7 @@ public abstract class BaseAction : MonoBehaviour
 
     [Header("Action Info")]
     [SerializeField] protected string _actionName;
+    [SerializeField] protected string _originalActionName;
     [SerializeField] protected ActionType _actionType;
     [SerializeField] protected int _actionPointDefaultCost = 1;
     [SerializeField] protected int _actionPointsCost = 1;
@@ -106,6 +107,7 @@ public abstract class BaseAction : MonoBehaviour
     public static event EventHandler OnAnyReloadableFired;
     public static event EventHandler OnAnyAmmoRemainingChanged;
     public static event EventHandler<ActionMadeNoiseEventArgs> OnAnyActionMakesNoise;
+    public static event EventHandler OnAnyActionUpdateByAltAction;
 
     // Non-static Actions
     public event EventHandler<bool> OnHasAltActionChanged;
@@ -120,15 +122,20 @@ public abstract class BaseAction : MonoBehaviour
             //_bombRunUnitAnimator = GetComponent<BombRunUnitAnimator>();
             _bombRunUnitAnimator = _unit.GetUnitAnimator();
         }
+        this._originalActionName = this._actionName;
         SetInitialAmmo();
     }
     protected virtual void Start()
     {
+        this.OnAltActionIndexChanged += BaseAction_OnAltActionIndexChanged;
         _unit.GetUnitHealthSystem().OnBodyPartFrozenStateChanged += BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged;
     }
 
+    
+
     protected virtual void OnDisable()
     {
+        this.OnAltActionIndexChanged -= BaseAction_OnAltActionIndexChanged;
         _unit.GetUnitHealthSystem().OnBodyPartFrozenStateChanged -= BombRunUnitHealthSystem_OnBodyPartFrozenStateChanged;
     }
     //public abstract string GetActionName();
@@ -382,6 +389,35 @@ public abstract class BaseAction : MonoBehaviour
 
         this.OnAltActionIndexChanged?.Invoke(this, _altActionIndex);
     }
+    private void BaseAction_OnAltActionIndexChanged(object sender, int index)
+    {
+        UpdateActionForNewAltActionIndex(this._altActionIndex);
+    }
+    private void UpdateActionForNewAltActionIndex(int index)
+    {
+        if (index == 0)
+        {
+            RevertToBaseAction();
+            return;
+        }
+
+        if (index > _altActions.Count)
+        {
+            return;
+        }
+
+        _altActions[index - 1].UpdateBaseActionForThisAltAction();
+    }
+    protected virtual void RevertToBaseAction()
+    {
+        Debug.Log("RevertToBaseAction: " + this.name);
+        
+        OnAnyActionUpdateByAltAction?.Invoke(this, EventArgs.Empty);
+    }
+    public virtual void BaseActionUpdateByAltAction()
+    {
+        OnAnyActionUpdateByAltAction?.Invoke(this, EventArgs.Empty);
+    }
     public bool GetIsReloadable()
     {
         return _isReloadable;
@@ -527,6 +563,11 @@ public abstract class BaseAction : MonoBehaviour
     }
     public void ActionMadeNoise(GridPosition actionGridPosition, int noiseDistance)
     {
+        if (!this._makesNoise)
+        {
+            return;
+        }
+
         Debug.Log("ActionMadeNoise: " + this._unit.name + " made noise at: " + actionGridPosition.ToString() + " with noise distance of: " + noiseDistance);
         this._unit.ActionMadeNoise(actionGridPosition, noiseDistance);
     }

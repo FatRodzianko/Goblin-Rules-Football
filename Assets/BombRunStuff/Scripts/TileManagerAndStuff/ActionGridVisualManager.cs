@@ -65,6 +65,7 @@ public class ActionGridVisualManager : MonoBehaviour
         // event subscriptions
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
+        BaseAction.OnAnyActionUpdateByAltAction += BaseAction_OnAnyActionUpdateByAltAction;
 
         //// cache the grid system?
         //_gridSystem = LevelGrid.Instance.GetGridObjectGridSystem();
@@ -80,6 +81,7 @@ public class ActionGridVisualManager : MonoBehaviour
         // event subscriptions
         UnitActionSystem.Instance.OnSelectedActionChanged -= UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnBusyChanged -= UnitActionSystem_OnBusyChanged;
+        BaseAction.OnAnyActionUpdateByAltAction -= BaseAction_OnAnyActionUpdateByAltAction;
     }
     public void InitializeActionGridVisualManager()
     {
@@ -203,6 +205,7 @@ public class ActionGridVisualManager : MonoBehaviour
     }
     public void ShowActionVisualsFromListOnFogOfWarOnly(List<GridPosition> gridPositions, GridVisualType gridVisualType)
     {
+        Debug.Log("ShowActionVisualsFromListOnFogOfWarOnly: ");
         if (gridPositions.Count == 0)
             return;
 
@@ -231,6 +234,10 @@ public class ActionGridVisualManager : MonoBehaviour
     {
         UpdateActionVisuals();
     }
+    private void BaseAction_OnAnyActionUpdateByAltAction(object sender, EventArgs e)
+    {
+        UpdateActionVisuals();
+    }
     private void UnitActionSystem_OnBusyChanged(object sender, bool busy)
     {
         if (busy)
@@ -241,6 +248,7 @@ public class ActionGridVisualManager : MonoBehaviour
     }
     private async void UpdateActionVisuals()
     {
+        Debug.Log("UpdateActionVisuals: _calculatingVisualGrid: " + _calculatingVisualGrid.ToString());
         if (_calculatingVisualGrid)
             return;
         //HideAllActionVisuals();

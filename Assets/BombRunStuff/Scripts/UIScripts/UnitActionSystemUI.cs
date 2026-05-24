@@ -28,6 +28,7 @@ public class UnitActionSystemUI : MonoBehaviour
 
         BaseAction.OnAnyAmmoRemainingChanged += BaseAction_OnAnyAmmoRemainingChanged;
         BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
+        BaseAction.OnAnyActionUpdateByAltAction += BaseAction_OnAnyActionUpdateByAltAction;
 
         BombRunUnitHealthSystem.OnAnyBodyPartFrozenStateChanged += BombRunUnitHealthSystem_OnAnyBodyPartFrozenStateChanged;
 
@@ -53,6 +54,7 @@ public class UnitActionSystemUI : MonoBehaviour
 
         BaseAction.OnAnyAmmoRemainingChanged -= BaseAction_OnAnyAmmoRemainingChanged;
         BaseAction.OnAnyActionCompleted -= BaseAction_OnAnyActionCompleted;
+        BaseAction.OnAnyActionUpdateByAltAction -= BaseAction_OnAnyActionUpdateByAltAction;
 
         BombRunUnitHealthSystem.OnAnyBodyPartFrozenStateChanged -= BombRunUnitHealthSystem_OnAnyBodyPartFrozenStateChanged;
 
@@ -145,6 +147,11 @@ public class UnitActionSystemUI : MonoBehaviour
     private void BaseAction_OnAnyActionCompleted(object sender, EventArgs e)
     {
         Debug.Log("UnitActionSystemUI: BaseAction_OnAnyActionCompleted");
+        UpdateActionItems();
+    }
+    private void BaseAction_OnAnyActionUpdateByAltAction(object sender, EventArgs e)
+    {
+        Debug.Log("UnitActionSystemUI: BaseAction_OnAnyActionUpdateByAltAction");
         UpdateActionItems();
     }
     private void UpdateSelectedActionVisual()

@@ -123,6 +123,6 @@ public class ActionButtonUI : MonoBehaviour
     }
     public void AltButtonClicked()
     {
-        UnitActionSystem.Instance.SetSelectedAction(this._baseAction);
+        //UnitActionSystem.Instance.SetSelectedAction(this._baseAction);
     }
 }

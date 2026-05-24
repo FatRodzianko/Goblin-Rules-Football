@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseAltAction : MonoBehaviour
+public abstract class BaseAltAction : MonoBehaviour
 {
     [Header("Base Stuff")]
     [SerializeField] protected BombRunUnit _unit;
@@ -24,10 +24,6 @@ public class BaseAltAction : MonoBehaviour
         _parentAction.AddAltActionToAltActionList(this);
 
     }
-    private void UpdateActionName()
-    {
-        _parentAction.SetActionName(_altActionName);
-    }
-
+    public abstract void UpdateBaseActionForThisAltAction();
 
 }

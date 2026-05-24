@@ -134,10 +134,28 @@ public class MoveAction : BaseAction
         if (maxMoveDistance < 0)
             return;
         _maxMoveDistance = maxMoveDistance;
+        this._gridVisualRange = _maxMoveDistance;
         ResetCachedValidPositionList();
+    }
+
+    protected override void RevertToBaseAction()
+    {
+        this.SetMaxMoveDistance(this._unit.GetMaxMoveDistance());
+        this.SetMakesNoise(true);
+        this.SetActionName(this._originalActionName);
+
+        //ResetCachedValidPositionList();
+
+        base.RevertToBaseAction();
+    }
+    public override void BaseActionUpdateByAltAction()
+    {
+        //ResetCachedValidPositionList();
+        base.BaseActionUpdateByAltAction();
     }
     void ResetCachedValidPositionList()
     {
+        Debug.Log("MoveAction: ResetCachedValidPositionList: " + this._unit.name);
         _cachedValidActionList.Clear();
     }
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.None)
@@ -180,7 +198,15 @@ public class MoveAction : BaseAction
         {
             Debug.Log("GetValidActionGridPositionList: repeating for grid position: " + unitGridPosition.ToString() + " returning cached list?");
             //Debug.Log("Time: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
-            return _cachedValidActionList[unitGridPosition];
+            try
+            {
+                return _cachedValidActionList[unitGridPosition];
+            }
+            catch (Exception e)
+            {
+                Debug.Log("GetValidActionGridPositionList: could not return _cachedValidActionList at unitGridPosition. Error: " + e);
+            }
+            
         }
         _cachedValidActionList.Clear();
         for (int x = -_maxMoveDistance; x <= _maxMoveDistance; x++)
