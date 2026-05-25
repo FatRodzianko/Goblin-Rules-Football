@@ -722,17 +722,23 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - so reload is its own action (actually, maybe it could be an alt action?)
 - - - - - - "Switch to Healing/Damage" remains its own action, since the idea is it requires you to reconfigure your weapon or something?
 - - - Alt Action can "modify" the base action
-- - - - - - So, sneak halves the maxMoveDistance of the MoveAction as well as makes no noise?
+- - - - - x So, sneak halves the maxMoveDistance of the MoveAction as well as makes no noise?
 - - - ActionButton UI to have some indicator for "Alt Actions"
-- - - - - - Maybe an icon above the ActionButton, like just a small square, that indicates what "Action" you are using
-- - - - - - - - - For actions with no Alt Action, there is just the one square that is always highlighted
-- - - - - - - - - For actions with one or more Alt Actions, there is another square/icon above the Action button. The "current" one highlighted
-- - - - - - - - - " [x] [ ] [ ] " - something like that above the action button
+- - - - - x Maybe an icon above the ActionButton, like just a small square, that indicates what "Action" you are using
+- - - - - - - - x For actions with no Alt Action, there is just the one square that is always highlighted
+- - - - - - - - x For actions with one or more Alt Actions, there is another square/icon above the Action button. The "current" one highlighted
+- - - - - - - - x " [x] [ ] [ ] " - something like that above the action button
 - - - Alternative Actions should only modify parameters for the base action
-- - - - - - "Sneak" halves the max move distance of MoveAction, and lowers the NoiseDistance of move distance
-- - - - - - - - - Everything else is the same as a normal Move Action
+- - - - - x "Sneak" halves the max move distance of MoveAction, and lowers the NoiseDistance of move distance
+- - - - - - - - x Everything else is the same as a normal Move Action
+- - - - - - - - - maybe want to change the half distance to make the action point cost be double what it normally is?
+- - - - - - - - - - - - right now half distance seems to be too short of a distance
+- - - - - - Sprint 1.5x more move distance, but louder?
+- - - - - - - - - also probably make it 2 action points? or maybe just really loud... probably not great for the performance of the noise stuff
 - - - - - - "Double Tap" is a ShootAction alt action that halves shoot distance and allows you to shoot two body parts
 - - - - - - - - - will need to modify the ShootSubAction to allow for multiple body part selections....
+- - - Have an event for Alternative Action Selected that includes the altActionIndex
+- - - - - - 0 means revert to the base action, so 
 # AI Unit "States" for actions to take
 - - - States will be things like
 - - - - - - patrol

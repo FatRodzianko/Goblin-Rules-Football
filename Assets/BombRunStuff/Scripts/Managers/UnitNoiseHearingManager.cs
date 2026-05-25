@@ -7,6 +7,7 @@ public class UnitNoiseHearingManager : MonoBehaviour
 {
     public static event EventHandler<BombRunUnit> OnAnyUnitWasHeard;
     // Start is called before the first frame update
+    [SerializeField] private int _maxNoiseDistance = 15; // no point drawing noise visuals off screen?
     void Start()
     {
         BombRunUnit.OnAnyUnitActionMadeNoise += BombRunUnit_OnAnyUnitActionMadeNoise;

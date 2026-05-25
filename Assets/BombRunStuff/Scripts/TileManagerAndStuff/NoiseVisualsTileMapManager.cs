@@ -31,6 +31,7 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
 
     [Header("Noise animation?")]
     [SerializeField] private float _animationDelay = 0.025f;
+    [SerializeField] private int _maxNoiseDistance; // no need to draw noise visuals beyond what is on the screen
 
     private void Start()
     {
@@ -73,6 +74,11 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
         List<NoiseVisualIndicatorParameters> noiseGridPositionsByDistance = new List<NoiseVisualIndicatorParameters>();
         foreach (GridPosition noiseGridPosition in noiseRadiusGridPositions)
         {
+            Vector3 screenPoint = Camera.main.WorldToScreenPoint(LevelGrid.Instance.GetWorldPosition(noiseGridPosition));
+            bool onScreen = screenPoint.x > 0f && screenPoint.x < Screen.width && screenPoint.y > 0f && screenPoint.y < Screen.height;
+            if (!onScreen)
+                continue;
+
             // if the tile is under fog of war, don't calculate path. Just show the "noise"
             // otherwise it could show player where walls/objects they haven't seen yet are?
             if (_fogOfWarTileMapManager.IsPositionInFogOfWar(noiseGridPosition))
