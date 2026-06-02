@@ -33,9 +33,15 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
     [SerializeField] private float _animationDelay = 0.025f;
     [SerializeField] private int _maxNoiseDistance; // no need to draw noise visuals beyond what is on the screen
 
+    [Header("Object Pool")]
+    [SerializeField] private GameObject _gridNoiseVisualIndicatorObject;
+    [SerializeField] private NoiseVisualObjectPool _noiseVisualObjectPool;
+
     private void Start()
     {
         BombRunUnit.OnAnyUnitActionMadeNoise += BombRunUnit_OnAnyUnitActionMadeNoise;
+        // create the noise visual object pool
+        _noiseVisualObjectPool = new NoiseVisualObjectPool(_gridNoiseVisualIndicatorObject, this.transform, 250, 500);
     }    
 
     private void OnDisable()
@@ -127,10 +133,20 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
                 continue;
             }
 
-            _bombRunTileMapManager.AnimateNoiseTiles(gridPositions);
-
+            //_bombRunTileMapManager.AnimateNoiseTiles(gridPositions);
+            SpawnNoiseTiles(gridPositions);
             yield return new WaitForSeconds(_animationDelay);
             //yield return new WaitForSeconds(0.15f);
         }        
+    }
+    public void SpawnNoiseTiles(List<GridPosition> gridPositions)
+    {
+        foreach (GridPosition gridPosition in gridPositions)
+        {
+            GameObject newObject = _noiseVisualObjectPool.GetObject(LevelGrid.Instance.GetWorldPosition(gridPosition));
+            GridNoiseVisualIndicatorScript gridNoiseVisualIndicatorScript = newObject.GetComponent<GridNoiseVisualIndicatorScript>();
+            gridNoiseVisualIndicatorScript.InitializeNoiseVisual(_noiseVisualObjectPool,_animationDelay);
+            gridNoiseVisualIndicatorScript.StartAnimation();
+        }
     }
 }

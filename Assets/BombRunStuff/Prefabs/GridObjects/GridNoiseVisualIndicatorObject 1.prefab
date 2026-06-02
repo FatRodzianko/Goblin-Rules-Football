@@ -10,10 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 9083731438183017176}
   - component: {fileID: 9083731438183017177}
-  - component: {fileID: 9083731438183017182}
   - component: {fileID: 2533382257262860600}
   m_Layer: 0
-  m_Name: GridNoiseVisualIndicatorObject
+  m_Name: GridNoiseVisualIndicatorObject 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -86,27 +85,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 2
   m_SpriteSortPoint: 0
---- !u!95 &9083731438183017182
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9083731438183017183}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: ab047d26f54ea7b428d5815919de9717, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &2533382257262860600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119,6 +97,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04d2246b1835c2c449de1fddd3e5f718, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _animator: {fileID: 9083731438183017182}
+  _animator: {fileID: 0}
   _spriteRenderer: {fileID: 9083731438183017177}
-  _sprites: []
+  _sprites:
+  - {fileID: 21300000, guid: a88aa6dfe65a716488dd90ee55860d8b, type: 3}
+  - {fileID: 21300000, guid: 67bba244859d18f45a1416be28c51a31, type: 3}
+  - {fileID: 21300000, guid: 8be8760e6a7dc8e479618101d551d0dc, type: 3}
+  - {fileID: 21300000, guid: 167d2e4575acae24cbb8b45ca49bc94c, type: 3}
+  - {fileID: 21300000, guid: ba5693553047c674ca45302d8fae5a44, type: 3}
+  - {fileID: 21300000, guid: f763b103c32f40d4a9167083052f1b9e, type: 3}
+  - {fileID: 21300000, guid: b909620ba760ce0439db728290d001f9, type: 3}
+  - {fileID: 21300000, guid: 603cff2396679744a9de0a8580fa7496, type: 3}
+  - {fileID: 21300000, guid: 87f352ff45069f04584979f260d6a718, type: 3}

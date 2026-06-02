@@ -51179,6 +51179,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _button: {fileID: 799555463}
+  _parentButton: {fileID: 0}
   _selectedHighlightSprite: {fileID: 671495797}
   _parentAction: {fileID: 0}
   _altAction: {fileID: 0}
@@ -52940,6 +52941,8 @@ MonoBehaviour:
   _bombRunTileMapManager: {fileID: 1494887097}
   _fogOfWarTileMapManager: {fileID: 1494887102}
   _animationDelay: 0.025
+  _maxNoiseDistance: 0
+  _gridNoiseVisualIndicatorObject: {fileID: 9083731438183017183, guid: 07aef034771e4e04e88eff993b71287a, type: 3}
 --- !u!1001 &1536326559
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -55427,6 +55430,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ae3cf56f4bfab344ab790fd712d651b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maxNoiseDistance: 15
 --- !u!1 &2138507406
 GameObject:
   m_ObjectHideFlags: 0
