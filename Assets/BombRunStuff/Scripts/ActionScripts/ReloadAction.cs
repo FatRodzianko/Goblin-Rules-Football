@@ -70,7 +70,8 @@ public class ReloadAction : BaseAction
     }
     public override bool CanTakeAction(int actionPointsAvailable, GridPosition actionPosition)
     {
-        if (actionPointsAvailable >= _actionPointsCost)
+        //if (actionPointsAvailable >= _actionPointsCost)
+        if (actionPointsAvailable >= this.GetActionPointsCost())
         {
             BaseAction[] baseActionArray = _unit.GetBaseActionArray();
             if (baseActionArray.Length == 0)

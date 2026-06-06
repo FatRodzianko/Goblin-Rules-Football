@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+
 public class MoveAction : BaseAction
 {
     //public class MoveActionBaseParameters : BaseParameters // override the base parameter for the spin class?
@@ -26,6 +27,7 @@ public class MoveAction : BaseAction
     public event EventHandler<bool> OnChangeDirection;
 
     [Header("Moving")]
+    [SerializeField] private int _cachedActionPointDefaultCost;
     [SerializeField] private int _maxMoveDistance = 4;
     [SerializeField] private List<Vector3> _positionList;
     private Vector3 _targetPosition;
@@ -45,6 +47,8 @@ public class MoveAction : BaseAction
 
         this._maxMoveDistance = _unit.GetMaxMoveDistance();
         this._gridVisualRange = this._maxMoveDistance;
+
+        this.SetCachedActionPointDefaultCost(this.GetActionPointDefaultCost());
     }
 
     protected override void OnDisable()
@@ -137,14 +141,22 @@ public class MoveAction : BaseAction
         this._gridVisualRange = _maxMoveDistance;
         ResetCachedValidPositionList();
     }
-
+    public int GetCachedActionPointDefaultCost()
+    {
+        return _cachedActionPointDefaultCost;
+    }
+    public void SetCachedActionPointDefaultCost(int newCost)
+    {
+        this._cachedActionPointDefaultCost = newCost;
+    }
     protected override void RevertToBaseAction()
     {
-        this.SetMaxMoveDistance(this._unit.GetMaxMoveDistance());
+        //this.SetMaxMoveDistance(this._unit.GetMaxMoveDistance());
         this.SetMakesNoise(true);
         this.SetActionName(this._originalActionName);
+        this.SetActionPointDefaultCost(_cachedActionPointDefaultCost);
 
-        //ResetCachedValidPositionList();
+        ResetCachedValidPositionList();
 
         base.RevertToBaseAction();
     }
@@ -157,6 +169,41 @@ public class MoveAction : BaseAction
     {
         Debug.Log("MoveAction: ResetCachedValidPositionList: " + this._unit.name);
         _cachedValidActionList.Clear();
+    }
+    public override bool CanTakeAction(int actionPointsAvailable, GridPosition actionPosition)
+    {
+        // Check if the applicable body part is frozen. If so, cannot take the action
+        if (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(_actionBodyPart) == BodyPartFrozenState.FullFrozen)
+            return false;
+
+        if (!DoesUnitHaveVisionRequiredForActionPosition(actionPosition))
+        {
+            return false;
+        }
+
+        //if (actionPointsAvailable >= _actionPointsCost)
+        if (actionPointsAvailable >= this.CalculateActionPointCostForValue(this._cachedActionPointDefaultCost))
+        {
+            if (_requiresAmmo)
+            {
+                if (_remainingAmmo > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.None)
     {

@@ -688,6 +688,10 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - - - x REMEMBER: LevelGrid.CalculateDistance is the distance ignoring walls and obstacles. Even if listening unit is not too far away to
                   hear the action noise, calculate the path from the unit making noise to listening unit. If the PATH LENGTH is greater than the
 				  Noise Distance x Hearing Sensitivity, action was not heard
+- - - - - - - - - When calculating the list of positions, maybe use a GenericPool<List<GridPositions>> to save on memory allocation/deallocation?
+- - - - - - - - - - - - See the end of this video from TaroDev on pooling and GenericPool (Object Pooling in Unity 2021 is Dope AF) https://www.youtube.com/watch?v=7EZ2F-TzHYw&t=16s
+- - - - - - - - - - - - use it for the "List<GridPosition> gridPositions" in AnimateNoiseTilesin NoiseVisualsTileMapManager.cs? As a test to see if it works
+- - - - - - - - - - - - - - - maybe useful in other places, like when calculating possible grid positions for MoveAction, or just getting lists of grid positions from LevelGrid, PathFinding, and so on?
 - - x static event on Unit that sends noise distance
 - - - - - x function to invoke event is called by baseaction
 - - - - - x baseaction provides noise distance

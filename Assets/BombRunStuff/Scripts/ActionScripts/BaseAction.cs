@@ -108,6 +108,7 @@ public abstract class BaseAction : MonoBehaviour
     public static event EventHandler OnAnyAmmoRemainingChanged;
     public static event EventHandler<ActionMadeNoiseEventArgs> OnAnyActionMakesNoise;
     public static event EventHandler OnAnyActionUpdateByAltAction;
+    public static event EventHandler OnAnyActionPointsCostChanged;
 
     // Non-static Actions
     public event EventHandler<bool> OnHasAltActionChanged;
@@ -161,14 +162,30 @@ public abstract class BaseAction : MonoBehaviour
     public abstract List<GridPosition> GetValidActionGridPositionList();
     public virtual int GetActionPointsCost()
     {
-        return _actionPointsCost;
+        //return _actionPointsCost;
+        return CalculateActionPointCost();
+    }
+    public virtual void SetActionPointsCost(int newCost)
+    {
+        this._actionPointsCost = newCost;
+        OnAnyActionPointsCostChanged?.Invoke(this, EventArgs.Empty);
+    }
+    public virtual int GetActionPointDefaultCost()
+    {
+        return _actionPointDefaultCost;
+    }
+    public virtual void SetActionPointDefaultCost(int newDefaultCost)
+    {
+        this._actionPointDefaultCost = newDefaultCost;
+        this.SetActionPointsCost(CalculateActionPointCost());
     }
     protected void ActionStart(Action onActionComplete)
     {
         _isActive = true;
         this._onActionComplete = onActionComplete;
 
-        this._unit.SpendActionPoints(this._actionPointsCost);
+        //this._unit.SpendActionPoints(this._actionPointsCost);
+        this._unit.SpendActionPoints(this.GetActionPointsCost());
         this._unit.AddActionTakenThisTurn(this);
 
         if (this._changeUnitStateOnStartAction)
@@ -236,7 +253,8 @@ public abstract class BaseAction : MonoBehaviour
             return false;
         }
 
-        if (actionPointsAvailable >= _actionPointsCost)
+        //if (actionPointsAvailable >= _actionPointsCost)
+        if (actionPointsAvailable >= this.GetActionPointsCost())
         {
             if (_requiresAmmo)
             {
@@ -260,7 +278,7 @@ public abstract class BaseAction : MonoBehaviour
         }
 
     }
-    private bool DoesUnitHaveVisionRequiredForActionPosition(GridPosition actionPosition)
+    protected bool DoesUnitHaveVisionRequiredForActionPosition(GridPosition actionPosition)
     {
         if (this._visionTypeRequired == VisionTypeRequired.None)
         {
@@ -503,18 +521,53 @@ public abstract class BaseAction : MonoBehaviour
         if (this._actionBodyPart != bodyPart)
             return;
 
-        switch (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(bodyPart))
+        //switch (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(bodyPart))
+        //{
+        //    case BodyPartFrozenState.NotFrozen:
+        //        _actionPointsCost = _actionPointDefaultCost;
+        //        break;
+        //    case BodyPartFrozenState.HalfFrozen:
+        //        _actionPointsCost = _actionPointDefaultCost * 2;
+        //        break;
+        //    case BodyPartFrozenState.FullFrozen:
+        //        _actionPointsCost = int.MaxValue;
+        //        break;
+        //}
+        this.SetActionPointsCost(CalculateActionPointCost());
+    }
+    protected int CalculateActionPointCost()
+    {
+        int newActionPointCost = 0;
+        switch (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(this._actionBodyPart))
         {
             case BodyPartFrozenState.NotFrozen:
-                _actionPointsCost = _actionPointDefaultCost;
+                newActionPointCost = _actionPointDefaultCost;
                 break;
             case BodyPartFrozenState.HalfFrozen:
-                _actionPointsCost = _actionPointDefaultCost * 2;
+                newActionPointCost = _actionPointDefaultCost * 2;
                 break;
             case BodyPartFrozenState.FullFrozen:
-                _actionPointsCost = int.MaxValue;
+                newActionPointCost = int.MaxValue;
                 break;
         }
+        return newActionPointCost;
+    }
+    public virtual int CalculateActionPointCostForValue(int value)
+    {
+        int newActionPointCost = 0;
+        switch (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(this._actionBodyPart))
+        {
+            case BodyPartFrozenState.NotFrozen:
+                newActionPointCost = value;
+                break;
+            case BodyPartFrozenState.HalfFrozen:
+                newActionPointCost = value * 2;
+                break;
+            case BodyPartFrozenState.FullFrozen:
+                newActionPointCost = int.MaxValue;
+                break;
+        }
+        return newActionPointCost;
     }
     public bool CanTargetFriendlyUnits()
     {

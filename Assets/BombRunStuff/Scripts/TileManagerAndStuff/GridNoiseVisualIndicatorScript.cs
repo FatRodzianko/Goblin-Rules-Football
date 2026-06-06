@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,16 +12,18 @@ public class GridNoiseVisualIndicatorScript : MonoBehaviour
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private List<Sprite> _sprites = new List<Sprite>();
     private float _animationDelay = 0.025f;
+    private Action<GameObject> _animationEnded;
 
     public void AnimationEnded()
     {
         _noiseVisualObjectPool.ReleaseObject(this.gameObject);
         //Destroy(this.gameObject);
     }
-    public void InitializeNoiseVisual(NoiseVisualObjectPool pool, float animationDelay)
+    public void InitializeNoiseVisual(NoiseVisualObjectPool pool, float animationDelay, Action<GameObject> completed)
     {
         _noiseVisualObjectPool = pool;
         _animationDelay = animationDelay;
+        this._animationEnded = completed;
     }
     public void StartAnimation()
     {
@@ -37,6 +40,7 @@ public class GridNoiseVisualIndicatorScript : MonoBehaviour
             this._spriteRenderer.sprite = _sprites[i];
             yield return new WaitForSeconds(_animationDelay);
         }
-        AnimationEnded();
+        //AnimationEnded();
+        _animationEnded(this.gameObject);
     }
 }

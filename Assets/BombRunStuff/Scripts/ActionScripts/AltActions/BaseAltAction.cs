@@ -13,6 +13,7 @@ public abstract class BaseAltAction : MonoBehaviour
     [Header("Alt Action Info")]
     [SerializeField] protected string _altActionName;
     [SerializeField] protected ActionType _actionType;
+    [SerializeField] protected int _baseActionCost;
 
     private void Start()
     {
@@ -25,5 +26,6 @@ public abstract class BaseAltAction : MonoBehaviour
 
     }
     public abstract void UpdateBaseActionForThisAltAction();
+    public abstract bool CanPlayerSpendActionPointsForAltAction();
 
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 using Unity.Mathematics;
 using Unity.Collections;
 using System;
+using UnityEngine.Pool;
 
 public class PathFinding : MonoBehaviour
 {
@@ -443,7 +444,9 @@ public class PathFinding : MonoBehaviour
     //}
     protected List<GridPosition> CalculatePath(PathNode endNode)
     {
-        List<PathNode> pathNodeList = new List<PathNode>();
+        var pathNodeList = GenericPool<List<PathNode>>.Get();
+        pathNodeList.Clear();
+        //List<PathNode> pathNodeList = new List<PathNode>();
         pathNodeList.Add(endNode);
 
         PathNode currentNode = endNode;
@@ -465,7 +468,7 @@ public class PathFinding : MonoBehaviour
         {
             gridPositionList.Add(pathNode.GetGridPosition());
         }
-
+        GenericPool<List<PathNode>>.Release(pathNodeList);
         return gridPositionList;
     }
     public bool IsWalkableGridPosition(GridPosition gridPosition)

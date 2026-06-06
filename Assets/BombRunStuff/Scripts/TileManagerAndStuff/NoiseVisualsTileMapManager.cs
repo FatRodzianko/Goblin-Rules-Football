@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.Tilemaps;
 
 [Serializable]
@@ -127,14 +128,19 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
         //Debug.Break();
         for (int i = 1; i <= maxNoiseDistance; i++)
         {
-            List<GridPosition> gridPositions = noiseGridPositionsByDistance.Where(x => x.NoiseDistance == i).Select(x => x.NoiseGridPosition).ToList();
+            var gridPositions = GenericPool<List<GridPosition>>.Get();
+            gridPositions.Clear();
+            gridPositions.AddRange(noiseGridPositionsByDistance.Where(x => x.NoiseDistance == i).Select(x => x.NoiseGridPosition).ToList());
+            //List<GridPosition> gridPositions = noiseGridPositionsByDistance.Where(x => x.NoiseDistance == i).Select(x => x.NoiseGridPosition).ToList();
             if (gridPositions.Count < 1)
             {
+                GenericPool<List<GridPosition>>.Release(gridPositions);
                 continue;
             }
 
             //_bombRunTileMapManager.AnimateNoiseTiles(gridPositions);
             SpawnNoiseTiles(gridPositions);
+            GenericPool<List<GridPosition>>.Release(gridPositions);
             yield return new WaitForSeconds(_animationDelay);
             //yield return new WaitForSeconds(0.15f);
         }        
@@ -145,8 +151,12 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
         {
             GameObject newObject = _noiseVisualObjectPool.GetObject(LevelGrid.Instance.GetWorldPosition(gridPosition));
             GridNoiseVisualIndicatorScript gridNoiseVisualIndicatorScript = newObject.GetComponent<GridNoiseVisualIndicatorScript>();
-            gridNoiseVisualIndicatorScript.InitializeNoiseVisual(_noiseVisualObjectPool,_animationDelay);
+            gridNoiseVisualIndicatorScript.InitializeNoiseVisual(_noiseVisualObjectPool,_animationDelay, ReleaseFromPool);
             gridNoiseVisualIndicatorScript.StartAnimation();
         }
+    }
+    private void ReleaseFromPool(GameObject poolObject)
+    {
+        _noiseVisualObjectPool.ReleaseObject(poolObject);
     }
 }

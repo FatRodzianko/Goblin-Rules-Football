@@ -10,6 +10,9 @@ public class UnitActionSystemUI : MonoBehaviour
     [SerializeField] private Transform _actionButtonPrefab;
     [SerializeField] private Transform _actionButtonContainer;
     [SerializeField] private TextMeshProUGUI _actionPointsText;
+    [SerializeField] private string _textForActionPointsText;
+    [SerializeField] private TextMeshProUGUI _actionCostAmountText;
+    [SerializeField] private string _textForActionCostamountText;
 
     private List<ActionButtonUI> _actionButtonUIList = new List<ActionButtonUI>();
 
@@ -66,13 +69,17 @@ public class UnitActionSystemUI : MonoBehaviour
         if (gameState == GameState_BombRun.Gameplay)
         {
             _isGameplayMode = true;
+            _actionPointsText.gameObject.SetActive(true);
+            _actionCostAmountText.gameObject.SetActive(true);
         }
         else
         {
             _isGameplayMode = false;
+            _actionPointsText.gameObject.SetActive(false);
+            _actionCostAmountText.gameObject.SetActive(false);
         }
     }
-
+    
     private void CreateUnitActionButtons(BombRunUnit selectedUnit)
     {
         // destroy the old button game objects
@@ -135,6 +142,7 @@ public class UnitActionSystemUI : MonoBehaviour
     private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
     {
         UpdateSelectedActionVisual();
+        UpdateActionCostText();
     }
     private void UnitActionSystem_OnActionStarted(object sender, EventArgs e)
     {
@@ -154,12 +162,29 @@ public class UnitActionSystemUI : MonoBehaviour
         Debug.Log("UnitActionSystemUI: BaseAction_OnAnyActionUpdateByAltAction");
         UpdateActionItems();
     }
+
     private void UpdateSelectedActionVisual()
     {
         foreach (ActionButtonUI actionButtonUI in _actionButtonUIList)
         {
             actionButtonUI.UpdateSelectedActionVisual();
         }
+    }
+    private void UpdateActionCostText()
+    {
+        if (UnitActionSystem.Instance.GetSelectedAction() == null)
+        {
+            _actionCostAmountText.text = _textForActionCostamountText + "0";
+            return;
+        }
+        int actionPointCost = UnitActionSystem.Instance.GetSelectedAction().GetActionPointsCost();
+        if (actionPointCost < 0)
+            actionPointCost = 0;
+
+        string actionPointCostString = actionPointCost.ToString();
+        if (actionPointCost == int.MaxValue)
+            actionPointCostString = "X";
+        _actionCostAmountText.text = _textForActionCostamountText + actionPointCostString;
     }
     private void UpdateActionButtonBodyPartVisuals()
     {
@@ -172,7 +197,7 @@ public class UnitActionSystemUI : MonoBehaviour
     {
         BombRunUnit unit = UnitActionSystem.Instance.GetSelectedUnit();
 
-        _actionPointsText.text = "Action Points: ";
+        _actionPointsText.text = "Action Points Remaining: ";
         if (unit == null)
         {
             Debug.Log("UpdateActionPoints: no selected unit?");
@@ -199,6 +224,7 @@ public class UnitActionSystemUI : MonoBehaviour
     {
         Debug.Log("UpdateActionItems: ");
         UpdateActionPoints();
+        UpdateActionCostText();
         CreateUnitActionButtons(UnitActionSystem.Instance.GetSelectedUnit());
         UpdateSelectedActionVisual();
     }
