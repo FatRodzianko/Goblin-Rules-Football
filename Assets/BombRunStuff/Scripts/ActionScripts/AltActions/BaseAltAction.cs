@@ -15,7 +15,7 @@ public abstract class BaseAltAction : MonoBehaviour
     [SerializeField] protected ActionType _actionType;
     [SerializeField] protected int _baseActionCost;
 
-    private void Start()
+    protected virtual void Start()
     {
         _parentAction = _unit.GetActionByActionType(_parentActionType);
         if (_parentAction == null)

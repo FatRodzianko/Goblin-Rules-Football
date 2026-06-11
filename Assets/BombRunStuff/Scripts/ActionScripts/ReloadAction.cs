@@ -65,7 +65,7 @@ public class ReloadAction : BaseAction
     {
         Debug.Log("TakeAction: ReloadAction");
         _reloadCounter = _reloadTime;
-        this.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
+        this.ActionMadeNoise(this._unit.GetGridPosition(), this.GetNoiseDistance());
         ActionStart(onActionComplete);
     }
     public override bool CanTakeAction(int actionPointsAvailable, GridPosition actionPosition)

@@ -65,6 +65,7 @@ public abstract class BaseAction : MonoBehaviour
     [Header("Noise Info")]
     [SerializeField] protected bool _makesNoise = false;
     [SerializeField] protected int _noiseDistance = 0;
+    [SerializeField] protected float _noiseDistanceModifier = 1.0f;
 
     [Header("Action Grid Visuals")]
     [SerializeField] GridVisualType _gridRangeVisualType = GridVisualType.RedSoft;
@@ -426,7 +427,7 @@ public abstract class BaseAction : MonoBehaviour
 
         _altActions[index - 1].UpdateBaseActionForThisAltAction();
     }
-    protected virtual void RevertToBaseAction()
+    public virtual void RevertToBaseAction()
     {
         Debug.Log("RevertToBaseAction: " + this.name);
         
@@ -632,12 +633,25 @@ public abstract class BaseAction : MonoBehaviour
     {
         this._makesNoise = makesNoise;
     }
-    public int NoiseDistance()
+    public int GetNoiseDistance()
     {
-        return _noiseDistance;
+        //return _noiseDistance;
+        return CalculateNoiseDistance();
+    }
+    private int CalculateNoiseDistance()
+    {
+        return (int)(this._noiseDistance * this._noiseDistanceModifier * this._unit.GetBaseNoiseDistanceModifierForBodyPart(this._actionBodyPart));
     }
     public void SetNoiseDistance(int noiseDistance)
     {
         this._noiseDistance = noiseDistance;
+    }
+    public float GetNoiseDistanceModifier()
+    {
+        return this._noiseDistanceModifier;
+    }
+    public void SetNoiseDistanceModifer(float newNoiseDistanceModifier)
+    {
+        this._noiseDistanceModifier = newNoiseDistanceModifier;
     }
 }

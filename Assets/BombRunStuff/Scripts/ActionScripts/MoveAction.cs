@@ -25,10 +25,12 @@ public class MoveAction : BaseAction
     public event EventHandler OnStartMoving;
     public event EventHandler OnStopMoving;
     public event EventHandler<bool> OnChangeDirection;
+    public event EventHandler OnMaxMoveDistanceOrModifierChanged;
 
     [Header("Moving")]
     [SerializeField] private int _cachedActionPointDefaultCost;
     [SerializeField] private int _maxMoveDistance = 4;
+    [SerializeField] private float _maxMoveDistanceModifier = 1.0f;
     [SerializeField] private List<Vector3> _positionList;
     private Vector3 _targetPosition;
     [SerializeField] private int _currentPositionIndex = 0;
@@ -44,9 +46,11 @@ public class MoveAction : BaseAction
         base.Start();
         PathFinding.Instance.IsWalkableUpdated += PathFinding_IsWalkableUpdated;
         BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
+        this.OnMaxMoveDistanceOrModifierChanged += MoveAction_OnMaxMoveDistanceOrModifierChanged;
 
+        //this._maxMoveDistance = _unit.GetMaxMoveDistance();
         this._maxMoveDistance = _unit.GetMaxMoveDistance();
-        this._gridVisualRange = this._maxMoveDistance;
+        this._gridVisualRange = this.GetMaxMoveDistance();
 
         this.SetCachedActionPointDefaultCost(this.GetActionPointDefaultCost());
     }
@@ -56,7 +60,11 @@ public class MoveAction : BaseAction
         base.OnDisable();
         PathFinding.Instance.IsWalkableUpdated -= PathFinding_IsWalkableUpdated;
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
+        this.OnMaxMoveDistanceOrModifierChanged -= MoveAction_OnMaxMoveDistanceOrModifierChanged;
     }
+
+    
+
     private void PathFinding_IsWalkableUpdated(object sender, GridPosition gridPosition)
     {
         ResetCachedValidPositionList();
@@ -83,7 +91,7 @@ public class MoveAction : BaseAction
         else
         {
             
-            this.ActionMadeNoise(LevelGrid.Instance.GetGridPositon(_targetPosition), this._noiseDistance);
+            this.ActionMadeNoise(LevelGrid.Instance.GetGridPositon(_targetPosition), this.GetNoiseDistance());
 
             _currentPositionIndex++;
             // check if the position index is larger than the position list. If so, action has completed
@@ -131,15 +139,19 @@ public class MoveAction : BaseAction
     }
     public int GetMaxMoveDistance()
     {
-        return _maxMoveDistance;
+        //return _maxMoveDistance;
+        return CalculateMaxMoveDistance();
     }
     public void SetMaxMoveDistance(int maxMoveDistance)
     {
         if (maxMoveDistance < 0)
             return;
         _maxMoveDistance = maxMoveDistance;
-        this._gridVisualRange = _maxMoveDistance;
-        ResetCachedValidPositionList();
+        //OnMaxMoveDistanceOrModifierChanged?.Invoke(this, EventArgs.Empty);
+
+        //this._gridVisualRange = _maxMoveDistance;
+        //ResetCachedValidPositionList();
+        UpdateGrdVisualRange();
     }
     public int GetCachedActionPointDefaultCost()
     {
@@ -149,14 +161,37 @@ public class MoveAction : BaseAction
     {
         this._cachedActionPointDefaultCost = newCost;
     }
-    protected override void RevertToBaseAction()
+    public void SetMaxMoveDistanceModifer(float newModifier)
     {
-        //this.SetMaxMoveDistance(this._unit.GetMaxMoveDistance());
+        this._maxMoveDistanceModifier = newModifier;
+        UpdateGrdVisualRange();
+        //OnMaxMoveDistanceOrModifierChanged?.Invoke(this, EventArgs.Empty);
+    }
+    public float GetMaxMoveDistanceModifier()
+    {
+        return this._maxMoveDistanceModifier;
+        
+    }
+    public int CalculateMaxMoveDistance()
+    {
+        return (int)(_maxMoveDistance * _maxMoveDistanceModifier);
+    }
+    public void ResetToBaseActionSettings()
+    {
         this.SetMakesNoise(true);
         this.SetActionName(this._originalActionName);
         this.SetActionPointDefaultCost(_cachedActionPointDefaultCost);
+        this.SetMaxMoveDistance(this._unit.GetMaxMoveDistance());
+        this.SetMaxMoveDistanceModifer(1.0f);
+        this.SetNoiseDistanceModifer(1.0f);
 
         ResetCachedValidPositionList();
+    }
+    public override void RevertToBaseAction()
+    {
+        Debug.Log("MoveAction: RevertToBaseAction: ");
+        //this.SetMaxMoveDistance(this._unit.GetMaxMoveDistance());
+        ResetToBaseActionSettings();  
 
         base.RevertToBaseAction();
     }
@@ -164,6 +199,15 @@ public class MoveAction : BaseAction
     {
         //ResetCachedValidPositionList();
         base.BaseActionUpdateByAltAction();
+    }
+    private void MoveAction_OnMaxMoveDistanceOrModifierChanged(object sender, EventArgs e)
+    {
+        UpdateGrdVisualRange();
+    }
+    private void UpdateGrdVisualRange()
+    {
+        this._gridVisualRange = this.GetMaxMoveDistance();
+        ResetCachedValidPositionList();
     }
     void ResetCachedValidPositionList()
     {
@@ -208,7 +252,7 @@ public class MoveAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete, BodyPart bodyPart = BodyPart.None)
     {
         // Get the path to the end position
-        List<GridPosition> pathGridPositionList =  PathFinding.Instance.FindPath(_unit.GetGridPosition(), gridPosition, out int pathLength, _maxMoveDistance);
+        List<GridPosition> pathGridPositionList =  PathFinding.Instance.FindPath(_unit.GetGridPosition(), gridPosition, out int pathLength, this.GetMaxMoveDistance());
 
         _currentPositionIndex = 0;
         //_positionList = new List<Vector3>();
@@ -256,9 +300,10 @@ public class MoveAction : BaseAction
             
         }
         _cachedValidActionList.Clear();
-        for (int x = -_maxMoveDistance; x <= _maxMoveDistance; x++)
+        int maxMoveDistance = this.GetMaxMoveDistance();
+        for (int x = -maxMoveDistance; x <= maxMoveDistance; x++)
         {
-            for (int y = -_maxMoveDistance; y <= _maxMoveDistance; y++)
+            for (int y = -maxMoveDistance; y <= maxMoveDistance; y++)
             {
                 GridPosition offsetGridPosition = new GridPosition(x, y);
                 GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
@@ -290,21 +335,21 @@ public class MoveAction : BaseAction
                 }
                 // check the distance to the target grid position. This will be the distance assuming no walls or anything. If distance with that is greater than distance max, skip
                 int pathFindingDistanceMultiplier = 10;
-                if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > _maxMoveDistance * pathFindingDistanceMultiplier)
+                if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > maxMoveDistance * pathFindingDistanceMultiplier)
                 {
                     continue;
                 }
-                if (!PathFinding.Instance.HasPath(unitGridPosition, testGridPosition, out int pathLength, _maxMoveDistance))
+                if (!PathFinding.Instance.HasPath(unitGridPosition, testGridPosition, out int pathLength, maxMoveDistance))
                 {
                     continue;
                 }
                 //Debug.Log("GetValidActionGridPositionList: Valid position at: " + testGridPosition.ToString() + " with a length of: " + pathLength.ToString());
                 // Get the length of the path and make sure it does not exceed the unit's max moving distance
                 
-                if (pathLength > _maxMoveDistance * pathFindingDistanceMultiplier) // pathLength was returned by the HasPath call above. Doing this instead of calling PathFinding.Instance.GetPathLength so that the same path isn't calculated twice
+                if (pathLength > maxMoveDistance * pathFindingDistanceMultiplier) // pathLength was returned by the HasPath call above. Doing this instead of calling PathFinding.Instance.GetPathLength so that the same path isn't calculated twice
                 {
                     // path length is too long
-                    //Debug.Log("GetValidActionGridPositionList: Path length from: " + unitGridPosition.ToString() + " to: " + testGridPosition.ToString() + " is: " + pathLength + " which is too far! Max movedistance is: " + _maxMoveDistance + " ("+ (_maxMoveDistance * pathFindingDistanceMultiplier).ToString() +")");
+                    //Debug.Log("GetValidActionGridPositionList: Path length from: " + unitGridPosition.ToString() + " to: " + testGridPosition.ToString() + " is: " + pathLength + " which is too far! Max movedistance is: " + maxMoveDistance + " ("+ (maxMoveDistance * pathFindingDistanceMultiplier).ToString() +")");
                     continue;
                 }
                 validGridPositionList.Add(testGridPosition);

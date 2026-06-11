@@ -86,7 +86,7 @@ public class ActionButtonUI : MonoBehaviour
             return;
         }
 
-        _actionNoiseIconImage.sprite = _scriptableNoiseUIMapping.GetSpriteFromNoiseVolume(_baseAction.NoiseDistance());
+        _actionNoiseIconImage.sprite = _scriptableNoiseUIMapping.GetSpriteFromNoiseVolume(_baseAction.GetNoiseDistance());
     }
     private void UpdateAltActions()
     {

@@ -1065,7 +1065,7 @@ public class ShootAction : BaseAction
     }
     public void ProjectileFired()
     {
-        this.ActionMadeNoise(this._unit.GetGridPosition(), this._noiseDistance);
+        this.ActionMadeNoise(this._unit.GetGridPosition(), this.GetNoiseDistance());
     }
     public void ProjectileHitTarget()
     {

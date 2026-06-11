@@ -75,3 +75,40 @@ PrefabInstance:
     - {fileID: 2898562228658105131, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
     - {fileID: 6393159762003104582, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+--- !u!1 &2085815897540192565 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1636655045978777828, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+  m_PrefabInstance: {fileID: 739962075154252241}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7118547177279874879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2085815897540192565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7418a121d14dbe64592b0ba2948dbf98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unit: {fileID: 2669113016032467902}
+  _parentActionType: 1
+  _parentAction: {fileID: 0}
+  _altActionName: Sprint
+  _actionType: 1
+  _baseActionCost: 1
+  _maxMoveDistanceIncrease: 1.5
+  _noiseDistanceIncrease: 2
+  _usedThisTurn: 0
+--- !u!114 &2669113016032467902 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+  m_PrefabInstance: {fileID: 739962075154252241}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8e71ecf61c8fd54892d9db60497d819, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

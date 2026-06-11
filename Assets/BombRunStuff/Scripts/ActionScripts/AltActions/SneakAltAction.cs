@@ -14,12 +14,14 @@ public class SneakAltAction : BaseAltAction
     public override void UpdateBaseActionForThisAltAction()
     {
         MoveAction moveAction = _parentAction as MoveAction;
+        moveAction.ResetToBaseActionSettings();
 
         //moveAction.SetMaxMoveDistance((int)(moveAction.GetMaxMoveDistance() * _maxMoveDistanceReduction));
         moveAction.SetActionPointDefaultCost((int)(moveAction.GetActionPointsCost() * _actionPointCostIncrease));
         moveAction.SetMakesNoise(false);
         moveAction.SetActionName(this._altActionName);
 
+        Debug.Log("SneakAltAction: UpdateBaseActionForThisAltAction: ");
         moveAction.BaseActionUpdateByAltAction();
     }
     public override bool CanPlayerSpendActionPointsForAltAction()

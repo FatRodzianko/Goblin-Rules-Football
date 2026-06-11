@@ -268,6 +268,7 @@ public class ActionGridVisualManager : MonoBehaviour
         GridVisualType gridRangeVisualType = GridVisualType.WhiteSoft;
         bool showGridVisualRange = selectedAction.ShowGridVisualRange();
         int gridVisualRange = selectedAction.GridVisualRange();
+        Debug.Log("UpdateActionVisuals: gridVisualRange: " + gridVisualRange.ToString()) ;
         bool squareGridRange = selectedAction.SquareGridRange();
         bool showGridVisualRangeOnFogOfWarOnly = selectedAction.ShowGridVisualRangeOnFogOfWarOnly();
 
@@ -320,7 +321,7 @@ public class ActionGridVisualManager : MonoBehaviour
         if (selectedAction.CanGetValidListAsTask())
         {
             _calculatingVisualGrid = true;
-            //Debug.Log("UpdateActionVisuals: Getting valid list as a task...");
+            Debug.Log("UpdateActionVisuals: Getting valid list as a task...");
             actionVisualPositions = await selectedAction.GetValidActionGridPositionListAsTask();
         }
         else

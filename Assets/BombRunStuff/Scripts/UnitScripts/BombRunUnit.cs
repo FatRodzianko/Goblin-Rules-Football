@@ -648,4 +648,20 @@ public class BombRunUnit : MonoBehaviour
     {
         this._hearingSensitivity = newSensitivity;
     }
+    public float GetBaseNoiseDistanceModifierForBodyPart(BodyPart bodyPart)
+    {
+        switch (bodyPart)
+        {
+            case BodyPart.Arms:
+                return 1.0f;
+            case BodyPart.Head:
+                return 1.0f;
+            case BodyPart.Legs:
+                return 1.0f;            
+            case BodyPart.None:
+            default:
+                return 1.0f;
+        }
+
+    }
 }
