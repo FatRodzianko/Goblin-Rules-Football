@@ -49,6 +49,7 @@ public class MoveAction : BaseAction
         this.OnMaxMoveDistanceOrModifierChanged += MoveAction_OnMaxMoveDistanceOrModifierChanged;
 
         //this._maxMoveDistance = _unit.GetMaxMoveDistance();
+        // When the unitStatManager is created, get rid of this since MaxMoveDistance will always be calculated there?
         this._maxMoveDistance = _unit.GetMaxMoveDistance();
         this._gridVisualRange = this.GetMaxMoveDistance();
 
@@ -151,7 +152,7 @@ public class MoveAction : BaseAction
 
         //this._gridVisualRange = _maxMoveDistance;
         //ResetCachedValidPositionList();
-        UpdateGrdVisualRange();
+        UpdateGridVisualRange();
     }
     public int GetCachedActionPointDefaultCost()
     {
@@ -164,7 +165,10 @@ public class MoveAction : BaseAction
     public void SetMaxMoveDistanceModifer(float newModifier)
     {
         this._maxMoveDistanceModifier = newModifier;
-        UpdateGrdVisualRange();
+
+        this._unit.AddActionStatModifier(this, StatType.MaxMoveDistance, newModifier, false);
+
+        UpdateGridVisualRange();
         //OnMaxMoveDistanceOrModifierChanged?.Invoke(this, EventArgs.Empty);
     }
     public float GetMaxMoveDistanceModifier()
@@ -202,9 +206,9 @@ public class MoveAction : BaseAction
     }
     private void MoveAction_OnMaxMoveDistanceOrModifierChanged(object sender, EventArgs e)
     {
-        UpdateGrdVisualRange();
+        UpdateGridVisualRange();
     }
-    private void UpdateGrdVisualRange()
+    private void UpdateGridVisualRange()
     {
         this._gridVisualRange = this.GetMaxMoveDistance();
         ResetCachedValidPositionList();

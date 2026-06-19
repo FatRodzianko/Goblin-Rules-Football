@@ -147,9 +147,12 @@ public class BombRunUnitSpawner : MonoBehaviour
         unitScript.SetUnitType(unit.UnitType());
         unitScript.SetUnitPortrait(unit.UnitPortrait());
         unitScript.SetDamageMode(unit.DamageMode());
-        unitScript.SetUnitSightRange(unit.SightRange());
-        unitScript.SetUnitMaxMoveDistance(unit.MaxMoveDistance());
-        unitScript.SetHearingSensitivity(unit.HearingSensitivity());
+        // Change these to some sort of "Unit Set Base Stats" function where the base stats scriptable object is passed to the unit
+        //unitScript.SetUnitSightRange(unit.SightRange());
+        //unitScript.SetUnitMaxMoveDistance(unit.MaxMoveDistance());
+        //unitScript.SetHearingSensitivity(unit.HearingSensitivity());
+        unitScript.InitializeUnitBaseStats(unit.BaseStatsScriptableObject());
+        // Change these to some sort of "Unit Set Base Stats" function where the base stats scriptable object is passed to the unit
         unitScript.SetIsEnemy(isEnemy);
 
         unitTransform.position = LevelGrid.Instance.GetWorldPosition(gridPosition);

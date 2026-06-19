@@ -85,6 +85,9 @@ public class BombRunUnit : MonoBehaviour
     private GridPosition _lastSeenAtGridPosition;
     [SerializeField] private Vector2Int _currentVector2Position = new Vector2Int(-1, -1);
 
+    [Header("Unit Stats Stuff...")]
+    [SerializeField] private BombRunUnitStatManager _statManager;
+
 
     private void Awake()
     {
@@ -135,6 +138,15 @@ public class BombRunUnit : MonoBehaviour
         UnitVisibilityManager_BombRun.OnAnyUnitBecameVisibile -= UnitVisibilityManager_BombRun_OnAnyUnitBecameVisibile;
         UnitVisibilityManager_BombRun.OnAnyUnitBecameInVisibile -= UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile;
         UnitNoiseHearingManager.OnAnyUnitWasHeard -= UnitNoiseHearingManager_OnAnyUnitWasHeard;
+
+        try
+        {
+            _statManager.UnsubscribeFromEvents();
+        }
+        catch (Exception e)
+        {
+            
+        }
     }
     public void InitializeBombRunUnit()
     {
@@ -415,13 +427,18 @@ public class BombRunUnit : MonoBehaviour
 
         _damageMode = damageMode;
     }
+    public void InitializeUnitBaseStats(ScriptableBombRunUnitBaseStats baseStats)
+    {
+        _statManager = new BombRunUnitStatManager(this, baseStats);
+    }
     public void SetUnitSightRange(int sightRange)
     {
         this._sightRange = sightRange;
     }
     public int GetSightRange()
     {
-        return _sightRange;
+        //return _sightRange;
+        return _statManager.GetSightDistance();
     }
     public void SetUnitMaxMoveDistance(int maxMoveDistance)
     {
@@ -429,7 +446,28 @@ public class BombRunUnit : MonoBehaviour
     }
     public int GetMaxMoveDistance()
     {
-        return this._maxMoveDistance;
+        //return this._maxMoveDistance;
+        return _statManager.GetMaxMoveDistance();
+    }
+    public void AddActionStatModifier(BaseAction action, StatType stat, float statModifier, bool isAdditive)
+    {
+        if (isAdditive)
+        {
+            _statManager.AddActionModifyingStatAdditive(action, stat, statModifier);
+        }
+        else
+        {
+            _statManager.AddActionModifyingStatMultiply(action, stat, statModifier);
+        }
+        
+    }
+    public void RemoveActionStatModifierByAction(BaseAction action)
+    {
+        _statManager.RemoveActionModifyingStatByAction(action);
+    }
+    public float GetUnitFOV()
+    {
+        return _statManager.GetFOV();
     }
     private void UpdateMoveActionMoveDistance()
     {
@@ -642,7 +680,8 @@ public class BombRunUnit : MonoBehaviour
     }
     public float GetHearingSensitivity()
     {
-        return _hearingSensitivity;
+        //return _hearingSensitivity;
+        return _statManager.GetHearingSensitivity();
     }
     public void SetHearingSensitivity(float newSensitivity)
     {

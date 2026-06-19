@@ -403,9 +403,12 @@ public abstract class BaseAction : MonoBehaviour
         // Base action is always index 0. First altAction would be index 1, but in the altActions list, it would be index 0 of the list
         if (index > (_altActions.Count))
             return;
+        if (_altActionIndex == index)
+            return;
 
         _altActionIndex = index;
 
+        _unit.RemoveActionStatModifierByAction(this);
         this.OnAltActionIndexChanged?.Invoke(this, _altActionIndex);
     }
     private void BaseAction_OnAltActionIndexChanged(object sender, int index)

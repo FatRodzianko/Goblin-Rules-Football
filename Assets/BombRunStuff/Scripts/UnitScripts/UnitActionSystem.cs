@@ -504,6 +504,23 @@ public class UnitActionSystem : MonoBehaviour
     public void SetSelectedAction(BaseAction baseAction)
     {
         _selectedAction = baseAction;
+        //try
+        //{
+        //    BaseAction moveAction = new MoveAction();
+        //    if (_selectedAction.GetType() != moveAction.GetType())
+        //    {
+        //        Debug.Log("SetSelectedAction: _selectedAction is NOT move action. It is: " + _selectedAction.GetType().ToString());
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("SetSelectedAction: _selectedAction is type of move action");
+        //    }
+        //}
+        //catch (Exception e)
+        //{
+        //    Debug.Log("SetSelectedAction: could not get selected action type");
+        //}
+        
         OnSelectedActionChanged?.Invoke(this, EventArgs.Empty);
     }
     public BombRunUnit GetSelectedUnit()

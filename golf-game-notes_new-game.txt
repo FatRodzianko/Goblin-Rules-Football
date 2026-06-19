@@ -723,14 +723,14 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - the UI is just generally cramped and could be larger. will make things more legible
 - - x looks bad when doubled in size so I reverted back to original size, but might just do it anyway? Or just ignore. The UI is "good enough" for this stage
 # "Alternative Actions" for actions
-- - - All actions can have an "Alt" action
-- - - - - - Ex: "Sneak" as an alt action for "Move"
-- - - Used for things that either shouldn't be their own action, or switching to should use up an action point
-- - - - - - so reload is its own action (actually, maybe it could be an alt action?)
-- - - - - - "Switch to Healing/Damage" remains its own action, since the idea is it requires you to reconfigure your weapon or something?
-- - - Alt Action can "modify" the base action
+- - x All actions can have an "Alt" action
+- - - - - x Ex: "Sneak" as an alt action for "Move"
+- - x Used for things that either shouldn't be their own action, or switching to should use up an action point
+- - - - - x so reload is its own action (actually, maybe it could be an alt action?)
+- - - - - x "Switch to Healing/Damage" remains its own action, since the idea is it requires you to reconfigure your weapon or something?
+- - x Alt Action can "modify" the base action
 - - - - - x So, sneak halves the maxMoveDistance of the MoveAction as well as makes no noise?
-- - - ActionButton UI to have some indicator for "Alt Actions"
+- - x ActionButton UI to have some indicator for "Alt Actions"
 - - - - - x Maybe an icon above the ActionButton, like just a small square, that indicates what "Action" you are using
 - - - - - - - - x For actions with no Alt Action, there is just the one square that is always highlighted
 - - - - - - - - x For actions with one or more Alt Actions, there is another square/icon above the Action button. The "current" one highlighted
@@ -738,14 +738,126 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - Alternative Actions should only modify parameters for the base action
 - - - - - x "Sneak" halves the max move distance of MoveAction, and lowers the NoiseDistance of move distance
 - - - - - - - - x Everything else is the same as a normal Move Action
-- - - - - - - - - maybe want to change the half distance to make the action point cost be double what it normally is?
-- - - - - - - - - - - - right now half distance seems to be too short of a distance
-- - - - - - Sprint 1.5x more move distance, but louder?
-- - - - - - - - - also probably make it 2 action points? or maybe just really loud... probably not great for the performance of the noise stuff
+- - - - - - - - x maybe want to change the half distance to make the action point cost be double what it normally is?
+- - - - - - - - - - - x right now half distance seems to be too short of a distance
+- - - - - x Sprint 1.5x more move distance, but louder?
+- - - - - - - - x also probably make it 2 action points? or maybe just really loud... probably not great for the performance of the noise stuff
 - - - - - - "Double Tap" is a ShootAction alt action that halves shoot distance and allows you to shoot two body parts
 - - - - - - - - - will need to modify the ShootSubAction to allow for multiple body part selections....
-- - - Have an event for Alternative Action Selected that includes the altActionIndex
-- - - - - - 0 means revert to the base action, so 
+- - - - - - - - - Could make it just hit your targetted body part for double damage instead
+- - - - - - - - - - - - ideally would update shootaction to accept a "number of targets" so shoot actions can potentially hit multiple targets...
+- - - - - - - - - - - - - - - different classes, weapons, and alt actions could target multiple enemies or body parts?
+- - - - - - - - - - - - - - - make it so you set a "number of targets" parameter on shoot action
+- - - - - - - - - - - - - - - complete shoot action as normal
+- - - - - - - - - - - - - - - - - - subtract from the number of targets, or "Remaining Targets" count
+- - - - - - - - - - - - - - - after shoot action completes, instead of immediately calling the event/action that the action has completed, check "Remaining targets" count
+- - - - - - - - - - - - - - - if Remaining Targets count > 0, start the shoot action again
+- - - - - - - - - - - - - - - if it is 0, then call OnActionCompleted or whatever
+- - - - - - - - - "Double Tap" probably makes sense to just hit one targetted body part twice...
+- - - - - - - - - - - - but something like "spray and pray" could target multiple targets?
+- - - Idea of a "turn cooldown" for actions and alt actions
+- - - - - - Sprint action can only be used once per turn, but other powerful alt actions should probably be limited more
+- - - - - - Double Tap could have a 3 turn cooldown, as an example
+- - - - - - - - - When the action is taken, set the cooldown to "3," or whatever the number may be
+- - - - - - - - - When the turn changes to the unit's turn (check the unit's "isFriendly" thing, compare to whose turn it is)
+- - - - - - - - - - - - this should affect enemy units as well, so can't just focus on player owned units
+- - - - - - - - - - - - when its the turn for the player who owns the unit, subtract 1 from the turn cooldown
+- - - - - - - - - when the cooldown reaches 0, it can be used again
+- - - - - - Need some sort of UI icon... a number next to a small "clock"?
+- - - Sniper - shoot action alt action
+- - - - - - Will narrow the FOV to something smaller than default. Say, half it (from 90 to 45)
+- - - - - - increases max sight distance and max shoot distance
+- - - - - - maybe make it so the target must be in the unit's vision cone to target. Whereas default shoot action just needs them to be in 
+			range and seen by the unit or a teammate, but the shooting action does not necessarily need to be looking at target before taking 
+			the action
+- - x Have an event for Alternative Action Selected that includes the altActionIndex
+- - - - - x 0 means revert to the base action, so 
+# Create something like a "Unit Base Parameters" class that is used to store unit's base stats?
+- - - Or like a "Unit Stat Manager" class/script
+- - - Referenced by things like BombRunUnit class to get unit's stats
+- - - Tracks stats for things like
+- - - - - - Sight Distance
+- - - - - - Movement Distance
+- - - - - - Hearing Sensitivity
+- - - - - - Sight FOV?
+- - - - - - Noise Dampening/Noise multiplier (per body part?)
+- - - Ex: BombRunUnit needs to get the unit's current sight distance
+- - - - - - Gets value from something like UnitStatsManager.SightDistance()
+- - - - - - - - - SightDistance will calculate units current sight distance by taking the unit's base stat for Sight Distance, then adding modifiers
+- - - - - - - - - - - - modifers can be items, body mods, failed body mods that hurt stats, injuries (?), whatever
+- - - (GOAL) Stats can be saved to a JSON file so they can be reloaded by the player in a new play session
+- - - I guess this would work as a scriptable object? idk really I forget how those work for storing data at runtime
+- - - Almost all actions rely on some sort of "stat" from the unit. Sight distance, movement distance, etc.
+- - - Actions should pull this info from the unit as needed
+- - - I started to add "Calculate" functions to actions, like "CalculateMaxMoveDistance" for movement
+- - - - - - These need a base stat value that can then be modified by the action, if needed
+- - - The UnitStatManager could track "temporary" stat modifiers in some sort of dictionary/list
+- - - - - - Stats can Temporarily be modifed by Base Actions and Alt Actions
+- - - - - - - - - When you switch to "sprint," max move distance is modifed by the action
+- - - - - - - - - - - - SprintAltAction tells its BaseAction (MoveAction) to add modifiers to UnitStatManager
+- - - - - - - - - - - - - - - UnitStatManager will have a list of ActionsModifyingStats
+- - - - - - - - - - - - - - - - - - This will likely be a class that has BaseAction, StatType, and StatModifier
+- - - - - - - - - - - - - - - UnitStatManager will add to the ActionsModifyingStats List
+- - - - - - - - - - - - - - - - - - MoveAction, MaxMoveDistance, 2.0f
+- - - - - - - - - - - - UnitStatManager will call event saying a base stat has been updated?
+- - - - - - - - - When you change your action, the action stat modifiers need to be updated/removed. Do one of two things?
+- - - - - - - - - - - - When the alt action is changed, such as changing SprintAltAction to regular MoveAction:
+- - - - - - - - - - - - - - - BaseAction (MoveAction) tells UnitStatManager to remove any ActionModifiers for itself
+- - - - - - - - - - - - - - - - - - Done in BaseAction_OnAltActionIndexChanged, before UpdateActionForNewAltActionIndex
+- - - - - - - - - - - - - - - If the newly selected alt action modifies a stat, it will do so in UpdateBaseActionForThisAltAction?
+- - - - - - - - - - - - Other option is for UnitStatManager to listen for the OnSelectedActionChanged event
+- - - - - - - - - - - - - - - Ignore if selected unit isn't for UnitStatManager's unit
+- - - - - - - - - - - - - - - Check the lists for the stats modified by actions
+- - - - - - - - - - - - - - - If those actions aren't the same action type as the currently selected action, remove from list
+- - - - - - - - - - - - - - - - - - can check with .GetType()?
+- - - - - - - - - - - - - - - - - - - - - if(newSelectedAction.GetType() != ActionsModifyingStats[i].ModifyingAction.GetType())
+- - - - - - - - - - - - - - - - - - - - - or, ActionsModifyingStats.RemoveAll(x => x.Action.GetType != newSelectedAction.GetType()); // https://stackoverflow.com/questions/853526/using-linq-to-remove-elements-from-a-listt
+- - - - - - - - - - - - - - - - - - - - - Before doing a RemoveAll, would need to first iterate over the list, get the StatTypes that were modified,
+                                          then call event for those StatTypes being modifed???
+- - - - - - - - - - - - - - - Track the "Stat types" that were removed from the list, call events for those stats being updated?
+- - - - - - - - - - - - - - - - - - so things like FOV or whatever update visually? If a player had "snipe" selected and changed to move,
+                                    the FOV visuals need to update...
+- - - - - - - - - - - - Would probably need to do both?
+- - - - - - - - - When UnitStatManager needs to calculate a stat, for example max move distance...
+- - - - - - - - - - - - It will get the base value from the ScriptableBombRunUnitBaseStats object
+- - - - - - - - - - - - It will go through each list of modifiers, and modify the stat
+- - - - - - - - - - - - - - - Ex: Sprint modified max move distance
+- - - - - - - - - - - - - - - - - - Will look through ActionsModifyingStats for anything modifying MaxMoveDistance
+- - - - - - - - - - - - - - - - - - Will get the StatModifier amount. Use that on base stat
+- - - - - - - - - Stat Modifiers can either be additive/subtractive, or multipliers
+- - - - - - - - - - - - additive stats just add a value. Such as adding +1 to MaxMovementDistance to increase from base of 10 to 11
+- - - - - - - - - - - - Multipliers will, well, multiply the value of the base stat
+- - - - - - - - - - - - Ex: Sprint action doubles max move distance. Base stat of 10 is multiplied by 2 to get 20
+- - - - - - - - - - - - Can use values less than 1 for division, obviously...
+- - - - - - - - - Keep the additive and multiplying stat modifier lists separate, to make it easier keep order of operations when calculating stat value
+- - - - - - - - - - - - First, apply additive modifiers to a stat
+- - - - - - - - - - - - Then, multiply
+- - - - - - - - - - - - So, if the MaxMovementDistance stat has a base of 10, there is a +2 body mody, and a x2 from SprintAction
+- - - - - - - - - - - - - - - Calculation would be: (10 + 2) * 2 = 24
+- - - - - - - - - - - - Might reverse this so that things like sneak can still make noise based on injuries/body mods? otherwise it will also be 0 for noise...
+- - - - - - Stats are also modified by BodyMods (whenever those get added...) and potentially by Unit level/experience?
+- - - - - - - - - So when a stat is calculated, it would go something like:
+- - - - - - - - - - - - Get Additive Unit LevelUp Stats
+- - - - - - - - - - - - Get Additive BodyMod Stats
+- - - - - - - - - - - - Get Additive BaseAction Stats
+- - - - - - - - - - - - Get Multiplying Unit LevelUp Stats
+- - - - - - - - - - - - Get Multiplying BodyMod Stats
+- - - - - - - - - - - - Get Multiplying BaseAction Stats
+- - - "Base Noise Stat" but it's per body part?
+- - - - - - For noise calculations for actions, the action will have a base noise amount, and then the unit will also modify the noise amount base on
+            the body part for the action
+- - - - - - For MoveAction, it takes its base noise amount, and then queries the unit for any noise additions
+- - - - - - - - - Move action sends its base noise amount to UnitStatManger, and its body part, Legs
+- - - - - - - - - UnitStatManager calculates noise for the legs
+- - - - - - - - - - - - Goes through the normal stat calculating process, but instead of their being a "base" noise stat, it is modifying the noise
+                        amount sent to it by the action
+- - - - - - - - - Ex: MoveAction has a base noise amount of 10
+- - - - - - - - - - - - MoveAction asks UnitStatManager to CalculateNoise, bases "10" and "BodyPart.Legs"
+- - - - - - - - - - - - UnitStatManager checks its lists for anything modifying "NoiseLegs," applies modifier to MoveActions noise amount
+- - - - - - - - - - - - UnitStatManager returns the calculated value
+- - - - - - - - - - - - MoveAction uses value for noise calculations
+- - - - - - When SprintAltAction is selected
+- - - - - - - - - Add an Action modifier to UnitStatManager for BodyPart.Legs of 2.0f
 # AI Unit "States" for actions to take
 - - - States will be things like
 - - - - - - patrol
@@ -796,21 +908,7 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - Attackers have a completely blacked out map. Everything is under black fog of war until they reveal it
 - - - - - - so defenders have advantage of map knowledge, but weakness in that they have multiple sites to defend
 - - - - - - attackers have advantage of only needing to suceed once at one site of their choosing, but they must first find it
-# Create something like a "Unit Base Parameters" class that is used to store unit's base stats?
-- - - Or like a "Unit Stat Manager" class/script
-- - - Referenced by things like BombRunUnit class to get unit's stats
-- - - Tracks stats for things like
-- - - - - - Sight Distance
-- - - - - - Movement Distance
-- - - - - - Hearing Sensitivity
-- - - - - - Sight FOV?
-- - - - - - Noise Dampening/Noise multiplier (per body part?)
-- - - Ex: BombRunUnit needs to get the unit's current sight distance
-- - - - - - Gets value from something like UnitStatsManager.SightDistance()
-- - - - - - - - - SightDistance will calculate units current sight distance by taking the unit's base stat for Sight Distance, then adding modifiers
-- - - - - - - - - - - - modifers can be items, body mods, failed body mods that hurt stats, injuries (?), whatever
-- - - (GOAL) Stats can be saved to a JSON file so they can be reloaded by the player in a new play session
-- - - I guess this would work as a scriptable object? idk really I forget how those work for storing data at runtime
+
 # "Body Mods" and unit inventory?
 - - - Have "upgrades" that can made to each goblin unit
 - - - from random junk/loot found throughout levels

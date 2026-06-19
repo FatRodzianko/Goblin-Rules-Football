@@ -87,6 +87,7 @@ public class BombRunUnitFieldOfView : MonoBehaviour
 
     public void InitializeFOV()
     {
+        this._fov = _unit.GetUnitFOV();
         SetAimDirection(_unit.GetActionDirection());
         if(isActiveAndEnabled)
             StartCoroutine(DelayForWallCollidersToSpawn(0.25f));

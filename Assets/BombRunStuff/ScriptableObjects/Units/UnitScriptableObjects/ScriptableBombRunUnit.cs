@@ -14,6 +14,7 @@ public class ScriptableBombRunUnit : ScriptableObject
     [SerializeField] private int _sightRange;
     [SerializeField] private int _maxMoveDistance;
     [SerializeField] private float _hearingSensitivity = 1.0f;
+    [SerializeField] private ScriptableBombRunUnitBaseStats _baseStats;
 
     [Header("Unit Visuals")]
     [SerializeField] private RuntimeAnimatorController _animatorController;
@@ -53,5 +54,8 @@ public class ScriptableBombRunUnit : ScriptableObject
     {
         return _hearingSensitivity;
     }
-
+    public ScriptableBombRunUnitBaseStats BaseStatsScriptableObject()
+    {
+        return _baseStats;
+    }
 }
