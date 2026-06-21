@@ -36,6 +36,8 @@ public class ActionGridVisualManager : MonoBehaviour
     [Header("Grid Visual Tiles")]
     [SerializeField] private Tile _actionVisualTile;
     [SerializeField] private bool _calculatingVisualGrid = false;
+    private IEnumerator _waitForCalculatingGridVisual;
+    [SerializeField] private bool _isWaitForCalculatingGridVisualRunning = false;
 
     [Header("Tile List")]
     [SerializeField] private List<GridPosition> _actionVisualPositions = new List<GridPosition>();
@@ -250,7 +252,16 @@ public class ActionGridVisualManager : MonoBehaviour
     {
         Debug.Log("UpdateActionVisuals: _calculatingVisualGrid: " + _calculatingVisualGrid.ToString());
         if (_calculatingVisualGrid)
+        {
+            if (_isWaitForCalculatingGridVisualRunning)
+            {
+                StopCoroutine(_waitForCalculatingGridVisual);
+            }
+            _waitForCalculatingGridVisual = WaitForGridCalculation();
+            StartCoroutine(_waitForCalculatingGridVisual);
             return;
+        }
+
         //HideAllActionVisuals();
 
         BombRunUnit selectedUnit = UnitActionSystem.Instance.GetSelectedUnit();
@@ -376,6 +387,17 @@ public class ActionGridVisualManager : MonoBehaviour
         }
         ShowActionVisualsFromList(actionVisualPositions, gridVisualType);
         _calculatingVisualGrid = false;
+    }
+    IEnumerator WaitForGridCalculation()
+    {
+        Debug.Log("WaitForGridCalculation: ");
+        _isWaitForCalculatingGridVisualRunning = true;
+        while (_calculatingVisualGrid)
+        {
+            yield return new WaitForSecondsRealtime(0.02f);
+        }
+        UpdateActionVisuals();
+        _isWaitForCalculatingGridVisualRunning = false;
     }
     private Color GetGridVisualTypeColor(GridVisualType gridVisualType)
     {

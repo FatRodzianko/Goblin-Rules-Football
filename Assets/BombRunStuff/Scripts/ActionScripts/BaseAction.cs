@@ -369,12 +369,20 @@ public abstract class BaseAction : MonoBehaviour
 
         return -1;
     }
-    public void AddAltActionToAltActionList(BaseAltAction altAction)
+    //public void AddAltActionToAltActionList(BaseAltAction altAction)
+    //{
+    //    if (_altActions.Contains(altAction))
+    //        return;
+    //    _altActions.Add(altAction);
+    //    this.OnNumberOfAltActionsChanged?.Invoke(this, EventArgs.Empty);
+    //}
+    public int AddAltActionToAltActionList(BaseAltAction altAction)
     {
         if (_altActions.Contains(altAction))
-            return;
+            return -1;
         _altActions.Add(altAction);
         this.OnNumberOfAltActionsChanged?.Invoke(this, EventArgs.Empty);
+        return _altActions.Count;
     }
     public void RemoveAltActionFromAltActionList(BaseAltAction altAction)
     {

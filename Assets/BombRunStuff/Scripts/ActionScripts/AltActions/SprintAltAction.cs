@@ -19,7 +19,6 @@ public class SprintAltAction : BaseAltAction
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         BaseAction.OnAnyActionStarted += BaseAction_OnAnyActionStarted;
     }
-
     private void OnDisable()
     {
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
