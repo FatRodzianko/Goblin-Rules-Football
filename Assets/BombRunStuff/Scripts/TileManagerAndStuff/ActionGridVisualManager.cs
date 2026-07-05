@@ -392,8 +392,15 @@ public class ActionGridVisualManager : MonoBehaviour
     {
         Debug.Log("WaitForGridCalculation: ");
         _isWaitForCalculatingGridVisualRunning = true;
+        float timeWaited = 0f;
         while (_calculatingVisualGrid)
         {
+            if (timeWaited > 1)
+            {
+                _isWaitForCalculatingGridVisualRunning = false;
+                yield break;
+            }
+            timeWaited += 0.02f;
             yield return new WaitForSecondsRealtime(0.02f);
         }
         UpdateActionVisuals();

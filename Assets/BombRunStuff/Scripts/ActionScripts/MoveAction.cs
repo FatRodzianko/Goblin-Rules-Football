@@ -141,7 +141,8 @@ public class MoveAction : BaseAction
     public int GetMaxMoveDistance()
     {
         //return _maxMoveDistance;
-        return CalculateMaxMoveDistance();
+        //return CalculateMaxMoveDistance();
+        return this._unit.GetMaxMoveDistance();
     }
     public void SetMaxMoveDistance(int maxMoveDistance)
     {

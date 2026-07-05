@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -40,6 +41,12 @@ public class BombRunUnitStatManager
     public EventHandler OnFOVChanged;
     public EventHandler OnHearingSensitivityChanged;
 
+    // updating stats trackers
+    private bool _maxMoveDistanceWasUpdated = true;
+
+    // cached stat values
+    private int _maxMoveDistanceCached = 0;
+
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BombRunUnitStatManager(BombRunUnit unit, ScriptableBombRunUnitBaseStats baseStats)
     {
@@ -51,7 +58,29 @@ public class BombRunUnitStatManager
     public int GetMaxMoveDistance()
     {
         Debug.Log("BombRunUnitStatManager: GetMaxMoveDistance");
-        return _baseStats.BaseMaxMoveDistance();
+        //return _baseStats.BaseMaxMoveDistance();
+        if (_maxMoveDistanceWasUpdated)
+        {
+            Debug.Log("BombRunUnitStatManager: GetMaxMoveDistance: _maxMoveDistanceWasUpdated: " + _maxMoveDistanceWasUpdated.ToString() + " getting a new max move distance value...");
+            _maxMoveDistanceCached = CalculateMaxMoveDistance();
+            _maxMoveDistanceWasUpdated = false;
+        }
+        Debug.Log("BombRunUnitStatManager: GetMaxMoveDistance: " + _maxMoveDistanceCached);
+        return _maxMoveDistanceCached;
+        
+    }
+    public int CalculateMaxMoveDistance()
+    {
+        int moveDistance = _baseStats.BaseMaxMoveDistance();
+        moveDistance += (int) GetAdditiveStatModifier(StatType.MaxMoveDistance);
+
+        if (_actionsModifyingStatsMultiply.Any(x => x.StatType == StatType.MaxMoveDistance))
+        {
+            moveDistance = (int)(moveDistance * GetMultiplingStatModifier(StatType.MaxMoveDistance));
+        }
+
+        //return (int)((_baseStats.BaseMaxMoveDistance() + GetAdditiveStatModifier(StatType.MaxMoveDistance)) * GetMultiplingStatModifier(StatType.MaxMoveDistance));
+        return moveDistance;
     }
     public int GetSightDistance()
     {
@@ -64,6 +93,30 @@ public class BombRunUnitStatManager
     public float GetHearingSensitivity()
     {
         return _baseStats.BaseHearingSensitivity();
+    }
+    private float GetAdditiveStatModifier(StatType statType)
+    {
+        float modifier = 0f;
+        foreach (ActionModifyingStat actionModifyingStat in _actionsModifyingStatsAdditive)
+        {
+            if (actionModifyingStat.StatType == statType)
+            {
+                modifier += actionModifyingStat.StatModifier;
+            }
+        }
+        return modifier;
+    }
+    private float GetMultiplingStatModifier(StatType statType)
+    {
+        float modifier = 1f;
+        foreach (ActionModifyingStat actionModifyingStat in _actionsModifyingStatsMultiply)
+        {
+            if (actionModifyingStat.StatType == statType)
+            {
+                modifier *= actionModifyingStat.StatModifier;
+            }
+        }
+        return modifier;
     }
     public void UnsubscribeFromEvents()
     {
@@ -181,6 +234,7 @@ public class BombRunUnitStatManager
         switch (statType)
         {
             case StatType.MaxMoveDistance:
+                _maxMoveDistanceWasUpdated = true;
                 OnMaxMovementDistanceChanged?.Invoke(this, EventArgs.Empty);
                 break;
             case StatType.SightDistance:
