@@ -38,7 +38,7 @@ public class UnitSelectedVisual : MonoBehaviour
     }
     private void UnitActionSystem_OnSelectedUnitChange(object sender, BombRunUnit unit)
     {
-        Debug.Log("UnitActionSystem_OnSelectedUnitChange: " + _unit + " : " + unit);
+        //Debug.Log("UnitActionSystem_OnSelectedUnitChange: " + _unit + " : " + unit);
         UpdateSelectedUnitVisuals(unit);
         
     }

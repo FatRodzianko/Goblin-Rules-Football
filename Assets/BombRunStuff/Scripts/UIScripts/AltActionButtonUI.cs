@@ -88,7 +88,7 @@ public class AltActionButtonUI : MonoBehaviour
 
     private void ButtonClicked()
     {
-        Debug.Log("AltActionButtonUI: Button Clicked!");
+        //Debug.Log("AltActionButtonUI: Button Clicked!");
 
         if (UnitActionSystem.Instance.GetSelectedAction() != this._parentAction)
             return;
@@ -126,13 +126,13 @@ public class AltActionButtonUI : MonoBehaviour
     }
     private void EnableAltActionButton()
     {
-        Debug.Log("EnableAltActionButton: ");
+        //Debug.Log("EnableAltActionButton: ");
         _button.interactable = true;
         _notSelectableSprite.SetActive(false);
     }
     private void DisableAltActionButton()
     {
-        Debug.Log("DisableAltActionButton: ");
+        //Debug.Log("DisableAltActionButton: ");
         _button.interactable = false;
         _notSelectableSprite.SetActive(true);
     }

@@ -106,7 +106,7 @@ public class MoveAction : BaseAction
             }
             else
             {
-                Debug.Log("MoveAction: " + this._unit.name + " will now move to move to: " + _positionList[_currentPositionIndex]);
+                //Debug.Log("MoveAction: " + this._unit.name + " will now move to move to: " + _positionList[_currentPositionIndex]);
                 _unit.SetActionDirection(_positionList[_currentPositionIndex] - LevelGrid.Instance.GetWorldPosition(_unit.GetGridPosition()));
             }
             
@@ -165,32 +165,40 @@ public class MoveAction : BaseAction
     }
     public void SetMaxMoveDistanceModifer(float newModifier)
     {
-        this._maxMoveDistanceModifier = newModifier;
+        //this._maxMoveDistanceModifier = newModifier;
 
         this._unit.AddActionStatModifier(this, StatType.MaxMoveDistance, newModifier, false);
 
         UpdateGridVisualRange();
         //OnMaxMoveDistanceOrModifierChanged?.Invoke(this, EventArgs.Empty);
     }
-    public float GetMaxMoveDistanceModifier()
+    private void ClearMaxMoveDistanceModifers()
     {
-        return this._maxMoveDistanceModifier;
-        
+        Debug.Log("MoveAction: ClearMaxMoveDistanceModifers");
+        this._unit.RemoveActionStatModifierByAction(this);
     }
-    public int CalculateMaxMoveDistance()
-    {
-        return (int)(_maxMoveDistance * _maxMoveDistanceModifier);
-    }
+    //public float GetMaxMoveDistanceModifier()
+    //{
+    //    return this._maxMoveDistanceModifier;
+
+    //}
+    //public int CalculateMaxMoveDistance()
+    //{
+    //    return (int)(_maxMoveDistance * _maxMoveDistanceModifier);
+    //}
     public void ResetToBaseActionSettings()
     {
+        Debug.Log("MoveAction: ResetToBaseActionSettings");
         this.SetMakesNoise(true);
         this.SetActionName(this._originalActionName);
         this.SetActionPointDefaultCost(_cachedActionPointDefaultCost);
-        this.SetMaxMoveDistance(this._unit.GetMaxMoveDistance());
-        this.SetMaxMoveDistanceModifer(1.0f);
+        //this.SetMaxMoveDistance(this._unit.GetMaxMoveDistance());
+        //this.SetMaxMoveDistanceModifer(1.0f);
+        this.ClearMaxMoveDistanceModifers();
         this.SetNoiseDistanceModifer(1.0f);
 
-        ResetCachedValidPositionList();
+        UpdateGridVisualRange();
+        //ResetCachedValidPositionList();
     }
     public override void RevertToBaseAction()
     {
@@ -211,6 +219,7 @@ public class MoveAction : BaseAction
     }
     private void UpdateGridVisualRange()
     {
+        Debug.Log("MoveAction: UpdateGridVisualRange");
         this._gridVisualRange = this.GetMaxMoveDistance();
         ResetCachedValidPositionList();
     }
@@ -283,6 +292,7 @@ public class MoveAction : BaseAction
     }
     public override List<GridPosition> GetValidActionGridPositionList()
     {
+        Debug.Log("MoveAction: GetValidActionGridPositionList");
         //float startTime = Time.realtimeSinceStartup;
         List<GridPosition> validGridPositionList = new List<GridPosition>();
         // For testing jobs?
@@ -292,7 +302,7 @@ public class MoveAction : BaseAction
 
         if (_cachedValidActionList.ContainsKey(unitGridPosition))
         {
-            Debug.Log("GetValidActionGridPositionList: repeating for grid position: " + unitGridPosition.ToString() + " returning cached list?");
+            Debug.Log("GetValidActionGridPositionList: repeating for grid position: " + unitGridPosition.ToString() + " returning cached list? Contains: " + _cachedValidActionList.Count + " positions");
             //Debug.Log("Time: Not-Dots: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
             try
             {
@@ -498,7 +508,7 @@ public class MoveAction : BaseAction
     }
     public override GridPosition GetNearestValidGridPosition(GridPosition targetGridPosition)
     {
-        //Debug.Log("GetNearestValidGridPosition: MoveAction: " + targetGridPosition);
+        Debug.Log("MoveAction: GetNearestValidGridPosition: " + targetGridPosition);
         GridPosition nearestPosition = targetGridPosition;
         GridPosition unitGridPosition = _unit.GetGridPosition();
         List<GridPosition> gridPositionList = new List<GridPosition>();

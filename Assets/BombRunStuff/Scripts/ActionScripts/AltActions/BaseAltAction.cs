@@ -25,13 +25,13 @@ public abstract class BaseAltAction : MonoBehaviour
         _parentAction.SetHasAltAction(true);
 
         BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
+        //UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
     }
     private void OnDisable()
     {
         BaseAction.OnAnyActionCompleted -= BaseAction_OnAnyActionCompleted;
+        //UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
     }
-
-
     public abstract void UpdateBaseActionForThisAltAction();
     public abstract bool CanPlayerSpendActionPointsForAltAction();
 
@@ -49,6 +49,20 @@ public abstract class BaseAltAction : MonoBehaviour
 
         Debug.Log("BaseAction_OnAnyActionCompleted: " + this.GetType().ToString() + ": cannot afford alt action. resetting alt action index to 0.");
         _parentAction.SetAltActionIndex(0);
+    }
+    private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
+    {
+
+        if (UnitActionSystem.Instance.GetSelectedAction() == null)
+            return;
+        if (UnitActionSystem.Instance.GetSelectedAction() != this._parentAction)
+            return;
+        if (this._parentAction.GetAltActionIndex() != this._altActionIndex)
+            return;
+        if (!this.CanPlayerSpendActionPointsForAltAction())
+            return;
+        
+        this.UpdateBaseActionForThisAltAction();
     }
 
 }

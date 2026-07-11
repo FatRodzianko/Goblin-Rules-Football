@@ -136,7 +136,7 @@ public class BombRunUnitStatManager
             return;
         }
 
-        RemoveActionModifyingStatByActionInverse(UnitActionSystem.Instance.GetSelectedAction());
+        //RemoveActionModifyingStatByActionInverse(UnitActionSystem.Instance.GetSelectedAction());
         
     }
     public void AddActionModifyingStatAdditive(BaseAction action, StatType statType, float statModifier)

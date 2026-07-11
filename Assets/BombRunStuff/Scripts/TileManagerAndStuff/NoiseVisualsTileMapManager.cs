@@ -70,7 +70,7 @@ public class NoiseVisualsTileMapManager : MonoBehaviour
     }
     private void StartActionMadeNoiseVisuals(GridPosition startingGridPosition, int noiseDistance)
     {
-        Debug.Log("StartActionMadeNoiseVisuals: Start position: " + startingGridPosition.ToString() + " noise distance: " + noiseDistance);
+        //Debug.Log("StartActionMadeNoiseVisuals: Start position: " + startingGridPosition.ToString() + " noise distance: " + noiseDistance);
         List<GridPosition> noiseRadiusGridPositions = LevelGrid.Instance.GetGridPositionsInRadius(startingGridPosition, noiseDistance);
         if (noiseRadiusGridPositions.Count < 1)
             return;

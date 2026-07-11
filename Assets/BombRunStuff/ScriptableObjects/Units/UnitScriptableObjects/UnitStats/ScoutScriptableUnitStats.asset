@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: ScoutScriptableUnitStats
   m_EditorClassIdentifier: 
   _baseSightDistance: 8
-  _baseFOV: 45
+  _baseFOV: 90
   _baseMaxMoveDistance: 10
   _baseHearingSensitivity: 1.2

@@ -23,10 +23,7 @@ public class SprintAltAction : BaseAltAction
     {
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
         BaseAction.OnAnyActionStarted -= BaseAction_OnAnyActionStarted;
-    }
-
-    
-
+    }  
     private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
     {
         _usedThisTurn = false;

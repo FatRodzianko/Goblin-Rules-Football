@@ -25,7 +25,7 @@ public class UnitNoiseHearingManager : MonoBehaviour
     }
     private void BombRunUnit_OnAnyUnitActionMadeNoise(object sender, ActionMadeNoiseEventArgs actionMadeNoiseArguments)
     {
-        Debug.Log("BombRunUnit_OnAnyUnitActionMadeNoise: ");
+        //Debug.Log("BombRunUnit_OnAnyUnitActionMadeNoise: ");
         BombRunUnit unitMakingNoise = actionMadeNoiseArguments.NoiseMakingUnit;
         if (unitMakingNoise.GetUnitVisibility())
         {

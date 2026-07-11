@@ -71,6 +71,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ScoutUnitPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 5928444417147222519, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: _canGetValidListAsTask
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2898562228658105131, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
     - {fileID: 6393159762003104582, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
@@ -98,6 +102,7 @@ MonoBehaviour:
   _altActionName: Sprint
   _actionType: 1
   _baseActionCost: 1
+  _altActionIndex: 0
   _maxMoveDistanceIncrease: 1.5
   _noiseDistanceIncrease: 2
   _usedThisTurn: 0

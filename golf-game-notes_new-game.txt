@@ -819,22 +819,25 @@ x Have some sort of UI thing that shows what your currently selected unit is
                                     the FOV visuals need to update...
 - - - - - - - - - - - - Would probably need to do both?
 - - - - - - - - - When UnitStatManager needs to calculate a stat, for example max move distance...
-- - - - - - - - - - - - It will get the base value from the ScriptableBombRunUnitBaseStats object
-- - - - - - - - - - - - It will go through each list of modifiers, and modify the stat
-- - - - - - - - - - - - - - - Ex: Sprint modified max move distance
-- - - - - - - - - - - - - - - - - - Will look through ActionsModifyingStats for anything modifying MaxMoveDistance
-- - - - - - - - - - - - - - - - - - Will get the StatModifier amount. Use that on base stat
-- - - - - - - - - Stat Modifiers can either be additive/subtractive, or multipliers
-- - - - - - - - - - - - additive stats just add a value. Such as adding +1 to MaxMovementDistance to increase from base of 10 to 11
-- - - - - - - - - - - - Multipliers will, well, multiply the value of the base stat
-- - - - - - - - - - - - Ex: Sprint action doubles max move distance. Base stat of 10 is multiplied by 2 to get 20
-- - - - - - - - - - - - Can use values less than 1 for division, obviously...
-- - - - - - - - - Keep the additive and multiplying stat modifier lists separate, to make it easier keep order of operations when calculating stat value
-- - - - - - - - - - - - First, apply additive modifiers to a stat
-- - - - - - - - - - - - Then, multiply
-- - - - - - - - - - - - So, if the MaxMovementDistance stat has a base of 10, there is a +2 body mody, and a x2 from SprintAction
-- - - - - - - - - - - - - - - Calculation would be: (10 + 2) * 2 = 24
+- - - - - - - - - - - x It will get the base value from the ScriptableBombRunUnitBaseStats object
+- - - - - - - - - - - x It will go through each list of modifiers, and modify the stat
+- - - - - - - - - - - - - - x Ex: Sprint modified max move distance
+- - - - - - - - - - - - - - - - - x Will look through ActionsModifyingStats for anything modifying MaxMoveDistance
+- - - - - - - - - - - - - - - - - x Will get the StatModifier amount. Use that on base stat
+- - - - - - - - x Stat Modifiers can either be additive/subtractive, or multipliers
+- - - - - - - - - - - x additive stats just add a value. Such as adding +1 to MaxMovementDistance to increase from base of 10 to 11
+- - - - - - - - - - - x Multipliers will, well, multiply the value of the base stat
+- - - - - - - - - - - x Ex: Sprint action doubles max move distance. Base stat of 10 is multiplied by 2 to get 20
+- - - - - - - - - - - x Can use values less than 1 for division, obviously...
+- - - - - - - - x Keep the additive and multiplying stat modifier lists separate, to make it easier keep order of operations when calculating stat value
+- - - - - - - - - - - x First, apply additive modifiers to a stat
+- - - - - - - - - - - x Then, multiply
+- - - - - - - - - - - x So, if the MaxMovementDistance stat has a base of 10, there is a +2 body mody, and a x2 from SprintAction
+- - - - - - - - - - - - - - x Calculation would be: (10 + 2) * 2 = 24
 - - - - - - - - - - - - Might reverse this so that things like sneak can still make noise based on injuries/body mods? otherwise it will also be 0 for noise...
+- - - - - - - - - - - - - - - Or just have "after effects" for things like injuries or hacked body modies
+- - - - - - - - - - - - - - - - - - They can be applied after the initial effects
+- - - - - - - - - - - - - - - - - - Or it's just positive effects first, then negative effects, and so on...
 - - - - - - Stats are also modified by BodyMods (whenever those get added...) and potentially by Unit level/experience?
 - - - - - - - - - So when a stat is calculated, it would go something like:
 - - - - - - - - - - - - Get Additive Unit LevelUp Stats
