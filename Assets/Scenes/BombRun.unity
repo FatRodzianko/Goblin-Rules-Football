@@ -52110,8 +52110,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 35}
-  m_SizeDelta: {x: 350, y: 70}
+  m_AnchoredPosition: {x: 0, y: 40}
+  m_SizeDelta: {x: 350, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1184021251
 PrefabInstance:
@@ -52810,8 +52810,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 35}
-  m_SizeDelta: {x: 350, y: 70}
+  m_AnchoredPosition: {x: 0, y: 40}
+  m_SizeDelta: {x: 350, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &1358341831 stripped
 Transform:
@@ -53011,6 +53011,7 @@ MonoBehaviour:
   _actionGridVisualsAboveFogOfWarTileMap: {fileID: 1022791947}
   _actionVisualTile: {fileID: 11400000, guid: 1c5c6185dc121d1459e11d26409c841b, type: 2}
   _calculatingVisualGrid: 0
+  _isWaitForCalculatingGridVisualRunning: 0
   _gridVisualTypeColorList:
   - gridVisualType: 0
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -53192,8 +53193,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 35}
-  m_SizeDelta: {x: 350, y: 70}
+  m_AnchoredPosition: {x: 0, y: 40}
+  m_SizeDelta: {x: 350, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1539402879
 MonoBehaviour:

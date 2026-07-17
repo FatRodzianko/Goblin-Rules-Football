@@ -195,7 +195,8 @@ public class MoveAction : BaseAction
         //this.SetMaxMoveDistance(this._unit.GetMaxMoveDistance());
         //this.SetMaxMoveDistanceModifer(1.0f);
         this.ClearMaxMoveDistanceModifers();
-        this.SetNoiseDistanceModifer(1.0f);
+        this.RemoveNoiseDistanceModiferByAction();
+        //this.SetNoiseDistanceModifer(1.0f);
 
         UpdateGridVisualRange();
         //ResetCachedValidPositionList();

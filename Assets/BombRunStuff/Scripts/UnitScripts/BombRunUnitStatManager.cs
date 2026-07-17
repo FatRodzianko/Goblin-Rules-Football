@@ -71,16 +71,18 @@ public class BombRunUnitStatManager
     }
     public int CalculateMaxMoveDistance()
     {
-        int moveDistance = _baseStats.BaseMaxMoveDistance();
-        moveDistance += (int) GetAdditiveStatModifier(StatType.MaxMoveDistance);
+        //int moveDistance = _baseStats.BaseMaxMoveDistance();
+        //moveDistance += (int) GetAdditiveStatModifier(StatType.MaxMoveDistance);
 
-        if (_actionsModifyingStatsMultiply.Any(x => x.StatType == StatType.MaxMoveDistance))
-        {
-            moveDistance = (int)(moveDistance * GetMultiplingStatModifier(StatType.MaxMoveDistance));
-        }
+        //if (_actionsModifyingStatsMultiply.Any((Func<ActionModifyingStat, bool>)(x => x.StatType == StatType.MaxMoveDistance)))
+        //{
+        //    moveDistance = (int)(moveDistance * GetMultiplingStatModifier(StatType.MaxMoveDistance));
+        //}
 
-        //return (int)((_baseStats.BaseMaxMoveDistance() + GetAdditiveStatModifier(StatType.MaxMoveDistance)) * GetMultiplingStatModifier(StatType.MaxMoveDistance));
-        return moveDistance;
+        return (int)((_baseStats.BaseMaxMoveDistance() + GetAdditiveStatModifier(StatType.MaxMoveDistance)) * GetMultiplingStatModifier(StatType.MaxMoveDistance));
+        
+        
+        //return moveDistance;
     }
     public int GetSightDistance()
     {

@@ -58,7 +58,7 @@ public class SprintAltAction : BaseAltAction
         //moveAction.SetMaxMoveDistance((int)(moveAction.GetMaxMoveDistance() * _maxMoveDistanceIncrease));
         //moveAction.SetNoiseDistance()
         moveAction.SetMaxMoveDistanceModifer(this._maxMoveDistanceIncrease);
-        moveAction.SetNoiseDistanceModifer(this._noiseDistanceIncrease);
+        moveAction.SetNoiseDistanceModifer(this._noiseDistanceIncrease, false);
         
         moveAction.SetActionName(this._altActionName);
 

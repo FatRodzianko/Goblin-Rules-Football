@@ -18,7 +18,8 @@ public class SneakAltAction : BaseAltAction
 
         //moveAction.SetMaxMoveDistance((int)(moveAction.GetMaxMoveDistance() * _maxMoveDistanceReduction));
         moveAction.SetActionPointDefaultCost((int)(moveAction.GetActionPointsCost() * _actionPointCostIncrease));
-        moveAction.SetMakesNoise(false);
+        //moveAction.SetMakesNoise(false);
+        moveAction.SetNoiseDistanceModifer(this._reducedNoiseDistanceAmount, false);
         moveAction.SetActionName(this._altActionName);
 
         Debug.Log("SneakAltAction: UpdateBaseActionForThisAltAction: ");

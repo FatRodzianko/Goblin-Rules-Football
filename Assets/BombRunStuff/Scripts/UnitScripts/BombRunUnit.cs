@@ -88,6 +88,9 @@ public class BombRunUnit : MonoBehaviour
     [Header("Unit Stats Stuff...")]
     [SerializeField] private BombRunUnitStatManager _statManager;
 
+    [Header("Noise Stuff")]
+    [SerializeField] private BombRunUnitNoiseManager _noiseManager;
+
 
     private void Awake()
     {
@@ -164,6 +167,8 @@ public class BombRunUnit : MonoBehaviour
 
 
         //_bombRunUnitFieldOfView.InitializeFOV();
+
+        _noiseManager = new BombRunUnitNoiseManager(this);
 
         OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
     }
@@ -464,6 +469,25 @@ public class BombRunUnit : MonoBehaviour
     public void RemoveActionStatModifierByAction(BaseAction action)
     {
         _statManager.RemoveActionModifyingStatByAction(action);
+    }
+    public void AddActionNoiseModifier(BaseAction action, BodyPart bodyPart, float statModifier, bool isAdditive)
+    {
+        if (isAdditive)
+        {
+            _noiseManager.AddActionModifyingNoiseAdditive(action, bodyPart, statModifier);
+        }
+        else
+        {
+            _noiseManager.AddActionModifyingNoiseMultiply(action, bodyPart, statModifier);
+        }
+    }
+    public void RemoveActionNoiseModifierByAction(BaseAction action)
+    {
+        _noiseManager.RemoveActionModifyingNoiseByAction(action);
+    }
+    public int GetNoiseDistanceByBodyPart(BodyPart bodyPart, int baseNoiseDistance = 0)
+    {
+        return this._noiseManager.GetNoiseDistance(baseNoiseDistance, bodyPart);
     }
     public float GetUnitFOV()
     {

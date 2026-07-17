@@ -417,6 +417,8 @@ public abstract class BaseAction : MonoBehaviour
         _altActionIndex = index;
 
         _unit.RemoveActionStatModifierByAction(this);
+        _unit.RemoveActionNoiseModifierByAction(this);
+
         this.OnAltActionIndexChanged?.Invoke(this, _altActionIndex);
     }
     private void BaseAction_OnAltActionIndexChanged(object sender, int index)
@@ -651,7 +653,8 @@ public abstract class BaseAction : MonoBehaviour
     }
     private int CalculateNoiseDistance()
     {
-        return (int)(this._noiseDistance * this._noiseDistanceModifier * this._unit.GetBaseNoiseDistanceModifierForBodyPart(this._actionBodyPart));
+        return this._unit.GetNoiseDistanceByBodyPart(this._actionBodyPart, this._noiseDistance);
+        //return (int)(this._noiseDistance * this._noiseDistanceModifier * this._unit.GetBaseNoiseDistanceModifierForBodyPart(this._actionBodyPart));
     }
     public void SetNoiseDistance(int noiseDistance)
     {
@@ -661,8 +664,14 @@ public abstract class BaseAction : MonoBehaviour
     {
         return this._noiseDistanceModifier;
     }
-    public void SetNoiseDistanceModifer(float newNoiseDistanceModifier)
+    public void SetNoiseDistanceModifer(float newNoiseDistanceModifier, bool isAdditive = false)
     {
-        this._noiseDistanceModifier = newNoiseDistanceModifier;
+        //this._noiseDistanceModifier = newNoiseDistanceModifier;
+
+        this._unit.AddActionNoiseModifier(this, this.GetActionBodyPart(), newNoiseDistanceModifier, isAdditive);
+    }
+    public void RemoveNoiseDistanceModiferByAction()
+    {
+        this._unit.RemoveActionNoiseModifierByAction(this);
     }
 }
