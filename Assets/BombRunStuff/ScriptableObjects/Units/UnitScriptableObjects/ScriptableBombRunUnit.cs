@@ -20,7 +20,8 @@ public class ScriptableBombRunUnit : ScriptableObject
     [SerializeField] private RuntimeAnimatorController _animatorController;
     [SerializeField] private Sprite _unitPortrait;
 
-    
+    [Header("Body Mods")]
+    [SerializeField] private List<ScriptableBodyMod> _bodyMods;
 
     public Transform UnitPrefab()
     {
@@ -57,5 +58,9 @@ public class ScriptableBombRunUnit : ScriptableObject
     public ScriptableBombRunUnitBaseStats BaseStatsScriptableObject()
     {
         return _baseStats;
+    }
+    public List<ScriptableBodyMod> BodyMods()
+    {
+        return _bodyMods;
     }
 }

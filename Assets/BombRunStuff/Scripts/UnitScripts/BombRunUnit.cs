@@ -91,6 +91,9 @@ public class BombRunUnit : MonoBehaviour
     [Header("Noise Stuff")]
     [SerializeField] private BombRunUnitNoiseManager _noiseManager;
 
+    [Header("Body Mods")]
+    [SerializeField] private BombRunUnitBodyModManager _bodyModManager;
+
 
     private void Awake()
     {
@@ -435,6 +438,10 @@ public class BombRunUnit : MonoBehaviour
     public void InitializeUnitBaseStats(ScriptableBombRunUnitBaseStats baseStats)
     {
         _statManager = new BombRunUnitStatManager(this, baseStats);
+    }
+    public void InitializeUnitBodyMods(List<ScriptableBodyMod> bodyMods)
+    {
+        _bodyModManager = new BombRunUnitBodyModManager(this, bodyMods);
     }
     public void SetUnitSightRange(int sightRange)
     {

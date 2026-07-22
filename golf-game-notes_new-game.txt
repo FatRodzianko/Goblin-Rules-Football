@@ -834,7 +834,7 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - - - - - - x Then, multiply
 - - - - - - - - - - - x So, if the MaxMovementDistance stat has a base of 10, there is a +2 body mody, and a x2 from SprintAction
 - - - - - - - - - - - - - - x Calculation would be: (10 + 2) * 2 = 24
-- - - - - - - - - - - - Might reverse this so that things like sneak can still make noise based on injuries/body mods? otherwise it will also be 0 for noise...
+- - - - - - - - - - - x Might reverse this so that things like sneak can still make noise based on injuries/body mods? otherwise it will also be 0 for noise...
 - - - - - - - - - - - - - - - Or just have "after effects" for things like injuries or hacked body modies
 - - - - - - - - - - - - - - - - - - They can be applied after the initial effects
 - - - - - - - - - - - - - - - - - - Or it's just positive effects first, then negative effects, and so on...
@@ -847,20 +847,20 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - - - - - - - Get Multiplying BodyMod Stats
 - - - - - - - - - - - - Get Multiplying BaseAction Stats
 - - - "Base Noise Stat" but it's per body part?
-- - - - - - For noise calculations for actions, the action will have a base noise amount, and then the unit will also modify the noise amount base on
+- - - - - x For noise calculations for actions, the action will have a base noise amount, and then the unit will also modify the noise amount base on
             the body part for the action
-- - - - - - For MoveAction, it takes its base noise amount, and then queries the unit for any noise additions
-- - - - - - - - - Move action sends its base noise amount to UnitStatManger, and its body part, Legs
-- - - - - - - - - UnitStatManager calculates noise for the legs
-- - - - - - - - - - - - Goes through the normal stat calculating process, but instead of their being a "base" noise stat, it is modifying the noise
+- - - - - x For MoveAction, it takes its base noise amount, and then queries the unit for any noise additions
+- - - - - - - - x Move action sends its base noise amount to UnitStatManger, and its body part, Legs
+- - - - - - - - x UnitStatManager calculates noise for the legs
+- - - - - - - - - - - x Goes through the normal stat calculating process, but instead of their being a "base" noise stat, it is modifying the noise
                         amount sent to it by the action
-- - - - - - - - - Ex: MoveAction has a base noise amount of 10
-- - - - - - - - - - - - MoveAction asks UnitStatManager to CalculateNoise, bases "10" and "BodyPart.Legs"
-- - - - - - - - - - - - UnitStatManager checks its lists for anything modifying "NoiseLegs," applies modifier to MoveActions noise amount
-- - - - - - - - - - - - UnitStatManager returns the calculated value
-- - - - - - - - - - - - MoveAction uses value for noise calculations
-- - - - - - When SprintAltAction is selected
-- - - - - - - - - Add an Action modifier to UnitStatManager for BodyPart.Legs of 2.0f
+- - - - - - - - x Ex: MoveAction has a base noise amount of 10
+- - - - - - - - - - - x MoveAction asks UnitStatManager to CalculateNoise, bases "10" and "BodyPart.Legs"
+- - - - - - - - - - - x UnitStatManager checks its lists for anything modifying "NoiseLegs," applies modifier to MoveActions noise amount
+- - - - - - - - - - - x UnitStatManager returns the calculated value
+- - - - - - - - - - - x MoveAction uses value for noise calculations
+- - - - - x When SprintAltAction is selected
+- - - - - - - - x Add an Action modifier to UnitStatManager for BodyPart.Legs of 2.0f
 # AI Unit "States" for actions to take
 - - - States will be things like
 - - - - - - patrol
@@ -954,6 +954,33 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - Maybe for the "Stat to Buff" and "Stat Buff Amount" make it a dictionary so body mods can affect more than one stat?
 - - - image of body mod
 - - - Description of item
+- BodyMod scriptable object will be on the unit scriptable object
+- - - when unit is spawned, the BodyMod script objects are sent to the unit
+- - - Unit will have a BodyModManager class that stores what scriptable objects the unit has
+- When StatManager is calculating a stat:
+- - - Does the calculation taken action modified stats into account
+- - - StatManager will also query the unit for relevant body mod stat modifiers
+- - - - - - Unit queries BodyModManager
+- - - - - - BodyModManager looks for any body mods that match the body part, checks if the mod has an additive or multiplitive modifier, and returns
+            modifier value
+- - - - - - BodyModManager would go through all mods that affect that body part, then add up/multiply up all the BodyMod modifiers, and that is the
+            value to return
+- Need to find out if values in a stored scriptable object can be modified individually, or if it modifies it for all copies of that scriptable object
+- - - Ex: Say two units have the same Vision+ bodymod that increases their sight distance
+- - - - - - But one unit's BodyMod is "hacked"
+- - - - - - So, every turn, the hacked body mod counts down its broken timer
+- - - - - - Can the broken timer be updated on only the "hacked" scriptable object, but not the non-hacked? Or will the value update on both?
+- - - Better Example:
+- - - - - - Two units have the same Vison+ BodyMod
+- - - - - - One unit does something to increase sight distance on their body mody (saw a consumable that increases a body mod's stats)
+- - - - - - Can the SightDistance value of the Vision+ bodymod be updated on only the unit using the consumable, or will the increase to SightDistance
+            happen to all Vision+ scriptable objects?
+- Maybe make it so there is also a BodyMod class
+- - - BodyMod scriptable object is used to create body mods in the editor and attach to units to spawn with
+- - - The body mod class would be what is actually created and added to the BodyModManager
+- - - Unit is spawned -> get bodymod scriptable objects -> BodyMod manager makes a new BodyMod class from each scriptable object
+- - - - - - BodyModManager stores the classes in a script
+- - - This should make it so that BodyMod values can be easily edited, since they'd each be their own instance of a BodyMod class
 
 ### END CURRENT TASKS
 
