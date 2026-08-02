@@ -18,7 +18,7 @@ MonoBehaviour:
   _bodyPart: 1
   _bodyModStatModifiers:
   - StatType: 2
-    StatModifier: 1
+    StatModifier: 2
     IsAdditive: 1
   - StatType: 3
     StatModifier: 1.5

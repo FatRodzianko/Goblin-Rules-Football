@@ -9,28 +9,49 @@ public class BombRunUnitBodyModManager
 {
     private BombRunUnit _unit;
 
-    [SerializeField] private List<ScriptableBodyMod> _bodyMods = new List<ScriptableBodyMod>();
+    [SerializeField] private List<BodyMod_Class> _bodyMods = new List<BodyMod_Class>();
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BombRunUnitBodyModManager(BombRunUnit unit, List<ScriptableBodyMod> bodyMods)
     {
         this._unit = unit;
-        this._bodyMods.AddRange(bodyMods);
+        //this._bodyMods.AddRange(bodyMods);
+        CreateBodyModClassObjects(bodyMods, _unit);
+    }
+    private void CreateBodyModClassObjects(List<ScriptableBodyMod> bodyMods, BombRunUnit unit)
+    {
+        foreach (ScriptableBodyMod bodyMod in bodyMods)
+        {
+            BodyMod_Class bodyModClass = new BodyMod_Class(bodyMod, unit);
+            if (!_bodyMods.Contains(bodyModClass))
+            {
+                _bodyMods.Add(bodyModClass);
+            }
+        }
     }
 
     public void AddBodyMod(ScriptableBodyMod bodyMod)
     {
-        if (!_bodyMods.Contains(bodyMod))
+        BodyMod_Class bodyModClass = new BodyMod_Class(bodyMod, this._unit);
+        if (!_bodyMods.Contains(bodyModClass))
         {
-            _bodyMods.Add(bodyMod);
+            _bodyMods.Add(bodyModClass);
         }
     }
-    public List<ScriptableBodyMod> GetAllBodyMods()
+    public List<BodyMod_Class> GetAllBodyMods()
     {
         return _bodyMods;
     }
-    public List<ScriptableBodyMod> GetAllBodyMods_ModifyNoise()
+    public List<BodyMod_Class> GetAllBodyMods_ModifyNoise()
     {
         return _bodyMods.Where(x => x.ModifiesNoise()).ToList();
+    }
+    public void ModifyBodyMod()
+    {
+        Debug.Log("BombRunUnitBodyModManager: ModifyBodyMod");
+        if (_bodyMods.Count < 1)
+            return;
+
+        _bodyMods[0].Modify_BodyModStatModifiers(Mathf.RoundToInt(UnityEngine.Random.Range(2f,10f)));
     }
 }

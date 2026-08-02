@@ -204,6 +204,14 @@ public class BombRunUnit : MonoBehaviour
             OnThisUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
             OnAnyUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
         }
+
+        if (GameplayManager_BombRun.Instance.GameState() == GameState_BombRun.Gameplay)
+        {
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                _bodyModManager.ModifyBodyMod();
+            }
+        }
     }
     private bool IsCurrentPositionACornerOfGrid(Vector3 currentPosition)
     {

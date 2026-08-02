@@ -975,12 +975,12 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - One unit does something to increase sight distance on their body mody (saw a consumable that increases a body mod's stats)
 - - - - - - Can the SightDistance value of the Vision+ bodymod be updated on only the unit using the consumable, or will the increase to SightDistance
             happen to all Vision+ scriptable objects?
-- Maybe make it so there is also a BodyMod class
-- - - BodyMod scriptable object is used to create body mods in the editor and attach to units to spawn with
-- - - The body mod class would be what is actually created and added to the BodyModManager
-- - - Unit is spawned -> get bodymod scriptable objects -> BodyMod manager makes a new BodyMod class from each scriptable object
-- - - - - - BodyModManager stores the classes in a script
-- - - This should make it so that BodyMod values can be easily edited, since they'd each be their own instance of a BodyMod class
+x Maybe make it so there is also a BodyMod class
+- - x BodyMod scriptable object is used to create body mods in the editor and attach to units to spawn with
+- - x The body mod class would be what is actually created and added to the BodyModManager
+- - x Unit is spawned -> get bodymod scriptable objects -> BodyMod manager makes a new BodyMod class from each scriptable object
+- - - - - x BodyModManager stores the classes in a script
+- - x This should make it so that BodyMod values can be easily edited, since they'd each be their own instance of a BodyMod class
 
 ### END CURRENT TASKS
 
