@@ -92,7 +92,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         if(isActiveAndEnabled)
             StartCoroutine(DelayForWallCollidersToSpawn(0.25f));
     }
-    
+    public void UpdateFOV(float newFOV)
+    {
+        this._fov = newFOV;
+    }
     IEnumerator DelayForWallCollidersToSpawn(float waitTime)
     {
         yield return new WaitForSeconds(waitTime);

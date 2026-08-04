@@ -43,9 +43,13 @@ public class BombRunUnitStatManager
 
     // updating stats trackers
     private bool _maxMoveDistanceWasUpdated = true;
+    private bool _sightDistanceWasUpdated = true;
+    private bool _fovWasUpdated = true;
 
     // cached stat values
     private int _maxMoveDistanceCached = 0;
+    private int _sightDistanceCached = 0;
+    private float _fovCached = 0f;
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BombRunUnitStatManager(BombRunUnit unit, ScriptableBombRunUnitBaseStats baseStats)
@@ -57,7 +61,7 @@ public class BombRunUnitStatManager
 
     public int GetMaxMoveDistance()
     {
-        Debug.Log("BombRunUnitStatManager: GetMaxMoveDistance");
+        //Debug.Log("BombRunUnitStatManager: GetMaxMoveDistance");
         //return _baseStats.BaseMaxMoveDistance();
         if (_maxMoveDistanceWasUpdated)
         {
@@ -65,7 +69,7 @@ public class BombRunUnitStatManager
             _maxMoveDistanceCached = CalculateMaxMoveDistance();
             _maxMoveDistanceWasUpdated = false;
         }
-        Debug.Log("BombRunUnitStatManager: GetMaxMoveDistance: " + _maxMoveDistanceCached);
+        //Debug.Log("BombRunUnitStatManager: GetMaxMoveDistance: " + _maxMoveDistanceCached);
         return _maxMoveDistanceCached;
         
     }
@@ -79,18 +83,50 @@ public class BombRunUnitStatManager
         //    moveDistance = (int)(moveDistance * GetMultiplingStatModifier(StatType.MaxMoveDistance));
         //}
 
-        return (int)((_baseStats.BaseMaxMoveDistance() + GetAdditiveStatModifier(StatType.MaxMoveDistance)) * GetMultiplingStatModifier(StatType.MaxMoveDistance));
+        return (int)((_baseStats.BaseMaxMoveDistance() + GetAdditiveStatModifier(StatType.MaxMoveDistance)) * GetMultiplyingStatModifier(StatType.MaxMoveDistance));
         
         
         //return moveDistance;
     }
     public int GetSightDistance()
     {
-        return _baseStats.BaseSightDistance();
+        //return _baseStats.BaseSightDistance();
+        //return (int)((_baseStats.BaseSightDistance() + GetAdditiveStatModifier(StatType.SightDistance)) * GetMultiplingStatModifier(StatType.SightDistance));
+        //Debug.Log("BombRunUnitStatManager: GetSightDistance");
+        //return _baseStats.BaseMaxMoveDistance();
+        if (_sightDistanceWasUpdated)
+        {
+            Debug.Log("BombRunUnitStatManager: GetSightDistance: _sightDistanceWasUpdated: " + _sightDistanceWasUpdated.ToString() + " getting a new sight distance value...");
+            _sightDistanceCached = CalculateSightDistance();
+            _sightDistanceWasUpdated = false;
+        }
+        //Debug.Log("BombRunUnitStatManager: GetSightDistance: " + _sightDistanceCached);
+        return _sightDistanceCached;
+    }
+    public int CalculateSightDistance()
+    {
+        return(int)((_baseStats.BaseSightDistance() + GetAdditiveStatModifier(StatType.SightDistance)) * GetMultiplyingStatModifier(StatType.SightDistance));
     }
     public float GetFOV()
     {
-        return _baseStats.BaseFOV();
+        //return _baseStats.BaseFOV();
+        //return (int)((_baseStats.BaseFOV() + GetAdditiveStatModifier(StatType.FOV)) * GetMultiplingStatModifier(StatType.FOV));
+
+        //Debug.Log("BombRunUnitStatManager: GetFOV");
+        //return _baseStats.BaseMaxMoveDistance();
+        if (_fovWasUpdated)
+        {
+            float newFOV = CalculateFOV();
+            Debug.Log("BombRunUnitStatManager: GetFOV: _fovWasUpdated: " + _fovWasUpdated.ToString() + " for " + this._unit + " old value: " +_fovCached + " new value: " + newFOV);
+            _fovCached = newFOV;
+            _fovWasUpdated = false;
+        }
+        //Debug.Log("BombRunUnitStatManager: GetFOV: " + _fovCached);
+        return _fovCached;
+    }
+    public float CalculateFOV()
+    {
+        return (int)((_baseStats.BaseFOV() + GetAdditiveStatModifier(StatType.FOV)) * GetMultiplyingStatModifier(StatType.FOV));
     }
     public float GetHearingSensitivity()
     {
@@ -106,9 +142,10 @@ public class BombRunUnitStatManager
                 modifier += actionModifyingStat.StatModifier;
             }
         }
+        modifier += _unit.BodyModManager().GetAdditiveStatModifierFromBodyMods(statType);
         return modifier;
     }
-    private float GetMultiplingStatModifier(StatType statType)
+    private float GetMultiplyingStatModifier(StatType statType)
     {
         float modifier = 1f;
         foreach (ActionModifyingStat actionModifyingStat in _actionsModifyingStatsMultiply)
@@ -118,6 +155,7 @@ public class BombRunUnitStatManager
                 modifier *= actionModifyingStat.StatModifier;
             }
         }
+        modifier *= _unit.BodyModManager().GetMultiplyingStatModifierFromBodyMods(statType);
         return modifier;
     }
     public void UnsubscribeFromEvents()
@@ -231,7 +269,7 @@ public class BombRunUnitStatManager
             StatTypeChanged(statType);
         }
     }
-    private void StatTypeChanged(StatType statType)
+    public void StatTypeChanged(StatType statType)
     {
         switch (statType)
         {
@@ -240,9 +278,11 @@ public class BombRunUnitStatManager
                 OnMaxMovementDistanceChanged?.Invoke(this, EventArgs.Empty);
                 break;
             case StatType.SightDistance:
+                _sightDistanceWasUpdated = true;
                 OnSightDistanceChanged?.Invoke(this, EventArgs.Empty);
                 break;
             case StatType.FOV:
+                _fovWasUpdated = true;
                 OnFOVChanged?.Invoke(this, EventArgs.Empty);
                 break;
             case StatType.HearingSensitivity:

@@ -59,8 +59,8 @@ public class BombRunUnitNoiseManager
     }
     public int GetNoiseDistance(int baseNoise, BodyPart bodyPartMakingNoise)
     {
-        Debug.Log("BombRunUnitNoiseManager: GetNoiseDistance: for " + this._unit.name + "'s " + bodyPartMakingNoise + " with base of: " + baseNoise);
-        return (int)((baseNoise + GetAdditiveNoiseModifier(bodyPartMakingNoise)) * GetMultiplingNoiseModifier(bodyPartMakingNoise));
+        //Debug.Log("BombRunUnitNoiseManager: GetNoiseDistance: for " + this._unit.name + "'s " + bodyPartMakingNoise + " with base of: " + baseNoise);
+        return (int)((baseNoise + GetAdditiveNoiseModifier(bodyPartMakingNoise)) * GetMultiplyingNoiseModifier(bodyPartMakingNoise));
     }
     private float GetAdditiveNoiseModifier(BodyPart bodyPart)
     {
@@ -72,9 +72,12 @@ public class BombRunUnitNoiseManager
                 modifier += actionModifyingNoise.StatModifier;
             }
         }
+
+        // Get from body mods?
+        modifier += _unit.BodyModManager().GetAdditiveNoiseModifierFromBodyMods(bodyPart);
         return modifier;
     }
-    private float GetMultiplingNoiseModifier(BodyPart bodyPart)
+    private float GetMultiplyingNoiseModifier(BodyPart bodyPart)
     {
         float modifier = 1f;
         foreach (ActionModifyingNoise actionModifyingNoise in _actionsModifyingNoiseMultiply)
@@ -84,6 +87,9 @@ public class BombRunUnitNoiseManager
                 modifier *= actionModifyingNoise.StatModifier;
             }
         }
+
+        // Get from body mods?
+        modifier *= _unit.BodyModManager().GetMultiplyingNoiseModifierFromBodyMods(bodyPart);
         return modifier;
     }
     public void AddActionModifyingNoiseAdditive(BaseAction action, BodyPart bodyPart, float statModifier)

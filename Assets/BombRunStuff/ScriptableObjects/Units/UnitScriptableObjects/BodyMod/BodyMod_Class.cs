@@ -48,6 +48,7 @@ public class BodyMod_Class
         foreach (BodyModStatModifier bodyModStatModifier in bodyModStatModifiers)
         {
             this._bodyModStatModifiers.Add(bodyModStatModifier.Clone());
+            //this._unit.StatModifierUpdated(bodyModStatModifier.StatType);
         }
     }
     public string Name()
@@ -113,6 +114,7 @@ public class BodyMod_Class
             return;
 
         _bodyModStatModifiers[0].StatModifier = newValue;
+        this._unit.StatModifierUpdated(_bodyModStatModifiers[0].StatType);
     }
     public ScriptableBodyMod ScriptableBodyMod()
     {
@@ -129,5 +131,9 @@ public class BodyMod_Class
     public void SetBombRunUnit(BombRunUnit unit)
     {
         this._unit = unit;
+    }
+    public List<BodyModStatModifier> BodyStatModifiers()
+    {
+        return _bodyModStatModifiers;
     }
 }

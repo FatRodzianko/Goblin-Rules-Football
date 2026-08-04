@@ -46,6 +46,94 @@ public class BombRunUnitBodyModManager
     {
         return _bodyMods.Where(x => x.ModifiesNoise()).ToList();
     }
+    public float GetAdditiveStatModifierFromBodyMods(StatType statType)
+    {
+        //Debug.Log("GetAdditiveNoiseModifierFromBodyMods: " + bodyPart + " on: " + _unit);
+        float statModifier = 0f;
+
+        foreach (BodyMod_Class bodyMod in _bodyMods)
+        {
+            if (bodyMod.BodyStatModifiers().Count < 1)
+                continue;
+
+            foreach (BodyModStatModifier bodyStatModifier in bodyMod.BodyStatModifiers())
+            {
+                if (!bodyStatModifier.IsAdditive)
+                    continue;
+                if (bodyStatModifier.StatType == statType)
+                {
+                    Debug.Log("GetAdditiveStatModifierFromBodyMods: body stat modifier found: " + bodyStatModifier.StatType + ":" + bodyStatModifier.StatModifier);
+                    statModifier += bodyStatModifier.StatModifier;
+                }
+            }
+        }
+
+        return statModifier;
+    }
+    public float GetMultiplyingStatModifierFromBodyMods(StatType statType)
+    {
+        //Debug.Log("GetAdditiveNoiseModifierFromBodyMods: " + bodyPart + " on: " + _unit);
+        float statModifier = 1f;
+
+        foreach (BodyMod_Class bodyMod in _bodyMods)
+        {
+            if (bodyMod.BodyStatModifiers().Count < 1)
+                continue;
+
+            foreach (BodyModStatModifier bodyStatModifier in bodyMod.BodyStatModifiers())
+            {
+                if (bodyStatModifier.IsAdditive)
+                    continue;
+                if (bodyStatModifier.StatType == statType)
+                {
+                    Debug.Log("GetMultiplyingStatModifierFromBodyMods: body stat modifier found: " + bodyStatModifier.StatType + ":" + bodyStatModifier.StatModifier);
+                    statModifier *= bodyStatModifier.StatModifier;
+                }
+            }
+        }
+
+        return statModifier;
+    }
+    public float GetAdditiveNoiseModifierFromBodyMods(BodyPart bodyPart)
+    {
+        //Debug.Log("GetAdditiveNoiseModifierFromBodyMods: " + bodyPart + " on: " + _unit);
+        float noiseModifier = 0f;
+
+        List<BodyMod_Class> noiseModifyingBodyMods = GetAllBodyMods_ModifyNoise();
+        foreach (BodyMod_Class bodyMod in noiseModifyingBodyMods)
+        {
+            if (!bodyMod.IsNoiseModifierAdditive())
+                continue;
+
+            if (bodyMod.BodyPart() != bodyPart)
+                continue;
+
+            Debug.Log("GetAdditiveNoiseModifierFromBodyMods: noise modifier found: " + bodyMod.NoiseModifier());
+            noiseModifier += bodyMod.NoiseModifier();
+        }
+
+        return noiseModifier;
+    }
+    public float GetMultiplyingNoiseModifierFromBodyMods(BodyPart bodyPart)
+    {
+        //Debug.Log("GetMultiplyingNoiseModifierFromBodyMods: " + bodyPart + " on: " + _unit);
+        float noiseModifier = 1f;
+
+        List<BodyMod_Class> noiseModifyingBodyMods = GetAllBodyMods_ModifyNoise();
+        foreach (BodyMod_Class bodyMod in noiseModifyingBodyMods)
+        {
+            if (bodyMod.IsNoiseModifierAdditive())
+                continue;
+
+            if (bodyMod.BodyPart() != bodyPart)
+                continue;
+
+            Debug.Log("GetMultiplyingNoiseModifierFromBodyMods: noise modifier found: " + bodyMod.NoiseModifier());
+            noiseModifier *= bodyMod.NoiseModifier();
+        }
+
+        return noiseModifier;
+    }
     public void ModifyBodyMod()
     {
         Debug.Log("BombRunUnitBodyModManager: ModifyBodyMod");

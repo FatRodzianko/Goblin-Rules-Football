@@ -446,10 +446,31 @@ public class BombRunUnit : MonoBehaviour
     public void InitializeUnitBaseStats(ScriptableBombRunUnitBaseStats baseStats)
     {
         _statManager = new BombRunUnitStatManager(this, baseStats);
+        _statManager.OnFOVChanged += StatManager_OnFOVChanged;
+    }
+
+    private void StatManager_OnFOVChanged(object sender, EventArgs e)
+    {
+        
+        if (_bombRunUnitFieldOfView == null)
+            return;
+        Debug.Log("StatManager_OnFOVChanged: " + this);
+        _bombRunUnitFieldOfView.UpdateFOV(this.GetUnitFOV());
+    }
+
+    public void StatModifierUpdated(StatType statType)
+    {
+        if (_statManager == null)
+            return;
+        _statManager.StatTypeChanged(statType);
     }
     public void InitializeUnitBodyMods(List<ScriptableBodyMod> bodyMods)
     {
         _bodyModManager = new BombRunUnitBodyModManager(this, bodyMods);
+    }
+    public BombRunUnitBodyModManager BodyModManager()
+    {
+        return _bodyModManager;
     }
     public void SetUnitSightRange(int sightRange)
     {
@@ -502,7 +523,10 @@ public class BombRunUnit : MonoBehaviour
     }
     public int GetNoiseDistanceByBodyPart(BodyPart bodyPart, int baseNoiseDistance = 0)
     {
-        return this._noiseManager.GetNoiseDistance(baseNoiseDistance, bodyPart);
+        int noiseDistance = this._noiseManager.GetNoiseDistance(baseNoiseDistance, bodyPart);
+        //Debug.Log("GetNoiseDistanceByBodyPart: " + this + ":" + bodyPart + " base noise distance: " + baseNoiseDistance + " calculated noise distance: " + noiseDistance);
+        return noiseDistance;
+        //return this._noiseManager.GetNoiseDistance(baseNoiseDistance, bodyPart);
     }
     public float GetUnitFOV()
     {
