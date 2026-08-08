@@ -53081,7 +53081,7 @@ MonoBehaviour:
   _gridVisualTileMap: {fileID: 946836224}
   _bombRunTileMapManager: {fileID: 1494887097}
   _fogOfWarTileMapManager: {fileID: 1494887102}
-  _animationDelay: 0.025
+  _animationDelay: 0.125
   _maxNoiseDistance: 0
   _gridNoiseVisualIndicatorObject: {fileID: 9083731438183017183, guid: 07aef034771e4e04e88eff993b71287a, type: 3}
 --- !u!1001 &1536326559

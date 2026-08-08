@@ -34,11 +34,17 @@ public class GridNoiseVisualIndicatorScript : MonoBehaviour
     {
         if (_sprites.Count < 1)
             yield break;
-
+        float frameCount = _sprites.Count;
+        this._spriteRenderer.color = new Color(1f, 1f, 1f, 0.33f);
         for (int i = 0; i < _sprites.Count; i++)
         {
             this._spriteRenderer.sprite = _sprites[i];
-            yield return new WaitForSeconds(_animationDelay);
+            //this._spriteRenderer.color = new Color(1f, 1f, 1f, 0.33f * ((frameCount - i) / frameCount));
+            Color newColor = this._spriteRenderer.color;
+            newColor.a = newColor.a * (1 - (1 / frameCount));
+            this._spriteRenderer.color = newColor;
+            //Debug.Log("AnimateNoiseTile: Setting alpha to: " + newColor.a + ":" + this._spriteRenderer.color.a + " for frame: " + i + ". Sprite color: " + this._spriteRenderer.color);
+            yield return new WaitForSeconds(_animationDelay / (frameCount / 4));
         }
         //AnimationEnded();
         _animationEnded(this.gameObject);

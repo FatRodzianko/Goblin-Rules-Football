@@ -957,13 +957,13 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - BodyMod scriptable object will be on the unit scriptable object
 - - - when unit is spawned, the BodyMod script objects are sent to the unit
 - - - Unit will have a BodyModManager class that stores what scriptable objects the unit has
-- When StatManager is calculating a stat:
-- - - Does the calculation taken action modified stats into account
-- - - StatManager will also query the unit for relevant body mod stat modifiers
-- - - - - - Unit queries BodyModManager
-- - - - - - BodyModManager looks for any body mods that match the body part, checks if the mod has an additive or multiplitive modifier, and returns
+x When StatManager is calculating a stat:
+- - x Does the calculation taken action modified stats into account
+- - x StatManager will also query the unit for relevant body mod stat modifiers
+- - - - - x Unit queries BodyModManager
+- - - - - x BodyModManager looks for any body mods that match the body part, checks if the mod has an additive or multiplitive modifier, and returns
             modifier value
-- - - - - - BodyModManager would go through all mods that affect that body part, then add up/multiply up all the BodyMod modifiers, and that is the
+- - - - - x BodyModManager would go through all mods that affect that body part, then add up/multiply up all the BodyMod modifiers, and that is the
             value to return
 - Need to find out if values in a stored scriptable object can be modified individually, or if it modifies it for all copies of that scriptable object
 - - - Ex: Say two units have the same Vision+ bodymod that increases their sight distance
@@ -971,9 +971,9 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - So, every turn, the hacked body mod counts down its broken timer
 - - - - - - Can the broken timer be updated on only the "hacked" scriptable object, but not the non-hacked? Or will the value update on both?
 - - - Better Example:
-- - - - - - Two units have the same Vison+ BodyMod
-- - - - - - One unit does something to increase sight distance on their body mody (saw a consumable that increases a body mod's stats)
-- - - - - - Can the SightDistance value of the Vision+ bodymod be updated on only the unit using the consumable, or will the increase to SightDistance
+- - - - - x Two units have the same Vison+ BodyMod
+- - - - - x One unit does something to increase sight distance on their body mody (saw a consumable that increases a body mod's stats)
+- - - - - x Can the SightDistance value of the Vision+ bodymod be updated on only the unit using the consumable, or will the increase to SightDistance
             happen to all Vision+ scriptable objects?
 x Maybe make it so there is also a BodyMod class
 - - x BodyMod scriptable object is used to create body mods in the editor and attach to units to spawn with
