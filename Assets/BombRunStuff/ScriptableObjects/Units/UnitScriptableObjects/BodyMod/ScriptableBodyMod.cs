@@ -39,6 +39,9 @@ public class ScriptableBodyMod : ScriptableObject
     [SerializeField] private float _noiseModifier = 0f;
     [SerializeField] private bool _isNoiseModifierAdditive;
 
+    [Header("Components")]
+    [SerializeField] private List<ScriptableBodyModComponent> _bodyModComponents = new List<ScriptableBodyModComponent>();
+
     public string Name()
     {
         return _name;
@@ -70,6 +73,10 @@ public class ScriptableBodyMod : ScriptableObject
     public List<BodyModStatModifier> BodyModStatModifiers()
     {
         return _bodyModStatModifiers;
+    }
+    public List<ScriptableBodyModComponent> BodyModComponents()
+    {
+        return _bodyModComponents;
     }
     
 }

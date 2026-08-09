@@ -935,6 +935,20 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - inventory items will be at least two different main "types"
 - - - - - - Body Mod
 - - - - - - Body Mod Components
+- - - - - - - - - Body Mod components can maybe have an effect on how actions are performed, or at least what they look like
+- - - - - - - - - Ex: Hover Boots
+- - - - - - - - - - - - Hover Boots have a component of "compressed air canisters" that are used to eject air before a step hits the ground,
+                        "lightening" the step and making it quieter
+- - - - - - - - - - - - On the animation, when the step frame is hit, it should query the unit's body mod manager for anything that would affect
+                        the animation
+- - - - - - - - - - - - Body Mod Manager will look for any body mods for the applicable body part for the action
+- - - - - - - - - - - - - - - Each body mod's components will be changed for "animation effects" or something like that
+- - - - - - - - - - - - - - - If the Body Mod Manager finds one, such as the compressed air canistor, will tell animator what type of effect it will be
+- - - - - - - - - - - - - - - - - - For the compressed air, white particles?
+- - - - - - - - - - - - - - - Animator will "load" whatever the effect from the component is, and execute the effect
+- - - - - - - - - - - - - - - The unit/animator will have pre-defined positions to spawn any effects, like particle effects, based on action body part
+- - - - - - - - - - - - - - - - - - For the compressed air: if it is on the legs, emit from the "foot" positions
+- - - - - - - - - - - - - - - - - - - - - If it is on an arm body mod (like something that makes melee more effective), emit from the arm / hand positions
 - - - Each inventory item type may have sub types or something
 - - - - - - particularly for the Body Mod Components. Different component sub types will be used to make different types of body mods?
 - - - - - - - - - "wiring," "chips", "batteries", whatever

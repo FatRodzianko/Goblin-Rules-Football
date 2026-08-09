@@ -23,6 +23,9 @@ public class BodyMod_Class
     [SerializeField] private float _noiseModifier = 0f;
     [SerializeField] private bool _isNoiseModifierAdditive;
 
+    [Header("Body Mod Components")]
+    [SerializeField] private List<BodyModComponent_Class> _bodyModComponents = new List<BodyModComponent_Class>();
+
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BodyMod_Class(ScriptableBodyMod bodyModScript, BombRunUnit unit)
     {
@@ -42,6 +45,7 @@ public class BodyMod_Class
         this._noiseModifier = bodyModScript.NoiseModifier();
         this._isNoiseModifierAdditive = bodyModScript.IsNoiseModifierAdditive();
 
+        AddBodyModComponentsFromScriptable(bodyModScript.BodyModComponents());
     }
     private void AddBodyModStatModifiersFromScriptable(List<BodyModStatModifier> bodyModStatModifiers)
     {
@@ -49,6 +53,14 @@ public class BodyMod_Class
         {
             this._bodyModStatModifiers.Add(bodyModStatModifier.Clone());
             //this._unit.StatModifierUpdated(bodyModStatModifier.StatType);
+        }
+    }
+    private void AddBodyModComponentsFromScriptable(List<ScriptableBodyModComponent> bodyModComponetScriptableObjects)
+    {
+        foreach (ScriptableBodyModComponent bodyModComponetScriptableObject in bodyModComponetScriptableObjects)
+        {
+            BodyModComponent_Class bodyModComponent = new BodyModComponent_Class(bodyModComponetScriptableObject, this);
+            _bodyModComponents.Add(bodyModComponent);
         }
     }
     public string Name()
