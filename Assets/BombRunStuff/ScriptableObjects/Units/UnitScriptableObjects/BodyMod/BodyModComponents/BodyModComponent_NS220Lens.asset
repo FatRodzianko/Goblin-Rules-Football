@@ -17,4 +17,5 @@ MonoBehaviour:
   _description: Precision lens for high end optics
   _bodyPart: 0
   _bodyPartComponentType: 4
+  _componentTierLevel: 2
   _hasAnimationEffect: 0

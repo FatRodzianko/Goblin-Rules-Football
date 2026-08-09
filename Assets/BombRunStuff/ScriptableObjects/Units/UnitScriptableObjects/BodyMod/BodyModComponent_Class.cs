@@ -19,6 +19,7 @@ public class BodyModComponent_Class
 
     [Header("Component Specifics")]
     [SerializeField] private BodyPartComponentType _bodyPartComponentType;
+    [SerializeField] private int _componentTierLevel;
     [SerializeField] private bool _hasAnimationEffect;
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
@@ -34,6 +35,7 @@ public class BodyModComponent_Class
         this._bodyPart = _bodyModComponentScriptableObject.BodyPart();
 
         this._bodyPartComponentType = _bodyModComponentScriptableObject.BodyPartComponentType();
+        this._componentTierLevel = _bodyModComponentScriptableObject.ComponentTierLevel();
         this._hasAnimationEffect = _bodyModComponentScriptableObject.HasAnimationEffect();
 
     }
@@ -60,5 +62,9 @@ public class BodyModComponent_Class
     public bool HasAnimationEffect()
     {
         return _hasAnimationEffect;
+    }
+    public int ComponentTierLevel()
+    {
+        return _componentTierLevel;
     }
 }

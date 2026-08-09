@@ -17,4 +17,5 @@ MonoBehaviour:
   _description: Jam through as much electricity as you can handle (maybe)
   _bodyPart: 0
   _bodyPartComponentType: 3
+  _componentTierLevel: 1
   _hasAnimationEffect: 0

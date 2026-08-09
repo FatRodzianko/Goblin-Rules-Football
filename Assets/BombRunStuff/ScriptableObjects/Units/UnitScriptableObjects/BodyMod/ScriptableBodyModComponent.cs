@@ -24,6 +24,7 @@ public class ScriptableBodyModComponent : ScriptableObject
 
     [Header("Component Specifics")]
     [SerializeField] private BodyPartComponentType _bodyPartComponentType;
+    [SerializeField] private int _componentTierLevel;
     [SerializeField] private bool _hasAnimationEffect;
 
     public string Name()
@@ -49,5 +50,9 @@ public class ScriptableBodyModComponent : ScriptableObject
     public bool HasAnimationEffect()
     {
         return _hasAnimationEffect;
-    }    
+    }
+    public int ComponentTierLevel()
+    {
+        return _componentTierLevel;
+    }
 }
