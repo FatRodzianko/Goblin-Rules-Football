@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57dcdca3171922a40b24952c0e77c11e, type: 3}
+  m_Name: BodyMod_HoverBoots
+  m_EditorClassIdentifier: 
+  _name: Hover Boots
+  _sprite: {fileID: 0}
+  _description: Dampens sound by ejecting air before foot fall to reduce impact with
+    ground
+  _bodyPart: 3
+  _bodyModStatModifiers: []
+  _modifiesNoise: 1
+  _noiseModifier: -1
+  _isNoiseModifierAdditive: 1
+  _bodyModComponents:
+  - {fileID: 11400000, guid: c41ff771a6a15b24d8a7f48431696b55, type: 2}
+  - {fileID: 11400000, guid: f34104d4d61459347b323fb8049518b3, type: 2}
+  _bodyModComponentRequirements:
+  - BodyModComponentType: 5
+    MinimumTierLevel: 0
+  - BodyModComponentType: 4
+    MinimumTierLevel: 0
+  _requiredBodyModyComponents:
+  - {fileID: 11400000, guid: f34104d4d61459347b323fb8049518b3, type: 2}

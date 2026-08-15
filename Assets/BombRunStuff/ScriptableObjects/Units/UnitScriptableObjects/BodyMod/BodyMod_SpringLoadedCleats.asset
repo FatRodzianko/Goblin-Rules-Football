@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 57dcdca3171922a40b24952c0e77c11e, type: 3}
-  m_Name: BodyMod_RunningCleats
+  m_Name: BodyMod_SpringLoadedCleats
   m_EditorClassIdentifier: 
-  _name: Running Cleats
+  _name: Spring-loaded Cleats
   _sprite: {fileID: 0}
   _description: Can move farther, but louder
   _bodyPart: 3
@@ -23,3 +23,16 @@ MonoBehaviour:
   _modifiesNoise: 1
   _noiseModifier: 1.2
   _isNoiseModifierAdditive: 0
+  _bodyModComponents:
+  - {fileID: 11400000, guid: c41ff771a6a15b24d8a7f48431696b55, type: 2}
+  - {fileID: 11400000, guid: 085edb4a82256e146b6bb3fe20e8818e, type: 2}
+  - {fileID: 11400000, guid: 62d937060d426a34ab49d588845f881a, type: 2}
+  _bodyModComponentRequirements:
+  - BodyModComponentType: 5
+    MinimumTierLevel: 0
+  - BodyModComponentType: 4
+    MinimumTierLevel: 0
+  - BodyModComponentType: 1
+    MinimumTierLevel: 0
+  _requiredBodyModyComponents:
+  - {fileID: 11400000, guid: 085edb4a82256e146b6bb3fe20e8818e, type: 2}

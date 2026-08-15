@@ -960,17 +960,26 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - - - - - - - Good hacker can retrieve all components, poor hacker only a few
 - - - - - - - - - - - - Each component and component type will have a "retrieval difficulty" stat that is compared to unit's "hacking" stat
 						Hacking stat has to equal or exceed component retrieval difficulty in order for unit to be able to retrieve the component
-- Necessary info for the Body Mods (what to put in the scriptable objects?
-- - - Name
-- - - Body Part
-- - - Stat to Buff (move distance, vision distance, fov angle, total action points, whatever)
-- - - Stat Buff Amount
-- - - - - - Maybe for the "Stat to Buff" and "Stat Buff Amount" make it a dictionary so body mods can affect more than one stat?
-- - - image of body mod
-- - - Description of item
-- BodyMod scriptable object will be on the unit scriptable object
-- - - when unit is spawned, the BodyMod script objects are sent to the unit
-- - - Unit will have a BodyModManager class that stores what scriptable objects the unit has
+- Body Mod component requirements?
+- - - Create a class that just stores "minimum requirements"
+- - - - - - Will be a list of the "required" component types along with any tier level requirements
+- - - - - - - - - So one entry would be "Fastener, Tier 2" meaning at least one fastener component type that is at least tier 2 is needed to craft this
+- - - - - - - - - - - - Would also mean you get a tier 2 fastener when disassembling the body mod?
+- - - Also have a list of "Required Components"
+- - - - - - These would be specific body mod component SOs that are required to make the body mod
+- - - - - - Ex: Spring loaded boots would require the Component "Pnuematic Spring" 
+- - - - - - - - - But the other components, such as the fastener or power source, can be whatever as long as they meet the component type requirements
+x Necessary info for the Body Mods (what to put in the scriptable objects?
+- - x Name
+- - x Body Part
+- - x Stat to Buff (move distance, vision distance, fov angle, total action points, whatever)
+- - x Stat Buff Amount
+- - - - - x Maybe for the "Stat to Buff" and "Stat Buff Amount" make it a dictionary so body mods can affect more than one stat?
+- - x image of body mod
+- - x Description of item
+x BodyMod scriptable object will be on the unit scriptable object
+- - x when unit is spawned, the BodyMod script objects are sent to the unit
+- - x Unit will have a BodyModManager class that stores what scriptable objects the unit has
 x When StatManager is calculating a stat:
 - - x Does the calculation taken action modified stats into account
 - - x StatManager will also query the unit for relevant body mod stat modifiers
@@ -979,11 +988,11 @@ x When StatManager is calculating a stat:
             modifier value
 - - - - - x BodyModManager would go through all mods that affect that body part, then add up/multiply up all the BodyMod modifiers, and that is the
             value to return
-- Need to find out if values in a stored scriptable object can be modified individually, or if it modifies it for all copies of that scriptable object
-- - - Ex: Say two units have the same Vision+ bodymod that increases their sight distance
-- - - - - - But one unit's BodyMod is "hacked"
-- - - - - - So, every turn, the hacked body mod counts down its broken timer
-- - - - - - Can the broken timer be updated on only the "hacked" scriptable object, but not the non-hacked? Or will the value update on both?
+x Need to find out if values in a stored scriptable object can be modified individually, or if it modifies it for all copies of that scriptable object
+- - x Ex: Say two units have the same Vision+ bodymod that increases their sight distance
+- - - - - x But one unit's BodyMod is "hacked"
+- - - - - x So, every turn, the hacked body mod counts down its broken timer
+- - - - - x Can the broken timer be updated on only the "hacked" scriptable object, but not the non-hacked? Or will the value update on both?
 - - - Better Example:
 - - - - - x Two units have the same Vison+ BodyMod
 - - - - - x One unit does something to increase sight distance on their body mody (saw a consumable that increases a body mod's stats)

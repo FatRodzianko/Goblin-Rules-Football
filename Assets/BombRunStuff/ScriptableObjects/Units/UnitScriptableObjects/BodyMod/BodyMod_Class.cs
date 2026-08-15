@@ -25,6 +25,8 @@ public class BodyMod_Class
 
     [Header("Body Mod Components")]
     [SerializeField] private List<BodyModComponent_Class> _bodyModComponents = new List<BodyModComponent_Class>();
+    [SerializeField] private List<BodyModComponentRequirement> _bodyModComponentRequirements = new List<BodyModComponentRequirement>();
+    [SerializeField] private List<ScriptableBodyModComponent> _requiredBodyModyComponents = new List<ScriptableBodyModComponent>();
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BodyMod_Class(ScriptableBodyMod bodyModScript, BombRunUnit unit)
@@ -46,6 +48,8 @@ public class BodyMod_Class
         this._isNoiseModifierAdditive = bodyModScript.IsNoiseModifierAdditive();
 
         AddBodyModComponentsFromScriptable(bodyModScript.BodyModComponents());
+        AddBodyModComponentRequirements(bodyModScript.BodyModComponentRequirements());
+        AddRequiredBodyModyComponents(bodyModScript.RequiredBodyModComponents());
     }
     private void AddBodyModStatModifiersFromScriptable(List<BodyModStatModifier> bodyModStatModifiers)
     {
@@ -61,6 +65,20 @@ public class BodyMod_Class
         {
             BodyModComponent_Class bodyModComponent = new BodyModComponent_Class(bodyModComponetScriptableObject, this);
             _bodyModComponents.Add(bodyModComponent);
+        }
+    }
+    private void AddBodyModComponentRequirements(List<BodyModComponentRequirement> bodyModComponentRequirements)
+    {
+        foreach (BodyModComponentRequirement bodyModComponentRequirement in bodyModComponentRequirements)
+        {
+            _bodyModComponentRequirements.Add(bodyModComponentRequirement.Clone());
+        }
+    }
+    private void AddRequiredBodyModyComponents(List<ScriptableBodyModComponent> requiredBodyModComponents)
+    {
+        foreach (ScriptableBodyModComponent bodyModComponent in requiredBodyModComponents)
+        {
+            this._requiredBodyModyComponents.Add(bodyModComponent);
         }
     }
     public string Name()
@@ -147,5 +165,13 @@ public class BodyMod_Class
     public List<BodyModStatModifier> BodyStatModifiers()
     {
         return _bodyModStatModifiers;
+    }
+    public List<BodyModComponentRequirement> BodyModComponentRequirements()
+    {
+        return _bodyModComponentRequirements;
+    }
+    public List<ScriptableBodyModComponent> RequiredBodyModComponents()
+    {
+        return _requiredBodyModyComponents;
     }
 }

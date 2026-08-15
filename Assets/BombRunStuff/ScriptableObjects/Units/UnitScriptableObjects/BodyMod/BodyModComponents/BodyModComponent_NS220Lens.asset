@@ -16,6 +16,6 @@ MonoBehaviour:
   _sprite: {fileID: 0}
   _description: Precision lens for high end optics
   _bodyPart: 0
-  _bodyPartComponentType: 4
+  _bodyModComponentType: 4
   _componentTierLevel: 2
   _hasAnimationEffect: 0

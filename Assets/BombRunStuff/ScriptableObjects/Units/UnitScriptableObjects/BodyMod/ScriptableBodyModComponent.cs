@@ -1,16 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum BodyPartComponentType
+public enum BodyModComponentType
 {
     None,
     Fastener, // how the component is attached to the body?
     Compute, // computer chips for things that need those?
     Electronics, // things like wires / boards / cables / whatever
-    Enhancer, // things doing the "enhancement." Lense for your eyes. Motor that makes you move faster
+    Enhancer, // things doing the "enhancement." Lense for your eyes. Motor that makes you move faster. Battery/power source for extra power?
+    PowerSource
 }
+
 [CreateAssetMenu(fileName = "ScriptableBodyModComponent", menuName = "BombRun/BodyMods/New Scriptable BodyMod Component")]
 public class ScriptableBodyModComponent : ScriptableObject
 {
@@ -23,7 +26,7 @@ public class ScriptableBodyModComponent : ScriptableObject
     [SerializeField] private BodyPart _bodyPart;
 
     [Header("Component Specifics")]
-    [SerializeField] private BodyPartComponentType _bodyPartComponentType;
+    [SerializeField] private BodyModComponentType _bodyModComponentType;
     [SerializeField] private int _componentTierLevel;
     [SerializeField] private bool _hasAnimationEffect;
 
@@ -43,9 +46,9 @@ public class ScriptableBodyModComponent : ScriptableObject
     {
         return _bodyPart;
     }
-    public BodyPartComponentType BodyPartComponentType()
+    public BodyModComponentType BodyPartComponentType()
     {
-        return _bodyPartComponentType;
+        return _bodyModComponentType;
     }
     public bool HasAnimationEffect()
     {

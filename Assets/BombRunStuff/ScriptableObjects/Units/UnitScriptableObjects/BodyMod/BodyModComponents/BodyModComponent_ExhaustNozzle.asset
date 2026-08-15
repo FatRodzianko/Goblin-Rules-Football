@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6e73011f166e764b860e9c59ef2dc0c, type: 3}
-  m_Name: BodyModComponent_SkullStrap
+  m_Name: BodyModComponent_ExhaustNozzle
   m_EditorClassIdentifier: 
-  _name: Skull Strap
+  _name: Exhaust Nozzle
   _sprite: {fileID: 0}
-  _description: Strap things to your skull
-  _bodyPart: 1
-  _bodyModComponentType: 1
+  _description: Nozzle to expel your gas
+  _bodyPart: 0
+  _bodyModComponentType: 4
   _componentTierLevel: 0
   _hasAnimationEffect: 0

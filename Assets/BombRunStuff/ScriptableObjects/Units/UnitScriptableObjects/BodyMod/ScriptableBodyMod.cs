@@ -22,6 +22,23 @@ public class BodyModStatModifier
         return new BodyModStatModifier(StatType, StatModifier, IsAdditive);
     }
 }
+[Serializable]
+public class BodyModComponentRequirement
+{
+    public BodyModComponentType BodyModComponentType;
+    public int MinimumTierLevel = 0;
+
+    public BodyModComponentRequirement(BodyModComponentType bodyModComponentType, int minimumTierLevel)
+    {
+        BodyModComponentType = bodyModComponentType;
+        MinimumTierLevel = minimumTierLevel;
+    }
+
+    public BodyModComponentRequirement Clone()
+    {
+        return new BodyModComponentRequirement(BodyModComponentType, MinimumTierLevel);
+    }
+}
 [CreateAssetMenu(fileName = "ScriptableBodyMod", menuName = "BombRun/BodyMods/New Scriptable BodyMod")]
 public class ScriptableBodyMod : ScriptableObject
 {
@@ -41,6 +58,8 @@ public class ScriptableBodyMod : ScriptableObject
 
     [Header("Components")]
     [SerializeField] private List<ScriptableBodyModComponent> _bodyModComponents = new List<ScriptableBodyModComponent>();
+    [SerializeField] private List<BodyModComponentRequirement> _bodyModComponentRequirements = new List<BodyModComponentRequirement>();
+    [SerializeField] private List<ScriptableBodyModComponent> _requiredBodyModyComponents = new List<ScriptableBodyModComponent>();
 
     public string Name()
     {
@@ -78,5 +97,12 @@ public class ScriptableBodyMod : ScriptableObject
     {
         return _bodyModComponents;
     }
-    
+    public List<BodyModComponentRequirement> BodyModComponentRequirements()
+    {
+        return _bodyModComponentRequirements;
+    }
+    public List<ScriptableBodyModComponent> RequiredBodyModComponents()
+    {
+        return _requiredBodyModyComponents;
+    }
 }

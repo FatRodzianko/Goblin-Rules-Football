@@ -30,3 +30,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 507658901ca0d2949b3082dd4ebe5d34, type: 2}
   - {fileID: 11400000, guid: bc200ad4f7305764788660199e96b8be, type: 2}
   - {fileID: 11400000, guid: 7b6b46dfc648d1a41b6ceaa180dc06b0, type: 2}
+  _bodyModComponentRequirements:
+  - BodyModComponentType: 1
+    MinimumTierLevel: 0
+  - BodyModComponentType: 3
+    MinimumTierLevel: 1
+  - BodyModComponentType: 4
+    MinimumTierLevel: 0
+  _requiredBodyModyComponents:
+  - {fileID: 11400000, guid: 7b6b46dfc648d1a41b6ceaa180dc06b0, type: 2}

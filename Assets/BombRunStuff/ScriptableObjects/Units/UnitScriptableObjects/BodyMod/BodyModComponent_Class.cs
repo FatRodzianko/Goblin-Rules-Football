@@ -18,7 +18,7 @@ public class BodyModComponent_Class
     [SerializeField] private BodyPart _bodyPart;
 
     [Header("Component Specifics")]
-    [SerializeField] private BodyPartComponentType _bodyPartComponentType;
+    [SerializeField] private BodyModComponentType _bodyPartComponentType;
     [SerializeField] private int _componentTierLevel;
     [SerializeField] private bool _hasAnimationEffect;
 
@@ -55,7 +55,7 @@ public class BodyModComponent_Class
     {
         return _bodyPart;
     }
-    public BodyPartComponentType BodyPartComponentType()
+    public BodyModComponentType BodyPartComponentType()
     {
         return _bodyPartComponentType;
     }
