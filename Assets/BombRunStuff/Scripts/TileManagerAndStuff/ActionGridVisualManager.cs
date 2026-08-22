@@ -26,7 +26,7 @@ public class ActionGridVisualManager : MonoBehaviour
     }
     
     public static ActionGridVisualManager Instance { get; private set; }
-
+    public int BaseAction_OnUpdateActionVisuals { get; private set; }
 
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _actionVisualsTileMap;
@@ -68,6 +68,7 @@ public class ActionGridVisualManager : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
         BaseAction.OnAnyActionUpdateByAltAction += BaseAction_OnAnyActionUpdateByAltAction;
+        BaseAction.OnAnyActionUpdateVisuals += BaseAction_OnAnyActionUpdateVisuals;
 
         //// cache the grid system?
         //_gridSystem = LevelGrid.Instance.GetGridObjectGridSystem();
@@ -84,6 +85,7 @@ public class ActionGridVisualManager : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedActionChanged -= UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnBusyChanged -= UnitActionSystem_OnBusyChanged;
         BaseAction.OnAnyActionUpdateByAltAction -= BaseAction_OnAnyActionUpdateByAltAction;
+        BaseAction.OnAnyActionUpdateVisuals -= BaseAction_OnAnyActionUpdateVisuals;
     }
     public void InitializeActionGridVisualManager()
     {
@@ -238,6 +240,16 @@ public class ActionGridVisualManager : MonoBehaviour
     }
     private void BaseAction_OnAnyActionUpdateByAltAction(object sender, EventArgs e)
     {
+        UpdateActionVisuals();
+    }
+    private void BaseAction_OnAnyActionUpdateVisuals(object sender, EventArgs e)
+    {
+        BaseAction action = sender as BaseAction;
+        if (action != UnitActionSystem.Instance.GetSelectedAction())
+            return;
+        if (action.GetUnit() != UnitActionSystem.Instance.GetSelectedUnit())
+            return;
+
         UpdateActionVisuals();
     }
     private void UnitActionSystem_OnBusyChanged(object sender, bool busy)

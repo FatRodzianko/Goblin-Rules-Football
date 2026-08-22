@@ -48,6 +48,8 @@ public class MoveAction : BaseAction
         BombRunUnit.OnAnyActionPointsChanged += BombRunUnit_OnAnyActionPointsChanged;
         this.OnMaxMoveDistanceOrModifierChanged += MoveAction_OnMaxMoveDistanceOrModifierChanged;
 
+        this._unit.OnMaxMoveDistanceChanged += BombRunUnit_OnMaxMoveDistanceChanged;
+
         //this._maxMoveDistance = _unit.GetMaxMoveDistance();
         // When the unitStatManager is created, get rid of this since MaxMoveDistance will always be calculated there?
         this._maxMoveDistance = _unit.GetMaxMoveDistance();
@@ -56,12 +58,16 @@ public class MoveAction : BaseAction
         this.SetCachedActionPointDefaultCost(this.GetActionPointDefaultCost());
     }
 
+    
+
     protected override void OnDisable()
     {
         base.OnDisable();
         PathFinding.Instance.IsWalkableUpdated -= PathFinding_IsWalkableUpdated;
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
         this.OnMaxMoveDistanceOrModifierChanged -= MoveAction_OnMaxMoveDistanceOrModifierChanged;
+
+        this._unit.OnMaxMoveDistanceChanged -= BombRunUnit_OnMaxMoveDistanceChanged;
     }
 
     
@@ -217,6 +223,11 @@ public class MoveAction : BaseAction
     private void MoveAction_OnMaxMoveDistanceOrModifierChanged(object sender, EventArgs e)
     {
         UpdateGridVisualRange();
+    }
+    private void BombRunUnit_OnMaxMoveDistanceChanged(object sender, EventArgs e)
+    {
+        UpdateGridVisualRange();
+        this.ActionUpdateVisuals_StatChange();
     }
     private void UpdateGridVisualRange()
     {

@@ -8,6 +8,7 @@ public class BodyMod_Class
 {
     [SerializeField] private BombRunUnit _unit;
     [SerializeField] private ScriptableBodyMod _bodyModScriptable;
+    [SerializeField] private bool _isEquipped;
 
     [Header("Details")]
     [SerializeField] private string _name;
@@ -27,6 +28,11 @@ public class BodyMod_Class
     [SerializeField] private List<BodyModComponent_Class> _bodyModComponents = new List<BodyModComponent_Class>();
     [SerializeField] private List<BodyModComponentRequirement> _bodyModComponentRequirements = new List<BodyModComponentRequirement>();
     [SerializeField] private List<ScriptableBodyModComponent> _requiredBodyModyComponents = new List<ScriptableBodyModComponent>();
+
+    // events
+    public event EventHandler OnBodyModEquipped;
+    public event EventHandler OnBodyModUnEquipped;
+    public event EventHandler OnBodyModDestroyed;
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BodyMod_Class(ScriptableBodyMod bodyModScript, BombRunUnit unit)
@@ -174,4 +180,23 @@ public class BodyMod_Class
     {
         return _requiredBodyModyComponents;
     }
+    public bool IsEquipped()
+    {
+        return _isEquipped;
+    }
+    public void EquipBodyMod()
+    {
+        _isEquipped = true;
+        OnBodyModEquipped?.Invoke(this, EventArgs.Empty);
+    }
+    public void UnEquipBodyMod()
+    {
+        _isEquipped = false;
+        OnBodyModUnEquipped?.Invoke(this, EventArgs.Empty);
+    }
+    public void DestroyBodyMod()
+    {
+        OnBodyModDestroyed?.Invoke(this, EventArgs.Empty);
+    }
+
 }

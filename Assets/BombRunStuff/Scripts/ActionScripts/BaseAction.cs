@@ -110,6 +110,7 @@ public abstract class BaseAction : MonoBehaviour
     public static event EventHandler<ActionMadeNoiseEventArgs> OnAnyActionMakesNoise;
     public static event EventHandler OnAnyActionUpdateByAltAction;
     public static event EventHandler OnAnyActionPointsCostChanged;
+    public static event EventHandler OnAnyActionUpdateVisuals;
 
     // Non-static Actions
     public event EventHandler<bool> OnHasAltActionChanged;
@@ -450,6 +451,10 @@ public abstract class BaseAction : MonoBehaviour
     {
         OnAnyActionUpdateByAltAction?.Invoke(this, EventArgs.Empty);
     }
+    public virtual void ActionUpdateVisuals_StatChange()
+    {
+        OnAnyActionUpdateVisuals?.Invoke(this, EventArgs.Empty);
+    }
     public bool GetIsReloadable()
     {
         return _isReloadable;
@@ -600,7 +605,7 @@ public abstract class BaseAction : MonoBehaviour
     {
         return _gridRangeVisualType;
     }
-    public int GridVisualRange()
+    public virtual int GridVisualRange()
     {
         return _gridVisualRange;
     }

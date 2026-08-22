@@ -40,6 +40,10 @@ public class BombRunUnit : MonoBehaviour
     public event EventHandler<bool> OnUnitVisibilityChanged;
     public event EventHandler<UnitState> OnUnitStateChanged;
 
+    // stat update events
+    public event EventHandler OnMaxMoveDistanceChanged;
+    public event EventHandler OnFOVChanged;
+    public event EventHandler OnSightDistanceChanged;
 
     [Header("Unit Info")]
     //[SerializeField] private int _startingHealth = 100;
@@ -148,6 +152,10 @@ public class BombRunUnit : MonoBehaviour
         try
         {
             _statManager.UnsubscribeFromEvents();
+
+            _statManager.OnFOVChanged -= StatManager_OnFOVChanged;
+            _statManager.OnSightDistanceChanged -= StatManager_OnSightDistanceChanged;
+            _statManager.OnMaxMovementDistanceChanged -= StatManager_OnMaxMovementDistanceChanged;
         }
         catch (Exception e)
         {
@@ -207,9 +215,26 @@ public class BombRunUnit : MonoBehaviour
 
         if (GameplayManager_BombRun.Instance.GameState() == GameState_BombRun.Gameplay)
         {
-            if (Input.GetKeyDown(KeyCode.J))
+            //if (Input.GetKeyDown(KeyCode.J))
+            //{
+            //    _bodyModManager.ModifyBodyMod();
+            //}
+            if (UnitActionSystem.Instance.GetIsBusy())
+                return;
+            if (UnitActionSystem.Instance.GetSelectedUnit() == this)
             {
-                _bodyModManager.ModifyBodyMod();
+                if (Input.GetKeyDown(KeyCode.U))
+                {
+                    _bodyModManager.UnEquipBodyModTest();
+                }
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    _bodyModManager.EquipBodyModTest();
+                }
+                if (Input.GetKeyDown(KeyCode.K))
+                {
+                    _bodyModManager.DestroyBodyModTest();
+                }
             }
         }
     }
@@ -447,17 +472,34 @@ public class BombRunUnit : MonoBehaviour
     {
         _statManager = new BombRunUnitStatManager(this, baseStats);
         _statManager.OnFOVChanged += StatManager_OnFOVChanged;
+        _statManager.OnSightDistanceChanged += StatManager_OnSightDistanceChanged;
+        _statManager.OnMaxMovementDistanceChanged += StatManager_OnMaxMovementDistanceChanged;
     }
 
+    
+
     private void StatManager_OnFOVChanged(object sender, EventArgs e)
-    {
-        
+    {        
         if (_bombRunUnitFieldOfView == null)
             return;
         Debug.Log("StatManager_OnFOVChanged: " + this);
-        _bombRunUnitFieldOfView.UpdateFOV(this.GetUnitFOV());
-    }
+        OnFOVChanged?.Invoke(this, EventArgs.Empty);
 
+       //_bombRunUnitFieldOfView.UpdateFOV(this.GetUnitFOV());
+    }
+    private void StatManager_OnSightDistanceChanged(object sender, EventArgs e)
+    {
+        if (_bombRunUnitFieldOfView == null)
+            return;
+        Debug.Log("StatManager_OnSightDistanceChanged: " + this);
+        OnSightDistanceChanged?.Invoke(this, EventArgs.Empty);
+        //_bombRunUnitFieldOfView.SightRangeUpdated();
+    }
+    private void StatManager_OnMaxMovementDistanceChanged(object sender, EventArgs e)
+    {
+        Debug.Log("StatManager_OnMaxMovementDistanceChanged: " + this);
+        OnMaxMoveDistanceChanged?.Invoke(this, EventArgs.Empty);
+    }
     public void StatModifierUpdated(StatType statType)
     {
         if (_statManager == null)

@@ -55,9 +55,15 @@ public class ShootAction : BaseAction
     {
         base.Start();
         //CheckForSwitchShootingModeAction();
+
+        _unit.OnSightDistanceChanged += BombRunUnit_OnSightDistanceChanged;
+
         _maxShootDistance = _unit.GetSightRange();
         this._gridVisualRange = _maxShootDistance;
     }
+
+    
+
     protected override void OnDisable()
     {
         base.OnDisable();
@@ -65,6 +71,7 @@ public class ShootAction : BaseAction
         //{
         //    _switchShootingModeAction.OnSwitchShootModeStarted -= SwitchShootingModeAction_OnSwitchShootModeStarted;
         //}
+        _unit.OnSightDistanceChanged -= BombRunUnit_OnSightDistanceChanged;
     }
     private void Update()
     {
@@ -195,21 +202,26 @@ public class ShootAction : BaseAction
                 break;
         }
     }
+    private void BombRunUnit_OnSightDistanceChanged(object sender, EventArgs e)
+    {
+        this.ActionUpdateVisuals_StatChange();
+    }
     public override List<GridPosition> GetValidActionGridPositionList()
     {
         GridPosition unitGridPosition = _unit.GetGridPosition();
         return GetValidActionGridPositionList(unitGridPosition);
     }
+
     public List<GridPosition> GetValidActionGridPositionList(GridPosition gridPosition, bool specifyDamageMode = false, DamageMode specifiedDamageMode = DamageMode.Damage)
     {
         List<GridPosition> validGridPositionList = new List<GridPosition>();
         //GridPosition unitGridPosition = _unit.GetGridPosition();
         GridPosition unitGridPosition = gridPosition;
-        
 
-        for (int x = -_maxShootDistance; x <= _maxShootDistance; x++)
+        int shootDistance = _unit.GetSightRange();
+        for (int x = -shootDistance; x <= shootDistance; x++)
         {
-            for (int y = -_maxShootDistance; y <= _maxShootDistance; y++)
+            for (int y = -shootDistance; y <= shootDistance; y++)
             {
                 GridPosition offsetGridPosition = new GridPosition(x, y);
                 GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
@@ -284,7 +296,7 @@ public class ShootAction : BaseAction
                 }
                 // check the distance to the target grid position. This will be the distance assuming no walls or anything. If distance with that is greater than distance max, skip
                 int pathFindingDistanceMultiplier = 10;
-                if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > _maxShootDistance * pathFindingDistanceMultiplier)
+                if (LevelGrid.Instance.CalculateDistance(unitGridPosition, testGridPosition) > shootDistance * pathFindingDistanceMultiplier)
                 {
                     continue;
                 }
@@ -1053,7 +1065,12 @@ public class ShootAction : BaseAction
     }
     public int GetMaxShootDistance()
     {
-        return _maxShootDistance;
+        //return _maxShootDistance;
+        return _unit.GetSightRange();
+    }
+    public override int GridVisualRange()
+    {
+        return _unit.GetSightRange();
     }
     public BombRunUnit GetTargetUnit()
     {

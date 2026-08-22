@@ -44,6 +44,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         // subscribe to events?
         _unit.OnActionDirectionChanged += Unit_OnActionDirectionChanged;
         _unit.OnThisUnitMovedGridPosition += Unit_OnThisUnitMovedGridPosition;
+
+        _unit.OnFOVChanged += BombRunUnit_OnFOVChanged;
+        _unit.OnSightDistanceChanged += BombRunUnit_OnSightDistanceChanged;
+
         if (_unit.TryGetComponent<MoveAction>(out MoveAction moveAction))
         {
             moveAction.OnStartMoving += MoveAction_OnStartMoving;
@@ -62,6 +66,10 @@ public class BombRunUnitFieldOfView : MonoBehaviour
     {
         _unit.OnActionDirectionChanged -= Unit_OnActionDirectionChanged;
         _unit.OnThisUnitMovedGridPosition -= Unit_OnThisUnitMovedGridPosition;
+
+        _unit.OnFOVChanged -= BombRunUnit_OnFOVChanged;
+        _unit.OnSightDistanceChanged -= BombRunUnit_OnSightDistanceChanged;
+
         if (_unit.TryGetComponent<MoveAction>(out MoveAction moveAction))
         {
             moveAction.OnStartMoving -= MoveAction_OnStartMoving;
@@ -92,9 +100,23 @@ public class BombRunUnitFieldOfView : MonoBehaviour
         if(isActiveAndEnabled)
             StartCoroutine(DelayForWallCollidersToSpawn(0.25f));
     }
+    private void BombRunUnit_OnSightDistanceChanged(object sender, EventArgs e)
+    {
+        SightRangeUpdated();
+    }
+
+    private void BombRunUnit_OnFOVChanged(object sender, EventArgs e)
+    {
+        UpdateFOV(_unit.GetUnitFOV());
+    }
     public void UpdateFOV(float newFOV)
     {
         this._fov = newFOV;
+        GetVisibileGridPositions();
+    }
+    public void SightRangeUpdated()
+    {
+        GetVisibileGridPositions();
     }
     IEnumerator DelayForWallCollidersToSpawn(float waitTime)
     {
