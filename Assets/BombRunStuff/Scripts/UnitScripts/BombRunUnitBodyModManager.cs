@@ -11,6 +11,8 @@ public class BombRunUnitBodyModManager
 
     [Header("All Body Mods")]
     [SerializeField] private List<BodyMod_Class> _bodyMods = new List<BodyMod_Class>();
+
+    [SerializeField] private Dictionary<BodyMod_Class, BodyMod_InventoryItem> _bodyModDict = new Dictionary<BodyMod_Class, BodyMod_InventoryItem>();
     
     [Header("Equiped Body Mods")]
     [SerializeField] private List<BodyMod_Class> _equippedBodyMods = new List<BodyMod_Class>();
@@ -29,7 +31,8 @@ public class BombRunUnitBodyModManager
             BodyMod_Class bodyModClass = new BodyMod_Class(bodyMod, unit);
             if (!_bodyMods.Contains(bodyModClass))
             {
-                _bodyMods.Add(bodyModClass);
+                //_bodyMods.Add(bodyModClass);
+                AddBodyMod(bodyModClass);
                 bodyModClass.OnBodyModEquipped += BodyModClass_OnBodyModEquipped;
                 bodyModClass.OnBodyModUnEquipped += BodyModClass_OnBodyModUnEquipped;
                 bodyModClass.OnBodyModDestroyed += BodyModClass_OnBodyModDestroyed;
@@ -39,25 +42,57 @@ public class BombRunUnitBodyModManager
         }
     } 
 
-    public void AddBodyMod(ScriptableBodyMod bodyMod)
+    public void AddBodyMod(BodyMod_Class bodyMod)
     {
-        BodyMod_Class bodyModClass = new BodyMod_Class(bodyMod, this._unit);
-        if (!_bodyMods.Contains(bodyModClass))
+        //BodyMod_Class bodyModClass = new BodyMod_Class(bodyMod, this._unit);
+        //if (!_bodyMods.Contains(bodyMod))
+        //{
+        //    _bodyMods.Add(bodyMod);
+        //}
+
+        if (_bodyModDict.TryGetValue(bodyMod, out BodyMod_InventoryItem inventoryItem))
         {
-            _bodyMods.Add(bodyModClass);
+            inventoryItem.AddToStack();
+        }
+        else
+        {
+            _bodyMods.Add(bodyMod);
+            BodyMod_InventoryItem newInventoryItem = new BodyMod_InventoryItem(bodyMod);
+            _bodyModDict.Add(bodyMod, newInventoryItem);
         }
     }
     public void RemoveBodyMod(BodyMod_Class bodyMod)
     {
-        if (_bodyMods.Contains(bodyMod))
+        if (_bodyModDict.TryGetValue(bodyMod, out BodyMod_InventoryItem inventoryItem))
         {
-            _bodyMods.Remove(bodyMod);
-
-            bodyMod.OnBodyModEquipped -= BodyModClass_OnBodyModEquipped;
-            bodyMod.OnBodyModUnEquipped -= BodyModClass_OnBodyModUnEquipped;
-            bodyMod.OnBodyModDestroyed -= BodyModClass_OnBodyModDestroyed;
-
+            inventoryItem.RemoveFromStack();
+            if (inventoryItem.StackSize() <= 0)
+            {
+                Debug.Log("RemoveBodyMod: No more of: " + bodyMod.Name() + " left in inventory. Removing...");
+                _bodyMods.Remove(bodyMod);
+                _bodyModDict.Remove(bodyMod);
+            }
+            else
+            {
+                Debug.Log("RemoveBodyMod: " + bodyMod.Name() + " still has " + inventoryItem.StackSize() + " items left in the inventory.");
+            }
         }
+        else
+        {
+            return;
+        }
+        // OLD
+        //if (_bodyMods.Contains(bodyMod))
+        //{
+        //    _bodyMods.Remove(bodyMod);
+
+        //    bodyMod.OnBodyModEquipped -= BodyModClass_OnBodyModEquipped;
+        //    bodyMod.OnBodyModUnEquipped -= BodyModClass_OnBodyModUnEquipped;
+        //    bodyMod.OnBodyModDestroyed -= BodyModClass_OnBodyModDestroyed;
+
+        //}
+        // OLD
+
         if (_equippedBodyMods.Contains(bodyMod))
         {
             UnEquipBodyMod(bodyMod);
