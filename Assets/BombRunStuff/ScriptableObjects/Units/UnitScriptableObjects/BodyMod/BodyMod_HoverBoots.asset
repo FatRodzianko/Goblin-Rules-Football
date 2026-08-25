@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BodyMod_HoverBoots
   m_EditorClassIdentifier: 
   _name: Hover Boots
-  _sprite: {fileID: 21300000, guid: 3c7571411cd81c744bb23265644dc101, type: 3}
+  _sprite: {fileID: 21300000, guid: ec8f6b3e832f3bf45b2daebbd898cf81, type: 3}
   _description: Dampens sound by ejecting air before foot fall to reduce impact with
     ground
   _bodyPart: 3

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BodyMod_Vision+
   m_EditorClassIdentifier: 
   _name: Vision+
-  _sprite: {fileID: 0}
+  _sprite: {fileID: 21300000, guid: 187727ac9be7d224aa665f2925d57dc8, type: 3}
   _description: Increases all vision stats
   _bodyPart: 1
   _bodyModStatModifiers:

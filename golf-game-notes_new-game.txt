@@ -1004,6 +1004,13 @@ x Maybe make it so there is also a BodyMod class
 - - x Unit is spawned -> get bodymod scriptable objects -> BodyMod manager makes a new BodyMod class from each scriptable object
 - - - - - x BodyModManager stores the classes in a script
 - - x This should make it so that BodyMod values can be easily edited, since they'd each be their own instance of a BodyMod class
+- Re-use/re-purpose the "Character Portrait" UI for spawning goblins in gameplay as well
+- - - will be used to show all your units
+- - - - - - should display health as well?
+- - - - - - remaining action points for that unit? Or at least some sort of visual to indicate if they have exhausted action points or not
+- - - Click to select that unit
+- - - - - - also leave this clickable when the body mod inventory is open so that you can click on the portrait to change what unit's inventory you
+            are looking at
 
 ### END CURRENT TASKS
 
