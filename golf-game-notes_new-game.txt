@@ -969,6 +969,25 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - These would be specific body mod component SOs that are required to make the body mod
 - - - - - - Ex: Spring loaded boots would require the Component "Pnuematic Spring" 
 - - - - - - - - - But the other components, such as the fastener or power source, can be whatever as long as they meet the component type requirements
+
+- Body Mod / Component Inventory
+- - - Gets number of item slots from Unit inventory count
+- - - - - - allow for items to upgrade unit's inventory capacity? This may not actually be important
+- - - - - - inventory capacity will be by class / unit type?
+- - - Gets number of equipment slots per body part from unit / bodymod manager
+- - - - - - So different units can have different number of slots for their arms, legs, etc.
+- - - When inventory is opened
+- - - - - - Do all this same stuff if inventory is currently open and player switches units
+- - - - - - Destroy any exist inventory slot objects
+- - - - - - - - - Use object pooling or whatever...
+- - - - - - Get number of inventory slots from unit
+- - - - - - - - - create those number of inventory slots
+- - - - - - Get number of equipment slots per body part
+- - - - - - - - - create those number of equipment slots per body part
+- - - - - - Go through units bodymods
+- - - - - - - - - Add equiped body mods to their appropriate equipment slot
+- - - - - - - - - Add unequiped body mods to the inventory slots
+
 x Necessary info for the Body Mods (what to put in the scriptable objects?
 - - x Name
 - - x Body Part

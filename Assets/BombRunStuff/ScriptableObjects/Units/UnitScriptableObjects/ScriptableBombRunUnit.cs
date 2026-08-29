@@ -22,6 +22,7 @@ public class ScriptableBombRunUnit : ScriptableObject
 
     [Header("Body Mods")]
     [SerializeField] private List<ScriptableBodyMod> _bodyMods;
+    [SerializeField] private int _inventoryCount;
 
     public Transform UnitPrefab()
     {
@@ -62,5 +63,9 @@ public class ScriptableBombRunUnit : ScriptableObject
     public List<ScriptableBodyMod> BodyMods()
     {
         return _bodyMods;
+    }
+    public int InventoryCount()
+    {
+        return _inventoryCount;
     }
 }

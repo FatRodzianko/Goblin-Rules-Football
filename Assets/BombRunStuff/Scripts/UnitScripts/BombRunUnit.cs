@@ -96,7 +96,10 @@ public class BombRunUnit : MonoBehaviour
     [SerializeField] private BombRunUnitNoiseManager _noiseManager;
 
     [Header("Body Mods")]
+    [SerializeField] private ScriptableBodyMod _testToAddBodyMod;
     [SerializeField] private BombRunUnitBodyModManager _bodyModManager;
+    [SerializeField] private int _inventoryCount;
+    
 
 
     private void Awake()
@@ -234,6 +237,10 @@ public class BombRunUnit : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.K))
                 {
                     _bodyModManager.DestroyBodyModTest();
+                }
+                if (Input.GetKeyDown(KeyCode.L))
+                {
+                    _bodyModManager.AddNewTestBodyMod(_testToAddBodyMod);
                 }
             }
         }
@@ -506,9 +513,9 @@ public class BombRunUnit : MonoBehaviour
             return;
         _statManager.StatTypeChanged(statType);
     }
-    public void InitializeUnitBodyMods(List<ScriptableBodyMod> bodyMods)
+    public void InitializeUnitBodyMods(List<ScriptableBodyMod> bodyMods, int inventoryCount)
     {
-        _bodyModManager = new BombRunUnitBodyModManager(this, bodyMods);
+        _bodyModManager = new BombRunUnitBodyModManager(this, bodyMods, inventoryCount);
     }
     public BombRunUnitBodyModManager BodyModManager()
     {
@@ -791,6 +798,14 @@ public class BombRunUnit : MonoBehaviour
     public void SetHearingSensitivity(float newSensitivity)
     {
         this._hearingSensitivity = newSensitivity;
+    }
+    public int InventoryCount()
+    {
+        return _inventoryCount;
+    }
+    public void SetInventoryCount(int count)
+    {
+        this._inventoryCount = count;
     }
     public float GetBaseNoiseDistanceModifierForBodyPart(BodyPart bodyPart)
     {

@@ -8,6 +8,8 @@ using UnityEngine;
 public class BombRunUnitBodyModManager
 {
     private BombRunUnit _unit;
+    private int _maxInventoryCount;
+
 
     [Header("All Body Mods")]
     [SerializeField] private List<BodyMod_Class> _bodyMods = new List<BodyMod_Class>();
@@ -18,11 +20,12 @@ public class BombRunUnitBodyModManager
     [SerializeField] private List<BodyMod_Class> _equippedBodyMods = new List<BodyMod_Class>();
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
-    public BombRunUnitBodyModManager(BombRunUnit unit, List<ScriptableBodyMod> bodyMods)
+    public BombRunUnitBodyModManager(BombRunUnit unit, List<ScriptableBodyMod> bodyMods, int maxInventoryCount)
     {
         this._unit = unit;
         //this._bodyMods.AddRange(bodyMods);
         CreateBodyModClassObjects(bodyMods, _unit);
+        SetMaxInvetoryCount(maxInventoryCount);
     }
     private void CreateBodyModClassObjects(List<ScriptableBodyMod> bodyMods, BombRunUnit unit)
     {
@@ -40,8 +43,15 @@ public class BombRunUnitBodyModManager
                 bodyModClass.EquipBodyMod();
             }
         }
-    } 
-
+    }
+    void AddBodyMod(ScriptableBodyMod bodyMod)
+    {
+        BodyMod_Class bodyModClass = new BodyMod_Class(bodyMod, _unit);
+        bodyModClass.OnBodyModEquipped += BodyModClass_OnBodyModEquipped;
+        bodyModClass.OnBodyModUnEquipped += BodyModClass_OnBodyModUnEquipped;
+        bodyModClass.OnBodyModDestroyed += BodyModClass_OnBodyModDestroyed;
+        AddBodyMod(bodyModClass);
+    }
     public void AddBodyMod(BodyMod_Class bodyMod)
     {
         //BodyMod_Class bodyModClass = new BodyMod_Class(bodyMod, this._unit);
@@ -265,10 +275,15 @@ public class BombRunUnitBodyModManager
     }
     public void DestroyBodyModTest()
     {
+        Debug.Log("DestroyBodyModTest: _bodyMods.Count: " + _bodyMods.Count.ToString());
         if (_bodyMods.Count < 1)
             return;
 
         _bodyMods[0].DestroyBodyMod();
+    }
+    public void AddNewTestBodyMod(ScriptableBodyMod bodyMod)
+    {
+        AddBodyMod(bodyMod);
     }
     private void BodyModClass_OnBodyModDestroyed(object sender, EventArgs e)
     {
@@ -279,5 +294,13 @@ public class BombRunUnitBodyModManager
         bodyMod.OnBodyModDestroyed += BodyModClass_OnBodyModDestroyed;
 
         RemoveBodyMod(bodyMod);
+    }
+    public int MaxInventoryCount()
+    {
+        return _maxInventoryCount;
+    }
+    public void SetMaxInvetoryCount(int newCount)
+    {
+        this._maxInventoryCount = newCount;
     }
 }

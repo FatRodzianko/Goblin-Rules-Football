@@ -520,6 +520,11 @@ MonoBehaviour:
   _parentAction: {fileID: 0}
   _altActionName: Sneak
   _actionType: 1
+  _baseActionCost: 0
+  _altActionIndex: 0
+  _maxMoveDistanceReduction: 0.5
+  _reducedNoiseDistanceAmount: 0
+  _actionPointCostIncrease: 2
 --- !u!1 &1929892282204359245
 GameObject:
   m_ObjectHideFlags: 0
@@ -1152,6 +1157,17 @@ MonoBehaviour:
   _hasUnitBeenSeen: 0
   _lastSeenAtVector2Position: {x: -1, y: -1}
   _currentVector2Position: {x: -1, y: -1}
+  _statManager:
+    _baseStats: {fileID: 0}
+    _actionsModifyingStatsAdditive: []
+    _actionsModifyingStatsMultiply: []
+  _noiseManager:
+    _actionsModifyingNoiseAdditive: []
+    _actionsModifyingNoiseMultiply: []
+  _testToAddBodyMod: {fileID: 11400000, guid: 9a4d7f0f98870b34380b01b771561d65, type: 2}
+  _bodyModManager:
+    _bodyMods: []
+    _equippedBodyMods: []
 --- !u!114 &7297105716296972232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1235,6 +1251,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionName: Look At
+  _originalActionName: 
   _actionType: 10
   _actionPointDefaultCost: 0
   _actionPointsCost: 0
@@ -1247,6 +1264,7 @@ MonoBehaviour:
   _canTakeActionInFogOfWar: 0
   _makesNoise: 0
   _noiseDistance: 0
+  _noiseDistanceModifier: 1
   _gridRangeVisualType: 3
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1284,6 +1302,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionName: Move
+  _originalActionName: 
   _actionType: 1
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1296,6 +1315,7 @@ MonoBehaviour:
   _canTakeActionInFogOfWar: 1
   _makesNoise: 1
   _noiseDistance: 8
+  _noiseDistanceModifier: 1
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1316,7 +1336,9 @@ MonoBehaviour:
   _changeUnitStateOnCompleteAction: 1
   _unitStateOnStartAction: 2
   _unitStateOnCompleteAction: 1
+  _cachedActionPointDefaultCost: 0
   _maxMoveDistance: 4
+  _maxMoveDistanceModifier: 1
   _positionList: []
   _currentPositionIndex: 0
 --- !u!114 &4887323598526683332
@@ -1334,6 +1356,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionName: Shoot
+  _originalActionName: 
   _actionType: 2
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1346,6 +1369,7 @@ MonoBehaviour:
   _canTakeActionInFogOfWar: 0
   _makesNoise: 1
   _noiseDistance: 8
+  _noiseDistanceModifier: 1
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1391,6 +1415,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionName: Reload
+  _originalActionName: 
   _actionType: 8
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1403,6 +1428,7 @@ MonoBehaviour:
   _canTakeActionInFogOfWar: 0
   _makesNoise: 1
   _noiseDistance: 2
+  _noiseDistanceModifier: 1
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1440,6 +1466,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionName: Switch To Healing
+  _originalActionName: 
   _actionType: 9
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1452,6 +1479,7 @@ MonoBehaviour:
   _canTakeActionInFogOfWar: 0
   _makesNoise: 0
   _noiseDistance: 0
+  _noiseDistanceModifier: 1
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1472,7 +1500,6 @@ MonoBehaviour:
   _changeUnitStateOnCompleteAction: 0
   _unitStateOnStartAction: 1
   _unitStateOnCompleteAction: 1
-  _actionName: Switch To Healing
   _healingMode: 0
   _switchModeTime: 1
   _switchModeCounter: 0
@@ -1493,6 +1520,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionName: Spin
+  _originalActionName: 
   _actionType: 3
   _actionPointDefaultCost: 1
   _actionPointsCost: 2
@@ -1505,6 +1533,7 @@ MonoBehaviour:
   _canTakeActionInFogOfWar: 0
   _makesNoise: 0
   _noiseDistance: 0
+  _noiseDistanceModifier: 1
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1540,6 +1569,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionName: Defend
+  _originalActionName: 
   _actionType: 4
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1552,6 +1582,7 @@ MonoBehaviour:
   _canTakeActionInFogOfWar: 0
   _makesNoise: 0
   _noiseDistance: 0
+  _noiseDistanceModifier: 1
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1590,6 +1621,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionName: Interact
+  _originalActionName: 
   _actionType: 5
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1602,6 +1634,7 @@ MonoBehaviour:
   _canTakeActionInFogOfWar: 0
   _makesNoise: 1
   _noiseDistance: 2
+  _noiseDistanceModifier: 1
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1637,6 +1670,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionName: Grenade
+  _originalActionName: 
   _actionType: 6
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1649,6 +1683,7 @@ MonoBehaviour:
   _canTakeActionInFogOfWar: 0
   _makesNoise: 1
   _noiseDistance: 4
+  _noiseDistanceModifier: 1
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 0
@@ -1687,6 +1722,7 @@ MonoBehaviour:
   _unit: {fileID: 0}
   _isActive: 0
   _actionName: Sword
+  _originalActionName: 
   _actionType: 7
   _actionPointDefaultCost: 1
   _actionPointsCost: 1
@@ -1699,6 +1735,7 @@ MonoBehaviour:
   _canTakeActionInFogOfWar: 0
   _makesNoise: 1
   _noiseDistance: 2
+  _noiseDistanceModifier: 1
   _gridRangeVisualType: 4
   _gridVisualRange: -1
   _squareGridRange: 1

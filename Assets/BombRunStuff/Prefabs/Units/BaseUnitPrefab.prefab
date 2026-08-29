@@ -67,6 +67,10 @@ PrefabInstance:
       propertyPath: _sightRange
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3408740805264284271, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
+      propertyPath: _testToAddBodyMod
+      value: 
+      objectReference: {fileID: 11400000, guid: 9a4d7f0f98870b34380b01b771561d65, type: 2}
     - target: {fileID: 3774028933683333569, guid: a631bc18be93b7143b7c489e2b9c8ce5, type: 3}
       propertyPath: m_Sprite
       value: 
