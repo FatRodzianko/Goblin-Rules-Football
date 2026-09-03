@@ -26,25 +26,28 @@ public class BodyModInventoryUIManager : MonoBehaviour
         {
             if (_menuOpen)
             {
-                _bodyModInventoryUIHolder.SetActive(false);
-                _menuOpen = false;
+                CloseInventory();
             }
             else
             {
-                _bodyModInventoryUIHolder.SetActive(true);
-                _menuOpen = true;
-
-
                 OpenInventory();
             }
             
         }
+    }
+    private void CloseInventory()
+    {
+        _bodyModInventoryUIHolder.SetActive(false);
+        _menuOpen = false;
     }
     private void OpenInventory()
     {
         BombRunUnit unit = UnitActionSystem.Instance.GetSelectedUnit();
         if (unit == null)
             return;
+
+        _bodyModInventoryUIHolder.SetActive(true);
+        _menuOpen = true;
 
         DestroyItemSlots();
         CreateItemSlots(unit.BodyModManager().MaxInventoryCount());
@@ -64,6 +67,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
         {
             Transform newItemSlot = Instantiate(_itemSlotPrefab, _itemSlotsHolder);
             InventoryItemSlot itemSlot = newItemSlot.GetComponent<InventoryItemSlot>();
+            itemSlot.SetSlotIndex(i);
             _itemSlots.Add(itemSlot);
             itemSlot.ClearItem();
 
@@ -75,11 +79,12 @@ public class BodyModInventoryUIManager : MonoBehaviour
 
         for (int i = 0; i < _itemSlots.Count; i++)
         {
-            _itemSlots[i].ClearItem();
+            //_itemSlots[i].ClearItem();
 
             if (bodyMods.Count > i)
             {
                 _itemSlots[i].AddItemToSlot(bodyMods[i].Sprite(), bodyMods[i].Name(), bodyMods[i].Description());
+                _itemSlots[i].SetIsEquipped(bodyMods[i].IsEquipped());
             }
         }
     }
