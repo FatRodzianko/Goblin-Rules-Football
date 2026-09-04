@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,13 +12,28 @@ public class BodyModInventoryUIManager : MonoBehaviour
     [SerializeField] private Transform _itemSlotsHolder;
     [SerializeField] private Transform _itemSlotPrefab;
     [SerializeField] private List<InventoryItemSlot> _itemSlots = new List<InventoryItemSlot>();
+    private Dictionary<int, BodyMod_Class> _bodyModByItemSlot = new Dictionary<int, BodyMod_Class>();
     [SerializeField] private int _numberOfSlots;
+
+    [Header("Selected Item")]
+    [SerializeField] private int _selectedItemIndex = 0;
+
 
     // Start is called before the first frame update
     void Start()
     {
         //CreateItemSlots();
+        InventoryItemSlot.OnAnyItemSlotClickedOn += InventoryItemSlot_OnAnyItemSlotClickedOn;
     }
+
+    
+
+    private void OnDisable()
+    {
+        InventoryItemSlot.OnAnyItemSlotClickedOn -= InventoryItemSlot_OnAnyItemSlotClickedOn;
+    }
+
+    
 
     // Update is called once per frame
     void Update()
@@ -39,6 +55,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     {
         _bodyModInventoryUIHolder.SetActive(false);
         _menuOpen = false;
+        _selectedItemIndex = 0;
     }
     private void OpenInventory()
     {
@@ -50,6 +67,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
         _menuOpen = true;
 
         DestroyItemSlots();
+        ResetBodyModByItemSlot();
         CreateItemSlots(unit.BodyModManager().MaxInventoryCount());
         GetInventoryItems(unit);
     }
@@ -60,6 +78,10 @@ public class BodyModInventoryUIManager : MonoBehaviour
             Destroy(_itemSlots[i].gameObject);
         }
         _itemSlots.Clear();
+    }
+    private void ResetBodyModByItemSlot()
+    {
+        _bodyModByItemSlot.Clear();
     }
     private void CreateItemSlots(int numberOfSlots)
     {
@@ -85,7 +107,26 @@ public class BodyModInventoryUIManager : MonoBehaviour
             {
                 _itemSlots[i].AddItemToSlot(bodyMods[i].Sprite(), bodyMods[i].Name(), bodyMods[i].Description());
                 _itemSlots[i].SetIsEquipped(bodyMods[i].IsEquipped());
+
+                _bodyModByItemSlot.Add(i, bodyMods[i]);
             }
         }
     }
+    private void InventoryItemSlot_OnAnyItemSlotClickedOn(object sender, int index)
+    {
+        if (!_menuOpen)
+            return;
+
+        if (_selectedItemIndex == index)
+        {
+            _itemSlots[_selectedItemIndex].SetIsSelected(!_itemSlots[_selectedItemIndex].IsSelected());
+            return;
+        }            
+
+        _itemSlots[_selectedItemIndex].SetIsSelected(false);
+        _itemSlots[index].SetIsSelected(true);
+
+        _selectedItemIndex = index;
+    }
+
 }

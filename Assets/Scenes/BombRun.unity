@@ -50909,6 +50909,7 @@ MonoBehaviour:
   _itemSlotPrefab: {fileID: 3119087039809846223, guid: ef48b705fa4cc934c885fa2c26932e8d, type: 3}
   _itemSlots: []
   _numberOfSlots: 28
+  _selectedItemIndex: 0
 --- !u!1 &756117797
 GameObject:
   m_ObjectHideFlags: 0

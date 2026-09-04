@@ -8,7 +8,7 @@ using UnityEngine;
 public class BombRunUnitBodyModManager
 {
     private BombRunUnit _unit;
-    private int _maxInventoryCount;
+    [SerializeField] private int _maxInventoryCount;
 
 
     [Header("All Body Mods")]

@@ -1,12 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
-public class InventoryItemSlot : MonoBehaviour
+
+public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private int _slotIndex;
+    [SerializeField] private bool _isSelected;
+
     [Header("Item Details")]
     [SerializeField] private Sprite _sprite;
     [SerializeField] private string _name;
@@ -20,6 +25,14 @@ public class InventoryItemSlot : MonoBehaviour
     [SerializeField] private Image _backgroundImage;
     [SerializeField] private TextMeshProUGUI _itemCountText;
     [SerializeField] private TextMeshProUGUI _equippedIndicator;
+
+    [Header("Selection Colors")]
+    [SerializeField] private Color _notSelected;
+    [SerializeField] private Color _selected;
+    [SerializeField] private Color _mouseOver;
+
+    // Events
+    public static event EventHandler<int> OnAnyItemSlotClickedOn;
 
     public void AddItemToSlot(Sprite sprite, string name, string description, int itemCount = 1)
     {
@@ -106,5 +119,41 @@ public class InventoryItemSlot : MonoBehaviour
     {
         this._isEquipped = isEquipped;
         UpdateIsEquippedIndicator(this._isEquipped);
+    }
+    public bool IsSelected()
+    {
+        return _isSelected;
+    }
+    public void SetIsSelected(bool isSelected)
+    {
+        _isSelected = isSelected;
+    }
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            OnLeftClick();
+        }
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            OnRightClick();
+        }
+    }
+    private void OnLeftClick()
+    {
+        OnAnyItemSlotClickedOn?.Invoke(this, this._slotIndex);
+    }
+    private void OnRightClick()
+    {
+        
+    }
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        // mmouse over
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        //mouse off
     }
 }
