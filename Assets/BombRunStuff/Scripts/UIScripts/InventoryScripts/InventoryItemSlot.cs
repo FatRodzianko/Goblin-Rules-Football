@@ -11,6 +11,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
 {
     [SerializeField] private int _slotIndex;
     [SerializeField] private bool _isSelected;
+    [SerializeField] private bool _mouseOver;
 
     [Header("Item Details")]
     [SerializeField] private Sprite _sprite;
@@ -27,13 +28,30 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     [SerializeField] private TextMeshProUGUI _equippedIndicator;
 
     [Header("Selection Colors")]
-    [SerializeField] private Color _notSelected;
-    [SerializeField] private Color _selected;
-    [SerializeField] private Color _mouseOver;
+    [SerializeField] private Color _notSelectedColor;
+    [SerializeField] private Color _selectedColor;
+    [SerializeField] private Color _mouseOverColor;
 
-    // Events
-    public static event EventHandler<int> OnAnyItemSlotClickedOn;
+    // static Events
+    public static event EventHandler<int> OnAnyItemSlotLeftClickedOn;
 
+    // events
+    private event EventHandler<bool> OnItemSlotSelected;
+
+    private void Awake()
+    {
+        InventoryItemSlot.OnAnyItemSlotLeftClickedOn += InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
+        this.OnItemSlotSelected += InventoryItemSlot_OnItemSlotSelected;
+    }
+
+    
+
+    void OnDisable()
+    {
+        InventoryItemSlot.OnAnyItemSlotLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
+        this.OnItemSlotSelected -= InventoryItemSlot_OnItemSlotSelected;
+    }
+    
     public void AddItemToSlot(Sprite sprite, string name, string description, int itemCount = 1)
     {
         this._sprite = sprite;
@@ -64,7 +82,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     }
     public void UpdateIsEquippedIndicator(bool isEquipped)
     {
-        Debug.Log("UpdateIsEquippedIndicator: " + isEquipped + " " + this._name + " at index: " + this._slotIndex);
+        //Debug.Log("UpdateIsEquippedIndicator: " + isEquipped + " " + this._name + " at index: " + this._slotIndex);
         this._equippedIndicator.gameObject.SetActive(isEquipped);
     }
     public void ClearItem()
@@ -127,6 +145,33 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     public void SetIsSelected(bool isSelected)
     {
         _isSelected = isSelected;
+        OnItemSlotSelected?.Invoke(this, _isSelected);
+
+        
+    }
+    private void InventoryItemSlot_OnItemSlotSelected(object sender, bool selected)
+    {
+        if (selected)
+        {
+            this._backgroundImage.color = _selectedColor;
+        }
+        else
+        {
+            //if (this._backgroundImage.color == _mouseOverColor)
+            //{
+            //    return;
+            //}
+            //this._backgroundImage.color = _notSelectedColor;
+            if (_mouseOver)
+            {
+                this._backgroundImage.color = _mouseOverColor;
+            }
+            else
+            {
+                this._backgroundImage.color = _notSelectedColor;
+            }
+            
+        }
     }
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -141,7 +186,14 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     }
     private void OnLeftClick()
     {
-        OnAnyItemSlotClickedOn?.Invoke(this, this._slotIndex);
+        OnAnyItemSlotLeftClickedOn?.Invoke(this, this._slotIndex);
+    }
+    private void InventoryItemSlot_OnAnyItemSlotLeftClickedOn(object sender, int index)
+    {
+        if (index == this._slotIndex)
+        {
+            
+        }
     }
     private void OnRightClick()
     {
@@ -149,11 +201,22 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // mmouse over
+        _mouseOver = true;
+        if (this._isSelected)
+        {
+            return;
+        }
+
+        this._backgroundImage.color = _mouseOverColor;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        //mouse off
+        _mouseOver = false;
+        if (this._isSelected)
+        {
+            return;
+        }
+        this._backgroundImage.color = _notSelectedColor;
     }
 }

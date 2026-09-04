@@ -94,6 +94,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _slotIndex: 0
+  _isSelected: 0
+  _mouseOver: 0
   _sprite: {fileID: 0}
   _name: 
   _description: 
@@ -104,6 +106,9 @@ MonoBehaviour:
   _backgroundImage: {fileID: 3119087039809846222}
   _itemCountText: {fileID: 4086714659210034946}
   _equippedIndicator: {fileID: 4857961617499429800}
+  _notSelectedColor: {r: 0, g: 0, b: 0, a: 0.29411766}
+  _selectedColor: {r: 1, g: 1, b: 0, a: 1}
+  _mouseOverColor: {r: 1, g: 1, b: 1, a: 0.5019608}
 --- !u!1 &3301738111017996412
 GameObject:
   m_ObjectHideFlags: 0

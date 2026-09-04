@@ -1,8 +1,21 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
+public class BodyModByItemSlot
+{
+    public int SlotIndex;
+    public BodyMod_Class BodyMod;
+
+    public BodyModByItemSlot(int slotIndex, BodyMod_Class bodyMod)
+    {
+        SlotIndex = slotIndex;
+        BodyMod = bodyMod;
+    }
+}
 public class BodyModInventoryUIManager : MonoBehaviour
 {
     [SerializeField] GameObject _bodyModInventoryUIHolder;
@@ -13,6 +26,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     [SerializeField] private Transform _itemSlotPrefab;
     [SerializeField] private List<InventoryItemSlot> _itemSlots = new List<InventoryItemSlot>();
     private Dictionary<int, BodyMod_Class> _bodyModByItemSlot = new Dictionary<int, BodyMod_Class>();
+    //[SerializeField] private List<BodyModByItemSlot> _bodyModByItemSlotClass = new List<BodyModByItemSlot>();
     [SerializeField] private int _numberOfSlots;
 
     [Header("Selected Item")]
@@ -23,14 +37,14 @@ public class BodyModInventoryUIManager : MonoBehaviour
     void Start()
     {
         //CreateItemSlots();
-        InventoryItemSlot.OnAnyItemSlotClickedOn += InventoryItemSlot_OnAnyItemSlotClickedOn;
+        InventoryItemSlot.OnAnyItemSlotLeftClickedOn += InventoryItemSlot_OnAnyItemSlotClickedOn;
     }
 
     
 
     private void OnDisable()
     {
-        InventoryItemSlot.OnAnyItemSlotClickedOn -= InventoryItemSlot_OnAnyItemSlotClickedOn;
+        InventoryItemSlot.OnAnyItemSlotLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotClickedOn;
     }
 
     
@@ -82,6 +96,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     private void ResetBodyModByItemSlot()
     {
         _bodyModByItemSlot.Clear();
+        //_bodyModByItemSlotClass.Clear();
     }
     private void CreateItemSlots(int numberOfSlots)
     {
@@ -109,24 +124,98 @@ public class BodyModInventoryUIManager : MonoBehaviour
                 _itemSlots[i].SetIsEquipped(bodyMods[i].IsEquipped());
 
                 _bodyModByItemSlot.Add(i, bodyMods[i]);
+                //_bodyModByItemSlotClass.Add(new BodyModByItemSlot(i, bodyMods[i]));
             }
+            else
+            {
+                _bodyModByItemSlot.Add(i, null);
+                //_bodyModByItemSlotClass.Add(new BodyModByItemSlot(i, null));
+            }
+            
         }
     }
     private void InventoryItemSlot_OnAnyItemSlotClickedOn(object sender, int index)
     {
         if (!_menuOpen)
             return;
+        if (index < 0)
+            return;
+        if (index >= _itemSlots.Count)
+            return;
 
         if (_selectedItemIndex == index)
         {
             _itemSlots[_selectedItemIndex].SetIsSelected(!_itemSlots[_selectedItemIndex].IsSelected());
             return;
-        }            
+        }
 
+        // make sure the inventorySlot at the selected index is currently selected
+        // if it isn't selected, treat as "stale" and just select the new inventory slot
+        if (!_itemSlots[_selectedItemIndex].IsSelected())
+        {
+            _itemSlots[index].SetIsSelected(true);
+            _selectedItemIndex = index;
+            return;
+        }
+
+        // Check to see if player is trying to move an inventory item to a new slot
+        // Check if _selectedItemIndex has an item in it
+        if (_itemSlots[_selectedItemIndex].HasItem())
+        {
+            // Check if new index is empty, move the old selected item to the new inventory slot?
+            if (!_itemSlots[index].HasItem())
+            {
+                SwapInventoryItemsAtIndexes(_selectedItemIndex, index);
+                _itemSlots[_selectedItemIndex].SetIsSelected(false);
+                _itemSlots[index].SetIsSelected(false);
+                _selectedItemIndex = 0;
+                return;
+            }
+        }
+
+        // All other checks failed so de-select current slot and select new slot
         _itemSlots[_selectedItemIndex].SetIsSelected(false);
         _itemSlots[index].SetIsSelected(true);
 
         _selectedItemIndex = index;
     }
+    private void SwapInventoryItemsAtIndexes(int previousIndex, int newIndex)
+    {
+        //BodyModByItemSlot previousIndexBodyModItemSlot = _bodyModByItemSlotClass?.First(x => x.SlotIndex == previousIndex);
+        //BodyModByItemSlot newIndexBodyModItemSlot = _bodyModByItemSlotClass?.First(x => x.SlotIndex == newIndex);
 
+        //BodyMod_Class previousIndexBodyMod = previousIndexBodyModItemSlot?.BodyMod;
+        //BodyMod_Class newIndexBodyMod = newIndexBodyModItemSlot?.BodyMod;
+
+        // dictionary?
+        BodyMod_Class previousIndexBodyMod = _bodyModByItemSlot[previousIndex];
+        BodyMod_Class newIndexBodyMod = _bodyModByItemSlot[newIndex];
+
+        // swap the item slot contents?
+        if (newIndexBodyMod == null)
+        {
+            _itemSlots[previousIndex].ClearItem();
+        }
+        else
+        {
+            _itemSlots[previousIndex].AddItemToSlot(newIndexBodyMod.Sprite(), newIndexBodyMod.Name(), newIndexBodyMod.Description());
+            _itemSlots[previousIndex].SetIsEquipped(newIndexBodyMod.IsEquipped());
+        }
+
+        if (previousIndexBodyMod == null)
+        {
+            _itemSlots[newIndex].ClearItem();
+        }
+        else
+        {
+            _itemSlots[newIndex].AddItemToSlot(previousIndexBodyMod.Sprite(), previousIndexBodyMod.Name(), previousIndexBodyMod.Description());
+            _itemSlots[newIndex].SetIsEquipped(previousIndexBodyMod.IsEquipped());
+        }        
+
+        //previousIndexBodyModItemSlot.BodyMod = newIndexBodyMod;
+        //newIndexBodyModItemSlot.BodyMod = previousIndexBodyMod;
+
+        _bodyModByItemSlot[previousIndex] = newIndexBodyMod;
+        _bodyModByItemSlot[newIndex] = previousIndexBodyMod;
+    }
 }

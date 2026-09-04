@@ -987,6 +987,14 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - Go through units bodymods
 - - - - - - - - - Add equiped body mods to their appropriate equipment slot
 - - - - - - - - - Add unequiped body mods to the inventory slots
+- - - Use the InventoryItem class to store/cache the inventory slot index of an item?
+- - - - - - Also, try and make the inventoryitem class generic or something that can accept generics?
+- - - - - - - - - So it can store either a bodymod_class or bodymodcomponent_class object?
+- - - - - - - - - And hopefully the inventory ui can just get the necessary data back regardless of item type?
+- - - - - - - - - - - - get name, description, sprite, whatever back?
+- - - - - - - - - - - - Maybe to make this easier, change the BodyMod_Class and BodyModComponent_Class classes inherit from a parent class,
+                        called something like Item_Class. Item_Class requires the basic info share across items (name, description, sprite, whatever)
+						so that the Inventory UI can just ask for a Item_Class object, and get all the info it needs from there regardless of item type?
 
 x Necessary info for the Body Mods (what to put in the scriptable objects?
 - - x Name
@@ -1097,7 +1105,6 @@ https://www.youtube.com/watch?v=oJAE6CbsQQA
 # Inventory system and equipment systm?
  Let's Make An Inventory System In Unity! (Series Intro) 
 https://www.youtube.com/watch?v=0wKB_rxtqh4&list=PLSR2vNOypvs6eIxvTu-rYjw2Eyw57nZrU
-4. https://www.youtube.com/watch?v=naDJPTxvgqc&t=13s
-3:05
+5. https://www.youtube.com/watch?v=GcWN1gZd36E
  1. UI Setup (Let's Make An Equipment System In Unity) 
 https://www.youtube.com/watch?v=Kz2rD2QrBiY&list=PLSR2vNOypvs6LusmsqUek8_uIQyeI1E9M
