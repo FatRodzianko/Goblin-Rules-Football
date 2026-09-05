@@ -4,6 +4,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum InventoryType
+{
+    None,
+    BodyMods,
+    BodyModComponents,
+}
 [Serializable]
 public class BombRunUnitBodyModManager
 {
@@ -19,13 +25,20 @@ public class BombRunUnitBodyModManager
     [Header("Equiped Body Mods")]
     [SerializeField] private List<BodyMod_Class> _equippedBodyMods = new List<BodyMod_Class>();
 
+    [Header("Inventory")]
+    [SerializeField] private Dictionary<int, BodyMod_Class> _inventoryBodyMods = new Dictionary<int, BodyMod_Class>(); // the int key is meant to cache where the item is in the inventory list?
+
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BombRunUnitBodyModManager(BombRunUnit unit, List<ScriptableBodyMod> bodyMods, int maxInventoryCount)
     {
         this._unit = unit;
         //this._bodyMods.AddRange(bodyMods);
-        CreateBodyModClassObjects(bodyMods, _unit);
+
         SetMaxInvetoryCount(maxInventoryCount);
+        CreateInventoryDictionary(maxInventoryCount);
+
+        CreateBodyModClassObjects(bodyMods, _unit);
+        
     }
     private void CreateBodyModClassObjects(List<ScriptableBodyMod> bodyMods, BombRunUnit unit)
     {
@@ -66,6 +79,11 @@ public class BombRunUnitBodyModManager
         }
         else
         {
+            if (CanAddItemToInventory(_inventoryBodyMods, out int index))
+            {
+                _inventoryBodyMods[index] = bodyMod;
+            }
+
             _bodyMods.Add(bodyMod);
             BodyMod_InventoryItem newInventoryItem = new BodyMod_InventoryItem(bodyMod);
             _bodyModDict.Add(bodyMod, newInventoryItem);
@@ -81,6 +99,19 @@ public class BombRunUnitBodyModManager
                 Debug.Log("RemoveBodyMod: No more of: " + bodyMod.Name() + " left in inventory. Removing...");
                 _bodyMods.Remove(bodyMod);
                 _bodyModDict.Remove(bodyMod);
+
+                int indexToRemove = -1;
+                foreach (KeyValuePair<int, BodyMod_Class> item in _inventoryBodyMods)
+                {
+                    if (item.Value == bodyMod)
+                    {
+                        indexToRemove = item.Key;
+                    }
+                }
+                if (indexToRemove > -1)
+                {
+                    _inventoryBodyMods[indexToRemove] = null;
+                }
             }
             else
             {
@@ -108,6 +139,28 @@ public class BombRunUnitBodyModManager
             UnEquipBodyMod(bodyMod);
         }
         bodyMod = null;
+    }
+    private void CreateInventoryDictionary(int size)
+    {
+        _inventoryBodyMods.Clear();
+        for (int i = 0; i < size; i++)
+        {
+            _inventoryBodyMods.Add(i, null);
+        }
+    }
+    private bool CanAddItemToInventory(Dictionary<int,BodyMod_Class> inventory, out int id)
+    {
+        foreach (KeyValuePair<int, BodyMod_Class> item in inventory)
+        {
+            if (item.Value == null)
+            {
+                Debug.Log("CanAddItemToInventory: Can add at index: " + item.Key);
+                id = item.Key;
+                return true;
+            }
+        }
+        id = -1;
+        return false;
     }
     private void BodyModClass_OnBodyModEquipped(object sender, EventArgs e)
     {
@@ -302,5 +355,18 @@ public class BombRunUnitBodyModManager
     public void SetMaxInvetoryCount(int newCount)
     {
         this._maxInventoryCount = newCount;
+    }
+    public Dictionary<int, BodyMod_Class> Inventory_BodyMods()
+    {
+        return _inventoryBodyMods;
+    }
+    public void SetInventoryItemAtIndex(int index, BodyMod_Class bodyMod, InventoryType inventoryType)
+    {
+        switch (inventoryType)
+        {
+            case InventoryType.BodyMods:
+                _inventoryBodyMods[index] = bodyMod;
+                break;
+        }
     }
 }

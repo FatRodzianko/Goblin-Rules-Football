@@ -20,12 +20,14 @@ public class BodyModInventoryUIManager : MonoBehaviour
 {
     [SerializeField] GameObject _bodyModInventoryUIHolder;
     [SerializeField] bool _menuOpen;
+    [SerializeField] BombRunUnitBodyModManager _bodyModManager;
 
     [Header("Item Slots")]
     [SerializeField] private Transform _itemSlotsHolder;
     [SerializeField] private Transform _itemSlotPrefab;
     [SerializeField] private List<InventoryItemSlot> _itemSlots = new List<InventoryItemSlot>();
     private Dictionary<int, BodyMod_Class> _bodyModByItemSlot = new Dictionary<int, BodyMod_Class>();
+    //[SerializeField] private BodyMod_Class[] _bodyModArray;
     //[SerializeField] private List<BodyModByItemSlot> _bodyModByItemSlotClass = new List<BodyModByItemSlot>();
     [SerializeField] private int _numberOfSlots;
 
@@ -70,6 +72,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
         _bodyModInventoryUIHolder.SetActive(false);
         _menuOpen = false;
         _selectedItemIndex = 0;
+        _bodyModManager = null;
     }
     private void OpenInventory()
     {
@@ -82,7 +85,8 @@ public class BodyModInventoryUIManager : MonoBehaviour
 
         DestroyItemSlots();
         ResetBodyModByItemSlot();
-        CreateItemSlots(unit.BodyModManager().MaxInventoryCount());
+        SetBodyModManager(unit.BodyModManager());
+        CreateItemSlots(_bodyModManager.MaxInventoryCount());
         GetInventoryItems(unit);
     }
     private void DestroyItemSlots()
@@ -98,8 +102,13 @@ public class BodyModInventoryUIManager : MonoBehaviour
         _bodyModByItemSlot.Clear();
         //_bodyModByItemSlotClass.Clear();
     }
+    private void SetBodyModManager(BombRunUnitBodyModManager bodyModManager)
+    {
+        this._bodyModManager = bodyModManager;
+    }
     private void CreateItemSlots(int numberOfSlots)
     {
+        //Array.Resize(ref _bodyModArray, numberOfSlots);
         for (int i = 0; i < numberOfSlots; i++)
         {
             Transform newItemSlot = Instantiate(_itemSlotPrefab, _itemSlotsHolder);
@@ -112,27 +121,53 @@ public class BodyModInventoryUIManager : MonoBehaviour
     }
     private void GetInventoryItems(BombRunUnit unit)
     {
-        List<BodyMod_Class> bodyMods = unit.BodyModManager().GetAllBodyMods();
+        ///
+        /// OLD
+        ///
+        //List<BodyMod_Class> bodyMods = unit.BodyModManager().GetAllBodyMods();
+
+        //for (int i = 0; i < _itemSlots.Count; i++)
+        //{
+        //    //_itemSlots[i].ClearItem();
+
+        //    if (bodyMods.Count > i)
+        //    {
+        //        _itemSlots[i].AddItemToSlot(bodyMods[i].Sprite(), bodyMods[i].Name(), bodyMods[i].Description());
+        //        _itemSlots[i].SetIsEquipped(bodyMods[i].IsEquipped());
+
+        //        _bodyModByItemSlot.Add(i, bodyMods[i]);
+        //        //_bodyModByItemSlotClass.Add(new BodyModByItemSlot(i, bodyMods[i]));
+        //        //_bodyModArray[i] = bodyMods[i];
+        //    }
+        //    else
+        //    {
+        //        _bodyModByItemSlot.Add(i, null);
+        //        //_bodyModArray[i] = null;
+        //        //_bodyModByItemSlotClass.Add(new BodyModByItemSlot(i, null));
+        //    }
+            
+        //}
+        //
+        // OLD
+        //
 
         for (int i = 0; i < _itemSlots.Count; i++)
         {
-            //_itemSlots[i].ClearItem();
-
-            if (bodyMods.Count > i)
+            if (unit.BodyModManager().Inventory_BodyMods()[i] == null)
             {
-                _itemSlots[i].AddItemToSlot(bodyMods[i].Sprite(), bodyMods[i].Name(), bodyMods[i].Description());
-                _itemSlots[i].SetIsEquipped(bodyMods[i].IsEquipped());
-
-                _bodyModByItemSlot.Add(i, bodyMods[i]);
-                //_bodyModByItemSlotClass.Add(new BodyModByItemSlot(i, bodyMods[i]));
+                _itemSlots[i].ClearItem();
+                Debug.Log("GetInventoryItems: item NOT FOUND at index: " + i + " . Clearing...");
             }
             else
             {
-                _bodyModByItemSlot.Add(i, null);
-                //_bodyModByItemSlotClass.Add(new BodyModByItemSlot(i, null));
+                BodyMod_Class bodyMod = unit.BodyModManager().Inventory_BodyMods()[i];
+                _itemSlots[i].AddItemToSlot(bodyMod.Sprite(), bodyMod.Name(), bodyMod.Description());
+                _itemSlots[i].SetIsEquipped(bodyMod.IsEquipped());
+                Debug.Log("GetInventoryItems: item found at index: " + i);
             }
-            
         }
+
+
     }
     private void InventoryItemSlot_OnAnyItemSlotClickedOn(object sender, int index)
     {
@@ -165,7 +200,8 @@ public class BodyModInventoryUIManager : MonoBehaviour
             // Check if new index is empty, move the old selected item to the new inventory slot?
             if (!_itemSlots[index].HasItem())
             {
-                SwapInventoryItemsAtIndexes(_selectedItemIndex, index);
+                //SwapInventoryItemsAtIndexes(_selectedItemIndex, index);
+                SwapInventoryItemsAtIndexes_BodyModManager(_selectedItemIndex, index);
                 _itemSlots[_selectedItemIndex].SetIsSelected(false);
                 _itemSlots[index].SetIsSelected(false);
                 _selectedItemIndex = 0;
@@ -191,6 +227,10 @@ public class BodyModInventoryUIManager : MonoBehaviour
         BodyMod_Class previousIndexBodyMod = _bodyModByItemSlot[previousIndex];
         BodyMod_Class newIndexBodyMod = _bodyModByItemSlot[newIndex];
 
+        // array?
+        //BodyMod_Class previousIndexBodyMod = _bodyModArray[previousIndex];
+        //BodyMod_Class newIndexBodyMod = _bodyModArray[newIndex];
+
         // swap the item slot contents?
         if (newIndexBodyMod == null)
         {
@@ -210,12 +250,52 @@ public class BodyModInventoryUIManager : MonoBehaviour
         {
             _itemSlots[newIndex].AddItemToSlot(previousIndexBodyMod.Sprite(), previousIndexBodyMod.Name(), previousIndexBodyMod.Description());
             _itemSlots[newIndex].SetIsEquipped(previousIndexBodyMod.IsEquipped());
-        }        
+        }
 
+        // list of classes
         //previousIndexBodyModItemSlot.BodyMod = newIndexBodyMod;
         //newIndexBodyModItemSlot.BodyMod = previousIndexBodyMod;
 
+        // dictionary
         _bodyModByItemSlot[previousIndex] = newIndexBodyMod;
         _bodyModByItemSlot[newIndex] = previousIndexBodyMod;
+
+        // array
+        //_bodyModArray[previousIndex] = newIndexBodyMod;
+        //_bodyModArray[newIndex] = previousIndexBodyMod;
+    }
+    private void SwapInventoryItemsAtIndexes_BodyModManager(int previousIndex, int newIndex)
+    {
+        if (_bodyModManager == null)
+            return;
+
+        BodyMod_Class previousIndexBodyMod = _bodyModManager.Inventory_BodyMods()[previousIndex];
+        BodyMod_Class newIndexBodyMod = _bodyModManager.Inventory_BodyMods()[newIndex];
+
+        if (newIndexBodyMod == null)
+        {
+            _itemSlots[previousIndex].ClearItem();
+        }
+        else
+        {
+            _itemSlots[previousIndex].AddItemToSlot(newIndexBodyMod.Sprite(), newIndexBodyMod.Name(), newIndexBodyMod.Description());
+            _itemSlots[previousIndex].SetIsEquipped(newIndexBodyMod.IsEquipped());
+        }
+
+        if (previousIndexBodyMod == null)
+        {
+            _itemSlots[newIndex].ClearItem();
+        }
+        else
+        {
+            _itemSlots[newIndex].AddItemToSlot(previousIndexBodyMod.Sprite(), previousIndexBodyMod.Name(), previousIndexBodyMod.Description());
+            _itemSlots[newIndex].SetIsEquipped(previousIndexBodyMod.IsEquipped());
+        }
+
+        //_bodyModManager.Inventory_BodyMods()[previousIndex] = newIndexBodyMod;
+        //_bodyModManager.Inventory_BodyMods()[newIndex] = previousIndexBodyMod;
+        _bodyModManager.SetInventoryItemAtIndex(previousIndex, newIndexBodyMod, InventoryType.BodyMods);
+        _bodyModManager.SetInventoryItemAtIndex(newIndex, previousIndexBodyMod, InventoryType.BodyMods);
+
     }
 }
