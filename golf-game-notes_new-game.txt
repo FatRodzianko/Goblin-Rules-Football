@@ -1105,6 +1105,6 @@ https://www.youtube.com/watch?v=oJAE6CbsQQA
 # Inventory system and equipment systm?
  Let's Make An Inventory System In Unity! (Series Intro) 
 https://www.youtube.com/watch?v=0wKB_rxtqh4&list=PLSR2vNOypvs6eIxvTu-rYjw2Eyw57nZrU
-5. https://www.youtube.com/watch?v=GcWN1gZd36E
+6. https://www.youtube.com/watch?v=2nTUFWTgS0g
  1. UI Setup (Let's Make An Equipment System In Unity) 
 https://www.youtube.com/watch?v=Kz2rD2QrBiY&list=PLSR2vNOypvs6LusmsqUek8_uIQyeI1E9M

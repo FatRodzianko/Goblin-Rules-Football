@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 [Serializable]
 public class BodyModByItemSlot
@@ -34,12 +36,21 @@ public class BodyModInventoryUIManager : MonoBehaviour
     [Header("Selected Item")]
     [SerializeField] private int _selectedItemIndex = 0;
 
+    [Header("Item Description UI")]
+    [SerializeField] private Image _itemDescription_Image;
+    [SerializeField] private TextMeshProUGUI _itemDescription_NameText;
+    [SerializeField] private TextMeshProUGUI _itemDescription_DescriptionText;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        CloseInventory();
         //CreateItemSlots();
         InventoryItemSlot.OnAnyItemSlotLeftClickedOn += InventoryItemSlot_OnAnyItemSlotClickedOn;
+        InventoryItemSlot.OnAnyItemIsSelected += InventoryItemSlot_OnAnyItemIsSelected;
+        InventoryItemSlot.OnAnyItemMousedOver += InventoryItemSlot_OnAnyItemMousedOver;
+        InventoryItemSlot.OnAnyItemMouseExit += InventoryItemSlot_OnAnyItemMouseExit;
     }
 
     
@@ -47,6 +58,9 @@ public class BodyModInventoryUIManager : MonoBehaviour
     private void OnDisable()
     {
         InventoryItemSlot.OnAnyItemSlotLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotClickedOn;
+        InventoryItemSlot.OnAnyItemIsSelected -= InventoryItemSlot_OnAnyItemIsSelected;
+        InventoryItemSlot.OnAnyItemMousedOver -= InventoryItemSlot_OnAnyItemMousedOver;
+        InventoryItemSlot.OnAnyItemMouseExit -= InventoryItemSlot_OnAnyItemMouseExit;
     }
 
     
@@ -71,7 +85,9 @@ public class BodyModInventoryUIManager : MonoBehaviour
     {
         _bodyModInventoryUIHolder.SetActive(false);
         _menuOpen = false;
-        _selectedItemIndex = 0;
+        //_selectedItemIndex = 0;
+        //SetSelectedItemIndex(0);
+        ResetSelectedItem();
         _bodyModManager = null;
     }
     private void OpenInventory()
@@ -86,6 +102,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
         DestroyItemSlots();
         ResetBodyModByItemSlot();
         SetBodyModManager(unit.BodyModManager());
+        ClearItemDescriptionDetails();
         CreateItemSlots(_bodyModManager.MaxInventoryCount());
         GetInventoryItems(unit);
     }
@@ -169,6 +186,19 @@ public class BodyModInventoryUIManager : MonoBehaviour
 
 
     }
+    public int GetSelectedItemIndex()
+    {
+        return _selectedItemIndex;
+    }
+    private void SetSelectedItemIndex(int index)
+    {
+        _selectedItemIndex = index;
+    }
+    private void ResetSelectedItem()
+    {
+        _selectedItemIndex = 0;
+        ClearItemDescriptionDetails();
+    }
     private void InventoryItemSlot_OnAnyItemSlotClickedOn(object sender, int index)
     {
         if (!_menuOpen)
@@ -181,6 +211,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
         if (_selectedItemIndex == index)
         {
             _itemSlots[_selectedItemIndex].SetIsSelected(!_itemSlots[_selectedItemIndex].IsSelected());
+            CheckIfItemDescriptionShouldReset(_selectedItemIndex);
             return;
         }
 
@@ -189,7 +220,8 @@ public class BodyModInventoryUIManager : MonoBehaviour
         if (!_itemSlots[_selectedItemIndex].IsSelected())
         {
             _itemSlots[index].SetIsSelected(true);
-            _selectedItemIndex = index;
+            //_selectedItemIndex = index;
+            SetSelectedItemIndex(index);
             return;
         }
 
@@ -204,7 +236,10 @@ public class BodyModInventoryUIManager : MonoBehaviour
                 SwapInventoryItemsAtIndexes_BodyModManager(_selectedItemIndex, index);
                 _itemSlots[_selectedItemIndex].SetIsSelected(false);
                 _itemSlots[index].SetIsSelected(false);
-                _selectedItemIndex = 0;
+                //_selectedItemIndex = 0;
+                //SetSelectedItemIndex(0);
+                //ResetSelectedItem();
+                CheckIfItemDescriptionShouldReset(index);
                 return;
             }
         }
@@ -213,7 +248,90 @@ public class BodyModInventoryUIManager : MonoBehaviour
         _itemSlots[_selectedItemIndex].SetIsSelected(false);
         _itemSlots[index].SetIsSelected(true);
 
-        _selectedItemIndex = index;
+        //_selectedItemIndex = index;
+        SetSelectedItemIndex(index);
+    }
+    private void InventoryItemSlot_OnAnyItemIsSelected(object sender, EventArgs e)
+    {
+        InventoryItemSlot selectedItem = sender as InventoryItemSlot;
+        if (!selectedItem.IsSelected())
+            return;
+
+        if (!selectedItem.HasItem())
+        {
+            ClearItemDescriptionDetails();
+            return;
+        }
+
+
+        SetItemDescriptionDetails(selectedItem.Sprite(), selectedItem.Name(), selectedItem.Description());
+    }
+    private void InventoryItemSlot_OnAnyItemMousedOver(object sender, int index)
+    {
+        if (index > _itemSlots.Count)
+        {
+            return;
+        }
+
+        if (_itemSlots[index].HasItem())
+        {
+            SetItemDescriptionDetails(_itemSlots[index].Sprite(), _itemSlots[index].Name(), _itemSlots[index].Description());
+        }
+        else
+        {
+            if (_itemSlots[_selectedItemIndex].IsSelected())
+            {
+                if (_itemSlots[_selectedItemIndex].HasItem())
+                {
+                    SetItemDescriptionDetails(_itemSlots[_selectedItemIndex].Sprite(), _itemSlots[_selectedItemIndex].Name(), _itemSlots[_selectedItemIndex].Description());
+                }
+                else
+                {
+                    ClearItemDescriptionDetails();
+                }
+            }
+            else
+            {
+                ClearItemDescriptionDetails();
+            }
+        }
+
+    }
+    private void InventoryItemSlot_OnAnyItemMouseExit(object sender, int index)
+    {
+        if (_itemSlots[_selectedItemIndex].IsSelected() && _itemSlots[_selectedItemIndex].HasItem())
+        {
+            SetItemDescriptionDetails(_itemSlots[_selectedItemIndex].Sprite(), _itemSlots[_selectedItemIndex].Name(), _itemSlots[_selectedItemIndex].Description());
+        }
+        else
+        {
+            ClearItemDescriptionDetails();
+        }
+    }
+    private void ClearItemDescriptionDetails()
+    {
+        _itemDescription_Image.enabled = false;
+        _itemDescription_NameText.text = "";
+        _itemDescription_DescriptionText.text = "";
+    }
+    private void SetItemDescriptionDetails(Sprite sprite, string name, string description)
+    {
+        _itemDescription_Image.sprite = sprite;
+        _itemDescription_NameText.text = name;
+        _itemDescription_DescriptionText.text = description;
+
+        _itemDescription_Image.enabled = true;
+    }
+    private void CheckIfItemDescriptionShouldReset(int index)
+    {
+        if (_itemSlots[index].HasItem())
+        {
+            SetItemDescriptionDetails(_itemSlots[index].Sprite(), _itemSlots[index].Name(), _itemSlots[index].Description());
+        }
+        else
+        {
+            ResetSelectedItem();
+        }
     }
     private void SwapInventoryItemsAtIndexes(int previousIndex, int newIndex)
     {
@@ -292,8 +410,6 @@ public class BodyModInventoryUIManager : MonoBehaviour
             _itemSlots[newIndex].SetIsEquipped(previousIndexBodyMod.IsEquipped());
         }
 
-        //_bodyModManager.Inventory_BodyMods()[previousIndex] = newIndexBodyMod;
-        //_bodyModManager.Inventory_BodyMods()[newIndex] = previousIndexBodyMod;
         _bodyModManager.SetInventoryItemAtIndex(previousIndex, newIndexBodyMod, InventoryType.BodyMods);
         _bodyModManager.SetInventoryItemAtIndex(newIndex, previousIndexBodyMod, InventoryType.BodyMods);
 

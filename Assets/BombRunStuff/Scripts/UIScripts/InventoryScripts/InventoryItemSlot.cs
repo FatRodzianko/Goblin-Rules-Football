@@ -34,6 +34,9 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
 
     // static Events
     public static event EventHandler<int> OnAnyItemSlotLeftClickedOn;
+    public static event EventHandler OnAnyItemIsSelected;
+    public static event EventHandler<int> OnAnyItemMousedOver;
+    public static event EventHandler<int> OnAnyItemMouseExit;
 
     // events
     private event EventHandler<bool> OnItemSlotSelected;
@@ -145,15 +148,14 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     public void SetIsSelected(bool isSelected)
     {
         _isSelected = isSelected;
-        OnItemSlotSelected?.Invoke(this, _isSelected);
-
-        
+        OnItemSlotSelected?.Invoke(this, _isSelected);        
     }
     private void InventoryItemSlot_OnItemSlotSelected(object sender, bool selected)
     {
         if (selected)
         {
             this._backgroundImage.color = _selectedColor;
+            OnAnyItemIsSelected?.Invoke(this, EventArgs.Empty);
         }
         else
         {
@@ -202,6 +204,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     public void OnPointerEnter(PointerEventData eventData)
     {
         _mouseOver = true;
+        OnAnyItemMousedOver?.Invoke(this, _slotIndex);
         if (this._isSelected)
         {
             return;
@@ -213,10 +216,15 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     public void OnPointerExit(PointerEventData eventData)
     {
         _mouseOver = false;
+        OnAnyItemMouseExit?.Invoke(this, _slotIndex);
         if (this._isSelected)
         {
             return;
         }
         this._backgroundImage.color = _notSelectedColor;
+    }
+    public bool MouseOver()
+    {
+        return _mouseOver;
     }
 }
