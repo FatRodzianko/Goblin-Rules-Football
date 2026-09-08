@@ -40,15 +40,17 @@ public class BodyModComponentRequirement
     }
 }
 [CreateAssetMenu(fileName = "ScriptableBodyMod", menuName = "BombRun/BodyMods/New Scriptable BodyMod")]
-public class ScriptableBodyMod : ScriptableObject
+public class ScriptableBodyMod: ScriptableItem
 {
-    [Header("Details")]
-    [SerializeField] private string _name;
-    [SerializeField] private Sprite _sprite;
-    [SerializeField] private string _description;
+    //[Header("Details")]
+    //[SerializeField] private string _name;
+    //[SerializeField] private Sprite _sprite;
+    //[SerializeField] private string _description;
 
+    //
+    //[SerializeField] private BodyPart _bodyPart;
+    [Header("Start: BodyMod")]
     [Header("Stat Modifiers")]
-    [SerializeField] private BodyPart _bodyPart;
     [SerializeField] private List<BodyModStatModifier> _bodyModStatModifiers = new List<BodyModStatModifier>();
 
     [Header("Noise Modifiers")]
@@ -61,22 +63,22 @@ public class ScriptableBodyMod : ScriptableObject
     [SerializeField] private List<BodyModComponentRequirement> _bodyModComponentRequirements = new List<BodyModComponentRequirement>();
     [SerializeField] private List<ScriptableBodyModComponent> _requiredBodyModyComponents = new List<ScriptableBodyModComponent>();
 
-    public string Name()
-    {
-        return _name;
-    }
-    public Sprite Sprite()
-    {
-        return _sprite;
-    }
-    public string Description()
-    {
-        return _description;
-    }
-    public BodyPart BodyPart()
-    {
-        return _bodyPart;
-    }
+    //public string Name()
+    //{
+    //    return _name;
+    //}
+    //public Sprite Sprite()
+    //{
+    //    return _sprite;
+    //}
+    //public string Description()
+    //{
+    //    return _description;
+    //}
+    //public BodyPart BodyPart()
+    //{
+    //    return _bodyPart;
+    //}
     public float NoiseModifier()
     {
         return _noiseModifier;

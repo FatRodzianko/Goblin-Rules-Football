@@ -50918,6 +50918,7 @@ MonoBehaviour:
   _itemDescription_Image: {fileID: 2006799168}
   _itemDescription_NameText: {fileID: 2072869457}
   _itemDescription_DescriptionText: {fileID: 911861157}
+  _currentInventoryType: 0
 --- !u!1 &756117797
 GameObject:
   m_ObjectHideFlags: 0

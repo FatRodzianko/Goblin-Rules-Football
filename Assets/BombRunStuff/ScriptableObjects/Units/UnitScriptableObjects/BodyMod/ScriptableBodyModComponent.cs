@@ -15,37 +15,39 @@ public enum BodyModComponentType
 }
 
 [CreateAssetMenu(fileName = "ScriptableBodyModComponent", menuName = "BombRun/BodyMods/New Scriptable BodyMod Component")]
-public class ScriptableBodyModComponent : ScriptableObject
+public class ScriptableBodyModComponent : ScriptableItem
 {
-    [Header("Details")]
-    [SerializeField] private string _name;
-    [SerializeField] private Sprite _sprite;
-    [SerializeField] private string _description;
+    //[Header("Details")]
+    //[SerializeField] private string _name;
+    //[SerializeField] private Sprite _sprite;
+    //[SerializeField] private string _description;
 
-    [Header("Stat Modifiers")]
-    [SerializeField] private BodyPart _bodyPart;
+    //[Header("Stat Modifiers")]
+    //[SerializeField] private BodyPart _bodyPart;
+
+    [Header("Start: BodyModComponent")]
 
     [Header("Component Specifics")]
     [SerializeField] private BodyModComponentType _bodyModComponentType;
     [SerializeField] private int _componentTierLevel;
     [SerializeField] private bool _hasAnimationEffect;
 
-    public string Name()
-    {
-        return _name;
-    }
-    public Sprite Sprite()
-    {
-        return _sprite;
-    }
-    public string Description()
-    {
-        return _description;
-    }
-    public BodyPart BodyPart()
-    {
-        return _bodyPart;
-    }
+    //public string Name()
+    //{
+    //    return _name;
+    //}
+    //public Sprite Sprite()
+    //{
+    //    return _sprite;
+    //}
+    //public string Description()
+    //{
+    //    return _description;
+    //}
+    //public BodyPart BodyPart()
+    //{
+    //    return _bodyPart;
+    //}
     public BodyModComponentType BodyPartComponentType()
     {
         return _bodyModComponentType;

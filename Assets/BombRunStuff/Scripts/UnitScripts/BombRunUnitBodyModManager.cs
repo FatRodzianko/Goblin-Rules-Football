@@ -360,12 +360,12 @@ public class BombRunUnitBodyModManager
     {
         return _inventoryBodyMods;
     }
-    public void SetInventoryItemAtIndex(int index, BodyMod_Class bodyMod, InventoryType inventoryType)
+    public void SetInventoryItemAtIndex(int index, BombRun_Item_Class item, InventoryType inventoryType)
     {
         switch (inventoryType)
         {
             case InventoryType.BodyMods:
-                _inventoryBodyMods[index] = bodyMod;
+                _inventoryBodyMods[index] = item as BodyMod_Class;
                 break;
         }
     }

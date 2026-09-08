@@ -4,19 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class BodyMod_Class
+public class BodyMod_Class: BombRun_Item_Class
 {
-    [SerializeField] private BombRunUnit _unit;
+    //[SerializeField] private BombRunUnit _unit;
+    [Header("Start: BodyMod_Class")]
     [SerializeField] private ScriptableBodyMod _bodyModScriptable;
     [SerializeField] private bool _isEquipped;
 
-    [Header("Details")]
-    [SerializeField] private string _name;
-    [SerializeField] private Sprite _sprite;
-    [SerializeField] private string _description;
+    //[Header("Details")]
+    //[SerializeField] private string _name;
+    //[SerializeField] private Sprite _sprite;
+    //[SerializeField] private string _description;
 
     [Header("Stat Modifiers")]
-    [SerializeField] private BodyPart _bodyPart;
+    //[SerializeField] private BodyPart _bodyPart;
     [SerializeField] private List<BodyModStatModifier> _bodyModStatModifiers = new List<BodyModStatModifier>();
 
     [Header("Noise Modifiers")]
@@ -35,7 +36,7 @@ public class BodyMod_Class
     public event EventHandler OnBodyModDestroyed;
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
-    public BodyMod_Class(ScriptableBodyMod bodyModScript, BombRunUnit unit)
+    public BodyMod_Class(ScriptableBodyMod bodyModScript, BombRunUnit unit) : base(bodyModScript, unit)
     {
         this._bodyModScriptable = bodyModScript;
         this._unit = unit;

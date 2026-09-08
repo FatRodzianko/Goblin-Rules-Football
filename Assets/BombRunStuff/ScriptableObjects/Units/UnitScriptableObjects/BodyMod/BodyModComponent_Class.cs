@@ -4,18 +4,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class BodyModComponent_Class
+public class BodyModComponent_Class: BombRun_Item_Class
 {
+    [Header("Start: BodyMod_Class")]
     [SerializeField] private ScriptableBodyModComponent _bodyModComponentScriptableObject;
     [SerializeField] private BodyMod_Class _bodyMod;
 
-    [Header("Details")]
-    [SerializeField] private string _name;
-    [SerializeField] private Sprite _sprite;
-    [SerializeField] private string _description;
+    //[Header("Details")]
+    //[SerializeField] private string _name;
+    //[SerializeField] private Sprite _sprite;
+    //[SerializeField] private string _description;
 
-    [Header("Stat Modifiers")]
-    [SerializeField] private BodyPart _bodyPart;
+    //[Header("Stat Modifiers")]
+    //[SerializeField] private BodyPart _bodyPart;
 
     [Header("Component Specifics")]
     [SerializeField] private BodyModComponentType _bodyPartComponentType;
@@ -23,7 +24,7 @@ public class BodyModComponent_Class
     [SerializeField] private bool _hasAnimationEffect;
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
-    public BodyModComponent_Class(ScriptableBodyModComponent bodyModComponentScriptableObject, BodyMod_Class bodyMod)
+    public BodyModComponent_Class(ScriptableBodyModComponent bodyModComponentScriptableObject, BodyMod_Class bodyMod) : base(bodyModComponentScriptableObject, bodyMod.Unit())
     {
         this._bodyModComponentScriptableObject = bodyModComponentScriptableObject;
         this._bodyMod = bodyMod;
