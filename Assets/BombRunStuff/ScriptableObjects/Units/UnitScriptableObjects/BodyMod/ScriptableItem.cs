@@ -13,6 +13,9 @@ public class ScriptableItem : ScriptableObject
     [Header("Base Item Body Parts")]
     [SerializeField] protected BodyPart _bodyPart;
 
+    [Header("Item Stack/Count")]
+    [SerializeField] protected bool _stackable;
+
     public string Name()
     {
         return _name;
@@ -28,5 +31,9 @@ public class ScriptableItem : ScriptableObject
     public BodyPart BodyPart()
     {
         return _bodyPart;
+    }
+    public bool Stackable()
+    {
+        return _stackable;
     }
 }

@@ -153,6 +153,7 @@ public class BombRunUnitSpawner : MonoBehaviour
         //unitScript.SetHearingSensitivity(unit.HearingSensitivity());
         unitScript.InitializeUnitBaseStats(unit.BaseStatsScriptableObject());
         unitScript.InitializeUnitBodyMods(unit.BodyMods(), unit.InventoryCount());
+        unitScript.InitializeUnitBodyModComponents(unit.BodyModComponents());
         // Change these to some sort of "Unit Set Base Stats" function where the base stats scriptable object is passed to the unit
         unitScript.SetIsEnemy(isEnemy);
 

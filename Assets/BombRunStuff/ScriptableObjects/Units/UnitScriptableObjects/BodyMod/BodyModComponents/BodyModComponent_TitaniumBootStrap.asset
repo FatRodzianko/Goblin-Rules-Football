@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: BodyModComponent_TitaniumBootStrap
   m_EditorClassIdentifier: 
   _name: Titaniam Boot Strap
-  _sprite: {fileID: 0}
+  _sprite: {fileID: 21300000, guid: c7cfc0ee26cf8974ca2115eb9a3f1566, type: 3}
   _description: Enhanced boot strap to handle excessive forces
   _bodyPart: 3
+  _stackable: 1
   _bodyModComponentType: 1
   _componentTierLevel: 0
   _hasAnimationEffect: 0

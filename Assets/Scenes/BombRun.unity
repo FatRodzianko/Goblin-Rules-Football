@@ -50910,6 +50910,7 @@ MonoBehaviour:
     _maxInventoryCount: 0
     _bodyMods: []
     _equippedBodyMods: []
+    _bodyModComponents: []
   _itemSlotsHolder: {fileID: 2121910381}
   _itemSlotPrefab: {fileID: 3119087039809846223, guid: ef48b705fa4cc934c885fa2c26932e8d, type: 3}
   _itemSlots: []
@@ -56210,6 +56211,7 @@ GameObject:
   - component: {fileID: 2121910382}
   - component: {fileID: 2121910384}
   - component: {fileID: 2121910385}
+  - component: {fileID: 2121910386}
   m_Layer: 5
   m_Name: InventorySlots
   m_TagString: Untagged
@@ -56319,6 +56321,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &2121910386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2121910380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShowMaskGraphic: 1
 --- !u!1001 &2126580726
 PrefabInstance:
   m_ObjectHideFlags: 0

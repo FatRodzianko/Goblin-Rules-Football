@@ -7,29 +7,31 @@ using UnityEngine;
 public class BombRun_Item_Class
 {
     [Header("Base Item ")]
-    [SerializeField] protected BombRunUnit _unit;
     [SerializeField] protected ScriptableItem _itemScriptable;
 
     [Header("Base Item Details")]
     [SerializeField] protected string _name;
     [SerializeField] protected Sprite _sprite;
     [SerializeField] protected string _description;
+    
 
     [Header("Base Item Stat Modifiers")]
     [SerializeField] protected BodyPart _bodyPart;
 
-    public BombRun_Item_Class(ScriptableItem itemScript, BombRunUnit unit)
+    [Header("Item Stack/Count")]
+    [SerializeField] protected bool _stackable;
+    [SerializeField] protected int _stackSize;
+
+
+    public BombRun_Item_Class(ScriptableItem itemScript)
     {
         this._itemScriptable = itemScript;
-        this._unit = unit;
 
         this._name = itemScript.Name();
         this._sprite = itemScript.Sprite();
         this._description = itemScript.Description();
-    }
-    public BombRunUnit Unit()
-    {
-        return _unit;
+
+        this._stackable = itemScript.Stackable();
     }
     public string Name()
     {
@@ -70,5 +72,30 @@ public class BombRun_Item_Class
     public void SetScriptableItem(ScriptableItem scriptableItem)
     {
         this._itemScriptable = scriptableItem;
+    }
+    public int StackSize()
+    {
+        return _stackSize;
+    }
+    public void AddToStack(int amount)
+    {
+        _stackSize += amount;
+        Debug.Log("BombRun_Item_Class: AddToStack: " + this._name + " Adding: " + amount + " to stack. Stack size is now: " + _stackSize);
+    }
+    public void RemoveFromItemCount(int amount)
+    {
+        _stackSize -= amount;
+    }
+    public void SetItemCount(int newCount)
+    {
+        _stackSize = newCount;
+    }
+    public bool Stackable()
+    {
+        return _stackable;
+    }
+    public void SetStackable(bool newStackable)
+    {
+        _stackable = newStackable;
     }
 }

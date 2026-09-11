@@ -24,7 +24,7 @@ public class BodyModComponent_Class: BombRun_Item_Class
     [SerializeField] private bool _hasAnimationEffect;
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
-    public BodyModComponent_Class(ScriptableBodyModComponent bodyModComponentScriptableObject, BodyMod_Class bodyMod) : base(bodyModComponentScriptableObject, bodyMod.Unit())
+    public BodyModComponent_Class(ScriptableBodyModComponent bodyModComponentScriptableObject, BodyMod_Class bodyMod) : base(bodyModComponentScriptableObject)
     {
         this._bodyModComponentScriptableObject = bodyModComponentScriptableObject;
         this._bodyMod = bodyMod;
@@ -40,22 +40,7 @@ public class BodyModComponent_Class: BombRun_Item_Class
         this._hasAnimationEffect = _bodyModComponentScriptableObject.HasAnimationEffect();
 
     }
-    //public string Name()
-    //{
-    //    return _name;
-    //}
-    //public Sprite Sprite()
-    //{
-    //    return _sprite;
-    //}
-    //public string Description()
-    //{
-    //    return _description;
-    //}
-    //public BodyPart BodyPart()
-    //{
-    //    return _bodyPart;
-    //}
+
     public BodyModComponentType BodyPartComponentType()
     {
         return _bodyPartComponentType;

@@ -97,6 +97,7 @@ public class BombRunUnit : MonoBehaviour
 
     [Header("Body Mods")]
     [SerializeField] private ScriptableBodyMod _testToAddBodyMod;
+    [SerializeField] private ScriptableBodyModComponent _testComponentToAdd;
     [SerializeField] private BombRunUnitBodyModManager _bodyModManager;
     [SerializeField] private int _inventoryCount;
     
@@ -242,6 +243,15 @@ public class BombRunUnit : MonoBehaviour
                 {
                     _bodyModManager.AddNewTestBodyMod(_testToAddBodyMod);
                 }
+                if (Input.GetKeyDown(KeyCode.Equals))
+                {
+                    _bodyModManager.AddNewTestBodyModComponent(_testComponentToAdd);
+                }
+                if (Input.GetKeyDown(KeyCode.Minus))
+                {
+                    _bodyModManager.RemoveNewTestBodyModComponent();
+                }
+
             }
         }
     }
@@ -516,6 +526,13 @@ public class BombRunUnit : MonoBehaviour
     public void InitializeUnitBodyMods(List<ScriptableBodyMod> bodyMods, int inventoryCount)
     {
         _bodyModManager = new BombRunUnitBodyModManager(this, bodyMods, inventoryCount);
+    }
+    public void InitializeUnitBodyModComponents(List<ScriptableBodyModComponent> bodyModComponents)
+    {
+        if (_bodyModManager == null)
+            return;
+
+        _bodyModManager.CreateBodyModComponetClassObjects(bodyModComponents);
     }
     public BombRunUnitBodyModManager BodyModManager()
     {

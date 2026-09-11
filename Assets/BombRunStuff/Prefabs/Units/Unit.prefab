@@ -1165,9 +1165,13 @@ MonoBehaviour:
     _actionsModifyingNoiseAdditive: []
     _actionsModifyingNoiseMultiply: []
   _testToAddBodyMod: {fileID: 11400000, guid: 9a4d7f0f98870b34380b01b771561d65, type: 2}
+  _testComponentToAdd: {fileID: 11400000, guid: 4e8d7e3db7d784e47a6623aa7b3caf03, type: 2}
   _bodyModManager:
+    _maxInventoryCount: 0
     _bodyMods: []
     _equippedBodyMods: []
+    _bodyModComponents: []
+  _inventoryCount: 0
 --- !u!114 &7297105716296972232
 MonoBehaviour:
   m_ObjectHideFlags: 0

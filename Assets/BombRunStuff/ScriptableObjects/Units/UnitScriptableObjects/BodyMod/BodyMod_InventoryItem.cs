@@ -6,12 +6,12 @@ using UnityEngine;
 [Serializable]
 public class BodyMod_InventoryItem
 {
-    private BodyMod_Class _bodyMod;
+    private BombRun_Item_Class _item;
     private int _stackSize;
 
-    public BodyMod_InventoryItem(BodyMod_Class bodyMod)
+    public BodyMod_InventoryItem(BombRun_Item_Class item)
     {
-        this._bodyMod = bodyMod;
+        this._item = item;
         AddToStack();
     }
     public void AddToStack()
@@ -22,9 +22,9 @@ public class BodyMod_InventoryItem
     {
         _stackSize--;
     }
-    public BodyMod_Class BodyMod()
+    public BombRun_Item_Class BodyMod()
     {
-        return _bodyMod;
+        return _item;
     }
     public int StackSize()
     {

@@ -49,7 +49,8 @@ public class BombRunUnitBodyModManager
         foreach (ScriptableBodyMod bodyMod in bodyMods)
         {
             BodyMod_Class bodyModClass = new BodyMod_Class(bodyMod, unit);
-            if (!_bodyMods.Contains(bodyModClass))
+            //if (!_bodyMods.Contains(bodyModClass))
+            if(!_bodyMods.Any(x => x.ItemScriptable() == bodyModClass.ItemScriptable()))
             {
                 //_bodyMods.Add(bodyModClass);
                 AddBodyMod(bodyModClass);
@@ -83,14 +84,70 @@ public class BombRunUnitBodyModManager
         }
         else
         {
-            if (CanAddItemToInventory(_inventoryBodyMods, out int index))
+            if (CanAddItemToInventory(_inventoryBodyMods, bodyMod, out int index))
             {
-                _inventoryBodyMods[index] = bodyMod;
+                //_inventoryBodyMods[index] = bodyMod;
+                SetInventoryItemAtIndex(index, bodyMod, InventoryType.BodyMods);
+
+                _bodyMods.Add(bodyMod);
+                BodyMod_InventoryItem newInventoryItem = new BodyMod_InventoryItem(bodyMod);
+                _bodyModDict.Add(bodyMod, newInventoryItem);
             }
 
-            _bodyMods.Add(bodyMod);
-            BodyMod_InventoryItem newInventoryItem = new BodyMod_InventoryItem(bodyMod);
-            _bodyModDict.Add(bodyMod, newInventoryItem);
+            //_bodyMods.Add(bodyMod);
+            //BodyMod_InventoryItem newInventoryItem = new BodyMod_InventoryItem(bodyMod);
+            //_bodyModDict.Add(bodyMod, newInventoryItem);
+        }
+    }
+    public void CreateBodyModComponetClassObjects(List<ScriptableBodyModComponent> bodyModComponents)
+    {
+        foreach (ScriptableBodyModComponent component in bodyModComponents)
+        {
+            BodyModComponent_Class bodyModComponent = new BodyModComponent_Class(component, null);
+            AddBodyModComponent(bodyModComponent);
+        }
+    }
+    public void AddBodyModComponent(BodyModComponent_Class bodyModComponent)
+    {
+        if (bodyModComponent == null)
+            return;
+        if (CanAddItemToInventory(_inventoryBodyModComponents, bodyModComponent, out int index))
+        {
+            Debug.Log("AddBodyModComponent: CanAddItemToInventory: true " + bodyModComponent.Name());
+            if (!_bodyModComponents.Any(x => x.ItemScriptable() == bodyModComponent.ItemScriptable()))
+            {
+                Debug.Log("AddBodyModComponent: _bodyModComponents does not contain: " + bodyModComponent.Name());
+                _bodyModComponents.Add(bodyModComponent);
+            }
+
+            BombRun_Item_Class componentAtIndex = GetInventoryItemAtIndex(index, InventoryType.BodyModComponents);
+            if (componentAtIndex == null)
+            {
+                Debug.Log("AddBodyModComponent: body mod component at index: " + index + " is null");
+                SetInventoryItemAtIndex(index, bodyModComponent, InventoryType.BodyModComponents);
+            }
+            else if (componentAtIndex.ItemScriptable() != bodyModComponent.ItemScriptable())
+            {
+                Debug.Log("AddBodyModComponent: body mod component (" + componentAtIndex.Name() + ") at index: " + index + " does NOT match: " + bodyModComponent.Name());
+                SetInventoryItemAtIndex(index, bodyModComponent, InventoryType.BodyModComponents);
+            }
+
+            _inventoryBodyModComponents[index].AddToStack(1);
+        }
+        else
+        {
+            Debug.Log("AddBodyModComponent: CanAddItemToInventory: false " + bodyModComponent.Name());
+            if (!_bodyModComponents.Any(x => x.ItemScriptable() == bodyModComponent.ItemScriptable()))
+            {
+                _bodyModComponents.Add(bodyModComponent);
+
+                index = _inventoryBodyModComponents.Count();
+                _inventoryBodyModComponents.Add(index, null);
+                SetInventoryItemAtIndex(index, bodyModComponent, InventoryType.BodyModComponents);
+                _inventoryBodyModComponents[index].AddToStack(1);
+            }
+
+            
         }
     }
     public void RemoveBodyMod(BodyMod_Class bodyMod)
@@ -104,18 +161,20 @@ public class BombRunUnitBodyModManager
                 _bodyMods.Remove(bodyMod);
                 _bodyModDict.Remove(bodyMod);
 
-                int indexToRemove = -1;
-                foreach (KeyValuePair<int, BodyMod_Class> item in _inventoryBodyMods)
-                {
-                    if (item.Value == bodyMod)
-                    {
-                        indexToRemove = item.Key;
-                    }
-                }
-                if (indexToRemove > -1)
-                {
-                    _inventoryBodyMods[indexToRemove] = null;
-                }
+                //int indexToRemove = -1;
+                //foreach (KeyValuePair<int, BodyMod_Class> item in _inventoryBodyMods)
+                //{
+                //    if (item.Value == bodyMod)
+                //    {
+                //        indexToRemove = item.Key;
+                //    }
+                //}
+                //if (indexToRemove > -1)
+                //{
+                //    //_inventoryBodyMods[indexToRemove] = null;
+                //    SetInventoryItemAtIndex(indexToRemove, null, InventoryType.BodyMods);
+                //}
+                RemoveItemFromInventoryByItem(bodyMod, InventoryType.BodyMods);
             }
             else
             {
@@ -144,6 +203,47 @@ public class BombRunUnitBodyModManager
         }
         bodyMod = null;
     }
+    public void RemoveBodyModComponent(BodyModComponent_Class bodyModComponent)
+    {
+        var foundItem = _bodyModComponents.FirstOrDefault(x => x.ItemScriptable() == bodyModComponent.ItemScriptable());
+
+        if (foundItem != null)
+        {
+            foundItem.RemoveFromItemCount(1);
+            if (foundItem.StackSize() > 0)
+            {
+                Debug.Log("RemoveBodyModComponent: " + foundItem.Name() + " has " + foundItem.StackSize() + " items remaining.");
+                return;
+            }
+            else
+            {
+                Debug.Log("RemoveBodyModComponent: " + foundItem.Name() + " fully removed");
+                _bodyModComponents.Remove(foundItem);
+                RemoveItemFromInventoryByItem(foundItem, InventoryType.BodyModComponents);
+            }            
+        }
+        else
+        {
+            Debug.Log("RemoveBodyModComponent: No matching component was found in the list.");
+        }
+    }
+    public void RemoveItemFromInventoryByItem(BombRun_Item_Class item, InventoryType inventoryType)
+    {
+        int indexToRemove = -1;
+        foreach (KeyValuePair<int, BombRun_Item_Class> inventoryItem in GetInventoryByType(inventoryType))
+        {
+            if (inventoryItem.Value == item)
+            {
+                Debug.Log("RemoveItemFromInventoryByItem: Found item (" + item.Name() + ") at index: " + inventoryItem.Key);
+                indexToRemove = inventoryItem.Key;
+            }
+        }
+        if (indexToRemove > -1)
+        {
+            //_inventoryBodyMods[indexToRemove] = null;
+            SetInventoryItemAtIndex(indexToRemove, null, inventoryType);
+        }
+    }
     private void CreateInventoryDictionary(int size)
     {
         _inventoryBodyMods.Clear();
@@ -152,13 +252,48 @@ public class BombRunUnitBodyModManager
             _inventoryBodyMods.Add(i, null);
         }
     }
-    private bool CanAddItemToInventory(Dictionary<int,BodyMod_Class> inventory, out int id)
-    {
-        foreach (KeyValuePair<int, BodyMod_Class> item in inventory)
+    private bool CanAddItemToInventory<T>(Dictionary<int, T> inventory, T itemClass, out int id) where T : BombRun_Item_Class
+    {        
+        if (itemClass == null)
+        {
+            id = -1;
+            return false;
+        }
+        // first check if a the item to add is stackable
+        // if it is, check if that item already exists in the inventory
+        // if it does, return that index
+        if (itemClass.Stackable())
+        {
+            if (IsStackleItemAlreadyInInventory(inventory, itemClass, out int stackableId))
+            {
+                id = stackableId;
+                return true;
+            }
+        }
+        foreach (KeyValuePair<int, T> item in inventory)
         {
             if (item.Value == null)
             {
                 Debug.Log("CanAddItemToInventory: Can add at index: " + item.Key);
+                id = item.Key;
+                return true;
+            }
+        }
+        id = -1;
+        return false;
+    }
+    private bool IsStackleItemAlreadyInInventory<T>(Dictionary<int, T> inventory, T itemClass, out int id) where T : BombRun_Item_Class
+    {
+        foreach (KeyValuePair<int, T> item in inventory)
+        {
+            if (item.Value == null)
+            {
+                continue;
+            }
+
+            if (item.Value.ItemScriptable() == itemClass.ItemScriptable())
+            {
+                Debug.Log("IsStackleItemAlreadyInInventory: Found stackable item in inventory at index: " + item.Key + " item: " + itemClass.Name() + " stackable: " + itemClass.Stackable());
                 id = item.Key;
                 return true;
             }
@@ -342,6 +477,17 @@ public class BombRunUnitBodyModManager
     {
         AddBodyMod(bodyMod);
     }
+    public void AddNewTestBodyModComponent(ScriptableBodyModComponent bodyModComponent)
+    {
+        AddBodyModComponent(new BodyModComponent_Class(bodyModComponent, null));
+    }
+    public void RemoveNewTestBodyModComponent()
+    {
+        if (_bodyModComponents.Count < 1)
+            return;
+
+        RemoveBodyModComponent(_bodyModComponents[0]);
+    }
     private void BodyModClass_OnBodyModDestroyed(object sender, EventArgs e)
     {
         BodyMod_Class bodyMod = sender as BodyMod_Class;
@@ -355,6 +501,16 @@ public class BombRunUnitBodyModManager
     public int MaxInventoryCount()
     {
         return _maxInventoryCount;
+    }
+    public int InventorySlotCount(InventoryType inventoryType)
+    {
+        switch (inventoryType)
+        {
+            case InventoryType.BodyModComponents:
+                return _inventoryBodyModComponents.Count;
+            default:
+                return MaxInventoryCount();
+        }
     }
     public void SetMaxInvetoryCount(int newCount)
     {
@@ -403,7 +559,7 @@ public class BombRunUnitBodyModManager
     {
         return _inventoryBodyModComponents;
     }
-    public BombRun_Item_Class GetInvetoryItemAtIndex(int index, InventoryType inventoryType)
+    public BombRun_Item_Class GetInventoryItemAtIndex(int index, InventoryType inventoryType)
     {
         switch (inventoryType)
         {

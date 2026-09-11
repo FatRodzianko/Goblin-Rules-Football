@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: BodyModComponent_NS220Lens
   m_EditorClassIdentifier: 
   _name: NS-2-20 Digital Optial Lens
-  _sprite: {fileID: 0}
+  _sprite: {fileID: 21300000, guid: ec8f6b3e832f3bf45b2daebbd898cf81, type: 3}
   _description: Precision lens for high end optics
   _bodyPart: 0
+  _stackable: 1
   _bodyModComponentType: 4
   _componentTierLevel: 2
   _hasAnimationEffect: 0
