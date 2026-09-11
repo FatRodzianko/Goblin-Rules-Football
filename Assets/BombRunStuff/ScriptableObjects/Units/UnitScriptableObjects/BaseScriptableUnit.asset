@@ -23,3 +23,5 @@ MonoBehaviour:
   _unitPortrait: {fileID: 21300000, guid: 80aa7b665a3cc184c869182ca58fe2f1, type: 3}
   _bodyMods: []
   _inventoryCount: 7
+  _bodyModComponents:
+  - {fileID: 11400000, guid: 3ea799f4610d41642a8b200d3b696ce4, type: 2}

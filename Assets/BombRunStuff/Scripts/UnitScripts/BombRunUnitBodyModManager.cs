@@ -19,14 +19,18 @@ public class BombRunUnitBodyModManager
 
     [Header("All Body Mods")]
     [SerializeField] private List<BodyMod_Class> _bodyMods = new List<BodyMod_Class>();
-
     [SerializeField] private Dictionary<BodyMod_Class, BodyMod_InventoryItem> _bodyModDict = new Dictionary<BodyMod_Class, BodyMod_InventoryItem>();
     
     [Header("Equiped Body Mods")]
     [SerializeField] private List<BodyMod_Class> _equippedBodyMods = new List<BodyMod_Class>();
 
-    [Header("Inventory")]
+    [Header("Body Mod Components")]
+    [SerializeField] private List<BodyModComponent_Class> _bodyModComponents = new List<BodyModComponent_Class>();
+    [SerializeField] private Dictionary<BodyModComponent_Class, BodyMod_InventoryItem> _bodyModComponentDict = new Dictionary<BodyModComponent_Class, BodyMod_InventoryItem>();
+
+    [Header("Inventories")]
     [SerializeField] private Dictionary<int, BodyMod_Class> _inventoryBodyMods = new Dictionary<int, BodyMod_Class>(); // the int key is meant to cache where the item is in the inventory list?
+    [SerializeField] private Dictionary<int, BodyModComponent_Class> _inventoryBodyModComponents = new Dictionary<int, BodyModComponent_Class>(); // the int key is meant to cache where the item is in the inventory list?
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BombRunUnitBodyModManager(BombRunUnit unit, List<ScriptableBodyMod> bodyMods, int maxInventoryCount)
@@ -356,9 +360,60 @@ public class BombRunUnitBodyModManager
     {
         this._maxInventoryCount = newCount;
     }
+    //public Dictionary<int, BombRun_Item_Class> GetInventoryByType(InventoryType inventoryType)
+    //{
+    //    switch (inventoryType)
+    //    {
+    //        case InventoryType.BodyMods:
+    //            return (Dictionary<int, BombRun_Item_Class>)Inventory_BodyMods().Cast<BombRun_Item_Class>();
+    //        case InventoryType.BodyModComponents:
+    //            return (Dictionary<int, BombRun_Item_Class>)Inventory_BodyModComponents().Cast<BombRun_Item_Class>();
+    //        default:
+    //            return new Dictionary<int, BombRun_Item_Class>();
+    //    }
+    //}
+    public Dictionary<int, BombRun_Item_Class> GetInventoryByType(InventoryType inventoryType)
+    {
+        var result = new Dictionary<int, BombRun_Item_Class>();
+
+        switch (inventoryType)
+        {
+            case InventoryType.BodyMods:
+                foreach (var kvp in Inventory_BodyMods())
+                {
+                    result.Add(kvp.Key, kvp.Value);
+                }
+                return result;
+
+            case InventoryType.BodyModComponents:
+                foreach (var kvp in Inventory_BodyModComponents())
+                {
+                    result.Add(kvp.Key, kvp.Value);
+                }
+                return result;
+        }
+
+        return result;
+    }
     public Dictionary<int, BodyMod_Class> Inventory_BodyMods()
     {
         return _inventoryBodyMods;
+    }
+    public Dictionary<int, BodyModComponent_Class> Inventory_BodyModComponents()
+    {
+        return _inventoryBodyModComponents;
+    }
+    public BombRun_Item_Class GetInvetoryItemAtIndex(int index, InventoryType inventoryType)
+    {
+        switch (inventoryType)
+        {
+            case InventoryType.BodyMods:
+                return _inventoryBodyMods[index];
+            case InventoryType.BodyModComponents:
+                return _inventoryBodyModComponents[index];
+            default:
+                return null;
+        }
     }
     public void SetInventoryItemAtIndex(int index, BombRun_Item_Class item, InventoryType inventoryType)
     {
@@ -366,6 +421,9 @@ public class BombRunUnitBodyModManager
         {
             case InventoryType.BodyMods:
                 _inventoryBodyMods[index] = item as BodyMod_Class;
+                break;
+            case InventoryType.BodyModComponents:
+                _inventoryBodyModComponents[index] = item as BodyModComponent_Class;
                 break;
         }
     }

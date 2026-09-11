@@ -1108,3 +1108,14 @@ https://www.youtube.com/watch?v=0wKB_rxtqh4&list=PLSR2vNOypvs6eIxvTu-rYjw2Eyw57n
 6. https://www.youtube.com/watch?v=2nTUFWTgS0g
  1. UI Setup (Let's Make An Equipment System In Unity) 
 https://www.youtube.com/watch?v=Kz2rD2QrBiY&list=PLSR2vNOypvs6LusmsqUek8_uIQyeI1E9M
+
+### Large tutorial playlist that covers:
+# Stats systems
+# Experience and leveling
+# skill tree
+# Inventory system
+# Shop system to buy/sell
+# NPC System
+# Dialogue system
+# Quest system
+https://www.youtube.com/playlist?list=PLSR2vNOypvs5yLsbqZc0e6RdqNnP1eGIc

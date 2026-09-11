@@ -25,3 +25,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 54366dfe60b93c24896d2459223d16b5, type: 2}
   - {fileID: 11400000, guid: 49e89c47fd462e145b86d43f159925b1, type: 2}
   _inventoryCount: 4
+  _bodyModComponents:
+  - {fileID: 11400000, guid: 7b6b46dfc648d1a41b6ceaa180dc06b0, type: 2}
+  - {fileID: 11400000, guid: c41ff771a6a15b24d8a7f48431696b55, type: 2}
+  - {fileID: 11400000, guid: f918c61fc00aa6e43a39f3eabe27994a, type: 2}

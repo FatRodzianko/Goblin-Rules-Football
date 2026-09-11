@@ -24,6 +24,9 @@ public class ScriptableBombRunUnit : ScriptableObject
     [SerializeField] private List<ScriptableBodyMod> _bodyMods;
     [SerializeField] private int _inventoryCount;
 
+    [Header("Body Mod Components")]
+    [SerializeField] private List<ScriptableBodyModComponent> _bodyModComponents = new List<ScriptableBodyModComponent>();
+
     public Transform UnitPrefab()
     {
         return _unitPrefab;
@@ -67,5 +70,9 @@ public class ScriptableBombRunUnit : ScriptableObject
     public int InventoryCount()
     {
         return _inventoryCount;
+    }
+    public List<ScriptableBodyModComponent> BodyModComponents()
+    {
+        return _bodyModComponents;
     }
 }

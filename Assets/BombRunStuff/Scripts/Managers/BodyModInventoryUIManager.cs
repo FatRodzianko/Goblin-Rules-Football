@@ -51,7 +51,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     {
         CloseInventory();
         //CreateItemSlots();
-        InventoryItemSlot.OnAnyItemSlotLeftClickedOn += InventoryItemSlot_OnAnyItemSlotClickedOn;
+        InventoryItemSlot.OnAnyItemSlotLeftClickedOn += InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
         InventoryItemSlot.OnAnyItemIsSelected += InventoryItemSlot_OnAnyItemIsSelected;
         InventoryItemSlot.OnAnyItemMousedOver += InventoryItemSlot_OnAnyItemMousedOver;
         InventoryItemSlot.OnAnyItemMouseExit += InventoryItemSlot_OnAnyItemMouseExit;
@@ -63,7 +63,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
 
     private void OnDisable()
     {
-        InventoryItemSlot.OnAnyItemSlotLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotClickedOn;
+        InventoryItemSlot.OnAnyItemSlotLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
         InventoryItemSlot.OnAnyItemIsSelected -= InventoryItemSlot_OnAnyItemIsSelected;
         InventoryItemSlot.OnAnyItemMousedOver -= InventoryItemSlot_OnAnyItemMousedOver;
         InventoryItemSlot.OnAnyItemMouseExit -= InventoryItemSlot_OnAnyItemMouseExit;
@@ -205,7 +205,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
         _selectedItemIndex = 0;
         ClearItemDescriptionDetails();
     }
-    private void InventoryItemSlot_OnAnyItemSlotClickedOn(object sender, int index)
+    private void InventoryItemSlot_OnAnyItemSlotLeftClickedOn(object sender, int index)
     {
         if (!_menuOpen)
             return;
@@ -397,8 +397,12 @@ public class BodyModInventoryUIManager : MonoBehaviour
 
         //BodyMod_Class previousIndexBodyMod = _bodyModManager.Inventory_BodyMods()[previousIndex];
         //BodyMod_Class newIndexBodyMod = _bodyModManager.Inventory_BodyMods()[newIndex];
-        BombRun_Item_Class previousIndexBodyMod = _bodyModManager.Inventory_BodyMods()[previousIndex];
-        BombRun_Item_Class newIndexBodyMod = _bodyModManager.Inventory_BodyMods()[newIndex];
+
+        //BombRun_Item_Class previousIndexBodyMod = _bodyModManager.Inventory_BodyMods()[previousIndex];
+        //BombRun_Item_Class newIndexBodyMod = _bodyModManager.Inventory_BodyMods()[newIndex];
+
+        BombRun_Item_Class previousIndexBodyMod = _bodyModManager.GetInvetoryItemAtIndex(previousIndex, _currentInventoryType);
+        BombRun_Item_Class newIndexBodyMod = _bodyModManager.GetInvetoryItemAtIndex(newIndex, _currentInventoryType);
 
         if (newIndexBodyMod == null)
         {

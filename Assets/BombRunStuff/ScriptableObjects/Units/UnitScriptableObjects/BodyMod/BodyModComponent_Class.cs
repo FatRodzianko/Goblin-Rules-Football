@@ -40,22 +40,22 @@ public class BodyModComponent_Class: BombRun_Item_Class
         this._hasAnimationEffect = _bodyModComponentScriptableObject.HasAnimationEffect();
 
     }
-    public string Name()
-    {
-        return _name;
-    }
-    public Sprite Sprite()
-    {
-        return _sprite;
-    }
-    public string Description()
-    {
-        return _description;
-    }
-    public BodyPart BodyPart()
-    {
-        return _bodyPart;
-    }
+    //public string Name()
+    //{
+    //    return _name;
+    //}
+    //public Sprite Sprite()
+    //{
+    //    return _sprite;
+    //}
+    //public string Description()
+    //{
+    //    return _description;
+    //}
+    //public BodyPart BodyPart()
+    //{
+    //    return _bodyPart;
+    //}
     public BodyModComponentType BodyPartComponentType()
     {
         return _bodyPartComponentType;

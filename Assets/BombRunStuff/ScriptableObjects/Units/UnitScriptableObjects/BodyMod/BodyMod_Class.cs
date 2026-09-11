@@ -88,38 +88,38 @@ public class BodyMod_Class: BombRun_Item_Class
             this._requiredBodyModyComponents.Add(bodyModComponent);
         }
     }
-    public string Name()
-    {
-        return _name;
-    }
-    public void SetName(string newName)
-    {
-        this._name = newName;
-    }
-    public Sprite Sprite()
-    {
-        return _sprite;
-    }
-    public void SetSprite(Sprite newSprite)
-    {
-        this._sprite = newSprite;
-    }
-    public string Description()
-    {
-        return _description;
-    }
-    public void SetDescription(string newDescription)
-    {
-        this._description = newDescription;
-    }
-    public BodyPart BodyPart()
-    {
-        return _bodyPart;
-    }
-    public void SetBodyPart(BodyPart newBodyPart)
-    {
-        this._bodyPart = newBodyPart;
-    }
+    //public string Name()
+    //{
+    //    return _name;
+    //}
+    //public void SetName(string newName)
+    //{
+    //    this._name = newName;
+    //}
+    //public Sprite Sprite()
+    //{
+    //    return _sprite;
+    //}
+    //public void SetSprite(Sprite newSprite)
+    //{
+    //    this._sprite = newSprite;
+    //}
+    //public string Description()
+    //{
+    //    return _description;
+    //}
+    //public void SetDescription(string newDescription)
+    //{
+    //    this._description = newDescription;
+    //}
+    //public BodyPart BodyPart()
+    //{
+    //    return _bodyPart;
+    //}
+    //public void SetBodyPart(BodyPart newBodyPart)
+    //{
+    //    this._bodyPart = newBodyPart;
+    //}
     public float NoiseModifier()
     {
         return _noiseModifier;
