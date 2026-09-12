@@ -32,6 +32,8 @@ public class BombRunUnitBodyModManager
     [SerializeField] private Dictionary<int, BodyMod_Class> _inventoryBodyMods = new Dictionary<int, BodyMod_Class>(); // the int key is meant to cache where the item is in the inventory list?
     [SerializeField] private Dictionary<int, BodyModComponent_Class> _inventoryBodyModComponents = new Dictionary<int, BodyModComponent_Class>(); // the int key is meant to cache where the item is in the inventory list?
 
+    public event EventHandler OnInventoryItemsUpdated;
+
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BombRunUnitBodyModManager(BombRunUnit unit, List<ScriptableBodyMod> bodyMods, int maxInventoryCount)
     {
@@ -92,6 +94,8 @@ public class BombRunUnitBodyModManager
                 _bodyMods.Add(bodyMod);
                 BodyMod_InventoryItem newInventoryItem = new BodyMod_InventoryItem(bodyMod);
                 _bodyModDict.Add(bodyMod, newInventoryItem);
+
+                this.OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
             }
 
             //_bodyMods.Add(bodyMod);
@@ -145,11 +149,17 @@ public class BombRunUnitBodyModManager
                 _inventoryBodyModComponents.Add(index, null);
                 SetInventoryItemAtIndex(index, bodyModComponent, InventoryType.BodyModComponents);
                 _inventoryBodyModComponents[index].AddToStack(1);
+                //_inventoryBodyModComponents[index].OnStackSizeChanged += BodyModComponent_OnStackSizeChanged;
             }
-
-            
         }
+        this.OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
     }
+
+    private void BodyModComponent_OnStackSizeChanged(object sender, EventArgs e)
+    {
+        //this.OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
+    }
+
     public void RemoveBodyMod(BodyMod_Class bodyMod)
     {
         if (_bodyModDict.TryGetValue(bodyMod, out BodyMod_InventoryItem inventoryItem))
@@ -213,12 +223,23 @@ public class BombRunUnitBodyModManager
             if (foundItem.StackSize() > 0)
             {
                 Debug.Log("RemoveBodyModComponent: " + foundItem.Name() + " has " + foundItem.StackSize() + " items remaining.");
+                OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
                 return;
             }
             else
             {
                 Debug.Log("RemoveBodyModComponent: " + foundItem.Name() + " fully removed");
                 _bodyModComponents.Remove(foundItem);
+
+                //try
+                //{
+                //    foundItem.OnStackSizeChanged -= BodyModComponent_OnStackSizeChanged;
+                //}
+                //catch (Exception e)
+                //{
+                //    Debug.Log("RemoveBodyModComponent: Could not unsubscribe from foundItem.OnStackSizeChanged. Error: " + e);
+                //}
+
                 RemoveItemFromInventoryByItem(foundItem, InventoryType.BodyModComponents);
             }            
         }
@@ -242,6 +263,7 @@ public class BombRunUnitBodyModManager
         {
             //_inventoryBodyMods[indexToRemove] = null;
             SetInventoryItemAtIndex(indexToRemove, null, inventoryType);
+            this.OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
         }
     }
     private void CreateInventoryDictionary(int size)

@@ -22,6 +22,9 @@ public class BombRun_Item_Class
     [SerializeField] protected bool _stackable;
     [SerializeField] protected int _stackSize;
 
+    // events
+    public event EventHandler OnStackSizeChanged;
+
 
     public BombRun_Item_Class(ScriptableItem itemScript)
     {
@@ -81,10 +84,12 @@ public class BombRun_Item_Class
     {
         _stackSize += amount;
         Debug.Log("BombRun_Item_Class: AddToStack: " + this._name + " Adding: " + amount + " to stack. Stack size is now: " + _stackSize);
+        OnStackSizeChanged?.Invoke(this, EventArgs.Empty);
     }
     public void RemoveFromItemCount(int amount)
     {
         _stackSize -= amount;
+        OnStackSizeChanged?.Invoke(this, EventArgs.Empty);
     }
     public void SetItemCount(int newCount)
     {
