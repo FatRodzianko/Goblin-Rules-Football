@@ -193,13 +193,10 @@ public class ShootAction : BaseAction
             default:
             case DamageMode.Damage:
                 return "Shoot";
-                break;
             case DamageMode.Heal:
-                return "Heal";
-                break;            
+                return "Heal";           
             case DamageMode.Medic:
                 return "Shoot\n/Heal";
-                break;
         }
     }
     private void BombRunUnit_OnSightDistanceChanged(object sender, EventArgs e)
@@ -1112,14 +1109,6 @@ public class ShootAction : BaseAction
             _targetUnit.DamageBodyPart(_targetBodyPart);
         }
 
-    }
-    int GetTargetUnitRemainingHealth(GridPosition gridPosition)
-    {
-        BombRunUnit target = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
-        if (target == null)
-            return -1;
-
-        return target.GetRemainingHealth();
     }
     public int GetTargetCountAtGridPosition(GridPosition gridPosition)
     {

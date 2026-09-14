@@ -38,7 +38,6 @@ public class BombRunUnitWorldUI : MonoBehaviour
         if (_healthSystem == null)
             _healthSystem = _unit.GetUnitHealthSystem();
 
-        _healthSystem.OnTakeDamage += HealthSystem_OnTakeDamage;
         _healthSystem.OnBodyPartFrozenStateChanged += HealthSystem_OnBodyPartFrozenStateChanged;
 
         ResetActionSymbolSprite();
@@ -53,7 +52,7 @@ public class BombRunUnitWorldUI : MonoBehaviour
         _unit.OnUnitVisibilityChanged -= Unit_OnUnitVisibilityChanged;
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
         BombRunUnit.OnAnyActionPointsChanged -= BombRunUnit_OnAnyActionPointsChanged;
-        _healthSystem.OnTakeDamage -= HealthSystem_OnTakeDamage;
+
         _healthSystem.OnBodyPartFrozenStateChanged -= HealthSystem_OnBodyPartFrozenStateChanged;
     }
     private void ResetActionSymbolSprite()
@@ -86,10 +85,6 @@ public class BombRunUnitWorldUI : MonoBehaviour
     private void UpdateActionPointsText()
     {
         _actionPointsText.text = _unit.GetActionPoints().ToString();
-    }
-    private void HealthSystem_OnTakeDamage(object sender, EventArgs e)
-    {
-        
     }
     private void HealthSystem_OnBodyPartFrozenStateChanged(object sender, BodyPart bodyPart)
     {

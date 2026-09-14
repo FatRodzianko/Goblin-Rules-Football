@@ -28,15 +28,15 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     // static events
     public static event EventHandler OnAnyBodyPartFrozenStateChanged;
     // events
-    public event EventHandler OnDead;
-    public event EventHandler OnTakeDamage;
+    //public event EventHandler OnDead;
+    //public event EventHandler OnTakeDamage;
     public event EventHandler<BodyPart> OnBodyPartFrozenStateChanged;
 
     [Header("Unit Details?")]
     [SerializeField] private BombRunUnit _unit;
-    [SerializeField] private int _startingHealth = 100;
-    [SerializeField] private int _health = 100;
-    [SerializeField] private int _maxHealth;
+    //[SerializeField] private int _startingHealth = 100;
+    //[SerializeField] private int _health = 100;
+    //[SerializeField] private int _maxHealth;
 
     [Header("Body Parts: Frozen State")]
     [SerializeField] private List<BombRunUnitBodyPartAndFrozenState> _bodyPartsAndFrozenState = new List<BombRunUnitBodyPartAndFrozenState>();
@@ -44,8 +44,8 @@ public class BombRunUnitHealthSystem : MonoBehaviour
 
     private void Awake()
     {
-        _health = _startingHealth;
-        _maxHealth = _startingHealth;
+        //_health = _startingHealth;
+        //_maxHealth = _startingHealth;
     }
     public void TakeDamageToBodyPart(BodyPart bodyPart)
     {
@@ -55,26 +55,22 @@ public class BombRunUnitHealthSystem : MonoBehaviour
     {
         UnFreezeBodyPart(bodyPart);
     }
-    private void Die()
-    {
-        OnDead?.Invoke(this, EventArgs.Empty);
-    }
     public BombRunUnit GetUnit()
     {
         return _unit;
     }
-    public int GetHealth()
-    {
-        return _health;
-    }
-    public int GetMaxHealth()
-    {
-        return _maxHealth;
-    }
-    public float GetHealthPercentRemaining()
-    {
-        return (float)_health / _maxHealth;
-    }
+    //public int GetHealth()
+    //{
+    //    return _health;
+    //}
+    //public int GetMaxHealth()
+    //{
+    //    return _maxHealth;
+    //}
+    //public float GetHealthPercentRemaining()
+    //{
+    //    return (float)_health / _maxHealth;
+    //}
     public List<BombRunUnitBodyPartAndFrozenState> GetAllBodyPartsAndFrozenState()
     {
         return _bodyPartsAndFrozenState;

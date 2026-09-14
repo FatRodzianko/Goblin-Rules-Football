@@ -286,11 +286,15 @@ public abstract class BaseAction : MonoBehaviour
         {
             return true;
         }
-        if (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(BodyPart.Head) != BodyPartFrozenState.FullFrozen)
+        //if (_unit.GetUnitHealthSystem().GetBodyPartFrozenState(BodyPart.Head) != BodyPartFrozenState.FullFrozen)
+        //{
+        //    return true;
+        //}
+        if (_unit.CanUnitChangeAimDirection())
         {
             return true;
         }
-        Debug.Log("CanTakeAction: action requires vision and head is frozen. (" + _unit.name + ")");
+        Debug.Log("CanTakeAction: DoesUnitHaveVisionRequiredForActionPosition: action requires vision and head is partially/frozen. (" + _unit.name + ")");
         switch (this._visionTypeRequired)
         {
             case VisionTypeRequired.Unit:

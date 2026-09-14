@@ -28,7 +28,15 @@ public class LookAction : BaseAction
     //{
     //    return "Look At";
     //}
+    public override bool CanTakeAction(int actionPointsAvailable, GridPosition actionPosition)
+    {
+        if (this._unit.GetUnitHealthSystem().GetBodyPartFrozenState(this._actionBodyPart) != BodyPartFrozenState.NotFrozen)
+        {
+            return false;
+        }
 
+        return base.CanTakeAction(actionPointsAvailable, actionPosition);
+    }
     public override BombRunEnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         return new BombRunEnemyAIAction

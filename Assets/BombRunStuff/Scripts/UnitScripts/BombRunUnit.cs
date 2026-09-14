@@ -46,8 +46,6 @@ public class BombRunUnit : MonoBehaviour
     public event EventHandler OnSightDistanceChanged;
 
     [Header("Unit Info")]
-    //[SerializeField] private int _startingHealth = 100;
-    //[SerializeField] private int _health;
     [SerializeField] private UnitType _unitType;
     [SerializeField] private bool _isEnemy;
     [SerializeField] private DamageMode _damageMode;
@@ -128,26 +126,17 @@ public class BombRunUnit : MonoBehaviour
     }
     private void Start()
     {
-        //_gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
-        //Debug.Log("BombRunUnit: Start: " + this.name + ": Starting position at: " + _gridPosition.ToString());
-        //LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
-
-        //TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
-        //_healthSystem.OnDead += HealthSystem_OnDead;
-
-        //OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);        
-
         UnitVisibilityManager_BombRun.OnAnyUnitBecameVisibile += UnitVisibilityManager_BombRun_OnAnyUnitBecameVisibile;
         UnitVisibilityManager_BombRun.OnAnyUnitBecameInVisibile += UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile;
         UnitNoiseHearingManager.OnAnyUnitWasHeard += UnitNoiseHearingManager_OnAnyUnitWasHeard;
-    }
 
-    
+        this._healthSystem.OnBodyPartFrozenStateChanged += HealthSystem_OnBodyPartFrozenStateChanged;
+    }
 
     private void OnDisable()
     {
         TurnSystem.Instance.OnTurnChanged -= TurnSystem_OnTurnChanged;
-        _healthSystem.OnDead -= HealthSystem_OnDead;
+        
 
         UnitVisibilityManager_BombRun.OnAnyUnitBecameVisibile -= UnitVisibilityManager_BombRun_OnAnyUnitBecameVisibile;
         UnitVisibilityManager_BombRun.OnAnyUnitBecameInVisibile -= UnitVisibilityManager_BombRun_OnAnyUnitBecameInVisibile;
@@ -160,10 +149,12 @@ public class BombRunUnit : MonoBehaviour
             _statManager.OnFOVChanged -= StatManager_OnFOVChanged;
             _statManager.OnSightDistanceChanged -= StatManager_OnSightDistanceChanged;
             _statManager.OnMaxMovementDistanceChanged -= StatManager_OnMaxMovementDistanceChanged;
+
+            this._healthSystem.OnBodyPartFrozenStateChanged -= HealthSystem_OnBodyPartFrozenStateChanged;
         }
         catch (Exception e)
         {
-            
+            Debug.Log("BombrunUnit: OnDisable: Failed to unsubscribe from events. Error: " + e);
         }
     }
     public void InitializeBombRunUnit()
@@ -173,15 +164,10 @@ public class BombRunUnit : MonoBehaviour
         LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
 
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
-        _healthSystem.OnDead += HealthSystem_OnDead;
+        
 
         _bombRunUnitAnimator.InitializeUnitSprite();
 
-        // hide unit to start?
-        //this.SetUnitVisibility(!this._isEnemy);       
-
-
-        //_bombRunUnitFieldOfView.InitializeFOV();
 
         _noiseManager = new BombRunUnitNoiseManager(this);
 
@@ -459,10 +445,6 @@ public class BombRunUnit : MonoBehaviour
     {
         return _healthSystem;
     }
-    public int GetRemainingHealth()
-    {
-        return _healthSystem.GetHealth();
-    }
     public void SetUnitType(UnitType unitType)
     {
         _unitType = unitType;
@@ -484,6 +466,13 @@ public class BombRunUnit : MonoBehaviour
         }
 
         _damageMode = damageMode;
+    }
+    private void HealthSystem_OnBodyPartFrozenStateChanged(object sender, BodyPart bodyPart)
+    {
+        if (_statManager != null)
+        {
+            _statManager.BodyPartFrozenStateUpdated(bodyPart);
+        }
     }
     public void InitializeUnitBaseStats(ScriptableBombRunUnitBaseStats baseStats)
     {
@@ -606,11 +595,23 @@ public class BombRunUnit : MonoBehaviour
     {
         return _actionDirection;
     }
+    public bool CanUnitChangeAimDirection()
+    {
+        if (this._healthSystem.GetBodyPartFrozenState(BodyPart.Head) == BodyPartFrozenState.NotFrozen)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     public void SetActionDirection(Vector2 direction)
     {
-        if (this._healthSystem.GetBodyPartFrozenState(BodyPart.Head) == BodyPartFrozenState.FullFrozen)
+        //if (this._healthSystem.GetBodyPartFrozenState(BodyPart.Head) == BodyPartFrozenState.FullFrozen)
+        if (!CanUnitChangeAimDirection())
         {
-            Debug.Log("SetActionDirection: Cannot change aim direction because head is frozen");
+            Debug.Log("SetActionDirection: Cannot change aim direction because head is frozen (fully or partially): " + this._healthSystem.GetBodyPartFrozenState(BodyPart.Head));
             return;
         }
         _actionDirection = direction.normalized;

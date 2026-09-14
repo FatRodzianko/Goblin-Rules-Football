@@ -45,11 +45,13 @@ public class BombRunUnitStatManager
     private bool _maxMoveDistanceWasUpdated = true;
     private bool _sightDistanceWasUpdated = true;
     private bool _fovWasUpdated = true;
+    private bool _hearingSensitivtyWasUpdate = true;
 
     // cached stat values
     private int _maxMoveDistanceCached = 0;
     private int _sightDistanceCached = 0;
     private float _fovCached = 0f;
+    private float _hearingSensitivityCached = 0f;
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BombRunUnitStatManager(BombRunUnit unit, ScriptableBombRunUnitBaseStats baseStats)
@@ -75,45 +77,36 @@ public class BombRunUnitStatManager
     }
     public int CalculateMaxMoveDistance()
     {
-        //int moveDistance = _baseStats.BaseMaxMoveDistance();
-        //moveDistance += (int) GetAdditiveStatModifier(StatType.MaxMoveDistance);
-
-        //if (_actionsModifyingStatsMultiply.Any((Func<ActionModifyingStat, bool>)(x => x.StatType == StatType.MaxMoveDistance)))
-        //{
-        //    moveDistance = (int)(moveDistance * GetMultiplingStatModifier(StatType.MaxMoveDistance));
-        //}
-
         return (int)((_baseStats.BaseMaxMoveDistance() + GetAdditiveStatModifier(StatType.MaxMoveDistance)) * GetMultiplyingStatModifier(StatType.MaxMoveDistance));
-        
-        
-        //return moveDistance;
     }
     public int GetSightDistance()
     {
-        //return _baseStats.BaseSightDistance();
-        //return (int)((_baseStats.BaseSightDistance() + GetAdditiveStatModifier(StatType.SightDistance)) * GetMultiplingStatModifier(StatType.SightDistance));
-        //Debug.Log("BombRunUnitStatManager: GetSightDistance");
-        //return _baseStats.BaseMaxMoveDistance();
         if (_sightDistanceWasUpdated)
         {
-            Debug.Log("BombRunUnitStatManager: GetSightDistance: _sightDistanceWasUpdated: " + _sightDistanceWasUpdated.ToString() + " getting a new sight distance value...");
-            _sightDistanceCached = CalculateSightDistance();
+            int newSightDistance = CalculateSightDistance();
+            Debug.Log("BombRunUnitStatManager: GetSightDistance: _sightDistanceWasUpdated: " + _sightDistanceWasUpdated.ToString() + " for " + this._unit + " old value: " + _sightDistanceCached + " new value: " + newSightDistance);
+            _sightDistanceCached = newSightDistance;
             _sightDistanceWasUpdated = false;
         }
-        //Debug.Log("BombRunUnitStatManager: GetSightDistance: " + _sightDistanceCached);
         return _sightDistanceCached;
     }
     public int CalculateSightDistance()
     {
-        return(int)((_baseStats.BaseSightDistance() + GetAdditiveStatModifier(StatType.SightDistance)) * GetMultiplyingStatModifier(StatType.SightDistance));
+        //return (int)((_baseStats.BaseSightDistance() + GetAdditiveStatModifier(StatType.SightDistance)) * GetMultiplyingStatModifier(StatType.SightDistance));
+        int sightDistance = (int)((_baseStats.BaseSightDistance() + GetAdditiveStatModifier(StatType.SightDistance)) * GetMultiplyingStatModifier(StatType.SightDistance));
+        switch (this._unit.GetUnitHealthSystem().GetBodyPartFrozenState(BodyPart.Head))
+        {
+            case BodyPartFrozenState.FullFrozen:
+                sightDistance = 0;
+                break;
+            case BodyPartFrozenState.HalfFrozen:
+                sightDistance = (int)(sightDistance / 2);
+                break;
+        }
+        return sightDistance;
     }
     public float GetFOV()
     {
-        //return _baseStats.BaseFOV();
-        //return (int)((_baseStats.BaseFOV() + GetAdditiveStatModifier(StatType.FOV)) * GetMultiplingStatModifier(StatType.FOV));
-
-        //Debug.Log("BombRunUnitStatManager: GetFOV");
-        //return _baseStats.BaseMaxMoveDistance();
         if (_fovWasUpdated)
         {
             float newFOV = CalculateFOV();
@@ -121,16 +114,48 @@ public class BombRunUnitStatManager
             _fovCached = newFOV;
             _fovWasUpdated = false;
         }
-        //Debug.Log("BombRunUnitStatManager: GetFOV: " + _fovCached);
         return _fovCached;
     }
     public float CalculateFOV()
     {
         return (int)((_baseStats.BaseFOV() + GetAdditiveStatModifier(StatType.FOV)) * GetMultiplyingStatModifier(StatType.FOV));
+        //int fov = (int)((_baseStats.BaseFOV() + GetAdditiveStatModifier(StatType.FOV)) * GetMultiplyingStatModifier(StatType.FOV));
+        //switch (this._unit.GetUnitHealthSystem().GetBodyPartFrozenState(BodyPart.Head))
+        //{
+        //    case BodyPartFrozenState.FullFrozen:
+        //        fov = 0;
+        //        break;
+        //    case BodyPartFrozenState.HalfFrozen:
+        //        fov = (int)(fov / 2);
+        //        break;
+        //}
+        //return fov;
     }
     public float GetHearingSensitivity()
     {
-        return _baseStats.BaseHearingSensitivity();
+        if (_hearingSensitivtyWasUpdate)
+        {
+            float newHearingSensitivity = CalculateHearingSensitivity();
+            Debug.Log("BombRunUnitStatManager: GetHearingSensitivity: _hearingSensitivtyWasUpdate: " + _fovWasUpdated.ToString() + " for " + this._unit + " old value: " + _hearingSensitivityCached + " new value: " + newHearingSensitivity);
+            _hearingSensitivityCached = newHearingSensitivity;
+            _hearingSensitivtyWasUpdate = false;
+        }
+        return _hearingSensitivityCached;
+    }
+    public float CalculateHearingSensitivity()
+    {
+        //return (_baseStats.BaseHearingSensitivity() + GetAdditiveStatModifier(StatType.HearingSensitivity)) * GetMultiplyingStatModifier(StatType.HearingSensitivity);
+        float hearingSensitivity = (_baseStats.BaseHearingSensitivity() + GetAdditiveStatModifier(StatType.HearingSensitivity)) * GetMultiplyingStatModifier(StatType.HearingSensitivity);
+        switch (this._unit.GetUnitHealthSystem().GetBodyPartFrozenState(BodyPart.Head))
+        {
+            case BodyPartFrozenState.FullFrozen:
+                hearingSensitivity = 0f;
+                break;
+            case BodyPartFrozenState.HalfFrozen:
+                hearingSensitivity = (hearingSensitivity / 2);
+                break;
+        }
+        return hearingSensitivity;
     }
     private float GetAdditiveStatModifier(StatType statType)
     {
@@ -267,6 +292,17 @@ public class BombRunUnitStatManager
         foreach (StatType statType in statTypesUpdated)
         {
             StatTypeChanged(statType);
+        }
+    }
+    public void BodyPartFrozenStateUpdated(BodyPart bodyPart)
+    {
+        switch (bodyPart)
+        {
+            case BodyPart.Head:
+                StatTypeChanged(StatType.HearingSensitivity);
+                StatTypeChanged(StatType.SightDistance);
+                StatTypeChanged(StatType.FOV);
+                break;
         }
     }
     public void StatTypeChanged(StatType statType)

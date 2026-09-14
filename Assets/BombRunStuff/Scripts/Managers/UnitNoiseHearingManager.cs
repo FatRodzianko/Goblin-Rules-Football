@@ -36,7 +36,7 @@ public class UnitNoiseHearingManager : MonoBehaviour
     private void CheckIfAnyUnitsHeardAction(BombRunUnit unitMakingNoise, GridPosition noisePosition, int noiseDistance)
     {
         List<BombRunUnit> unitsToCheck = GetUnitsEnemies(unitMakingNoise);
-        List<BombRunUnit> unitsCloseEnoughToHear = new List<BombRunUnit>();
+        //List<BombRunUnit> unitsCloseEnoughToHear = new List<BombRunUnit>();
         foreach (BombRunUnit unit in unitsToCheck)
         {
             if (IsUnitCloseEnoughToHearNoise(noisePosition, unit.GetGridPosition(), noiseDistance, unit.GetHearingSensitivity()))
@@ -50,7 +50,14 @@ public class UnitNoiseHearingManager : MonoBehaviour
     }
     private bool IsUnitCloseEnoughToHearNoise(GridPosition noiseStartPosition, GridPosition listeningUnitPosition, int noiseDistance, float listeningUnitHearingSensitivity)
     {
-        
+        // If hearing sensitivity is at 0
+        if (listeningUnitHearingSensitivity <= 0)
+        {
+            Debug.Log("IsUnitCloseEnoughToHearNoise: hearing sensitivity was <= 0 for unit. Cannot hear...");
+            return false;
+        }
+            
+
         int distance = LevelGrid.Instance.CalculateDistance(noiseStartPosition, listeningUnitPosition);
         int hearingDistance = (int)(noiseDistance * listeningUnitHearingSensitivity * LevelGrid.Instance.GetPathFindingDistanceMultiplier());
         Debug.Log("IsUnitCloseEnoughToHearNoise: noiseStartPosition: " + noiseStartPosition + " listeningUnitPosition: " + listeningUnitPosition + " noiseDistance: " + noiseDistance + " hearing sensitivity: " + listeningUnitHearingSensitivity + " hearingDistance: " + hearingDistance + " distance between noise source and listening unit: " + distance);
@@ -69,12 +76,6 @@ public class UnitNoiseHearingManager : MonoBehaviour
         }
         return false;
     }
-    //private bool CanSoundTravelToListeningUnit(GridPosition noiseStartPosition, GridPosition listeningUnitPosition, int noiseDistance, float listeningUnitHearingSensitivity)
-    //{
-    //    int maxDistance = 
-    //    // Get the path to the end position
-        
-    //}
     private List<BombRunUnit> GetUnitsTeammates(BombRunUnit unit)
     {
         if (unit.IsEnemy())
