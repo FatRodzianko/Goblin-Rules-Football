@@ -9,6 +9,7 @@ public class UnitActionSystem : MonoBehaviour
 {
     public static UnitActionSystem Instance { get; private set; }
     public static EventHandler OnPlayerClickInvalidPosition;
+    public static event EventHandler<Vector3> OnPlayerClickedUnitSelectionButton;
 
 
     [SerializeField] private BombRunUnit _selectedUnit;
@@ -100,11 +101,11 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (gameState == GameState_BombRun.SetSpawnLocation)
         {
-            UnitSpawningButtonUI.OnPlayerClickedUnitSpawnButton += UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
+            UnitSelectionButtonUI.OnPlayerClickedUnitSpawnButton += UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
         }
         else
         {
-            UnitSpawningButtonUI.OnPlayerClickedUnitSpawnButton -= UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
+            UnitSelectionButtonUI.OnPlayerClickedUnitSpawnButton -= UnitSpawningButtonUI_OnPlayerClickedUnitSpawnButton;
         }
         if (gameState == GameState_BombRun.Gameplay)
         {
@@ -490,6 +491,20 @@ public class UnitActionSystem : MonoBehaviour
         SetSelectedAction(null);
         return true;
 
+    }
+    public void PlayerClickedUnitSelectionButton(BombRunUnit unit)
+    {
+        if (unit == null || GameplayManager_BombRun.Instance.GameState() != GameState_BombRun.Gameplay)
+            return;
+
+        if (unit == _selectedUnit)
+            return;
+
+        if (TurnSystem.Instance.IsPlayerTurn() && _isBusy)
+            return;
+
+        SetSelectedUnit(unit);
+        OnPlayerClickedUnitSelectionButton?.Invoke(this, unit.GetWorldPosition());
     }
     private void SetSelectedUnit(BombRunUnit unit)
     {

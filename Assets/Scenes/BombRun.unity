@@ -50885,7 +50885,7 @@ RectTransform:
   m_Children:
   - {fileID: 788525292}
   m_Father: {fileID: 1623695650}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -50979,6 +50979,9 @@ MonoBehaviour:
   _actionCostAmountText: {fileID: 976870993}
   _textForActionCostamountText: 'Selected Action Cost: '
   _isGameplayMode: 0
+  _unitPortraitHolder: {fileID: 1072252895}
+  _unitPortraitUIButtonPrefab: {fileID: 7063918966502934099, guid: 9cb81c2a65c855145ab101b4f47e4f7a, type: 3}
+  _unitSelectionButtonUIObjects: []
 --- !u!1 &774889738
 GameObject:
   m_ObjectHideFlags: 0
@@ -51147,9 +51150,8 @@ RectTransform:
   - {fileID: 2010295068}
   - {fileID: 1896322180}
   - {fileID: 574575293}
-  - {fileID: 1072252896}
   m_Father: {fileID: 1623695650}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -52563,13 +52565,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1072252895}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 790674928}
-  m_RootOrder: 3
+  m_Father: {fileID: 1623695650}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -54207,6 +54209,7 @@ RectTransform:
   - {fileID: 1539402878}
   - {fileID: 184017701}
   - {fileID: 1350840636}
+  - {fileID: 1072252896}
   - {fileID: 790674928}
   - {fileID: 751406621}
   m_Father: {fileID: 0}
@@ -54892,9 +54895,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.05
+    y: 0
     width: 1
-    height: 0.90000004
+    height: 1
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 90

@@ -18,6 +18,11 @@ public class UnitActionSystemUI : MonoBehaviour
 
     [SerializeField] private bool _isGameplayMode = false;
 
+    [Header("Unit Selection UI")]
+    [SerializeField] private GameObject _unitPortraitHolder;
+    [SerializeField] private Transform _unitPortraitUIButtonPrefab;
+    [SerializeField] private List<UnitSelectionButtonUI> _unitSelectionButtonUIObjects = new List<UnitSelectionButtonUI>();
+
     private void Start()
     {
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
@@ -71,15 +76,60 @@ public class UnitActionSystemUI : MonoBehaviour
             _isGameplayMode = true;
             _actionPointsText.gameObject.SetActive(true);
             _actionCostAmountText.gameObject.SetActive(true);
+            CreateUnitSelectionPortraits();
         }
         else
         {
             _isGameplayMode = false;
             _actionPointsText.gameObject.SetActive(false);
             _actionCostAmountText.gameObject.SetActive(false);
+            DestroyUnitSelectionPortraits();
         }
     }
+    private void CreateUnitSelectionPortraits()
+    {
+        int i = 0;
+        foreach (BombRunUnit unit in BombRunUnitManager.Instance.GetFriendlyUnitList())
+        {
+            Transform unitPortraitUIButtonTransform = Instantiate(_unitPortraitUIButtonPrefab, _unitPortraitHolder.transform);
+            UnitSelectionButtonUI unitSelectionButtonUI = unitPortraitUIButtonTransform.GetComponent<UnitSelectionButtonUI>();
+
+            unitSelectionButtonUI.InitializeUIObject(unit.GetUnitPortrait(), i, unit.GetUnitType().ToString());
+            unitSelectionButtonUI.SetUnit(unit);
+
+            unitSelectionButtonUI.OnPlayerClickedThisButton += UnitSelectionButtonUI_OnPlayerClickedThisButton;
+
+            _unitSelectionButtonUIObjects.Add(unitSelectionButtonUI);
+
+            i++;
+        }
+    }
+
     
+
+    private void DestroyUnitSelectionPortraits()
+    {
+        if (_unitSelectionButtonUIObjects.Count > 0)
+        {
+            foreach (UnitSelectionButtonUI button in _unitSelectionButtonUIObjects)
+            {
+                button.OnPlayerClickedThisButton -= UnitSelectionButtonUI_OnPlayerClickedThisButton;
+                Destroy(button.gameObject);
+            }
+        }
+        _unitSelectionButtonUIObjects.Clear();
+    }
+
+    private void UnitSelectionButtonUI_OnPlayerClickedThisButton(object sender, EventArgs e)
+    {
+        UnitSelectionButtonUI selectionButtonUI = sender as UnitSelectionButtonUI;
+        if (selectionButtonUI.Unit() == null)
+        {
+            return;
+        }
+
+        UnitActionSystem.Instance.PlayerClickedUnitSelectionButton(selectionButtonUI.Unit());
+    }
     private void CreateUnitActionButtons(BombRunUnit selectedUnit)
     {
         // destroy the old button game objects

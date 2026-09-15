@@ -12,7 +12,7 @@ public class UnitSpawningUI : MonoBehaviour
     public static event EventHandler OnUnitSpawnUIStartGameButtonPressed;
 
     [SerializeField] private Transform _unitPortraitUIButtonPrefab;
-    [SerializeField] private List<UnitSpawningButtonUI> _unitSpawningButtonUIObjects = new List<UnitSpawningButtonUI>();
+    [SerializeField] private List<UnitSelectionButtonUI> _unitSpawningButtonUIObjects = new List<UnitSelectionButtonUI>();
 
     private void Start()
     {
@@ -46,7 +46,7 @@ public class UnitSpawningUI : MonoBehaviour
     private void BombRunUnitSpawner_OnCreateUIObjectForUnitToSpawn(object sender, OnCreateUIObjectForUnitToSpawnEventArgs args)
     {
         Transform unitPortraitUIButtonTransform = Instantiate(_unitPortraitUIButtonPrefab, _unitPortraitHolder.transform);
-        UnitSpawningButtonUI unitSpawningButtonUI = unitPortraitUIButtonTransform.GetComponent<UnitSpawningButtonUI>();
+        UnitSelectionButtonUI unitSpawningButtonUI = unitPortraitUIButtonTransform.GetComponent<UnitSelectionButtonUI>();
 
         unitSpawningButtonUI.InitializeUIObject(args.ScriptableBombRunUnit.UnitPortrait(), args.Index, args.ScriptableBombRunUnit.UnitType().ToString());
 
@@ -54,7 +54,7 @@ public class UnitSpawningUI : MonoBehaviour
     }
     private void BombRunUnitSpawner_OnSpawnedUnitAtIndex(object sender, int index)
     {
-        UnitSpawningButtonUI unitSpawningButtonUI = _unitSpawningButtonUIObjects.First(x => x.GetIndex() == index);
+        UnitSelectionButtonUI unitSpawningButtonUI = _unitSpawningButtonUIObjects.First(x => x.GetIndex() == index);
         if (unitSpawningButtonUI == null)
             return;
 

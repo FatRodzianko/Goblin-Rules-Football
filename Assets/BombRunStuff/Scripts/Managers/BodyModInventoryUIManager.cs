@@ -56,6 +56,9 @@ public class BodyModInventoryUIManager : MonoBehaviour
         InventoryItemSlot.OnAnyItemMousedOver += InventoryItemSlot_OnAnyItemMousedOver;
         InventoryItemSlot.OnAnyItemMouseExit += InventoryItemSlot_OnAnyItemMouseExit;
 
+        UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
+
+
         this._currentInventoryType = InventoryType.BodyMods;
     }
 
@@ -67,9 +70,9 @@ public class BodyModInventoryUIManager : MonoBehaviour
         InventoryItemSlot.OnAnyItemIsSelected -= InventoryItemSlot_OnAnyItemIsSelected;
         InventoryItemSlot.OnAnyItemMousedOver -= InventoryItemSlot_OnAnyItemMousedOver;
         InventoryItemSlot.OnAnyItemMouseExit -= InventoryItemSlot_OnAnyItemMouseExit;
-    }
 
-    
+        UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
+    }
 
     // Update is called once per frame
     void Update()
@@ -86,7 +89,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
                     else
                         _currentInventoryType = InventoryType.BodyMods;
 
-                    SetSelectedItemIndex(0);
+                    //SetSelectedItemIndex(0);
                     OpenInventory();
                     return;
                 }
@@ -121,6 +124,8 @@ public class BodyModInventoryUIManager : MonoBehaviour
     }
     private void OpenInventory()
     {
+        SetSelectedItemIndex(0);
+
         BombRunUnit unit = UnitActionSystem.Instance.GetSelectedUnit();
         if (unit == null)
             return;
@@ -470,5 +475,15 @@ public class BodyModInventoryUIManager : MonoBehaviour
         _bodyModManager.SetInventoryItemAtIndex(previousIndex, newIndexBodyMod, _currentInventoryType);
         _bodyModManager.SetInventoryItemAtIndex(newIndex, previousIndexBodyMod, _currentInventoryType);
 
+    }
+    private void UnitActionSystem_OnSelectedUnitChanged(object sender, BombRunUnit unit)
+    {
+        if (!_menuOpen)
+            return;
+
+        if (unit == null)
+            return;
+
+        OpenInventory();
     }
 }

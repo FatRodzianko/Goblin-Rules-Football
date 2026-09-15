@@ -13,6 +13,12 @@ public class BombRunCameraController : MonoBehaviour
     private void Start()
     {
         CurrentSelectedUnitButtonScript.OnPlayerClickedCurrentSelectedUnitButton += CurrentSelectedUnitButtonScript_OnPlayerClickedCurrentSelectedUnitButton;
+        UnitActionSystem.OnPlayerClickedUnitSelectionButton += UnitActionSystem_OnPlayerClickedUnitSelectionButton;
+    }
+    private void OnDisable()
+    {
+        CurrentSelectedUnitButtonScript.OnPlayerClickedCurrentSelectedUnitButton -= CurrentSelectedUnitButtonScript_OnPlayerClickedCurrentSelectedUnitButton;
+        UnitActionSystem.OnPlayerClickedUnitSelectionButton -= UnitActionSystem_OnPlayerClickedUnitSelectionButton;
     }
 
     
@@ -33,6 +39,15 @@ public class BombRunCameraController : MonoBehaviour
     }
     private void CurrentSelectedUnitButtonScript_OnPlayerClickedCurrentSelectedUnitButton(object sender, Vector3 unitPosition)
     {
-        _cinemachineVirtualCamera.transform.position = new Vector3(unitPosition.x, unitPosition.y, _cinemachineVirtualCamera.transform.position.z);
+        //_cinemachineVirtualCamera.transform.position = new Vector3(unitPosition.x, unitPosition.y, _cinemachineVirtualCamera.transform.position.z);
+        FocusOnPosition(unitPosition);
+    }
+    private void UnitActionSystem_OnPlayerClickedUnitSelectionButton(object sender, Vector3 unitPosition)
+    {
+        FocusOnPosition(unitPosition);
+    }
+    private void FocusOnPosition(Vector3 position)
+    {
+        _cinemachineVirtualCamera.transform.position = new Vector3(position.x, position.y, _cinemachineVirtualCamera.transform.position.z);
     }
 }

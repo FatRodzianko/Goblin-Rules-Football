@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using System;
 using UnityEngine.EventSystems;
 
-public class UnitSpawningButtonUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class UnitSelectionButtonUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("Button / UI Stuff")]
     [SerializeField] private TextMeshProUGUI _unitTypeText;
@@ -17,6 +17,7 @@ public class UnitSpawningButtonUI : MonoBehaviour, IPointerEnterHandler, IPointe
 
 
     [Header("Unit Stuff")]
+    [SerializeField] private BombRunUnit _unit;
     [SerializeField] private Sprite _unitPortraitSprite;
     [SerializeField] private int _index;
 
@@ -28,6 +29,8 @@ public class UnitSpawningButtonUI : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public static event EventHandler<int> OnPlayerClickedUnitSpawnButton;
     private static event EventHandler OnPlayerClickedButton;
+
+    public event EventHandler OnPlayerClickedThisButton;
 
     private void Start()
     {
@@ -62,10 +65,11 @@ public class UnitSpawningButtonUI : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         OnPlayerClickedUnitSpawnButton?.Invoke(this, _index);
         OnPlayerClickedButton?.Invoke(this, EventArgs.Empty);
+        OnPlayerClickedThisButton?.Invoke(this, EventArgs.Empty);
     }
     private void OnPlayerClickedButtonFunction(object sender, EventArgs e)
     {
-        if (sender as UnitSpawningButtonUI == this)
+        if (sender as UnitSelectionButtonUI == this)
         {
             PlayerClickedOnThisButton();
         }
@@ -77,14 +81,12 @@ public class UnitSpawningButtonUI : MonoBehaviour, IPointerEnterHandler, IPointe
     private void PlayerClickedOnThisButton()
     {
         this._isSelected = true;
-        //this._outline.effectColor = Color.yellow;
         this._backgroundImage.color = Color.yellow;
     }
     private void PlayerClickedOnOtherButton()
     {
         Debug.Log("UnitSpawningButtonUI: PlayerClickedOnOtherButton");
         this._isSelected = false;
-        //this._outline.effectColor = Color.black;
         this._backgroundImage.color = Color.black;
     }
     public int GetIndex()
@@ -122,5 +124,13 @@ public class UnitSpawningButtonUI : MonoBehaviour, IPointerEnterHandler, IPointe
         {
             this._backgroundImage.color = Color.black;
         }
+    }
+    public void SetUnit(BombRunUnit unit)
+    {
+        this._unit = unit;
+    }
+    public BombRunUnit Unit()
+    {
+        return _unit;
     }
 }

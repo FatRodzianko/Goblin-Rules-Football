@@ -98,11 +98,26 @@ public class AltActionButtonUI : MonoBehaviour
     }
     private void EnableSelectedHighlightSprite()
     {
-        _selectedHighlightSprite.SetActive(true);
+        try
+        {
+            _selectedHighlightSprite.SetActive(true);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("AltActionButtonUI: EnableSelectedHighlightSprite: Could not access _selectedHighlightSprite. Error: " + e);
+        }
+        
     }
     private void DisableSelectedHighlightSprite()
     {
-        _selectedHighlightSprite.SetActive(false);
+        try
+        {
+            _selectedHighlightSprite.SetActive(false);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("AltActionButtonUI: DisableSelectedHighlightSprite: Could not access _selectedHighlightSprite. Error: " + e);
+        }
     }
     private void UpdateAltActionButtonStatus()
     {
