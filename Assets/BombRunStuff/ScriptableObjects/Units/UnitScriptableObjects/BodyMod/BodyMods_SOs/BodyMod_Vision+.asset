@@ -15,7 +15,9 @@ MonoBehaviour:
   _name: Vision+
   _sprite: {fileID: 21300000, guid: 187727ac9be7d224aa665f2925d57dc8, type: 3}
   _description: Increases all vision stats
+  _equippable: 1
   _bodyPart: 1
+  _stackable: 0
   _bodyModStatModifiers:
   - StatType: 2
     StatModifier: 2

@@ -16,7 +16,9 @@ MonoBehaviour:
   _sprite: {fileID: 21300000, guid: ec8f6b3e832f3bf45b2daebbd898cf81, type: 3}
   _description: Dampens sound by ejecting air before foot fall to reduce impact with
     ground
+  _equippable: 1
   _bodyPart: 3
+  _stackable: 0
   _bodyModStatModifiers: []
   _modifiesNoise: 1
   _noiseModifier: -1

@@ -9,6 +9,7 @@ public class ScriptableItem : ScriptableObject
     [SerializeField] protected string _name;
     [SerializeField] protected Sprite _sprite;
     [SerializeField] protected string _description;
+    [SerializeField] protected bool _equippable;
 
     [Header("Base Item Body Parts")]
     [SerializeField] protected BodyPart _bodyPart;
@@ -35,5 +36,9 @@ public class ScriptableItem : ScriptableObject
     public bool Stackable()
     {
         return _stackable;
+    }
+    public bool Equippable()
+    {
+        return _equippable;
     }
 }

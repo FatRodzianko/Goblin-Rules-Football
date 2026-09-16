@@ -51,7 +51,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     {
         CloseInventory();
         //CreateItemSlots();
-        InventoryItemSlot.OnAnyItemSlotLeftClickedOn += InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
+        InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn += InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
         InventoryItemSlot.OnAnyItemIsSelected += InventoryItemSlot_OnAnyItemIsSelected;
         InventoryItemSlot.OnAnyItemMousedOver += InventoryItemSlot_OnAnyItemMousedOver;
         InventoryItemSlot.OnAnyItemMouseExit += InventoryItemSlot_OnAnyItemMouseExit;
@@ -66,7 +66,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
 
     private void OnDisable()
     {
-        InventoryItemSlot.OnAnyItemSlotLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
+        InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
         InventoryItemSlot.OnAnyItemIsSelected -= InventoryItemSlot_OnAnyItemIsSelected;
         InventoryItemSlot.OnAnyItemMousedOver -= InventoryItemSlot_OnAnyItemMousedOver;
         InventoryItemSlot.OnAnyItemMouseExit -= InventoryItemSlot_OnAnyItemMouseExit;
@@ -264,6 +264,13 @@ public class BodyModInventoryUIManager : MonoBehaviour
 
         if (_selectedItemIndex == index)
         {
+            if (_itemSlots[index].IsSelected())
+            {
+                if (_bodyModManager.GetInventoryItemAtIndex(index, _currentInventoryType) != null)
+                {
+                    _bodyModManager.EquipInventoryItem(_currentInventoryType, index);
+                }
+            }
             _itemSlots[_selectedItemIndex].SetIsSelected(!_itemSlots[_selectedItemIndex].IsSelected());
             CheckIfItemDescriptionShouldReset(_selectedItemIndex);
             return;

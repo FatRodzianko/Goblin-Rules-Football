@@ -13,6 +13,7 @@ public class BombRun_Item_Class
     [SerializeField] protected string _name;
     [SerializeField] protected Sprite _sprite;
     [SerializeField] protected string _description;
+    [SerializeField] protected bool _equippable;
     
 
     [Header("Base Item Stat Modifiers")]
@@ -35,6 +36,8 @@ public class BombRun_Item_Class
         this._description = itemScript.Description();
 
         this._stackable = itemScript.Stackable();
+
+        this._equippable = itemScript.Equippable();
     }
     public string Name()
     {
@@ -102,5 +105,13 @@ public class BombRun_Item_Class
     public void SetStackable(bool newStackable)
     {
         _stackable = newStackable;
+    }
+    public bool Equippable()
+    {
+        return _equippable;    
+    }
+    public void SetEquippable(bool newEquippable)
+    {
+        _equippable = newEquippable;
     }
 }

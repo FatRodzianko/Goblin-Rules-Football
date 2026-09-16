@@ -32,8 +32,16 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     [SerializeField] private Color _selectedColor;
     [SerializeField] private Color _mouseOverColor;
 
+    //[Header("Misc.")]
+    //[SerializeField] private int _clickedOnCount = 0;
+    //[SerializeField] private float _clickedOnTime;
+    //[SerializeField] private float _clickDelay = 0.25f;
+    //private IEnumerator _clickDelayRoutine;
+    //[SerializeField] private bool _clickDelayRoutineIsRunning = false;
+
     // static Events
-    public static event EventHandler<int> OnAnyItemSlotLeftClickedOn;
+    public static event EventHandler<int> OnAnyItemSlotSingleLeftClickedOn;
+    public static event EventHandler<int> OnAnyItemSlotDoubleLeftClickedOn;
     public static event EventHandler OnAnyItemIsSelected;
     public static event EventHandler<int> OnAnyItemMousedOver;
     public static event EventHandler<int> OnAnyItemMouseExit;
@@ -43,7 +51,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
 
     private void Awake()
     {
-        InventoryItemSlot.OnAnyItemSlotLeftClickedOn += InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
+        InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn += InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
         this.OnItemSlotSelected += InventoryItemSlot_OnItemSlotSelected;
     }
 
@@ -51,7 +59,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
 
     void OnDisable()
     {
-        InventoryItemSlot.OnAnyItemSlotLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
+        InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
         this.OnItemSlotSelected -= InventoryItemSlot_OnItemSlotSelected;
     }
     
@@ -179,6 +187,14 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     {
         if (eventData.button == PointerEventData.InputButton.Left)
         {
+            //if (eventData.clickCount == 1)
+            //{
+            //    Debug.Log("single click");
+            //}
+            //if (eventData.clickCount == 2)
+            //{
+            //    Debug.Log("double click");
+            //}
             OnLeftClick();
         }
         if (eventData.button == PointerEventData.InputButton.Right)
@@ -188,7 +204,35 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     }
     private void OnLeftClick()
     {
-        OnAnyItemSlotLeftClickedOn?.Invoke(this, this._slotIndex);
+        //if (_clickDelayRoutineIsRunning)
+        //{
+        //    StopCoroutine(_clickDelayRoutine);
+        //    _clickDelayRoutineIsRunning = false;
+        //    DoubleClick();
+        //}
+        //else
+        //{
+        //    _clickDelayRoutine = ClickDelayRoutine(_clickDelay);
+        //    StartCoroutine(_clickDelayRoutine);
+        //}
+        OnAnyItemSlotSingleLeftClickedOn?.Invoke(this, this._slotIndex);
+    }
+    //private IEnumerator ClickDelayRoutine(float delay)
+    //{
+    //    _clickDelayRoutineIsRunning = true;
+    //    yield return new WaitForSeconds(delay);
+    //    SingleClick();
+    //    _clickDelayRoutineIsRunning = false;
+    //}
+    private void SingleClick()
+    {
+        Debug.Log("Single Click");
+        OnAnyItemSlotSingleLeftClickedOn?.Invoke(this, this._slotIndex);
+    }
+    private void DoubleClick()
+    {
+        Debug.Log("Double Click");
+        OnAnyItemSlotDoubleLeftClickedOn?.Invoke(this, this._slotIndex);
     }
     private void InventoryItemSlot_OnAnyItemSlotLeftClickedOn(object sender, int index)
     {

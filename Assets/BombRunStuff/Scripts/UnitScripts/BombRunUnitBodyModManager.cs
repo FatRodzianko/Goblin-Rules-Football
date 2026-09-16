@@ -14,23 +14,31 @@ public enum InventoryType
 public class BombRunUnitBodyModManager
 {
     private BombRunUnit _unit;
+
+    [Header("Inventory / Equipment Counts")]
     [SerializeField] private int _maxInventoryCount;
+    private Dictionary<BodyPart, int> _maxEquippedModsPerBodyPart = new Dictionary<BodyPart, int>();
 
 
     [Header("All Body Mods")]
     [SerializeField] private List<BodyMod_Class> _bodyMods = new List<BodyMod_Class>();
-    [SerializeField] private Dictionary<BodyMod_Class, BodyMod_InventoryItem> _bodyModDict = new Dictionary<BodyMod_Class, BodyMod_InventoryItem>();
+    private Dictionary<BodyMod_Class, BodyMod_InventoryItem> _bodyModDict = new Dictionary<BodyMod_Class, BodyMod_InventoryItem>();
     
     [Header("Equiped Body Mods")]
     [SerializeField] private List<BodyMod_Class> _equippedBodyMods = new List<BodyMod_Class>();
 
     [Header("Body Mod Components")]
     [SerializeField] private List<BodyModComponent_Class> _bodyModComponents = new List<BodyModComponent_Class>();
-    [SerializeField] private Dictionary<BodyModComponent_Class, BodyMod_InventoryItem> _bodyModComponentDict = new Dictionary<BodyModComponent_Class, BodyMod_InventoryItem>();
+    private Dictionary<BodyModComponent_Class, BodyMod_InventoryItem> _bodyModComponentDict = new Dictionary<BodyModComponent_Class, BodyMod_InventoryItem>();
 
     [Header("Inventories")]
-    [SerializeField] private Dictionary<int, BodyMod_Class> _inventoryBodyMods = new Dictionary<int, BodyMod_Class>(); // the int key is meant to cache where the item is in the inventory list?
-    [SerializeField] private Dictionary<int, BodyModComponent_Class> _inventoryBodyModComponents = new Dictionary<int, BodyModComponent_Class>(); // the int key is meant to cache where the item is in the inventory list?
+    private Dictionary<int, BodyMod_Class> _inventoryBodyMods = new Dictionary<int, BodyMod_Class>(); // the int key is meant to cache where the item is in the inventory list?
+    private Dictionary<int, BodyModComponent_Class> _inventoryBodyModComponents = new Dictionary<int, BodyModComponent_Class>(); // the int key is meant to cache where the item is in the inventory list?
+
+    [Header("Equipped Body Mods")]
+    private Dictionary<int, BodyMod_Class> _equippedBodyModsHead = new Dictionary<int, BodyMod_Class>();
+    private Dictionary<int, BodyMod_Class> _equippedBodyModsArms = new Dictionary<int, BodyMod_Class>();
+    private Dictionary<int, BodyMod_Class> _equippedBodyModsLegs = new Dictionary<int, BodyMod_Class>();
 
     public event EventHandler OnInventoryItemsUpdated;
 
@@ -60,7 +68,7 @@ public class BombRunUnitBodyModManager
                 bodyModClass.OnBodyModUnEquipped += BodyModClass_OnBodyModUnEquipped;
                 bodyModClass.OnBodyModDestroyed += BodyModClass_OnBodyModDestroyed;
 
-                bodyModClass.EquipBodyMod();
+                //bodyModClass.EquipBodyMod();
             }
         }
     }
@@ -288,6 +296,7 @@ public class BombRunUnitBodyModManager
         {
             if (IsStackleItemAlreadyInInventory(inventory, itemClass, out int stackableId))
             {
+                Debug.Log("CanAddItemToInventory: Can add at index: " + stackableId + " as a stackable item.");
                 id = stackableId;
                 return true;
             }
@@ -301,6 +310,7 @@ public class BombRunUnitBodyModManager
                 return true;
             }
         }
+        Debug.Log("CanAddItemToInventory: CANNOT add item to the inventory. Inventory is full.");
         id = -1;
         return false;
     }
@@ -330,6 +340,30 @@ public class BombRunUnitBodyModManager
     private void BodyModClass_OnBodyModUnEquipped(object sender, EventArgs e)
     {
         UnEquipBodyMod(sender as BodyMod_Class);
+    }
+    public void EquipInventoryItem(InventoryType invetoryType, int itemIndex)
+    {
+        // for testing. Later grab the appropriate inventory type?
+        if (invetoryType != InventoryType.BodyMods)
+            return;
+
+        Debug.Log("EquipInventoryItem: " + invetoryType + ": " + itemIndex);
+        if (_inventoryBodyMods.TryGetValue(itemIndex, out BodyMod_Class bodyMod))
+        {
+            if (bodyMod.IsEquipped())
+            {
+
+                bodyMod.UnEquipBodyMod();
+            }
+            else
+            {
+                bodyMod.EquipBodyMod();
+            }
+        }
+        else
+        {
+            Debug.Log("EquipInventoryItem: no item at: " + itemIndex);
+        }
     }
     void EquipBodyMod(BodyMod_Class bodyMod)
     {

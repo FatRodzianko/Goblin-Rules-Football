@@ -1032,12 +1032,21 @@ x Maybe make it so there is also a BodyMod class
 - - - - - x BodyModManager stores the classes in a script
 - - x This should make it so that BodyMod values can be easily edited, since they'd each be their own instance of a BodyMod class
 - Re-use/re-purpose the "Character Portrait" UI for spawning goblins in gameplay as well
-- - - will be used to show all your units
+- - x will be used to show all your units
 - - - - - - should display health as well?
 - - - - - - remaining action points for that unit? Or at least some sort of visual to indicate if they have exhausted action points or not
-- - - Click to select that unit
-- - - - - - also leave this clickable when the body mod inventory is open so that you can click on the portrait to change what unit's inventory you
+- - x Click to select that unit
+- - - - - x also leave this clickable when the body mod inventory is open so that you can click on the portrait to change what unit's inventory you
             are looking at
+- Equip and Unequip Body mods from the inventory
+- - - All body mods should start unequipped (for testing)
+- - - If player clicks on selected item, flip its "equipped" status (just clicking to equip for now)
+- - - - - - later, check if the item can be equipped
+- - - - - - - - - What body part is the item? Does that body part's inventory have space to equip that?
+- Dropping items
+- - - right click to "drop" item and remove from inventory
+- - - When unequipping an item, check if there is room in the regular inventory to store it. If not, drop it?
+
 
 ### END CURRENT TASKS
 
