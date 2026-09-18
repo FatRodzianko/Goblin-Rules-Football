@@ -326,8 +326,17 @@ public class BodyModInventoryUIManager : MonoBehaviour
         {
             if (_itemSlots[index].IsSelected())
             {
-                // check if item is equipped. If it is, unequip?
+                if (_itemSlots[index].IsEquipped())
+                {
+                    _bodyModManager.UnEquipItemAtIndex(index, _currentInventoryType);
+                }
+                else
+                {
+                    _bodyModManager.DropItemAtIndex(index, _currentInventoryType);
+                }
             }
+            _itemSlots[_selectedItemIndex].SetIsSelected(false);
+            CheckIfItemDescriptionShouldReset(index);
         }
     }
     private void InventoryItemSlot_OnAnyItemIsSelected(object sender, EventArgs e)

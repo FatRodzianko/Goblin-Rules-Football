@@ -48,7 +48,7 @@ public class BombRunUnitBodyModManager
         this._unit = unit;
         //this._bodyMods.AddRange(bodyMods);
 
-        SetMaxInvetoryCount(maxInventoryCount);
+        SetMaxInventoryCount(maxInventoryCount);
         CreateInventoryDictionary(maxInventoryCount);
 
         CreateBodyModClassObjects(bodyMods, _unit);
@@ -64,9 +64,9 @@ public class BombRunUnitBodyModManager
             {
                 //_bodyMods.Add(bodyModClass);
                 AddBodyMod(bodyModClass);
-                bodyModClass.OnItemEquipped += BodyModClass_OnItemEquipped;
-                bodyModClass.OnItemUnEquipped += BodyModClass_OnItemUnEquipped;
-                bodyModClass.OnItemDestroyed += BodyModClass_OnItemDestroyed;
+                //bodyModClass.OnItemEquipped += BodyModClass_OnItemEquipped;
+                //bodyModClass.OnItemUnEquipped += BodyModClass_OnItemUnEquipped;
+                //bodyModClass.OnItemDestroyed += BodyModClass_OnItemDestroyed;
 
                 //bodyModClass.EquipItem();
             }
@@ -77,7 +77,7 @@ public class BombRunUnitBodyModManager
         BodyMod_Class bodyModClass = new BodyMod_Class(bodyMod, _unit);
         bodyModClass.OnItemEquipped += BodyModClass_OnItemEquipped;
         bodyModClass.OnItemUnEquipped += BodyModClass_OnItemUnEquipped;
-        bodyModClass.OnItemDestroyed += BodyModClass_OnItemDestroyed;
+        bodyModClass.OnItemDestroyed += BombRun_Item_Class_OnItemDestroyed;
         AddBodyMod(bodyModClass);
     }
     public void AddBodyMod(BodyMod_Class bodyMod)
@@ -100,6 +100,11 @@ public class BombRunUnitBodyModManager
                 SetInventoryItemAtIndex(index, bodyMod, InventoryType.BodyMods);
 
                 _bodyMods.Add(bodyMod);
+
+                bodyMod.OnItemEquipped += BodyModClass_OnItemEquipped;
+                bodyMod.OnItemUnEquipped += BodyModClass_OnItemUnEquipped;
+                bodyMod.OnItemDestroyed += BombRun_Item_Class_OnItemDestroyed;
+
                 BodyMod_InventoryItem newInventoryItem = new BodyMod_InventoryItem(bodyMod);
                 _bodyModDict.Add(bodyMod, newInventoryItem);
 
@@ -123,6 +128,7 @@ public class BombRunUnitBodyModManager
     {
         if (bodyModComponent == null)
             return;
+
         if (CanAddItemToInventory(_inventoryBodyModComponents, bodyModComponent, out int index))
         {
             Debug.Log("AddBodyModComponent: CanAddItemToInventory: true " + bodyModComponent.Name());
@@ -137,6 +143,9 @@ public class BombRunUnitBodyModManager
             {
                 Debug.Log("AddBodyModComponent: body mod component at index: " + index + " is null");
                 SetInventoryItemAtIndex(index, bodyModComponent, InventoryType.BodyModComponents);
+
+                bodyModComponent.OnStackSizeChanged += BodyModComponent_OnStackSizeChanged;
+                bodyModComponent.OnItemDestroyed += BombRun_Item_Class_OnItemDestroyed;
             }
             else if (componentAtIndex.ItemScriptable() != bodyModComponent.ItemScriptable())
             {
@@ -157,7 +166,9 @@ public class BombRunUnitBodyModManager
                 _inventoryBodyModComponents.Add(index, null);
                 SetInventoryItemAtIndex(index, bodyModComponent, InventoryType.BodyModComponents);
                 _inventoryBodyModComponents[index].AddToStack(1);
-                //_inventoryBodyModComponents[index].OnStackSizeChanged += BodyModComponent_OnStackSizeChanged;
+
+                bodyModComponent.OnStackSizeChanged += BodyModComponent_OnStackSizeChanged;
+                bodyModComponent.OnItemDestroyed += BombRun_Item_Class_OnItemDestroyed;
             }
         }
         this.OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
@@ -165,9 +176,22 @@ public class BombRunUnitBodyModManager
 
     private void BodyModComponent_OnStackSizeChanged(object sender, EventArgs e)
     {
-        //this.OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
+        this.OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
     }
+    private void RemoveItemFromInventory(BombRun_Item_Class inventoryItem)
+    {
+        InventoryType inventoryType = GetInventoryTypeByItem(inventoryItem);
 
+        switch (inventoryType)
+        {
+            case InventoryType.BodyMods:
+                RemoveBodyMod(inventoryItem as BodyMod_Class);
+                break;
+            case InventoryType.BodyModComponents:
+                RemoveBodyModComponent(inventoryItem as BodyModComponent_Class);
+                break;
+        }
+    }
     public void RemoveBodyMod(BodyMod_Class bodyMod)
     {
         if (_bodyModDict.TryGetValue(bodyMod, out BodyMod_InventoryItem inventoryItem))
@@ -179,19 +203,6 @@ public class BombRunUnitBodyModManager
                 _bodyMods.Remove(bodyMod);
                 _bodyModDict.Remove(bodyMod);
 
-                //int indexToRemove = -1;
-                //foreach (KeyValuePair<int, BodyMod_Class> item in _inventoryBodyMods)
-                //{
-                //    if (item.Value == bodyMod)
-                //    {
-                //        indexToRemove = item.Key;
-                //    }
-                //}
-                //if (indexToRemove > -1)
-                //{
-                //    //_inventoryBodyMods[indexToRemove] = null;
-                //    SetInventoryItemAtIndex(indexToRemove, null, InventoryType.BodyMods);
-                //}
                 RemoveItemFromInventoryByItem(bodyMod, InventoryType.BodyMods);
             }
             else
@@ -203,17 +214,6 @@ public class BombRunUnitBodyModManager
         {
             return;
         }
-        // OLD
-        //if (_bodyMods.Contains(bodyMod))
-        //{
-        //    _bodyMods.Remove(bodyMod);
-
-        //    bodyMod.OnItemEquipped -= BodyModClass_OnItemEquipped;
-        //    bodyMod.OnItemUnEquipped -= BodyModClass_OnItemUnEquipped;
-        //    bodyMod.OnItemDestroyed -= BodyModClass_OnItemDestroyed;
-
-        //}
-        // OLD
 
         if (_equippedBodyMods.Contains(bodyMod))
         {
@@ -238,15 +238,6 @@ public class BombRunUnitBodyModManager
             {
                 Debug.Log("RemoveBodyModComponent: " + foundItem.Name() + " fully removed");
                 _bodyModComponents.Remove(foundItem);
-
-                //try
-                //{
-                //    foundItem.OnStackSizeChanged -= BodyModComponent_OnStackSizeChanged;
-                //}
-                //catch (Exception e)
-                //{
-                //    Debug.Log("RemoveBodyModComponent: Could not unsubscribe from foundItem.OnStackSizeChanged. Error: " + e);
-                //}
 
                 RemoveItemFromInventoryByItem(foundItem, InventoryType.BodyModComponents);
             }            
@@ -365,6 +356,7 @@ public class BombRunUnitBodyModManager
             Debug.Log("EquipInventoryItem: no item at: " + itemIndex);
         }
     }
+
     void EquipItem(BodyMod_Class bodyMod)
     {
         if (_equippedBodyMods.Contains(bodyMod))
@@ -376,6 +368,17 @@ public class BombRunUnitBodyModManager
         }
 
     }
+    public void UnEquipItemAtIndex(int index, InventoryType inventoryType)
+    {
+        BombRun_Item_Class itemAtIndex = GetInventoryItemAtIndex(index, inventoryType);
+        if (itemAtIndex == null)
+            return;
+
+        if (!itemAtIndex.IsEquipped())
+            return;
+
+        itemAtIndex.UnEquipItem();
+    }
     void UnEquipItem(BodyMod_Class bodyMod)
     {
         if (_equippedBodyMods.Contains(bodyMod))
@@ -386,6 +389,15 @@ public class BombRunUnitBodyModManager
                 this._unit.StatModifierUpdated(statModifier.StatType);
             }
         }
+    }
+    public void DropItemAtIndex(int index, InventoryType inventoryType)
+    {
+        Debug.Log("DropItemAtIndex: " + inventoryType + ": " + index);
+        BombRun_Item_Class itemAtIndex = GetInventoryItemAtIndex(index, inventoryType);
+        if (itemAtIndex == null)
+            return;
+        Debug.Log("DropItemAtIndex: " + itemAtIndex.Name() + " found at index: " + index);
+        itemAtIndex.DropItem();
     }
     public List<BodyMod_Class> GetAllBodyMods()
     {
@@ -544,15 +556,16 @@ public class BombRunUnitBodyModManager
 
         RemoveBodyModComponent(_bodyModComponents[0]);
     }
-    private void BodyModClass_OnItemDestroyed(object sender, EventArgs e)
+    private void BombRun_Item_Class_OnItemDestroyed(object sender, EventArgs e)
     {
-        BodyMod_Class bodyMod = sender as BodyMod_Class;
+        BombRun_Item_Class inventoryItem = sender as BombRun_Item_Class;
 
-        bodyMod.OnItemEquipped += BodyModClass_OnItemEquipped;
-        bodyMod.OnItemUnEquipped += BodyModClass_OnItemUnEquipped;
-        bodyMod.OnItemDestroyed += BodyModClass_OnItemDestroyed;
+        inventoryItem.OnItemEquipped -= BodyModClass_OnItemEquipped;
+        inventoryItem.OnItemUnEquipped -= BodyModClass_OnItemUnEquipped;
+        inventoryItem.OnItemDestroyed -= BombRun_Item_Class_OnItemDestroyed;
 
-        RemoveBodyMod(bodyMod);
+        RemoveItemFromInventory(inventoryItem);
+        //RemoveBodyMod(inventoryItem);
     }
     public int MaxInventoryCount()
     {
@@ -568,7 +581,7 @@ public class BombRunUnitBodyModManager
                 return MaxInventoryCount();
         }
     }
-    public void SetMaxInvetoryCount(int newCount)
+    public void SetMaxInventoryCount(int newCount)
     {
         this._maxInventoryCount = newCount;
     }
@@ -584,6 +597,15 @@ public class BombRunUnitBodyModManager
     //            return new Dictionary<int, BombRun_Item_Class>();
     //    }
     //}
+    public InventoryType GetInventoryTypeByItem(BombRun_Item_Class item)
+    {
+        if (item.GetType() == typeof(BodyMod_Class))
+            return InventoryType.BodyMods;
+        else if (item.GetType() == typeof(BodyModComponent_Class))
+            return InventoryType.BodyModComponents;
+
+        return InventoryType.None;
+    }
     public Dictionary<int, BombRun_Item_Class> GetInventoryByType(InventoryType inventoryType)
     {
         var result = new Dictionary<int, BombRun_Item_Class>();
@@ -620,21 +642,35 @@ public class BombRunUnitBodyModManager
         switch (inventoryType)
         {
             case InventoryType.BodyMods:
-                return _inventoryBodyMods[index];
+                //if (_inventoryBodyMods.Count <= index)
+                //    return null;
+                //return _inventoryBodyMods[index];
+                _inventoryBodyMods.TryGetValue(index, out BodyMod_Class bodyMod);
+                return bodyMod;
             case InventoryType.BodyModComponents:
-                return _inventoryBodyModComponents[index];
+                //if (_inventoryBodyModComponents.Count <= index)
+                //    return null;
+                //return _inventoryBodyModComponents[index];
+                _inventoryBodyModComponents.TryGetValue(index, out BodyModComponent_Class component);
+                return component;
             default:
                 return null;
         }
+        
     }
+    
     public void SetInventoryItemAtIndex(int index, BombRun_Item_Class item, InventoryType inventoryType)
     {
         switch (inventoryType)
         {
             case InventoryType.BodyMods:
+                if (_inventoryBodyMods.Count <= index)
+                    return;
                 _inventoryBodyMods[index] = item as BodyMod_Class;
                 break;
             case InventoryType.BodyModComponents:
+                if (_inventoryBodyModComponents.Count <= index)
+                    return;
                 _inventoryBodyModComponents[index] = item as BodyModComponent_Class;
                 break;
         }

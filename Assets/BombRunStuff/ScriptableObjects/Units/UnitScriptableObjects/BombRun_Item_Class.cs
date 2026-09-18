@@ -137,6 +137,16 @@ public class BombRun_Item_Class
         _isEquipped = false;
         OnItemUnEquipped?.Invoke(this, EventArgs.Empty);
     }
+    public void DropItem()
+    {
+        // for now, just destroy dropped items?
+        RemoveFromItemCount(1);
+        if (this._stackSize < 1)
+        {
+            DestroyItem();
+        }
+        
+    }
     public void DestroyItem()
     {
         OnItemDestroyed?.Invoke(this, EventArgs.Empty);

@@ -90,8 +90,12 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         }
 
         _itemClass = itemClass;
-        _itemClass.OnItemEquipped += BombRun_Item_Class_OnItemEquipped;
-        _itemClass.OnItemUnEquipped += BombRun_Item_Class_OnItemUnEquipped;
+
+        if (_itemClass != null)
+        {
+            _itemClass.OnItemEquipped += BombRun_Item_Class_OnItemEquipped;
+            _itemClass.OnItemUnEquipped += BombRun_Item_Class_OnItemUnEquipped;
+        }
     }
     public void AddItemImage(Sprite sprite)
     {
@@ -130,6 +134,13 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
 
         this._itemImage.sprite = null;
         this._itemImage.color = new Color(1, 1, 1, 0);
+
+        if (_itemClass != null)
+        {
+            _itemClass.OnItemEquipped -= BombRun_Item_Class_OnItemEquipped;
+            _itemClass.OnItemUnEquipped -= BombRun_Item_Class_OnItemUnEquipped;
+        }
+        _itemClass = null;
     }
     public Sprite Sprite()
     {
