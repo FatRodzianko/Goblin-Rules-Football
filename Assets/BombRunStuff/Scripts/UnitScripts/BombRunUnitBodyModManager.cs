@@ -64,20 +64,20 @@ public class BombRunUnitBodyModManager
             {
                 //_bodyMods.Add(bodyModClass);
                 AddBodyMod(bodyModClass);
-                bodyModClass.OnBodyModEquipped += BodyModClass_OnBodyModEquipped;
-                bodyModClass.OnBodyModUnEquipped += BodyModClass_OnBodyModUnEquipped;
-                bodyModClass.OnBodyModDestroyed += BodyModClass_OnBodyModDestroyed;
+                bodyModClass.OnItemEquipped += BodyModClass_OnItemEquipped;
+                bodyModClass.OnItemUnEquipped += BodyModClass_OnItemUnEquipped;
+                bodyModClass.OnItemDestroyed += BodyModClass_OnItemDestroyed;
 
-                //bodyModClass.EquipBodyMod();
+                //bodyModClass.EquipItem();
             }
         }
     }
     void AddBodyMod(ScriptableBodyMod bodyMod)
     {
         BodyMod_Class bodyModClass = new BodyMod_Class(bodyMod, _unit);
-        bodyModClass.OnBodyModEquipped += BodyModClass_OnBodyModEquipped;
-        bodyModClass.OnBodyModUnEquipped += BodyModClass_OnBodyModUnEquipped;
-        bodyModClass.OnBodyModDestroyed += BodyModClass_OnBodyModDestroyed;
+        bodyModClass.OnItemEquipped += BodyModClass_OnItemEquipped;
+        bodyModClass.OnItemUnEquipped += BodyModClass_OnItemUnEquipped;
+        bodyModClass.OnItemDestroyed += BodyModClass_OnItemDestroyed;
         AddBodyMod(bodyModClass);
     }
     public void AddBodyMod(BodyMod_Class bodyMod)
@@ -208,16 +208,16 @@ public class BombRunUnitBodyModManager
         //{
         //    _bodyMods.Remove(bodyMod);
 
-        //    bodyMod.OnBodyModEquipped -= BodyModClass_OnBodyModEquipped;
-        //    bodyMod.OnBodyModUnEquipped -= BodyModClass_OnBodyModUnEquipped;
-        //    bodyMod.OnBodyModDestroyed -= BodyModClass_OnBodyModDestroyed;
+        //    bodyMod.OnItemEquipped -= BodyModClass_OnItemEquipped;
+        //    bodyMod.OnItemUnEquipped -= BodyModClass_OnItemUnEquipped;
+        //    bodyMod.OnItemDestroyed -= BodyModClass_OnItemDestroyed;
 
         //}
         // OLD
 
         if (_equippedBodyMods.Contains(bodyMod))
         {
-            UnEquipBodyMod(bodyMod);
+            UnEquipItem(bodyMod);
         }
         bodyMod = null;
     }
@@ -333,13 +333,13 @@ public class BombRunUnitBodyModManager
         id = -1;
         return false;
     }
-    private void BodyModClass_OnBodyModEquipped(object sender, EventArgs e)
+    private void BodyModClass_OnItemEquipped(object sender, EventArgs e)
     {
-        EquipBodyMod(sender as BodyMod_Class);
+        EquipItem(sender as BodyMod_Class);
     }
-    private void BodyModClass_OnBodyModUnEquipped(object sender, EventArgs e)
+    private void BodyModClass_OnItemUnEquipped(object sender, EventArgs e)
     {
-        UnEquipBodyMod(sender as BodyMod_Class);
+        UnEquipItem(sender as BodyMod_Class);
     }
     public void EquipInventoryItem(InventoryType invetoryType, int itemIndex)
     {
@@ -353,11 +353,11 @@ public class BombRunUnitBodyModManager
             if (bodyMod.IsEquipped())
             {
 
-                bodyMod.UnEquipBodyMod();
+                bodyMod.UnEquipItem();
             }
             else
             {
-                bodyMod.EquipBodyMod();
+                bodyMod.EquipItem();
             }
         }
         else
@@ -365,7 +365,7 @@ public class BombRunUnitBodyModManager
             Debug.Log("EquipInventoryItem: no item at: " + itemIndex);
         }
     }
-    void EquipBodyMod(BodyMod_Class bodyMod)
+    void EquipItem(BodyMod_Class bodyMod)
     {
         if (_equippedBodyMods.Contains(bodyMod))
             return;
@@ -376,7 +376,7 @@ public class BombRunUnitBodyModManager
         }
 
     }
-    void UnEquipBodyMod(BodyMod_Class bodyMod)
+    void UnEquipItem(BodyMod_Class bodyMod)
     {
         if (_equippedBodyMods.Contains(bodyMod))
         {
@@ -500,14 +500,14 @@ public class BombRunUnitBodyModManager
 
         _bodyMods[0].Modify_BodyModStatModifiers(Mathf.RoundToInt(UnityEngine.Random.Range(2f,10f)));
     }
-    public void UnEquipBodyModTest()
+    public void UnEquipItemTest()
     {
         if (_equippedBodyMods.Count < 1)
             return;
 
-        _equippedBodyMods[0].UnEquipBodyMod();
+        _equippedBodyMods[0].UnEquipItem();
     }
-    public void EquipBodyModTest()
+    public void EquipItemTest()
     {
         if (_bodyMods.Count < 1)
             return;
@@ -516,18 +516,18 @@ public class BombRunUnitBodyModManager
         {
             if (!_equippedBodyMods.Contains(bodyMod))
             {
-                bodyMod.EquipBodyMod();
+                bodyMod.EquipItem();
                 break;
             }
         }
     }
-    public void DestroyBodyModTest()
+    public void DestroyItemTest()
     {
-        Debug.Log("DestroyBodyModTest: _bodyMods.Count: " + _bodyMods.Count.ToString());
+        Debug.Log("DestroyItemTest: _bodyMods.Count: " + _bodyMods.Count.ToString());
         if (_bodyMods.Count < 1)
             return;
 
-        _bodyMods[0].DestroyBodyMod();
+        _bodyMods[0].DestroyItem();
     }
     public void AddNewTestBodyMod(ScriptableBodyMod bodyMod)
     {
@@ -544,13 +544,13 @@ public class BombRunUnitBodyModManager
 
         RemoveBodyModComponent(_bodyModComponents[0]);
     }
-    private void BodyModClass_OnBodyModDestroyed(object sender, EventArgs e)
+    private void BodyModClass_OnItemDestroyed(object sender, EventArgs e)
     {
         BodyMod_Class bodyMod = sender as BodyMod_Class;
 
-        bodyMod.OnBodyModEquipped += BodyModClass_OnBodyModEquipped;
-        bodyMod.OnBodyModUnEquipped += BodyModClass_OnBodyModUnEquipped;
-        bodyMod.OnBodyModDestroyed += BodyModClass_OnBodyModDestroyed;
+        bodyMod.OnItemEquipped += BodyModClass_OnItemEquipped;
+        bodyMod.OnItemUnEquipped += BodyModClass_OnItemUnEquipped;
+        bodyMod.OnItemDestroyed += BodyModClass_OnItemDestroyed;
 
         RemoveBodyMod(bodyMod);
     }

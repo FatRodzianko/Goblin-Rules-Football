@@ -215,15 +215,15 @@ public class BombRunUnit : MonoBehaviour
             {
                 if (Input.GetKeyDown(KeyCode.U))
                 {
-                    _bodyModManager.UnEquipBodyModTest();
+                    _bodyModManager.UnEquipItemTest();
                 }
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    _bodyModManager.EquipBodyModTest();
+                    _bodyModManager.EquipItemTest();
                 }
                 if (Input.GetKeyDown(KeyCode.K))
                 {
-                    _bodyModManager.DestroyBodyModTest();
+                    _bodyModManager.DestroyItemTest();
                 }
                 if (Input.GetKeyDown(KeyCode.L))
                 {

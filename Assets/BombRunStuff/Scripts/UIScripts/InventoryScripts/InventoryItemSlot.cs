@@ -13,6 +13,8 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     [SerializeField] private bool _isSelected;
     [SerializeField] private bool _mouseOver;
 
+    private BombRun_Item_Class _itemClass;
+
     [Header("Item Details")]
     [SerializeField] private Sprite _sprite;
     [SerializeField] private string _name;
@@ -32,16 +34,11 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     [SerializeField] private Color _selectedColor;
     [SerializeField] private Color _mouseOverColor;
 
-    //[Header("Misc.")]
-    //[SerializeField] private int _clickedOnCount = 0;
-    //[SerializeField] private float _clickedOnTime;
-    //[SerializeField] private float _clickDelay = 0.25f;
-    //private IEnumerator _clickDelayRoutine;
-    //[SerializeField] private bool _clickDelayRoutineIsRunning = false;
-
     // static Events
     public static event EventHandler<int> OnAnyItemSlotSingleLeftClickedOn;
     public static event EventHandler<int> OnAnyItemSlotDoubleLeftClickedOn;
+    public static event EventHandler<int> OnAnyItemSlotSingleRightClickedOn;
+
     public static event EventHandler OnAnyItemIsSelected;
     public static event EventHandler<int> OnAnyItemMousedOver;
     public static event EventHandler<int> OnAnyItemMouseExit;
@@ -61,9 +58,17 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     {
         InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
         this.OnItemSlotSelected -= InventoryItemSlot_OnItemSlotSelected;
+
+        if (_itemClass != null)
+        {
+            _itemClass.OnItemEquipped -= BombRun_Item_Class_OnItemEquipped;
+            _itemClass.OnItemUnEquipped -= BombRun_Item_Class_OnItemUnEquipped;
+        }
     }
+
     
-    public void AddItemToSlot(Sprite sprite, string name, string description, int itemCount = 1)
+
+    public void AddItemToSlot(Sprite sprite, string name, string description, BombRun_Item_Class itemClass, int itemCount = 1)
     {
         this._sprite = sprite;
         this._name = name;
@@ -73,6 +78,20 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
 
         AddItemImage(sprite);
         UpdateItemCountText(itemCount);
+
+        AddItemClass(itemClass);
+    }
+    private void AddItemClass(BombRun_Item_Class itemClass)
+    {
+        if (_itemClass != null)
+        {
+            _itemClass.OnItemEquipped -= BombRun_Item_Class_OnItemEquipped;
+            _itemClass.OnItemUnEquipped -= BombRun_Item_Class_OnItemUnEquipped;
+        }
+
+        _itemClass = itemClass;
+        _itemClass.OnItemEquipped += BombRun_Item_Class_OnItemEquipped;
+        _itemClass.OnItemUnEquipped += BombRun_Item_Class_OnItemUnEquipped;
     }
     public void AddItemImage(Sprite sprite)
     {
@@ -143,6 +162,15 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     public bool IsEquipped()
     {
         return _isEquipped;
+    }
+    private void BombRun_Item_Class_OnItemUnEquipped(object sender, EventArgs e)
+    {
+        SetIsEquipped(false);
+    }
+
+    private void BombRun_Item_Class_OnItemEquipped(object sender, EventArgs e)
+    {
+        SetIsEquipped(true);
     }
     public void SetIsEquipped(bool isEquipped)
     {
@@ -243,7 +271,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     }
     private void OnRightClick()
     {
-        
+        OnAnyItemSlotSingleRightClickedOn?.Invoke(this, this._slotIndex);
     }
     public void OnPointerEnter(PointerEventData eventData)
     {

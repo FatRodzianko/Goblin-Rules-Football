@@ -9,7 +9,7 @@ public class BodyMod_Class: BombRun_Item_Class
     [SerializeField] private BombRunUnit _unit;
     [Header("Start: BodyMod_Class")]
     [SerializeField] private ScriptableBodyMod _bodyModScriptable;
-    [SerializeField] private bool _isEquipped;
+    //[SerializeField] private bool _isEquipped;
 
     //[Header("Details")]
     //[SerializeField] private string _name;
@@ -31,9 +31,9 @@ public class BodyMod_Class: BombRun_Item_Class
     [SerializeField] private List<ScriptableBodyModComponent> _requiredBodyModyComponents = new List<ScriptableBodyModComponent>();
 
     // events
-    public event EventHandler OnBodyModEquipped;
-    public event EventHandler OnBodyModUnEquipped;
-    public event EventHandler OnBodyModDestroyed;
+    //public event EventHandler OnBodyModEquipped;
+    //public event EventHandler OnBodyModUnEquipped;
+    //public event EventHandler OnBodyModDestroyed;
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BodyMod_Class(ScriptableBodyMod bodyModScript, BombRunUnit unit) : base(bodyModScript)
@@ -88,38 +88,6 @@ public class BodyMod_Class: BombRun_Item_Class
             this._requiredBodyModyComponents.Add(bodyModComponent);
         }
     }
-    //public string Name()
-    //{
-    //    return _name;
-    //}
-    //public void SetName(string newName)
-    //{
-    //    this._name = newName;
-    //}
-    //public Sprite Sprite()
-    //{
-    //    return _sprite;
-    //}
-    //public void SetSprite(Sprite newSprite)
-    //{
-    //    this._sprite = newSprite;
-    //}
-    //public string Description()
-    //{
-    //    return _description;
-    //}
-    //public void SetDescription(string newDescription)
-    //{
-    //    this._description = newDescription;
-    //}
-    //public BodyPart BodyPart()
-    //{
-    //    return _bodyPart;
-    //}
-    //public void SetBodyPart(BodyPart newBodyPart)
-    //{
-    //    this._bodyPart = newBodyPart;
-    //}
     public float NoiseModifier()
     {
         return _noiseModifier;
@@ -181,23 +149,23 @@ public class BodyMod_Class: BombRun_Item_Class
     {
         return _requiredBodyModyComponents;
     }
-    public bool IsEquipped()
-    {
-        return _isEquipped;
-    }
-    public void EquipBodyMod()
-    {
-        _isEquipped = true;
-        OnBodyModEquipped?.Invoke(this, EventArgs.Empty);
-    }
-    public void UnEquipBodyMod()
-    {
-        _isEquipped = false;
-        OnBodyModUnEquipped?.Invoke(this, EventArgs.Empty);
-    }
-    public void DestroyBodyMod()
-    {
-        OnBodyModDestroyed?.Invoke(this, EventArgs.Empty);
-    }
+    //public bool IsEquipped()
+    //{
+    //    return _isEquipped;
+    //}
+    //public void EquipBodyMod()
+    //{
+    //    _isEquipped = true;
+    //    OnBodyModEquipped?.Invoke(this, EventArgs.Empty);
+    //}
+    //public void UnEquipBodyMod()
+    //{
+    //    _isEquipped = false;
+    //    OnBodyModUnEquipped?.Invoke(this, EventArgs.Empty);
+    //}
+    //public void DestroyBodyMod()
+    //{
+    //    OnBodyModDestroyed?.Invoke(this, EventArgs.Empty);
+    //}
 
 }

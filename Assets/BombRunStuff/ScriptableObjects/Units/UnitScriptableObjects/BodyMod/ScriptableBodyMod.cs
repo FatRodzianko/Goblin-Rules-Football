@@ -42,12 +42,6 @@ public class BodyModComponentRequirement
 [CreateAssetMenu(fileName = "ScriptableBodyMod", menuName = "BombRun/BodyMods/New Scriptable BodyMod")]
 public class ScriptableBodyMod: ScriptableItem
 {
-    //[Header("Details")]
-    //[SerializeField] private string _name;
-    //[SerializeField] private Sprite _sprite;
-    //[SerializeField] private string _description;
-
-    //
     //[SerializeField] private BodyPart _bodyPart;
     [Header("Start: BodyMod")]
     [Header("Stat Modifiers")]

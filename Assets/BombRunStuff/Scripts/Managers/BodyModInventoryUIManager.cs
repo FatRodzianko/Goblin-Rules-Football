@@ -52,6 +52,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
         CloseInventory();
         //CreateItemSlots();
         InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn += InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
+        InventoryItemSlot.OnAnyItemSlotSingleRightClickedOn += InventoryItemSlot_OnAnyItemSlotSingleRightClickedOn;
         InventoryItemSlot.OnAnyItemIsSelected += InventoryItemSlot_OnAnyItemIsSelected;
         InventoryItemSlot.OnAnyItemMousedOver += InventoryItemSlot_OnAnyItemMousedOver;
         InventoryItemSlot.OnAnyItemMouseExit += InventoryItemSlot_OnAnyItemMouseExit;
@@ -67,6 +68,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     private void OnDisable()
     {
         InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
+        InventoryItemSlot.OnAnyItemSlotSingleRightClickedOn -= InventoryItemSlot_OnAnyItemSlotSingleRightClickedOn;
         InventoryItemSlot.OnAnyItemIsSelected -= InventoryItemSlot_OnAnyItemIsSelected;
         InventoryItemSlot.OnAnyItemMousedOver -= InventoryItemSlot_OnAnyItemMousedOver;
         InventoryItemSlot.OnAnyItemMouseExit -= InventoryItemSlot_OnAnyItemMouseExit;
@@ -232,8 +234,8 @@ public class BodyModInventoryUIManager : MonoBehaviour
             {
                 //BodyMod_Class bodyMod = unit.BodyModManager().Inventory_BodyMods()[i];
                 BombRun_Item_Class item = bodyModManager.GetInventoryByType(_currentInventoryType)[i];
-                _itemSlots[i].AddItemToSlot(item.Sprite(), item.Name(), item.Description(), item.StackSize());
-                //_itemSlots[i].SetIsEquipped((item as BodyMod_Class).IsEquipped());
+                _itemSlots[i].AddItemToSlot(item.Sprite(), item.Name(), item.Description(), item, item.StackSize());
+                _itemSlots[i].SetIsEquipped(item.IsEquipped());
                 Debug.Log("GetInventoryItems: item found at index: " + i);
             }
         }
@@ -281,7 +283,6 @@ public class BodyModInventoryUIManager : MonoBehaviour
         if (!_itemSlots[_selectedItemIndex].IsSelected())
         {
             _itemSlots[index].SetIsSelected(true);
-            //_selectedItemIndex = index;
             SetSelectedItemIndex(index);
             return;
         }
@@ -309,8 +310,25 @@ public class BodyModInventoryUIManager : MonoBehaviour
         _itemSlots[_selectedItemIndex].SetIsSelected(false);
         _itemSlots[index].SetIsSelected(true);
 
-        //_selectedItemIndex = index;
         SetSelectedItemIndex(index);
+    }
+    private void InventoryItemSlot_OnAnyItemSlotSingleRightClickedOn(object sender, int index)
+    {
+        if (index != _selectedItemIndex)
+        {
+            if (_itemSlots[_selectedItemIndex].IsSelected())
+            {
+                _itemSlots[_selectedItemIndex].SetIsSelected(false);
+            }
+            CheckIfItemDescriptionShouldReset(index);
+        }
+        else
+        {
+            if (_itemSlots[index].IsSelected())
+            {
+                // check if item is equipped. If it is, unequip?
+            }
+        }
     }
     private void InventoryItemSlot_OnAnyItemIsSelected(object sender, EventArgs e)
     {
@@ -323,8 +341,6 @@ public class BodyModInventoryUIManager : MonoBehaviour
             ClearItemDescriptionDetails();
             return;
         }
-
-
         SetItemDescriptionDetails(selectedItem.Sprite(), selectedItem.Name(), selectedItem.Description());
     }
     private void InventoryItemSlot_OnAnyItemMousedOver(object sender, int index)
@@ -465,8 +481,8 @@ public class BodyModInventoryUIManager : MonoBehaviour
         }
         else
         {
-            _itemSlots[previousIndex].AddItemToSlot(newIndexBodyMod.Sprite(), newIndexBodyMod.Name(), newIndexBodyMod.Description(), newIndexBodyMod.StackSize());
-            //_itemSlots[previousIndex].SetIsEquipped((newIndexBodyMod as BodyMod_Class).IsEquipped());
+            _itemSlots[previousIndex].AddItemToSlot(newIndexBodyMod.Sprite(), newIndexBodyMod.Name(), newIndexBodyMod.Description(), newIndexBodyMod, newIndexBodyMod.StackSize());
+            _itemSlots[previousIndex].SetIsEquipped(newIndexBodyMod.IsEquipped());
         }
 
         if (previousIndexBodyMod == null)
@@ -475,8 +491,8 @@ public class BodyModInventoryUIManager : MonoBehaviour
         }
         else
         {
-            _itemSlots[newIndex].AddItemToSlot(previousIndexBodyMod.Sprite(), previousIndexBodyMod.Name(), previousIndexBodyMod.Description(), previousIndexBodyMod.StackSize());
-            //_itemSlots[newIndex].SetIsEquipped((previousIndexBodyMod as BodyMod_Class).IsEquipped());
+            _itemSlots[newIndex].AddItemToSlot(previousIndexBodyMod.Sprite(), previousIndexBodyMod.Name(), previousIndexBodyMod.Description(), previousIndexBodyMod, previousIndexBodyMod.StackSize());
+            _itemSlots[newIndex].SetIsEquipped(previousIndexBodyMod.IsEquipped());
         }
 
         _bodyModManager.SetInventoryItemAtIndex(previousIndex, newIndexBodyMod, _currentInventoryType);

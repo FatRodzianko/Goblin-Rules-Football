@@ -13,7 +13,7 @@ public class BombRun_Item_Class
     [SerializeField] protected string _name;
     [SerializeField] protected Sprite _sprite;
     [SerializeField] protected string _description;
-    [SerializeField] protected bool _equippable;
+    
     
 
     [Header("Base Item Stat Modifiers")]
@@ -23,8 +23,17 @@ public class BombRun_Item_Class
     [SerializeField] protected bool _stackable;
     [SerializeField] protected int _stackSize;
 
+    [Header("Equipped")]
+    [SerializeField] protected bool _equippable;
+    [SerializeField] protected bool _isEquipped;
+
     // events
     public event EventHandler OnStackSizeChanged;
+
+    // events
+    public event EventHandler OnItemEquipped;
+    public event EventHandler OnItemUnEquipped;
+    public event EventHandler OnItemDestroyed;
 
 
     public BombRun_Item_Class(ScriptableItem itemScript)
@@ -113,5 +122,23 @@ public class BombRun_Item_Class
     public void SetEquippable(bool newEquippable)
     {
         _equippable = newEquippable;
+    }
+    public bool IsEquipped()
+    {
+        return _isEquipped;
+    }
+    public void EquipItem()
+    {
+        _isEquipped = true;
+        OnItemEquipped?.Invoke(this, EventArgs.Empty);
+    }
+    public void UnEquipItem()
+    {
+        _isEquipped = false;
+        OnItemUnEquipped?.Invoke(this, EventArgs.Empty);
+    }
+    public void DestroyItem()
+    {
+        OnItemDestroyed?.Invoke(this, EventArgs.Empty);
     }
 }
