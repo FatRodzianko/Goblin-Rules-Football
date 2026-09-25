@@ -36,6 +36,8 @@ public class BombRunUnitBodyModManager
     private Dictionary<int, BodyModComponent_Class> _inventoryBodyModComponents = new Dictionary<int, BodyModComponent_Class>(); // the int key is meant to cache where the item is in the inventory list?
 
     [Header("Equipped Body Mods")]
+    private Dictionary<BodyPart, Dictionary<int, BodyMod_Class>> _equippedInventories = new Dictionary<BodyPart, Dictionary<int, BodyMod_Class>>();
+
     private Dictionary<int, BodyMod_Class> _equippedBodyModsHead = new Dictionary<int, BodyMod_Class>();
     private Dictionary<int, BodyMod_Class> _equippedBodyModsArms = new Dictionary<int, BodyMod_Class>();
     private Dictionary<int, BodyMod_Class> _equippedBodyModsLegs = new Dictionary<int, BodyMod_Class>();
@@ -50,6 +52,8 @@ public class BombRunUnitBodyModManager
 
         SetMaxInventoryCount(maxInventoryCount);
         CreateInventoryDictionary(maxInventoryCount);
+
+        CreateEquippedInventories(unit);
 
         CreateBodyModClassObjects(bodyMods, _unit);
         
@@ -72,6 +76,23 @@ public class BombRunUnitBodyModManager
 
             //    //bodyModClass.EquipItem();
             //}
+        }
+    }
+    private void CreateEquippedInventories(BombRunUnit unit)
+    {
+        foreach (BombRunUnitBodyPartAndFrozenState bodyPartAndFrozenState in unit.GetUnitHealthSystem().GetAllBodyPartsAndFrozenState())
+        {
+            BodyPart bodyPart = bodyPartAndFrozenState.BodyPart;
+            if (!_equippedInventories.ContainsKey(bodyPart))
+            {
+                Dictionary<int, BodyMod_Class> newInventory = new Dictionary<int, BodyMod_Class>();
+
+                for (int i = 0; i < unit.GetInventorySizeByBodyPart(bodyPart); i++)
+                {
+                    newInventory.Add(i, null);
+                }
+                _equippedInventories.Add(bodyPart, newInventory);
+            }
         }
     }
     void AddBodyMod(ScriptableBodyMod bodyMod)
@@ -363,6 +384,7 @@ public class BombRunUnitBodyModManager
     private void BodyModClass_OnItemUnEquipped(object sender, EventArgs e)
     {
         UnEquipItem(sender as BodyMod_Class);
+        
     }
     public void EquipInventoryItem(InventoryType invetoryType, int itemIndex)
     {
@@ -380,7 +402,17 @@ public class BombRunUnitBodyModManager
             }
             else
             {
-                bodyMod.EquipItem();
+                if (CanAddItemToInventory(GetEquippedInventoryForBodyPart(bodyMod.BodyPart()), bodyMod, out int index))
+                {
+                    EquipItemAtIndex(bodyMod, index);
+                    Debug.Log("EquipInventoryItem: equipped " + bodyMod.Name() + " at index " + index + " of " + bodyMod.BodyPart() + " inventory. Inventory now: " + GetEquippedInventoryForBodyPart(bodyMod.BodyPart())[index].Name());
+                    bodyMod.EquipItem();
+                }
+                else
+                {
+                    Debug.Log("EquipInventoryItem: Could not quip " + bodyMod.Name() + " on the " + bodyMod.BodyPart() + " inventory.");
+                }
+                
             }
         }
         else
@@ -388,17 +420,38 @@ public class BombRunUnitBodyModManager
             Debug.Log("EquipInventoryItem: no item at: " + itemIndex);
         }
     }
+    //private bool CanInventoryItemBeEquipped(BodyMod_Class bodyMod)
+    //{
+    //    bool canEquip = false;
 
+    //    Dictionary<int, BodyMod_Class> equippedInventory = GetEquippedInventoryForBodyPart(bodyMod.BodyPart());
+
+    //    if (equippedInventory.Count < 1)
+    //        return false;
+
+    //    CanAddItemToInventory(equippedInventory, bodyMod, out int id);
+
+    //    return canEquip;
+    //}
+    
     void EquipItem(BodyMod_Class bodyMod)
     {
+        Debug.Log("EquipItem: " + bodyMod.Name());
         if (_equippedBodyMods.Contains(bodyMod))
             return;
+        
         _equippedBodyMods.Add(bodyMod);
+
         foreach (BodyModStatModifier statModifier in bodyMod.BodyStatModifiers())
         {
             this._unit.StatModifierUpdated(statModifier.StatType);
         }
 
+    }
+    private void EquipItemAtIndex(BodyMod_Class bodyMod, int index)
+    {
+        Dictionary<int, BodyMod_Class> equippedInventory = GetEquippedInventoryForBodyPart(bodyMod.BodyPart());
+        equippedInventory[index] = bodyMod;
     }
     public void UnEquipItemAtIndex(int index, InventoryType inventoryType)
     {
@@ -421,6 +474,24 @@ public class BombRunUnitBodyModManager
                 this._unit.StatModifierUpdated(statModifier.StatType);
             }
         }
+
+        Dictionary<int, BodyMod_Class> equippedInventory = GetEquippedInventoryForBodyPart(bodyMod.BodyPart());
+        int indexToRemove = -1;
+        foreach (KeyValuePair<int, BodyMod_Class> inventoryItem in equippedInventory)
+        {
+            if (inventoryItem.Value == bodyMod)
+            {
+                Debug.Log("UnEquipItem: " + bodyMod.Name() + " found at index " + inventoryItem.Key + ". Removing...");
+                indexToRemove = inventoryItem.Key;
+                break;
+            }
+        }
+        if (indexToRemove > -1)
+        {
+            equippedInventory[indexToRemove] = null;
+        }
+        Debug.Log("EquipInventoryItem: equipped " + bodyMod.Name() + " at index " + indexToRemove + " of " + bodyMod.BodyPart() + " inventory. Inventory now: " + (GetEquippedInventoryForBodyPart(bodyMod.BodyPart())[indexToRemove] is null));
+
     }
     public void DropItemAtIndex(int index, InventoryType inventoryType)
     {
@@ -658,8 +729,15 @@ public class BombRunUnitBodyModManager
                 }
                 return result;
         }
-
         return result;
+    }
+    private Dictionary<int, BodyMod_Class> GetEquippedInventoryForBodyPart(BodyPart bodyPart)
+    {
+        if (_equippedInventories.ContainsKey(bodyPart))
+        {
+            return _equippedInventories[bodyPart];
+        }
+        return new Dictionary<int, BodyMod_Class>();
     }
     public Dictionary<int, BodyMod_Class> Inventory_BodyMods()
     {

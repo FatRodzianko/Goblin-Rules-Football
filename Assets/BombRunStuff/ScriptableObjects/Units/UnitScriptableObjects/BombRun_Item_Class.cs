@@ -7,7 +7,7 @@ using UnityEngine;
 public class BombRun_Item_Class
 {
     [Header("Base Item ")]
-    [SerializeField] protected ScriptableItem _itemScriptable;
+    protected ScriptableItem _itemScriptable;
 
     [Header("Base Item Details")]
     [SerializeField] protected string _name;
@@ -139,6 +139,7 @@ public class BombRun_Item_Class
     }
     public void DropItem()
     {
+        Debug.Log("DropItem: " + this._name);
         // for now, just destroy dropped items?
         RemoveFromItemCount(1);
         if (this._stackSize < 1)
@@ -149,6 +150,7 @@ public class BombRun_Item_Class
     }
     public void DestroyItem()
     {
+        Debug.Log("DestroyItem: " + this._name);
         OnItemDestroyed?.Invoke(this, EventArgs.Empty);
     }
 }

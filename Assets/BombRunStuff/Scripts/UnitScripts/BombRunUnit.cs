@@ -841,4 +841,18 @@ public class BombRunUnit : MonoBehaviour
         }
 
     }
+    public int GetInventorySizeByBodyPart(BodyPart bodyPart)
+    {
+        switch (bodyPart)
+        {
+            case BodyPart.Head:
+                return 1;
+            case BodyPart.Arms:
+                return 2;
+            case BodyPart.Legs:
+                return 2;
+            default:
+                return 2;
+        }
+    }
 }
