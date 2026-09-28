@@ -25,3 +25,10 @@ MonoBehaviour:
   _inventoryCount: 7
   _bodyModComponents:
   - {fileID: 11400000, guid: 3ea799f4610d41642a8b200d3b696ce4, type: 2}
+  _inventorySlotsPerBodyPart:
+  - BodyPart: 1
+    InventoryCount: 1
+  - BodyPart: 2
+    InventoryCount: 1
+  - BodyPart: 3
+    InventoryCount: 1

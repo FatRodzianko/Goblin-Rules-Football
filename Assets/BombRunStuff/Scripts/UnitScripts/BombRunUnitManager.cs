@@ -62,7 +62,7 @@ public class BombRunUnitManager : MonoBehaviour
         }
         for (int i = 0; i < units.Length; i++)
         {
-            units[i].GetComponent<BombRunUnit>().InitializeBombRunUnit();
+            //units[i].GetComponent<BombRunUnit>().InitializeBombRunUnit();
         }
     }
     private void BombRunUnit_OnAnyUnitSpawned(object sender, EventArgs e)

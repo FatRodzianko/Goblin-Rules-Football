@@ -27,6 +27,9 @@ public class ScriptableBombRunUnit : ScriptableObject
     [Header("Body Mod Components")]
     [SerializeField] private List<ScriptableBodyModComponent> _bodyModComponents = new List<ScriptableBodyModComponent>();
 
+    [Header("Equipped Inventories")]
+    [SerializeField] private List<BodyPartInventorySlots> _inventorySlotsPerBodyPart = new List<BodyPartInventorySlots>();
+
     public Transform UnitPrefab()
     {
         return _unitPrefab;
@@ -74,5 +77,9 @@ public class ScriptableBombRunUnit : ScriptableObject
     public List<ScriptableBodyModComponent> BodyModComponents()
     {
         return _bodyModComponents;
+    }
+    public List<BodyPartInventorySlots> InventorySlotsPerBodyPart()
+    {
+        return _inventorySlotsPerBodyPart;
     }
 }

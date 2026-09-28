@@ -47,6 +47,7 @@ public class BombRunUnit : MonoBehaviour
 
     [Header("Unit Info")]
     [SerializeField] private UnitType _unitType;
+    private ScriptableBombRunUnit _unitScriptableObject;
     [SerializeField] private bool _isEnemy;
     [SerializeField] private DamageMode _damageMode;
     [SerializeField] private int _sightRange = 10;
@@ -157,16 +158,32 @@ public class BombRunUnit : MonoBehaviour
             Debug.Log("BombrunUnit: OnDisable: Failed to unsubscribe from events. Error: " + e);
         }
     }
-    public void InitializeBombRunUnit()
+    public void InitializeBombRunUnit(ScriptableBombRunUnit unitSO, bool isEnemy = false)
     {
         _gridPosition = LevelGrid.Instance.GetGridPositon(this.transform.position);
         Debug.Log("BombRunUnit: InitializeBombRunUnit: " + this.name + ": Starting position at: " + _gridPosition.ToString());
         LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
 
+        // add all the stuff that the unit spawner was setting from the SCriptableUnit here. no reason to make the unit spawner make a ton of different calls just passing data from the scriptable object. Make the unit do that...
+
+        this.SetBaseScriptableObject(unitSO);
+
+        this.SetUnitType(unitSO.UnitType());
+        this.SetUnitPortrait(unitSO.UnitPortrait());
+        this.SetDamageMode(unitSO.DamageMode());
+
+        this.InitializeUnitBaseStats(unitSO.BaseStatsScriptableObject());
+        this.InitializeUnitBodyMods(unitSO.BodyMods(), unitSO.InventoryCount());
+        this.InitializeUnitBodyModComponents(unitSO.BodyModComponents());
+
+        this.SetIsEnemy(isEnemy);
+
+        // done with stuff from unit spawner
+
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         
 
-        _bombRunUnitAnimator.InitializeUnitSprite();
+        _bombRunUnitAnimator.InitializeUnitSprite(this._unitType, this._isEnemy);
 
 
         _noiseManager = new BombRunUnitNoiseManager(this);
@@ -473,6 +490,10 @@ public class BombRunUnit : MonoBehaviour
         {
             _statManager.BodyPartFrozenStateUpdated(bodyPart);
         }
+    }
+    public void SetBaseScriptableObject(ScriptableBombRunUnit scriptable)
+    {
+        SetScriptableBombRunUnit(scriptable);
     }
     public void InitializeUnitBaseStats(ScriptableBombRunUnitBaseStats baseStats)
     {
@@ -854,5 +875,13 @@ public class BombRunUnit : MonoBehaviour
             default:
                 return 2;
         }
+    }
+    public ScriptableBombRunUnit ScriptableBombRunUnit()
+    {
+        return _unitScriptableObject;
+    }
+    private void SetScriptableBombRunUnit(ScriptableBombRunUnit scriptable)
+    {
+        _unitScriptableObject = scriptable;
     }
 }

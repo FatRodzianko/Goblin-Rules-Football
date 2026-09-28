@@ -144,18 +144,22 @@ public class BombRunUnitSpawner : MonoBehaviour
         Transform unitTransform = Instantiate(unit.UnitPrefab());
         BombRunUnit unitScript = unitTransform.GetComponent<BombRunUnit>();
 
-        unitScript.SetUnitType(unit.UnitType());
-        unitScript.SetUnitPortrait(unit.UnitPortrait());
-        unitScript.SetDamageMode(unit.DamageMode());
-        // Change these to some sort of "Unit Set Base Stats" function where the base stats scriptable object is passed to the unit
-        //unitScript.SetUnitSightRange(unit.SightRange());
-        //unitScript.SetUnitMaxMoveDistance(unit.MaxMoveDistance());
-        //unitScript.SetHearingSensitivity(unit.HearingSensitivity());
-        unitScript.InitializeUnitBaseStats(unit.BaseStatsScriptableObject());
-        unitScript.InitializeUnitBodyMods(unit.BodyMods(), unit.InventoryCount());
-        unitScript.InitializeUnitBodyModComponents(unit.BodyModComponents());
-        // Change these to some sort of "Unit Set Base Stats" function where the base stats scriptable object is passed to the unit
-        unitScript.SetIsEnemy(isEnemy);
+        ////Give unit its base ScriptableUnit
+        //unitScript.SetBaseScriptableObject(unit);
+
+        //unitScript.SetUnitType(unit.UnitType());
+        //unitScript.SetUnitPortrait(unit.UnitPortrait());
+        //unitScript.SetDamageMode(unit.DamageMode());
+        //// Change these to some sort of "Unit Set Base Stats" function where the base stats scriptable object is passed to the unit
+        ////unitScript.SetUnitSightRange(unit.SightRange());
+        ////unitScript.SetUnitMaxMoveDistance(unit.MaxMoveDistance());
+        ////unitScript.SetHearingSensitivity(unit.HearingSensitivity());
+        //unitScript.InitializeUnitBaseStats(unit.BaseStatsScriptableObject());
+        //unitScript.InitializeUnitBodyMods(unit.BodyMods(), unit.InventoryCount());
+        //unitScript.InitializeUnitBodyModComponents(unit.BodyModComponents());
+
+        //// Change these to some sort of "Unit Set Base Stats" function where the base stats scriptable object is passed to the unit
+        //unitScript.SetIsEnemy(isEnemy);
 
         unitTransform.position = LevelGrid.Instance.GetWorldPosition(gridPosition);
         unitTransform.gameObject.name = "TestSpawnUnit_" + count;
@@ -168,7 +172,7 @@ public class BombRunUnitSpawner : MonoBehaviour
 
         Debug.Log("BombRunUnitSpawner: SpawnUnit: " + unitTransform.gameObject.name + " : " + gridPosition);
 
-        unitScript.InitializeBombRunUnit();
+        unitScript.InitializeBombRunUnit(unit, isEnemy);
     }
     private void UnitSpawningUI_OnUnitSpawnUIStartGameButtonPressed(object sender, EventArgs e)
     {

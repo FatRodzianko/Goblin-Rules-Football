@@ -27,6 +27,11 @@ public class BombRunUnitAnimator : MonoBehaviour
     [Header("Unit Animation State?")]
     [SerializeField] private UnitAnimationState _unitAnimationState = UnitAnimationState.None;
 
+    [Header("Unit Colors")]
+    [SerializeField] private Color _scoutColor;
+    [SerializeField] private Color _medicColor;
+    [SerializeField] private Color _enemyColor;
+
     private void Awake()
     {
         if (_unit == null)
@@ -45,10 +50,44 @@ public class BombRunUnitAnimator : MonoBehaviour
     {
 
     }
-    public void InitializeUnitSprite()
+    public void InitializeUnitSprite(UnitType unitType = UnitType.Grunt, bool isEnemy = false)
     {
         //Debug.Log("InitializeUnitSprite: " + this._spriteRenderer.sprite.name);
         UnitSpriteChanged(this._spriteRenderer);
+        SetSpriteColorFromUnitType(unitType, isEnemy);
+    }
+    private void SetSpriteColorFromUnitType(UnitType unitType, bool isEnemy)
+    {
+        if (isEnemy)
+        {
+            switch (unitType)
+            {
+                case UnitType.Scout:
+                    _spriteRenderer.color = Color.Lerp(_enemyColor, _scoutColor, 0.66f);
+                    break;
+                case UnitType.Medic:
+                    _spriteRenderer.color = Color.Lerp(_enemyColor, _medicColor, 0.66f);
+                    break;
+                default:
+                    _spriteRenderer.color = _enemyColor;
+                    break;
+            }
+        }
+        else
+        {
+            switch (unitType)
+            {
+                case UnitType.Scout:
+                    _spriteRenderer.color = _scoutColor;
+                    break;
+                case UnitType.Medic:
+                    _spriteRenderer.color = _medicColor;
+                    break;
+                default:
+                    _spriteRenderer.color = Color.white;
+                    break;
+            }
+        }
     }
     private void UnitSpriteChanged(SpriteRenderer spriteRenderer)
     {

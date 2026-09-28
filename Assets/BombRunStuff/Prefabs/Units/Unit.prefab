@@ -1230,9 +1230,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _unit: {fileID: 3408740805264284271}
-  _startingHealth: 100
-  _health: 100
-  _maxHealth: 0
   _bodyPartsAndFrozenState:
   - BodyPart: 1
     BodyPartFrozenState: 0
@@ -2108,6 +2105,9 @@ MonoBehaviour:
   _shootProjectilePrefab: {fileID: 6527801240750598869, guid: a9e4d5d120043af429184696ec5f8786, type: 3}
   _shootPoint: {x: 0.1875, y: 1.34375, z: 0}
   _unitAnimationState: 0
+  _scoutColor: {r: 1, g: 0.91517913, b: 0, a: 1}
+  _medicColor: {r: 0, g: 1, b: 0.06844115, a: 1}
+  _enemyColor: {r: 1, g: 0.25943398, b: 0.25943398, a: 1}
 --- !u!331 &2186479288814106386
 SpriteMask:
   m_ObjectHideFlags: 0

@@ -1038,14 +1038,14 @@ x Maybe make it so there is also a BodyMod class
 - - x Click to select that unit
 - - - - - x also leave this clickable when the body mod inventory is open so that you can click on the portrait to change what unit's inventory you
             are looking at
-- Equip and Unequip Body mods from the inventory
+x Equip and Unequip Body mods from the inventory
 - - x All body mods should start unequipped (for testing)
 - - x If player clicks on selected item, flip its "equipped" status (just clicking to equip for now)
-- - - - - - later, check if the item can be equipped
-- - - - - - - - - What body part is the item? Does that body part's inventory have space to equip that?
-- Dropping items
-- - - right click to "drop" item and remove from inventory
-- - - When unequipping an item, check if there is room in the regular inventory to store it. If not, drop it?
+- - - - - x later, check if the item can be equipped
+- - - - - - - - x What body part is the item? Does that body part's inventory have space to equip that?
+x Dropping items
+- - x right click to "drop" item and remove from inventory
+- - x When unequipping an item, check if there is room in the regular inventory to store it. If not, drop it?
 
 
 ### END CURRENT TASKS

@@ -4,6 +4,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
+public class BodyPartInventorySlots
+{
+    public BodyPart BodyPart;
+    public int InventoryCount;
+
+    public BodyPartInventorySlots(BodyPart bodyPart, int inventoryCount)
+    {
+        BodyPart = bodyPart;
+        InventoryCount = inventoryCount;
+    }
+    public BodyPartInventorySlots Clone()
+    {
+        return new BodyPartInventorySlots(BodyPart, InventoryCount);
+    }
+}
 public enum InventoryType
 {
     None,
@@ -37,6 +53,9 @@ public class BombRunUnitBodyModManager
 
     [Header("Equipped Body Mods")]
     private Dictionary<BodyPart, Dictionary<int, BodyMod_Class>> _equippedInventories = new Dictionary<BodyPart, Dictionary<int, BodyMod_Class>>();
+
+    [Header("Equipped Inventory Additions")]
+    [SerializeField] private List<BodyPartInventorySlots> _additionalBodyPartInventorySlots = new List<BodyPartInventorySlots>();
 
     private Dictionary<int, BodyMod_Class> _equippedBodyModsHead = new Dictionary<int, BodyMod_Class>();
     private Dictionary<int, BodyMod_Class> _equippedBodyModsArms = new Dictionary<int, BodyMod_Class>();
@@ -80,19 +99,30 @@ public class BombRunUnitBodyModManager
     }
     private void CreateEquippedInventories(BombRunUnit unit)
     {
-        foreach (BombRunUnitBodyPartAndFrozenState bodyPartAndFrozenState in unit.GetUnitHealthSystem().GetAllBodyPartsAndFrozenState())
+        foreach (BodyPartInventorySlots bodyPartInventory in unit.ScriptableBombRunUnit().InventorySlotsPerBodyPart())
         {
-            BodyPart bodyPart = bodyPartAndFrozenState.BodyPart;
+            BodyPart bodyPart = bodyPartInventory.BodyPart;
             if (!_equippedInventories.ContainsKey(bodyPart))
             {
                 Dictionary<int, BodyMod_Class> newInventory = new Dictionary<int, BodyMod_Class>();
 
-                for (int i = 0; i < unit.GetInventorySizeByBodyPart(bodyPart); i++)
+                for (int i = 0; i < bodyPartInventory.InventoryCount; i++)
                 {
                     newInventory.Add(i, null);
                 }
                 _equippedInventories.Add(bodyPart, newInventory);
             }
+        }
+    }
+    public int GetInventorySizeByBodyPart(BodyPart bodyPart)
+    {
+        if (_equippedInventories.TryGetValue(bodyPart, out Dictionary<int, BodyMod_Class> equippedInventory))
+        {
+            return equippedInventory.Count;
+        }
+        else
+        {
+            return -1;
         }
     }
     void AddBodyMod(ScriptableBodyMod bodyMod)
@@ -441,6 +471,7 @@ public class BombRunUnitBodyModManager
             return;
         
         _equippedBodyMods.Add(bodyMod);
+        //GetEquippedInventoryForBodyPart(bodyMod.BodyPart)
 
         foreach (BodyModStatModifier statModifier in bodyMod.BodyStatModifiers())
         {
@@ -450,6 +481,7 @@ public class BombRunUnitBodyModManager
     }
     private void EquipItemAtIndex(BodyMod_Class bodyMod, int index)
     {
+        Debug.Log("EquipItemAtIndex: " + bodyMod.BodyPart() + ": index: " + index + " BodyMod: " + bodyMod.Name());
         Dictionary<int, BodyMod_Class> equippedInventory = GetEquippedInventoryForBodyPart(bodyMod.BodyPart());
         equippedInventory[index] = bodyMod;
     }
