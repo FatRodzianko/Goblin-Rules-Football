@@ -254,6 +254,10 @@ public class BombRunUnit : MonoBehaviour
                 {
                     _bodyModManager.RemoveNewTestBodyModComponent();
                 }
+                if (Input.GetKeyDown(KeyCode.Tab))
+                {
+                    _bodyModManager.SwapInventoryItemAndEquippedItemTest();
+                }
 
             }
         }

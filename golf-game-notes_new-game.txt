@@ -971,28 +971,28 @@ x Have some sort of UI thing that shows what your currently selected unit is
 - - - - - - - - - But the other components, such as the fastener or power source, can be whatever as long as they meet the component type requirements
 
 - Body Mod / Component Inventory
-- - - Gets number of item slots from Unit inventory count
+- - x Gets number of item slots from Unit inventory count
 - - - - - - allow for items to upgrade unit's inventory capacity? This may not actually be important
-- - - - - - inventory capacity will be by class / unit type?
+- - - - - x inventory capacity will be by class / unit type?
 - - - Gets number of equipment slots per body part from unit / bodymod manager
 - - - - - - So different units can have different number of slots for their arms, legs, etc.
 - - - When inventory is opened
-- - - - - - Do all this same stuff if inventory is currently open and player switches units
-- - - - - - Destroy any exist inventory slot objects
+- - - - - x Do all this same stuff if inventory is currently open and player switches units
+- - - - - x Destroy any exist inventory slot objects
 - - - - - - - - - Use object pooling or whatever...
-- - - - - - Get number of inventory slots from unit
-- - - - - - - - - create those number of inventory slots
+- - - - - x Get number of inventory slots from unit
+- - - - - - - - x create those number of inventory slots
 - - - - - - Get number of equipment slots per body part
 - - - - - - - - - create those number of equipment slots per body part
 - - - - - - Go through units bodymods
 - - - - - - - - - Add equiped body mods to their appropriate equipment slot
 - - - - - - - - - Add unequiped body mods to the inventory slots
 - - - Use the InventoryItem class to store/cache the inventory slot index of an item?
-- - - - - - Also, try and make the inventoryitem class generic or something that can accept generics?
-- - - - - - - - - So it can store either a bodymod_class or bodymodcomponent_class object?
-- - - - - - - - - And hopefully the inventory ui can just get the necessary data back regardless of item type?
-- - - - - - - - - - - - get name, description, sprite, whatever back?
-- - - - - - - - - - - - Maybe to make this easier, change the BodyMod_Class and BodyModComponent_Class classes inherit from a parent class,
+- - - - - x Also, try and make the inventoryitem class generic or something that can accept generics?
+- - - - - - - - x So it can store either a bodymod_class or bodymodcomponent_class object?
+- - - - - - - - x And hopefully the inventory ui can just get the necessary data back regardless of item type?
+- - - - - - - - - - - x get name, description, sprite, whatever back?
+- - - - - - - - - - - x Maybe to make this easier, change the BodyMod_Class and BodyModComponent_Class classes inherit from a parent class,
                         called something like Item_Class. Item_Class requires the basic info share across items (name, description, sprite, whatever)
 						so that the Inventory UI can just ask for a Item_Class object, and get all the info it needs from there regardless of item type?
 
@@ -1038,7 +1038,7 @@ x Maybe make it so there is also a BodyMod class
 - - x Click to select that unit
 - - - - - x also leave this clickable when the body mod inventory is open so that you can click on the portrait to change what unit's inventory you
             are looking at
-x Equip and Unequip Body mods from the inventory
+- Equip and Unequip Body mods from the inventory
 - - x All body mods should start unequipped (for testing)
 - - x If player clicks on selected item, flip its "equipped" status (just clicking to equip for now)
 - - - - - x later, check if the item can be equipped
@@ -1046,7 +1046,34 @@ x Equip and Unequip Body mods from the inventory
 x Dropping items
 - - x right click to "drop" item and remove from inventory
 - - x When unequipping an item, check if there is room in the regular inventory to store it. If not, drop it?
-
+- Define how many equipment slots each body part has
+- - x dictionary on scriptableUnit - <BodyPart, int>
+- - x Gets passed from scriptable unit to BombRunUnitBodyModManager
+- - x BombRunUnitBodyModManager will then make the equipped inventories for each body part, and give them the number of slots provided by the ScriptableUnit
+- - - BombRunUnitBodyModManager will create its own "additional" inventory slots?
+- - - - - - when BombRunUnitBodyModManager calculates number of slots per body part:
+- - - - - - - - - Get base number of slots from the unit's scriptable object
+- - - - - - - - - Get additional slots from other "sources?"
+- - - - - - - - - - - - Unit level/upgrades
+- - - - - - - - - - - - Items can add slots? or something?
+- Moving items between inventory and equipped inventory
+- - - When an item is equipped, remove it from BodyMod Inventory, add to Equipped inventory
+- - - When an item is unequipped
+- - - - - - Remove from equipment inventory
+- - - - - - Check if it can be added to regular inventory (is there any room left in the inventory?)
+- - - - - - - - - True: add previously equipped item to inventory
+- - - - - - - - - False: "drop" the item
+- - - - - - - - - - - - For now that just destroys it...
+- - - - - - - - - - - - Maybe only let an unequip happen if there is space in the inventory? So if you want to unequip, drop something first?
+- - - How to handle "Swapping" item from inventory for an equipped item
+- - - - - - Scenario: Player has ItemA equiiped in only Head slot. They have a full regular inventory. They want to equip ItemB on the head
+- - - - - - First, check that ItemB can be equipped on that body part (check the BodyMod's BodyPart matchs)
+- - - - - x Unequip ItemA, caching the BodyMod object
+- - - - - - - - x Do this first, to clear up that equipped spot
+- - - - - x Equip ItemB
+- - - - - x Remove ItemB from regular inventory
+- - - - - - - - x When item is equipped, after it goes through the EquipItem event stack and BombRunUnitBodyModManager.EquipItem should remove it from the regular inventory?
+- - - - - x Add ItemA to regular inventory
 
 ### END CURRENT TASKS
 

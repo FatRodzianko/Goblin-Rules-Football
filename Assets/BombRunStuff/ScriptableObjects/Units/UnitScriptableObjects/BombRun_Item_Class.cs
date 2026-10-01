@@ -129,11 +129,17 @@ public class BombRun_Item_Class
     }
     public void EquipItem()
     {
+        if (_isEquipped)
+            return;
+
         _isEquipped = true;
         OnItemEquipped?.Invoke(this, EventArgs.Empty);
     }
     public void UnEquipItem()
     {
+        if (!_isEquipped)
+            return;
+
         _isEquipped = false;
         OnItemUnEquipped?.Invoke(this, EventArgs.Empty);
     }

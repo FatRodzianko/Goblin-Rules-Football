@@ -272,6 +272,10 @@ public class BodyModInventoryUIManager : MonoBehaviour
                 {
                     _bodyModManager.EquipInventoryItem(_currentInventoryType, index);
                 }
+                else
+                {
+                    Debug.Log("InventoryItemSlot_OnAnyItemSlotLeftClickedOn: Could not find selected item in inventory. Index: " + index + " Inventory type: " + _currentInventoryType);
+                }
             }
             _itemSlots[_selectedItemIndex].SetIsSelected(!_itemSlots[_selectedItemIndex].IsSelected());
             CheckIfItemDescriptionShouldReset(_selectedItemIndex);
