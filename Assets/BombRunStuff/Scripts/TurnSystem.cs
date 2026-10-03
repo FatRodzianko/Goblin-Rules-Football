@@ -6,8 +6,8 @@ using System;
 public class TurnSystem : MonoBehaviour
 {
     public static TurnSystem Instance { get; private set; }
-    private int _turnNumber = 1;
-    private bool _isPlayerTurn = true;
+    [SerializeField] private int _turnNumber = 1;
+    [SerializeField] private bool _isPlayerTurn = true;
 
     // events
     public event EventHandler OnTurnChanged;

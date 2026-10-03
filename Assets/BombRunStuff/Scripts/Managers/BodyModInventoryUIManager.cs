@@ -32,7 +32,11 @@ public class BodyModInventoryUIManager : MonoBehaviour
     //private Dictionary<int, BombRun_Item_Class> _bodyModByItemSlot = new Dictionary<int, BombRun_Item_Class>();
     //[SerializeField] private BodyMod_Class[] _bodyModArray;
     //[SerializeField] private List<BodyModByItemSlot> _bodyModByItemSlotClass = new List<BodyModByItemSlot>();
+    
     [SerializeField] private int _numberOfSlots;
+
+    [Header("Equipped Item Slots")]
+    private Dictionary<BodyPart, List<InventoryItemSlot>> _equippedItemSlotsByBodyPart = new Dictionary<BodyPart, List<InventoryItemSlot>>();
 
     [Header("Selected Item")]
     [SerializeField] private int _selectedItemIndex = 0;
@@ -44,6 +48,16 @@ public class BodyModInventoryUIManager : MonoBehaviour
 
     [Header("Inventory Type")]
     [SerializeField] private InventoryType _currentInventoryType;
+
+    [Header("Inventory Type UI")]
+    [SerializeField] private Transform _inventoryTypeButtonHolder;
+    [SerializeField] private Transform _inventoryTypeButtonPrefab;
+
+    //Events
+    public static event EventHandler OnInventoryMenuOpened;
+    public static event EventHandler OnInventoryMenuClosed;
+
+    public static event EventHandler<InventoryType> OnCurrentInventoryTypeChanged;
 
 
     // Start is called before the first frame update
@@ -57,10 +71,12 @@ public class BodyModInventoryUIManager : MonoBehaviour
         InventoryItemSlot.OnAnyItemMousedOver += InventoryItemSlot_OnAnyItemMousedOver;
         InventoryItemSlot.OnAnyItemMouseExit += InventoryItemSlot_OnAnyItemMouseExit;
 
+        InventoryTypeButton.OnInventoryTypeButtonClicked += InventoryTypeButton_OnInventoryTypeButtonClicked;
+
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
 
 
-        this._currentInventoryType = InventoryType.BodyMods;
+        SetCurrentInventoryType(InventoryType.BodyMods);
     }
 
     
@@ -73,8 +89,12 @@ public class BodyModInventoryUIManager : MonoBehaviour
         InventoryItemSlot.OnAnyItemMousedOver -= InventoryItemSlot_OnAnyItemMousedOver;
         InventoryItemSlot.OnAnyItemMouseExit -= InventoryItemSlot_OnAnyItemMouseExit;
 
+        InventoryTypeButton.OnInventoryTypeButtonClicked -= InventoryTypeButton_OnInventoryTypeButtonClicked;
+
         UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
     }
+
+    
 
     // Update is called once per frame
     void Update()
@@ -87,9 +107,9 @@ public class BodyModInventoryUIManager : MonoBehaviour
                 {
                     Debug.Log("BodyModInventoryUIManager: Shift + I detected. Changing inventory type...");
                     if (_currentInventoryType == InventoryType.BodyMods)
-                        _currentInventoryType = InventoryType.BodyModComponents;
+                        SetCurrentInventoryType(InventoryType.BodyModComponents);
                     else
-                        _currentInventoryType = InventoryType.BodyMods;
+                        SetCurrentInventoryType(InventoryType.BodyMods);
 
                     //SetSelectedItemIndex(0);
                     OpenInventory();
@@ -99,11 +119,35 @@ public class BodyModInventoryUIManager : MonoBehaviour
             }
             else
             {
-                _currentInventoryType = InventoryType.BodyMods;
+                SetCurrentInventoryType(InventoryType.BodyMods);
                 OpenInventory();
             }
             
         }
+    }
+    private void InventoryTypeButton_OnInventoryTypeButtonClicked(object sender, InventoryType inventoryType)
+    {
+        if (inventoryType == InventoryType.None)
+            return;
+
+        if (_currentInventoryType == inventoryType)
+            return;
+
+        SetCurrentInventoryType(inventoryType);
+        OpenInventory();
+    }
+    private void SetCurrentInventoryType(InventoryType inventoryType)
+    {
+        if (_currentInventoryType == inventoryType)
+            return;
+
+        this._currentInventoryType = inventoryType;
+        OnCurrentInventoryTypeChanged?.Invoke(this, _currentInventoryType);
+        Debug.Log("SetCurrentInventoryType: OnCurrentInventoryTypeChanged?.Invoke(this, " + _currentInventoryType + ");");
+    }
+    public InventoryType GetInventoryType()
+    {
+        return _currentInventoryType;
     }
     private void CloseInventory()
     {
@@ -123,6 +167,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
         }
 
         _bodyModManager = null;
+        OnInventoryMenuClosed?.Invoke(this, EventArgs.Empty);
     }
     private void OpenInventory()
     {
@@ -142,6 +187,8 @@ public class BodyModInventoryUIManager : MonoBehaviour
         //CreateItemSlots(_bodyModManager.MaxInventoryCount());
         CreateItemSlots(_bodyModManager.InventorySlotCount(_currentInventoryType));
         GetInventoryItems(_bodyModManager);
+
+        OnInventoryMenuOpened?.Invoke(this, EventArgs.Empty);
     }
     private void DestroyItemSlots()
     {
@@ -522,4 +569,5 @@ public class BodyModInventoryUIManager : MonoBehaviour
 
         OpenInventory();
     }
+    
 }

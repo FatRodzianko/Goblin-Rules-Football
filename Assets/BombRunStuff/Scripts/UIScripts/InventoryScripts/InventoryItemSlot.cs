@@ -23,6 +23,10 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     [SerializeField] private bool _hasItem;
     [SerializeField] private bool _isEquipped;
 
+    [Header("Equipped Item")]
+    [SerializeField] private BodyPart _bodyPart = BodyPart.None;
+
+
     [Header("UI Objects")]
     [SerializeField] private Image _itemImage;
     [SerializeField] private Image _backgroundImage;
@@ -196,6 +200,10 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     {
         _isSelected = isSelected;
         OnItemSlotSelected?.Invoke(this, _isSelected);        
+    }
+    public BodyPart GetBodyPart()
+    {
+        return _bodyPart;
     }
     private void InventoryItemSlot_OnItemSlotSelected(object sender, bool selected)
     {

@@ -29,6 +29,7 @@ public class ActionButtonUI : MonoBehaviour
 
     private BaseAction _baseAction;
 
+
     public void SetBaseAction(BaseAction baseAction)
     {
         this._baseAction = baseAction;

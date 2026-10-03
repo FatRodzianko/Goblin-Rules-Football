@@ -1056,24 +1056,51 @@ x Dropping items
 - - - - - - - - - Get additional slots from other "sources?"
 - - - - - - - - - - - - Unit level/upgrades
 - - - - - - - - - - - - Items can add slots? or something?
-- Moving items between inventory and equipped inventory
-- - - When an item is equipped, remove it from BodyMod Inventory, add to Equipped inventory
+x Moving items between inventory and equipped inventory
+- - x When an item is equipped, remove it from BodyMod Inventory, add to Equipped inventory
 - - - When an item is unequipped
-- - - - - - Remove from equipment inventory
-- - - - - - Check if it can be added to regular inventory (is there any room left in the inventory?)
-- - - - - - - - - True: add previously equipped item to inventory
-- - - - - - - - - False: "drop" the item
-- - - - - - - - - - - - For now that just destroys it...
-- - - - - - - - - - - - Maybe only let an unequip happen if there is space in the inventory? So if you want to unequip, drop something first?
+- - - - - x Remove from equipment inventory
+- - - - - x Check if it can be added to regular inventory (is there any room left in the inventory?)
+- - - - - - - - x True: add previously equipped item to inventory
+- - - - - - - - x False: "drop" the item
+- - - - - - - - - - - x For now that just destroys it...
+- - - - - - - - - - - x Maybe only let an unequip happen if there is space in the inventory? So if you want to unequip, drop something first?
 - - - How to handle "Swapping" item from inventory for an equipped item
-- - - - - - Scenario: Player has ItemA equiiped in only Head slot. They have a full regular inventory. They want to equip ItemB on the head
-- - - - - - First, check that ItemB can be equipped on that body part (check the BodyMod's BodyPart matchs)
+- - - - - x Scenario: Player has ItemA equiiped in only Head slot. They have a full regular inventory. They want to equip ItemB on the head
+- - - - - x First, check that ItemB can be equipped on that body part (check the BodyMod's BodyPart matchs)
 - - - - - x Unequip ItemA, caching the BodyMod object
 - - - - - - - - x Do this first, to clear up that equipped spot
 - - - - - x Equip ItemB
 - - - - - x Remove ItemB from regular inventory
 - - - - - - - - x When item is equipped, after it goes through the EquipItem event stack and BombRunUnitBodyModManager.EquipItem should remove it from the regular inventory?
 - - - - - x Add ItemA to regular inventory
+- Equipment Inventory UI
+- - - Will Query BombRunUnitBodyModManager for the body parts the unit has inventory slots for, and the number of slots to create
+- - - Will store this in a dictionary Dictionary<BodyPart, List<InventoryItemSlot>> _equippedItemSlotsByBodyPart
+- - - When an inventory item is selected, highlight the equipped item slots related to that body part (if there are any)
+- - - - - - If user double clicks to equip an item, and there is no room at that equipped item slot to equip, flash the equipped item slots red?
+- Comparing item with equipped item
+- - - When an inventory item is selected (and it is equippable), show a comparison to any relevant equipped items
+- - - - - - Check the inventory item's body body, get the relevant body part inventory
+- - - - - - Check the first item in that body part inventory
+- - - - - - - - - Maybe allow for mouse wheel to change which equipped item you are comparing to, if applicable
+- - - - - - - - - Have the border of the equipped item being compared to change to red or something
+- - - - - - - - - Maybe only do the comparison if the player has selected an inventory item, and then mouses over an equipped item slot
+- - - - - - - - - - - - and the equipped item slot matches the body part of the inventory item
+- - - - - - Get the selected unit's current stats
+- - - - - - - - - From stat manager
+- - - - - - - - - Also get noise stats for body part from the noise manager?
+- - - - - - Take the unit's current stats, and store in value that can be modified? or just go through each stat one by one
+- - - - - - "Remove" the equipped items stats. For each stat the equipped item affects:
+- - - - - - - - - First divide stat by any multiplitive stat boosts
+- - - - - - - - - then subtract stat by any additive stat boosts
+- - - - - - Then add the inventory item's stat boosts
+- - - - - - - - - first additive, then subtractive
+- - - - - - For each stat type (and body part noise modifier):
+- - - - - - - - - Show the net change in stat from changing the equipped item for inventory item
+- - - - - - - - - if same "-"
+- - - - - - - - - if positive "+#"
+- - - - - - - - - if negative "-#"
 
 ### END CURRENT TASKS
 
@@ -1139,10 +1166,9 @@ https://www.youtube.com/watch?v=geq7lQSBDAE
 #  Unity INVENTORY: A Definitive Tutorial
 https://www.youtube.com/watch?v=oJAE6CbsQQA
 # Inventory system and equipment systm?
- Let's Make An Inventory System In Unity! (Series Intro) 
+x Let's Make An Inventory System In Unity! (Series Intro) 
 https://www.youtube.com/watch?v=0wKB_rxtqh4&list=PLSR2vNOypvs6eIxvTu-rYjw2Eyw57nZrU
-8. https://www.youtube.com/watch?v=xvivINDa8-w&list=PLSR2vNOypvs6eIxvTu-rYjw2Eyw57nZrU&index=9
- 1. UI Setup (Let's Make An Equipment System In Unity) 
+- 1. UI Setup (Let's Make An Equipment System In Unity) 
 https://www.youtube.com/watch?v=Kz2rD2QrBiY&list=PLSR2vNOypvs6LusmsqUek8_uIQyeI1E9M
 
 ### Large tutorial playlist that covers:

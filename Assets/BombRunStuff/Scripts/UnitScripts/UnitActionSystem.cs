@@ -16,7 +16,8 @@ public class UnitActionSystem : MonoBehaviour
     [SerializeField] private LayerMask _unitLayerMask;
     [SerializeField] private BaseAction _selectedAction;
 
-    private bool _isBusy;
+    [SerializeField] private bool _isBusy;
+    [SerializeField] private bool _inventoryMenuOpen = false;
 
     [Header("Sub Action Stuff")]
     [SerializeField] private bool _waitingOnSubAction = false;
@@ -52,6 +53,9 @@ public class UnitActionSystem : MonoBehaviour
         BaseSubAction.OnAnySubActionCancelled += BaseSubAction_OnAnySubActionCancelled;
 
         GameplayManager_BombRun.OnGameStateChanged += GameplayManager_BombRun_OnGameStateChanged;
+
+        BodyModInventoryUIManager.OnInventoryMenuOpened += BodyModInventoryUIManager_OnInventoryMenuOpened;
+        BodyModInventoryUIManager.OnInventoryMenuClosed += BodyModInventoryUIManager_OnInventoryMenuClosed;
     }
 
     private void OnDisable()
@@ -60,7 +64,13 @@ public class UnitActionSystem : MonoBehaviour
         BaseSubAction.OnAnySubActionCancelled -= BaseSubAction_OnAnySubActionCancelled;
 
         GameplayManager_BombRun.OnGameStateChanged -= GameplayManager_BombRun_OnGameStateChanged;
+
+        BodyModInventoryUIManager.OnInventoryMenuOpened -= BodyModInventoryUIManager_OnInventoryMenuOpened;
+        BodyModInventoryUIManager.OnInventoryMenuClosed -= BodyModInventoryUIManager_OnInventoryMenuClosed;
     }
+
+    
+
     private void Update()
     {
         // Change what happens on mouse click based on current game state? Or only have this work on the "Gameplay" game state?
@@ -381,8 +391,15 @@ public class UnitActionSystem : MonoBehaviour
         if (!InputManagerBombRun.Instance.IsMouseButtonDownThisFrame())
             return;
 
+        if (_inventoryMenuOpen)
+        {
+            return;
+        }
+
         if (_selectedAction == null)
             return;
+
+
 
         GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositon(MouseWorld.GetPosition());
 
@@ -516,8 +533,21 @@ public class UnitActionSystem : MonoBehaviour
         OnSelectedUnitChanged?.Invoke(this, _selectedUnit);
         Debug.Log("SetSelectedUnit: " + unit);
     }
+    private void BodyModInventoryUIManager_OnInventoryMenuOpened(object sender, EventArgs e)
+    {
+        _inventoryMenuOpen = true;
+    }
+
+    private void BodyModInventoryUIManager_OnInventoryMenuClosed(object sender, EventArgs e)
+    {
+        _inventoryMenuOpen = false;
+    }
     public void SetSelectedAction(BaseAction baseAction)
     {
+        if (_inventoryMenuOpen)
+        {
+            return;
+        }
         _selectedAction = baseAction;
         //try
         //{
