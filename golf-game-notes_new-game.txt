@@ -1077,6 +1077,20 @@ x Moving items between inventory and equipped inventory
 - Equipment Inventory UI
 - - - Will Query BombRunUnitBodyModManager for the body parts the unit has inventory slots for, and the number of slots to create
 - - - Will store this in a dictionary Dictionary<BodyPart, List<InventoryItemSlot>> _equippedItemSlotsByBodyPart
+- - - - - - Have another dict of <BodyPart, List<EquippedItemLayOutGroup> _equippedItemSlotLocations that stores where to spawn the inventory slots for each body part
+- - - - - - - - - when going through _equippedItemSlotsByBodyPart, figure out which of the the layout groups to spawn to based on number of layout groups and index in the inventory?
+- - - - - - - - - - - - So, if pulling index 1 for arms, check that:
+- - - - - - - - - - - - - - - There are 2 layout groups for arms
+- - - - - - - - - - - - - - - check if List<EquippedItemLayOutGroup>[index] exists. If it does, spawn there?
+- - - - - - - - - - - - - - - - - - If not, take "index - (List<EquippedItemLayOutGroup>.Count())" (may need to add 1 to index?), see if that exists in 
+- - - - - - - - - - - - - - - - - - - - - for (int i = 0; i < (index / List<EquippedItemLayOutGroup>.Count()); i++)
+- - - - - - - - - - - - - - - - - - - - - index -= List<EquippedItemLayOutGroup>.Count();
+- - - - - - - - - - - - - - - - - - - - - then check if List<EquippedItemLayOutGroup>[index] exists
+- - - - - - - - - - - - - - - - - - - - - Ex: Index 5 on legs that have 3 groups
+- - - - - - - - - - - - - - - - - - - - - (int)(5 / 3) = 1
+- - - - - - - - - - - - - - - - - - - - - 5 - 3 = 2
+- - - - - - - - - - - - - - - - - - - - - List<EquippedItemLayOutGroup>[2] is the 3rd group
+- - - - - - - - - - - - - - - - - - <BodyPart, List<EquippedItemLayOutGroup> _equippedItemSlotLocations[bodyPart][1]
 - - - When an inventory item is selected, highlight the equipped item slots related to that body part (if there are any)
 - - - - - - If user double clicks to equip an item, and there is no room at that equipped item slot to equip, flash the equipped item slots red?
 - Comparing item with equipped item

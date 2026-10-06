@@ -72,32 +72,24 @@ public class PyramidLayoutGroup : MonoBehaviour
             return;
         }
 
-        // Calculate the number of rows.
-        int totalRows = 0;
-        int remainingChildren = childCount;
+        const int itemsPerRow = 2;
 
-        while (remainingChildren > 0)
-        {
-            int rowCapacity = totalRows + 1;
-            int childrenInRow = Mathf.Min(rowCapacity, remainingChildren);
-
-            remainingChildren -= childrenInRow;
-            totalRows++;
-        }
+        // Calculate how many rows are needed.
+        int totalRows = Mathf.CeilToInt(childCount / (float)itemsPerRow);
 
         int childIndex = 0;
 
         for (int row = 0; row < totalRows; row++)
         {
-            int rowCapacity = row + 1;
-            int remainingInPyramid = childCount - childIndex;
-            int childrenInRow = Mathf.Min(rowCapacity, remainingInPyramid);
+            int remainingChildren = childCount - childIndex;
+            int childrenInRow = Mathf.Min(itemsPerRow, remainingChildren);
 
             // Center the row horizontally.
             float rowWidth = (childrenInRow - 1) * horizontalSpacing;
             float startingX = -rowWidth / 2f;
 
-            // Center the whole pyramid vertically.
+            // The bottom row is row 0.
+            // Higher rows move upward.
             float centeredRow = row - (totalRows - 1) / 2f;
             float y = -centeredRow * verticalSpacing;
 
