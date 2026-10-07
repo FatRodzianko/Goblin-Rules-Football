@@ -70,20 +70,37 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         }
     }
 
-    
 
-    public void AddItemToSlot(Sprite sprite, string name, string description, BombRun_Item_Class itemClass, int itemCount = 1)
+
+    //public void AddItemToSlot(Sprite sprite, string name, string description, BombRun_Item_Class itemClass, int itemCount = 1)
+    public void AddItemToSlot(BombRun_Item_Class itemClass)
     {
-        this._sprite = sprite;
-        this._name = name;
-        this._description = description;
-        this._itemCount = itemCount;
+        if (itemClass == null)
+        {
+            this.ClearItem();
+            return;
+        }
+        this._sprite = itemClass.Sprite();
+        this._name = itemClass.Name();
+        this._description = itemClass.Description();
+        this._itemCount = itemClass.StackSize();
         this._hasItem = true;
 
-        AddItemImage(sprite);
-        UpdateItemCountText(itemCount);
+        AddItemImage(_sprite);
+        UpdateItemCountText(_itemCount);
 
         AddItemClass(itemClass);
+
+        //this._sprite = sprite;
+        //this._name = name;
+        //this._description = description;
+        //this._itemCount = itemCount;
+        //this._hasItem = true;
+
+        //AddItemImage(sprite);
+        //UpdateItemCountText(itemCount);
+
+        //AddItemClass(itemClass);
     }
     private void AddItemClass(BombRun_Item_Class itemClass)
     {
@@ -100,6 +117,10 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
             _itemClass.OnItemEquipped += BombRun_Item_Class_OnItemEquipped;
             _itemClass.OnItemUnEquipped += BombRun_Item_Class_OnItemUnEquipped;
         }
+    }
+    public BombRun_Item_Class ItemClass()
+    {
+        return _itemClass;
     }
     public void AddItemImage(Sprite sprite)
     {
@@ -121,7 +142,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     public void UpdateIsEquippedIndicator(bool isEquipped)
     {
         //Debug.Log("UpdateIsEquippedIndicator: " + isEquipped + " " + this._name + " at index: " + this._slotIndex);
-        this._equippedIndicator.gameObject.SetActive(isEquipped);
+        //this._equippedIndicator.gameObject.SetActive(isEquipped);
     }
     public void ClearItem()
     {
@@ -189,6 +210,8 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     }
     public void SetIsEquipped(bool isEquipped)
     {
+        //if (this._isSelected)
+        //    SetIsSelected(false);
         this._isEquipped = isEquipped;
         UpdateIsEquippedIndicator(this._isEquipped);
     }

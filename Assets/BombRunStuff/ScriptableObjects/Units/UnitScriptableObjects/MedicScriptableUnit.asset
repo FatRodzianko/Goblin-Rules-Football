@@ -35,6 +35,6 @@ MonoBehaviour:
   - BodyPart: 1
     InventoryCount: 1
   - BodyPart: 2
-    InventoryCount: 2
+    InventoryCount: 6
   - BodyPart: 3
     InventoryCount: 1
