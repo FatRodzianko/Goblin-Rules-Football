@@ -86,6 +86,9 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         this._itemCount = itemClass.StackSize();
         this._hasItem = true;
 
+        this._bodyPart = itemClass.BodyPart();
+        SetIsEquipped(itemClass.IsEquipped());
+
         AddItemImage(_sprite);
         UpdateItemCountText(_itemCount);
 
@@ -154,12 +157,14 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         this._hasItem = false;
         UpdateItemCountText(this._itemCount);
 
-        this._isEquipped = false;
+        //this._isEquipped = false;
+        SetIsEquipped(false);
         UpdateIsEquippedIndicator(this._isEquipped);
 
         this._itemImage.sprite = null;
         this._itemImage.color = new Color(1, 1, 1, 0);
 
+        this._bodyPart = BodyPart.None;
         if (_itemClass != null)
         {
             _itemClass.OnItemEquipped -= BombRun_Item_Class_OnItemEquipped;
@@ -201,17 +206,19 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     }
     private void BombRun_Item_Class_OnItemUnEquipped(object sender, EventArgs e)
     {
-        SetIsEquipped(false);
+        //SetIsEquipped(false);
     }
 
     private void BombRun_Item_Class_OnItemEquipped(object sender, EventArgs e)
     {
-        SetIsEquipped(true);
+        //SetIsEquipped(true);
     }
     public void SetIsEquipped(bool isEquipped)
     {
         //if (this._isSelected)
         //    SetIsSelected(false);
+
+        //Debug.Log("SetIsEquipped: " + isEquipped + " " + this._name);
         this._isEquipped = isEquipped;
         UpdateIsEquippedIndicator(this._isEquipped);
     }

@@ -187,6 +187,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     private void OpenInventory()
     {
         SetSelectedItemIndex(0);
+        SetSelectedItemSlot(null);
 
         BombRunUnit unit = UnitActionSystem.Instance.GetSelectedUnit();
         if (unit == null)
@@ -249,11 +250,16 @@ public class BodyModInventoryUIManager : MonoBehaviour
         if (_bodyModManager == null)
             return;
 
-        //DestroyInventoryItemSlots();
-        //DestroyEquippedItemSlots();
+        DestroyInventoryItemSlots();
+        DestroyEquippedItemSlots();
 
-        //CreateInventoryItemSlots(_bodyModManager.InventorySlotCount(_currentInventoryType));
-        //CreateEquippedItemSlots(_bodyModManager);
+        CreateInventoryItemSlots(_bodyModManager.InventorySlotCount(_currentInventoryType));
+        CreateEquippedItemSlots(_bodyModManager);
+
+        //if (_bodyModManager.GetInventoryByType(_currentInventoryType).Count != _inventoryItemSlots.Count())
+        //{
+
+        //}
 
         GetInventoryItems(_bodyModManager);
         GetEquippedInventoryItems(_bodyModManager);
@@ -332,7 +338,6 @@ public class BodyModInventoryUIManager : MonoBehaviour
     }
     private void GetInventoryItems(BombRunUnitBodyModManager bodyModManager)
     {
-
         for (int i = 0; i < _inventoryItemSlots.Count; i++)
         {
             //if (unit.BodyModManager().Inventory_BodyMods()[i] == null)
@@ -381,6 +386,10 @@ public class BodyModInventoryUIManager : MonoBehaviour
     {
         _selectedItemIndex = index;
     }
+    private void SetSelectedItemSlot(InventoryItemSlot inventorySlot)
+    {
+        this._selectedItemSlot = inventorySlot;
+    }
     private void ResetSelectedItem()
     {
         _selectedItemIndex = 0;
@@ -392,23 +401,32 @@ public class BodyModInventoryUIManager : MonoBehaviour
             return;
         if (index < 0)
             return;
-        if (index >= _inventoryItemSlots.Count)
+
+        InventoryItemSlot clickedOnSlot = sender as InventoryItemSlot;
+        if (clickedOnSlot == null)
             return;
 
-        if (_selectedItemIndex == index)
+        if (_selectedItemSlot == clickedOnSlot)
         {
-            if (_inventoryItemSlots[index].IsSelected())
+            if (clickedOnSlot.IsSelected())
             {
-                if (_bodyModManager.GetInventoryItemAtIndex(index, _currentInventoryType) != null)
+
+                if (!clickedOnSlot.IsEquipped())
                 {
-                    _bodyModManager.EquipInventoryItem(_currentInventoryType, index);
+                    if (_bodyModManager.GetInventoryItemAtIndex(clickedOnSlot.SlotIndex(), _currentInventoryType) != null)
+                    {
+                        _bodyModManager.EquipInventoryItem(_currentInventoryType, clickedOnSlot.SlotIndex());
+                    }
                 }
                 else
                 {
-                    Debug.Log("InventoryItemSlot_OnAnyItemSlotLeftClickedOn: Could not find selected item in inventory. Index: " + index + " Inventory type: " + _currentInventoryType);
+                    if (_bodyModManager.GetEquippedItemAtIndex(clickedOnSlot.GetBodyPart(), clickedOnSlot.SlotIndex()) != null)
+                    {
+                        _bodyModManager.UnEquipItemAtIndex(clickedOnSlot.GetBodyPart(), clickedOnSlot.SlotIndex());
+                    }
                 }
             }
-            _inventoryItemSlots[_selectedItemIndex].SetIsSelected(!_inventoryItemSlots[_selectedItemIndex].IsSelected());
+            _selectedItemSlot.SetIsSelected(!_selectedItemSlot.IsSelected());
             CheckIfItemDescriptionShouldReset(_selectedItemIndex);
             return;
         }
@@ -417,8 +435,9 @@ public class BodyModInventoryUIManager : MonoBehaviour
         // if it isn't selected, treat as "stale" and just select the new inventory slot
         if (!_inventoryItemSlots[_selectedItemIndex].IsSelected())
         {
-            _inventoryItemSlots[index].SetIsSelected(true);
             SetSelectedItemIndex(index);
+            clickedOnSlot.SetIsSelected(true);
+            SetSelectedItemSlot(clickedOnSlot);
             return;
         }
 
@@ -429,24 +448,83 @@ public class BodyModInventoryUIManager : MonoBehaviour
             // Check if new index is empty, move the old selected item to the new inventory slot?
             if (!_inventoryItemSlots[index].HasItem())
             {
-                //SwapInventoryItemsAtIndexes(_selectedItemIndex, index);
                 SwapInventoryItemsAtIndexes_BodyModManager(_selectedItemIndex, index);
-                _inventoryItemSlots[_selectedItemIndex].SetIsSelected(false);
-                _inventoryItemSlots[index].SetIsSelected(false);
-                //_selectedItemIndex = 0;
-                //SetSelectedItemIndex(0);
-                //ResetSelectedItem();
+
+                _selectedItemSlot.SetIsSelected(false);
+                clickedOnSlot.SetIsSelected(false);
+
                 CheckIfItemDescriptionShouldReset(index);
                 return;
             }
         }
 
-        // All other checks failed so de-select current slot and select new slot
-        _inventoryItemSlots[_selectedItemIndex].SetIsSelected(false);
-        _inventoryItemSlots[index].SetIsSelected(true);
+        _selectedItemSlot.SetIsSelected(false);
+        clickedOnSlot.SetIsSelected(true);
 
+        SetSelectedItemSlot(clickedOnSlot);
         SetSelectedItemIndex(index);
     }
+    //private void InventoryItemSlot_OnAnyItemSlotLeftClickedOn(object sender, int index)
+    //{
+    //    if (!_menuOpen)
+    //        return;
+    //    if (index < 0)
+    //        return;
+    //    if (index >= _inventoryItemSlots.Count)
+    //        return;
+
+    //    if (_selectedItemIndex == index)
+    //    {
+    //        if (_inventoryItemSlots[index].IsSelected())
+    //        {
+    //            if (_bodyModManager.GetInventoryItemAtIndex(index, _currentInventoryType) != null)
+    //            {
+    //                _bodyModManager.EquipInventoryItem(_currentInventoryType, index);
+    //            }
+    //            else
+    //            {
+    //                Debug.Log("InventoryItemSlot_OnAnyItemSlotLeftClickedOn: Could not find selected item in inventory. Index: " + index + " Inventory type: " + _currentInventoryType);
+    //            }
+    //        }
+    //        _inventoryItemSlots[_selectedItemIndex].SetIsSelected(!_inventoryItemSlots[_selectedItemIndex].IsSelected());
+    //        CheckIfItemDescriptionShouldReset(_selectedItemIndex);
+    //        return;
+    //    }
+
+    //    // make sure the inventorySlot at the selected index is currently selected
+    //    // if it isn't selected, treat as "stale" and just select the new inventory slot
+    //    if (!_inventoryItemSlots[_selectedItemIndex].IsSelected())
+    //    {
+    //        _inventoryItemSlots[index].SetIsSelected(true);
+    //        SetSelectedItemIndex(index);
+    //        return;
+    //    }
+
+    //    // Check to see if player is trying to move an inventory item to a new slot
+    //    // Check if _selectedItemIndex has an item in it
+    //    if (_inventoryItemSlots[_selectedItemIndex].HasItem())
+    //    {
+    //        // Check if new index is empty, move the old selected item to the new inventory slot?
+    //        if (!_inventoryItemSlots[index].HasItem())
+    //        {
+    //            //SwapInventoryItemsAtIndexes(_selectedItemIndex, index);
+    //            SwapInventoryItemsAtIndexes_BodyModManager(_selectedItemIndex, index);
+    //            _inventoryItemSlots[_selectedItemIndex].SetIsSelected(false);
+    //            _inventoryItemSlots[index].SetIsSelected(false);
+    //            //_selectedItemIndex = 0;
+    //            //SetSelectedItemIndex(0);
+    //            //ResetSelectedItem();
+    //            CheckIfItemDescriptionShouldReset(index);
+    //            return;
+    //        }
+    //    }
+
+    //    // All other checks failed so de-select current slot and select new slot
+    //    _inventoryItemSlots[_selectedItemIndex].SetIsSelected(false);
+    //    _inventoryItemSlots[index].SetIsSelected(true);
+
+    //    SetSelectedItemIndex(index);
+    //}
     private void InventoryItemSlot_OnAnyItemSlotSingleRightClickedOn(object sender, int index)
     {
         if (index != _selectedItemIndex)

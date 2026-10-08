@@ -1117,9 +1117,10 @@ x Moving items between inventory and equipped inventory
 - - - - - - - - - if negative "-#"
 - Need to fix iventory item slot remaining "selected" after item is equipped
 - Update the select inventory item/index stufff to cache the InventorySlot gameobject and use that instead of the indexes?
-- - - this may cause issues when "BodyModManager_OnInventoryItemsUpdated" triggers, and destroys gameobjects?
-- - - - - - Removing the DestroySlots and CreateSlots sort of "fixed" this, but now, if a new inventory slot needs to be added, such as when a new
+- - x this may cause issues when "BodyModManager_OnInventoryItemsUpdated" triggers, and destroys gameobjects?
+- - - - - x Removing the DestroySlots and CreateSlots sort of "fixed" this, but now, if a new inventory slot needs to be added, such as when a new
             body mod component is added to the inventory, the new inventory slot will not be created
+- - - - - - - - - I don't know why, but this isn't causing issues? I added the destroy/create slots to BodyModManager_OnInventoryItemsUpdated and it works???
 - - - - - - This isn't a problem for body mods, because the inventory size is fixed...
 - - - - - - - - - Could always just make bodymod component inventories the same? Fixed size, and check if there is an available slot to add new?
 

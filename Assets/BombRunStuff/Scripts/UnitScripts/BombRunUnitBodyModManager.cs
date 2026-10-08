@@ -450,6 +450,7 @@ public class BombRunUnitBodyModManager
         {
             Debug.Log("EquipInventoryItem: no item at: " + itemIndex);
         }
+        OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
     }
     
     void EquipItem(BodyMod_Class bodyMod)
@@ -473,7 +474,7 @@ public class BombRunUnitBodyModManager
             SetInventoryItemAtIndex(index, null, inventoryType);
         }
 
-        OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
+        //OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
     }
     private void EquipItemAtIndex(BodyMod_Class bodyMod, int index)
     {
@@ -505,6 +506,7 @@ public class BombRunUnitBodyModManager
             Debug.Log("UnEquipItemAtIndex: Unequipped item: " + itemAtIndex.Name() + " could not be added back to the inventory. Inventory was full. Dropping item...");
             itemAtIndex.DropItem();
         }
+        OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
     }
     public void UnEquipItemAtIndex(BodyPart equippedBodyPart, int equippedIndex)
     {
@@ -530,7 +532,7 @@ public class BombRunUnitBodyModManager
                 bodyMod.DropItem();
             }
         }
-
+        OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
     }
     void UnEquipItem(BodyMod_Class bodyMod)
     {
@@ -558,9 +560,9 @@ public class BombRunUnitBodyModManager
         {
             equippedInventory[indexToRemove] = null;
         }
-        Debug.Log("UnEquipItem: unequipped " + bodyMod.Name() + " at index " + indexToRemove + " of " + bodyMod.BodyPart() + " inventory. Inventory now: " + (GetEquippedInventoryForBodyPart_BodyMod(bodyMod.BodyPart())[indexToRemove] is null));
+        //Debug.Log("UnEquipItem: unequipped " + bodyMod.Name() + " at index " + indexToRemove + " of " + bodyMod.BodyPart() + " inventory. Inventory now: " + (GetEquippedInventoryForBodyPart_BodyMod(bodyMod.BodyPart())[indexToRemove] is null));
 
-        OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
+        //OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
     }
     public void SwapInventoryItemAtIndexForEquippedItemAtIndex(InventoryType inventoryType, int inventoryIndex, BodyPart equippedBodyPart, int equippedIndex)
     {
