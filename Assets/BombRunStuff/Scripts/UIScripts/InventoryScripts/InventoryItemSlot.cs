@@ -24,6 +24,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     [SerializeField] private bool _isEquipped;
 
     [Header("Equipped Item")]
+    [SerializeField] private bool _isEquippedSlot = false;
     [SerializeField] private BodyPart _bodyPart = BodyPart.None;
 
 
@@ -55,13 +56,18 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn += InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
         this.OnItemSlotSelected += InventoryItemSlot_OnItemSlotSelected;
     }
+    private void Start()
+    {
+        BodyModInventoryUIManager.OnInventoryItemSlotSelected += BodyModInventoryUIManager_OnInventoryItemSlotSelected;
+    }
 
-    
 
     void OnDisable()
     {
         InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
         this.OnItemSlotSelected -= InventoryItemSlot_OnItemSlotSelected;
+
+        BodyModInventoryUIManager.OnInventoryItemSlotSelected -= BodyModInventoryUIManager_OnInventoryItemSlotSelected;
 
         if (_itemClass != null)
         {
@@ -70,16 +76,22 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         }
     }
 
+    
+
 
 
     //public void AddItemToSlot(Sprite sprite, string name, string description, BombRun_Item_Class itemClass, int itemCount = 1)
-    public void AddItemToSlot(BombRun_Item_Class itemClass)
+    public void AddItemToSlot(BombRun_Item_Class itemClass, bool isEquippedSlot = false, BodyPart bodyPart = BodyPart.None)
     {
+        this._isEquippedSlot = isEquippedSlot;
+        this._bodyPart = bodyPart;
+
         if (itemClass == null)
-        {
+            {
             this.ClearItem();
             return;
         }
+
         this._sprite = itemClass.Sprite();
         this._name = itemClass.Name();
         this._description = itemClass.Description();
@@ -164,7 +176,6 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         this._itemImage.sprite = null;
         this._itemImage.color = new Color(1, 1, 1, 0);
 
-        this._bodyPart = BodyPart.None;
         if (_itemClass != null)
         {
             _itemClass.OnItemEquipped -= BombRun_Item_Class_OnItemEquipped;
@@ -222,12 +233,26 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         this._isEquipped = isEquipped;
         UpdateIsEquippedIndicator(this._isEquipped);
     }
+    private void BodyModInventoryUIManager_OnInventoryItemSlotSelected(object sender, InventoryItemSlot selectedInventorySlot)
+    {
+        if (this == selectedInventorySlot)
+        {
+            SetIsSelected(true);
+        }
+        else
+        {
+            SetIsSelected(false);
+        }
+    }
     public bool IsSelected()
     {
         return _isSelected;
     }
     public void SetIsSelected(bool isSelected)
     {
+        if (this._isSelected == isSelected)
+            return;
+
         _isSelected = isSelected;
         OnItemSlotSelected?.Invoke(this, _isSelected);        
     }
@@ -347,5 +372,9 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     public bool MouseOver()
     {
         return _mouseOver;
+    }
+    public bool IsEquippedSlot()
+    {
+        return _isEquippedSlot;
     }
 }

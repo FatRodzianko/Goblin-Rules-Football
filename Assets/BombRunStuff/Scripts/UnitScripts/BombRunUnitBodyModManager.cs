@@ -417,6 +417,42 @@ public class BombRunUnitBodyModManager
     {
         UnEquipItem(sender as BodyMod_Class);        
     }
+    public void EquipInventoryItemAtEquippedIndex(InventoryType invetoryType, int itemIndex, int equippedItemIndex)
+    {
+        // for testing. Later grab the appropriate inventory type?
+        if (invetoryType != InventoryType.BodyMods)
+            return;
+
+        Debug.Log("EquipInventoryItem: " + invetoryType + ": " + itemIndex + " equippedItemIndex: " + equippedItemIndex);
+        if (_inventoryBodyMods.TryGetValue(itemIndex, out BodyMod_Class bodyMod))
+        {
+            if (bodyMod.BodyPart() == BodyPart.None)
+                return;
+
+            if (bodyMod.IsEquipped())
+            {
+                Debug.Log("bodyMod.UnEquipItem(): started executing");
+                bodyMod.UnEquipItem();
+                Debug.Log("bodyMod.UnEquipItem(): finished executing");
+            }
+            else
+            {
+                if (equippedItemIndex > -1 && equippedItemIndex < GetEquippedInventoryForBodyPart_BodyMod(bodyMod.BodyPart()).Count())
+                {
+                    if (GetEquippedInventoryForBodyPart_BodyMod(bodyMod.BodyPart())[equippedItemIndex] == null)
+                    {
+                        EquipItemAtIndex(bodyMod, equippedItemIndex);
+                        bodyMod.EquipItem();
+                    }
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("EquipInventoryItem: no item at: " + itemIndex);
+        }
+        OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
+    }
     public void EquipInventoryItem(InventoryType invetoryType, int itemIndex)
     {
         // for testing. Later grab the appropriate inventory type?
@@ -434,6 +470,7 @@ public class BombRunUnitBodyModManager
             }
             else
             {
+
                 if (CanAddItemToInventory(GetEquippedInventoryForBodyPart_BodyMod(bodyMod.BodyPart()), bodyMod, out int index))
                 {
                     EquipItemAtIndex(bodyMod, index);
@@ -442,7 +479,7 @@ public class BombRunUnitBodyModManager
                 }
                 else
                 {
-                    Debug.Log("EquipInventoryItem: Could not quip " + bodyMod.Name() + " on the " + bodyMod.BodyPart() + " inventory.");
+                    Debug.Log("EquipInventoryItem: Could not equip " + bodyMod.Name() + " on the " + bodyMod.BodyPart() + " inventory.");
                 }                
             }
         }
@@ -457,6 +494,9 @@ public class BombRunUnitBodyModManager
     {
         Debug.Log("EquipItem: " + bodyMod.Name());
         if (_equippedBodyMods.Contains(bodyMod))
+            return;
+
+        if (bodyMod.Equippable())
             return;
         
         _equippedBodyMods.Add(bodyMod);
@@ -478,34 +518,36 @@ public class BombRunUnitBodyModManager
     }
     private void EquipItemAtIndex(BodyMod_Class bodyMod, int index)
     {
-        Debug.Log("EquipItemAtIndex: " + bodyMod.BodyPart() + ": index: " + index + " BodyMod: " + bodyMod.Name());
+        //Debug.Log("EquipItemAtIndex: " + bodyMod.BodyPart() + ": index: " + index + " BodyMod: " + bodyMod.Name());
         Dictionary<int, BodyMod_Class> equippedInventory = GetEquippedInventoryForBodyPart_BodyMod(bodyMod.BodyPart());
         equippedInventory[index] = bodyMod;
     }
-    public void UnEquipItemAtIndex(int index, InventoryType inventoryType)
+    private void EquipItemAtIndex(BodyPart inventoryBodyPart, BodyMod_Class bodyMod, int index)
     {
-        BombRun_Item_Class itemAtIndex = GetInventoryItemAtIndex(index, inventoryType);
-        if (itemAtIndex == null)
-            return;
+        //Debug.Log("EquipItemAtIndex: " + bodyMod.BodyPart() + ": index: " + index + " BodyMod: " + bodyMod.Name());
+        Dictionary<int, BodyMod_Class> equippedInventory = GetEquippedInventoryForBodyPart_BodyMod(inventoryBodyPart);
+        equippedInventory[index] = bodyMod;
+    }
+    public void UnEquipItemAtIndex(BodyPart equippedItemBodyPart, int equippedIndex, InventoryType inventoryType, int inventoryIndex)
+    {
 
-        if (!itemAtIndex.IsEquipped())
-            return;
-
-        Debug.Log("bodyMod.UnEquipItem(): started executing");
-        itemAtIndex.UnEquipItem();
-        Debug.Log("bodyMod.UnEquipItem(): finished executing");
-
-        // Try to add the equipped item back to the inventory?
-        if (CanAddItemToInventory(GetInventoryByType(inventoryType), itemAtIndex, out int newIndex))
+        if (inventoryIndex < 0 || inventoryIndex >= GetInventoryByType(inventoryType).Count())
         {
-            Debug.Log("UnEquipItemAtIndex: Unequipped item: " + itemAtIndex.Name() + " will be added back to regular inventory at: " + index);
-            SetInventoryItemAtIndex(newIndex, itemAtIndex, inventoryType);
+            return;
         }
-        else
+
+        if (GetEquippedInventoryForBodyPart_BodyMod(equippedItemBodyPart).TryGetValue(equippedIndex, out BodyMod_Class bodyMod))
         {
-            Debug.Log("UnEquipItemAtIndex: Unequipped item: " + itemAtIndex.Name() + " could not be added back to the inventory. Inventory was full. Dropping item...");
-            itemAtIndex.DropItem();
+            if (bodyMod == null)
+                return;
+
+            if (GetInventoryByType(inventoryType)[inventoryIndex] != null)
+                return;
+
+            bodyMod.UnEquipItem();
+            SetInventoryItemAtIndex(inventoryIndex, bodyMod, GetInventoryTypeByItem(bodyMod));
         }
+        
         OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
     }
     public void UnEquipItemAtIndex(BodyPart equippedBodyPart, int equippedIndex)
@@ -564,6 +606,30 @@ public class BombRunUnitBodyModManager
 
         //OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
     }
+    public void SwapInventoryItemsAtIndex(InventoryType inventoryType, int firstIndex, int secondIndex)
+    {
+        Debug.Log("SwapInventoryItemsAtIndex:  inventoryType: " + inventoryType + " firstIndex: " + firstIndex + " secondIndex: " + secondIndex );
+        BombRun_Item_Class firstItem = GetInventoryItemAtIndex(firstIndex, inventoryType);
+        BombRun_Item_Class secondItem = GetInventoryItemAtIndex(secondIndex, inventoryType);
+
+        SetInventoryItemAtIndex(firstIndex, secondItem, inventoryType);
+        SetInventoryItemAtIndex(secondIndex, firstItem, inventoryType);
+
+        OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
+    }
+    public void SwapEquippedItemsAtIndices(BodyPart inventoryBodyPart, int firstIndex, int secondIndex)
+    {
+        Debug.Log("SwapEquippedItemsAtIndices:  inventoryBodyPart: " + inventoryBodyPart + " firstIndex: " + firstIndex + " secondIndex: " + secondIndex);
+
+        BombRun_Item_Class firstItem = GetEquippedItemAtIndex(inventoryBodyPart, firstIndex);
+        BombRun_Item_Class secondItem = GetEquippedItemAtIndex(inventoryBodyPart, secondIndex);
+
+
+        EquipItemAtIndex(inventoryBodyPart, firstItem as BodyMod_Class, secondIndex);
+        EquipItemAtIndex(inventoryBodyPart, secondItem as BodyMod_Class, firstIndex);
+
+        OnInventoryItemsUpdated?.Invoke(this, EventArgs.Empty);
+    }
     public void SwapInventoryItemAtIndexForEquippedItemAtIndex(InventoryType inventoryType, int inventoryIndex, BodyPart equippedBodyPart, int equippedIndex)
     {
         //UnEquipItemAtIndex(equippedBodyPart, equippedIndex);
@@ -594,7 +660,8 @@ public class BombRunUnitBodyModManager
 
             equippedItem.UnEquipItem();
             //EquipItemAtIndex(inventoryItem, equippedIndex);
-            EquipInventoryItem(inventoryType, inventoryIndex);
+            //EquipInventoryItem(inventoryType, inventoryIndex);
+            EquipInventoryItemAtEquippedIndex(inventoryType, inventoryIndex, equippedIndex);
 
             if (GetInventoryByType(inventoryType)[inventoryIndex] == null)
             {
@@ -915,10 +982,16 @@ public class BombRunUnitBodyModManager
             return null;
 
         Dictionary<int, BodyMod_Class> equippedInventory = GetEquippedInventoryForBodyPart_BodyMod(bodyPart);
-        if (equippedInventory.Count <= index)
-            return null;
 
-        return equippedInventory[index];
+        if (equippedInventory.TryGetValue(index, out var equippedItem))
+        {
+            return equippedItem;
+        }
+        return null;
+        //if (equippedInventory.Count <= index)
+        //    return null;
+
+        //return equippedInventory[index];
     }
     public Dictionary<int, BodyMod_Class> Inventory_BodyMods()
     {

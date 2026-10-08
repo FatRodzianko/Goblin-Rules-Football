@@ -34,6 +34,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f918c61fc00aa6e43a39f3eabe27994a, type: 2}
   _inventorySlotsPerBodyPart:
   - BodyPart: 1
-    InventoryCount: 1
+    InventoryCount: 3
   - BodyPart: 3
     InventoryCount: 2

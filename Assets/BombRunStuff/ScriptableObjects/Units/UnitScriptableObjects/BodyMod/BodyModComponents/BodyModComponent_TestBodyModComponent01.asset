@@ -15,7 +15,8 @@ MonoBehaviour:
   _name: TestBodyModComponent01
   _sprite: {fileID: 21300000, guid: 8fb835e060ce3bd478618fbd12c6715f, type: 3}
   _description: TestBodyModComponent01
-  _bodyPart: 0
+  _equippable: 0
+  _bodyPart: 1
   _stackable: 1
   _bodyModComponentType: 1
   _componentTierLevel: 0
