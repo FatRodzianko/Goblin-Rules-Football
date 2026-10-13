@@ -496,7 +496,7 @@ public class BombRunUnitBodyModManager
         if (_equippedBodyMods.Contains(bodyMod))
             return;
 
-        if (bodyMod.Equippable())
+        if (!bodyMod.Equippable())
             return;
         
         _equippedBodyMods.Add(bodyMod);

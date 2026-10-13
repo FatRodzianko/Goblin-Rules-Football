@@ -38,6 +38,9 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     [SerializeField] private Color _notSelectedColor;
     [SerializeField] private Color _selectedColor;
     [SerializeField] private Color _mouseOverColor;
+    [SerializeField] private Color _highlightedColor = Color.red;
+
+    [SerializeField] private Color _previousColor;
 
     // static Events
     public static event EventHandler<int> OnAnyItemSlotSingleLeftClickedOn;
@@ -53,8 +56,10 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
 
     private void Awake()
     {
+        _previousColor = _notSelectedColor;
         InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn += InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
         this.OnItemSlotSelected += InventoryItemSlot_OnItemSlotSelected;
+        InventoryItemSlot.OnAnyItemIsSelected += InventoryItemSlot_OnAnyItemIsSelected;
     }
     private void Start()
     {
@@ -68,6 +73,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         this.OnItemSlotSelected -= InventoryItemSlot_OnItemSlotSelected;
 
         BodyModInventoryUIManager.OnInventoryItemSlotSelected -= BodyModInventoryUIManager_OnInventoryItemSlotSelected;
+        InventoryItemSlot.OnAnyItemIsSelected -= InventoryItemSlot_OnAnyItemIsSelected;
 
         if (_itemClass != null)
         {
@@ -80,6 +86,8 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
 
 
 
+
+
     //public void AddItemToSlot(Sprite sprite, string name, string description, BombRun_Item_Class itemClass, int itemCount = 1)
     public void AddItemToSlot(BombRun_Item_Class itemClass, bool isEquippedSlot = false, BodyPart bodyPart = BodyPart.None)
     {
@@ -87,7 +95,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         this._bodyPart = bodyPart;
 
         if (itemClass == null)
-            {
+        { 
             this.ClearItem();
             return;
         }
@@ -105,17 +113,6 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         UpdateItemCountText(_itemCount);
 
         AddItemClass(itemClass);
-
-        //this._sprite = sprite;
-        //this._name = name;
-        //this._description = description;
-        //this._itemCount = itemCount;
-        //this._hasItem = true;
-
-        //AddItemImage(sprite);
-        //UpdateItemCountText(itemCount);
-
-        //AddItemClass(itemClass);
     }
     private void AddItemClass(BombRun_Item_Class itemClass)
     {
@@ -265,25 +262,84 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         if (selected)
         {
             this._backgroundImage.color = _selectedColor;
+            SetBackgroundColor(_selectedColor);
             OnAnyItemIsSelected?.Invoke(this, EventArgs.Empty);
         }
         else
         {
-            //if (this._backgroundImage.color == _mouseOverColor)
-            //{
-            //    return;
-            //}
-            //this._backgroundImage.color = _notSelectedColor;
             if (_mouseOver)
             {
-                this._backgroundImage.color = _mouseOverColor;
+                SetBackgroundColor(_mouseOverColor);
             }
             else
             {
-                this._backgroundImage.color = _notSelectedColor;
+                if (CheckIfEquippedSlotShouldHighlightForSelectedSlot(sender as InventoryItemSlot))
+                {
+                    SetBackgroundColor(_highlightedColor);
+                }
+                else
+                {
+                    SetBackgroundColor(_notSelectedColor);
+                }
+                //SetBackgroundColor(_notSelectedColor);
             }
-            
+
         }
+    }
+    private void InventoryItemSlot_OnAnyItemIsSelected(object sender, EventArgs e)
+    {
+        //InventoryItemSlot selectedSlot = sender as InventoryItemSlot;
+        //if (ReferenceEquals(selectedSlot, this))
+        //{
+        //    SetBackgroundColor(_selectedColor);
+        //}
+        //else
+        //{
+        //    if (_mouseOver)
+        //    {
+        //        SetBackgroundColor(_mouseOverColor);
+        //    }
+        //    else
+        //    {
+        //        if (CheckIfEquippedSlotShouldHighlightForSelectedSlot(sender as InventoryItemSlot))
+        //        {
+        //            SetBackgroundColor(_highlightedColor);
+        //        }
+        //        else
+        //        {
+        //            SetBackgroundColor(_notSelectedColor);
+        //        }
+        //        //SetBackgroundColor(_notSelectedColor);
+        //    }
+        //}
+    }
+    private bool CheckIfEquippedSlotShouldHighlightForSelectedSlot(InventoryItemSlot slot)
+    {
+        if (!this.IsEquippedSlot())
+        {
+            //Debug.Log("CheckIfEquippedSlotShouldHighlightForSelectedSlot: !this.IsEquippedSlot()");
+            return false;
+        }
+
+        if (!slot.IsEquippable())
+        {
+            //Debug.Log("CheckIfEquippedSlotShouldHighlightForSelectedSlot: !slot.IsEquippable()");
+            return false;
+        }
+
+        if (this.HasItem())
+        {
+            //Debug.Log("CheckIfEquippedSlotShouldHighlightForSelectedSlot: this.HasItem()");
+            return false;
+        }
+
+        if (slot.GetBodyPart() == BodyPart.None || slot.GetBodyPart() != this._bodyPart)
+        {
+            //Debug.Log("CheckIfEquippedSlotShouldHighlightForSelectedSlot: slot.GetBodyPart() == BodyPart.None || slot.GetBodyPart() != this._bodyPart");
+            return false;
+        }
+
+        return true;
     }
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -356,7 +412,8 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
             return;
         }
 
-        this._backgroundImage.color = _mouseOverColor;
+        //this._backgroundImage.color = _mouseOverColor;
+        SetBackgroundColor(_mouseOverColor);
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -367,7 +424,9 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         {
             return;
         }
-        this._backgroundImage.color = _notSelectedColor;
+
+        //SetBackgroundColor(_notSelectedColor);
+        SetBackgroundColor(_previousColor);
     }
     public bool MouseOver()
     {
@@ -376,5 +435,31 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     public bool IsEquippedSlot()
     {
         return _isEquippedSlot;
+    }
+    public bool IsEquippable()
+    {
+        if (_itemClass == null)
+            return false;
+
+        return _itemClass.Equippable();
+    }
+    public void HighlightSlotForBodyPartMatch()
+    {
+        if (this.HasItem())
+            return;
+        Debug.Log("HighlightSlotForBodyPartMatch: true");
+        SetBackgroundColor(_highlightedColor);
+    }
+    private void SetBackgroundColor(Color backgroundColor)
+    {
+        if (this._backgroundImage.color == backgroundColor)
+            return;
+
+        //if (backgroundColor != _previousColor)
+        //{
+        //    _previousColor = this._backgroundImage.color;
+        //}
+        _previousColor = this._backgroundImage.color;
+        this._backgroundImage.color = backgroundColor;
     }
 }

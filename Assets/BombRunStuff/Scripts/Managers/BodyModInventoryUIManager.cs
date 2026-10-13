@@ -90,7 +90,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
         InventoryTypeButton.OnInventoryTypeButtonClicked += InventoryTypeButton_OnInventoryTypeButtonClicked;
 
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
-
+        BodyModInventoryUIManager.OnInventoryItemSlotSelected += BodyModInventoryUIManager_OnInventoryItemSlotSelected;
 
         SetCurrentInventoryType(InventoryType.BodyMods);
     }
@@ -106,11 +106,14 @@ public class BodyModInventoryUIManager : MonoBehaviour
         InventoryItemSlot.OnAnyItemMouseExit -= InventoryItemSlot_OnAnyItemMouseExit;
 
         InventoryTypeButton.OnInventoryTypeButtonClicked -= InventoryTypeButton_OnInventoryTypeButtonClicked;
+        BodyModInventoryUIManager.OnInventoryItemSlotSelected -= BodyModInventoryUIManager_OnInventoryItemSlotSelected;
 
         UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
     }
 
     
+
+
 
     // Update is called once per frame
     void Update()
@@ -212,6 +215,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     }
     private void DestroyInventoryItemSlots()
     {
+        Debug.Log("DestroyInventoryItemSlots");
         for (int i = 0; i < _inventoryItemSlots.Count; i++)
         {
             Destroy(_inventoryItemSlots[i].gameObject);
@@ -220,6 +224,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     }
     private void DestroyEquippedItemSlots()
     {
+        Debug.Log("DestroyEquippedItemSlots");
         foreach (KeyValuePair<BodyPart, List<InventoryItemSlot>> equippedItemSlots in _equippedItemSlotsByBodyPart)
         {
             for (int i = 0; i < equippedItemSlots.Value.Count; i++)
@@ -249,7 +254,11 @@ public class BodyModInventoryUIManager : MonoBehaviour
         Debug.Log("BodyModManager_OnInventoryItemsUpdated: ");
 
         if (_bodyModManager == null)
+        {
+            Debug.Log("BodyModManager_OnInventoryItemsUpdated: _bodyModManager == null");
             return;
+        }
+           
 
         DestroyInventoryItemSlots();
         DestroyEquippedItemSlots();
@@ -263,6 +272,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
 
     private void CreateInventoryItemSlots(int numberOfSlots)
     {
+        Debug.Log("CreateInventoryItemSlots: " + numberOfSlots) ;
         //Array.Resize(ref _bodyModArray, numberOfSlots);
         for (int i = 0; i < numberOfSlots; i++)
         {
@@ -276,6 +286,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     }
     private void CreateEquippedItemSlots(BombRunUnitBodyModManager bodyModManager)
     {
+        Debug.Log("CreateEquippedItemSlots");
         foreach (ItemSlotLocationByBodyPart itemSlotLocation in _equippedItemSlotLocationsByBodyPart)
         {
             if (bodyModManager.GetMaxEquippedSlotsForBodyPart(itemSlotLocation.BodyPart) < 1)
@@ -357,6 +368,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
     }
     private void GetEquippedInventoryItems(BombRunUnitBodyModManager bodyModManager)
     {
+        Debug.Log("GetEquippedInventoryItems");
         foreach (KeyValuePair<BodyPart, List<InventoryItemSlot>> _equippedItemSlots in _equippedItemSlotsByBodyPart)
         {
             foreach (InventoryItemSlot inventoryItemSlot in _equippedItemSlots.Value)
@@ -382,6 +394,30 @@ public class BodyModInventoryUIManager : MonoBehaviour
         }
         this._selectedItemSlot = inventorySlot;
         OnInventoryItemSlotSelected?.Invoke(this, this._selectedItemSlot);
+    }
+    private void BodyModInventoryUIManager_OnInventoryItemSlotSelected(object sender, InventoryItemSlot inventorySlot)
+    {
+        if (ReferenceEquals(inventorySlot, null))
+            return;
+
+        if (inventorySlot.IsEquippedSlot())
+        {
+            return;
+        }
+        else if (inventorySlot.IsEquippable())
+        {
+            FindEquippedSlotsToHighlight(inventorySlot);
+        }
+    }
+    private void FindEquippedSlotsToHighlight(InventoryItemSlot inventorySlot)
+    {
+        if (_equippedItemSlotsByBodyPart.TryGetValue(inventorySlot.GetBodyPart(), out List<InventoryItemSlot> equippedSlots))
+        {
+            foreach (InventoryItemSlot slot in equippedSlots)
+            {
+                slot.HighlightSlotForBodyPartMatch();
+            }
+        }
     }
     private void SetIsSelectedForIventoryItemSlot(InventoryItemSlot inventorySlot, bool isSelected)
     {
@@ -463,31 +499,6 @@ public class BodyModInventoryUIManager : MonoBehaviour
             return;
         }
 
-        // previously selected slot has an item, but new slot does not
-        // If both slots are within unquipped inventory, swap them
-        // if clicked on slot is an equipped slot, check if item can be equipped
-        //if (_selectedItemSlot.HasItem() && !clickedOnSlot.HasItem())
-        //{
-        //    // If the new slot is an equipment slot, try to equip that item at at slot
-        //    if (clickedOnSlot.IsEquippedSlot() && !_selectedItemSlot.IsEquippedSlot())
-        //    {
-        //        if (clickedOnSlot.GetBodyPart() != _bodyModManager.GetInventoryItemAtIndex(_selectedItemSlot.SlotIndex(), _currentInventoryType).BodyPart())
-        //        {
-        //            Debug.Log("SwapInventoryItemsAtIndexes_BodyModManager: Body parts do not match. Equipped Slot: " + clickedOnSlot.GetBodyPart() + " item body part: " + _bodyModManager.GetInventoryItemAtIndex(_selectedItemSlot.SlotIndex(), _currentInventoryType).BodyPart());
-        //            return;
-        //        }
-        //        _bodyModManager.EquipInventoryItem(_currentInventoryType, _selectedItemSlot.SlotIndex(), clickedOnSlot.SlotIndex());
-        //        return;
-        //    }
-
-        //    // if the two slots are both regular inventory slots, but the previously selected item into the new selected slot
-        //    if (!clickedOnSlot.IsEquippedSlot() && !_selectedItemSlot.IsEquippedSlot())
-        //    {
-        //        _bodyModManager.SwapInventoryItemsAtIndex(_currentInventoryType, _selectedItemSlot.SlotIndex(), clickedOnSlot.SlotIndex());
-        //        return;
-        //    }
-        //}
-
         // if either slot has an item, swap them
         // If _selectedItemSlot is inventory, and clickedOnSlot is inventory, swap the items (whether one is null or not)
         // If _selectedItemSlot is inventory, and clickedOnSlot is equipped slot, check if item at _selectedItemSlot can be equipped there
@@ -501,27 +512,6 @@ public class BodyModInventoryUIManager : MonoBehaviour
             CheckIfItemDescriptionShouldReset(clickedOnSlot);
             return;
         }
-
-
-        // 
-        //if (_selectedItemSlot.HasItem())
-        //{
-        //    Debug.Log("InventoryItemSlot_OnAnyItemSlotLeftClickedOn: _selectedItemSlot != null && _selectedItemSlot.HasItem()");
-        //    // Check if new index is empty, move the old selected item to the new inventory slot?
-        //    if (!clickedOnSlot.HasItem())
-        //    {
-        //        SwapInventoryItemsAtIndexes_BodyModManager(_selectedItemSlot, clickedOnSlot);
-        //        SetSelectedItemSlot(null);
-
-        //        CheckIfItemDescriptionShouldReset(clickedOnSlot);
-        //        return;
-        //    }
-        //}
-        
-        
-
-        //_selectedItemSlot.SetIsSelected(false);
-        //clickedOnSlot.SetIsSelected(true);
 
         SetSelectedItemSlot(clickedOnSlot);
         SetSelectedItemIndex(index);
@@ -668,6 +658,7 @@ public class BodyModInventoryUIManager : MonoBehaviour
             return;
         }
         SetItemDescriptionDetails(selectedItem.Sprite(), selectedItem.Name(), selectedItem.Description());
+        //FindEquippedSlotsToHighlight(selectedItem);
     }
     private void InventoryItemSlot_OnAnyItemMousedOver(object sender, int index)
     {
