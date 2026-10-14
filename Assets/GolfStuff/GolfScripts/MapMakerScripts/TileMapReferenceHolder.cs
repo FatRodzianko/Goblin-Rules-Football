@@ -7,4 +7,5 @@ public class TileMapReferenceHolder : MonoBehaviour
 {
     [SerializeField] public List<Tilemap> AllMaps = new List<Tilemap>();
     [SerializeField] public List<Tilemap> ForbiddenPlacingWithMaps = new List<Tilemap>();
+    [SerializeField] public List<Tilemap> FloodFillBlockingMaps = new List<Tilemap>();
 }

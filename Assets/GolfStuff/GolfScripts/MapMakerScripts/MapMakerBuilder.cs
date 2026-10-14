@@ -18,6 +18,16 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     // Tile maps?
     [SerializeField] Tilemap _previewMap, _greenMap, _fairwayMap, _currentTileSelectedDisplayMap;
     [SerializeField] TileMapReferenceHolder _tileMapReferenceHolder;
+    [SerializeField] int _maxFloodFillPoints = 5000;
+
+    [SerializeField] bool _useFixedFloodFillBounds;
+    [SerializeField] BoundsInt _fixedFloodFillBounds;
+    [SerializeField] int _floodFillPadding = 1;
+
+    static readonly Vector3Int[] FloodFillDirections =
+    {
+        Vector3Int.up, Vector3Int.right, Vector3Int.down, Vector3Int.left
+    };
 
     // Selected objects?
     [SerializeField] MapMakerGroundTileBase _selectedObject;
@@ -1594,108 +1604,140 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     }
     void FloodFill()
     {
-        
         if (!_selectedObject)
             return;
 
-        Debug.Log("FloodFill: " + _tilemap.ToString() + " : " + _currentGridPosition.ToString() + " : " + _selectedTileBase.ToString());
+        bool isEraser = _selectedObject.GetType() == typeof(MapMakerTool);
 
-        //_tilemap.FloodFill(_currentGridPosition, _selectedTileBase);
-        //DrawItem(_tilemap, _currentGridPosition, _selectedTileBase);
-
-        // Check to see if the current selected tile type is an eraser. If so, get the tilemap that the eraser wants to erase from to pass to GetFloodFillPoints
-        // If not, then the map used will be the preview map, which is empty. Floodfill will then select all points in the preview map, and send those points to be deleted in Eraser function, causing all tiles in all maps to be deleted
+        // For the eraser, fill each map that has a tile at the clicked point.
+        // Otherwise only the selected tile's map is filled.
         List<Tilemap> mapsToFill = new List<Tilemap>();
-
-        // Get all maps for eraser tool
-        if (_selectedObject.GetType() == typeof(MapMakerTool))
-        {
-            mapsToFill.AddRange(GetTileMapThatHasTileAtPoint(_currentGridPosition)) ;
-        }
+        if (isEraser)
+            mapsToFill.AddRange(GetTileMapThatHasTileAtPoint(_currentGridPosition));
         else
-        {
             mapsToFill.Add(_tilemap);
-        }
 
-        Debug.Log("FloodFill: total number of tilemaps: " + mapsToFill.Count.ToString());
-        // Get all the fill points on each map?
         List<Vector3Int> fillPoints = new List<Vector3Int>();
         foreach (Tilemap map in mapsToFill)
         {
-            fillPoints.AddRange(GetFloodFillPoints(map, _currentGridPosition, _selectedTileBase));
+            // Eraser keeps its per-map behaviour (no blocking maps)
+            List<Tilemap> blockers = isEraser ? null : GetFloodFillBlockingMaps(map);
+            fillPoints.AddRange(GetFloodFillPoints(map, _currentGridPosition, _selectedTileBase, blockers));
         }
-        Debug.Log("FloodFill: number of fill points: " + fillPoints.Count());
-        DrawItem(_tilemap, fillPoints.ToArray(), _selectedTileBase);
 
-        // OLD
-        ////List<Vector3Int> fillPoints = GetFloodFillPoints(_tilemap, _currentGridPosition, _selectedTileBase);
-        //List<Vector3Int> fillPoints = GetFloodFillPoints(mapToFill, _currentGridPosition, _selectedTileBase);
-        //Debug.Log("FloodFill: Number of fill points: " + fillPoints.Count());
-        ////DrawItem(_tilemap, GetFloodFillPoints(_tilemap, _currentGridPosition, _selectedTileBase).ToArray(), _selectedTileBase);
-        //DrawItem(_tilemap, fillPoints.ToArray(), _selectedTileBase);
-        // OLD
+        Debug.Log("FloodFill: number of fill points: " + fillPoints.Count);
+
+        if (fillPoints.Count == 0)
+            return;
+
+        DrawItem(_tilemap, fillPoints.ToArray(), _selectedTileBase);
     }
-    private List<Vector3Int> GetFloodFillPoints(Tilemap map, Vector3Int startPosition, TileBase newTile)
+    List<Tilemap> GetFloodFillBlockingMaps(Tilemap fillMap)
+    {
+        if (_tileMapReferenceHolder == null || _tileMapReferenceHolder.FloodFillBlockingMaps == null)
+            return new List<Tilemap>();
+
+        return _tileMapReferenceHolder.FloodFillBlockingMaps
+            .Where(m => m != null && m != fillMap)
+            .Distinct()
+            .ToList();
+    }
+    private List<Vector3Int> GetFloodFillPoints(Tilemap map, Vector3Int startPosition, TileBase newTile, List<Tilemap> blockingMaps = null)
     {
         List<Vector3Int> fillPoints = new List<Vector3Int>();
-        //fillPoints.Add(startPosition);
 
-        //TileBase targetTile = _tilemap.GetTile(startPosition);
         TileBase targetTile = map.GetTile(startPosition);
         if (newTile == targetTile)
         {
-            Debug.Log("GetFloodFillPoints: User clicked on a tile that matches what they are filling with. Returning just the starting position of: " + startPosition.ToString() +" . Newtile: " + newTile.ToString() + " clicked on tile: " + targetTile.ToString());
+            // Clicked a tile that already matches what we're filling with
             fillPoints.Add(startPosition);
             return fillPoints;
         }
-        if (targetTile == null)
+
+        // Remember what each blocking map holds at the start cell.
+        // A cell only belongs to the region if it matches the start cell on ALL of them.
+        int blockerCount = blockingMaps != null ? blockingMaps.Count : 0;
+        TileBase[] blockerStartTiles = new TileBase[blockerCount];
+        for (int i = 0; i < blockerCount; i++)
+            blockerStartTiles[i] = blockingMaps[i].GetTile(startPosition);
+
+        bool BelongsToRegion(Vector3Int cell)
         {
-            Debug.Log("GetFloodFillPoints: target tile is null");
+            if (map.GetTile(cell) != targetTile)
+                return false;
+            for (int i = 0; i < blockerCount; i++)
+            {
+                if (blockingMaps[i].GetTile(cell) != blockerStartTiles[i])
+                    return false;
+            }
+            return true;
         }
 
-        
-        // Get the current tile at startPosition. When going through the algorithm, check if new tiles match the start position. If yes, add it to the list of tiles to be updated
-        // This should allow player to fill "empty space" by replacing all null tiles
-        // If they click on a spot with a specific tile already, the algo will search for all tiles that match that tile, and replace those with the new tile?
-        // If the user clicks on a tile that matches their selected tile, nothing should happen?
+        BoundsInt bounds = GetFloodFillBounds(map, blockingMaps, startPosition);
 
-        // https://simpledevcode.wordpress.com/2015/12/29/flood-fill-algorithm-using-c-net/
-        // Create a "Stack" of points to iterate through?
-        Stack<Vector3Int> points = new Stack<Vector3Int>();
-        // Add start position to end of stack
-        points.Push(startPosition);
-        // Set the "boundary" of what you will search through to the tilemap's bounds? The get width and height of the bounds
-        BoundsInt bounds = map.cellBounds;
-        //int boundsLength = bounds.xMax - bounds.xMin;
-        //int boundsHeight = bounds.yMax - bounds.yMin;
+        // HashSet instead of List.Contains: O(1) lookups, and each cell is only queued once
+        HashSet<Vector3Int> visited = new HashSet<Vector3Int> { startPosition };
 
-        Debug.Log("GetFloodFillPoints: using tilemap: " + map.ToString() + " new tile to fill with is: " + newTile.ToString() + " Start position is: " + startPosition.ToString() + " bounds are: " + bounds.ToString());
-        // loop through the tilemap until there are no more points to go through?
+        // Queue = breadth-first search: the fill grows outward evenly from the click point,
+        // so if the limit cuts it short you get a diamond-shaped area instead of a snaking strip
+        Queue<Vector3Int> points = new Queue<Vector3Int>();
+        points.Enqueue(startPosition);
+
         while (points.Count > 0)
         {
-            Vector3Int a = points.Pop();
-            // make sure the point is within the bounds of the tilemap?
-            if (a.x < bounds.xMax && a.x > bounds.xMin && a.y < bounds.yMax && a.y > bounds.yMin)
+            Vector3Int cell = points.Dequeue();
+            if (!BelongsToRegion(cell))
+                continue;
+
+            fillPoints.Add(cell);
+
+            // Endless fill detection: stop searching, but keep what we've found so far
+            if (fillPoints.Count >= _maxFloodFillPoints)
             {
-                // Get the tile at this point
-                TileBase tileBase = map.GetTile(a);
+                Debug.LogWarning("GetFloodFillPoints: fill reached the limit of " + _maxFloodFillPoints +
+                                 " cells, stopping early and filling what was found.");
+                break;
+            }
 
-                // Compare to the targetTile. If they DO match, add this point to fillPoints
-                if (tileBase == targetTile && !fillPoints.Contains(a))
-                {
-                    fillPoints.Add(a);
+            foreach (Vector3Int dir in FloodFillDirections)
+            {
+                Vector3Int next = cell + dir;
+                if (next.x < bounds.xMin || next.x >= bounds.xMax ||
+                    next.y < bounds.yMin || next.y >= bounds.yMax)
+                    continue;
 
-                    //Add points in North/East/South/West directions of this point to the points stack
-                    points.Push(new Vector3Int(a.x, a.y + 1, 0));
-                    points.Push(new Vector3Int(a.x + 1, a.y, 0));
-                    points.Push(new Vector3Int(a.x, a.y - 1, 0));
-                    points.Push(new Vector3Int(a.x -1, a.y, 0));
-                }
-
+                if (visited.Add(next))
+                    points.Enqueue(next);
             }
         }
 
         return fillPoints;
+    }
+    // Finite area the fill is allowed to search. Only matters when the clicked region is NOT enclosed.
+    private BoundsInt GetFloodFillBounds(Tilemap map, List<Tilemap> blockingMaps, Vector3Int startPosition)
+    {
+        if (_useFixedFloodFillBounds && _fixedFloodFillBounds.size.x > 0 && _fixedFloodFillBounds.size.y > 0)
+            return _fixedFloodFillBounds;
+
+        int xMin = startPosition.x, xMax = startPosition.x + 1;
+        int yMin = startPosition.y, yMax = startPosition.y + 1;
+
+        void Include(Tilemap m)
+        {
+            if (m == null) return;
+            BoundsInt b = m.cellBounds;
+            if (b.size.x <= 0 || b.size.y <= 0) return;
+            xMin = Mathf.Min(xMin, b.xMin); xMax = Mathf.Max(xMax, b.xMax);
+            yMin = Mathf.Min(yMin, b.yMin); yMax = Mathf.Max(yMax, b.yMax);
+        }
+
+        Include(map);
+        if (blockingMaps != null)
+            foreach (Tilemap m in blockingMaps) Include(m);
+
+        int pad = Mathf.Max(0, _floodFillPadding);
+        return new BoundsInt(xMin - pad, yMin - pad, 0,
+                             (xMax - xMin) + pad * 2, (yMax - yMin) + pad * 2, 1);
     }
     List<Tilemap> GetTileMapThatHasTileAtPoint(Vector3Int position)
     {

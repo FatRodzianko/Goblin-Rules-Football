@@ -6222,9 +6222,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.018952062
+    y: 0
     width: 1
-    height: 0.96195656
+    height: 1
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 90
@@ -6531,6 +6531,11 @@ MonoBehaviour:
   _fairwayMap: {fileID: 931620}
   _currentTileSelectedDisplayMap: {fileID: 1043876708}
   _tileMapReferenceHolder: {fileID: 1322270431}
+  _useFixedFloodFillBounds: 0
+  _fixedFloodFillBounds:
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Size: {x: 0, y: 0, z: 0}
+  _floodFillPadding: 1
   _selectedObject: {fileID: 0}
   _selectedTileBase: {fileID: 0}
   _currentSelectedTileIcon: {fileID: 11400000, guid: 17a8c8634fe14b54c854d99bdcfac8c2, type: 2}
@@ -608325,6 +608330,34 @@ PrefabInstance:
       propertyPath: AllMaps.Array.data[8]
       value: 
       objectReference: {fileID: 493678380}
+    - target: {fileID: 8294246174729175879, guid: 56dbf48902ecba84c9df8fa490641d14, type: 3}
+      propertyPath: FloodFillBlockingMaps.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8294246174729175879, guid: 56dbf48902ecba84c9df8fa490641d14, type: 3}
+      propertyPath: FloodFillBlockingMaps.Array.data[0]
+      value: 
+      objectReference: {fileID: 801900053}
+    - target: {fileID: 8294246174729175879, guid: 56dbf48902ecba84c9df8fa490641d14, type: 3}
+      propertyPath: FloodFillBlockingMaps.Array.data[1]
+      value: 
+      objectReference: {fileID: 931620}
+    - target: {fileID: 8294246174729175879, guid: 56dbf48902ecba84c9df8fa490641d14, type: 3}
+      propertyPath: FloodFillBlockingMaps.Array.data[2]
+      value: 
+      objectReference: {fileID: 1702707726}
+    - target: {fileID: 8294246174729175879, guid: 56dbf48902ecba84c9df8fa490641d14, type: 3}
+      propertyPath: FloodFillBlockingMaps.Array.data[3]
+      value: 
+      objectReference: {fileID: 1451719105}
+    - target: {fileID: 8294246174729175879, guid: 56dbf48902ecba84c9df8fa490641d14, type: 3}
+      propertyPath: FloodFillBlockingMaps.Array.data[4]
+      value: 
+      objectReference: {fileID: 70798282}
+    - target: {fileID: 8294246174729175879, guid: 56dbf48902ecba84c9df8fa490641d14, type: 3}
+      propertyPath: FloodFillBlockingMaps.Array.data[5]
+      value: 
+      objectReference: {fileID: 705138139}
     - target: {fileID: 8294246174729175879, guid: 56dbf48902ecba84c9df8fa490641d14, type: 3}
       propertyPath: ForbiddenPlacingWithMaps.Array.size
       value: 0

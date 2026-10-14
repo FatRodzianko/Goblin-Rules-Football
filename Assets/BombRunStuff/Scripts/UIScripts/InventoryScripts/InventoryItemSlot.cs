@@ -14,6 +14,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     [SerializeField] private bool _mouseOver;
 
     private BombRun_Item_Class _itemClass;
+    private InventoryItemSlot _selectedSlot;
 
     [Header("Item Details")]
     [SerializeField] private Sprite _sprite;
@@ -58,7 +59,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     {
         _previousColor = _notSelectedColor;
         InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn += InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
-        this.OnItemSlotSelected += InventoryItemSlot_OnItemSlotSelected;
+        //this.OnItemSlotSelected += InventoryItemSlot_OnItemSlotSelected;
         InventoryItemSlot.OnAnyItemIsSelected += InventoryItemSlot_OnAnyItemIsSelected;
     }
     private void Start()
@@ -70,7 +71,7 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     void OnDisable()
     {
         InventoryItemSlot.OnAnyItemSlotSingleLeftClickedOn -= InventoryItemSlot_OnAnyItemSlotLeftClickedOn;
-        this.OnItemSlotSelected -= InventoryItemSlot_OnItemSlotSelected;
+        //this.OnItemSlotSelected -= InventoryItemSlot_OnItemSlotSelected;
 
         BodyModInventoryUIManager.OnInventoryItemSlotSelected -= BodyModInventoryUIManager_OnInventoryItemSlotSelected;
         InventoryItemSlot.OnAnyItemIsSelected -= InventoryItemSlot_OnAnyItemIsSelected;
@@ -232,13 +233,31 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     }
     private void BodyModInventoryUIManager_OnInventoryItemSlotSelected(object sender, InventoryItemSlot selectedInventorySlot)
     {
+        this._selectedSlot = selectedInventorySlot;
         if (this == selectedInventorySlot)
         {
             SetIsSelected(true);
+            SetBackgroundColor(_selectedColor);
         }
         else
         {
             SetIsSelected(false);
+
+            if (_mouseOver)
+            {
+                SetBackgroundColor(_mouseOverColor);
+            }
+            else
+            {
+                if (CheckIfEquippedSlotShouldHighlightForSelectedSlot(selectedInventorySlot))
+                {
+                    SetBackgroundColor(_highlightedColor);
+                }
+                else
+                {
+                    SetBackgroundColor(_notSelectedColor);
+                }
+            }
         }
     }
     public bool IsSelected()
@@ -247,45 +266,44 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     }
     public void SetIsSelected(bool isSelected)
     {
-        if (this._isSelected == isSelected)
-            return;
+        //if (this._isSelected == isSelected)
+        //    return;
 
         _isSelected = isSelected;
-        OnItemSlotSelected?.Invoke(this, _isSelected);        
+        //OnItemSlotSelected?.Invoke(this, _isSelected);
     }
     public BodyPart GetBodyPart()
     {
         return _bodyPart;
     }
-    private void InventoryItemSlot_OnItemSlotSelected(object sender, bool selected)
-    {
-        if (selected)
-        {
-            this._backgroundImage.color = _selectedColor;
-            SetBackgroundColor(_selectedColor);
-            OnAnyItemIsSelected?.Invoke(this, EventArgs.Empty);
-        }
-        else
-        {
-            if (_mouseOver)
-            {
-                SetBackgroundColor(_mouseOverColor);
-            }
-            else
-            {
-                if (CheckIfEquippedSlotShouldHighlightForSelectedSlot(sender as InventoryItemSlot))
-                {
-                    SetBackgroundColor(_highlightedColor);
-                }
-                else
-                {
-                    SetBackgroundColor(_notSelectedColor);
-                }
-                //SetBackgroundColor(_notSelectedColor);
-            }
+    //private void InventoryItemSlot_OnItemSlotSelected(object sender, bool selected)
+    //{
+    //    if (selected)
+    //    {
+    //        this._backgroundImage.color = _selectedColor;
+    //        SetBackgroundColor(_selectedColor);
+    //        OnAnyItemIsSelected?.Invoke(this, EventArgs.Empty);
+    //    }
+    //    else
+    //    {
+    //        if (_mouseOver)
+    //        {
+    //            SetBackgroundColor(_mouseOverColor);
+    //        }
+    //        else
+    //        {
+    //            if (CheckIfEquippedSlotShouldHighlightForSelectedSlot(sender as InventoryItemSlot))
+    //            {
+    //                SetBackgroundColor(_highlightedColor);
+    //            }
+    //            else
+    //            {
+    //                SetBackgroundColor(_notSelectedColor);
+    //            }
+    //        }
 
-        }
-    }
+    //    }
+    //}
     private void InventoryItemSlot_OnAnyItemIsSelected(object sender, EventArgs e)
     {
         //InventoryItemSlot selectedSlot = sender as InventoryItemSlot;
@@ -315,6 +333,10 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
     }
     private bool CheckIfEquippedSlotShouldHighlightForSelectedSlot(InventoryItemSlot slot)
     {
+        if (ReferenceEquals(slot, null))
+        {
+            return false;
+        }
         if (!this.IsEquippedSlot())
         {
             //Debug.Log("CheckIfEquippedSlotShouldHighlightForSelectedSlot: !this.IsEquippedSlot()");
@@ -426,7 +448,15 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         }
 
         //SetBackgroundColor(_notSelectedColor);
-        SetBackgroundColor(_previousColor);
+        //SetBackgroundColor(_previousColor);
+        if (CheckIfEquippedSlotShouldHighlightForSelectedSlot(this._selectedSlot))
+        {
+            SetBackgroundColor(_highlightedColor);
+        }
+        else
+        {
+            SetBackgroundColor(_notSelectedColor);
+        }
     }
     public bool MouseOver()
     {
@@ -455,11 +485,6 @@ public class InventoryItemSlot : MonoBehaviour, IPointerClickHandler, IPointerEn
         if (this._backgroundImage.color == backgroundColor)
             return;
 
-        //if (backgroundColor != _previousColor)
-        //{
-        //    _previousColor = this._backgroundImage.color;
-        //}
-        _previousColor = this._backgroundImage.color;
         this._backgroundImage.color = backgroundColor;
     }
 }

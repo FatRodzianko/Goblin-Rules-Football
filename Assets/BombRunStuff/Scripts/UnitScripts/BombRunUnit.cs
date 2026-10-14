@@ -552,6 +552,37 @@ public class BombRunUnit : MonoBehaviour
     {
         return _bodyModManager;
     }
+    public BombRunUnitStatManager StatManager()
+    {
+        return _statManager;
+    }
+    public BombRunUnitNoiseManager NoiseManager()
+    {
+        return _noiseManager;
+    }
+    public List<StatType> GetAllStatTypes()
+    {
+        if (ReferenceEquals(_statManager, null))
+            return new List<StatType>();
+
+        return _statManager.GetAllStatTypes();
+    }
+    public float GetStatValueByType(StatType statType)
+    {
+        switch (statType)
+        {
+            case StatType.FOV:
+                return GetUnitFOV();
+            case StatType.HearingSensitivity:
+                return GetHearingSensitivity();
+            case StatType.MaxMoveDistance:
+                return GetMaxMoveDistance();
+            case StatType.SightDistance:
+                return GetSightRange();
+            default:
+                return 0;
+        }
+    }
     public void SetUnitSightRange(int sightRange)
     {
         this._sightRange = sightRange;
@@ -569,6 +600,15 @@ public class BombRunUnit : MonoBehaviour
     {
         //return this._maxMoveDistance;
         return _statManager.GetMaxMoveDistance();
+    }
+    public float GetHearingSensitivity()
+    {
+        //return _hearingSensitivity;
+        return _statManager.GetHearingSensitivity();
+    }
+    public void SetHearingSensitivity(float newSensitivity)
+    {
+        this._hearingSensitivity = newSensitivity;
     }
     public void AddActionStatModifier(BaseAction action, StatType stat, float statModifier, bool isAdditive)
     {
@@ -833,15 +873,7 @@ public class BombRunUnit : MonoBehaviour
             NoiseDistance = noiseDistance
         });
     }
-    public float GetHearingSensitivity()
-    {
-        //return _hearingSensitivity;
-        return _statManager.GetHearingSensitivity();
-    }
-    public void SetHearingSensitivity(float newSensitivity)
-    {
-        this._hearingSensitivity = newSensitivity;
-    }
+    
     public int InventoryCount()
     {
         return _inventoryCount;

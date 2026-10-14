@@ -32,6 +32,7 @@ public class BombRunUnitNoiseManager
     public EventHandler OnBodyPartChanged_Arms;
     public EventHandler OnBodyPartChanged_Head;
     public EventHandler OnBodyPartChanged_None;
+    public EventHandler OnAnyBodyPartChanged;
 
     // Our class's constructor. Takes a ScriptableBombRunUnitBaseStats as an argument.
     public BombRunUnitNoiseManager(BombRunUnit unit)
@@ -198,6 +199,9 @@ public class BombRunUnitNoiseManager
             case BodyPart.None:
                 OnBodyPartChanged_None?.Invoke(this, EventArgs.Empty);
                 break;
+            default:
+                return;
         }
+        OnAnyBodyPartChanged?.Invoke(this, EventArgs.Empty);
     }
 }

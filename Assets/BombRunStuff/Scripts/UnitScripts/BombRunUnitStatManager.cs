@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text.RegularExpressions;
 
 public enum StatType
 {
@@ -29,8 +30,17 @@ public class ActionModifyingStat
 [Serializable]
 public class BombRunUnitStatManager 
 {
+    private readonly List<StatType> _allStatTypes = new()
+    {
+        StatType.FOV,
+        StatType.HearingSensitivity,
+        StatType.MaxMoveDistance,
+        StatType.SightDistance
+    };
+
     private BombRunUnit _unit;
     [SerializeField] private ScriptableBombRunUnitBaseStats _baseStats;
+    
 
     [SerializeField] private List<ActionModifyingStat> _actionsModifyingStatsAdditive = new List<ActionModifyingStat>();
     [SerializeField] private List<ActionModifyingStat> _actionsModifyingStatsMultiply = new List<ActionModifyingStat>();
@@ -40,6 +50,7 @@ public class BombRunUnitStatManager
     public EventHandler OnSightDistanceChanged;
     public EventHandler OnFOVChanged;
     public EventHandler OnHearingSensitivityChanged;
+    public EventHandler OnAnyStatChanged;
 
     // updating stats trackers
     private bool _maxMoveDistanceWasUpdated = true;
@@ -60,7 +71,30 @@ public class BombRunUnitStatManager
         this._baseStats = baseStats;
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
     }
-
+    public List<StatType> GetAllStatTypes()
+    {
+        return _allStatTypes;
+    }
+    public float GetStatValueByType(StatType statType)
+    {
+        switch (statType)
+        {
+            case StatType.FOV:
+                return GetFOV();
+            case StatType.HearingSensitivity:
+                return GetHearingSensitivity();
+            case StatType.MaxMoveDistance:
+                return GetMaxMoveDistance();
+            case StatType.SightDistance:
+                return GetSightDistance();
+            default:
+                return 0;
+        }
+    }
+    public string StatTypeToDisplayName(StatType statType)
+    {
+        return Regex.Replace(statType.ToString(), "(?<=[a-z])(?=[A-Z])", " ");
+    }
     public int GetMaxMoveDistance()
     {
         //Debug.Log("BombRunUnitStatManager: GetMaxMoveDistance");
@@ -324,7 +358,10 @@ public class BombRunUnitStatManager
             case StatType.HearingSensitivity:
                 OnHearingSensitivityChanged?.Invoke(this, EventArgs.Empty);
                 break;
+            default:
+                return;
         }
+        OnAnyStatChanged?.Invoke(this, EventArgs.Empty);
     }
 
 }

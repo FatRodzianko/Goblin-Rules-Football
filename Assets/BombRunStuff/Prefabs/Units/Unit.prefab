@@ -1171,6 +1171,7 @@ MonoBehaviour:
     _bodyMods: []
     _equippedBodyMods: []
     _bodyModComponents: []
+    _additionalBodyPartInventorySlots: []
   _inventoryCount: 0
 --- !u!114 &7297105716296972232
 MonoBehaviour:

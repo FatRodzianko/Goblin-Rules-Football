@@ -976,6 +976,15 @@ public class BombRunUnitBodyModManager
             pair => (BombRun_Item_Class)pair.Value
             );
     }
+    public List<BodyPart> GetAllBodyPartsWithInventories()
+    {
+        List<BodyPart> bodyParts = new List<BodyPart>();
+        foreach (KeyValuePair<BodyPart, Dictionary<int, BodyMod_Class>> inventory in _equippedInventories)
+        {
+            bodyParts.Add(inventory.Key);
+        }
+        return bodyParts;
+    }
     public BombRun_Item_Class GetEquippedItemAtIndex(BodyPart bodyPart, int index)
     {
         if (index < 0)
