@@ -237,7 +237,7 @@ public class MoveAction : BaseAction
     }
     void ResetCachedValidPositionList()
     {
-        Debug.Log("MoveAction: ResetCachedValidPositionList: " + this._unit.name);
+        //Debug.Log("MoveAction: ResetCachedValidPositionList: " + this._unit.name);
         _cachedValidActionList.Clear();
     }
     public override bool CanTakeAction(int actionPointsAvailable, GridPosition actionPosition)

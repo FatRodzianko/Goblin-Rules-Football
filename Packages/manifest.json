@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main",
     "com.heathen.steamworksfoundation": "https://github.com/heathen-engineering/SteamworksFoundation.git?path=Unity/com.heathen.steamworksfoundation",
     "com.heathen.systemcore": "https://github.com/heathen-engineering/SystemCore.git?path=/com.heathen.systemcore",
     "com.pandaroo.auto-rule-tile": "https://gitlab.com/pandaroo-public/auto-rule-tile.git",

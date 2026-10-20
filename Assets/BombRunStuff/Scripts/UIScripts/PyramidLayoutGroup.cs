@@ -33,17 +33,21 @@ public class PyramidLayoutGroup : MonoBehaviour
         if (layoutQueued)
             return;
 
-        layoutQueued = true;
-
 #if UNITY_EDITOR
         if (!Application.isPlaying)
         {
+            // Don't touch transforms while the editor is switching to Play Mode.
+            // OnEnable will run again in Play Mode and arrange then.
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
+
+            layoutQueued = true;
             EditorApplication.delayCall += DelayedArrangeChildren;
             return;
         }
 #endif
 
-        // In Play Mode, arrange on the next frame.
+        layoutQueued = true;
         Invoke(nameof(DelayedArrangeChildren), 0f);
     }
 
@@ -54,7 +58,21 @@ public class PyramidLayoutGroup : MonoBehaviour
         if (this == null || !isActiveAndEnabled)
             return;
 
+#if UNITY_EDITOR
+        if (!Application.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode)
+            return;
+#endif
+
         ArrangeChildren();
+    }
+
+    private void OnDisable()
+    {
+        layoutQueued = false;
+        CancelInvoke(nameof(DelayedArrangeChildren));
+#if UNITY_EDITOR
+        EditorApplication.delayCall -= DelayedArrangeChildren;
+#endif
     }
 
     public void ArrangeChildren()
@@ -108,10 +126,5 @@ public class PyramidLayoutGroup : MonoBehaviour
         isArranging = false;
     }
 
-#if UNITY_EDITOR
-    private void OnDisable()
-    {
-        EditorApplication.delayCall -= DelayedArrangeChildren;
-    }
-#endif
+
 }
