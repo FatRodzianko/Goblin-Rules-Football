@@ -8,7 +8,7 @@ public class BodyModComponent_Class: BombRun_Item_Class
 {
     [Header("Start: BodyMod_Class")]
     [SerializeField] private ScriptableBodyModComponent _bodyModComponentScriptableObject;
-    [SerializeField] private BodyMod_Class _bodyMod;
+    [NonSerialized] private BodyMod_Class _bodyMod; // back-reference to parent; not serialized to avoid a BodyMod <-> Component cycle
 
     //[Header("Details")]
     //[SerializeField] private string _name;

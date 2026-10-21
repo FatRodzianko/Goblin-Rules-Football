@@ -1020,6 +1020,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void SetPlayerOnBall()
     {
+        // Only the owner moves their player; everyone else gets the position from the client authoritative NetworkTransform.
+        // Moving it on non-owners used the local copy of the ball, which may not have synced yet at the start of a hole.
+        if (!this.IsOwner)
+            return;
         Debug.Log("SetPlayerOnBall: ");
         this.transform.position = MyBall.transform.position;
     }
