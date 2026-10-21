@@ -24,20 +24,26 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] CustomGolfCourseLoader _customGolfCourseLoader;
     [SerializeField] public ScriptableCourse CurrentCourse;
     [SerializeField] public ScriptableHole CurrentHoleInCourse;
-    [SerializeField] [SyncVar] public int CurrentHoleIndex;
+    private readonly SyncVar<int> _syncCurrentHoleIndex = new SyncVar<int>();
+    public int CurrentHoleIndex { get => _syncCurrentHoleIndex.Value; set => _syncCurrentHoleIndex.Value = value; }
     [SerializeField] public ScriptableCourse CourseToPlay;
-    [SerializeField] [SyncVar] public string CourseHolesToPlay;
+    private readonly SyncVar<string> _syncCourseHolesToPlay = new SyncVar<string>();
+    public string CourseHolesToPlay { get => _syncCourseHolesToPlay.Value; set => _syncCourseHolesToPlay.Value = value; }
     [SerializeField] public List<int> CustomHolesSelectedToPlay = new List<int>();
     //[SerializeField] [SyncVar(OnChange = nameof(SyncSelectedCourseId))] public string SelectedCourseId;
-    [SerializeField] [SyncVar] public string SelectedCourseId;
-    [SerializeField] [SyncVar] public ulong CourseWorkshopID;
-    [SerializeField] [SyncVar] public string CourseName;
+    private readonly SyncVar<string> _syncSelectedCourseId = new SyncVar<string>();
+    public string SelectedCourseId { get => _syncSelectedCourseId.Value; set => _syncSelectedCourseId.Value = value; }
+    private readonly SyncVar<ulong> _syncCourseWorkshopID = new SyncVar<ulong>();
+    public ulong CourseWorkshopID { get => _syncCourseWorkshopID.Value; set => _syncCourseWorkshopID.Value = value; }
+    private readonly SyncVar<string> _syncCourseName = new SyncVar<string>();
+    public string CourseName { get => _syncCourseName.Value; set => _syncCourseName.Value = value; }
 
     [Header("TeeOffChallenge Info:")]
     [SerializeField] public ScriptableCourse TeeOffChallenges;
     [SerializeField] public ScriptableHole SelectedChallenge;
     [SerializeField] List<GolfPlayerTopDown> _playerOrderFromChallenege = new List<GolfPlayerTopDown>();
-    [SerializeField] [SyncVar] public string TeeOffChallengeClubType;
+    private readonly SyncVar<string> _syncTeeOffChallengeClubType = new SyncVar<string>();
+    public string TeeOffChallengeClubType { get => _syncTeeOffChallengeClubType.Value; set => _syncTeeOffChallengeClubType.Value = value; }
 
     [Header("Current Hole Information")]
     public Vector3 TeeOffPosition;
@@ -59,9 +65,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] public GolfPlayerTopDown LocalGolfPlayer;
 
     [Header("Player Info")]
-    [SerializeField] [SyncObject] public readonly SyncList<NetworkPlayer> NetworkPlayersServer = new SyncList<NetworkPlayer>();
+    [SerializeField] public readonly SyncList<NetworkPlayer> NetworkPlayersServer = new SyncList<NetworkPlayer>();
     [SerializeField] public List<GolfPlayerTopDown> GolfPlayers = new List<GolfPlayerTopDown>();
-    [SerializeField] [SyncObject] public readonly SyncList<GolfPlayerTopDown> GolfPlayersServer = new SyncList<GolfPlayerTopDown>();
+    [SerializeField] public readonly SyncList<GolfPlayerTopDown> GolfPlayersServer = new SyncList<GolfPlayerTopDown>();
     public List<GolfPlayerTopDown> GolfPlayersInTeeOffOrder = new List<GolfPlayerTopDown>();
     public List<GolfPlayerTopDown> GolfPlayersOutOfCommission = new List<GolfPlayerTopDown>();
     [SerializeField] int _numberOfPlayersTeedOff = 0;
@@ -70,14 +76,16 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] float _lastBallInHoleTime = 0f;
     [SerializeField] bool _haveAllPlayersTeedOff = false;
     public GolfPlayerTopDown CurrentPlayer;
-    [SyncVar(OnChange = nameof(SyncCurrentPlayerNetId))] public int CurrentPlayerNetId;
+    private readonly SyncVar<int> _syncCurrentPlayerNetId = new SyncVar<int>();
+    public int CurrentPlayerNetId { get => _syncCurrentPlayerNetId.Value; set => _syncCurrentPlayerNetId.Value = value; }
 
     [Header("Player Score Board")]
     [SerializeField] PlayerScoreBoard _playerScoreBoard;
 
     [Header("Weather Effects")]
     [SerializeField] LightningManager _lightningManager;
-    [SerializeField] [SyncVar] public float AveragePlayerWeatherFavor = 0;
+    private readonly SyncVar<float> _syncAveragePlayerWeatherFavor = new SyncVar<float>();
+    public float AveragePlayerWeatherFavor { get => _syncAveragePlayerWeatherFavor.Value; set => _syncAveragePlayerWeatherFavor.Value = value; }
 
     [Header("Camera and UI Stuff?")]
     [SerializeField] CameraViewHole _cameraViewHole;
@@ -118,22 +126,30 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] public int TurnsSinceSkip = 0;
     [SerializeField] public int SkipsInARow = 0;
     [SerializeField] bool _skipLightningCheck = false;
-    [SyncVar] public float TimeSinceLastSkip = 0f;
-    [SyncVar] public float TimeSinceLastTurnStart = 0f;
+    private readonly SyncVar<float> _syncTimeSinceLastSkip = new SyncVar<float>();
+    public float TimeSinceLastSkip { get => _syncTimeSinceLastSkip.Value; set => _syncTimeSinceLastSkip.Value = value; }
+    private readonly SyncVar<float> _syncTimeSinceLastTurnStart = new SyncVar<float>();
+    public float TimeSinceLastTurnStart { get => _syncTimeSinceLastTurnStart.Value; set => _syncTimeSinceLastTurnStart.Value = value; }
     [SerializeField] bool _tellingPlayersStormWillPass = false;
 
     [Header("Statue Stuff")]
     [SerializeField] List<GameObject> StatesOnServer = new List<GameObject>();
 
     [Header("Game Phase")] // this should probably be changed to an enum or something at some point? Or switch to a "finite state machine?"
-    [SyncVar] public bool IsTeeOffChallenge = false;
+    private readonly SyncVar<bool> _syncIsTeeOffChallenge = new SyncVar<bool>();
+    public bool IsTeeOffChallenge { get => _syncIsTeeOffChallenge.Value; set => _syncIsTeeOffChallenge.Value = value; }
 
     [Header("Game Settings")]
-    [SyncVar] public bool IsThereAStrokeLimit = false;
-    [SyncVar] public int StrokeLimitNumber = 0;
-    [SyncVar] public bool PowerUpsEnabled = true;
-    [SyncVar] public bool WeatherStatuesEnabled = true;
-    [SyncVar] public bool ParFavorPenalty = false;
+    private readonly SyncVar<bool> _syncIsThereAStrokeLimit = new SyncVar<bool>();
+    public bool IsThereAStrokeLimit { get => _syncIsThereAStrokeLimit.Value; set => _syncIsThereAStrokeLimit.Value = value; }
+    private readonly SyncVar<int> _syncStrokeLimitNumber = new SyncVar<int>();
+    public int StrokeLimitNumber { get => _syncStrokeLimitNumber.Value; set => _syncStrokeLimitNumber.Value = value; }
+    private readonly SyncVar<bool> _syncPowerUpsEnabled = new SyncVar<bool>(true);
+    public bool PowerUpsEnabled { get => _syncPowerUpsEnabled.Value; set => _syncPowerUpsEnabled.Value = value; }
+    private readonly SyncVar<bool> _syncWeatherStatuesEnabled = new SyncVar<bool>(true);
+    public bool WeatherStatuesEnabled { get => _syncWeatherStatuesEnabled.Value; set => _syncWeatherStatuesEnabled.Value = value; }
+    private readonly SyncVar<bool> _syncParFavorPenalty = new SyncVar<bool>();
+    public bool ParFavorPenalty { get => _syncParFavorPenalty.Value; set => _syncParFavorPenalty.Value = value; }
 
     [Header("Prompt Player to Download Course")]
     [SerializeField] GameObject _promptPlayerToDownloadPanel;
@@ -151,6 +167,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     }
     private void Awake()
     {
+        _syncCurrentPlayerNetId.OnChange += SyncCurrentPlayerNetId;
 
         MakeInstance();
 
@@ -199,6 +216,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         // set the ownership to the server?
         Debug.Log("OnStartServer: On GameplayManager: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHost.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
         ClearSyncLists();
+        RegisterAlreadySpawnedNetworkPlayers();
 
 
         // hardcoding these values for now but they should be set by multiplayer game config in the future?
@@ -604,7 +622,9 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             //player.MyBall.ResetBallSpriteForNewHole();
             if (player == CurrentPlayer)
             {
-                player.MovePlayerToPosition(player.Owner, TeeOffPosition);
+                // Move the ball too: on FishNet 4 the ball can be placed under the player before this move,
+                // which would leave it at the spawn position for the first shot.
+                player.MovePlayerToPosition(player.Owner, TeeOffPosition, true);
                 player.RpcResetBallSpriteForNewHole();
             }
             else
@@ -1417,6 +1437,17 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         for (int i = 0; i < players.Count; i++)
         {
             GolfPlayers.Add(players[i]);
+        }
+    }
+    // FishNet 4 can start the NetworkPlayers made by the PlayerSpawner before this scene object starts,
+    // so their own AddNetworkPlayer calls are skipped. Pick up any that are already running on the server.
+    [Server]
+    void RegisterAlreadySpawnedNetworkPlayers()
+    {
+        foreach (NetworkObject spawnedObject in InstanceFinder.ServerManager.Objects.Spawned.Values)
+        {
+            if (spawnedObject.TryGetComponent(out NetworkPlayer player))
+                AddNetworkPlayer(player);
         }
     }
     [Server]

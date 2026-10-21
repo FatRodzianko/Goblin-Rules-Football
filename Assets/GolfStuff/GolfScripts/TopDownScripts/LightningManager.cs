@@ -13,7 +13,8 @@ public class LightningManager : NetworkBehaviour
     [SerializeField] bool _lightningFlashing = false;
     IEnumerator _lightningRoutine;
 
-    [SyncVar(OnChange = nameof(SyncIsThereLightning))] public bool IsThereLightning = false;
+    private readonly SyncVar<bool> _syncIsThereLightning = new SyncVar<bool>();
+    public bool IsThereLightning { get => _syncIsThereLightning.Value; set => _syncIsThereLightning.Value = value; }
 
     [Header("Lightning Cooldown Times")]
     [SerializeField] float _lightRainMin = 20f;
@@ -66,6 +67,10 @@ public class LightningManager : NetworkBehaviour
     [SerializeField] string _thunderFarAway;
     [SerializeField] GameObject _thunderSubtitle;
 
+    private void Awake()
+    {
+        _syncIsThereLightning.OnChange += SyncIsThereLightning;
+    }
     // Start is called before the first frame update
     void Start()
     {

@@ -49,18 +49,14 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 6875112187249593470}
   _networkObjectCache: {fileID: 6875112187249593470}
-  _availableCourses: {fileID: 11400000, guid: 83d00bb733777f64ebde5255c493e813, type: 2}
+  _customGolfCourseLoader: {fileID: 0}
   CurrentCourse: {fileID: 11400000, guid: f8ed099443d7d0e4cb1143f45263a104, type: 2}
   CurrentHoleInCourse: {fileID: 0}
-  CurrentHoleIndex: 0
   CourseToPlay: {fileID: 0}
-  CourseHolesToPlay: 
   CustomHolesSelectedToPlay: 
-  SelectedCourseId: 
   TeeOffChallenges: {fileID: 0}
   SelectedChallenge: {fileID: 0}
   _playerOrderFromChallenege: []
-  TeeOffChallengeClubType: 
   TeeOffPosition: {x: 0, y: 0, z: 0}
   CurrentHoleName: 
   CurrentHolePar: 0
@@ -82,10 +78,8 @@ MonoBehaviour:
   _lastBallInHoleTime: 0
   _haveAllPlayersTeedOff: 0
   CurrentPlayer: {fileID: 0}
-  CurrentPlayerNetId: 0
   _playerScoreBoard: {fileID: 0}
   _lightningManager: {fileID: 0}
-  AveragePlayerWeatherFavor: 0
   _cameraViewHole: {fileID: 0}
   _cameraBoundingBox: {fileID: 0}
   _holeNumberText: {fileID: 0}
@@ -108,16 +102,10 @@ MonoBehaviour:
   TurnsSinceSkip: 0
   SkipsInARow: 0
   _skipLightningCheck: 0
-  TimeSinceLastSkip: 0
-  TimeSinceLastTurnStart: 0
   _tellingPlayersStormWillPass: 0
   StatesOnServer: []
-  IsTeeOffChallenge: 0
-  IsThereAStrokeLimit: 0
-  StrokeLimitNumber: 0
-  PowerUpsEnabled: 1
-  WeatherStatuesEnabled: 1
-  ParFavorPenalty: 0
+  _promptPlayerToDownloadPanel: {fileID: 0}
+  _promptPlayerToDownloadText: {fileID: 0}
 --- !u!114 &6875112187249593470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,29 +119,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours:
-  - {fileID: 8242093619301733080}
-  <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
+  _isSpawnable: 1
   _isGlobal: 0
   _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
   NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
   <PrefabId>k__BackingField: 9
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 0
-  <SceneId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 8321511996279241685
-  _sceneNetworkObjects:
-  - {fileID: 6875112187249593470}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  <AssetPathHash>k__BackingField: 1750751148249133446
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
 --- !u!114 &331123447
 MonoBehaviour:
   m_ObjectHideFlags: 0

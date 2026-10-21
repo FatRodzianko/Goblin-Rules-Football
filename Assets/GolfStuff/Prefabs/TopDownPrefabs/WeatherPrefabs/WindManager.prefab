@@ -49,15 +49,12 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 8837063655550505329}
   _networkObjectCache: {fileID: 8837063655550505329}
-  WindDirection: {x: 0, y: -1}
-  WindPower: 0
+  GameWindMode: 0
   _windPower: 0
-  BaseWindPower: 0
   InitialWindPower: 0
   WindSeverity: 
   _tornadoPrefab: {fileID: 1816894770352592253, guid: 636b6bdd4aa23de4c810ce27dd13f5d5, type: 3}
   _tornadoObject: {fileID: 0}
-  IsThereATorndao: 0
   TornadoScript: {fileID: 0}
   _minSpawnDist: 30
   _maxSpawnDist: 50
@@ -78,29 +75,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours:
-  - {fileID: 1223725244161091194}
-  <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
+  _isSpawnable: 1
   _isGlobal: 0
   _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
   NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
   <PrefabId>k__BackingField: 21
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 1727917535
-  <SceneId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 501433820110773757
-  _sceneNetworkObjects:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 8837063655550505329}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  <AssetPathHash>k__BackingField: 5946756835259707446
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
 --- !u!114 &576748318750095402
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -17,7 +17,7 @@ public class PowerUpManagerTopDownGolf : NetworkBehaviour
 
     [Header("Balloons")]
     [SerializeField] List<BalloonPowerUp> _activeBallonPowerUps = new List<BalloonPowerUp>(); // only maintained by the server?
-    [SerializeField] [SyncObject] public readonly SyncList<int> BalloonNetIds = new SyncList<int>();
+    [SerializeField] public readonly SyncList<int> BalloonNetIds = new SyncList<int>();
 
     [Header("Misc")]
     [SerializeField] Vector3 _spawnPoint; // 183.469 -79.61863

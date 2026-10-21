@@ -9,7 +9,8 @@ using System;
 
 public class TNTScript : NetworkBehaviour
 {
-    [SerializeField] [SyncVar(OnChange = nameof(SyncPlayerConnectionID))] public int PlayerConnectionID; // connection id of the player object that spawned this TNT
+    private readonly SyncVar<int> _syncPlayerConnectionID = new SyncVar<int>(-99);
+    public int PlayerConnectionID { get => _syncPlayerConnectionID.Value; set => _syncPlayerConnectionID.Value = value; } // connection id of the player object that spawned this TNT
 
     [Header("Animation")]
     [SerializeField] Animator _myAnimator;
@@ -17,7 +18,8 @@ public class TNTScript : NetworkBehaviour
 
     [Header("Explosion stuff")]
     [SerializeField] LayerMask _golfBallLayer;
-    [SerializeField] [SyncVar] public float BlastRadius = 5f;
+    private readonly SyncVar<float> _syncBlastRadius = new SyncVar<float>(5f);
+    public float BlastRadius { get => _syncBlastRadius.Value; set => _syncBlastRadius.Value = value; }
 
     [Header("Balls blown up")]
     bool _areBallsInBlastRadius = false;
@@ -26,6 +28,10 @@ public class TNTScript : NetworkBehaviour
     public List<GolfBallTopDown> BallsBlownUpThatStopped = new List<GolfBallTopDown>();
     [SerializeField] GolfBallTopDown _golfBallThatStartedExplosion;
 
+    private void Awake()
+    {
+        _syncPlayerConnectionID.OnChange += SyncPlayerConnectionID;
+    }
     // Start is called before the first frame update
     void Start()
     {

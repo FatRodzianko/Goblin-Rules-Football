@@ -15,7 +15,8 @@ public class BalloonPowerUp : NetworkBehaviour
 
     [Header("Balloon Info")]
     [SerializeField] public string SavedHeightOfBalloon; // used in the map editor to save the height of the balloon, which is then set when the balloon is spawned
-    [SerializeField] [SyncVar(OnChange = nameof(SyncHeightOfBalloon))] public string HeightOfBalloon;
+    private readonly SyncVar<string> _syncHeightOfBalloon = new SyncVar<string>();
+    public string HeightOfBalloon { get => _syncHeightOfBalloon.Value; set => _syncHeightOfBalloon.Value = value; }
     [SerializeField] public bool IsPopped = false;
 
     [Header("Collider Stuff")]
@@ -40,7 +41,8 @@ public class BalloonPowerUp : NetworkBehaviour
     [SerializeField] float _boxHighTopHeight;
 
     [Header("PowerUp Info")]
-    [SyncVar(OnChange = nameof(SyncPowerUpType))] public string PowerUpType;
+    private readonly SyncVar<string> _syncPowerUpType = new SyncVar<string>();
+    public string PowerUpType { get => _syncPowerUpType.Value; set => _syncPowerUpType.Value = value; }
     [SerializeField] Sprite _powerUpSprite;
     [SerializeField] string _powerUpText;
 
@@ -66,6 +68,11 @@ public class BalloonPowerUp : NetworkBehaviour
     [SerializeField] EnvironmentObstacleTopDown _balloonEnvironmentObstacleTopDown;
     [SerializeField] EnvironmentObstacleTopDown _boxEnvironmentObstacleTopDown;
 
+    private void Awake()
+    {
+        _syncHeightOfBalloon.OnChange += SyncHeightOfBalloon;
+        _syncPowerUpType.OnChange += SyncPowerUpType;
+    }
     // Start is called before the first frame update
     void Start()
     {

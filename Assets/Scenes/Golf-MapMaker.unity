@@ -606881,8 +606881,16 @@ PrefabInstance:
       value: PowerUpManager
       objectReference: {fileID: 0}
     - target: {fileID: 7030450351127779416, guid: f0831003b8878aa4ca2b9acf431906c0, type: 3}
+      propertyPath: SceneId
+      value: 1054204393
+      objectReference: {fileID: 0}
+    - target: {fileID: 7030450351127779416, guid: f0831003b8878aa4ca2b9acf431906c0, type: 3}
       propertyPath: _scenePathHash
       value: 152618785
+      objectReference: {fileID: 0}
+    - target: {fileID: 7030450351127779416, guid: f0831003b8878aa4ca2b9acf431906c0, type: 3}
+      propertyPath: WasActiveDuringEdit
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7030450351127779416, guid: f0831003b8878aa4ca2b9acf431906c0, type: 3}
       propertyPath: <SceneId>k__BackingField

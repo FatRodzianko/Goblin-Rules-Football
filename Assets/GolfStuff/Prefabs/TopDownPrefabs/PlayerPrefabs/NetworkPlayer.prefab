@@ -880,6 +880,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -3332,8 +3333,6 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 383208058805492564}
   _golfPlayerPrefab: {fileID: 3144715486186738516, guid: 62bba22d42e2b7f4bbc08c4ba8186523, type: 3}
   _golfPlayerScript: {fileID: 0}
-  PlayerSteamID: 0
-  _ballColor: {r: 1, g: 1, b: 1, a: 1}
   _ballColorPicker: {fileID: 8514042572030176941}
   _playerUICanvas: {fileID: 1101217417568372103}
   _readyButton: {fileID: 2467153876372856284}
@@ -3348,8 +3347,6 @@ MonoBehaviour:
   _lobbyPlayerListItemPrefab: {fileID: 7566048167208569167, guid: cba0a4deb55d35d4b908ff69159f45a4, type: 3}
   _myLobbyPlayerListObject: {fileID: 0}
   _myLobbyPlayerListScript: {fileID: 0}
-  IsReady: 0
-  PlayerName: 
   _promptPlayerHolder: {fileID: 5825857633638649403}
   _promptPlayerText: {fileID: 5314734647381223277}
   _workshopPublishedItemID: 0
@@ -3367,25 +3364,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours:
-  - {fileID: 670838306306591962}
-  <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
+  _isSpawnable: 1
   _isGlobal: 0
   _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
   NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
   <PrefabId>k__BackingField: 22
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 0
-  <SceneId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 15509170593700276690
-  _sceneNetworkObjects:
-  - {fileID: 383208058805492564}
-  - {fileID: 0}
+  <AssetPathHash>k__BackingField: 5604200748811928021
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
 --- !u!114 &8514042572030176941
 MonoBehaviour:
   m_ObjectHideFlags: 0

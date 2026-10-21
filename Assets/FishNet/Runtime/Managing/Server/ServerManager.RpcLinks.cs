@@ -6,20 +6,17 @@ using UnityEngine;
 
 namespace FishNet.Managing.Server
 {
-
     public sealed partial class ServerManager : MonoBehaviour
     {
-
-
         #region Internal
         /// <summary>
         /// Current RPCLinks.
         /// </summary>
-        internal Dictionary<ushort, RpcLink> RpcLinks = new Dictionary<ushort, RpcLink>();
+        internal Dictionary<ushort, RpcLink> RpcLinks = new();
         /// <summary>
         /// RPCLink indexes which can be used.
         /// </summary>
-        private Queue<ushort> _availableRpcLinkIndexes = new Queue<ushort>();
+        private Queue<ushort> _availableRpcLinkIndexes = new();
         #endregion
 
         /// <summary>
@@ -27,15 +24,8 @@ namespace FishNet.Managing.Server
         /// </summary>
         private void InitializeRpcLinks()
         {
-            /* Brute force enum values. 
-             * Linq Last/Max lookup throws for IL2CPP. */
-            ushort highestValue = 0;
-            Array pidValues = Enum.GetValues(typeof(PacketId));
-            foreach (PacketId pid in pidValues)
-                highestValue = Math.Max(highestValue, (ushort)pid);
-
-            highestValue += 1;
-            for (ushort i = highestValue; i < ushort.MaxValue; i++)
+            ushort startingLink = NetworkManager.StartingRpcLinkIndex;
+            for (ushort i = ushort.MaxValue; i >= startingLink; i--)
                 _availableRpcLinkIndexes.Enqueue(i);
         }
 
@@ -71,8 +61,7 @@ namespace FishNet.Managing.Server
         internal void StoreRpcLinks(Dictionary<uint, RpcLinkType> links)
         {
             foreach (RpcLinkType rlt in links.Values)
-                _availableRpcLinkIndexes.Enqueue(rlt.LinkIndex);
+                _availableRpcLinkIndexes.Enqueue(rlt.LinkPacketId);
         }
     }
-
 }

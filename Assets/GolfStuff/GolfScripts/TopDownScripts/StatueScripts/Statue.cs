@@ -21,13 +21,15 @@ public class Statue : NetworkBehaviour
     [SerializeField] public float HeightInUnityUnits;
     [SerializeField] float _brokenHeight;
     [SerializeField] float _originalHeight;
-    [SerializeField] [SyncVar(OnChange = nameof(SyncRingRadius))] public float RingRadius;
+    private readonly SyncVar<float> _syncRingRadius = new SyncVar<float>(5f);
+    public float RingRadius { get => _syncRingRadius.Value; set => _syncRingRadius.Value = value; }
     [SerializeField] public bool IsBroken;
     [SerializeField] public bool IsCracked;
 
     [Header("Statue Damage")]
     [SerializeField] float _startingHealth = 5f;
-    [SerializeField] [SyncVar] public float Health = 5f;
+    private readonly SyncVar<float> _syncHealth = new SyncVar<float>(5f);
+    public float Health { get => _syncHealth.Value; set => _syncHealth.Value = value; }
     [SerializeField] float _lastDamageTime = 0f;
     [SerializeField] float _lastDamageThreshold = 0.5f;
 
@@ -44,6 +46,10 @@ public class Statue : NetworkBehaviour
     [Header("Inner Circle Components")]
     [SerializeField] GameObject _innerCircle;
 
+    private void Awake()
+    {
+        _syncRingRadius.OnChange += SyncRingRadius;
+    }
     // Start is called before the first frame update
     void Start()
     {

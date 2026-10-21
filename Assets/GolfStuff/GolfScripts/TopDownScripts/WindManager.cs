@@ -21,11 +21,14 @@ public class WindManager : NetworkBehaviour
     }
     [SerializeField] public WindMode GameWindMode = WindMode.ControlledByPlayerFavor;
 
-    [SyncVar] public Vector2 WindDirection = Vector2.zero;
+    private readonly SyncVar<Vector2> _syncWindDirection = new SyncVar<Vector2>(new Vector2(0f, -1f));
+    public Vector2 WindDirection { get => _syncWindDirection.Value; set => _syncWindDirection.Value = value; }
     private Vector2 _windDirection = Vector2.zero;
-    [SerializeField] [SyncVar] public int WindPower = 0; // WindPower for the player's turn that uses player FavorWeather to set its value relative to BaseWindPower. Negative favor = higher wind power. Positive favor = lower wind power
+    private readonly SyncVar<int> _syncWindPower = new SyncVar<int>();
+    public int WindPower { get => _syncWindPower.Value; set => _syncWindPower.Value = value; } // WindPower for the player's turn that uses player FavorWeather to set its value relative to BaseWindPower. Negative favor = higher wind power. Positive favor = lower wind power
     [SerializeField] private int _windPower = 0;
-    [SerializeField] [SyncVar] public int BaseWindPower = 0; // this is the base wind power that server tracks
+    private readonly SyncVar<int> _syncBaseWindPower = new SyncVar<int>();
+    public int BaseWindPower { get => _syncBaseWindPower.Value; set => _syncBaseWindPower.Value = value; } // this is the base wind power that server tracks
     private int _baseWindPower = 0;
     [SerializeField] public int InitialWindPower = 0; // this is the initial wind power. used when modifying the "Base" wind power from player favor. Average player favor modifies the base wind power relative to the initial wind power. negative average favor = Base Wind Power increases from initial window. Oppositve for positive average favor
 
@@ -45,7 +48,8 @@ public class WindManager : NetworkBehaviour
     [Header("Tornado Stuff")]
     [SerializeField] GameObject _tornadoPrefab;
     [SerializeField] GameObject _tornadoObject;
-    [SyncVar] public bool IsThereATorndao = false;
+    private readonly SyncVar<bool> _syncIsThereATorndao = new SyncVar<bool>();
+    public bool IsThereATorndao { get => _syncIsThereATorndao.Value; set => _syncIsThereATorndao.Value = value; }
     private bool _isThereATornado = false;
     public delegate void IsTornadoChanged(bool tornado);
     public event IsTornadoChanged TornadoChanged;

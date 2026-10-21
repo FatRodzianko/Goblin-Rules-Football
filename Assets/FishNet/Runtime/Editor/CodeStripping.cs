@@ -1,33 +1,26 @@
-﻿
+﻿#if UNITY_EDITOR
 using FishNet.Configuring;
 using System.IO;
 using UnityEngine;
 using System.Xml.Serialization;
-
-#if UNITY_EDITOR
 using FishNet.Editing.PrefabCollectionGenerator;
 using UnityEditor.Compilation;
 using UnityEditor.Build.Reporting;
 using UnityEditor;
 using UnityEditor.Build;
-#endif
 
 namespace FishNet.Configuring
 {
-
-
     public class CodeStripping
-    
-    {
-
+        {
         /// <summary>
         /// True if making a release build for client.
         /// </summary>
-        public static bool ReleasingForClient => (Configuration.Configurations.CodeStripping.IsBuilding && !Configuration.Configurations.CodeStripping.IsHeadless && !Configuration.Configurations.CodeStripping.IsDevelopment);
+        public static bool ReleasingForClient => Configuration.Configurations.CodeStripping.IsBuilding && !Configuration.Configurations.CodeStripping.IsHeadless && !Configuration.Configurations.CodeStripping.IsDevelopment;
         /// <summary>
         /// True if making a release build for server.
         /// </summary>
-        public static bool ReleasingForServer => (Configuration.Configurations.CodeStripping.IsBuilding && Configuration.Configurations.CodeStripping.IsHeadless && !Configuration.Configurations.CodeStripping.IsDevelopment);
+        public static bool ReleasingForServer => Configuration.Configurations.CodeStripping.IsBuilding && Configuration.Configurations.CodeStripping.IsHeadless && !Configuration.Configurations.CodeStripping.IsDevelopment;
         /// <summary>
         /// Returns if to remove server logic.
         /// </summary>
@@ -36,8 +29,6 @@ namespace FishNet.Configuring
         {
             get
             {
-                
-
                 /* This is to protect non pro users from enabling this
                  * without the extra logic code.  */
 #pragma warning disable CS0162 // Unreachable code detected
@@ -52,8 +43,6 @@ namespace FishNet.Configuring
         {
             get
             {
-                
-
                 /* This is to protect non pro users from enabling this
                  * without the extra logic code.  */
 #pragma warning disable CS0162 // Unreachable code detected
@@ -65,10 +54,8 @@ namespace FishNet.Configuring
         /// Technique to strip methods.
         /// </summary>
         public static StrippingTypes StrippingType => (StrippingTypes)Configuration.Configurations.CodeStripping.StrippingType;
-
         private static object _compilationContext;
         public int callbackOrder => 0;
-#if UNITY_EDITOR
 
         public void OnPreprocessBuild(BuildReport report)
         {
@@ -77,11 +64,11 @@ namespace FishNet.Configuring
             CompilationPipeline.compilationStarted += CompilationPipelineOnCompilationStarted;
             CompilationPipeline.compilationFinished += CompilationPipelineOnCompilationFinished;
 
-            
-        }
+            }
+
         /* Solution for builds ending with errors and not triggering OnPostprocessBuild.
-        * Link: https://gamedev.stackexchange.com/questions/181611/custom-build-failure-callback
-        */
+         * Link: https://gamedev.stackexchange.com/questions/181611/custom-build-failure-callback
+         */
         private void CompilationPipelineOnCompilationStarted(object compilationContext)
         {
             _compilationContext = compilationContext;
@@ -97,22 +84,18 @@ namespace FishNet.Configuring
             CompilationPipeline.compilationStarted -= CompilationPipelineOnCompilationStarted;
             CompilationPipeline.compilationFinished -= CompilationPipelineOnCompilationFinished;
 
-            BuildingEnded();
+            // BuildingEnded();
         }
 
         private void BuildingEnded()
         {
-            
-
             Generator.IgnorePostProcess = false;
         }
 
         public void OnPostprocessBuild(BuildReport report)
         {
-            
-                BuildingEnded();
+            BuildingEnded();
         }
-#endif
     }
-
 }
+#endif

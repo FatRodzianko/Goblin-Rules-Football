@@ -109,7 +109,6 @@ MonoBehaviour:
   _myRenderer: {fileID: 1294718589790411388}
   _balloonAnimator: {fileID: 1294718589790411385}
   SavedHeightOfBalloon: 
-  HeightOfBalloon: 
   IsPopped: 0
   _myCollider: {fileID: 1294718589790411386}
   _originalColliderPoints:
@@ -136,7 +135,12 @@ MonoBehaviour:
   _medTopHeight: 6
   _highStartHeight: 4.375
   _highTopHeight: 7.25
-  PowerUpType: 
+  _boxLowStartHeight: 0
+  _boxLowTopHeight: 0
+  _boxMedStartHeight: 0
+  _boxMedTopHeight: 0
+  _boxHighStartHeight: 0
+  _boxHighTopHeight: 0
   _powerUpSprite: {fileID: 0}
   _powerUpText: 
   _iconRenderer: {fileID: 406276117195401006}
@@ -147,6 +151,12 @@ MonoBehaviour:
   - med
   - high
   _environmentObstacleTopDown: {fileID: 3773523054185311849}
+  myScriptableObject: {fileID: 0}
+  _balloonSpriteCollision: {fileID: 0}
+  _spriteColliderObject: {fileID: 0}
+  _twoColliders: 0
+  _balloonEnvironmentObstacleTopDown: {fileID: 0}
+  _boxEnvironmentObstacleTopDown: {fileID: 0}
 --- !u!114 &1294718589790411385
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,6 +173,7 @@ MonoBehaviour:
   _animator: {fileID: 359966342195928935}
   _heightOfBallon: 
   _popAnimation: -pop
+  _crateHitAnimation: 
   _idleAnimation: -idle
   _isIdle: 0
   _isPopped: 0
@@ -179,30 +190,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours:
-  - {fileID: 1294718589790411389}
-  <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
+  _isSpawnable: 1
   _isGlobal: 0
   _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
   NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
   <PrefabId>k__BackingField: 0
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 0
-  <SceneId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 6060965588774960081
-  _sceneNetworkObjects:
-  - {fileID: 0}
-  - {fileID: 1294718589790411384}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  <AssetPathHash>k__BackingField: 15521900790664678704
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
 --- !u!60 &1294718589790411386
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -238,7 +269,7 @@ PolygonCollider2D:
       - {x: 1.1875, y: 0.4375}
 --- !u!95 &359966342195928935
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -255,7 +286,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &3773523054185311849
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,6 +320,16 @@ MonoBehaviour:
   _myStatue: {fileID: 0}
   _isBalloon: 1
   _myBalloon: {fileID: 1294718589790411389}
+  _twoColliders: 0
+  _crateCollider: 0
+  _isSpinningHoop: 0
+  _spinningHoopScript: {fileID: 0}
+  _isTube: 0
+  _tubeScript: {fileID: 0}
+  _ballInTube: 0
+  _isLandMine: 0
+  _isLandMineInnerCircle: 0
+  _landMineScript: {fileID: 0}
 --- !u!1 &3551204756378181811
 GameObject:
   m_ObjectHideFlags: 0

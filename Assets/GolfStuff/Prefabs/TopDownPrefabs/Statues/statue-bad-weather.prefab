@@ -116,11 +116,9 @@ MonoBehaviour:
   HeightInUnityUnits: 3.375
   _brokenHeight: 0.25
   _originalHeight: 3.375
-  RingRadius: 5
   IsBroken: 0
   IsCracked: 0
   _startingHealth: 7.5
-  Health: 5
   _lastDamageTime: 0
   _lastDamageThreshold: 0.5
   _myCollider: {fileID: 6243970928968063507}
@@ -257,7 +255,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!95 &698239185559862178
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -274,7 +272,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &3432858679223941275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,23 +304,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours:
-  - {fileID: 2370977877022451250}
-  <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
+  _isSpawnable: 1
   _isGlobal: 0
   _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
   NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
   <PrefabId>k__BackingField: 8
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 0
-  <SceneId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 14246519237433203975
-  _sceneNetworkObjects: []
+  <AssetPathHash>k__BackingField: 8026893240150488160
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
 --- !u!114 &2452447529520024882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -567,6 +593,8 @@ MonoBehaviour:
   _defaultOrderInLayer: 0
   _myCollider: {fileID: 3791652840507948659}
   MySpriteMask: {fileID: 2441882193936205998}
+  _noTransparency: {r: 1, g: 1, b: 1, a: 1}
+  _transparent: {r: 1, g: 1, b: 1, a: 0.5}
 --- !u!60 &3791652840507948659
 PolygonCollider2D:
   m_ObjectHideFlags: 0

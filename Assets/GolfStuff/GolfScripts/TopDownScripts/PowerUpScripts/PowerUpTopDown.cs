@@ -11,15 +11,23 @@ using FishNet;
 public class PowerUpTopDown : NetworkBehaviour
 {
     [Header("Owner Info")]
-    [SyncVar(OnChange = nameof(SyncOwnerID))] public int OwnerID;
+    private readonly SyncVar<int> _syncOwnerID = new SyncVar<int>();
+    public int OwnerID { get => _syncOwnerID.Value; set => _syncOwnerID.Value = value; }
     GolfPlayerTopDown _myOwner;
 
     [Header("PowerUp Attributes")]
-    [SyncVar(OnChange = nameof(SyncPowerUpType))] public string PowerUpType;
-    [SyncVar] string _powerUpText;
+    private readonly SyncVar<string> _syncPowerUpType = new SyncVar<string>();
+    public string PowerUpType { get => _syncPowerUpType.Value; set => _syncPowerUpType.Value = value; }
+    private readonly SyncVar<string> _powerUpText = new SyncVar<string>();
     Sprite _powerUpSprite;
-    [SyncVar] public bool HasBeenUsed = false;
+    private readonly SyncVar<bool> _syncHasBeenUsed = new SyncVar<bool>();
+    public bool HasBeenUsed { get => _syncHasBeenUsed.Value; set => _syncHasBeenUsed.Value = value; }
 
+    private void Awake()
+    {
+        _syncOwnerID.OnChange += SyncOwnerID;
+        _syncPowerUpType.OnChange += SyncPowerUpType;
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -59,7 +67,7 @@ public class PowerUpTopDown : NetworkBehaviour
     [Server]
     public void SetPowerUpText(string newText)
     {
-        this._powerUpText = newText;
+        this._powerUpText.Value = newText;
     }
     private void OnDestroy()
     {

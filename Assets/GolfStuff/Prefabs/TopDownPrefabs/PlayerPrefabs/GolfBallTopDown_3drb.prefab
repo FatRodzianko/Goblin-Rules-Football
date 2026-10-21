@@ -10024,9 +10024,9 @@ MonoBehaviour:
   trail: {fileID: 885962383}
   _rocketParticle: {fileID: 1428307966907750258}
   isHit: 0
-  _clientMovingBall: 0
   PlayerUsingRocket: 0
   BallInTube: 0
+  BallOnPipeEntryHole: 0
   hitBallPonts:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
@@ -10064,8 +10064,9 @@ MonoBehaviour:
   twoBounceDistancesAgo: 0
   isRolling: 0
   HitApexOfHill: 0
+  _lastKnownPosition: {x: 0, y: 0}
+  _stuckWhileRollingCount: 0
   LocalIsInHole: 0
-  IsInHole: 0
   BouncedOffObstacle: 0
   IsHitByTornado: 0
   MyTornado: {fileID: 0}
@@ -10087,6 +10088,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 67108864
   _currentTileCell: {x: 0, y: 0, z: 0}
+  _groundTileOrder: {fileID: 0}
   _ballSounds: {fileID: 11400000, guid: b32cc943f2db3b64a987f96b00abadc9, type: 2}
 --- !u!54 &-6338695618932937821
 Rigidbody:
@@ -10132,18 +10134,23 @@ MonoBehaviour:
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 1260874229579962410}
   _networkObjectCache: {fileID: 1260874229579962410}
+  _componentConfiguration: 0
   _synchronizeParent: 0
   _packing:
     Position: 0
     Rotation: 1
     Scale: 1
+  _useScaledTime: 1
   _interpolation: 4
   _extrapolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
   _clientAuthoritative: 1
   _sendToOwner: 1
+  _useLevelOfDetail: 0
+  _interval: 1
   _synchronizePosition: 1
+  _positionSensitivity: 0.001
   _positionSnapping:
     X: 0
     Y: 0
@@ -10154,6 +10161,7 @@ MonoBehaviour:
     Y: 0
     Z: 0
   _synchronizeScale: 0
+  _scaleSensitivity: 0.001
   _scaleSnapping:
     X: 0
     Y: 0
@@ -10171,24 +10179,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours:
-  - {fileID: 4414391001200824294}
-  - {fileID: 8404304866366200417}
-  <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
+  _isSpawnable: 1
   _isGlobal: 0
   _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
   NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
   <PrefabId>k__BackingField: 20
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 0
-  <SceneId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 15768312188581768546
-  _sceneNetworkObjects: []
+  <AssetPathHash>k__BackingField: 5102375800167029037
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
 --- !u!114 &1116387223850152150
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -16,7 +16,8 @@ public class Torndao : NetworkBehaviour
 
     [Header("Attributes")]
     [SerializeField] public float HeightInUnityUnits = 3f;
-    [SerializeField] [SyncVar(OnChange = nameof(SyncTornadoStrength))] public int TornadoStrength = -1;
+    private readonly SyncVar<int> _syncTornadoStrength = new SyncVar<int>(-1);
+    public int TornadoStrength { get => _syncTornadoStrength.Value; set => _syncTornadoStrength.Value = value; }
 
     [Header("Movement")]
     public bool IsMoving = false;
@@ -52,6 +53,7 @@ public class Torndao : NetworkBehaviour
     }
     private void Awake()
     {
+        _syncTornadoStrength.OnChange += SyncTornadoStrength;
         //if (!_myCollider)
         //    _myCollider = this.GetComponent<BoxCollider2D>();
         //SetTornadoStrength();

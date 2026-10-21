@@ -17,10 +17,11 @@ public class NetworkPlayer : NetworkBehaviour
     [Header("Golf Player Stuff")]
     [SerializeField] GameObject _golfPlayerPrefab;
     [SerializeField] GolfPlayerTopDown _golfPlayerScript;
-    [SerializeField] [SyncVar(OnChange = nameof(SyncPlayerSteamID))] public ulong PlayerSteamID;
+    private readonly SyncVar<ulong> _syncPlayerSteamID = new SyncVar<ulong>();
+    public ulong PlayerSteamID { get => _syncPlayerSteamID.Value; set => _syncPlayerSteamID.Value = value; }
 
     [Header("Color Picker Stuff")]
-    [SerializeField] [SyncVar(OnChange = nameof(SyncBallColor))] Color _ballColor = Color.white;
+    private readonly SyncVar<Color> _ballColor = new SyncVar<Color>(Color.white);
     [SerializeField] BallColorPicker _ballColorPicker;
 
     [Header("UI Stuff")]
@@ -43,8 +44,10 @@ public class NetworkPlayer : NetworkBehaviour
     [SerializeField] GolfPlayerListItem _myLobbyPlayerListScript;
 
     [Header("Player Status")]
-    [SerializeField] [SyncVar(OnChange = nameof(SyncIsReady))] public bool IsReady = false;
-    [SerializeField] [SyncVar(OnChange = nameof(SyncPlayerName))] public string PlayerName;
+    private readonly SyncVar<bool> _syncIsReady = new SyncVar<bool>();
+    public bool IsReady { get => _syncIsReady.Value; set => _syncIsReady.Value = value; }
+    private readonly SyncVar<string> _syncPlayerName = new SyncVar<string>();
+    public string PlayerName { get => _syncPlayerName.Value; set => _syncPlayerName.Value = value; }
 
     [Header("Prompt Player To Download")]
     [SerializeField] GameObject _promptPlayerHolder;
@@ -54,6 +57,13 @@ public class NetworkPlayer : NetworkBehaviour
     [Header("Networking stuff?")]
     [SerializeField] NetworkManager _networkManager;
 
+    private void Awake()
+    {
+        _syncPlayerSteamID.OnChange += SyncPlayerSteamID;
+        _ballColor.OnChange += SyncBallColor;
+        _syncIsReady.OnChange += SyncIsReady;
+        _syncPlayerName.OnChange += SyncPlayerName;
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -78,14 +88,22 @@ public class NetworkPlayer : NetworkBehaviour
         {
             _networkManager = GameObject.FindGameObjectWithTag("GolfNetworkManager").GetComponent<NetworkManager>();
         }
-        GameplayManagerTopDownGolf.instance.AddNetworkPlayer(this);
-        CheckIfHostCanStartGame();
+        // The PlayerSpawner can start this before the Golf scene's GameplayManager exists or has started on the server.
+        // In that case the GameplayManager registers this player in its own OnStartServer.
+        GameplayManagerTopDownGolf gameplayManager = GameplayManagerTopDownGolf.instance;
+        if (gameplayManager != null && gameplayManager.IsServerInitialized)
+        {
+            gameplayManager.AddNetworkPlayer(this);
+            CheckIfHostCanStartGame();
+        }
 
     }
     public override void OnStopServer()
     {
         base.OnStopServer();
-        GameplayManagerTopDownGolf.instance.RemoveNetworkPlayer(this);
+        GameplayManagerTopDownGolf gameplayManager = GameplayManagerTopDownGolf.instance;
+        if (gameplayManager != null && gameplayManager.IsServerInitialized)
+            gameplayManager.RemoveNetworkPlayer(this);
     }
     public override void OnStartClient()
     {
@@ -307,7 +325,7 @@ public class NetworkPlayer : NetworkBehaviour
         _golfPlayerScript.PlayerName = playerName;
         _golfPlayerScript.IsGameLeader = this.Owner.IsHost;
         _golfPlayerScript.OwnerNetId = this.OwnerId;
-        _golfPlayerScript.BallColor = this._ballColor;
+        _golfPlayerScript.BallColor = this._ballColor.Value;
         InstanceFinder.ServerManager.Spawn(_golfPlayerScript.gameObject, this.Owner);
     }
     [TargetRpc]
@@ -396,7 +414,7 @@ public class NetworkPlayer : NetworkBehaviour
     void CmdUpdateBallColorValue(Color newColor)
     {
         Debug.Log("CmdUpdateBallColorValue: " + newColor.ToString());
-        this._ballColor = newColor;
+        this._ballColor.Value = newColor;
     }
     void SpawnLobbyPlayerListItem()
     {

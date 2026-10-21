@@ -40,7 +40,7 @@ public class GolfBallTopDown : NetworkBehaviour
 
     [Header("Ball Status")]
     public bool isHit = false;
-    [SerializeField] [SyncVar(OnChange = nameof(SyncClientMovingBall))] bool _clientMovingBall = false;
+    private readonly SyncVar<bool> _clientMovingBall = new SyncVar<bool>();
     public bool PlayerUsingRocket = false;
     public bool BallInTube = false;
     public bool BallOnPipeEntryHole = false;
@@ -87,7 +87,8 @@ public class GolfBallTopDown : NetworkBehaviour
 
     [Header("Ball State")]
     public bool LocalIsInHole = false;
-    [SyncVar(OnChange = nameof(SyncIsInHole))] public bool IsInHole = false;
+    private readonly SyncVar<bool> _syncIsInHole = new SyncVar<bool>();
+    public bool IsInHole { get => _syncIsInHole.Value; set => _syncIsInHole.Value = value; }
     public bool BouncedOffObstacle = false;
 
     [Header("Tornado")]
@@ -124,6 +125,11 @@ public class GolfBallTopDown : NetworkBehaviour
     [Header("Sounds References")]
     [SerializeField] ScriptableBallSounds _ballSounds;
 
+    private void Awake()
+    {
+        _clientMovingBall.OnChange += SyncClientMovingBall;
+        _syncIsInHole.OnChange += SyncIsInHole;
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -149,7 +155,7 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         if (!this.IsOwner)
         {
-            if (_clientMovingBall)
+            if (_clientMovingBall.Value)
             {
                 UpdateBallSpriteForHeight();
             }
@@ -2300,7 +2306,7 @@ public class GolfBallTopDown : NetworkBehaviour
     [ServerRpc]
     void CmdTellClientsBallIsMoving(bool isBallMoving)
     {
-        this._clientMovingBall = isBallMoving;
+        this._clientMovingBall.Value = isBallMoving;
     }
     void SyncClientMovingBall(bool prev, bool next, bool asServer)
     {

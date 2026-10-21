@@ -8,8 +8,9 @@ using FishNet;
 
 public class LandMineScript : NetworkBehaviour
 {
-    [SerializeField] [SyncVar] public int PlayerConnectionID; // connection id of the player object that spawned this TNT
-    [SerializeField] [SyncVar] float _radius;
+    private readonly SyncVar<int> _syncPlayerConnectionID = new SyncVar<int>();
+    public int PlayerConnectionID { get => _syncPlayerConnectionID.Value; set => _syncPlayerConnectionID.Value = value; } // connection id of the player object that spawned this TNT
+    private readonly SyncVar<float> _radius = new SyncVar<float>();
 
     [Header("Line Radius Stuff")]
     [SerializeField] LineRadiusDrawer _lineRadiusDrawer;
@@ -22,7 +23,7 @@ public class LandMineScript : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        UpdateRadius(_radius);
+        UpdateRadius(_radius.Value);
     }
 
     // Update is called once per frame

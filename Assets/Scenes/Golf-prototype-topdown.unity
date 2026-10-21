@@ -628208,6 +628208,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 868425389592874398, guid: fa9fb9434f41e1048b14b261f8ff92e7, type: 3}
+      propertyPath: SceneId
+      value: 4123000319
+      objectReference: {fileID: 0}
+    - target: {fileID: 868425389592874398, guid: fa9fb9434f41e1048b14b261f8ff92e7, type: 3}
+      propertyPath: WasActiveDuringEdit
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 868425389592874398, guid: fa9fb9434f41e1048b14b261f8ff92e7, type: 3}
       propertyPath: <SceneId>k__BackingField
       value: 7421349305812822300
       objectReference: {fileID: 0}
@@ -628297,6 +628305,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8837063655550505329, guid: 916ede9246aa64745a850f86cff701f4, type: 3}
+      propertyPath: SceneId
+      value: 4290609151
+      objectReference: {fileID: 0}
+    - target: {fileID: 8837063655550505329, guid: 916ede9246aa64745a850f86cff701f4, type: 3}
+      propertyPath: WasActiveDuringEdit
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8837063655550505329, guid: 916ede9246aa64745a850f86cff701f4, type: 3}
       propertyPath: <SceneId>k__BackingField
       value: 7421349305569290399
       objectReference: {fileID: 0}
@@ -628378,8 +628394,16 @@ PrefabInstance:
       value: PowerUpManager
       objectReference: {fileID: 0}
     - target: {fileID: 7030450351127779416, guid: f0831003b8878aa4ca2b9acf431906c0, type: 3}
+      propertyPath: SceneId
+      value: 4289460223
+      objectReference: {fileID: 0}
+    - target: {fileID: 7030450351127779416, guid: f0831003b8878aa4ca2b9acf431906c0, type: 3}
       propertyPath: _scenePathHash
       value: 1727917535
+      objectReference: {fileID: 0}
+    - target: {fileID: 7030450351127779416, guid: f0831003b8878aa4ca2b9acf431906c0, type: 3}
+      propertyPath: WasActiveDuringEdit
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7030450351127779416, guid: f0831003b8878aa4ca2b9acf431906c0, type: 3}
       propertyPath: <SceneId>k__BackingField
@@ -628514,6 +628538,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5172241719810091104, guid: c2e74526f475df64c8e0597c10a4a22c, type: 3}
+      propertyPath: SceneId
+      value: 4156158975
+      objectReference: {fileID: 0}
+    - target: {fileID: 5172241719810091104, guid: c2e74526f475df64c8e0597c10a4a22c, type: 3}
+      propertyPath: WasActiveDuringEdit
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5172241719810091104, guid: c2e74526f475df64c8e0597c10a4a22c, type: 3}
       propertyPath: <SceneId>k__BackingField
       value: 7421349306486149293
@@ -628934,8 +628966,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 924405063}
     - target: {fileID: 87436914173318899, guid: 790dcc9d251f5b04ab7b442d93a52886, type: 3}
+      propertyPath: SceneId
+      value: 4159306239
+      objectReference: {fileID: 0}
+    - target: {fileID: 87436914173318899, guid: 790dcc9d251f5b04ab7b442d93a52886, type: 3}
       propertyPath: _scenePathHash
       value: 1727917535
+      objectReference: {fileID: 0}
+    - target: {fileID: 87436914173318899, guid: 790dcc9d251f5b04ab7b442d93a52886, type: 3}
+      propertyPath: WasActiveDuringEdit
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 87436914173318899, guid: 790dcc9d251f5b04ab7b442d93a52886, type: 3}
       propertyPath: <SceneId>k__BackingField
@@ -629330,8 +629370,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 6875112187249593470, guid: 6d18c956d7127c74b936e2e3930bcb6e, type: 3}
+      propertyPath: SceneId
+      value: 4122968063
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875112187249593470, guid: 6d18c956d7127c74b936e2e3930bcb6e, type: 3}
       propertyPath: _scenePathHash
       value: 1727917535
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875112187249593470, guid: 6d18c956d7127c74b936e2e3930bcb6e, type: 3}
+      propertyPath: WasActiveDuringEdit
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6875112187249593470, guid: 6d18c956d7127c74b936e2e3930bcb6e, type: 3}
       propertyPath: <SceneId>k__BackingField

@@ -7,15 +7,22 @@ using FishNet.Object.Synchronizing;
 
 public class GolfPlayerScore : NetworkBehaviour
 {
-    [SyncVar(OnChange = nameof(SyncStrokesForCurrentHole))] public int StrokesForCurrentHole = 0;
-    [SyncVar(OnChange = nameof(SyncTotalStrokesForCourse))] public int TotalStrokesForCourse = 0;
+    private readonly SyncVar<int> _syncStrokesForCurrentHole = new SyncVar<int>();
+    public int StrokesForCurrentHole { get => _syncStrokesForCurrentHole.Value; set => _syncStrokesForCurrentHole.Value = value; }
+    private readonly SyncVar<int> _syncTotalStrokesForCourse = new SyncVar<int>();
+    public int TotalStrokesForCourse { get => _syncTotalStrokesForCourse.Value; set => _syncTotalStrokesForCourse.Value = value; }
     public Dictionary<int, int> LocalHoleWithScores = new Dictionary<int, int>();
-    [SyncObject] public readonly SyncDictionary<int, int> ServerHoleWithScores = new SyncDictionary<int,int>();
+    public readonly SyncDictionary<int, int> ServerHoleWithScores = new SyncDictionary<int,int>();
 
     [SerializeField] float _timeLastStrokeRemoved = 0f;
     float _timeLastHit = 0f;
     float _timeLastPenalty = 0f;
 
+    private void Awake()
+    {
+        _syncStrokesForCurrentHole.OnChange += SyncStrokesForCurrentHole;
+        _syncTotalStrokesForCourse.OnChange += SyncTotalStrokesForCourse;
+    }
     // Start is called before the first frame update
     void Start()
     {

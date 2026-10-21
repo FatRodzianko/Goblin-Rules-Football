@@ -22,10 +22,12 @@ public class RainManager : NetworkBehaviour
     [Header("Rain state")]
     [SerializeField] public RainMode GameRainMode;
     public bool IsRaining = false;
-    [SyncVar] public string RainState; // player's rain state. Based on the BaseRainState value and the player's weather favor
+    private readonly SyncVar<string> _syncRainState = new SyncVar<string>("clear");
+    public string RainState { get => _syncRainState.Value; set => _syncRainState.Value = value; } // player's rain state. Based on the BaseRainState value and the player's weather favor
     public List<string> RainStates = new List<string> { "clear", "light rain", "med rain", "heavy rain" };
     [SerializeField] private string _rainState;
-    [SyncVar] public string BaseRainState; // rain state that player's favor modifies. ex: base state is light rain, but player has +3 good weather favor, so there's a chance they have clear weather for their turn. Next player has -5 favor, so they get med rain for their turn
+    private readonly SyncVar<string> _syncBaseRainState = new SyncVar<string>();
+    public string BaseRainState { get => _syncBaseRainState.Value; set => _syncBaseRainState.Value = value; } // rain state that player's favor modifies. ex: base state is light rain, but player has +3 good weather favor, so there's a chance they have clear weather for their turn. Next player has -5 favor, so they get med rain for their turn
     private string _baseRainState;
 
     [Header("Rain Rates")]

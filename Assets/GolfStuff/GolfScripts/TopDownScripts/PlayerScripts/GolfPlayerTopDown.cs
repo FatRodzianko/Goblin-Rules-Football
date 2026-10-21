@@ -18,29 +18,40 @@ using UnityEngine.InputSystem;
 public class GolfPlayerTopDown : NetworkBehaviour
 {
     [Header("Player Info")]
-    [SyncVar(OnChange = nameof(SyncPlayerName))] public string PlayerName;
+    private readonly SyncVar<string> _syncPlayerName = new SyncVar<string>("Player1");
+    public string PlayerName { get => _syncPlayerName.Value; set => _syncPlayerName.Value = value; }
     public GolfPlayerScore PlayerScore;
     [SerializeField] Canvas _playerCanvas;
     [SerializeField] PlayerUIMessage _playerUIMessage;
-    [SyncVar(OnChange = nameof(SyncIsGameLeader))] public bool IsGameLeader = false;
-    [SyncVar] public int OwnerNetId;
-    [SyncVar(OnChange = nameof(SyncConnectionId))] public int ConnectionId;
+    private readonly SyncVar<bool> _syncIsGameLeader = new SyncVar<bool>();
+    public bool IsGameLeader { get => _syncIsGameLeader.Value; set => _syncIsGameLeader.Value = value; }
+    private readonly SyncVar<int> _syncOwnerNetId = new SyncVar<int>();
+    public int OwnerNetId { get => _syncOwnerNetId.Value; set => _syncOwnerNetId.Value = value; }
+    private readonly SyncVar<int> _syncConnectionId = new SyncVar<int>(-99);
+    public int ConnectionId { get => _syncConnectionId.Value; set => _syncConnectionId.Value = value; }
     [SerializeField] TextMeshPro _playerNameText;
 
     [Header("Favor of the Gods")]
-    [SerializeField] [SyncVar(OnChange = nameof(SyncFavorWeather))] public int FavorWeather;
-    [SerializeField] [SyncVar] public int FavorWind;
-    [SerializeField] [SyncVar] public float AccuracyFavorModifier = 1.0f;
-    [SerializeField] [SyncVar] public float DistanceFavorModifier = 1.0f;
+    private readonly SyncVar<int> _syncFavorWeather = new SyncVar<int>();
+    public int FavorWeather { get => _syncFavorWeather.Value; set => _syncFavorWeather.Value = value; }
+    private readonly SyncVar<int> _syncFavorWind = new SyncVar<int>();
+    public int FavorWind { get => _syncFavorWind.Value; set => _syncFavorWind.Value = value; }
+    private readonly SyncVar<float> _syncAccuracyFavorModifier = new SyncVar<float>(1.0f);
+    public float AccuracyFavorModifier { get => _syncAccuracyFavorModifier.Value; set => _syncAccuracyFavorModifier.Value = value; }
+    private readonly SyncVar<float> _syncDistanceFavorModifier = new SyncVar<float>(1.0f);
+    public float DistanceFavorModifier { get => _syncDistanceFavorModifier.Value; set => _syncDistanceFavorModifier.Value = value; }
 
 
     [Header("Golf Ball Stuff")]
     [SerializeField] GameObject _golfBallPrefab;
-    [SerializeField] [SyncVar(OnChange = nameof(SyncMyBallNetId))] int _myBallNetId;
+    private readonly SyncVar<int> _myBallNetId = new SyncVar<int>();
     [SerializeField] public GolfBallTopDown MyBall;
-    [SyncVar] public float DistanceToHole;
-    [SyncVar] public int NumberOfBallsSpawnedForClient = 0;
-    [SyncVar] public Color BallColor;
+    private readonly SyncVar<float> _syncDistanceToHole = new SyncVar<float>();
+    public float DistanceToHole { get => _syncDistanceToHole.Value; set => _syncDistanceToHole.Value = value; }
+    private readonly SyncVar<int> _syncNumberOfBallsSpawnedForClient = new SyncVar<int>();
+    public int NumberOfBallsSpawnedForClient { get => _syncNumberOfBallsSpawnedForClient.Value; set => _syncNumberOfBallsSpawnedForClient.Value = value; }
+    private readonly SyncVar<Color> _syncBallColor = new SyncVar<Color>();
+    public Color BallColor { get => _syncBallColor.Value; set => _syncBallColor.Value = value; }
 
 
     [Header("Hit Values")]
@@ -50,7 +61,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] [Range(-10f, 5f)] public float hitTopSpin = 0f;
     [SerializeField] [Range(-5f, 5f)] public float hitLeftOrRightspin = 0f;
     public bool IsShanked = false;
-    [SyncVar] public bool IsShankedSynced = false;
+    private readonly SyncVar<bool> _syncIsShankedSynced = new SyncVar<bool>();
+    public bool IsShankedSynced { get => _syncIsShankedSynced.Value; set => _syncIsShankedSynced.Value = value; }
     Vector2 _previousAimMovement = Vector2.zero;
     [SerializeField] Vector2 _normalizedDirection = new Vector2(1f, 1f).normalized;
 
@@ -80,9 +92,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] float _changeDistanceRate = 5f;
 
     [Header("Player Turn")]
-    [SyncVar(OnChange = nameof(SyncIsPlayersTurn))] public bool IsPlayersTurn = false;
+    private readonly SyncVar<bool> _syncIsPlayersTurn = new SyncVar<bool>();
+    public bool IsPlayersTurn { get => _syncIsPlayersTurn.Value; set => _syncIsPlayersTurn.Value = value; }
     public bool DirectionAndDistanceChosen = false;
-    [SyncVar] public bool HasPlayerTeedOff = false;
+    private readonly SyncVar<bool> _syncHasPlayerTeedOff = new SyncVar<bool>();
+    public bool HasPlayerTeedOff { get => _syncHasPlayerTeedOff.Value; set => _syncHasPlayerTeedOff.Value = value; }
     public bool PromptedForLightning = false;
     public bool PlayerStruckByLightning = false;
     [SerializeField] int _currentAimPointIndex = 0;
@@ -151,31 +165,40 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [SerializeField] Sprite _longPuttTextImage;
 
     [Header("Power Ups")]
-    [SyncVar] public bool HasPowerUp = false;
-    [SyncVar] public string PlayerPowerUpType = null;
+    private readonly SyncVar<bool> _syncHasPowerUp = new SyncVar<bool>();
+    public bool HasPowerUp { get => _syncHasPowerUp.Value; set => _syncHasPowerUp.Value = value; }
+    private readonly SyncVar<string> _syncPlayerPowerUpType = new SyncVar<string>();
+    public string PlayerPowerUpType { get => _syncPlayerPowerUpType.Value; set => _syncPlayerPowerUpType.Value = value; }
     string _playerPowerUpText = null;
     PowerUpTopDown _myPowerUp;
-    [SyncVar(OnChange = nameof(SyncUsedPowerUpType))] public string UsedPowerUpType;
-    [SyncVar(OnChange = nameof(SyncUsedPowerupThisTurn))] public bool UsedPowerupThisTurn = false;
+    private readonly SyncVar<string> _syncUsedPowerUpType = new SyncVar<string>();
+    public string UsedPowerUpType { get => _syncUsedPowerUpType.Value; set => _syncUsedPowerUpType.Value = value; }
+    private readonly SyncVar<bool> _syncUsedPowerupThisTurn = new SyncVar<bool>();
+    public bool UsedPowerupThisTurn { get => _syncUsedPowerupThisTurn.Value; set => _syncUsedPowerupThisTurn.Value = value; }
 
     [Header("Power Up Effects")]
-    [SyncVar(OnChange = nameof(SyncPowerUpDistanceModifier))] public float PowerUpDistanceModifier = 1.0f;
-    [SyncVar] public float PowerUpAccuracyModifier = 1.0f;
+    private readonly SyncVar<float> _syncPowerUpDistanceModifier = new SyncVar<float>(1.0f);
+    public float PowerUpDistanceModifier { get => _syncPowerUpDistanceModifier.Value; set => _syncPowerUpDistanceModifier.Value = value; }
+    private readonly SyncVar<float> _syncPowerUpAccuracyModifier = new SyncVar<float>(1.0f);
+    public float PowerUpAccuracyModifier { get => _syncPowerUpAccuracyModifier.Value; set => _syncPowerUpAccuracyModifier.Value = value; }
     Vector2 _rocketMove = Vector2.zero;
     float _rocketBoost = 10f;
     [SerializeField] bool _canUseRocketPower = false;
 
 
     [Header("Mulligan Stuff")]
-    [SyncVar(OnChange = nameof(SyncPlayerMulligan))] public bool PlayerMulligan = false;
+    private readonly SyncVar<bool> _syncPlayerMulligan = new SyncVar<bool>();
+    public bool PlayerMulligan { get => _syncPlayerMulligan.Value; set => _syncPlayerMulligan.Value = value; }
     public bool PromptedForMulligan = false;
     [SerializeField] Vector3 _ballStartPosition = Vector3.zero;
     IEnumerator _mulliganRoutine;
     [SerializeField] bool _isMulliganRoutineRunning = false;
 
     [Header("Statue and Weather Effects")]
-    [SyncVar] public bool BrokeGoodWeatherStatue = false;
-    [SyncVar] public bool BrokeBadWeatherStatue = false;
+    private readonly SyncVar<bool> _syncBrokeGoodWeatherStatue = new SyncVar<bool>();
+    public bool BrokeGoodWeatherStatue { get => _syncBrokeGoodWeatherStatue.Value; set => _syncBrokeGoodWeatherStatue.Value = value; }
+    private readonly SyncVar<bool> _syncBrokeBadWeatherStatue = new SyncVar<bool>();
+    public bool BrokeBadWeatherStatue { get => _syncBrokeBadWeatherStatue.Value; set => _syncBrokeBadWeatherStatue.Value = value; }
 
     [Header("Wind UI")]
     [SerializeField] GameObject _windUIHolder;
@@ -210,6 +233,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
     private void Awake()
     {
+        _syncPlayerName.OnChange += SyncPlayerName;
+        _syncIsGameLeader.OnChange += SyncIsGameLeader;
+        _syncConnectionId.OnChange += SyncConnectionId;
+        _syncFavorWeather.OnChange += SyncFavorWeather;
+        _myBallNetId.OnChange += SyncMyBallNetId;
+        _syncIsPlayersTurn.OnChange += SyncIsPlayersTurn;
+        _syncUsedPowerUpType.OnChange += SyncUsedPowerUpType;
+        _syncUsedPowerupThisTurn.OnChange += SyncUsedPowerupThisTurn;
+        _syncPowerUpDistanceModifier.OnChange += SyncPowerUpDistanceModifier;
+        _syncPlayerMulligan.OnChange += SyncPlayerMulligan;
         //if (!MyBall)
         //    SpawnPlayerBall();
         /*if(!myCamera)
@@ -253,6 +286,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             GameplayManagerTopDownGolf.instance.SetLocalGolfPlayer(this);
             Debug.Log("ScriptableBallSound string for tee off: " + _ballSounds.HitTeeOff);
             SubscribeToControls();
+            CountBallsSpawnedBeforeLocalPlayer();
         }
         else
         {
@@ -365,7 +399,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         GameObject newBall = Instantiate(_golfBallPrefab);
         GolfBallTopDown newBallScript = newBall.GetComponent<GolfBallTopDown>();
         InstanceFinder.ServerManager.Spawn(newBall, this.Owner);
-        this._myBallNetId = newBallScript.ObjectId;
+        this._myBallNetId.Value = newBallScript.ObjectId;
     }
     void SyncMyBallNetId(int prev, int next, bool asServer)
     {
@@ -395,8 +429,11 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 Debug.Log("SyncMyBallNetId: player spawned for someone who isn't the owner of this playeR? " + this.IsOwner.ToString() + " will try and find local game player to track number of balls spawned");
                 try
                 {
-                    GolfPlayerTopDown localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GolfPlayerTopDown>();
-                    localPlayer.CmdBallSpawnedForPlayer();
+                    GameObject localPlayerObject = GameObject.FindGameObjectWithTag("LocalGamePlayer");
+                    if (localPlayerObject)
+                        localPlayerObject.GetComponent<GolfPlayerTopDown>().CmdBallSpawnedForPlayer();
+                    else
+                        Debug.Log("SyncMyBallNetId: local game player has not started yet. It will count this ball when it starts.");
                 }
                 catch (Exception e)
                 {
@@ -404,6 +441,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 }
             }
             MyBall.UpdateBallColor(this.BallColor);
+        }
+    }
+    // FishNet 4 can start other players, and sync their ball ids, before the local player starts.
+    // SyncMyBallNetId couldn't find the local player for those, so count their balls now.
+    void CountBallsSpawnedBeforeLocalPlayer()
+    {
+        foreach (GolfPlayerTopDown player in FindObjectsOfType<GolfPlayerTopDown>())
+        {
+            if (player != this && player.MyBall)
+                CmdBallSpawnedForPlayer();
         }
     }
     [ServerRpc]

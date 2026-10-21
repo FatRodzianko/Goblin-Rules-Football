@@ -320,6 +320,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -948,31 +949,18 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 5665735165111769197}
   _networkObjectCache: {fileID: 5665735165111769197}
-  PlayerName: Player1
   PlayerScore: {fileID: 2653947506407809911}
   _playerCanvas: {fileID: 3381234889782742433}
   _playerUIMessage: {fileID: 5631159995116756437}
-  IsGameLeader: 0
-  OwnerNetId: 0
-  ConnectionId: -99
   _playerNameText: {fileID: 8036728465122121126}
-  FavorWeather: 0
-  FavorWind: 0
-  AccuracyFavorModifier: 1
-  DistanceFavorModifier: 1
   _golfBallPrefab: {fileID: 7504929942250748449, guid: 6721b70aef94bf54988229bfa7f71add, type: 3}
-  _myBallNetId: 0
   MyBall: {fileID: 0}
-  DistanceToHole: 0
-  NumberOfBallsSpawnedForClient: 0
-  BallColor: {r: 0, g: 0, b: 0, a: 0}
   hitDirection: {x: 0, y: 1}
   hitDistance: 200
   hitAngle: 24
   hitTopSpin: 0
   hitLeftOrRightspin: 0
   IsShanked: 0
-  IsShankedSynced: 0
   _normalizedDirection: {x: 0.70710677, y: 0.70710677}
   drawTrajectoryTopDown: {fileID: 3662651631311076367}
   _landingTargetSprite: {fileID: 4478594324651228388}
@@ -992,9 +980,7 @@ MonoBehaviour:
   perpendicular: {x: 0, y: 0}
   turnRate: 0.15
   _changeDistanceRate: 5
-  IsPlayersTurn: 0
   DirectionAndDistanceChosen: 0
-  HasPlayerTeedOff: 0
   PromptedForLightning: 0
   PlayerStruckByLightning: 0
   _currentAimPointIndex: 0
@@ -1044,19 +1030,10 @@ MonoBehaviour:
   _puttDistanceTextImage: {fileID: 8757087352194737499}
   _shortPuttTextImage: {fileID: 21300000, guid: 384d8aa8f0245594a8c794fcde468719, type: 3}
   _longPuttTextImage: {fileID: 21300000, guid: 21cf22b8677268049a7cac29ab6ebcbc, type: 3}
-  HasPowerUp: 0
-  PlayerPowerUpType: 
-  UsedPowerUpType: 
-  UsedPowerupThisTurn: 0
-  PowerUpDistanceModifier: 1
-  PowerUpAccuracyModifier: 1
   _canUseRocketPower: 0
-  PlayerMulligan: 0
   PromptedForMulligan: 0
   _ballStartPosition: {x: 0, y: 0, z: 0}
   _isMulliganRoutineRunning: 0
-  BrokeGoodWeatherStatue: 0
-  BrokeBadWeatherStatue: 0
   _windUIHolder: {fileID: 8772944465458510233}
   myCamera: {fileID: 0}
   _vCam: {fileID: 0}
@@ -1110,8 +1087,6 @@ MonoBehaviour:
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 5665735165111769197}
   _networkObjectCache: {fileID: 5665735165111769197}
-  StrokesForCurrentHole: 0
-  TotalStrokesForCourse: 0
   _timeLastStrokeRemoved: 0
 --- !u!114 &5665735165111769197
 MonoBehaviour:
@@ -1126,27 +1101,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours:
-  - {fileID: 7513493645420276422}
-  - {fileID: 2653947506407809911}
-  - {fileID: 1368494483326148317}
-  - {fileID: 3891610743640057217}
-  - {fileID: 5853080995522655165}
-  <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
+  _isSpawnable: 1
   _isGlobal: 0
   _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
   NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
   <PrefabId>k__BackingField: 14
   <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 0
-  <SceneId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 12848862753505696058
-  _sceneNetworkObjects: []
+  <AssetPathHash>k__BackingField: 10118554516539934191
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
 --- !u!114 &1368494483326148317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1162,18 +1160,23 @@ MonoBehaviour:
   _componentIndexCache: 2
   _addedNetworkObject: {fileID: 5665735165111769197}
   _networkObjectCache: {fileID: 5665735165111769197}
+  _componentConfiguration: 0
   _synchronizeParent: 0
   _packing:
     Position: 1
     Rotation: 1
     Scale: 0
+  _useScaledTime: 1
   _interpolation: 2
   _extrapolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
   _clientAuthoritative: 1
   _sendToOwner: 1
+  _useLevelOfDetail: 0
+  _interval: 1
   _synchronizePosition: 1
+  _positionSensitivity: 0.001
   _positionSnapping:
     X: 0
     Y: 0
@@ -1184,6 +1187,7 @@ MonoBehaviour:
     Y: 0
     Z: 0
   _synchronizeScale: 1
+  _scaleSensitivity: 0.001
   _scaleSnapping:
     X: 0
     Y: 0
@@ -1585,7 +1589,7 @@ SpriteRenderer:
   m_SpriteSortPoint: 1
 --- !u!95 &8337812199374243185
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1602,7 +1606,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &3891610743640057217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1663,6 +1668,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 5665735165111769197}
   IgnoredParameters: []
   _animator: {fileID: 8337812199374243185}
+  _synchronizeWhenDisabled: 0
   _smoothFloats: 1
   _interpolation: 2
   _clientAuthoritative: 1
