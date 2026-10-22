@@ -1,13 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
-using System.Linq;
 using UnityEngine.SceneManagement;
 using Steamworks;
+using FishNet.Connection;
+using FishNet.Managing;
+using FishNet.Object;
+using FishNet.Transporting;
 
-public class NetworkManagerGRF : NetworkManager
+// Football's session manager. With Mirror this was the NetworkManager itself. Football now shares Golf's FishNet
+// NetworkManager, so this sits on the same object and listens to its events instead. Its public members are unchanged,
+// so the rest of Football still reaches it through NetworkManagerGRF.singleton.
+public class NetworkManagerGRF : MonoBehaviour
 {
+    public static NetworkManagerGRF singleton;
+
+    // These two came from Mirror's NetworkManager.
+    public string networkAddress = "localhost";
+    public int maxConnections = 100;
+
     [SerializeField] public int minPlayers = 2;
     [SerializeField] private LobbyPlayer lobbyPlayerPrefab;
     [SerializeField] private GamePlayer gamePlayerPrefab;
@@ -45,56 +56,149 @@ public class NetworkManagerGRF : NetworkManager
     public List<GamePlayer> GamePlayers { get; } = new List<GamePlayer>();
     public List<LobbyPlayer> LobbyPlayers { get; } = new List<LobbyPlayer>();
 
+    private NetworkManager _networkManager;
+    // True from StartHost/StartClient until the connection stops, so Golf sessions on the shared NetworkManager are left alone.
+    private bool _isFootballSession = false;
+    private bool _startHostClientWhenLobbyLoads = false;
+    public bool IsFootballSession => _isFootballSession;
 
-    // Start is called before the first frame update
-    public override void OnStartServer()
+    private void Awake()
     {
-        spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
-    }
-    public override void OnStartClient()
-    {
-        Debug.Log("Starting client...");
-        List<GameObject> spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
-        Debug.Log("Spawnable Prefab count: " + spawnablePrefabs.Count());
-
-        foreach (GameObject prefab in spawnablePrefabs)
-        {
-            NetworkClient.RegisterPrefab(prefab);
-            Debug.Log("Registering prefab: " + prefab);
-        }
-    }
-    public override void OnClientConnect(NetworkConnection conn)
-    {
-        Debug.Log("Client connected.");
-        base.OnClientConnect(conn);
-    }
-    public override void OnClientDisconnect(NetworkConnection conn)
-    {
-        Debug.Log("Client disconnected.");
-        base.OnClientDisconnect(conn);
-    }
-    public override void OnServerConnect(NetworkConnection conn)
-    {
-        Debug.Log("Connecting to server...");
-        if (numPlayers >= maxConnections) // prevents players joining if the game is full
-        {
-            Debug.Log("Too many players. Disconnecting user.");
-            conn.Disconnect();
+        // FishNet keeps the first NetworkManager and destroys copies that load later, such as when the title screen loads again.
+        // This component is on that same object, so keep the first one too.
+        if (singleton != null && singleton != this)
             return;
-        }
-        if (SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene") // prevents players from joining a game that has already started. When the game starts, the scene will no longer be the "TitleScreen"
-        {
-            Debug.Log("Player loaded from scene: " + SceneManager.GetActiveScene().name);
-        }
-        else
-        {
-            Debug.Log("Player did not load from correct scene. Disconnecting user. Player loaded from scene: " + SceneManager.GetActiveScene().name);
-            conn.Disconnect();
-            return;
-        }
-        Debug.Log("Server Connected");
+        singleton = this;
+        _networkManager = GetComponent<NetworkManager>();
     }
-    public override void OnServerAddPlayer(NetworkConnection conn)
+    private void Start()
+    {
+        if (singleton != this)
+            return;
+        _networkManager.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
+        _networkManager.ServerManager.OnRemoteConnectionState += ServerManager_OnRemoteConnectionState;
+        _networkManager.ClientManager.OnClientConnectionState += ClientManager_OnClientConnectionState;
+        _networkManager.SceneManager.OnLoadEnd += SceneManager_OnLoadEnd;
+    }
+    private void OnDestroy()
+    {
+        if (singleton != this)
+            return;
+        singleton = null;
+        if (_networkManager == null)
+            return;
+        _networkManager.ServerManager.OnServerConnectionState -= ServerManager_OnServerConnectionState;
+        _networkManager.ServerManager.OnRemoteConnectionState -= ServerManager_OnRemoteConnectionState;
+        _networkManager.ClientManager.OnClientConnectionState -= ClientManager_OnClientConnectionState;
+        _networkManager.SceneManager.OnLoadEnd -= SceneManager_OnLoadEnd;
+    }
+    // Mirror's StartHost loaded the online scene (LobbyScene) and then added the host's player there. Start the server now;
+    // the host's own client starts once the lobby has loaded, in SceneManager_OnLoadEnd.
+    public void StartHost()
+    {
+        _isFootballSession = true;
+        _startHostClientWhenLobbyLoads = true;
+        if (!_networkManager.ServerManager.StartConnection())
+            EndFootballSession();
+    }
+    public void StartClient()
+    {
+        _isFootballSession = true;
+        if (!_networkManager.ClientManager.StartConnection(networkAddress))
+            EndFootballSession();
+    }
+    public void StopHost()
+    {
+        _networkManager.ServerManager.StopConnection(true);
+        _networkManager.ClientManager.StopConnection();
+    }
+    public void StopClient()
+    {
+        _networkManager.ClientManager.StopConnection();
+    }
+    private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs args)
+    {
+        if (!_isFootballSession)
+            return;
+        if (args.ConnectionState == LocalConnectionState.Started)
+        {
+            // Mirror changed to the online scene here. Clients that join later load it automatically.
+            FishNet.Managing.Scened.SceneLoadData lobbyScene = new FishNet.Managing.Scened.SceneLoadData("LobbyScene");
+            lobbyScene.ReplaceScenes = FishNet.Managing.Scened.ReplaceOption.All;
+            _networkManager.SceneManager.LoadGlobalScenes(lobbyScene);
+        }
+        else if (args.ConnectionState == LocalConnectionState.Stopped)
+        {
+            Debug.Log("Stopping the server");
+            LobbyPlayers.Clear();
+            GamePlayers.Clear();
+            // Without a client there is no client stop to return to the title screen, so do it here.
+            if (!_networkManager.IsClientStarted)
+                EndFootballSession();
+        }
+    }
+    private void ServerManager_OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)
+    {
+        if (!_isFootballSession)
+            return;
+        if (args.ConnectionState == RemoteConnectionState.Started)
+        {
+            Debug.Log("Connecting to server...");
+            if (LobbyPlayers.Count >= maxConnections) // prevents players joining if the game is full
+            {
+                Debug.Log("Too many players. Disconnecting user.");
+                conn.Disconnect(true);
+                return;
+            }
+            if (SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene") // prevents players from joining a game that has already started. When the game starts, the scene will no longer be the "TitleScreen"
+            {
+                Debug.Log("Player loaded from scene: " + SceneManager.GetActiveScene().name);
+            }
+            else
+            {
+                Debug.Log("Player did not load from correct scene. Disconnecting user. Player loaded from scene: " + SceneManager.GetActiveScene().name);
+                conn.Disconnect(true);
+                return;
+            }
+            Debug.Log("Server Connected");
+        }
+        else if (args.ConnectionState == RemoteConnectionState.Stopped)
+        {
+            // FishNet despawns the player's objects as well, and their LobbyPlayer removes itself in OnStopClient.
+            LobbyPlayers.RemoveAll(player => player == null || player.OwnerId == conn.ClientId);
+        }
+    }
+    private void ClientManager_OnClientConnectionState(ClientConnectionStateArgs args)
+    {
+        if (!_isFootballSession)
+            return;
+        if (args.ConnectionState == LocalConnectionState.Stopped)
+            EndFootballSession();
+    }
+    // Mirror loaded its offline scene, the title screen, when the client stopped.
+    private void EndFootballSession()
+    {
+        _isFootballSession = false;
+        _startHostClientWhenLobbyLoads = false;
+        if (SceneManager.GetActiveScene().name != "TitleScreen")
+            SceneManager.LoadScene("TitleScreen");
+    }
+    private void SceneManager_OnLoadEnd(FishNet.Managing.Scened.SceneLoadEndEventArgs args)
+    {
+        if (!_startHostClientWhenLobbyLoads || !args.QueueData.AsServer)
+            return;
+        foreach (Scene loadedScene in args.LoadedScenes)
+        {
+            if (loadedScene.name == "LobbyScene")
+            {
+                _startHostClientWhenLobbyLoads = false;
+                _networkManager.ClientManager.StartConnection();
+                return;
+            }
+        }
+    }
+    // Called by GameModePlayerSpawner on the server once a connection has loaded the lobby. This was OnServerAddPlayer with Mirror.
+    public void SpawnLobbyPlayer(NetworkConnection conn)
     {
         Debug.Log("Checking if player is in correct scene. Player's scene name is: " + SceneManager.GetActiveScene().name.ToString() + ". Correct scene name is: TitleScreen");
         if (SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene")
@@ -104,46 +208,31 @@ public class NetworkManagerGRF : NetworkManager
             LobbyPlayer lobbyPlayerInstance = Instantiate(lobbyPlayerPrefab);
 
             lobbyPlayerInstance.IsGameLeader = isGameLeader;
-            lobbyPlayerInstance.ConnectionId = conn.connectionId;
+            lobbyPlayerInstance.ConnectionId = conn.ClientId;
             lobbyPlayerInstance.playerNumber = LobbyPlayers.Count + 1;
             lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.current_lobbyID, LobbyPlayers.Count);
             lobbyPlayerInstance.is1v1 = this.is1v1;
             lobbyPlayerInstance.isSinglePlayer = this.isSinglePlayer;
 
-            NetworkServer.AddPlayerForConnection(conn, lobbyPlayerInstance.gameObject);
+            _networkManager.ServerManager.Spawn(lobbyPlayerInstance.gameObject, conn);
             Debug.Log("Player added. Player name: " + lobbyPlayerInstance.PlayerName + ". Player connection id: " + lobbyPlayerInstance.ConnectionId.ToString());
         }
     }
-    /*public override void OnServerAddPlayer(NetworkConnection conn)
-    {
-        Debug.Log("Checking if player is in correct scene. Player's scene name is: " + SceneManager.GetActiveScene().name.ToString() + ". Correct scene name is: TitleScreen");
-        bool isGameLeader = GamePlayers.Count == 0; // isLeader is true if the player count is 0, aka when you are the first player to be added to a server/room
-
-        GamePlayer gamePlayerInstance = Instantiate(gamePlayerPrefab);
-
-        gamePlayerInstance.IsGameLeader = isGameLeader;
-        gamePlayerInstance.ConnectionId = conn.connectionId;
-        gamePlayerInstance.playerNumber = GamePlayers.Count + 1;
-
-        NetworkServer.AddPlayerForConnection(conn, gamePlayerInstance.gameObject);
-        Debug.Log("Player added. Player name: " + gamePlayerInstance.PlayerName + ". Player connection id: " + gamePlayerInstance.ConnectionId.ToString());
-        
-    }*/
     public void StartGame()
     {
         if (CanStartGame() && SceneManager.GetActiveScene().name == "LobbyScene")
         {
-            //ServerChangeScene("Gameplay");
-            ServerChangeScene("Gameplay-768-432");
-
+            // Loading the gameplay scene, and spawning a GamePlayer for each LobbyPlayer, moves to FishNet in the
+            // core match step of the conversion. Until then the lobby stays open.
+            Debug.Log("StartGame: everyone is ready, but gameplay isn't converted to FishNet yet. Staying in the lobby.");
         }
     }
     private bool CanStartGame()
     {
         Debug.Log("NetworkManager: CanStartGame");
-        if (numPlayers < minPlayers)
+        if (LobbyPlayers.Count < minPlayers)
         {
-            Debug.Log("CanStartGame: Not enough players to start the game. total players: " + numPlayers.ToString() + " need this many players: " + minPlayers.ToString());
+            Debug.Log("CanStartGame: Not enough players to start the game. total players: " + LobbyPlayers.Count.ToString() + " need this many players: " + minPlayers.ToString());
             return false;
         }
         foreach (LobbyPlayer player in LobbyPlayers)
@@ -153,103 +242,11 @@ public class NetworkManagerGRF : NetworkManager
         }
         return true;
     }
-    public override void ServerChangeScene(string newSceneName)
-    {
-        Debug.Log("ServerChangeScene: Changing to the following scene: " + newSceneName);
-        //Changing from the menu to the scene
-        //if ((SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene") && newSceneName == "Gameplay")
-        if ((SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene") && newSceneName == "Gameplay-768-432")
-        {
-            Debug.Log("Changing scene to: " + newSceneName);
-            for (int i = LobbyPlayers.Count - 1; i >= 0; i--)
-            {
-                var conn = LobbyPlayers[i].connectionToClient;
-                var gamePlayerInstance = Instantiate(gamePlayerPrefab);
-
-                gamePlayerInstance.SetPlayerName(LobbyPlayers[i].PlayerName);
-                gamePlayerInstance.SetConnectionId(LobbyPlayers[i].ConnectionId);
-                gamePlayerInstance.SetPlayerNumber(LobbyPlayers[i].playerNumber);
-                gamePlayerInstance.IsGameLeader = LobbyPlayers[i].IsGameLeader;
-                gamePlayerInstance.playerSteamId = LobbyPlayers[i].playerSteamId;
-                gamePlayerInstance.is1v1 = LobbyPlayers[i].is1v1;
-                gamePlayerInstance.isSinglePlayer = LobbyPlayers[i].isSinglePlayer;
-                if (!this.is1v1 && !this.isSinglePlayer)
-                {
-                    gamePlayerInstance.isTeamGrey = LobbyPlayers[i].isTeamGrey;
-                    gamePlayerInstance.goblinType = LobbyPlayers[i].goblinType;
-                }
-                else if (this.isSinglePlayer)
-                {
-                    gamePlayerInstance.isTeamGrey = LobbyPlayers[i].isTeamGrey;
-                }
-                
-
-                NetworkServer.Destroy(conn.identity.gameObject);
-                NetworkServer.ReplacePlayerForConnection(conn, gamePlayerInstance.gameObject, true);
-                Debug.Log("Spawned new GamePlayer: " + gamePlayerInstance.PlayerName);
-            }
-        }
-        base.ServerChangeScene(newSceneName);
-    }
-    public override void OnServerDisconnect(NetworkConnection conn)
-    {
-        if (conn.identity != null)
-        {
-            LobbyPlayer player = conn.identity.GetComponent<LobbyPlayer>();
-            LobbyPlayers.Remove(player);
-        }
-        base.OnServerDisconnect(conn);
-    }
-
-    public override void OnStopServer()
-    {
-        Debug.Log("Stopping the server with OnStopServer");
-        LobbyPlayers.Clear();
-        GamePlayers.Clear();
-        //Debug.Log("Game Over: OnStopServer");
-    }
     public void HostShutDownServer()
     {
-        GameObject NetworkManagerObject = GameObject.Find("NetworkManager");
-        //Destroy(this.GetComponent<SteamManager>());
-        Destroy(NetworkManagerObject);
-        Shutdown();
-        SceneManager.LoadScene("TitleScreen");
-        //Debug.Log("Game Over: HostShutDownServer");
-        Start();
-
-    }
-    public override void OnClientSceneChanged(NetworkConnection conn)
-    {
-        base.OnClientSceneChanged(conn);
-        Debug.Log("OnClientSceneChanged for scene: " + SceneManager.GetActiveScene().name + " client with connection id: " + conn.ToString());
-        if (SceneManager.GetActiveScene().name == "Gameplay")
-        {
-
-           /* try
-            {
-                Destroy(waitingForPlayersObject);
-            }
-            catch
-            {
-                Debug.Log("Could not destroy WaitingForPlayersCanvas");
-            }*/
-            
-        }
-
-        
-    }
-    public override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling)
-    {
-        Debug.Log("OnClientChangeScene. Old scene: " + SceneManager.GetActiveScene().name + " new scene: " + newSceneName);
-        //if (newSceneName == "Gameplay")
-        if (newSceneName == "Gameplay-768-432")
-        {
-            waitingForPlayersObject = Instantiate(WaitingForPlayersCanvas);
-            DontDestroyOnLoad(waitingForPlayersObject);
-        }
-            
-        base.OnClientChangeScene(newSceneName, sceneOperation, customHandling);
+        // Mirror's version destroyed the NetworkManager and started a new one. The FishNet NetworkManager is shared with Golf,
+        // so only stop the connections. Stopping the client returns everyone to the title screen.
+        StopHost();
     }
     [Server]
     public void ReportPlayerFinishedLoading(int playerNumber)

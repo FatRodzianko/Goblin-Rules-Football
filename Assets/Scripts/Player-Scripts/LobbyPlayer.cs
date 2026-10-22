@@ -1,33 +1,52 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System;
 using Steamworks;
 
 public class LobbyPlayer : NetworkBehaviour
 {
     [Header("Player Info")]
-    [SyncVar(hook = nameof(HandlePlayerNameUpdate))] public string PlayerName;
-    [SyncVar] public int ConnectionId;
-    [SyncVar] public int playerNumber;
-    [SyncVar] public ulong playerSteamId;
+    private readonly SyncVar<string> _syncPlayerName = new SyncVar<string>("");
+    public string PlayerName { get => _syncPlayerName.Value; set => _syncPlayerName.Value = value; }
+    private readonly SyncVar<int> _syncConnectionId = new SyncVar<int>();
+    public int ConnectionId { get => _syncConnectionId.Value; set => _syncConnectionId.Value = value; }
+    private readonly SyncVar<int> _syncPlayerNumber = new SyncVar<int>();
+    public int playerNumber { get => _syncPlayerNumber.Value; set => _syncPlayerNumber.Value = value; }
+    private readonly SyncVar<ulong> _syncPlayerSteamId = new SyncVar<ulong>();
+    public ulong playerSteamId { get => _syncPlayerSteamId.Value; set => _syncPlayerSteamId.Value = value; }
 
     [Header("Game Info")]
-    [SyncVar] public bool IsGameLeader = false;
-    [SyncVar(hook = nameof(HandlePlayerReadyStatusChange))] public bool isPlayerReady;
+    private readonly SyncVar<bool> _syncIsGameLeader = new SyncVar<bool>(false);
+    public bool IsGameLeader { get => _syncIsGameLeader.Value; set => _syncIsGameLeader.Value = value; }
+    private readonly SyncVar<bool> _syncIsPlayerReady = new SyncVar<bool>();
+    public bool isPlayerReady { get => _syncIsPlayerReady.Value; set => _syncIsPlayerReady.Value = value; }
     public PlayerListItem myPlayerListItem;
 
     [Header("1v1 or 3v3 stuff")]
-    [SyncVar] public bool is1v1 = false;
-    [SyncVar] public bool isSinglePlayer = false;
-    [SyncVar(hook = nameof(HandleGoblinType))] public string goblinType;
-    [SyncVar(hook = nameof(HandleIsTeamGrey))] public bool isTeamGrey;
-    [SyncVar(hook = nameof(HandleIsGoblinSelected))] public bool isGoblinSelected = false;
-    [SyncVar(hook = nameof(HandleWantsToSwitchTeams))] public bool wantsToSwitchTeams = false;
+    private readonly SyncVar<bool> _syncIs1v1 = new SyncVar<bool>(false);
+    public bool is1v1 { get => _syncIs1v1.Value; set => _syncIs1v1.Value = value; }
+    private readonly SyncVar<bool> _syncIsSinglePlayer = new SyncVar<bool>(false);
+    public bool isSinglePlayer { get => _syncIsSinglePlayer.Value; set => _syncIsSinglePlayer.Value = value; }
+    private readonly SyncVar<string> _syncGoblinType = new SyncVar<string>("");
+    public string goblinType { get => _syncGoblinType.Value; set => _syncGoblinType.Value = value; }
+    private readonly SyncVar<bool> _syncIsTeamGrey = new SyncVar<bool>();
+    public bool isTeamGrey { get => _syncIsTeamGrey.Value; set => _syncIsTeamGrey.Value = value; }
+    private readonly SyncVar<bool> _syncIsGoblinSelected = new SyncVar<bool>(false);
+    public bool isGoblinSelected { get => _syncIsGoblinSelected.Value; set => _syncIsGoblinSelected.Value = value; }
+    private readonly SyncVar<bool> _syncWantsToSwitchTeams = new SyncVar<bool>(false);
+    public bool wantsToSwitchTeams { get => _syncWantsToSwitchTeams.Value; set => _syncWantsToSwitchTeams.Value = value; }
 
     [Header("DLC Installed SyncVars")]
-    [SyncVar(hook = nameof(HandleWhatDLCsAreInstalled))] public string whatDLCsAreInstalled;
+    private readonly SyncVar<string> _syncWhatDLCsAreInstalled = new SyncVar<string>("");
+    public string whatDLCsAreInstalled { get => _syncWhatDLCsAreInstalled.Value; set => _syncWhatDLCsAreInstalled.Value = value; }
+
+    // FishNet clears the owner before OnDestroy runs, so remember whether this machine owned it.
+    private bool _isOwnedLocally = false;
 
     private const string PlayerPrefsNameKey = "PlayerName";
 
@@ -44,6 +63,16 @@ public class LobbyPlayer : NetworkBehaviour
         }
     }
 
+    private void Awake()
+    {
+        _syncPlayerName.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandlePlayerNameUpdate(prev, next); };
+        _syncIsPlayerReady.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandlePlayerReadyStatusChange(prev, next); };
+        _syncGoblinType.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleGoblinType(prev, next); };
+        _syncIsTeamGrey.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsTeamGrey(prev, next); };
+        _syncIsGoblinSelected.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsGoblinSelected(prev, next); };
+        _syncWantsToSwitchTeams.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleWantsToSwitchTeams(prev, next); };
+        _syncWhatDLCsAreInstalled.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleWhatDLCsAreInstalled(prev, next); };
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -55,22 +84,12 @@ public class LobbyPlayer : NetworkBehaviour
     {
         
     }
-    public override void OnStartAuthority()
-    {
-        CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
-        //CmdSetPlayerName(PlayerPrefs.GetString(PlayerPrefsNameKey));
-        gameObject.name = "LocalLobbyPlayer";
-        LobbyManager.instance.FindLocalLobbyPlayer();
-        LobbyManager.instance.UpdateLobbyName();
-        CmdSetPlayerInitialTeam();
-        CheckIfDLCsAreInstalled();
-    }
     public override void OnStartServer()
     {
         base.OnStartServer();
         //UpdateTeamListsOnLobbyManager();
     }
-    [Command]
+    [ServerRpc]
     private void CmdSetPlayerName(string PlayerNameSubmitted)
     {
         Debug.Log("CmdSetPlayerName: Setting player name to: " + PlayerNameSubmitted);
@@ -81,7 +100,7 @@ public class LobbyPlayer : NetworkBehaviour
             playerNameToSet = PlayerNameSubmitted;
         this.HandlePlayerNameUpdate(this.PlayerName, playerNameToSet);
     }
-    [Command]
+    [ServerRpc]
     void CmdSetPlayerInitialTeam()
     {
         // set the host as team grey
@@ -119,9 +138,9 @@ public class LobbyPlayer : NetworkBehaviour
     public void HandlePlayerNameUpdate(string oldValue, string newValue)
     {
         Debug.Log("Player name has been updated for: " + oldValue + " to new value: " + newValue);
-        if (isServer)
+        if (IsServerInitialized)
             this.PlayerName = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             LobbyManager.instance.UpdateUI();
         }
@@ -130,7 +149,7 @@ public class LobbyPlayer : NetworkBehaviour
     public void UpdateTeam(bool isGrey)
     {
         Debug.Log("UpdateTeam to grey? " + isGrey.ToString() + " for player " + this.PlayerName);
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (isGrey != this.isTeamGrey)
             {
@@ -144,7 +163,7 @@ public class LobbyPlayer : NetworkBehaviour
         }
             
     }
-    [Command]
+    [ServerRpc]
     void CmdUpdateTeam(bool isGrey)
     {
         Debug.Log("CmdUpdateTeam to grey? " + isGrey.ToString() + " for player " + this.PlayerName + " are they already grey? " + isGrey.ToString());
@@ -170,7 +189,7 @@ public class LobbyPlayer : NetworkBehaviour
             UpdateAllPlayersOnAvailableGoblins(isGrey);
         }
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off, UseIsStarted = true)]
     void CheckIfOtherPlayersWantToSwitch(LobbyPlayer playerRequestingSwitch)
     {
         Debug.Log("CheckIfOtherPlayersWantToSwitch for player: " + playerRequestingSwitch.PlayerName);
@@ -199,7 +218,7 @@ public class LobbyPlayer : NetworkBehaviour
             }
         }
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off, UseIsStarted = true)]
     void CheckIfTeamIsNoLongerFull()
     {
         foreach (LobbyPlayer player in Game.LobbyPlayers)
@@ -252,15 +271,15 @@ public class LobbyPlayer : NetworkBehaviour
     }
     public void StartUpdateTeamListsOnLobbyManager()
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdStartUpdateTeamListsOnLobbyManager();
     }
-    [Command]
+    [ServerRpc]
     void CmdStartUpdateTeamListsOnLobbyManager()
     {
         UpdateTeamListsOnLobbyManager();
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off, UseIsStarted = true)]
     void UpdateTeamListsOnLobbyManager()
     {
         Debug.Log("UpdateTeamListsOnLobbyManager: for this many players: " + Game.LobbyPlayers.Count.ToString());
@@ -287,7 +306,7 @@ public class LobbyPlayer : NetworkBehaviour
     
     void HandleIsTeamGrey(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             if (!this.isSinglePlayer)
             {
@@ -296,7 +315,7 @@ public class LobbyPlayer : NetworkBehaviour
                 UpdateAllPlayersOnAvailableGoblins(newValue);
             }
         }   
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (!this.isSinglePlayer)
             {
@@ -306,19 +325,33 @@ public class LobbyPlayer : NetworkBehaviour
     }
     public override void OnStartClient()
     {
+        base.OnStartClient();
+        // This was OnStartAuthority with Mirror, which ran right before OnStartClient. FindLocalLobbyPlayer has to run first
+        // so LobbyManager knows if this is a 1v1 lobby before UpdateUI makes this player's list item.
+        if (IsOwner)
+        {
+            _isOwnedLocally = true;
+            CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
+            //CmdSetPlayerName(PlayerPrefs.GetString(PlayerPrefsNameKey));
+            gameObject.name = "LocalLobbyPlayer";
+            LobbyManager.instance.FindLocalLobbyPlayer();
+            LobbyManager.instance.UpdateLobbyName();
+            CmdSetPlayerInitialTeam();
+            CheckIfDLCsAreInstalled();
+        }
+
         Game.LobbyPlayers.Add(this);
         LobbyManager.instance.UpdateLobbyName();
         LobbyManager.instance.UpdateUI();
         StartUpdateTeamListsOnLobbyManager();
-        
     }
     public void ChangeReadyStatus()
     {
         Debug.Log("Executing ChangeReadyStatus for player: " + this.PlayerName);
-        if (hasAuthority)
+        if (IsOwner)
             CmdChangePlayerReadyStatus();
     }
-    [Command]
+    [ServerRpc]
     void CmdChangePlayerReadyStatus()
     {
         Debug.Log("Executing CmdChangePlayerReadyStatus on the server for player: " + this.PlayerName);
@@ -326,17 +359,17 @@ public class LobbyPlayer : NetworkBehaviour
     }
     void HandlePlayerReadyStatusChange(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
             this.isPlayerReady = newValue;
-        if (isClient && ! this.isSinglePlayer)
+        if (IsClientInitialized && ! this.isSinglePlayer)
             LobbyManager.instance.UpdateUI();
     }
     public void CanLobbyStartGame()
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdCanLobbyStartGame();
     }
-    [Command]
+    [ServerRpc]
     void CmdCanLobbyStartGame()
     {
         Debug.Log("CmdCanLobbyStartGame");
@@ -344,7 +377,7 @@ public class LobbyPlayer : NetworkBehaviour
     }
     public void UnselectGoblin()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             CmdUnselectGoblin();
             if (this.isPlayerReady)
@@ -352,7 +385,7 @@ public class LobbyPlayer : NetworkBehaviour
         }
             
     }
-    [Command]
+    [ServerRpc]
     void CmdUnselectGoblin()
     {
         /*if (this.isTeamGrey)
@@ -380,7 +413,7 @@ public class LobbyPlayer : NetworkBehaviour
         this.HandleGoblinType(this.goblinType, "");*/
         UnselectGoblinOnServer();
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off, UseIsStarted = true)]
     void UnselectGoblinOnServer()
     {
         if (this.isTeamGrey)
@@ -409,12 +442,12 @@ public class LobbyPlayer : NetworkBehaviour
     }
     public void SelectGoblin(string typeOfGoblin)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             CmdSelectGoblin(typeOfGoblin);
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdSelectGoblin(string typeOfGoblin)
     {
         if (this.goblinType != typeOfGoblin)
@@ -446,11 +479,11 @@ public class LobbyPlayer : NetworkBehaviour
     }
     public void HandleIsGoblinSelected(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
             this.isGoblinSelected = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 LobbyManager.instance.ActivateChangeGoblinButton();
                 try
@@ -470,11 +503,11 @@ public class LobbyPlayer : NetworkBehaviour
     }
     void HandleGoblinType(string oldValue, string newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
             this.goblinType = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 LobbyManager.instance.ActivateChangeGoblinButton();
                 try
@@ -490,7 +523,7 @@ public class LobbyPlayer : NetworkBehaviour
             LobbyManager.instance.UpdateGoblinSelectedTextOnPlayerListItems(this);
         }
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off, UseIsStarted = true)]
     void UpdateAllPlayersOnAvailableGoblins(bool isGrey)
     {
         foreach (LobbyPlayer player in Game.LobbyPlayers)
@@ -500,13 +533,13 @@ public class LobbyPlayer : NetworkBehaviour
                 Debug.Log("UpdateAllPlayersOnAvailableGoblins: Player name: " + player.PlayerName + " player connection id: " + player.ConnectionId);
                 if (isGrey)
                 {
-                    Debug.Log("UpdateAllPlayersOnAvailableGoblins: Sending RpcSendPlayersUpdatedAvailableGoblinList to Player name: " + player.PlayerName + " player connection id: " + player.ConnectionId.ToString() + " " + player.connectionToClient.ToString());
-                    player.RpcSendPlayersUpdatedAvailableGoblinList(player.connectionToClient, LobbyManager.instance.GreyGoblinsAvailable);
+                    Debug.Log("UpdateAllPlayersOnAvailableGoblins: Sending RpcSendPlayersUpdatedAvailableGoblinList to Player name: " + player.PlayerName + " player connection id: " + player.ConnectionId.ToString() + " " + player.Owner.ToString());
+                    player.RpcSendPlayersUpdatedAvailableGoblinList(player.Owner, LobbyManager.instance.GreyGoblinsAvailable);
                 }
                 else
                 {
-                    Debug.Log("UpdateAllPlayersOnAvailableGoblins: Sending RpcSendPlayersUpdatedAvailableGoblinList to Player name: " + player.PlayerName + " player connection id: " + player.ConnectionId.ToString() + " " + player.connectionToClient.ToString());
-                    player.RpcSendPlayersUpdatedAvailableGoblinList(player.connectionToClient, LobbyManager.instance.GreenGoblinsAvailable);
+                    Debug.Log("UpdateAllPlayersOnAvailableGoblins: Sending RpcSendPlayersUpdatedAvailableGoblinList to Player name: " + player.PlayerName + " player connection id: " + player.ConnectionId.ToString() + " " + player.Owner.ToString());
+                    player.RpcSendPlayersUpdatedAvailableGoblinList(player.Owner, LobbyManager.instance.GreenGoblinsAvailable);
                 }   
             }
         }
@@ -515,10 +548,10 @@ public class LobbyPlayer : NetworkBehaviour
     public void RpcSendPlayersUpdatedAvailableGoblinList(NetworkConnection target, List<string> availableGoblins)
     {
         Debug.Log("RpcSendPlayersUpdatedAvailableGoblinList: for player: " + this.PlayerName + " is team grey? " + this.isTeamGrey.ToString() + " and list available: " + availableGoblins.Count.ToString() + " for UpdateGoblinsAvailable");
-        if(hasAuthority && !LobbyManager.instance.is1v1)
+        if(IsOwner && !LobbyManager.instance.is1v1)
             this.myPlayerListItem.UpdateGoblinsAvailable(availableGoblins);
     }
-    /*[ClientRpc]
+    /*[ObserversRpc]
     void RpcSendPlayersUpdatedAvailableGoblinList(bool isGrey, List<string> availableGoblins)
     {
         LobbyPlayer localPlayer = GameObject.FindGameObjectWithTag("LocalLobbyPlayer").GetComponent<LobbyPlayer>();
@@ -529,18 +562,18 @@ public class LobbyPlayer : NetworkBehaviour
     }*/
     void HandleWantsToSwitchTeams(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             wantsToSwitchTeams = newValue;
         }
-        if (isClient)
+        if (IsClientInitialized)
         { 
 
         }
     }
     public void QuitLobby()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (IsGameLeader)
             {
@@ -554,7 +587,7 @@ public class LobbyPlayer : NetworkBehaviour
     }
     private void OnDestroy()
     {
-        if (hasAuthority)
+        if (_isOwnedLocally)
         {
             try
             {
@@ -567,7 +600,7 @@ public class LobbyPlayer : NetworkBehaviour
             }
             
         }
-        if (isServer)
+        if (IsServerInitialized)
         { 
 
         }
@@ -575,11 +608,13 @@ public class LobbyPlayer : NetworkBehaviour
     }
     public override void OnStopClient()
     {
+        base.OnStopClient();
         Debug.Log(PlayerName + " is quiting the game.");
         Game.LobbyPlayers.Remove(this);
         Debug.Log("Removed player from the GamePlayer list: " + this.PlayerName);
         LobbyManager.instance.UpdateUI();
-        if (isServer)
+        // FishNet stops the server side of a despawned object before its client side, so check the server itself here.
+        if (IsServerStarted)
         {
             // Remove lobby player from team member lists
             if (LobbyManager.instance.GreenTeamMembers.Contains(this))
@@ -593,10 +628,10 @@ public class LobbyPlayer : NetworkBehaviour
             }
         }
     }
-    [ClientCallback]
+    [Client(Logging = LoggingType.Off, UseIsStarted = true)]
     void CheckIfDLCsAreInstalled()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             Steamworks.AppId_t dlc_99 = new Steamworks.AppId_t(2174640);
             bool dlc99Installed = SteamApps.BIsDlcInstalled(dlc_99);
@@ -606,7 +641,7 @@ public class LobbyPlayer : NetworkBehaviour
             CmdTellServerWhatDLCsAreInstalled(dlc99Installed, dlc199Installed);
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdTellServerWhatDLCsAreInstalled(bool dlc_99, bool dlc_1_99)
     {
         Debug.Log("CmdTellServerWhatDLCsAreInstalled: for player with Steam Id of : " + this.playerSteamId.ToString() + " dlc_99 " + dlc_99.ToString() + " dlc_1_99 " + dlc_1_99.ToString());
@@ -628,7 +663,7 @@ public class LobbyPlayer : NetworkBehaviour
             this.HandleWhatDLCsAreInstalled(this.whatDLCsAreInstalled, "both");
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcUpdateDLCImages(bool dlc_99, bool dlc_1_99)
     {
         Debug.Log("RpcUpdateDLCImages: for player with Steam Id of : " + this.playerSteamId.ToString() + " dlc_99 " + dlc_99.ToString() + " dlc_1_99 " + dlc_1_99.ToString());
@@ -647,9 +682,9 @@ public class LobbyPlayer : NetworkBehaviour
     }
     public void HandleWhatDLCsAreInstalled(string oldValue, string newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
             whatDLCsAreInstalled = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             Debug.Log("HandleWhatDLCsAreInstalled. For player: " + this.PlayerName + " newValue: " + newValue);
             GameObject[] playerListItems = GameObject.FindGameObjectsWithTag("PlayerListItem");

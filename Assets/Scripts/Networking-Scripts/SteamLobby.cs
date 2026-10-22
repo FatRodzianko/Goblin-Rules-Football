@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
 using Steamworks;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -26,7 +26,7 @@ public class SteamLobby : MonoBehaviour
 
     public bool JoiningMirror = false;
 
-    private NetworkManager networkManager;
+    private NetworkManagerGRF networkManager;
 
     struct LobbyMetaData
     {
@@ -51,7 +51,7 @@ public class SteamLobby : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        networkManager = GetComponent<NetworkManager>();
+        networkManager = GetComponent<NetworkManagerGRF>();
 
         if (!SteamManager.Initialized) { return; }
         MakeInstance();
@@ -159,7 +159,7 @@ public class SteamLobby : MonoBehaviour
             return;
         current_lobbyID = callback.m_ulSteamIDLobby;
         Debug.Log("OnLobbyEntered for lobby with id: " + current_lobbyID.ToString());
-        if (NetworkServer.active) { return; }
+        if (InstanceFinder.IsServerStarted) { return; }
 
         string hostAddress = SteamMatchmaking.GetLobbyData(
             new CSteamID(callback.m_ulSteamIDLobby),

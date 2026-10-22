@@ -765,6 +765,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -1810,6 +1811,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -2213,10 +2215,12 @@ GameObject:
   - component: {fileID: 7983715474653844592}
   - component: {fileID: 7983715474653844599}
   - component: {fileID: 7983715474653844594}
-  - component: {fileID: 7983715474653844595}
   - component: {fileID: 7983715474653844588}
   - component: {fileID: 7983715474653844589}
   - component: {fileID: 7983715474653844590}
+  - component: {fileID: 5746368019743588139}
+  - component: {fileID: 5024017012025825574}
+  - component: {fileID: 1531992552086719743}
   m_Layer: 0
   m_Name: NetworkManagerGolf
   m_TagString: Untagged
@@ -2272,11 +2276,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d331f979d46e8e4a9fc90070c596d44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _useNetworkLod: 0
-  _levelOfDetailDistances: []
   _updateHostVisibility: 1
+  _maximumTimedObserversDuration: 10
   _defaultConditions:
   - {fileID: 11400000, guid: 2033f54fd2794464bae08fa5a55c8996, type: 2}
+  _useLevelOfDetail: 0
+  _maximumLevelOfDetailInterval: 2
+  _levelOfDetailUpdateDuration: 1
+  _levelOfDetailDistances: []
 --- !u!114 &7983715474653844593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2290,6 +2297,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _authenticator: {fileID: 0}
+  _remoteClientTimeout: 2
+  _remoteClientTimeoutDuration: 60
+  _allowPredictedSpawning: 0
+  _reservedObjectIds: 15
   _syncTypeRate: 0.1
   SpawnPacking:
     Position: 0
@@ -2299,7 +2310,6 @@ MonoBehaviour:
   _frameRate: 500
   _shareIds: 1
   _startOnHeadless: 1
-  _limitClientMTU: 1
 --- !u!114 &7983715474653844592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2313,6 +2323,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Transport: {fileID: 7983715474653844588}
+  _maximumClientPacketSize: 20480
   _intermediateLayer: {fileID: 0}
   _latencySimulator:
     _enabled: 0
@@ -2338,7 +2349,6 @@ MonoBehaviour:
   _maximumFrameTicks: 2
   _tickRate: 100
   _pingInterval: 1
-  _timingInterval: 2
   _physicsMode: 0
 --- !u!114 &7983715474653844594
 MonoBehaviour:
@@ -2353,21 +2363,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerPrefab: {fileID: 3144715486186738516, guid: 62bba22d42e2b7f4bbc08c4ba8186523, type: 3}
---- !u!114 &7983715474653844595
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7983715474653844596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 211a9f6ec51ddc14f908f5acc0cd0423, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playerPrefab: {fileID: 383208058805492564, guid: ac146805612437a4986dd0485f322a8f, type: 3}
-  _addToDefaultScene: 1
-  Spawns: []
 --- !u!114 &7983715474653844588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2380,7 +2375,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 400639878008206409ec440eb16c3007, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _steamAppID: 2071510
   _serverBindAddress: 127.0.0.1
   _port: 7770
   _maximumClients: 9001
@@ -2401,6 +2395,28 @@ MonoBehaviour:
   _networkManager: {fileID: 7983715474653844597}
   _fishySteamWorks: {fileID: 7983715474653844588}
   _lobbyNumber: {fileID: 0}
+  CurrentLobbyName: 
+  JoiningFishNet: 0
+  LobbyName: 
+  NumberOfPlayers: 1
+  MinNumberOfPlayers: 1
+  MaxNumberOfPlayers: 10
+  FriendsOnly: 0
+  PowerUpsEnabled: 0
+  WeatherStatuesEnabled: 0
+  StrokeLimitEnabled: 0
+  StrokeLimitNumber: 0
+  _strokeLimitDefault: 12
+  GameRainMode: 0
+  GameWindMode: 0
+  SelectedCourseID: 
+  CourseHoleSelection: 
+  ParFavorPenalty: 0
+  SelectedCourseId: 
+  CourseName: 
+  CourseHolesToPlay: 
+  CustomHolesToPlay: 
+  CourseWorkshopID: 0
 --- !u!114 &7983715474653844590
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2413,3 +2429,71 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef4bffeda13d7a748973ff9204401c07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5746368019743588139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7983715474653844596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 023388a2e14ac9a4e83601c6c83ba5ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkAddress: 127.0.0.1
+  maxConnections: 100
+  minPlayers: 2
+  lobbyPlayerPrefab: {fileID: 9114685772438749880, guid: db9cd257207cc0548a0ed4cba8b158a5, type: 3}
+  gamePlayerPrefab: {fileID: 554441546451090241, guid: 28687f36ab3be4e45a8cf649939dcbe1, type: 3}
+  WaitingForPlayersCanvas: {fileID: 2342166639519145750, guid: f0686eca83607064299e7e8ce9ee42ce, type: 3}
+  waitingForPlayersObject: {fileID: 0}
+  playersFinishedLoading: 
+  areAllPlayersLoaded: 0
+  areAllGoblinsLoaded: 0
+  playersWithFootballSpawned: 
+  areFootballsSpawned: 0
+  is1v1: 0
+  isSinglePlayer: 0
+  isTutorial: 0
+  lobbyName: 
+  secondsPerHalf: 0
+  powerUpsEnabled: 0
+  randomEventsEnabled: 0
+  spawnObstaclesEnabled: 0
+  mercyRuleEnabled: 0
+  mercyRulePointDifferential: 0
+  isGamePaused: 0
+  playerWhoPaused: {fileID: 0}
+  playerWhoPausedNetId: 0
+  lastPauseTimeStamp: 0
+--- !u!114 &5024017012025825574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7983715474653844596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c1ce63880171e045a469bceddb2e4dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  current_lobbyID: 0
+  lobbyIDS: []
+  JoiningMirror: 0
+--- !u!114 &1531992552086719743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7983715474653844596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acd4b2d1895ba074c8e9c6d2392e7e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerPrefab: {fileID: 383208058805492564, guid: ac146805612437a4986dd0485f322a8f, type: 3}
+  _addToDefaultScene: 1
+  Spawns: []

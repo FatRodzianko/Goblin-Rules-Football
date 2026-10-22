@@ -23,6 +23,8 @@ public class GolfSteamLobby : MonoBehaviour
     [SerializeField] public string CurrentLobbyName;
 
     public bool JoiningFishNet;
+    // Set when hosting: the host's own client starts once the Golf scene has loaded on the server (see OnLobbyEntered).
+    bool _startHostClientWhenGolfSceneLoads = false;
 
     [Header("Golf Game Settings")]
     [SerializeField] public string LobbyName;
@@ -67,7 +69,13 @@ public class GolfSteamLobby : MonoBehaviour
         LobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
         JoinRequest = Callback<GameLobbyJoinRequested_t>.Create(OnJoinRequest);
         LobbyEntered = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
-        
+        if (instance == this)
+            _networkManager.SceneManager.OnLoadEnd += SceneManager_OnLoadEnd;
+    }
+    private void OnDestroy()
+    {
+        if (instance == this && _networkManager != null)
+            _networkManager.SceneManager.OnLoadEnd -= SceneManager_OnLoadEnd;
     }
 
     // Update is called once per frame
@@ -260,7 +268,29 @@ public class GolfSteamLobby : MonoBehaviour
         sld.ReplaceScenes = ReplaceOption.All;
         FishNet.InstanceFinder.SceneManager.LoadGlobalScenes(sld);
 
+        // The host's own client waits until the Golf scene has loaded on the server. Started now, FishNet could spawn the
+        // host's NetworkPlayer while the scene was still loading: before LobbyManagerGolf existed, or into FishNet's temporary
+        // MovedObjectsHolder scene, where other players never see it.
+        if (FishNet.InstanceFinder.IsServerStarted)
+        {
+            _startHostClientWhenGolfSceneLoads = true;
+            return;
+        }
         _fishySteamWorks.StartConnection(false);
+    }
+    private void SceneManager_OnLoadEnd(SceneLoadEndEventArgs args)
+    {
+        if (!_startHostClientWhenGolfSceneLoads || !args.QueueData.AsServer)
+            return;
+        foreach (UnityEngine.SceneManagement.Scene loadedScene in args.LoadedScenes)
+        {
+            if (loadedScene.name == "Golf-prototype-topdown")
+            {
+                _startHostClientWhenGolfSceneLoads = false;
+                _fishySteamWorks.StartConnection(false);
+                return;
+            }
+        }
     }
     public void LeaveLobby()
     {
