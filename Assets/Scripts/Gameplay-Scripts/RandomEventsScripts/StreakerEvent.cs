@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class StreakerEvent : NetworkBehaviour
 {
@@ -45,26 +49,26 @@ public class StreakerEvent : NetworkBehaviour
         IEnumerator timetoWait = WaitRandomTime(Random.Range(0.15f, 0.35f));
         StartCoroutine(timetoWait);
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void FixedUpdate()
     {
         if (isRunning)
         {
             if (Vector3.Distance(this.transform.position, finalDestination) <= 0.2f)
-                NetworkServer.Destroy(this.gameObject);
+                InstanceFinder.ServerManager.Despawn(this.gameObject);
             rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             //Debug.Log("OnTriggerEnter2D for StreakerEvent: " + this.name);
             if (collision.tag == "Goblin")
             {
                 //Debug.Log("StreakerEvent: collided with goblin named: " + collision.transform.name);
-                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+                int goblinNetId = collision.transform.gameObject.GetComponent<NetworkObject>().ObjectId;
 
                 GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
                 if (goblinScript.canCollide && !goblinScript.isGoblinKnockedOut)
@@ -72,12 +76,12 @@ public class StreakerEvent : NetworkBehaviour
 
             }
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (collision.tag == "Goblin")
             {
                 //this.PlaySFXClip();
-                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+                int goblinNetId = collision.transform.gameObject.GetComponent<NetworkObject>().ObjectId;
 
                 GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
                 if (goblinScript.canCollide)

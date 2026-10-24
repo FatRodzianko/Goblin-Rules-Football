@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8456977640809881309}
   - component: {fileID: 8456977640809881298}
-  - component: {fileID: 8456977640809881299}
+  - component: {fileID: 6358242509417557477}
   m_Layer: 0
   m_Name: GameplayManager
   m_TagString: Untagged
@@ -28,6 +28,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -44,16 +45,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51dbc061db2bc8f4497f396a53150569, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  is1v1: 0
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 6358242509417557477}
+  _networkObjectCache: {fileID: 0}
   LocalGamePlayer: {fileID: 0}
   LocalGamePlayerScript: {fileID: 0}
   gameplayCanvas: {fileID: 0}
   coinTossCanvas: {fileID: 0}
-  gamePhase: 
-  firstHalfCompleted: 0
-  firstHalfKickingTeam: 
   kickingPlayer: {fileID: 0}
   receivingPlayer: {fileID: 0}
   kickingTeam: {fileID: 0}
@@ -65,8 +63,6 @@ MonoBehaviour:
   blockingPlayer: {fileID: 0}
   scoringTeam: {fileID: 0}
   blockingTeam: {fileID: 0}
-  yPositionOfKickAfter: 0
-  scoringGoblinNetId: 0
   KickAfterPositionControlsPanel: {fileID: 0}
   KickAfterTimerBeforeKickPanel: {fileID: 0}
   TimerInstructionsBoard: {fileID: 0}
@@ -77,13 +73,10 @@ MonoBehaviour:
   KickWasGoodText: {fileID: 0}
   KickWasNotGoodText: {fileID: 0}
   KickWasBlockedText: {fileID: 0}
-  isXtraTime: 0
+  _wasKickGoodOrBadSubmitted: 0
   lengthOfHalves: 0
   timerText: {fileID: 0}
-  timeLeftInGame: 0
   isGameTimerRunning: 0
-  greenScore: 0
-  greyScore: 0
   ScoreGreenText: {fileID: 0}
   ScoreGreyText: {fileID: 0}
   GameOverScorePanel: {fileID: 0}
@@ -94,6 +87,8 @@ MonoBehaviour:
   greyTeamScoreText: {fileID: 0}
   teamWinnerText: {fileID: 0}
   GameOverScrollPanelObject: {fileID: 0}
+  gameWinnersNotified: 0
+  mercyRuleResultsSent: 0
   PossessionFootballGreen: {fileID: 0}
   PossessionFootballGrey: {fileID: 0}
   PossessionBarGreen: {fileID: 0}
@@ -108,9 +103,23 @@ MonoBehaviour:
   eventSystem: {fileID: 0}
   inputSystem: {fileID: 0}
   aiPlayerPrefab: {fileID: 746005145141606358, guid: 99ad0a2136d863b43b69c51e64ec3a12, type: 3}
+  aiPlayerObject: {fileID: 0}
   aiGamePlayerScript: {fileID: 0}
   aiPlayerScript: {fileID: 0}
---- !u!114 &8456977640809881299
+  GamePausedTextObject: {fileID: 0}
+  GamePausedSecondsLeftText: {fileID: 0}
+  playerWhoPaused: {fileID: 0}
+  greenPauseTimeStamp: -30
+  greyPauseTimeStamp: -30
+  TimeoutTimerHolder: {fileID: 0}
+  timeoutTimerText: {fileID: 0}
+  isKickAfterTimerCountDownRunning: 0
+  isKickAfterTimerRunning: 0
+  isKickOffTimerCountDownRunning: 0
+  errorCanvas: {fileID: 0}
+  errorCanvasText: {fileID: 0}
+  isErrorMessageDisplayed: 0
+--- !u!114 &6358242509417557477
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -119,11 +128,51 @@ MonoBehaviour:
   m_GameObject: {fileID: 8456977640809881308}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  visible: 0
-  m_AssetId: dcc63033471145348880d77a042ceb7d
-  hasSpawned: 0
+  <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 65535
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 16288070550505668370
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0

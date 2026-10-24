@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class BombPowerUp : NetworkBehaviour
 {
@@ -23,7 +27,8 @@ public class BombPowerUp : NetworkBehaviour
     {
         PlayTimerSound();
     }
-    [ServerCallback]
+    // Animation event: it fires on every machine that plays the clip, so it skips quietly where it doesn't apply.
+    [Server(Logging = LoggingType.Off)]
     public void StartBombCountDown()
     {   
         if (!isCountdownRunning)
@@ -33,7 +38,7 @@ public class BombPowerUp : NetworkBehaviour
             StartCoroutine(countDownRoutine);
         }
     }
-    [ServerCallback]
+    [Server]
     IEnumerator CountdownRoutine()
     {
         isCountdownRunning = true;
@@ -41,7 +46,8 @@ public class BombPowerUp : NetworkBehaviour
         yield return new WaitForSeconds(0.6f);
         myAnimator.SetBool("explode", true);
     }
-    [ServerCallback]
+    // Animation event: it fires on every machine that plays the clip, so it skips quietly where it doesn't apply.
+    [Server(Logging = LoggingType.Off)]
     public void ExplosionKnockOutGoblins()
     {
         Debug.Log("ExplosionKnockOutGoblins");
@@ -61,12 +67,14 @@ public class BombPowerUp : NetworkBehaviour
         }
 
     }
-    [ServerCallback]
+    // Animation event: it fires on every machine that plays the clip, so it skips quietly where it doesn't apply.
+    [Server(Logging = LoggingType.Off)]
     public void DestroyMe()
     {
-        NetworkServer.Destroy(this.gameObject);
+        InstanceFinder.ServerManager.Despawn(this.gameObject);
     }
-    [ClientCallback]
+    // Animation event: it fires on every machine that plays the clip, so it skips quietly where it doesn't apply.
+    [Client(Logging = LoggingType.Off)]
     public void SFXBombExplode()
     {
         if (IsOnScreen())
@@ -88,12 +96,12 @@ public class BombPowerUp : NetworkBehaviour
             onscreen = true;
         return onscreen;
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcStartTimerSound()
     {
         PlayTimerSound();
     }
-    [ClientCallback]
+    [Client]
     void PlayTimerSound()
     {
         if (IsOnScreen())
@@ -110,7 +118,7 @@ public class BombPowerUp : NetworkBehaviour
                 StopTimerSound();
         }
     }
-    [ClientCallback]
+    [Client]
     void StopTimerSound()
     {
         SoundManager.instance.StopSound("bomb-timer");

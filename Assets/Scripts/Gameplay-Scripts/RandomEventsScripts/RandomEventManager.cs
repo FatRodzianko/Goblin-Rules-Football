@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class RandomEventManager : NetworkBehaviour
 {
@@ -65,7 +69,7 @@ public class RandomEventManager : NetworkBehaviour
     {
         gameFootball = football;
     }
-    [ServerCallback]
+    [Server]
     public void StartGeneratingRandomEvents(bool generate)
     {
         Debug.Log("StartGeneratingRandomEvents: " + generate.ToString());
@@ -85,7 +89,7 @@ public class RandomEventManager : NetworkBehaviour
             StopCoroutine(randomEventGenerator);
         }
     }
-    [ServerCallback]
+    [Server]
     IEnumerator GenerateRandomEventsRoutine()
     {
         isRandomEventGeneratorRunning = true;
@@ -100,7 +104,7 @@ public class RandomEventManager : NetworkBehaviour
         //yield return new WaitForSeconds(1.0f);
         yield break;
     }
-    [ServerCallback]
+    [Server]
     void CheckForRandomEvent()
     {
         // Only create an event if a player is running with the football?
@@ -137,7 +141,7 @@ public class RandomEventManager : NetworkBehaviour
             CreateRandomEvent(eventType);
         }
     }
-    [ServerCallback]
+    [Server]
     void CreateRandomEvent(string eventType)
     {
         Debug.Log("CreateRandomEvent: type: " + eventType);
@@ -154,7 +158,7 @@ public class RandomEventManager : NetworkBehaviour
             StreakerGoblinEvent();
         }
     }
-    [ServerCallback]
+    [Server]
     void BottlesEvent()
     {
         //Define placement boundaries for the broken bottles
@@ -202,9 +206,9 @@ public class RandomEventManager : NetworkBehaviour
 
         GameObject randomEvent = Instantiate(brokenGlassPrefab);
         randomEvent.transform.position = positionOfEvent;
-        NetworkServer.Spawn(randomEvent);
+        InstanceFinder.ServerManager.Spawn(randomEvent);
     }
-    [ServerCallback]
+    [Server]
     void SplitGroundEvent()
     {
         Debug.Log("Executing SplitGroundEvent on the server.");
@@ -223,9 +227,9 @@ public class RandomEventManager : NetworkBehaviour
 
         GameObject randomEvent = Instantiate(splitGroundPrefab);
         randomEvent.transform.position = positionOfEvent;
-        NetworkServer.Spawn(randomEvent);
+        InstanceFinder.ServerManager.Spawn(randomEvent);
     }
-    [ServerCallback]
+    [Server]
     void StreakerGoblinEvent()
     {
         Debug.Log("Executing StreakerGoblinEvent on the server.");
@@ -258,22 +262,22 @@ public class RandomEventManager : NetworkBehaviour
         //Spawn three streaker objects?
         GameObject randomEvent = Instantiate(streakerGoblinPrefab);
         randomEvent.transform.position = positionOfEvent;
-        NetworkServer.Spawn(randomEvent);
+        InstanceFinder.ServerManager.Spawn(randomEvent);
         //Second streaker
         float xModifier = Random.Range(1.0f, 3.0f);
         positionOfEvent.x += xModifier;
         GameObject randomEvent2 = Instantiate(streakerGoblinPrefab);
         randomEvent2.transform.position = positionOfEvent;
-        NetworkServer.Spawn(randomEvent2);
+        InstanceFinder.ServerManager.Spawn(randomEvent2);
         // streaker 3
         xModifier = Random.Range(1.0f, 3.0f);
         GameObject randomEvent3 = Instantiate(streakerGoblinPrefab);
         positionOfEvent.x -= xModifier;
         randomEvent3.transform.position = positionOfEvent;
-        NetworkServer.Spawn(randomEvent3);
+        InstanceFinder.ServerManager.Spawn(randomEvent3);
         //streakerGoblinPrefab.GetComponent<StreakerEvent>().StartAnimation(positionOfEvent);
     }
-    [ServerCallback]
+    [Server]
     bool IsGoblinTooCloseToEndzoneForEvent(Vector3 positionOfEvent)
     {
         bool isTooClose = false;
@@ -286,7 +290,7 @@ public class RandomEventManager : NetworkBehaviour
 
         return isTooClose;
     }
-    [ServerCallback]
+    [Server]
     Vector3 PositionOfEvent(Vector3 currentPosition, float yModifier, float xModifier, int directionModifier)
     {
         Vector3 newEventPosition = currentPosition;

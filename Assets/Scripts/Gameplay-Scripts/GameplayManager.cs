@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System;
 using System.Linq;
 using TMPro;
@@ -15,14 +19,22 @@ public class GameplayManager : NetworkBehaviour
     public static GameplayManager instance;
 
     [Header("Game Info")]
-    [SyncVar] public bool is1v1 = false;
-    [SyncVar] public bool isSinglePlayer = false;
-    [SyncVar] public int secondsPerHalf;
-    [SyncVar] public bool powerUpsEnabled;
-    [SyncVar] public bool randomEventsEnabled;
-    [SyncVar] public bool spawnObstaclesEnabled;
-    [SyncVar] public bool mercyRuleEnabled;
-    [SyncVar] public int mercyRulePointDifferential;
+    private readonly SyncVar<bool> _syncIs1v1 = new SyncVar<bool>();
+    public bool is1v1 { get => _syncIs1v1.Value; set => _syncIs1v1.Value = value; }
+    private readonly SyncVar<bool> _syncIsSinglePlayer = new SyncVar<bool>();
+    public bool isSinglePlayer { get => _syncIsSinglePlayer.Value; set => _syncIsSinglePlayer.Value = value; }
+    private readonly SyncVar<int> _syncSecondsPerHalf = new SyncVar<int>();
+    public int secondsPerHalf { get => _syncSecondsPerHalf.Value; set => _syncSecondsPerHalf.Value = value; }
+    private readonly SyncVar<bool> _syncPowerUpsEnabled = new SyncVar<bool>();
+    public bool powerUpsEnabled { get => _syncPowerUpsEnabled.Value; set => _syncPowerUpsEnabled.Value = value; }
+    private readonly SyncVar<bool> _syncRandomEventsEnabled = new SyncVar<bool>();
+    public bool randomEventsEnabled { get => _syncRandomEventsEnabled.Value; set => _syncRandomEventsEnabled.Value = value; }
+    private readonly SyncVar<bool> _syncSpawnObstaclesEnabled = new SyncVar<bool>();
+    public bool spawnObstaclesEnabled { get => _syncSpawnObstaclesEnabled.Value; set => _syncSpawnObstaclesEnabled.Value = value; }
+    private readonly SyncVar<bool> _syncMercyRuleEnabled = new SyncVar<bool>();
+    public bool mercyRuleEnabled { get => _syncMercyRuleEnabled.Value; set => _syncMercyRuleEnabled.Value = value; }
+    private readonly SyncVar<int> _syncMercyRulePointDifferential = new SyncVar<int>();
+    public int mercyRulePointDifferential { get => _syncMercyRulePointDifferential.Value; set => _syncMercyRulePointDifferential.Value = value; }
 
     [Header("Local GamePlayers")]
     [SerializeField] private GameObject LocalGamePlayer;
@@ -33,9 +45,12 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] private GameObject coinTossCanvas;
 
     [Header("Gameplay Statuses")]
-    [SyncVar(hook=nameof(HandleGamePhase))] public string gamePhase;
-    [SyncVar] public bool firstHalfCompleted = false; // tracks when the first half has completed and when the game should transition to halftime or game over
-    [SyncVar] public string firstHalfKickingTeam; // name of the team that kicked in the first half (green or grey). That team will receive to start the second half
+    private readonly SyncVar<string> _syncGamePhase = new SyncVar<string>();
+    public string gamePhase { get => _syncGamePhase.Value; set => _syncGamePhase.Value = value; }
+    private readonly SyncVar<bool> _syncFirstHalfCompleted = new SyncVar<bool>();
+    public bool firstHalfCompleted { get => _syncFirstHalfCompleted.Value; set => _syncFirstHalfCompleted.Value = value; } // tracks when the first half has completed and when the game should transition to halftime or game over
+    private readonly SyncVar<string> _syncFirstHalfKickingTeam = new SyncVar<string>();
+    public string firstHalfKickingTeam { get => _syncFirstHalfKickingTeam.Value; set => _syncFirstHalfKickingTeam.Value = value; } // name of the team that kicked in the first half (green or grey). That team will receive to start the second half
 
     [Header("Kickoff Info")]
     public GamePlayer kickingPlayer;
@@ -53,14 +68,17 @@ public class GameplayManager : NetworkBehaviour
     public GamePlayer blockingPlayer;
     public Team scoringTeam;
     public Team blockingTeam;
-    [SyncVar] public float yPositionOfKickAfter;
-    [SyncVar] public uint scoringGoblinNetId;
+    private readonly SyncVar<float> _syncYPositionOfKickAfter = new SyncVar<float>();
+    public float yPositionOfKickAfter { get => _syncYPositionOfKickAfter.Value; set => _syncYPositionOfKickAfter.Value = value; }
+    private readonly SyncVar<int> _syncScoringGoblinNetId = new SyncVar<int>(ObjectLookup.NoObject);
+    public int scoringGoblinNetId { get => _syncScoringGoblinNetId.Value; set => _syncScoringGoblinNetId.Value = value; }
     [SerializeField] GameObject KickAfterPositionControlsPanel;
     [SerializeField] GameObject KickAfterTimerBeforeKickPanel;
     [SerializeField] GameObject TimerInstructionsBoard;
     [SerializeField] TextMeshProUGUI TimerInstructionsText;
     [SerializeField] TextMeshProUGUI KickAfterTimerText;
-    [SyncVar(hook = nameof(HandleKickAfterTimerUpdate))] int KickAfterTimer;
+    private readonly SyncVar<int> _syncKickAfterTimer = new SyncVar<int>();
+    private int KickAfterTimer { get => _syncKickAfterTimer.Value; set => _syncKickAfterTimer.Value = value; }
     [SerializeField] GameObject KickAfterWasKickGoodPanel;
     [SerializeField] TextMeshProUGUI TheKickWasText;
     [SerializeField] TextMeshProUGUI KickWasGoodText;
@@ -70,24 +88,29 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] bool _wasKickGoodOrBadSubmitted = false;
 
     [Header("Xtra Time")]
-    [SyncVar] public bool isXtraTime;
+    private readonly SyncVar<bool> _syncIsXtraTime = new SyncVar<bool>();
+    public bool isXtraTime { get => _syncIsXtraTime.Value; set => _syncIsXtraTime.Value = value; }
 
 
     [Header("Game timer")]
     [SerializeField] float lengthOfHalves;
     [SerializeField] TextMeshProUGUI timerText;
-    [SyncVar(hook = nameof(HandleGameTimerUpdate))] public float timeLeftInGame;
+    private readonly SyncVar<float> _syncTimeLeftInGame = new SyncVar<float>();
+    public float timeLeftInGame { get => _syncTimeLeftInGame.Value; set => _syncTimeLeftInGame.Value = value; }
     IEnumerator gameTimeRoutine;
     public bool isGameTimerRunning = false;
     string minutes;
     string seconds;
 
     [Header("Score")]
-    [SyncVar(hook = nameof(HandleGreenScoreUpdate))] public int greenScore;
-    [SyncVar(hook = nameof(HandleGreyScoreUpdate))] public int greyScore;
+    private readonly SyncVar<int> _syncGreenScore = new SyncVar<int>();
+    public int greenScore { get => _syncGreenScore.Value; set => _syncGreenScore.Value = value; }
+    private readonly SyncVar<int> _syncGreyScore = new SyncVar<int>();
+    public int greyScore { get => _syncGreyScore.Value; set => _syncGreyScore.Value = value; }
     [SerializeField] TextMeshProUGUI ScoreGreenText;
     [SerializeField] TextMeshProUGUI ScoreGreyText;
-    [SyncVar] string winningTeam;
+    private readonly SyncVar<string> _syncWinningTeam = new SyncVar<string>();
+    private string winningTeam { get => _syncWinningTeam.Value; set => _syncWinningTeam.Value = value; }
 
     [Header("Game Over")]
     [SerializeField] GameObject GameOverScorePanel;
@@ -131,10 +154,13 @@ public class GameplayManager : NetworkBehaviour
     [Header("Pause/Resume Game")]
     [SerializeField] GameObject GamePausedTextObject;
     [SerializeField] TextMeshProUGUI GamePausedSecondsLeftText;
-    [SyncVar (hook = nameof(HandleIsGamePaused))] public bool isGamePaused = false;
+    private readonly SyncVar<bool> _syncIsGamePaused = new SyncVar<bool>();
+    public bool isGamePaused { get => _syncIsGamePaused.Value; set => _syncIsGamePaused.Value = value; }
     public GamePlayer playerWhoPaused;
-    [SyncVar] public uint playerWhoPausedNetId;
-    [SyncVar] public float lastPauseTimeStamp;
+    private readonly SyncVar<int> _syncPlayerWhoPausedNetId = new SyncVar<int>(ObjectLookup.NoObject);
+    public int playerWhoPausedNetId { get => _syncPlayerWhoPausedNetId.Value; set => _syncPlayerWhoPausedNetId.Value = value; }
+    private readonly SyncVar<float> _syncLastPauseTimeStamp = new SyncVar<float>();
+    public float lastPauseTimeStamp { get => _syncLastPauseTimeStamp.Value; set => _syncLastPauseTimeStamp.Value = value; }
     bool isGamePausedTimeoutRoutineRunning = false;
     IEnumerator GamePausedTimeout;
     public float greenPauseTimeStamp = -30f;
@@ -148,12 +174,14 @@ public class GameplayManager : NetworkBehaviour
     public bool isKickAfterTimerCountDownRunning = false;
     public bool isKickAfterTimerRunning = false;
     IEnumerator timeoutKickAfter;
-    [SyncVar (hook = nameof(HandleKickAfterTimerTimeLeft))] int kickAfterTimerTimeLeft = 30;
+    private readonly SyncVar<int> _syncKickAfterTimerTimeLeft = new SyncVar<int>(30);
+    private int kickAfterTimerTimeLeft { get => _syncKickAfterTimerTimeLeft.Value; set => _syncKickAfterTimerTimeLeft.Value = value; }
 
     [Header("Timeouts: Kick Off")]
     public bool isKickOffTimerCountDownRunning = false;
     IEnumerator timeoutKickOff;
-    [SyncVar(hook = nameof(HandleKickOffTimerTimeLeft))] int kickOffTimerTimeLeft = 30;
+    private readonly SyncVar<int> _syncKickOffTimerTimeLeft = new SyncVar<int>(30);
+    private int kickOffTimerTimeLeft { get => _syncKickOffTimerTimeLeft.Value; set => _syncKickOffTimerTimeLeft.Value = value; }
 
     [Header("Error Messages Display")]
     [SerializeField] GameObject errorCanvas;
@@ -175,6 +203,14 @@ public class GameplayManager : NetworkBehaviour
     }
     private void Awake()
     {
+        _syncGamePhase.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleGamePhase(prev, next); };
+        _syncKickAfterTimer.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleKickAfterTimerUpdate(prev, next); };
+        _syncTimeLeftInGame.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleGameTimerUpdate(prev, next); };
+        _syncGreenScore.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleGreenScoreUpdate(prev, next); };
+        _syncGreyScore.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleGreyScoreUpdate(prev, next); };
+        _syncIsGamePaused.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsGamePaused(prev, next); };
+        _syncKickAfterTimerTimeLeft.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleKickAfterTimerTimeLeft(prev, next); };
+        _syncKickOffTimerTimeLeft.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleKickOffTimerTimeLeft(prev, next); };
         MakeInstance();
         gameplayCanvas.SetActive(false);
         coinTossCanvas.SetActive(false);
@@ -186,16 +222,23 @@ public class GameplayManager : NetworkBehaviour
         if (instance == null)
             instance = this;
     }
-    // Start is called before the first frame update
-    void Start()
+    // This was Start() with Mirror. FishNet can run Start before this scene object has started on the network, so it
+    // happens here instead. On the host this runs after OnStartServer, so isSinglePlayer is already set.
+    public override void OnStartClient()
     {
-        if (isClient)
-        {
-            GetLocalGamePlayer();
-            UpdateKickAfterControlsUIForGamepad(GamepadUIManager.instance.gamepadUI);
-        }
+        base.OnStartClient();
+        UpdateKickAfterControlsUIForGamepad(GamepadUIManager.instance.gamepadUI);
+        StartWithLocalGamePlayer();
+    }
+    // Needs the local GamePlayer. FishNet 4 can start this scene object before that player, so the player's own
+    // OnStartClient calls this again once it exists. Runs once.
+    public void StartWithLocalGamePlayer()
+    {
+        if (LocalGamePlayerScript != null || GameObject.Find("LocalGamePlayer") == null)
+            return;
+        GetLocalGamePlayer();
         // Spawn the AIPlayer if this is a singleplayer game
-        if (isServer && this.isSinglePlayer && !this.is1v1)
+        if (IsServerInitialized && this.isSinglePlayer && !this.is1v1)
         {
             SpawnAIPlayer();
         }
@@ -214,10 +257,10 @@ public class GameplayManager : NetworkBehaviour
 
         Debug.Log("GameplayManager: is 1v1 is set to: " + this.is1v1);
         //gamePhase = "cointoss";
-        HandleGamePhase(gamePhase, "cointoss");
+        gamePhase = "cointoss";
         //timeLeftInGame = 300f;
         //timeLeftInGame = 30f;
-        HandleGameTimerUpdate(0f, secondsPerHalf);
+        timeLeftInGame = secondsPerHalf;
         greenScore = 0;
         greyScore = 0;
     }
@@ -226,7 +269,7 @@ public class GameplayManager : NetworkBehaviour
     {
         
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void FixedUpdate()
     {
         /*if (isGameTimerRunning)
@@ -249,14 +292,15 @@ public class GameplayManager : NetworkBehaviour
     void SpawnAIPlayer()
     {
         aiPlayerObject = Instantiate(aiPlayerPrefab);
-        NetworkServer.Spawn(aiPlayerObject,LocalGamePlayerScript.connectionToClient);
+        InstanceFinder.ServerManager.Spawn(aiPlayerObject,LocalGamePlayerScript.Owner);
         aiGamePlayerScript = aiPlayerObject.GetComponent<GamePlayer>();
         aiGamePlayerScript.isSinglePlayer = LocalGamePlayerScript.isSinglePlayer;
         aiGamePlayerScript.isTeamGrey = !LocalGamePlayerScript.isTeamGrey;
         aiGamePlayerScript.SetPlayerName("AIPlayer");
         aiGamePlayerScript.SetConnectionId(-1);
         aiGamePlayerScript.SetPlayerNumber(2);
-        aiGamePlayerScript.InitializeAIPlayer();
+        // InitializeAIPlayer sends ServerRpcs, which FishNet only sends once the host's client side has started this
+        // object, so the AI GamePlayer calls it from its own OnStartClient.
         aiPlayerScript = aiPlayerObject.GetComponent<AIPlayer>();
     }
     public void ActivateCoinTossUI(bool activate)
@@ -279,9 +323,8 @@ public class GameplayManager : NetworkBehaviour
     public void HandleGamePhase(string oldValue, string newValue)
     {
         // Possible Game phases should be: cointoss, kickoff, gameplay, touchdown-transition, kick-after-attempt, xtra-time, halftime, gameover
-        if (isServer)
+        if (IsServerInitialized)
         {
-            gamePhase = newValue;
             if (newValue == "kickoff")
             {
                 RepositionTeamsForKickOff();
@@ -323,10 +366,10 @@ public class GameplayManager : NetworkBehaviour
             {
                 try
                 {
-                    GoblinScript goblinThatKicked = NetworkIdentity.spawned[scoringGoblinNetId].GetComponent<GoblinScript>();
+                    GoblinScript goblinThatKicked = ObjectLookup.Get(scoringGoblinNetId).GetComponent<GoblinScript>();
                     goblinThatKicked.isKickAfterPositionSet = false;
                     goblinThatKicked.isKickAfterGoblin = false;
-                    scoringGoblinNetId = 0;
+                    scoringGoblinNetId = ObjectLookup.NoObject;
                 }
                 catch (Exception e)
                 {
@@ -358,7 +401,7 @@ public class GameplayManager : NetworkBehaviour
             }
             
         }            
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (newValue == "cointoss")
             {
@@ -448,7 +491,7 @@ public class GameplayManager : NetworkBehaviour
                 bool isThisTheKickingPlayer = false;
                 if (player == kickingPlayer)
                     isThisTheKickingPlayer = true;
-                player.RpcRepositionTeamForKickOff3v3(player.connectionToClient, true, isThisTheKickingPlayer);
+                player.RpcRepositionTeamForKickOff3v3(player.Owner, true, isThisTheKickingPlayer);
                 player.gameplayActionControlsOnServer = false;
                 player.goblinMovementControlsOnServer = false;
                 player.powerupsControlsOnServer = false;
@@ -459,7 +502,7 @@ public class GameplayManager : NetworkBehaviour
             foreach (GamePlayer player in receivingTeam.teamPlayers)
             {
 
-                player.RpcRepositionTeamForKickOff3v3(player.connectionToClient, false, false);
+                player.RpcRepositionTeamForKickOff3v3(player.Owner, false, false);
                 player.gameplayActionControlsOnServer = false;
                 player.goblinMovementControlsOnServer = false;
                 player.powerupsControlsOnServer = false;
@@ -510,11 +553,11 @@ public class GameplayManager : NetworkBehaviour
         }
     }
     [Server]
-    public void TouchDownScored(bool wasGrey, uint goblinNetId, float yPosition)
+    public void TouchDownScored(bool wasGrey, int goblinNetId, float yPosition)
     {
         Debug.Log("TouchDownScored: " + goblinNetId.ToString());
         //Remove this place holder phase if it causes issues???
-        HandleGamePhase(this.gamePhase, "touchdown-transition");
+        gamePhase = "touchdown-transition";
 
         //SetKickAfterPlayers(scoringGoblinNetId);
         this.scoringGoblinNetId = goblinNetId;
@@ -534,7 +577,7 @@ public class GameplayManager : NetworkBehaviour
             int differenceInScores = greenScore - greyScore;
             if (Mathf.Abs(differenceInScores) > 2)
             {
-                HandleGamePhase(this.gamePhase, "gameover");
+                gamePhase = "gameover";
                 return;
             }            
         }
@@ -543,7 +586,7 @@ public class GameplayManager : NetworkBehaviour
         {
             if (CheckForMercyRule())
             {
-                HandleGamePhase(this.gamePhase, "gameover");
+                gamePhase = "gameover";
                 if (greenScore > greyScore)
                 {
                     if (!mercyRuleResultsSent)
@@ -573,7 +616,7 @@ public class GameplayManager : NetworkBehaviour
 
         try
         {
-            GoblinScript scoringGoblinScript = NetworkIdentity.spawned[goblinNetId].GetComponent<GoblinScript>();
+            GoblinScript scoringGoblinScript = ObjectLookup.Get(goblinNetId).GetComponent<GoblinScript>();
             scoringGoblinScript.TouchdownScoredAchievement();
         }
         catch (Exception e)
@@ -585,8 +628,8 @@ public class GameplayManager : NetworkBehaviour
         // Stop Goblins from running?
         ResetAllGoblinStatuses();
     }
-    [ClientRpc]
-    void RpcTouchDownScored(bool wasGrey, uint goblinId)
+    [ObserversRpc]
+    void RpcTouchDownScored(bool wasGrey, int goblinId)
     {
         Debug.Log("RpcTouchDownScored: " + wasGrey.ToString() + " and goblin netid of : " + goblinId.ToString());
         touchDownText.text = "TOUCHDOWN!";
@@ -603,7 +646,7 @@ public class GameplayManager : NetworkBehaviour
         TouchDownPanel.SetActive(true);
         touchDownText.GetComponent<TouchDownTextGradient>().ActivateGradient();
         touchDownTeamText.GetComponent<TouchDownTextGradient>().SetGreenOrGreyColor(wasGrey);
-        GameObject scoringGoblin = NetworkIdentity.spawned[goblinId].gameObject;
+        GameObject scoringGoblin = ObjectLookup.Get(goblinId).gameObject;
         LocalGamePlayerScript.FollowSelectedGoblin(scoringGoblin.transform);
         SoundManager.instance.PlaySound("touchdown-cheer", 0.75f);
         SoundManager.instance.PlaySound("touchdown-touchdown", 1.0f);
@@ -642,28 +685,30 @@ public class GameplayManager : NetworkBehaviour
         float timeLeftTracker;
         while (isGameTimerRunning)
         {
-            // Don't count down the time if the game is paused?
+            // Don't count down the time if the game is paused. Wait a frame first: a bare continue never yields, so a pause
+            // seen here spun this loop forever and froze the host.
             if (this.isGamePaused)
+            {
+                yield return null;
                 continue;
+            }
 
             yield return new WaitForSeconds(1.0f);
             timeLeftTracker = timeLeftInGame - 1;
             
-            HandleGameTimerUpdate(timeLeftInGame, timeLeftTracker);
+            timeLeftInGame = timeLeftTracker;
             if (timeLeftTracker <= 0)
             {
-                HandleGameTimerUpdate(timeLeftInGame, 0);
+                timeLeftInGame = 0;
                 isGameTimerRunning = false;
-                HandleGamePhase(this.gamePhase, "xtra-time");
+                gamePhase = "xtra-time";
             }
         }
         yield break;        
     }
     void HandleGameTimerUpdate(float oldValue, float newValue)
     {
-        if (isServer)
-            timeLeftInGame = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             /*minutes = Mathf.Floor(newValue / 60).ToString("0");
             seconds = Mathf.Floor(newValue % 60).ToString("00");
@@ -687,12 +732,11 @@ public class GameplayManager : NetworkBehaviour
     }
     void HandleGreenScoreUpdate(int oldValue, int newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            greenScore = newValue;
             //CheckForMercyRule();
         }   
-        if (isClient)
+        if (IsClientInitialized)
         {
             ScoreGreenText.text = newValue.ToString("00");
             greenTeamScoreText.text = newValue.ToString("00");
@@ -700,12 +744,11 @@ public class GameplayManager : NetworkBehaviour
     }
     void HandleGreyScoreUpdate(int oldValue, int newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            greyScore = newValue;
             //CheckForMercyRule();
         }   
-        if (isClient)
+        if (IsClientInitialized)
         {
             ScoreGreyText.text = newValue.ToString("00");
             greyTeamScoreText.text = newValue.ToString("00");
@@ -715,7 +758,7 @@ public class GameplayManager : NetworkBehaviour
     IEnumerator GameplayToKickAfterTransition()
     {
         yield return new WaitForSeconds(3.0f);
-        HandleGamePhase(gamePhase, "kick-after-attempt");
+        gamePhase = "kick-after-attempt";
     }
     void HideTouchDownText()
     {
@@ -726,10 +769,10 @@ public class GameplayManager : NetworkBehaviour
         touchDownText.GetComponent<TouchDownTextGradient>().isColorChangeRunning = false;
     }
     [Server]
-    void SetKickAfterPlayers(uint scoringGoblin)
+    void SetKickAfterPlayers(int scoringGoblin)
     {
         Debug.Log("SetKickAfterPlayers: the scoring goblin was: " + scoringGoblin.ToString());
-        GoblinScript scoringGoblinScript = NetworkIdentity.spawned[scoringGoblin].GetComponent<GoblinScript>();
+        GoblinScript scoringGoblinScript = ObjectLookup.Get(scoringGoblin).GetComponent<GoblinScript>();
         scoringGoblinScript.isKickAfterGoblin = true;
         
         // Make sure all goblins are healed after the touchdown. This is to make sure that kicking and blocking goblins are not still knocked out.
@@ -749,13 +792,13 @@ public class GameplayManager : NetworkBehaviour
                 {
                     scoringPlayer = player;
                     kickingPlayer = player;
-                    player.RpcRepositionForKickAfter(player.connectionToClient, true, scoringGoblin, yPositionOfKickAfter);
+                    player.RpcRepositionForKickAfter(player.Owner, true, scoringGoblin, yPositionOfKickAfter);
                 }
                 else
                 {
                     blockingPlayer = player;
                     receivingPlayer = player;
-                    player.RpcRepositionForKickAfter(player.connectionToClient, false, scoringGoblin, yPositionOfKickAfter);
+                    player.RpcRepositionForKickAfter(player.Owner, false, scoringGoblin, yPositionOfKickAfter);
                 }
             }
         }
@@ -767,13 +810,13 @@ public class GameplayManager : NetworkBehaviour
                 {
                     scoringPlayer = player;
                     kickingPlayer = player;
-                    player.RpcRepositionForKickAfter(player.connectionToClient, true, scoringGoblin, yPositionOfKickAfter);
+                    player.RpcRepositionForKickAfter(player.Owner, true, scoringGoblin, yPositionOfKickAfter);
                 }
                 else
                 {
                     blockingPlayer = player;
                     receivingPlayer = player;
-                    player.RpcRepositionForKickAfter(player.connectionToClient, false, scoringGoblin, yPositionOfKickAfter);
+                    player.RpcRepositionForKickAfter(player.Owner, false, scoringGoblin, yPositionOfKickAfter);
                 }
             }
         }
@@ -809,16 +852,16 @@ public class GameplayManager : NetworkBehaviour
             foreach (GamePlayer player in scoringTeam.teamPlayers)
             {
                 if (player == scoringPlayer)
-                    player.RpcRepositionForKickAfterFor3v3(player.connectionToClient, true, true, scoringGoblin, yPositionOfKickAfter, 1);
+                    player.RpcRepositionForKickAfterFor3v3(player.Owner, true, true, scoringGoblin, yPositionOfKickAfter, 1);
                 else
                 {
                     yModifier *= -1;
-                    player.RpcRepositionForKickAfterFor3v3(player.connectionToClient, false, true, scoringGoblin, yPositionOfKickAfter, yModifier);
+                    player.RpcRepositionForKickAfterFor3v3(player.Owner, false, true, scoringGoblin, yPositionOfKickAfter, yModifier);
                 }
             }
             foreach (GamePlayer player in blockingTeam.teamPlayers)
             {
-                player.RpcRepositionForKickAfterFor3v3(player.connectionToClient, false, false, scoringGoblin, yPositionOfKickAfter, 1);
+                player.RpcRepositionForKickAfterFor3v3(player.Owner, false, false, scoringGoblin, yPositionOfKickAfter, 1);
             }
         }      
     }
@@ -840,7 +883,7 @@ public class GameplayManager : NetworkBehaviour
     {
         try
         {
-            scoringPlayer.RpcDisableKickAfterPositioningControls(scoringPlayer.connectionToClient);
+            scoringPlayer.RpcDisableKickAfterPositioningControls(scoringPlayer.Owner);
         }
         catch (Exception e)
         {
@@ -854,26 +897,26 @@ public class GameplayManager : NetworkBehaviour
         Debug.Log("StartKickAfterTimer: for 1v1? " + this.is1v1.ToString());
         if (this.is1v1)
         {
-            scoringPlayer.RpcStartKickAfterTimer(scoringPlayer.connectionToClient, true);
-            blockingPlayer.RpcStartKickAfterTimer(blockingPlayer.connectionToClient, false);
+            scoringPlayer.RpcStartKickAfterTimer(scoringPlayer.Owner, true);
+            blockingPlayer.RpcStartKickAfterTimer(blockingPlayer.Owner, false);
         }
         else if (this.isSinglePlayer && !this.is1v1)
         { 
             // Only have the player be sent the RpcStartKickAfterTimer stuff, not the AI. So, check if the player is the scoring player or blocking player and send approriate message
             if(scoringPlayer == LocalGamePlayerScript)
-                scoringPlayer.RpcStartKickAfterTimer(scoringPlayer.connectionToClient, true);
+                scoringPlayer.RpcStartKickAfterTimer(scoringPlayer.Owner, true);
             else if (blockingPlayer == LocalGamePlayerScript)
-                blockingPlayer.RpcStartKickAfterTimer(blockingPlayer.connectionToClient, false);
+                blockingPlayer.RpcStartKickAfterTimer(blockingPlayer.Owner, false);
         }
         else
         {
             foreach (GamePlayer player in scoringTeam.teamPlayers)
             {
-                player.RpcStartKickAfterTimer(player.connectionToClient, true);
+                player.RpcStartKickAfterTimer(player.Owner, true);
             }
             foreach (GamePlayer player in blockingTeam.teamPlayers)
             {
-                player.RpcStartKickAfterTimer(player.connectionToClient, false);
+                player.RpcStartKickAfterTimer(player.Owner, false);
             }
         }
         IEnumerator kickAfterCountdown = KickAfterTimerCountDown();
@@ -912,29 +955,29 @@ public class GameplayManager : NetworkBehaviour
         isKickAfterTimerCountDownRunning = false;
         if (this.is1v1)
         {
-            scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, true);
-            blockingPlayer.RpcActivateKickAfterKickingControls(blockingPlayer.connectionToClient, false);
+            scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.Owner, true);
+            blockingPlayer.RpcActivateKickAfterKickingControls(blockingPlayer.Owner, false);
 
-            scoringPlayer.RpcActivateKickAfterBlockingControls(scoringPlayer.connectionToClient, false);
-            blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, true);
+            scoringPlayer.RpcActivateKickAfterBlockingControls(scoringPlayer.Owner, false);
+            blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.Owner, true);
 
-            scoringPlayer.RpcKickAfterUpdateInsctructionsText(scoringPlayer.connectionToClient, true);
-            blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.connectionToClient, false);
+            scoringPlayer.RpcKickAfterUpdateInsctructionsText(scoringPlayer.Owner, true);
+            blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.Owner, false);
         }
         else if (this.isSinglePlayer && !this.is1v1)
         {
             // Only have the player be sent the RpcStartKickAfterTimer stuff, not the AI. So, check if the player is the scoring player or blocking player and send approriate message
             if (scoringPlayer == LocalGamePlayerScript)
             {
-                scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, true);
-                scoringPlayer.RpcActivateKickAfterBlockingControls(scoringPlayer.connectionToClient, false);
-                scoringPlayer.RpcKickAfterUpdateInsctructionsText(scoringPlayer.connectionToClient, true);
+                scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.Owner, true);
+                scoringPlayer.RpcActivateKickAfterBlockingControls(scoringPlayer.Owner, false);
+                scoringPlayer.RpcKickAfterUpdateInsctructionsText(scoringPlayer.Owner, true);
             }
             else if (blockingPlayer == LocalGamePlayerScript)
             {
-                blockingPlayer.RpcActivateKickAfterKickingControls(blockingPlayer.connectionToClient, false);
-                blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, true);
-                blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.connectionToClient, false);
+                blockingPlayer.RpcActivateKickAfterKickingControls(blockingPlayer.Owner, false);
+                blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.Owner, true);
+                blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.Owner, false);
             }
             if (blockingPlayer == aiGamePlayerScript)
             {
@@ -952,16 +995,16 @@ public class GameplayManager : NetworkBehaviour
                 if (player == scoringPlayer)
                 {
                     Debug.Log("KickAfterTimerCountDown: send true to RpcActivateKickAfterKickingControls for scoring playeR: " + player.PlayerName);
-                    player.RpcActivateKickAfterKickingControls(player.connectionToClient, true);
+                    player.RpcActivateKickAfterKickingControls(player.Owner, true);
                 }
-                player.RpcActivateKickAfterBlockingControls(player.connectionToClient, false);
-                player.RpcKickAfterUpdateInsctructionsText(player.connectionToClient, true);
+                player.RpcActivateKickAfterBlockingControls(player.Owner, false);
+                player.RpcKickAfterUpdateInsctructionsText(player.Owner, true);
             }
             foreach (GamePlayer player in blockingTeam.teamPlayers)
             {
-                player.RpcActivateKickAfterKickingControls(player.connectionToClient, false);
-                player.RpcActivateKickAfterBlockingControls(player.connectionToClient, true);
-                player.RpcKickAfterUpdateInsctructionsText(player.connectionToClient, false);
+                player.RpcActivateKickAfterKickingControls(player.Owner, false);
+                player.RpcActivateKickAfterBlockingControls(player.Owner, true);
+                player.RpcKickAfterUpdateInsctructionsText(player.Owner, false);
             }
         }
         
@@ -969,14 +1012,12 @@ public class GameplayManager : NetworkBehaviour
     }
     void HandleKickAfterTimerUpdate(int oldValue, int newValue)
     {
-        if (isServer)
-            KickAfterTimer = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             KickAfterTimerText.text = newValue.ToString();
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcDisableKickAfterTimerUI()
     {
         KickAfterTimerText.gameObject.SetActive(false);
@@ -1030,7 +1071,7 @@ public class GameplayManager : NetworkBehaviour
             // Kick after attempt achievement checks
             if (scoringPlayer)
             {
-                scoringPlayer.RpcKickAfterAttemptAchievement(scoringPlayer.connectionToClient);
+                scoringPlayer.RpcKickAfterAttemptAchievement(scoringPlayer.Owner);
             }
         }
         _wasKickGoodOrBadSubmitted = true;
@@ -1047,7 +1088,7 @@ public class GameplayManager : NetworkBehaviour
         yield return new WaitForSeconds(0.2f);
         _wasKickGoodOrBadSubmitted = false;
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcKickAfterWasKickGoodOrBad(bool isKickGood, bool isScoringPlayerGrey)
     {
         // in case the kick was good/was blocked thing happen at the same time or one after the other, turn off the kcik was blocked text stuff
@@ -1105,25 +1146,25 @@ public class GameplayManager : NetworkBehaviour
         {
             if (this.is1v1)
             {
-                scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, false);
-                blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, false);
+                scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.Owner, false);
+                blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.Owner, false);
             }
             else if (this.isSinglePlayer && !this.is1v1)
             { 
                 if(scoringPlayer == LocalGamePlayerScript)
-                    scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.connectionToClient, false);
+                    scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.Owner, false);
                 else if (blockingPlayer == LocalGamePlayerScript)
-                    blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.connectionToClient, false);
+                    blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.Owner, false);
             }
             else
             {
                 foreach (GamePlayer player in scoringTeam.teamPlayers)
                 {
-                    player.RpcActivateKickAfterKickingControls(player.connectionToClient, false);
+                    player.RpcActivateKickAfterKickingControls(player.Owner, false);
                 }
                 foreach (GamePlayer player in blockingTeam.teamPlayers)
                 {
-                    player.RpcActivateKickAfterBlockingControls(player.connectionToClient, false);
+                    player.RpcActivateKickAfterBlockingControls(player.Owner, false);
                 }
             }
         }
@@ -1140,25 +1181,25 @@ public class GameplayManager : NetworkBehaviour
         RpcDisableKickAfterWasKickGoodOrBadUI();
         if (this.mercyRuleEnabled && CheckForMercyRule())
         {
-            HandleGamePhase(this.gamePhase, "gameover");
+            gamePhase = "gameover";
         }
         else if (isXtraTime && firstHalfCompleted)
         {
-            GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
+            GameplayManager.instance.gamePhase = "gameover";
         }
         else if (isXtraTime && !firstHalfCompleted)
         {
             Debug.Log("TransitionFromKickAfterAttemptToKickOffRoutine: it should be halftime now!");
-            GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "halftime");
+            GameplayManager.instance.gamePhase = "halftime";
         }
         else
         {
             Debug.Log("TransitionFromKickAfterAttemptToKickOffRoutine: not halftime. Kickoff time!");
-            GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "kickoff");
+            GameplayManager.instance.gamePhase = "kickoff";
         }
         kickAfterRoutineRunning = false;        
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcDisableKickAfterWasKickGoodOrBadUI()
     {
         KickAfterWasKickGoodPanel.SetActive(false);
@@ -1209,7 +1250,7 @@ public class GameplayManager : NetworkBehaviour
         }
 
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcKickAfterAttemptWasBlocked()
     {
         // incase there is an issue with the kick was blocked/kick was good thing happening at the same time:
@@ -1260,7 +1301,7 @@ public class GameplayManager : NetworkBehaviour
         }
         RpcWinnerOfGameDetermined(winningTeam);
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcWinnerOfGameDetermined(string winnerOfGame)
     {
         Debug.Log("RpcWinnerOfGameDetermined: " + winnerOfGame);
@@ -1302,11 +1343,11 @@ public class GameplayManager : NetworkBehaviour
     {
         if ((isGoblinGrey && greyScore > greenScore) || (!isGoblinGrey && greyScore < greenScore))
         {
-            HandleGamePhase(this.gamePhase, "gameover");
+            gamePhase = "gameover";
         }
 
     }
-    [ServerCallback]
+    [Server]
     void ResetGoblinKickAfterRespositioningBool()
     {
         foreach (GamePlayer player in Game.GamePlayers)
@@ -1318,7 +1359,7 @@ public class GameplayManager : NetworkBehaviour
         }
     }
     // Check to see if all goblins have be repositioned by the clients. If they have, wait 0.25f seconds and then check to make sure that the scoring goblin has the football
-    [ServerCallback]
+    [Server]
     public void AreAllGoblinsRepositionedForKickAfter()
     {
         bool doneRepositioning = true;
@@ -1350,7 +1391,7 @@ public class GameplayManager : NetworkBehaviour
     IEnumerator WaitForRepositioningSyncUp()
     {
         yield return new WaitForSeconds(0.25f);
-        GoblinScript scoringGoblinScript = NetworkIdentity.spawned[scoringGoblinNetId].GetComponent<GoblinScript>();
+        GoblinScript scoringGoblinScript = ObjectLookup.Get(scoringGoblinNetId).GetComponent<GoblinScript>();
         if (!scoringGoblinScript.doesCharacterHaveBall)
         {
             Football football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
@@ -1381,7 +1422,7 @@ public class GameplayManager : NetworkBehaviour
             PossessionFootballGreen.SetActive(true);
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcNoTeamWithFootball()
     {
         NoTeamWithFootball();
@@ -1406,7 +1447,7 @@ public class GameplayManager : NetworkBehaviour
             EnterToSubmitText.text = "\"Enter\" to Submit";
         }
     }
-    [ServerCallback]
+    [Server]
     void EnableGoblinCollidersOnServer(bool enable)
     {
         GameObject[] goblinObjects = GameObject.FindGameObjectsWithTag("Goblin");
@@ -1418,7 +1459,7 @@ public class GameplayManager : NetworkBehaviour
             }
         }
     }
-    [ServerCallback]
+    [Server]
     void DisableGoblinColliderForKickAfter()
     {
         GameObject[] goblinObjects = GameObject.FindGameObjectsWithTag("Goblin");
@@ -1430,7 +1471,7 @@ public class GameplayManager : NetworkBehaviour
             }
         }
     }
-    [ServerCallback]
+    [Server]
     public void SaveFirstHalfKickingTeam()
     {
         Debug.Log("SaveFirstHalfKickingTeam: team that is kicking is: " + kickingPlayer.teamName);
@@ -1440,7 +1481,7 @@ public class GameplayManager : NetworkBehaviour
         }
 
     }
-    [ServerCallback]
+    [Server]
     void TransitionToSecondHalf()
     {
         GetSecondHalfKickingTeam();
@@ -1448,7 +1489,7 @@ public class GameplayManager : NetworkBehaviour
         IEnumerator transitionToSecondHalfRoutine = TransitionToSecondHalfRoutine();
         StartCoroutine(transitionToSecondHalfRoutine);
     }
-    [ServerCallback]
+    [Server]
     void GetSecondHalfKickingTeam()
     {
         Debug.Log("GetSecondHalfKickingTeam");
@@ -1479,7 +1520,7 @@ public class GameplayManager : NetworkBehaviour
             kickingPlayer = kickingTeam.captain;
         }
     }
-    [ServerCallback]
+    [Server]
     IEnumerator TransitionToSecondHalfRoutine()
     {
         RpcHalfTimeTransition(true, kickingPlayer.teamName);
@@ -1488,10 +1529,10 @@ public class GameplayManager : NetworkBehaviour
         yield return new WaitForSeconds(1f);
         this.firstHalfCompleted = true;
         ResetAllGoblinStatuses();
-        this.HandleGamePhase(this.gamePhase, "kickoff");
-        this.HandleGameTimerUpdate(this.timeLeftInGame, secondsPerHalf);
+        this.gamePhase = "kickoff";
+        this.timeLeftInGame = secondsPerHalf;
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcHalfTimeTransition(bool enable, string kickingTeam)
     {
         Debug.Log("RpcHalfTimeTransition: enable? " + enable.ToString());
@@ -1511,7 +1552,7 @@ public class GameplayManager : NetworkBehaviour
             SoundManager.instance.PlaySound("ref-whistle", 1.0f);
         }
     }
-    [ServerCallback]
+    [Server]
     void StopPossessionRoutinesForPlayers()
     {
         Debug.Log("StopPossessionRoutinesForPlayers");
@@ -1530,7 +1571,7 @@ public class GameplayManager : NetworkBehaviour
         else
             PossessionBarGrey.GetComponent<PossessionBar>().UpdatePossessionBar(possession);
     }
-    [ClientCallback]
+    [Client]
     public void PlayPossessionChangedSFX(bool doesGreyTeamHaveBall)
     {
         if (LocalGamePlayerScript)
@@ -1636,7 +1677,7 @@ public class GameplayManager : NetworkBehaviour
     }
     IEnumerator AIKickAfterKickingPlayerDelay()
     {
-        aiPlayerScript.kickAfterGoblin = NetworkIdentity.spawned[scoringGoblinNetId].GetComponent<GoblinScript>();
+        aiPlayerScript.kickAfterGoblin = ObjectLookup.Get(scoringGoblinNetId).GetComponent<GoblinScript>();
         yield return new WaitForSeconds(1.0f);
         Debug.Log("AIKickAfterKickingPlayerDelay");
         aiPlayerScript.finalPositionReached = false;
@@ -1649,13 +1690,13 @@ public class GameplayManager : NetworkBehaviour
         Debug.Log("AIKickAfterAttempt");
         aiPlayerScript.KickAfterAttempt();
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcKickOffWhistle()
     {
         SoundManager.instance.PlaySound("ref-whistle", 1.0f);
     }
-    [ServerCallback]
-    public void PauseGameOnServer(GamePlayer pausingPlayer, uint pausingPlayerNetId)
+    [Server]
+    public void PauseGameOnServer(GamePlayer pausingPlayer, int pausingPlayerNetId)
     {
         if (this.isGamePaused)
             return;
@@ -1694,7 +1735,7 @@ public class GameplayManager : NetworkBehaviour
             if (!canPlayerPause)
             {
                 //SendErrorMessageToTeam(pausingPlayer.isTeamGrey, "Team must wait 30 seconds of game time to pause again.");
-                pausingPlayer.RpcErrorMessageToDisplayFromServer(pausingPlayer.connectionToClient, "Your team must wait 30 seconds of game time to pause again.");
+                pausingPlayer.RpcErrorMessageToDisplayFromServer(pausingPlayer.Owner, "Your team must wait 30 seconds of game time to pause again.");
                 return;
             }
         }
@@ -1702,7 +1743,7 @@ public class GameplayManager : NetworkBehaviour
         playerWhoPaused = pausingPlayer;
         playerWhoPausedNetId = pausingPlayerNetId;
         PauseGameForAllPlayers(true);
-        this.HandleIsGamePaused(this.isGamePaused, true);
+        this.isGamePaused = true;
         if (!this.isSinglePlayer)
         {
             GamePausedTimeout = PauseGameTimeoutRoutine();
@@ -1710,8 +1751,8 @@ public class GameplayManager : NetworkBehaviour
         }
         //Time.timeScale = 0f;
     }
-    [ServerCallback]
-    public void ResumeGameOnServer(GamePlayer pausingPlayer, uint pausingPlayerNetId)
+    [Server]
+    public void ResumeGameOnServer(GamePlayer pausingPlayer, int pausingPlayerNetId)
     {
         if (!this.isGamePaused)
             return;
@@ -1720,9 +1761,9 @@ public class GameplayManager : NetworkBehaviour
         {
             Debug.Log("ResumeGameOnServer: Player with a netid of: " + pausingPlayerNetId.ToString() + " matches netid of player who paused: " + this.playerWhoPausedNetId.ToString() + " will resume game.");
             playerWhoPaused = null;
-            playerWhoPausedNetId = 0;
+            playerWhoPausedNetId = ObjectLookup.NoObject;
             PauseGameForAllPlayers(false);
-            this.HandleIsGamePaused(this.isGamePaused, false);
+            this.isGamePaused = false;
             if (isGamePausedTimeoutRoutineRunning)
             {
                 StopCoroutine(GamePausedTimeout);
@@ -1733,14 +1774,12 @@ public class GameplayManager : NetworkBehaviour
         else
         {
             if (!this.isSinglePlayer)
-                pausingPlayer.RpcErrorMessageToDisplayFromServer(pausingPlayer.connectionToClient, "Only the player who paused the game can resume the game.");
+                pausingPlayer.RpcErrorMessageToDisplayFromServer(pausingPlayer.Owner, "Only the player who paused the game can resume the game.");
         }
     }
     public void HandleIsGamePaused(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isGamePaused = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             //GamePausedTextObject.SetActive(newValue);
             /*if (newValue)
@@ -1755,12 +1794,12 @@ public class GameplayManager : NetworkBehaviour
             }*/   
         }
     }
-    [ServerCallback]
+    [Server]
     void PauseGameForAllPlayers(bool pauseGame)
     {
         foreach (GamePlayer player in Game.GamePlayers)
         {
-            player.RpcGamePausedByServer(player.connectionToClient, pauseGame);
+            player.RpcGamePausedByServer(player.Owner, pauseGame);
         }
     }
     public void ActivateGamePausedText(bool activate)
@@ -1796,14 +1835,14 @@ public class GameplayManager : NetworkBehaviour
         {
             Debug.Log("PauseGameTimeoutRoutine: Reached paused game timeout");
             playerWhoPaused = null;
-            playerWhoPausedNetId = 0;
+            playerWhoPausedNetId = ObjectLookup.NoObject;
             PauseGameForAllPlayers(false);
-            this.HandleIsGamePaused(this.isGamePaused, false);
+            this.isGamePaused = false;
             isGamePausedTimeoutRoutineRunning = false;
         }
         yield break;
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcUpdateGamePausedSecondsLeftText(int secondsLeft)
     {
         if (!this.isSinglePlayer)
@@ -1815,14 +1854,17 @@ public class GameplayManager : NetworkBehaviour
     {
         isKickAfterTimerRunning = true;
         
-        this.HandleKickAfterTimerTimeLeft(this.kickAfterTimerTimeLeft, 30);
+        this.kickAfterTimerTimeLeft = 30;
         RpcActivateTheTimeoutTimer(true);
         int timeLeftTracker;
         while (isKickAfterTimerRunning)
         {
-            // Don't count down the time if the game is paused?
+            // Don't count down the time if the game is paused. Wait a frame first, as in GameTimerCountdown.
             if (this.isGamePaused)
+            {
+                yield return null;
                 continue;
+            }
             if (this.gamePhase != "kick-after-attempt")
             {
                 isKickAfterTimerRunning = false;
@@ -1833,15 +1875,15 @@ public class GameplayManager : NetworkBehaviour
                 continue;
             timeLeftTracker = kickAfterTimerTimeLeft - 1;
 
-            HandleKickAfterTimerTimeLeft(this.kickAfterTimerTimeLeft, timeLeftTracker);
+            kickAfterTimerTimeLeft = timeLeftTracker;
             if (timeLeftTracker <= 0)
             {
-                HandleKickAfterTimerTimeLeft(this.kickAfterTimerTimeLeft, 0);
+                kickAfterTimerTimeLeft = 0;
                 isKickAfterTimerRunning = false;
                 // code to block kick automatically?
                 try
                 {
-                    GoblinScript goblin = NetworkIdentity.spawned[scoringGoblinNetId].GetComponent<GoblinScript>();
+                    GoblinScript goblin = ObjectLookup.Get(scoringGoblinNetId).GetComponent<GoblinScript>();
                     goblin.KnockOutGoblin(false);
                 }
                 catch (Exception e)
@@ -1858,19 +1900,17 @@ public class GameplayManager : NetworkBehaviour
     }
     void HandleKickAfterTimerTimeLeft(int oldValue, int newValue)
     {
-        if (isServer)
-            kickAfterTimerTimeLeft = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             timeoutTimerText.text = ":" + newValue.ToString();
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcActivateTheTimeoutTimer(bool activate)
     {
         TimeoutTimerHolder.SetActive(activate);
     }
-    [ServerCallback]
+    [Server]
     public void StopTimeoutKickAfterRoutine()
     {
         if (isKickAfterTimerRunning)
@@ -1890,7 +1930,7 @@ public class GameplayManager : NetworkBehaviour
     {
         isKickOffTimerCountDownRunning = true;
 
-        this.HandleKickOffTimerTimeLeft(this.kickOffTimerTimeLeft, 30);
+        this.kickOffTimerTimeLeft = 30;
         RpcActivateTheTimeoutTimer(true);
         int timeLeftTracker;
         while (isKickOffTimerCountDownRunning)
@@ -1907,15 +1947,15 @@ public class GameplayManager : NetworkBehaviour
 
             timeLeftTracker = kickOffTimerTimeLeft - 1;
 
-            HandleKickOffTimerTimeLeft(this.kickOffTimerTimeLeft, timeLeftTracker);
+            kickOffTimerTimeLeft = timeLeftTracker;
             if (timeLeftTracker <= 0)
             {
-                HandleKickOffTimerTimeLeft(this.kickOffTimerTimeLeft, 0);
+                kickOffTimerTimeLeft = 0;
                 isKickOffTimerCountDownRunning = false;
                 // code to block kick automatically?
                 try
                 {
-                    kickingPlayer.serverSelectGoblin.RpcKickOffTimeoutForceKick(kickingPlayer.serverSelectGoblin.connectionToClient);
+                    kickingPlayer.serverSelectGoblin.RpcKickOffTimeoutForceKick(kickingPlayer.serverSelectGoblin.Owner);
                 }
                 catch (Exception e)
                 {
@@ -1931,14 +1971,12 @@ public class GameplayManager : NetworkBehaviour
     }
     void HandleKickOffTimerTimeLeft(int oldValue, int newValue)
     {
-        if (isServer)
-            kickOffTimerTimeLeft = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             timeoutTimerText.text = ":" + newValue.ToString();
         }
     }
-    [ServerCallback]
+    [Server]
     public void StopTimeoutKickOffRoutine()
     {
         if (isKickOffTimerCountDownRunning)
@@ -1954,25 +1992,25 @@ public class GameplayManager : NetworkBehaviour
 
         RpcActivateTheTimeoutTimer(false);
     }
-    [ServerCallback]
+    [Server]
     void SendErrorMessageToTeam(bool isTeamGrey, string message)
     {
         if (isTeamGrey)
         {
             foreach (GamePlayer player in TeamManager.instance.greyTeam.teamPlayers)
             {
-                player.RpcErrorMessageToDisplayFromServer(player.connectionToClient, message);
+                player.RpcErrorMessageToDisplayFromServer(player.Owner, message);
             }
         }
         else
         {
             foreach (GamePlayer player in TeamManager.instance.greenTeam.teamPlayers)
             {
-                player.RpcErrorMessageToDisplayFromServer(player.connectionToClient, message);
+                player.RpcErrorMessageToDisplayFromServer(player.Owner, message);
             }
         }
     }
-    [ClientCallback]
+    [Client]
     public void DisplayErrorMessage(string message)
     {
         if (isErrorMessageDisplayed)
@@ -1991,7 +2029,7 @@ public class GameplayManager : NetworkBehaviour
         displayErrorMessageFromServer = DisplayErrorMessageFromServer(message);
         StartCoroutine(displayErrorMessageFromServer);
     }
-    [ClientCallback]
+    [Client]
     IEnumerator DisplayErrorMessageFromServer(string message)
     {
         Debug.Log("DisplayErrorMessageFromServer");
@@ -2003,7 +2041,7 @@ public class GameplayManager : NetworkBehaviour
         errorCanvasText.text = "";
         isErrorMessageDisplayed = false;
     }
-    [ServerCallback]
+    [Server]
     bool CheckForMercyRule()
     {
         bool beMerciful = false;
@@ -2055,9 +2093,9 @@ public class GameplayManager : NetworkBehaviour
 
                 if (teamToIterate != null)
                 {
-                    foreach (uint goblinNetId in teamToIterate.goblinNetIds)
+                    foreach (int goblinNetId in teamToIterate.goblinNetIds)
                     {
-                        NetworkIdentity.spawned[goblinNetId].GetComponent<GoblinScript>().UpdateGamePadUIMarkersForGoblins(enableGamepadUI);
+                        ObjectLookup.Get(goblinNetId).GetComponent<GoblinScript>().UpdateGamePadUIMarkersForGoblins(enableGamepadUI);
                     }
                 }
             }

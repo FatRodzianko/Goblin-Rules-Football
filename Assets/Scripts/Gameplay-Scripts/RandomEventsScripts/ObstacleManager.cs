@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class ObstacleManager : NetworkBehaviour
 {
@@ -49,7 +53,7 @@ public class ObstacleManager : NetworkBehaviour
         GenerateObstacles();
     }
     // Get number of obstacles to spawn, then choose that number of obstacles randomly from the array ObstaclePrefabs
-    [ServerCallback]
+    [Server]
     public void GenerateObstacles()
     {
         Debug.Log("GenerateObstacles executed on server");
@@ -66,7 +70,7 @@ public class ObstacleManager : NetworkBehaviour
         PlaceObstacles();
     }
     // After the obstacles have been selected, place them on the field
-    [ServerCallback]
+    [Server]
     void PlaceObstacles()
     {
         Debug.Log("PlaceObstacles executed on the server");
@@ -86,7 +90,7 @@ public class ObstacleManager : NetworkBehaviour
         BalanceSideOfFieldObstaclesAreOn();
     }
     // AFter Obstacles have been spawned on the server, Double check to make sure the obstacles are not too close to any No Place zones or too close to each other
-    [ServerCallback]
+    [Server]
     void VerifyObstaclePosition()
     {
         Debug.Log("VerifyObstaclePosition executed on server");
@@ -102,11 +106,11 @@ public class ObstacleManager : NetworkBehaviour
                     tooClose = IsObstacleTooCloseToNoPlaceZones(SpawnedObstacles[i], i);
                 }
             }
-            NetworkServer.Spawn(SpawnedObstacles[i]);
+            InstanceFinder.ServerManager.Spawn(SpawnedObstacles[i]);
         }
     }
     // Check distance of the obstacle from each of the no-place zones and the other obstacles. Return tooClose as true if the objects are too close to any of those
-    [ServerCallback]
+    [Server]
     bool IsObstacleTooCloseToNoPlaceZones(GameObject obstacle, int placeInSpawnedObstaclesArray)
     {
         Debug.Log("IsObstacleTooCloseToNoPlaceZones executed on the server");
@@ -137,7 +141,7 @@ public class ObstacleManager : NetworkBehaviour
         }
         return tooClose;
     }
-    [ServerCallback]
+    [Server]
     void GetNewPositionForObstacle(GameObject obstacle)
     {
         Debug.Log("GetNewPositionForObstacle executed on the server");
@@ -169,7 +173,7 @@ public class ObstacleManager : NetworkBehaviour
         obstacle.transform.position = newPosition;
     }
     // Try to balance out the obstacles on what side of the field they are on. It could be unfair if all or most objects are only on one side
-    [ServerCallback]
+    [Server]
     void BalanceSideOfFieldObstaclesAreOn()
     {
         Debug.Log("BalanceSideOfFieldObstaclesAreOn executed on the server");
@@ -232,7 +236,7 @@ public class ObstacleManager : NetworkBehaviour
         }
     }
     // Disable colliders on obstacles during gamephases when players shouldn't be able to collide with them
-    [ServerCallback]
+    [Server]
     public void DisableCollidersOnObjects(bool enable)
     {
         for (int i = 0; i < SpawnedObstacles.Count; i++)
@@ -240,13 +244,13 @@ public class ObstacleManager : NetworkBehaviour
             SpawnedObstacles[i].GetComponent<ObstacleObject>().DisableColliderDuringPhase(enable);
         }
     }
-    [ServerCallback]
+    [Server]
     public void KickAfterWaitToEnableObstacleColliders()
     {
         IEnumerator waitToEnableObstacleColliders = WaitToEnableObstacleColliders();
         StartCoroutine(waitToEnableObstacleColliders);
     }
-    [ServerCallback]
+    [Server]
     IEnumerator WaitToEnableObstacleColliders()
     {
         yield return new WaitForSeconds(0.666f);

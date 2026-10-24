@@ -1,7 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Component.Animating;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class BrokeGlassThrownBottle : NetworkBehaviour
 {
@@ -11,6 +16,7 @@ public class BrokeGlassThrownBottle : NetworkBehaviour
     public Vector3 endPoint;
     float throwCount = 0f;
     [SerializeField] public Animator myAnimator;
+    NetworkAnimator networkAnimator;
     public GameObject myParentEvent;
 
     [Header("SFX Stuff")]
@@ -19,7 +25,8 @@ public class BrokeGlassThrownBottle : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        // The break animation plays on the server; FishNet's NetworkAnimator only sends state changes made through it.
+        networkAnimator = GetComponent<NetworkAnimator>();
     }
 
     // Update is called once per frame
@@ -27,7 +34,7 @@ public class BrokeGlassThrownBottle : NetworkBehaviour
     {
         
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void FixedUpdate()
     {
         if (isThrown)
@@ -39,13 +46,13 @@ public class BrokeGlassThrownBottle : NetworkBehaviour
                 this.transform.position = newPosition;
                 if (throwCount >= 1.0f)
                 {
-                    myAnimator.Play("bottle-break-ground");
+                    networkAnimator.Play("bottle-break-ground", 0, float.NegativeInfinity);
                     isThrown = false;
                 }
             }
             else
             {
-                myAnimator.Play("bottle-break-ground");
+                networkAnimator.Play("bottle-break-ground", 0, float.NegativeInfinity);
                 isThrown = false;
             }
         }
@@ -59,12 +66,12 @@ public class BrokeGlassThrownBottle : NetworkBehaviour
     }
     public void DestroyObject()
     {
-        if (isServer)
-            NetworkServer.Destroy(this.gameObject);
+        if (IsServerInitialized)
+            InstanceFinder.ServerManager.Despawn(this.gameObject);
     }
     public void ActivateBrokenGlassArea()
     {
-        if (isServer && isRandomEvent && myParentEvent)
+        if (IsServerInitialized && isRandomEvent && myParentEvent)
         {
             //BrokenGlassEvent myParent = this.transform.parent.GetComponent<BrokenGlassEvent>();
             BrokenGlassEvent myParent = myParentEvent.GetComponent<BrokenGlassEvent>();
@@ -77,7 +84,8 @@ public class BrokeGlassThrownBottle : NetworkBehaviour
                 myParent.myCollider.enabled = true;
         }
     }
-    [ClientCallback]
+    // Animation event: it fires on every machine that plays the clip, so it skips quietly where it doesn't apply.
+    [Client(Logging = LoggingType.Off)]
     public void PlaySFXClipEvent()
     {
         //Debug.Log("PlaySFXClipEvent");

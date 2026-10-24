@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class TripObject : NetworkBehaviour
 {
@@ -17,18 +21,18 @@ public class TripObject : NetworkBehaviour
     {
         
     }
-    [ServerCallback]
+    [Server]
     public void DisableColliderForKickAfter(bool enable)
     {
         myCollider.enabled = enable;
     }
-    [ServerCallback]
+    [Server]
     public void KickAfterWaitToEnableObstacleColliders()
     {
         IEnumerator waitToEnableObstacleColliders = WaitToEnableObstacleColliders();
         StartCoroutine(waitToEnableObstacleColliders);
     }
-    [ServerCallback]
+    [Server]
     IEnumerator WaitToEnableObstacleColliders()
     {
         yield return new WaitForSeconds(0.666f);

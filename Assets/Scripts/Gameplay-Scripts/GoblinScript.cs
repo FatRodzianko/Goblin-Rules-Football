@@ -1,7 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Component.Animating;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System;
 
 public class GoblinScript : NetworkBehaviour
@@ -23,10 +28,14 @@ public class GoblinScript : NetworkBehaviour
 
 
     [Header("Player Owner Info")]
-    [SyncVar] public string ownerName;
-    [SyncVar] public int ownerConnectionId;
-    [SyncVar] public int ownerPlayerNumber;
-    [SyncVar] public uint ownerNetId;
+    private readonly SyncVar<string> _syncOwnerName = new SyncVar<string>();
+    public string ownerName { get => _syncOwnerName.Value; set => _syncOwnerName.Value = value; }
+    private readonly SyncVar<int> _syncOwnerConnectionId = new SyncVar<int>();
+    public int ownerConnectionId { get => _syncOwnerConnectionId.Value; set => _syncOwnerConnectionId.Value = value; }
+    private readonly SyncVar<int> _syncOwnerPlayerNumber = new SyncVar<int>();
+    public int ownerPlayerNumber { get => _syncOwnerPlayerNumber.Value; set => _syncOwnerPlayerNumber.Value = value; }
+    private readonly SyncVar<int> _syncOwnerNetId = new SyncVar<int>(ObjectLookup.NoObject);
+    public int ownerNetId { get => _syncOwnerNetId.Value; set => _syncOwnerNetId.Value = value; }
     public GamePlayer myGamePlayer;
     public GamePlayer serverGamePlayer;
     float touchdownScoredtime = 0f;
@@ -34,39 +43,54 @@ public class GoblinScript : NetworkBehaviour
     
 
     [Header("Goblin Base Stats")]
-    [SyncVar] public int MaxHealth;
-    [SyncVar] public float MaxStamina;
-    [SyncVar] public float StaminaDrain;
-    [SyncVar] public float StaminaRecovery;
-    [SyncVar] public float MaxSpeed;
-    [SyncVar] public int MaxDamage;
-    [SyncVar] public bool canCollide = true;
+    public int MaxHealth;
+    public float MaxStamina;
+    public float StaminaDrain;
+    public float StaminaRecovery;
+    public float MaxSpeed;
+    public int MaxDamage;
+    private readonly SyncVar<bool> _syncCanCollide = new SyncVar<bool>(true);
+    public bool canCollide { get => _syncCanCollide.Value; set => _syncCanCollide.Value = value; }
     public string soundType;
 
 
     [Header("Goblin Current Stats")]
-    [SyncVar(hook = nameof(UpdateGoblinHealth))] public float health;
-    [SyncVar(hook = nameof(UpdateGoblinStamina))] public float stamina;
-    [SyncVar] public float speed;
-    [SyncVar] public float damage;
-    [SyncVar] public float ballCarrySpeedModifier = 1.0f;
-    [SyncVar] public float blockingSpeedModifier = 1.0f;
-    [SyncVar] public float defenseModifier;
-    [SyncVar] public float speedModifierFromPowerUps = 1.0f;
-    [SyncVar] public float slowDownObstacleModifier = 1.0f;
-    [SyncVar] public float possessionSpeedBonus = 1.0f;
+    private readonly SyncVar<float> _syncHealth = new SyncVar<float>();
+    public float health { get => _syncHealth.Value; set => _syncHealth.Value = value; }
+    private readonly SyncVar<float> _syncStamina = new SyncVar<float>();
+    public float stamina { get => _syncStamina.Value; set => _syncStamina.Value = value; }
+    private readonly SyncVar<float> _syncSpeed = new SyncVar<float>();
+    public float speed { get => _syncSpeed.Value; set => _syncSpeed.Value = value; }
+    private readonly SyncVar<float> _syncDamage = new SyncVar<float>();
+    public float damage { get => _syncDamage.Value; set => _syncDamage.Value = value; }
+    private readonly SyncVar<float> _syncBallCarrySpeedModifier = new SyncVar<float>(1.0f);
+    public float ballCarrySpeedModifier { get => _syncBallCarrySpeedModifier.Value; set => _syncBallCarrySpeedModifier.Value = value; }
+    private readonly SyncVar<float> _syncBlockingSpeedModifier = new SyncVar<float>(1.0f);
+    public float blockingSpeedModifier { get => _syncBlockingSpeedModifier.Value; set => _syncBlockingSpeedModifier.Value = value; }
+    private readonly SyncVar<float> _syncDefenseModifier = new SyncVar<float>();
+    public float defenseModifier { get => _syncDefenseModifier.Value; set => _syncDefenseModifier.Value = value; }
+    private readonly SyncVar<float> _syncSpeedModifierFromPowerUps = new SyncVar<float>(1.0f);
+    public float speedModifierFromPowerUps { get => _syncSpeedModifierFromPowerUps.Value; set => _syncSpeedModifierFromPowerUps.Value = value; }
+    private readonly SyncVar<float> _syncSlowDownObstacleModifier = new SyncVar<float>(1.0f);
+    public float slowDownObstacleModifier { get => _syncSlowDownObstacleModifier.Value; set => _syncSlowDownObstacleModifier.Value = value; }
+    private readonly SyncVar<float> _syncPossessionSpeedBonus = new SyncVar<float>(1.0f);
+    public float possessionSpeedBonus { get => _syncPossessionSpeedBonus.Value; set => _syncPossessionSpeedBonus.Value = value; }
     private float _sprintSpeedModifier = 1.15f;
 
 
     [Header("Character selection stuff")]
-    [SyncVar(hook = nameof(HandleCharacterSelected))] public bool isCharacterSelected = false;
-    [SyncVar(hook = nameof(HandleIsQGoblin))] public bool isQGoblin = false;
-    [SyncVar(hook = nameof(HandleIsEGoblin))] public bool isEGoblin = false;
+    private readonly SyncVar<bool> _syncIsCharacterSelected = new SyncVar<bool>();
+    public bool isCharacterSelected { get => _syncIsCharacterSelected.Value; set => _syncIsCharacterSelected.Value = value; }
+    private readonly SyncVar<bool> _syncIsQGoblin = new SyncVar<bool>();
+    public bool isQGoblin { get => _syncIsQGoblin.Value; set => _syncIsQGoblin.Value = value; }
+    private readonly SyncVar<bool> _syncIsEGoblin = new SyncVar<bool>();
+    public bool isEGoblin { get => _syncIsEGoblin.Value; set => _syncIsEGoblin.Value = value; }
     public bool isQGoblinLocally3v3 = false;
     public bool isEGoblinLocally3v3 = false;
     public bool canGoblinMove = true;
     public bool isGoblinPunching = false;
-    [SyncVar(hook = nameof(HandleIsPunching))] public bool isPunching = false;
+    private readonly SyncVar<bool> _syncIsPunching = new SyncVar<bool>();
+    public bool isPunching { get => _syncIsPunching.Value; set => _syncIsPunching.Value = value; }
     bool hasGoblinGottenBallBefore = false;
     
     
@@ -80,14 +104,16 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] private GameObject youMarkerPrefab;
     private GameObject youMarkerObject;
 
-    [Header("Character Properties")]    
+    [Header("Character Properties")]
     public Animator animator;
+    NetworkAnimator networkAnimator;
     public Rigidbody2D rb;
     public Collider2D playerCollider;
     public Vector2 previousInput;
     public SpriteRenderer myRenderer;
     [SerializeField] BoxCollider2D golbinBodyCollider;
-    [SyncVar] public string goblinType;
+    private readonly SyncVar<string> _syncGoblinType = new SyncVar<string>();
+    public string goblinType { get => _syncGoblinType.Value; set => _syncGoblinType.Value = value; }
     [SerializeField] private StatusBarScript myStatusBars;
     [SerializeField] private GameObject touchdownHitbox;
     [SerializeField] private GameObject divingHitbox;
@@ -103,29 +129,42 @@ public class GoblinScript : NetworkBehaviour
 
 
     [Header("Character Game State Stuff")]
-    [SyncVar(hook = nameof(HandleIsGoblinGrey))] public bool isGoblinGrey = false;
-    [SyncVar(hook = nameof(HandleHasBall))] public bool doesCharacterHaveBall;
-    [SyncVar(hook = nameof(HandleIsThrowing))] public bool isThrowing = false;
-    [SyncVar] public bool isRunningOnServer = false;
+    private readonly SyncVar<bool> _syncIsGoblinGrey = new SyncVar<bool>();
+    public bool isGoblinGrey { get => _syncIsGoblinGrey.Value; set => _syncIsGoblinGrey.Value = value; }
+    private readonly SyncVar<bool> _syncDoesCharacterHaveBall = new SyncVar<bool>();
+    public bool doesCharacterHaveBall { get => _syncDoesCharacterHaveBall.Value; set => _syncDoesCharacterHaveBall.Value = value; }
+    private readonly SyncVar<bool> _syncIsThrowing = new SyncVar<bool>();
+    public bool isThrowing { get => _syncIsThrowing.Value; set => _syncIsThrowing.Value = value; }
+    private readonly SyncVar<bool> _syncIsRunningOnServer = new SyncVar<bool>();
+    public bool isRunningOnServer { get => _syncIsRunningOnServer.Value; set => _syncIsRunningOnServer.Value = value; }
     private Vector2 runningDirectionOnServer = Vector2.zero;
     public bool isRunning = false;
     public bool isSprinting = false;
     public bool shiftHeldDown = false;
-    [SyncVar] public bool isSprintingOnServer = false;
-    [SyncVar] public bool canRecoveryStamina = true;
-    [SyncVar(hook = nameof(HandleIsFatigued))] public bool isFatigued = false;
-    [SyncVar(hook = nameof(HandleIsGoblinKnockedOut))] public bool isGoblinKnockedOut = false;
+    private readonly SyncVar<bool> _syncIsSprintingOnServer = new SyncVar<bool>();
+    public bool isSprintingOnServer { get => _syncIsSprintingOnServer.Value; set => _syncIsSprintingOnServer.Value = value; }
+    private readonly SyncVar<bool> _syncCanRecoveryStamina = new SyncVar<bool>(true);
+    public bool canRecoveryStamina { get => _syncCanRecoveryStamina.Value; set => _syncCanRecoveryStamina.Value = value; }
+    private readonly SyncVar<bool> _syncIsFatigued = new SyncVar<bool>();
+    public bool isFatigued { get => _syncIsFatigued.Value; set => _syncIsFatigued.Value = value; }
+    private readonly SyncVar<bool> _syncIsGoblinKnockedOut = new SyncVar<bool>();
+    public bool isGoblinKnockedOut { get => _syncIsGoblinKnockedOut.Value; set => _syncIsGoblinKnockedOut.Value = value; }
     
     [Header("Slide Info")]
-    [SyncVar(hook = nameof(HandleIsSliding))] public bool isSliding = false;
-    [SyncVar] public Vector2 slideDirection = Vector2.zero;
-    [SyncVar(hook = nameof(HandleIsSlidingRoutineRunning))] public bool isSlidingRoutineRunning = false;
+    private readonly SyncVar<bool> _syncIsSliding = new SyncVar<bool>();
+    public bool isSliding { get => _syncIsSliding.Value; set => _syncIsSliding.Value = value; }
+    private readonly SyncVar<Vector2> _syncSlideDirection = new SyncVar<Vector2>(Vector2.zero);
+    public Vector2 slideDirection { get => _syncSlideDirection.Value; set => _syncSlideDirection.Value = value; }
+    private readonly SyncVar<bool> _syncIsSlidingRoutineRunning = new SyncVar<bool>();
+    public bool isSlidingRoutineRunning { get => _syncIsSlidingRoutineRunning.Value; set => _syncIsSlidingRoutineRunning.Value = value; }
     IEnumerator isSlidingRoutine;
     public float slideSpeedModifer = 1.0f;
 
     [Header("Dive Info")]
-    [SyncVar(hook = nameof(HandleIsDiving))] public bool isDiving = false;
-    [SyncVar(hook = nameof(HandleIsDivingRoutineRunning))] public bool DivingRoutineRunning = false;
+    private readonly SyncVar<bool> _syncIsDiving = new SyncVar<bool>();
+    public bool isDiving { get => _syncIsDiving.Value; set => _syncIsDiving.Value = value; }
+    private readonly SyncVar<bool> _syncDivingRoutineRunning = new SyncVar<bool>();
+    public bool DivingRoutineRunning { get => _syncDivingRoutineRunning.Value; set => _syncDivingRoutineRunning.Value = value; }
     IEnumerator DivingRoutine;
 
     [Header("Is Goblin Throwing Stuff")]
@@ -133,39 +172,48 @@ public class GoblinScript : NetworkBehaviour
     IEnumerator throwing;
 
     [Header("Blocking Info")]
-    [SyncVar(hook = nameof(HandleIsBlocking))] public bool isBlocking = false;
+    private readonly SyncVar<bool> _syncIsBlocking = new SyncVar<bool>();
+    public bool isBlocking { get => _syncIsBlocking.Value; set => _syncIsBlocking.Value = value; }
 
     [Header("Kicking Info")]
-    [SyncVar(hook = nameof(HandleIsKicking))] public bool isKicking = false;
+    private readonly SyncVar<bool> _syncIsKicking = new SyncVar<bool>();
+    public bool isKicking { get => _syncIsKicking.Value; set => _syncIsKicking.Value = value; }
     [SerializeField] GameObject KickPowerBarHolder;
     [SerializeField] GameObject KickPowerBarFillerImage;
     [SerializeField] GameObject KickoffAimArrow;
     public bool powerBarActive = false;
-    [SyncVar] public float GoblinMaxKickDistance = 40f;
-    [SyncVar] public float GoblinMinKickDistance = 10f;
-    [SyncVar] public float GoblinPowerBarSpeed = 1f;
-    [SyncVar] public float GoblinKickPower = 0f;
+    public float GoblinMaxKickDistance = 40f;
+    public float GoblinMinKickDistance = 10f;
+    public float GoblinPowerBarSpeed = 1f;
+    private readonly SyncVar<float> _syncGoblinKickPower = new SyncVar<float>();
+    public float GoblinKickPower { get => _syncGoblinKickPower.Value; set => _syncGoblinKickPower.Value = value; }
     
     public float currentPowerBarScale = 0f;
     public int powerBarDirection = 1;
     public float kickoffAngle = 0f;
-    [SyncVar] public float GoblinKickoffAngle = 0f;
+    private readonly SyncVar<float> _syncGoblinKickoffAngle = new SyncVar<float>();
+    public float GoblinKickoffAngle { get => _syncGoblinKickoffAngle.Value; set => _syncGoblinKickoffAngle.Value = value; }
     float kickoffAngleSpeed = 30f;
     public bool aimArrowButtonHeldDown = false;
     public bool aimArrowUp = false;
 
     [Header("Kick After Repositioning Stuff")]
-    [SyncVar] public bool isKickAfterGoblin = false;
-    [SyncVar] public bool isKickAfterPositionSet = false;
-    [SyncVar] public float angleOfKickAttempt = 0f;
-    [SyncVar(hook =nameof(HandleKickAfterAccuracyDifficultyUpdate))] public float kickAfterAccuracyDifficulty = 0f;
+    private readonly SyncVar<bool> _syncIsKickAfterGoblin = new SyncVar<bool>();
+    public bool isKickAfterGoblin { get => _syncIsKickAfterGoblin.Value; set => _syncIsKickAfterGoblin.Value = value; }
+    private readonly SyncVar<bool> _syncIsKickAfterPositionSet = new SyncVar<bool>();
+    public bool isKickAfterPositionSet { get => _syncIsKickAfterPositionSet.Value; set => _syncIsKickAfterPositionSet.Value = value; }
+    private readonly SyncVar<float> _syncAngleOfKickAttempt = new SyncVar<float>();
+    public float angleOfKickAttempt { get => _syncAngleOfKickAttempt.Value; set => _syncAngleOfKickAttempt.Value = value; }
+    private readonly SyncVar<float> _syncKickAfterAccuracyDifficulty = new SyncVar<float>();
+    public float kickAfterAccuracyDifficulty { get => _syncKickAfterAccuracyDifficulty.Value; set => _syncKickAfterAccuracyDifficulty.Value = value; }
     //[SyncVar] public float kickAfterAccuracyBar1 = 0f;
     //[SyncVar] public float kickAfterAccuracyBar2 = 0f;
     public bool repositioningButtonHeldDown = false;
     public bool repositioningToLeft = false;
     Vector2 greenGoalPost = new Vector2(50.3f, -1.5f);
     Vector2 greyGoalPost = new Vector2(-50.3f, -1.5f);
-    [SyncVar] public Vector2 kickAfterFinalPosition = Vector2.zero;
+    private readonly SyncVar<Vector2> _syncKickAfterFinalPosition = new SyncVar<Vector2>(Vector2.zero);
+    public Vector2 kickAfterFinalPosition { get => _syncKickAfterFinalPosition.Value; set => _syncKickAfterFinalPosition.Value = value; }
     public bool hasGoblinBeenRepositionedForKickAfter = false;
 
     [Header("Kick After Accuracy Bar Stuff")]
@@ -173,8 +221,10 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] GameObject kickAfterGuageLine;
     [SerializeField] GameObject kickAfterMarkerLeft;
     [SerializeField] GameObject kickAfterMarkerRight;
-    [SyncVar] public float accuracyValueSubmitted;
-    [SyncVar] public float powerValueSubmitted;
+    private readonly SyncVar<float> _syncAccuracyValueSubmitted = new SyncVar<float>();
+    public float accuracyValueSubmitted { get => _syncAccuracyValueSubmitted.Value; set => _syncAccuracyValueSubmitted.Value = value; }
+    private readonly SyncVar<float> _syncPowerValueSubmitted = new SyncVar<float>();
+    public float powerValueSubmitted { get => _syncPowerValueSubmitted.Value; set => _syncPowerValueSubmitted.Value = value; }
     public bool isGoblinDoingKickAfterAttempt = false;
     bool isAccuracySubmittedYet = false;
     bool isPowerSubmittedYet = false;
@@ -184,22 +234,28 @@ public class GoblinScript : NetworkBehaviour
     public float AccuracyBarSpeed = 0f;
 
     [Header("wasPunchedSpeedModifier Info")]
-    [SyncVar(hook = nameof(HandleWasPunchedRoutineRunning))] public bool isWasPunchedRoutineRunning = false;
+    private readonly SyncVar<bool> _syncIsWasPunchedRoutineRunning = new SyncVar<bool>();
+    public bool isWasPunchedRoutineRunning { get => _syncIsWasPunchedRoutineRunning.Value; set => _syncIsWasPunchedRoutineRunning.Value = value; }
     IEnumerator isWasPunched;
     public float wasPunchedSpeedModifier = 1.0f;
 
     [Header("Can the Goblin Pass stuff")]
     public Football gameFootball;
-    [SyncVar(hook = nameof(HandleCanGoblinReceivePass))] public bool canGoblinReceivePass = false;
+    private readonly SyncVar<bool> _syncCanGoblinReceivePass = new SyncVar<bool>();
+    public bool canGoblinReceivePass { get => _syncCanGoblinReceivePass.Value; set => _syncCanGoblinReceivePass.Value = value; }
 
 
     [Header("Recovery Enumerator Stuff?")]
-    [SyncVar] public bool isStaminaRecoveryRoutineRunning = false;
+    private readonly SyncVar<bool> _syncIsStaminaRecoveryRoutineRunning = new SyncVar<bool>();
+    public bool isStaminaRecoveryRoutineRunning { get => _syncIsStaminaRecoveryRoutineRunning.Value; set => _syncIsStaminaRecoveryRoutineRunning.Value = value; }
     public IEnumerator staminaRecoveryRoutine;
-    [SyncVar] public bool isHealthRecoveryRoutineRunning = false;
+    private readonly SyncVar<bool> _syncIsHealthRecoveryRoutineRunning = new SyncVar<bool>();
+    public bool isHealthRecoveryRoutineRunning { get => _syncIsHealthRecoveryRoutineRunning.Value; set => _syncIsHealthRecoveryRoutineRunning.Value = value; }
     public IEnumerator healthRecoveryRoutine;
-    [SyncVar] public bool canGoblinRegainHealth = false;
-    [SyncVar] public bool isRegainHealthRoutineRunning = false;
+    private readonly SyncVar<bool> _syncCanGoblinRegainHealth = new SyncVar<bool>();
+    public bool canGoblinRegainHealth { get => _syncCanGoblinRegainHealth.Value; set => _syncCanGoblinRegainHealth.Value = value; }
+    private readonly SyncVar<bool> _syncIsRegainHealthRoutineRunning = new SyncVar<bool>();
+    public bool isRegainHealthRoutineRunning { get => _syncIsRegainHealthRoutineRunning.Value; set => _syncIsRegainHealthRoutineRunning.Value = value; }
     public IEnumerator regainHealthRoutine;
     public bool isTrippedTimerRunning = false;
     public IEnumerator trippedTimerRoutine;
@@ -221,9 +277,12 @@ public class GoblinScript : NetworkBehaviour
     [SerializeField] private GameObject wasPunchedBandAid;
 
     [Header("SFX Stuff")]
-    [SyncVar] public bool onWaterSlowDown;
-    [SyncVar] public bool onBrushSlowDown;
-    [SyncVar] public bool onGlueSlowDown;
+    private readonly SyncVar<bool> _syncOnWaterSlowDown = new SyncVar<bool>();
+    public bool onWaterSlowDown { get => _syncOnWaterSlowDown.Value; set => _syncOnWaterSlowDown.Value = value; }
+    private readonly SyncVar<bool> _syncOnBrushSlowDown = new SyncVar<bool>();
+    public bool onBrushSlowDown { get => _syncOnBrushSlowDown.Value; set => _syncOnBrushSlowDown.Value = value; }
+    private readonly SyncVar<bool> _syncOnGlueSlowDown = new SyncVar<bool>();
+    public bool onGlueSlowDown { get => _syncOnGlueSlowDown.Value; set => _syncOnGlueSlowDown.Value = value; }
     public bool firstFootStep = false;
     [SerializeField] GoblinSoundManager mySoundManager;
 
@@ -275,9 +334,9 @@ public class GoblinScript : NetworkBehaviour
     public float diveCheckRate = 0.25f;
 
 
-    public override void OnStartAuthority()
+    // This was Mirror's OnStartAuthority. OnStartClient calls it first for the owner, since Mirror ran it before OnStartClient.
+    void StartAsOwner()
     {
-        base.OnStartAuthority();
         GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
         if (localPlayer && !localPlayer.isSinglePlayer)
         {
@@ -310,7 +369,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 Debug.Log("OnStartAuthority for " + this.name + " could not find AIPlayer object. " + e);
             }
-            if (this.ownerNetId == localPlayer.GetComponent<NetworkIdentity>().netId)
+            if (this.ownerNetId == localPlayer.GetComponent<NetworkObject>().ObjectId)
             {
                 myGamePlayer = localPlayer;
                 myGamePlayer.AddToGoblinTeam(this);
@@ -395,6 +454,8 @@ public class GoblinScript : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+        if (IsOwner)
+            StartAsOwner();
 
         try
         {
@@ -411,7 +472,7 @@ public class GoblinScript : NetworkBehaviour
         }
         //rb.bodyType = RigidbodyType2D.Kinematic;
 
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (!GameplayManager.instance.isSinglePlayer)
             {
@@ -451,7 +512,7 @@ public class GoblinScript : NetworkBehaviour
         markerPosition.y += 0.75f;
         ballMarkerObject.transform.localPosition = markerPosition;
         ballMarkerObject.SetActive(false);
-        if (hasAuthority)
+        if (IsOwner)
         {
             youMarkerObject.transform.SetParent(this.transform);
             youMarkerObject.transform.localPosition = markerPosition;
@@ -461,6 +522,27 @@ public class GoblinScript : NetworkBehaviour
     // Start is called before the first frame update
     private void Awake()
     {
+        networkAnimator = GetComponent<NetworkAnimator>();
+        _syncHealth.OnChange +=(prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) UpdateGoblinHealth(prev, next); };
+        _syncStamina.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) UpdateGoblinStamina(prev, next); };
+        _syncIsCharacterSelected.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleCharacterSelected(prev, next); };
+        _syncIsQGoblin.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsQGoblin(prev, next); };
+        _syncIsEGoblin.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsEGoblin(prev, next); };
+        _syncIsPunching.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsPunching(prev, next); };
+        _syncIsGoblinGrey.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsGoblinGrey(prev, next); };
+        _syncDoesCharacterHaveBall.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleHasBall(prev, next); };
+        _syncIsThrowing.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsThrowing(prev, next); };
+        _syncIsFatigued.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsFatigued(prev, next); };
+        _syncIsGoblinKnockedOut.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsGoblinKnockedOut(prev, next); };
+        _syncIsSliding.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsSliding(prev, next); };
+        _syncIsSlidingRoutineRunning.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsSlidingRoutineRunning(prev, next); };
+        _syncIsDiving.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsDiving(prev, next); };
+        _syncDivingRoutineRunning.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsDivingRoutineRunning(prev, next); };
+        _syncIsBlocking.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsBlocking(prev, next); };
+        _syncIsKicking.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsKicking(prev, next); };
+        _syncKickAfterAccuracyDifficulty.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleKickAfterAccuracyDifficultyUpdate(prev, next); };
+        _syncIsWasPunchedRoutineRunning.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleWasPunchedRoutineRunning(prev, next); };
+        _syncCanGoblinReceivePass.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleCanGoblinReceivePass(prev, next); };
         
         qMarker = Instantiate(qMarkerPrefab);
         qMarker.transform.SetParent(this.transform);
@@ -479,11 +561,11 @@ public class GoblinScript : NetworkBehaviour
     public void SelectThisCharacter()
     {
         Debug.Log("SelectThisCharacter " + this.name);
-        if (hasAuthority)
+        if (IsOwner)
             CmdSelectThisCharacter();
     }
 
-    [Command]
+    [ServerRpc]
     void CmdSelectThisCharacter()
     {
         isCharacterSelected = true;
@@ -491,22 +573,20 @@ public class GoblinScript : NetworkBehaviour
     public void UnSelectThisCharacter()
     {
         Debug.Log("UnSelectThisCharacter " + this.name);
-        if (hasAuthority)
+        if (IsOwner)
             CmdUnSelectThisCharacter();
     }
 
-    [Command]
+    [ServerRpc]
     void CmdUnSelectThisCharacter()
     {
         isCharacterSelected = false;
     }
     public void HandleCharacterSelected(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isCharacterSelected = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 if (newValue)
                 {
@@ -551,7 +631,7 @@ public class GoblinScript : NetworkBehaviour
     public void SetQGoblin(bool isQ)
     {
         //Debug.Log("SetQGoblin " + isQ.ToString());
-        if (hasAuthority)
+        if (IsOwner)
         {
             if(GameplayManager.instance.is1v1 || GameplayManager.instance.isSinglePlayer)
                 CmdSetQGoblin(isQ);
@@ -562,21 +642,19 @@ public class GoblinScript : NetworkBehaviour
         }
             
     }
-    [Command]
+    [ServerRpc]
     void CmdSetQGoblin(bool isQ)
     {
         Debug.Log("CmdSetQGoblin " + isQ.ToString() + " "  + this.name + " is grey? " + this.isGoblinGrey.ToString());
-        HandleIsQGoblin(isQGoblin, isQ);
+        isQGoblin = isQ;
     }
     public void HandleIsQGoblin(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isQGoblin = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
-                if (hasAuthority)
+                if (IsOwner)
                 {
                     if (GameplayManager.instance.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
                     {
@@ -606,7 +684,7 @@ public class GoblinScript : NetworkBehaviour
     public void SetEGoblin(bool isE)
     {
         Debug.Log("SetEGoblin " + isE.ToString() + " " + this.name);
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (GameplayManager.instance.is1v1 || GameplayManager.instance.isSinglePlayer)
                 CmdSetEGoblin(isE);
@@ -617,20 +695,18 @@ public class GoblinScript : NetworkBehaviour
         }
             
     }
-    [Command]
+    [ServerRpc]
     void CmdSetEGoblin(bool isE)
     {
         Debug.Log("CmdSetEGoblin " + isE.ToString() + " is grey? " + this.isGoblinGrey.ToString());
-        HandleIsEGoblin(isEGoblin, isE);
+        isEGoblin = isE;
     }
 
     public void HandleIsEGoblin(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isEGoblin = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 if (GameplayManager.instance.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
                 {
@@ -659,7 +735,7 @@ public class GoblinScript : NetworkBehaviour
     }
     private void Update()
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             // Check if goblin can be passed too?
             if (serverGamePlayer.doesTeamHaveBall && !doesCharacterHaveBall)
@@ -669,28 +745,28 @@ public class GoblinScript : NetworkBehaviour
                 {
                     if (diffFromFootball <= 0)
                     {
-                        HandleCanGoblinReceivePass(this.canGoblinReceivePass, true);
+                        canGoblinReceivePass = true;
                     }
                     else
                     {
-                        HandleCanGoblinReceivePass(this.canGoblinReceivePass, false);
+                        canGoblinReceivePass = false;
                     }
                 }
                 else
                 {
                     if (diffFromFootball >= 0)
                     {
-                        HandleCanGoblinReceivePass(this.canGoblinReceivePass, true);
+                        canGoblinReceivePass = true;
                     }
                     else
                     {
-                        HandleCanGoblinReceivePass(this.canGoblinReceivePass, false);
+                        canGoblinReceivePass = false;
                     }
                 }
             }
             else
             {
-                HandleCanGoblinReceivePass(this.canGoblinReceivePass, true);
+                canGoblinReceivePass = true;
             }
             if (this.isKickAfterGoblin && !this.isKickAfterPositionSet && GameplayManager.instance.gamePhase == "kick-after-attempt")
             {
@@ -712,7 +788,7 @@ public class GoblinScript : NetworkBehaviour
                 CalculateKickAfterAccuracyDifficulty(angleOfKickAttempt);
             }
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
             // Update the kick powerbar stuff
             if (powerBarActive && doesCharacterHaveBall)
@@ -797,23 +873,24 @@ public class GoblinScript : NetworkBehaviour
             }
         }
     }
-    [ClientCallback]
+    [Client(Logging = LoggingType.Off)]
     private void FixedUpdate()
     {
-        if (canGoblinRegainHealth && health < MaxHealth && hasAuthority)
+        if (canGoblinRegainHealth && health < MaxHealth && IsOwner)
             CmdRegainHealth();
         Move();
     }
-    [Client]
+    // Input callbacks: their subscriptions outlive this goblin, so they stay quiet after it despawns.
+    [Client(Logging = LoggingType.Off)]
     private void SetMovement(Vector2 movement) => previousInput = movement;
 
-    [Client]
+    [Client(Logging = LoggingType.Off)]
     private void ResetMovement() => previousInput = Vector2.zero;
 
     [Client]
     private void Move()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (isFatigued)
                 CmdRecoverStamina();
@@ -824,7 +901,7 @@ public class GoblinScript : NetworkBehaviour
                 CmdRecoverHealth();*/
         }
         //if (hasAuthority && isCharacterSelected && canGoblinMove && !isGoblinPunching && !isGoblinKnockedOut && !isSliding && !isDiving)
-        if (hasAuthority && isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && !(GameplayManager.instance.isSinglePlayer && !this.myGamePlayer.isLocalPlayer) && GameplayManager.instance.gamePhase != "kickoff")
+        if (IsOwner && isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && !(GameplayManager.instance.isSinglePlayer && !this.myGamePlayer.isLocalPlayer) && GameplayManager.instance.gamePhase != "kickoff")
         {
             CmdIsPlayerSprinting(isSprinting);
             isRunning = false;
@@ -866,12 +943,12 @@ public class GoblinScript : NetworkBehaviour
 
             animator.SetBool("isRunning", isRunning);
         }
-        else if (hasAuthority && (isSliding || isDiving) && slideDirection != Vector2.zero)
+        else if (IsOwner && (isSliding || isDiving) && slideDirection != Vector2.zero)
         {
             Vector2 direction = Vector2.ClampMagnitude(slideDirection, 1);
             rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
         }
-        if (hasAuthority && !isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+        if (IsOwner && !isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
         {
             // Important thing here is "&& !isCharacterSelected"
             // This will be what the goblin does when they are not selected. AI code will go here?
@@ -972,7 +1049,7 @@ public class GoblinScript : NetworkBehaviour
             }
         }
         // Check for the AI character for what to do with their goblin that they have selected?
-        else if (hasAuthority && this.isCharacterSelected && !this.myGamePlayer.isLocalPlayer && this.myGamePlayer.isSinglePlayer && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+        else if (IsOwner && this.isCharacterSelected && !this.myGamePlayer.isLocalPlayer && this.myGamePlayer.isSinglePlayer && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
         {
             if (this.doesCharacterHaveBall)
                 state = State.RunTowardEndzone;
@@ -1008,20 +1085,20 @@ public class GoblinScript : NetworkBehaviour
     }
     public void FlipRenderer(bool flip)
     { 
-        if(hasAuthority)
+        if(IsOwner)
         {
             if (this.myRenderer.flipX != flip)
                 CmdFlipRenderer(flip);
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdFlipRenderer(bool flip)
     {
         if(myRenderer.flipX != flip)
             myRenderer.flipX = flip;
         RpcFlipRenderer(flip);
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcFlipRenderer(bool flip)
     {
         float newScaleX = 0f;
@@ -1099,21 +1176,23 @@ public class GoblinScript : NetworkBehaviour
     }
     public void SetGoblinHasBall(bool doesHaveBall)
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdSetGoblinHasBall(doesHaveBall);
     }
-    [Command]
+    [ServerRpc]
     void CmdSetGoblinHasBall(bool doesHaveBall)
     {
-        HandleHasBall(this.doesCharacterHaveBall, doesHaveBall);
+        doesCharacterHaveBall = doesHaveBall;
     }
     public void HandleHasBall(bool oldValue, bool newValue)
     {
-        if (isServer)
-            doesCharacterHaveBall = newValue;
-        if (isClient)
+        if (IsServerInitialized)
         {
-            if (hasAuthority)
+            ParentFootballOnServer(newValue);
+        }
+        if (IsClientInitialized)
+        {
+            if (IsOwner)
             {
                 //add check for if goblin is in punch animation. if so, stop the animation?
                 if (!animator.GetCurrentAnimatorStateInfo(0).IsName(goblinType + "-punch"))
@@ -1147,13 +1226,13 @@ public class GoblinScript : NetworkBehaviour
             }
             if (newValue)
             {
-                GameObject football = GameObject.FindGameObjectWithTag("football");
-                football.transform.SetParent(this.transform);
-                football.transform.localPosition = new Vector3(0f, 0f, 0f);
                 if (!this.isCharacterSelected)
                 {
                     //Debug.Log("HandleHasBall: Player that is not selected has the ball: " + this.name);
-                    if (hasAuthority)
+                    // On the host this runs twice: from the server's direct call and from the SyncVar hook. Mirror's host
+                    // ran the selection Cmds at once, so the second run saw this goblin selected. FishNet runs them a tick
+                    // later, so also check the player's own selection, or the second run switches back and throws the ball.
+                    if (IsOwner && myGamePlayer.selectGoblin != this)
                     {
                         if (this.isEGoblin)
                         {
@@ -1169,7 +1248,7 @@ public class GoblinScript : NetworkBehaviour
                 {
                     if (GameplayManager.instance.is1v1 || GameplayManager.instance.isSinglePlayer)
                         hasGoblinGottenBallBefore = true;
-                    else if (hasAuthority)
+                    else if (IsOwner)
                         hasGoblinGottenBallBefore = true;
                     else
                     {
@@ -1209,9 +1288,7 @@ public class GoblinScript : NetworkBehaviour
             }
             else
             {
-                GameObject football = GameObject.FindGameObjectWithTag("football");
-                football.transform.parent = null;
-                if (hasAuthority && powerBarActive)
+                if (IsOwner && powerBarActive)
                     ResetPowerBar();
                 // Set the sprite outline material
                 myRenderer.material = spriteDefault;
@@ -1252,10 +1329,28 @@ public class GoblinScript : NetworkBehaviour
             }*/
         }
     }
-    [Command]
+    // The football used to be parented here on every machine. FishNet sends SyncVars every 0.1 s but the football's
+    // position every tick, so clients placed a dropped ball's world position under the goblin that still held it.
+    // Now only the server parents it, through FishNet, and the football's NetworkTransform syncs the parent with the position.
+    void ParentFootballOnServer(bool hasBall)
+    {
+        GameObject football = GameObject.FindGameObjectWithTag("football");
+        NetworkObject footballNetworkObject = football.GetComponent<NetworkObject>();
+        if (hasBall)
+        {
+            if (football.transform.parent != this.transform)
+                footballNetworkObject.SetParent(this);
+            football.transform.localPosition = new Vector3(0f, 0f, 0f);
+        }
+        else if (football.transform.parent != null)
+        {
+            footballNetworkObject.UnsetParent();
+        }
+    }
+    [ServerRpc]
     void CmdCheckIfTeamStillHasBall()
     {
-        GamePlayer goblinOwnerScript = NetworkIdentity.spawned[ownerNetId].gameObject.GetComponent<GamePlayer>();
+        GamePlayer goblinOwnerScript = ObjectLookup.Get(ownerNetId).gameObject.GetComponent<GamePlayer>();
         if (this.doesCharacterHaveBall)
         {
             //Debug.Log("CmdCheckIfTeamStillHasBall: Goblin has ball. Goblin's team still has ball. Setting doesTeamHaveBall to true for player: " + goblinOwnerScript.PlayerName);
@@ -1281,10 +1376,10 @@ public class GoblinScript : NetworkBehaviour
         else
         {
             bool anyGoblinHaveBall = false;
-            List<uint> goblinNetIds = new List<uint>();
-            foreach (uint goblinNetId in goblinOwnerScript.goblinTeamNetIds)
+            List<int> goblinNetIds = new List<int>();
+            foreach (int goblinNetId in goblinOwnerScript.goblinTeamNetIds)
             {
-                GoblinScript goblinNetIdScript = NetworkIdentity.spawned[goblinNetId].gameObject.GetComponent<GoblinScript>();
+                GoblinScript goblinNetIdScript = ObjectLookup.Get(goblinNetId).gameObject.GetComponent<GoblinScript>();
                 if (goblinNetIdScript.doesCharacterHaveBall)
                 {
                     anyGoblinHaveBall = true;
@@ -1318,7 +1413,7 @@ public class GoblinScript : NetworkBehaviour
         Football footballScript = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
         if (!isKicking && !isDiving && !this.isGoblinKnockedOut && this.doesCharacterHaveBall)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 /*IEnumerator throwing = DisableColliderForThrow();
                 //DisableColliderForThrow();
@@ -1327,21 +1422,19 @@ public class GoblinScript : NetworkBehaviour
                 CmdStartThrowing();
             }
 
-            footballScript.CmdThrowFootball(this.gameObject.GetComponent<NetworkIdentity>().netId, goblinToThrowTo.gameObject.GetComponent<NetworkIdentity>().netId);
+            footballScript.CmdThrowFootball(this.gameObject.GetComponent<NetworkObject>().ObjectId, goblinToThrowTo.gameObject.GetComponent<NetworkObject>().ObjectId);
         }
         
     }
-    [Command]
+    [ServerRpc]
     void CmdStartThrowing()
     {
         if(!isKicking && !isDiving)
-            this.HandleIsThrowing(isThrowing, true);
+            this.isThrowing = true;
     }
     public void HandleIsThrowing(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isThrowing = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (newValue)
             {
@@ -1364,24 +1457,23 @@ public class GoblinScript : NetworkBehaviour
         yield return new WaitForSeconds(0.2f);
         golbinBodyCollider.enabled = true;
         throwingRoutine = false;
-        if (hasAuthority)
+        if (IsOwner)
             CmdStopThrowing();
     }
-    [Command]
+    [ServerRpc]
     void CmdStopThrowing()
     {
-        this.HandleIsThrowing(isThrowing, false);
+        this.isThrowing = false;
     }
-    [Command]
+    [ServerRpc]
     void CmdMakeGoblinGrey()
     {
-        HandleIsGoblinGrey(isGoblinGrey, true);
+        isGoblinGrey = true;
     }
     public void HandleIsGoblinGrey(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            isGoblinGrey = newValue;
             //Debug.Log("HandleIsGoblinGrey: current goblin layeR: " + this.gameObject.layer);
             /*if (newValue)
                 this.gameObject.layer = greyGoblinLayer.value;
@@ -1389,7 +1481,7 @@ public class GoblinScript : NetworkBehaviour
                 this.gameObject.layer = greenGoblinLayer.value;*/
             //Debug.Log("HandleIsGoblinGrey: current goblin layeR: " + this.gameObject.layer + " green layer: " + greenGoblinLayer.value + " grey layeR: " + greyGoblinLayer.value);
         }   
-        if (isClient)
+        if (IsClientInitialized)
         {
             Debug.Log("HandleIsGoblinGrey: current goblin layeR: " + this.gameObject.layer);
             if (newValue)
@@ -1406,7 +1498,7 @@ public class GoblinScript : NetworkBehaviour
                 this.gameObject.layer = layerInt;
             }
             Debug.Log("HandleIsGoblinGrey: current goblin layeR: " + this.gameObject.layer + " green layer: " + greenGoblinLayer.ToString() + " grey layeR: " + greyGoblinLayer.ToString());
-            if (newValue && hasAuthority)
+            if (newValue && IsOwner)
             {
                 FlipKickoffAimArrow();
             }
@@ -1414,7 +1506,7 @@ public class GoblinScript : NetworkBehaviour
     }
     void IsPlayerSprinting(bool isPlayerSprinting)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
 
             /*CmdIsPlayerSprinting(isPlayerSprinting);
@@ -1434,7 +1526,7 @@ public class GoblinScript : NetworkBehaviour
         }
             
     }
-    [Command]
+    [ServerRpc]
     void CmdIsPlayerSprinting(bool isPlayerSprinting)
     {
         //Debug.Log("CmdIsPlayerSprinting: " + isPlayerSprinting.ToString());
@@ -1485,7 +1577,7 @@ public class GoblinScript : NetworkBehaviour
     {
         return _sprintSpeedModifier;
     }
-    [Command]
+    [ServerRpc]
     void CmdSetIsRunningOnServer(bool isPlayerRunning, Vector2 runningDirection)
     {
         isRunningOnServer = isPlayerRunning;
@@ -1496,7 +1588,7 @@ public class GoblinScript : NetworkBehaviour
     {
         return runningDirectionOnServer;
     }
-    [Command]
+    [ServerRpc]
     void CmdDrainStamina()
     {
         if (isRunningOnServer && !this.invinvibilityBlueShell)
@@ -1509,7 +1601,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 stamina = 0f;
                 //isFatigued = true;
-                HandleIsFatigued(isFatigued, true);
+                isFatigued = true;
                 this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier) * 0.5f;
             }
         }
@@ -1517,16 +1609,14 @@ public class GoblinScript : NetworkBehaviour
     }
     public void HandleIsFatigued(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isFatigued = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             myStatusBars.ChangeStaminaBarColor(newValue);
             /*fatigueSweatDrop.SetActive(newValue);
             if(newValue)
                 spriteFlash.Flash(Color.yellow);*/
             FatigueIndicators(newValue);
-            if (hasAuthority)
+            if (IsOwner)
             {
                 if (this.myGamePlayer.isSinglePlayer && !myGamePlayer.isLocalPlayer)
                 {
@@ -1552,7 +1642,7 @@ public class GoblinScript : NetworkBehaviour
             }            
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdRecoverStamina()
     {
         bool isGoblinAllowedToRecover = false;
@@ -1569,12 +1659,12 @@ public class GoblinScript : NetworkBehaviour
                 if (stamina > MaxStamina)
                 {
                     stamina = MaxStamina;
-                    HandleIsFatigued(isFatigued, false);
+                    isFatigued = false;
                 }
             }
         }        
     }
-    [Command]
+    [ServerRpc]
     void CmdSetBallCarrySpeedModifier()
     {
         if (doesCharacterHaveBall && !this.invinvibilityBlueShell)
@@ -1597,26 +1687,33 @@ public class GoblinScript : NetworkBehaviour
         {
             if (isRunningOnServer)
             {
-                animator.Play(goblinType + "-punch-running");
+                PlayNetworkedState(goblinType + "-punch-running");
             }
             else
             {
-                animator.Play(goblinType + "-punch");
+                PlayNetworkedState(goblinType + "-punch");
             }
-            
+
         }
+    }
+    // FishNet's NetworkAnimator only sends state changes made through it (Mirror's picked up animator.Play). The server's
+    // copy has to play these states too: the punch, dive and touchdown hitboxes are driven by the animations.
+    // NegativeInfinity keeps animator.Play's behavior of not restarting a state that's already playing.
+    void PlayNetworkedState(string stateName)
+    {
+        networkAnimator.Play(stateName, 0, float.NegativeInfinity);
     }
     public void HurtBoxCollision(GoblinScript punchingGoblin)
     {
 
-        if (isServer)
+        if (IsServerInitialized)
         {
             /*if(this.ownerConnectionId != punchingGoblin.ownerConnectionId)
                 DealDamageToGoblins(this, punchingGoblin);*/
             if (this.isGoblinGrey != punchingGoblin.isGoblinGrey)
                 DealDamageToGoblins(this, punchingGoblin);
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (this.isGoblinGrey != punchingGoblin.isGoblinGrey)
             {
@@ -1629,7 +1726,7 @@ public class GoblinScript : NetworkBehaviour
                 }
                 if (this.isGoblinOnScreen())
                 {
-                    if(this.hasAuthority && this.isCharacterSelected)
+                    if(this.IsOwner && this.isCharacterSelected)
                         this.mySoundManager.PlaySound(this.soundType + "-hit", 1.0f);
                     else
                         this.mySoundManager.PlaySound(this.soundType + "-hit", 0.8f);
@@ -1710,7 +1807,7 @@ public class GoblinScript : NetworkBehaviour
 
 
 
-        HandleIsGoblinKnockedOut(isGoblinKnockedOut, true);
+        isGoblinKnockedOut = true;
         //isGoblinKnockedOut = true;
 
         if (isRegainHealthRoutineRunning)
@@ -1738,7 +1835,7 @@ public class GoblinScript : NetworkBehaviour
         if (GameplayManager.instance.gamePhase == "kick-after-attempt" && this.isKickAfterGoblin && !gameFootball.isKicked && doesCharacterHaveBall)
         {
             GameplayManager.instance.KickAfterAttemptWasBlocked();
-            RpcKickBlockedStopKickAfterAttempt(this.connectionToClient);
+            RpcKickBlockedStopKickAfterAttempt(this.Owner);
         }
         else
         {
@@ -1748,7 +1845,7 @@ public class GoblinScript : NetworkBehaviour
         if (doesCharacterHaveBall)
         {
             //Debug.Log("KnockOutGoblin: Goblin with football was knocked out. Goblin will need to fumble the football.");
-            HandleHasBall(doesCharacterHaveBall, false);
+            doesCharacterHaveBall = false;
             Football footballScript = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
             footballScript.FumbleFootball();
             if (GameplayManager.instance.gamePhase != "kick-after-attempt")
@@ -1776,7 +1873,7 @@ public class GoblinScript : NetworkBehaviour
         isHealthRecoveryRoutineRunning = false;
         this.health = (MaxHealth * 0.66f);
         //isGoblinKnockedOut = false;
-        HandleIsGoblinKnockedOut(isGoblinKnockedOut, false);
+        isGoblinKnockedOut = false;
 
         if (isRegainHealthRoutineRunning)
             StopCoroutine(regainHealthRoutine);
@@ -1793,7 +1890,7 @@ public class GoblinScript : NetworkBehaviour
         isRegainHealthRoutineRunning = false;
         canGoblinRegainHealth = true;
     }
-    [Command]
+    [ServerRpc]
     void CmdRegainHealth()
     {
         if (canGoblinRegainHealth && health < MaxHealth)
@@ -1808,13 +1905,11 @@ public class GoblinScript : NetworkBehaviour
     }
     public void HandleIsGoblinKnockedOut(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isGoblinKnockedOut = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             golbinBodyCollider.enabled = !newValue;
             myStatusBars.gameObject.SetActive(!newValue);
-            if (hasAuthority)
+            if (IsOwner)
             {
                 if (isBlocking)
                     CmdSetBlocking(false);                
@@ -1822,7 +1917,10 @@ public class GoblinScript : NetworkBehaviour
                 // code for knocked out animation?
                 if (newValue)
                 {
-                    animator.Play(goblinType + "-knocked-out");
+                    // CrossFade rather than Play: NetworkAnimator.Play sends whatever state the animator is in at the next
+                    // tick. The bomb and lightning knock goblins out from animation events, after this frame's animator
+                    // update, so a host goblin sent its old state (running) to clients. CrossFade sends this state itself.
+                    networkAnimator.CrossFade(goblinType + "-knocked-out", 0f, 0, 0f);
 
                     //Make sure that all the isPunching, isDiving things are false so it doesn't fuck with controls
                     if (isPunching)
@@ -1849,7 +1947,7 @@ public class GoblinScript : NetworkBehaviour
             }
             if (newValue && isGoblinOnScreen())
             {
-                if(hasAuthority && this.isCharacterSelected)
+                if(IsOwner && this.isCharacterSelected)
                     mySoundManager.PlaySound("goblin-knocked-out", 0.75f);
                 else
                     mySoundManager.PlaySound("goblin-knocked-out", 0.4f);
@@ -1860,7 +1958,7 @@ public class GoblinScript : NetworkBehaviour
             }
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdStopSliding()
     {
         isSliding = false;
@@ -1868,24 +1966,24 @@ public class GoblinScript : NetworkBehaviour
         slideDirection = Vector2.zero;
         if(isSlidingRoutineRunning)
             StopCoroutine(isSlidingRoutine);
-        this.HandleIsSlidingRoutineRunning(this.isSlidingRoutineRunning, false);
+        this.isSlidingRoutineRunning = false;
     }
     public void GoblinPickUpFootball()
     {
-        if (hasAuthority && !isThrowing)
+        if (IsOwner && !isThrowing)
             CmdGoblinPickUpFootball();
     }
-    [Command]
+    [ServerRpc]
     void CmdGoblinPickUpFootball()
     {
         //Debug.Log("CmdGoblinPickUpFootball: for goblin: " + this.name + " owned by player " + this.serverGamePlayer.PlayerName);
-        GameObject.FindGameObjectWithTag("football").GetComponent<Football>().PlayerPickUpFootball(this.GetComponent<NetworkIdentity>().netId);
+        GameObject.FindGameObjectWithTag("football").GetComponent<Football>().PlayerPickUpFootball(this.GetComponent<NetworkObject>().ObjectId);
     }
     public void UpdateGoblinHealth(float oldValue, float newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
             health = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             float newHealth = newValue;
             if (newHealth < 0f)
@@ -1897,16 +1995,16 @@ public class GoblinScript : NetworkBehaviour
     }
     public void UpdateGoblinStamina(float oldValue, float newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
             stamina = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             float newStamina = newValue;
             if (newStamina < 0f)
                 newStamina = 0f;
             try
             {
-                if (hasAuthority)
+                if (IsOwner)
                 {
                     if (this.myGamePlayer.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
                     {
@@ -1926,7 +2024,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void SlideGoblin()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (isBlocking)
                 CmdSetBlocking(false);
@@ -1934,7 +2032,7 @@ public class GoblinScript : NetworkBehaviour
         }
             
     }
-    [Command]
+    [ServerRpc]
     void CmdSlideGoblin(Vector2 directionToSlide)
     {
         if (isRunningOnServer && directionToSlide != Vector2.zero && !doesCharacterHaveBall && !isSliding && !isFatigued && !isPunching && !isGoblinKnockedOut)
@@ -1954,11 +2052,9 @@ public class GoblinScript : NetworkBehaviour
     }
     public void HandleIsSliding(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isSliding = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 animator.SetBool("isSliding", newValue);
                 if (!newValue)
@@ -1977,7 +2073,7 @@ public class GoblinScript : NetworkBehaviour
     [Server]
     public IEnumerator SlideGoblinRoutine()
     {
-        this.HandleIsSlidingRoutineRunning(this.isSlidingRoutineRunning, true);
+        this.isSlidingRoutineRunning = true;
         isSliding = true;
         yield return new WaitForSeconds(0.25f);
         speed = MaxSpeed * 1.2f;
@@ -1989,11 +2085,11 @@ public class GoblinScript : NetworkBehaviour
         slideSpeedModifer = 1.0f;
         yield return new WaitForSeconds(0.75f);
         slideDirection = Vector2.zero;
-        this.HandleIsSlidingRoutineRunning(this.isSlidingRoutineRunning, false);
+        this.isSlidingRoutineRunning = false;
     }
     public void SlideBoxCollision(GoblinScript slidingGoblin)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             /*if (this.ownerConnectionId != slidingGoblin.ownerConnectionId)
                 slidingGoblin.TripGoblin();
@@ -2010,7 +2106,7 @@ public class GoblinScript : NetworkBehaviour
                 {   
                     if (this.serverGamePlayer)
                     {
-                        serverGamePlayer.RpcBlockedKickAchievement(serverGamePlayer.connectionToClient);
+                        serverGamePlayer.RpcBlockedKickAchievement(serverGamePlayer.Owner);
                     }
                 }
             }   
@@ -2041,7 +2137,7 @@ public class GoblinScript : NetworkBehaviour
         yield return new WaitForSeconds(1.25f);
         isTrippedTimerRunning = false;
 
-        HandleIsGoblinKnockedOut(isGoblinKnockedOut, false);
+        isGoblinKnockedOut = false;
 
         if (isRegainHealthRoutineRunning)
             StopCoroutine(regainHealthRoutine);
@@ -2051,11 +2147,11 @@ public class GoblinScript : NetworkBehaviour
     }
     public void DiveGoblin()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (isRunning)
             {
-                if (!isGoblinKnockedOut && !isSliding && !isDiving && hasAuthority && !isPunching)
+                if (!isGoblinKnockedOut && !isSliding && !isDiving && IsOwner && !isPunching)
                 {
                     CmdStartDiving(previousInput);
                     if (isBlocking)
@@ -2066,14 +2162,14 @@ public class GoblinScript : NetworkBehaviour
     }
     public void DiveAIGoblinTowardEndzone(Vector3 diveDirection)
     {
-        if (!isGoblinKnockedOut && !isSliding && !isDiving && hasAuthority && !isPunching)
+        if (!isGoblinKnockedOut && !isSliding && !isDiving && IsOwner && !isPunching)
         {
             CmdStartDiving(diveDirection);
             if (isBlocking)
                 CmdSetBlocking(false);
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdStartDiving(Vector2 directionToDive)
     {
         //Debug.Log("CmdStartDiving: isRunningOnServer: " + this.isRunningOnServer.ToString() + " Direction to move: " + directionToDive.ToString());
@@ -2081,7 +2177,7 @@ public class GoblinScript : NetworkBehaviour
         {
             //Debug.Log("CmdStartDiving: Goblin will slide in direction of: " + directionToDive.ToString());
             slideDirection = directionToDive;
-            HandleIsDiving(isDiving, true);
+            isDiving = true;
             speed = MaxSpeed * 1.2f;
             //Debug.Log("CmdStartDiving: Set speed to 1.2x for goblin " + this.name + " owned by player: " + this.ownerConnectionId.ToString());
         }
@@ -2089,26 +2185,24 @@ public class GoblinScript : NetworkBehaviour
     }
     public void HandleIsDiving(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isDiving = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
 
-            if (hasAuthority && newValue)
+            if (IsOwner && newValue)
             {
                 
                 if (doesCharacterHaveBall)
                 {
-                    animator.Play(goblinType + "-dive-with-football");
+                    PlayNetworkedState(goblinType + "-dive-with-football");
                 }
                 else
                 {
-                    animator.Play(goblinType + "-dive");
+                    PlayNetworkedState(goblinType + "-dive");
                 }
                 IEnumerator divingResetSanityCheckRoutine = DivingResetSanityCheckRoutine();
                 StartCoroutine(divingResetSanityCheckRoutine);
             }
-            if (hasAuthority && !newValue)
+            if (IsOwner && !newValue)
             {
                 if (!golbinBodyCollider.gameObject.activeInHierarchy)
                     golbinBodyCollider.gameObject.SetActive(true);
@@ -2124,17 +2218,17 @@ public class GoblinScript : NetworkBehaviour
     }
     public void StopDiving()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             CmdStopDiving();
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdStopDiving()
     {
         if (isDiving)
         {
-            HandleIsDiving(isDiving, false);
+            isDiving = false;
             if (!DivingRoutineRunning)
             {
                 DivingRoutine = DiveGoblinRoutine();
@@ -2151,18 +2245,18 @@ public class GoblinScript : NetworkBehaviour
     public IEnumerator DiveGoblinRoutine()
     {
         //DivingRoutineRunning = true;
-        this.HandleIsDivingRoutineRunning(this.DivingRoutineRunning, true);
+        this.DivingRoutineRunning = true;
         slideSpeedModifer = 0.7f;
         yield return new WaitForSeconds(1.25f);
         slideSpeedModifer = 1.0f;
         yield return new WaitForSeconds(0.75f);
         slideDirection = Vector2.zero;
         //DivingRoutineRunning = false;
-        this.HandleIsDivingRoutineRunning(this.DivingRoutineRunning, false);
+        this.DivingRoutineRunning = false;
     }
     public void StartBlocking()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             CmdSetBlocking(true);
             // stop player from sprinting when blocking
@@ -2175,7 +2269,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void StopBlocking()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             CmdSetBlocking(false);
             if(Input.GetKey(KeyCode.LeftShift))
@@ -2183,7 +2277,7 @@ public class GoblinScript : NetworkBehaviour
         }
             
     }
-    [Command]
+    [ServerRpc]
     void CmdSetBlocking(bool isGoblinBlocking)
     {
         //Debug.Log("CmdSetBlocking: Set blocking to " + isGoblinBlocking.ToString() + " for goblin " + this.name);
@@ -2197,32 +2291,30 @@ public class GoblinScript : NetworkBehaviour
                 blockingSpeedModifier = 1.0f;
             }
 
-            HandleIsBlocking(this.isBlocking, isGoblinBlocking);
+            isBlocking = isGoblinBlocking;
         }
         else
         {
             blockingSpeedModifier = 1.0f;
-            HandleIsBlocking(this.isBlocking, false);
+            isBlocking = false;
         }
     }
     public void HandleIsBlocking(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isBlocking = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 animator.SetBool("isBlocking", newValue);
                 if (newValue)
                 {
                     if (doesCharacterHaveBall)
                     {
-                        animator.Play(goblinType + "-block-with-football");
+                        PlayNetworkedState(goblinType + "-block-with-football");
                     }
                     else
                     {
-                        animator.Play(goblinType + "-block");
+                        PlayNetworkedState(goblinType + "-block");
                     }
                     
                 }
@@ -2236,30 +2328,28 @@ public class GoblinScript : NetworkBehaviour
     }
     public void StartPunching()
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdPunching(true);
     }
     public void StopPunching()
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdPunching(false);
     }
-    [Command]
+    [ServerRpc]
     void CmdPunching(bool punching)
     {
         //isPunching = punching;
-        HandleIsPunching(isPunching, punching);
+        isPunching = punching;
         /*if (this.isCharacterSelected && punching)
             TeamManager.instance.ThrownPunch(this.serverGamePlayer);*/
         TeamManager.instance.ThrownPunch(this);
     }
     public void HandleIsPunching(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isPunching = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 if (newValue && isBlocking)
                     CmdSetBlocking(false);
@@ -2273,7 +2363,7 @@ public class GoblinScript : NetworkBehaviour
     [TargetRpc]
     public void RpcKickOffTimeoutForceKick(NetworkConnection target)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             //this.KickFootballGoblin(0.5f, 0f);
             this.StopKickPower();
@@ -2281,13 +2371,13 @@ public class GoblinScript : NetworkBehaviour
     }
     public void KickFootballGoblin(float kickPower, float kickAngle)
     {
-        if (hasAuthority && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
+        if (IsOwner && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
         {
             CmdKickFootball(kickPower, kickAngle);
         }
             
     }
-    [Command]
+    [ServerRpc]
     void CmdKickFootball(float kickPower, float kickAngle)
     {
         if (!isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing && kickPower <= 1f && kickPower >= 0f)
@@ -2301,25 +2391,23 @@ public class GoblinScript : NetworkBehaviour
             {
                 GameplayManager.instance.StopTimeoutKickOffRoutine();
             }
-            HandleIsKicking(this.isKicking, true);
+            isKicking = true;
             GoblinKickPower = kickPower;
             GoblinKickoffAngle = kickAngle;
         }
     }
     public void HandleIsKicking(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isKicking = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             //Debug.Log("HandleIsKicking: isClient");
-            if (hasAuthority)
+            if (IsOwner)
             {
                 //Debug.Log("HandleIsKicking: hasAuthority");
                 if (newValue)
                 {
                     //Debug.Log("HandleIsKicking: start the kick animation");
-                    animator.Play(goblinType + "-kick-football");
+                    PlayNetworkedState(goblinType + "-kick-football");
                 }
                     
             }
@@ -2329,14 +2417,14 @@ public class GoblinScript : NetworkBehaviour
     public void KickTheFootball()
     {
         //Debug.Log("KickTheFootball");
-        if (hasAuthority && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
+        if (IsOwner && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
         {
             CmdKickTheFootball();
         }
         KickedFootballSFX();
             
     }
-    [Command]
+    [ServerRpc]
     void CmdKickTheFootball()
     {
         Debug.Log("CmdKickTheFootball()");
@@ -2346,7 +2434,7 @@ public class GoblinScript : NetworkBehaviour
             //Debug.Log("CmdKickTheFootball: this goblin is knocked out on the server. Don't kick? Returning..." );
             return;
         }
-        HandleHasBall(doesCharacterHaveBall, false);
+        doesCharacterHaveBall = false;
         Football footballScript = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
         Vector3 newLocalPosition = footballScript.transform.localPosition;
         if (myRenderer.flipX)
@@ -2369,21 +2457,19 @@ public class GoblinScript : NetworkBehaviour
     public void StopKicking()
     {
         //Debug.Log("StopKicking");
-        if (hasAuthority)
+        if (IsOwner)
             CmdStopKicking();
     }
-    [Command]
+    [ServerRpc]
     void CmdStopKicking()
     {
-        HandleIsKicking(this.isKicking, false);
+        isKicking = false;
     }
     public void HandleCanGoblinReceivePass(bool oldValue, bool newValue)
     {
-        if (isServer)
-            canGoblinReceivePass = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 qMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(newValue);
                 eMarker.GetComponent<QEMarkerScript>().UpdateSpriteForPassing(newValue);
@@ -2438,12 +2524,12 @@ public class GoblinScript : NetworkBehaviour
     public IEnumerator WasPunchedRoutine()
     {
         //isWasPunchedRoutineRunning = true;
-        this.HandleWasPunchedRoutineRunning(this.isWasPunchedRoutineRunning, true);
+        this.isWasPunchedRoutineRunning = true;
         wasPunchedSpeedModifier = 0.8f;
         yield return new WaitForSeconds(3.0f);
         wasPunchedSpeedModifier = 1.0f;
         //isWasPunchedRoutineRunning = false;
-        this.HandleWasPunchedRoutineRunning(this.isWasPunchedRoutineRunning, false);
+        this.isWasPunchedRoutineRunning = false;
     }
     public void ToggleGoblinBodyCollider()
     {
@@ -2509,7 +2595,7 @@ public class GoblinScript : NetworkBehaviour
         if (newDifficulty < 0.1f)
             newDifficulty = 0.1f;
         //HandleKickAfterAccuracyDifficultyUpdate(this.kickAfterAccuracyDifficulty, (1 - ((angle / 100) * 3)));
-        HandleKickAfterAccuracyDifficultyUpdate(this.kickAfterAccuracyDifficulty, newDifficulty);
+        kickAfterAccuracyDifficulty = newDifficulty;
         //kickAfterAccuracyBar1 = 0.5f - (kickAfterAccuracyDifficulty / 2);
         //kickAfterAccuracyBar2 = 0.5f + (kickAfterAccuracyDifficulty / 2);
     }
@@ -2521,11 +2607,9 @@ public class GoblinScript : NetworkBehaviour
     }
     void HandleKickAfterAccuracyDifficultyUpdate(float oldValue, float newValue)
     {
-        if (isServer)
-            kickAfterAccuracyDifficulty = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 Vector3 newPosition = new Vector3(newValue, 0f, 0f);
                 kickAfterMarkerRight.transform.localPosition = newPosition;
@@ -2537,11 +2621,11 @@ public class GoblinScript : NetworkBehaviour
     }
     public void SubmitKickAfterPositionToServer()
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdSubmitKickAfterPositionToServer(transform.position);
 
     }
-    [Command]
+    [ServerRpc]
     void CmdSubmitKickAfterPositionToServer(Vector3 kickAfterPosition)
     {
         if (Vector2.Distance(kickAfterPosition, this.transform.position) > 3.0f)
@@ -2551,13 +2635,13 @@ public class GoblinScript : NetworkBehaviour
         isKickAfterPositionSet = true;
         GameplayManager.instance.DisableKickAfterPositioningControls();
         GameplayManager.instance.StartKickAfterTimer();
-        this.RpcKickAfterPositionFromServer(this.connectionToClient, kickAfterPosition);
+        this.RpcKickAfterPositionFromServer(this.Owner, kickAfterPosition);
         
     }
     [TargetRpc]
     void RpcKickAfterPositionFromServer(NetworkConnection target, Vector2 newPosition)
     {
-        if (hasAuthority)
+        if (IsOwner)
             this.transform.position = newPosition;
     }
     public void StartKickAfterKickAttempt()
@@ -2599,7 +2683,7 @@ public class GoblinScript : NetworkBehaviour
         if (!isAccuracySubmittedYet)
         {
             isAccuracySubmittedYet = true;
-            if (hasAuthority)
+            if (IsOwner)
                 CmdSubmitKickAfterAccuracyValue(kickAfterGuageLine.transform.localPosition.x);
             StartKickAfterPower();
             //StopCoroutine(kickAfterMoveAccuracyGuageLineRoutine);
@@ -2617,7 +2701,7 @@ public class GoblinScript : NetworkBehaviour
         kickAfterAccuracyBar.SetActive(false);
         StartKickPower();
     }
-    [Command]
+    [ServerRpc]
     void CmdSubmitKickAfterAccuracyValue(float accuracyValue)
     {
         Debug.Log("CmdSubmitKickAfterAccuracyValue: " + accuracyValue);
@@ -2639,7 +2723,7 @@ public class GoblinScript : NetworkBehaviour
     //[ServerCallback]
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             if (GameplayManager.instance.gamePhase == "kick-after-attempt")
             {
@@ -2652,7 +2736,7 @@ public class GoblinScript : NetworkBehaviour
                         collidingGoblin.KickAfterGoblinWasRunInto();
                         if (this.serverGamePlayer)
                         {
-                            serverGamePlayer.RpcBlockedKickAchievement(serverGamePlayer.connectionToClient);
+                            serverGamePlayer.RpcBlockedKickAchievement(serverGamePlayer.Owner);
                         }
                     }
                     /*if (this.isKickAfterGoblin)
@@ -2663,7 +2747,7 @@ public class GoblinScript : NetworkBehaviour
                 }
             }
         }
-        if(isClient)
+        if(IsClientInitialized)
         {
             if ((GameplayManager.instance.is1v1 || GameplayManager.instance.isSinglePlayer) && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
             {
@@ -2711,15 +2795,15 @@ public class GoblinScript : NetworkBehaviour
     {
         Debug.Log("KickAfterGoblinWasRunInto()");
         this.KnockOutGoblin(false);
-        RpcKickBlockedStopKickAfterAttempt(this.connectionToClient);
+        RpcKickBlockedStopKickAfterAttempt(this.Owner);
     }
-    [ServerCallback]
+    [Server]
     public void StartAttackNormal()
     {
         IEnumerator attackNormalRoutine = AttackNormalRoutine();
         StartCoroutine(attackNormalRoutine);
     }
-    [ServerCallback]
+    [Server]
     IEnumerator AttackNormalRoutine()
     {
         this.damage = MaxDamage * 2.0f;
@@ -2728,13 +2812,13 @@ public class GoblinScript : NetworkBehaviour
         this.damage = MaxDamage;
         attackNormal = false;
     }
-    [ServerCallback]
+    [Server]
     public void StartDefenseNormal()
     {
         IEnumerator defenseNormalRoutine = DefenseNormalRoutine();
         StartCoroutine(defenseNormalRoutine);
     }
-    [ServerCallback]
+    [Server]
     IEnumerator DefenseNormalRoutine()
     {
         defenseModifier = 0.35f;
@@ -2743,13 +2827,13 @@ public class GoblinScript : NetworkBehaviour
         defenseModifier = 1.0f;
         defenseNormal = false;
     }
-    [ServerCallback]
+    [Server]
     public void StartSpeedNormal()
     {
         IEnumerator speedNormalRoutine = SpeedNormalRoutine();
         StartCoroutine(speedNormalRoutine);
     }
-    [ServerCallback]
+    [Server]
     IEnumerator SpeedNormalRoutine()
     {
         speedModifierFromPowerUps = 1.2f;
@@ -2758,7 +2842,7 @@ public class GoblinScript : NetworkBehaviour
         speedModifierFromPowerUps = 1.0f;
         speedNormal = false;
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcPlayPowerUpParticle(string particleType)
     {
         GameObject newParticle = Instantiate(PowerUpParticleSystemPrefab, this.transform);
@@ -2794,7 +2878,7 @@ public class GoblinScript : NetworkBehaviour
             
             //this.health = (MaxHealth * 0.25f);
             //isGoblinKnockedOut = false;
-            HandleIsGoblinKnockedOut(isGoblinKnockedOut, false);
+            isGoblinKnockedOut = false;
             if (isRegainHealthRoutineRunning)
                 StopCoroutine(regainHealthRoutine);
             regainHealthRoutine = RegainHealth();
@@ -2809,7 +2893,7 @@ public class GoblinScript : NetworkBehaviour
         IEnumerator invinvibilityBlueShellRoutine = InvinvibilityBlueShellRoutine();
         StartCoroutine(invinvibilityBlueShellRoutine);
     }
-    [ServerCallback]
+    [Server]
     IEnumerator InvinvibilityBlueShellRoutine()
     {
         invinvibilityBlueShell = true;
@@ -2824,7 +2908,7 @@ public class GoblinScript : NetworkBehaviour
         RpcStopInvincibilitySound();
 
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcStopInvincibilitySound()
     {
         mySoundManager.StopSound("powerup-used-invincibilityBlueShell");
@@ -2835,10 +2919,10 @@ public class GoblinScript : NetworkBehaviour
         this.UpdateGoblinStamina(this.stamina, this.MaxStamina);
         if (this.isFatigued)
         {
-            this.HandleIsFatigued(this.isFatigued, false);
+            this.isFatigued = false;
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcInvincibilityMultiFlash()
     {
         Debug.Log("RpcInvincibilityMultiFlash: for goblin " + this.name);
@@ -2953,7 +3037,7 @@ public class GoblinScript : NetworkBehaviour
             if (distanceToTarget > minDistanceFromTarget)
             {
                 // Get the goblin with the football to target them with the AI script
-                this.goblinTarget = NetworkIdentity.spawned[gameFootball.goblinWithBallNetId].GetComponent<GoblinScript>();
+                this.goblinTarget = ObjectLookup.Get(gameFootball.goblinWithBallNetId).GetComponent<GoblinScript>();
                 
                 //Check to see if the goblin should be sprinting to the ball carrier
                 if (distanceToTarget > 3f || goblinTarget.isSprintingOnServer)
@@ -3242,10 +3326,10 @@ public class GoblinScript : NetworkBehaviour
         Vector3 diretionToBallCarrier = (positionToRunTo - currentPosition).normalized;
         AIMoveTowardDirection(diretionToBallCarrier, positionToRunTo);
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcResetGoblinStatuses()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (isPunching)
                 CmdPunching(false);
@@ -3296,7 +3380,7 @@ public class GoblinScript : NetworkBehaviour
         }        
     }
     // If the isWasPunchedRoutineRunning coroutine is running on the server, this command will stop it and reset the goblins wasPunchedSpeedModifier.
-    [Command]
+    [ServerRpc]
     void CmdStopWasPunchedCoroutine()
     {
         if (isWasPunchedRoutineRunning)
@@ -3304,11 +3388,11 @@ public class GoblinScript : NetworkBehaviour
             StopCoroutine(isWasPunched);
             wasPunchedSpeedModifier = 1.0f;
             //isWasPunchedRoutineRunning = false;
-            this.HandleWasPunchedRoutineRunning(this.isWasPunchedRoutineRunning, false);
+            this.isWasPunchedRoutineRunning = false;
         }
     }
     // Resets the footstep modifers on the server. This controls the footstep sound that is played, as well as any slowDownObstacleModifier effects that are affecting the goblin.
-    [Command]
+    [ServerRpc]
     void CmdResetFootstepModifers()
     {
         this.onGlueSlowDown = false;
@@ -3506,16 +3590,16 @@ public class GoblinScript : NetworkBehaviour
     }
     public void UpdateHasGoblinRepositionedForKickAfter()
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdUpdateHasGoblinRepositionedForKickAfter();
     }
-    [Command]
+    [ServerRpc]
     void CmdUpdateHasGoblinRepositionedForKickAfter()
     {
         this.hasGoblinBeenRepositionedForKickAfter = true;
         GameplayManager.instance.AreAllGoblinsRepositionedForKickAfter();
     }
-    [ServerCallback]
+    [Server]
     public void SlowDownObstacleEffect(bool stillColliding)
     {
         if (stillColliding && !this.invinvibilityBlueShell)
@@ -3523,20 +3607,20 @@ public class GoblinScript : NetworkBehaviour
         else
             slowDownObstacleModifier = 1.0f;
     }
-    [ServerCallback]
+    [Server]
     public void KickAfterWaitToEnableObstacleColliders()
     {
         canCollide = false;
         IEnumerator waitToEnableObstacleColliders = WaitToEnableObstacleColliders();
         StartCoroutine(waitToEnableObstacleColliders);
     }
-    [ServerCallback]
+    [Server]
     IEnumerator WaitToEnableObstacleColliders()
     {
         yield return new WaitForSeconds(0.666f);
         canCollide = true;
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcPunchedFlashSprite()
     {
         Debug.Log("RpcPunchedFlashSprite: for goblin " + this.name);
@@ -3584,7 +3668,8 @@ public class GoblinScript : NetworkBehaviour
             wasPunchedBandAid.transform.localPosition = bandAidPosition;
         }
     }
-    [ClientCallback]
+    // Animation event: it fires on every machine that plays the clip, so it skips quietly where it doesn't apply.
+    [Client(Logging = LoggingType.Off)]
     public void BerserkerSwingSound()
     {
         Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
@@ -3604,7 +3689,7 @@ public class GoblinScript : NetworkBehaviour
             onscreen = true;
         return onscreen;
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcHitByGoblin(string type)
     {
         Debug.Log("RpcHitByGoblin: goblin type: " + type);
@@ -3659,7 +3744,7 @@ public class GoblinScript : NetworkBehaviour
         }
 
         float volume = 0.0f;
-        if (this.hasAuthority && this.isCharacterSelected)
+        if (this.IsOwner && this.isCharacterSelected)
             volume = 0.5f;
         else
             volume = 0.25f;
@@ -3707,12 +3792,12 @@ public class GoblinScript : NetworkBehaviour
     }
     public void CollisionWithObstacleObject(bool knockOut)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             this.CmdCollisionWithObstacleObject(knockOut);
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdCollisionWithObstacleObject(bool knockOut)
     {
         if (!this.isGoblinKnockedOut && this.canCollide)
@@ -3830,7 +3915,7 @@ public class GoblinScript : NetworkBehaviour
         }
 
         // Get the ball carrier goblin
-        GoblinScript ballCarrier = NetworkIdentity.spawned[gameFootball.goblinWithBallNetId].GetComponent<GoblinScript>();
+        GoblinScript ballCarrier = ObjectLookup.Get(gameFootball.goblinWithBallNetId).GetComponent<GoblinScript>();
 
         // Go through each goblin in the player's goblinTeam and check who they are targetting (if any) and track how many are targetting the ball carrier
         int numberTargetingBallCarrier = 0;
@@ -4040,18 +4125,14 @@ public class GoblinScript : NetworkBehaviour
     }
     public void HandleIsDivingRoutineRunning(bool oldValue, bool newValue)
     {
-        if (isServer)
-            this.DivingRoutineRunning = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             this.FatigueIndicators(newValue);
         }
     }
     public void HandleIsSlidingRoutineRunning(bool oldValue, bool newValue)
     {
-        if (isServer)
-            this.isSlidingRoutineRunning = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             this.FatigueIndicators(newValue);
         }
@@ -4066,9 +4147,7 @@ public class GoblinScript : NetworkBehaviour
     }
     public void HandleWasPunchedRoutineRunning(bool oldVale, bool newValue)
     {
-        if (isServer)
-            isWasPunchedRoutineRunning = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             wasPunchedBandAid.SetActive(newValue);
         }
@@ -4076,7 +4155,7 @@ public class GoblinScript : NetworkBehaviour
     public void CheckForStubbedToeAchievement()
     {
         Debug.Log("CheckForStubbedToeAchievement: for goblin: " + this.name + " is grey? " + this.isGoblinGrey.ToString());
-        if (hasAuthority)
+        if (IsOwner)
         {
             // Don't give the achievement for a goblin that the player isn't controlling
             if (!this.isCharacterSelected)
@@ -4101,14 +4180,14 @@ public class GoblinScript : NetworkBehaviour
                 if (serverGamePlayer.PlayerName == "AIPlayer")
                     return;
             }
-            RpcTouchdownScoredAchievement(serverGamePlayer.connectionToClient);
+            RpcTouchdownScoredAchievement(serverGamePlayer.Owner);
         }
     }
     [TargetRpc]
     void RpcTouchdownScoredAchievement(NetworkConnection target)
     {
         Debug.Log("RpcTouchdownScoredAchievement: goblin scored touchdown: " + this.name);
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (GameplayManager.instance.isSinglePlayer)
             {

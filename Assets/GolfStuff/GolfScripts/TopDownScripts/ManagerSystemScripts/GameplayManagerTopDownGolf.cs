@@ -226,7 +226,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     public override void OnStopServer()
     {
         base.OnStopServer();
-        ClearSyncLists();
+        // When the whole server stops, FishNet no longer accepts SyncList changes, and OnStartServer clears the lists on
+        // the next start anyway.
+        if (IsServerStarted)
+            ClearSyncLists();
     }
     void ClearSyncLists()
     {

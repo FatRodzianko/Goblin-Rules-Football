@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using TMPro;
 using System;
 
@@ -33,14 +37,19 @@ public class CoinTossManager : NetworkBehaviour
     IEnumerator StartKickOffPhase;
 
     [Header("Coin Toss Results")]
-    [SyncVar] public bool didPlayerSelectCoin;
-    [SyncVar] public string playerSelectedCoin;
-    [SyncVar(hook = nameof(HandleHeadsOrTailsOnServer))] public string headsOrTailsServer;
+    private readonly SyncVar<bool> _syncDidPlayerSelectCoin = new SyncVar<bool>();
+    public bool didPlayerSelectCoin { get => _syncDidPlayerSelectCoin.Value; set => _syncDidPlayerSelectCoin.Value = value; }
+    private readonly SyncVar<string> _syncPlayerSelectedCoin = new SyncVar<string>();
+    public string playerSelectedCoin { get => _syncPlayerSelectedCoin.Value; set => _syncPlayerSelectedCoin.Value = value; }
+    private readonly SyncVar<string> _syncHeadsOrTailsServer = new SyncVar<string>();
+    public string headsOrTailsServer { get => _syncHeadsOrTailsServer.Value; set => _syncHeadsOrTailsServer.Value = value; }
     
 
     [Header("Kick or Receive Results")]
-    [SyncVar] public bool didPlayerSelectKickOrReceive;
-    [SyncVar] public string playerKickOrReceive;
+    private readonly SyncVar<bool> _syncDidPlayerSelectKickOrReceive = new SyncVar<bool>();
+    public bool didPlayerSelectKickOrReceive { get => _syncDidPlayerSelectKickOrReceive.Value; set => _syncDidPlayerSelectKickOrReceive.Value = value; }
+    private readonly SyncVar<string> _syncPlayerKickOrReceive = new SyncVar<string>();
+    public string playerKickOrReceive { get => _syncPlayerKickOrReceive.Value; set => _syncPlayerKickOrReceive.Value = value; }
 
     [Header("Coin Toss Animation Object")]
     [SerializeField] GameObject coinTossAnimationPrefab;
@@ -62,7 +71,8 @@ public class CoinTossManager : NetworkBehaviour
     [Header("Timeouts: Cointoss")]
     public bool isCoinTossTimerRunning = false;
     IEnumerator timeOutCoinToss;
-    [SyncVar(hook = nameof(HandleCointossTimerTimeLeft))] int cointossTimerTimeLeft = 30;
+    private readonly SyncVar<int> _syncCointossTimerTimeLeft = new SyncVar<int>(30);
+    private int cointossTimerTimeLeft { get => _syncCointossTimerTimeLeft.Value; set => _syncCointossTimerTimeLeft.Value = value; }
 
     private NetworkManagerGRF game;
     private NetworkManagerGRF Game
@@ -80,12 +90,22 @@ public class CoinTossManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        GetLocalGamePlayer();
+        StartWithLocalGamePlayer();
         UpdateUIForGamepad(GamepadUIManager.instance.gamepadUI);
+    }
+    // Needs the local GamePlayer. FishNet 4 can start this scene object before that player, so the player's own
+    // OnStartClient calls this again once it exists. Runs once.
+    public void StartWithLocalGamePlayer()
+    {
+        if (LocalGamePlayerScript != null || GameObject.Find("LocalGamePlayer") == null)
+            return;
+        GetLocalGamePlayer();
     }
     // Start is called before the first frame update
     void Awake()
     {
+        _syncHeadsOrTailsServer.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleHeadsOrTailsOnServer(prev, next); };
+        _syncCointossTimerTimeLeft.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleCointossTimerTimeLeft(prev, next); };
         MakeInstance();   
     }
     void MakeInstance()
@@ -164,16 +184,15 @@ public class CoinTossManager : NetworkBehaviour
         //string result = "tails";
 
         Debug.Log("FlipCoin: " + result);
-        HandleHeadsOrTailsOnServer(headsOrTailsServer, result);
+        headsOrTailsServer = result;
     }
     void HandleHeadsOrTailsOnServer(string oldValue, string newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            headsOrTailsServer = newValue;
             StartCoinTossAnimation(newValue);
         }            
-        if (isClient)
+        if (IsClientInitialized)
         {
             //coinTossResultsText.gameObject.SetActive(true);
             //coinTossResultsText.text = newValue.ToUpper();
@@ -184,14 +203,14 @@ public class CoinTossManager : NetworkBehaviour
         if (!coinTossAnimationObject)
         {
             coinTossAnimationObject = Instantiate(coinTossAnimationPrefab);
-            NetworkServer.Spawn(coinTossAnimationObject);
+            InstanceFinder.ServerManager.Spawn(coinTossAnimationObject);
             myAnimator = coinTossAnimationObject.GetComponent<Animator>();
             RpcCoinResultsText("-");
             coinAnimationRoutine = RunCoinTossAnimation(headsOrTails);
             StartCoroutine(coinAnimationRoutine);
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcCoinResultsText(string textResults)
     {
         EnterToSubmitGroup.SetActive(false);
@@ -211,7 +230,7 @@ public class CoinTossManager : NetworkBehaviour
         else
             myAnimator.SetBool("Tails", true);
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcHideHeadsOrTailsChoices(string headsOrTailsSelected)
     {
         if(headsOrTailsSelected == "tails")
@@ -233,14 +252,14 @@ public class CoinTossManager : NetworkBehaviour
                 {
                     if (player.teamName == "Grey")
                     {
-                        player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, true);
+                        player.doesPlayerChooseKickOrReceive = true;
                         player.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
                         player.coinTossControlsOnServer = false;
                         player.kickOrReceiveControlsOnServer = true;
                     }
                     else
                     {
-                        player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, false);
+                        player.doesPlayerChooseKickOrReceive = false;
                         player.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
                         player.coinTossControlsOnServer = false;
                         player.kickOrReceiveControlsOnServer = false;
@@ -257,14 +276,14 @@ public class CoinTossManager : NetworkBehaviour
                         {
                             if (teamPlayer == team.captain)
                             {
-                                teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, true);
+                                teamPlayer.doesPlayerChooseKickOrReceive = true;
                                 teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
                                 teamPlayer.coinTossControlsOnServer = false;
                                 teamPlayer.kickOrReceiveControlsOnServer = true;
                             }
                             else
                             {
-                                teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
+                                teamPlayer.doesPlayerChooseKickOrReceive = false;
                                 teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
                                 teamPlayer.coinTossControlsOnServer = false;
                                 teamPlayer.kickOrReceiveControlsOnServer = false;
@@ -275,7 +294,7 @@ public class CoinTossManager : NetworkBehaviour
                     {
                         foreach (GamePlayer teamPlayer in team.teamPlayers)
                         {
-                            teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
+                            teamPlayer.doesPlayerChooseKickOrReceive = false;
                             teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
                             teamPlayer.coinTossControlsOnServer = false;
                             teamPlayer.kickOrReceiveControlsOnServer = false;
@@ -297,14 +316,14 @@ public class CoinTossManager : NetworkBehaviour
                 {
                     if (player.teamName == "Grey")
                     {
-                        player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, false);
+                        player.doesPlayerChooseKickOrReceive = false;
                         player.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
                         player.coinTossControlsOnServer = false;
                         player.kickOrReceiveControlsOnServer = false;
                     }
                     else
                     {
-                        player.HandleDoesPlayerChooseKickOrReceive(player.doesPlayerChooseKickOrReceive, true);
+                        player.doesPlayerChooseKickOrReceive = true;
                         player.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
                         player.coinTossControlsOnServer = false;
                         player.kickOrReceiveControlsOnServer = true;
@@ -321,14 +340,14 @@ public class CoinTossManager : NetworkBehaviour
                         {
                             if (teamPlayer == team.captain)
                             {
-                                teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, true);
+                                teamPlayer.doesPlayerChooseKickOrReceive = true;
                                 teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
                                 teamPlayer.coinTossControlsOnServer = false;
                                 teamPlayer.kickOrReceiveControlsOnServer = true;
                             }
                             else
                             {
-                                teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
+                                teamPlayer.doesPlayerChooseKickOrReceive = false;
                                 teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
                                 teamPlayer.coinTossControlsOnServer = false;
                                 teamPlayer.kickOrReceiveControlsOnServer = false;
@@ -339,7 +358,7 @@ public class CoinTossManager : NetworkBehaviour
                     {
                         foreach (GamePlayer teamPlayer in team.teamPlayers)
                         {
-                            teamPlayer.HandleDoesPlayerChooseKickOrReceive(teamPlayer.doesPlayerChooseKickOrReceive, false);
+                            teamPlayer.doesPlayerChooseKickOrReceive = false;
                             teamPlayer.RpcCoinTossAndKickOrReceiveControllerActivation(false, false);
                             teamPlayer.coinTossControlsOnServer = false;
                             teamPlayer.kickOrReceiveControlsOnServer = false;
@@ -354,7 +373,7 @@ public class CoinTossManager : NetworkBehaviour
         ActivateKickOrReceiveChoice = ActivateKickOrReceive(didGreyWinCoinToss);
         StartCoroutine(ActivateKickOrReceiveChoice);
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcWinnerOfCoinToss(bool didSelectingPlayerWin)
     {
         if (didSelectingPlayerWin)
@@ -382,9 +401,9 @@ public class CoinTossManager : NetworkBehaviour
     {
         yield return new WaitForSeconds(2.0f);
         RpcActivateKickOrReceiveGUI(didGreyWinCoinToss);
-        NetworkServer.Destroy(coinTossAnimationObject);
+        InstanceFinder.ServerManager.Despawn(coinTossAnimationObject);
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcActivateKickOrReceiveGUI(bool didGreyWinCoinToss)
     {
         HeadsCoinImageGroup.SetActive(false);
@@ -531,7 +550,7 @@ public class CoinTossManager : NetworkBehaviour
     public IEnumerator StartKickOffPhaseRoutine()
     {
         yield return new WaitForSeconds(2.0f);
-        GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "kickoff");
+        GameplayManager.instance.gamePhase = "kickoff";
     }
     [Client]
     public void UpdateUIForGamepad(bool usingGamepad)
@@ -555,9 +574,7 @@ public class CoinTossManager : NetworkBehaviour
     }
     public void HandleCointossTimerTimeLeft(int oldValue, int newValue)
     {
-        if (isServer)
-            cointossTimerTimeLeft = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             timeoutTimerText.text = ":" + newValue.ToString();
         }
@@ -566,7 +583,7 @@ public class CoinTossManager : NetworkBehaviour
     {
         isCoinTossTimerRunning = true;
 
-        this.HandleCointossTimerTimeLeft(this.cointossTimerTimeLeft, 30);
+        this.cointossTimerTimeLeft = 30;
         RpcActivateTheTimeoutTimer(true);
         yield return new WaitForSeconds(1.0f);
         int timeLeftTracker;
@@ -581,10 +598,10 @@ public class CoinTossManager : NetworkBehaviour
 
             timeLeftTracker = cointossTimerTimeLeft - 1;
 
-            HandleCointossTimerTimeLeft(this.cointossTimerTimeLeft, timeLeftTracker);
+            cointossTimerTimeLeft = timeLeftTracker;
             if (timeLeftTracker <= 0)
             {
-                HandleCointossTimerTimeLeft(this.cointossTimerTimeLeft, 0);
+                cointossTimerTimeLeft = 0;
                 isCoinTossTimerRunning = false;
                 // code to block kick automatically?
                 try
@@ -595,7 +612,7 @@ public class CoinTossManager : NetworkBehaviour
                         {
                             if (player.doesPlayerChooseCoin)
                             {
-                                player.RpcForceSelectCoin(player.connectionToClient);
+                                player.RpcForceSelectCoin(player.Owner);
                             }
                         }
                     }
@@ -605,7 +622,7 @@ public class CoinTossManager : NetworkBehaviour
                         {
                             if (player.doesPlayerChooseKickOrReceive)
                             {
-                                player.RpcForceSelectKickOrReceive(player.connectionToClient);
+                                player.RpcForceSelectKickOrReceive(player.Owner);
                             }
                         }
                     }
@@ -622,12 +639,12 @@ public class CoinTossManager : NetworkBehaviour
         RpcActivateTheTimeoutTimer(false);
         yield break;
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcActivateTheTimeoutTimer(bool activate)
     {
         TimeoutTimerHolder.SetActive(activate);
     }
-    [ServerCallback]
+    [Server]
     public void StopTimeoutCointossRoutine()
     {
         if (GameplayManager.instance.isSinglePlayer)

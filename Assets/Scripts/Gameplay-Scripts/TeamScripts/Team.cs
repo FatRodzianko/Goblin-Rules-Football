@@ -1,43 +1,66 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class Team : NetworkBehaviour
 {
     [Header("Team Info")]
-    [SyncVar] public bool isGrey = false;
+    public bool isGrey = false;
     public List<GamePlayer> teamPlayers = new List<GamePlayer>();
     public GamePlayer captain;
     public List<GoblinScript> goblins = new List<GoblinScript>();
-    public SyncList<uint> goblinNetIds = new SyncList<uint>();
-    public SyncList<uint> teammateNetIds = new SyncList<uint>();
+    public readonly SyncList<int> goblinNetIds = new SyncList<int>();
+    public readonly SyncList<int> teammateNetIds = new SyncList<int>();
     public bool sentMercyRuleToTeamServer = false;
     public bool sentMercyRuleToTeamClient = false;
 
 
     [Header("Team Stats")]
-    [SyncVar] public int punchesThrown; //
-    [SyncVar] public int punchesHit; //
-    [SyncVar] public int slideTackles; //
-    [SyncVar] public int slideTacklesHit; //
-    [SyncVar] public int kicksDownfield; // 
-    [SyncVar] public int passesThrown; // 
-    [SyncVar] public int powerUpsCollected; // 
-    [SyncVar] public int powerUpsUsed; // 
-    [SyncVar] public int cowboysYeehawed; //
-    [SyncVar] public int timesKnockedOut; // 
-    [SyncVar] public int timesTripped;
-    [SyncVar] public int touchdownsScored; //
-    [SyncVar] public int kickAfterAttempts; //
-    [SyncVar] public int kickAfterAttemptsMade; //
-    [SyncVar] public int kicksBlocked; //
-    [SyncVar] public int fumbles; // 
+    private readonly SyncVar<int> _syncPunchesThrown = new SyncVar<int>();
+    public int punchesThrown { get => _syncPunchesThrown.Value; set => _syncPunchesThrown.Value = value; } //
+    private readonly SyncVar<int> _syncPunchesHit = new SyncVar<int>();
+    public int punchesHit { get => _syncPunchesHit.Value; set => _syncPunchesHit.Value = value; } //
+    private readonly SyncVar<int> _syncSlideTackles = new SyncVar<int>();
+    public int slideTackles { get => _syncSlideTackles.Value; set => _syncSlideTackles.Value = value; } //
+    private readonly SyncVar<int> _syncSlideTacklesHit = new SyncVar<int>();
+    public int slideTacklesHit { get => _syncSlideTacklesHit.Value; set => _syncSlideTacklesHit.Value = value; } //
+    private readonly SyncVar<int> _syncKicksDownfield = new SyncVar<int>();
+    public int kicksDownfield { get => _syncKicksDownfield.Value; set => _syncKicksDownfield.Value = value; } //
+    private readonly SyncVar<int> _syncPassesThrown = new SyncVar<int>();
+    public int passesThrown { get => _syncPassesThrown.Value; set => _syncPassesThrown.Value = value; } //
+    private readonly SyncVar<int> _syncPowerUpsCollected = new SyncVar<int>();
+    public int powerUpsCollected { get => _syncPowerUpsCollected.Value; set => _syncPowerUpsCollected.Value = value; } //
+    private readonly SyncVar<int> _syncPowerUpsUsed = new SyncVar<int>();
+    public int powerUpsUsed { get => _syncPowerUpsUsed.Value; set => _syncPowerUpsUsed.Value = value; } //
+    private readonly SyncVar<int> _syncCowboysYeehawed = new SyncVar<int>();
+    public int cowboysYeehawed { get => _syncCowboysYeehawed.Value; set => _syncCowboysYeehawed.Value = value; } //
+    private readonly SyncVar<int> _syncTimesKnockedOut = new SyncVar<int>();
+    public int timesKnockedOut { get => _syncTimesKnockedOut.Value; set => _syncTimesKnockedOut.Value = value; } //
+    private readonly SyncVar<int> _syncTimesTripped = new SyncVar<int>();
+    public int timesTripped { get => _syncTimesTripped.Value; set => _syncTimesTripped.Value = value; }
+    private readonly SyncVar<int> _syncTouchdownsScored = new SyncVar<int>();
+    public int touchdownsScored { get => _syncTouchdownsScored.Value; set => _syncTouchdownsScored.Value = value; } //
+    private readonly SyncVar<int> _syncKickAfterAttempts = new SyncVar<int>();
+    public int kickAfterAttempts { get => _syncKickAfterAttempts.Value; set => _syncKickAfterAttempts.Value = value; } //
+    private readonly SyncVar<int> _syncKickAfterAttemptsMade = new SyncVar<int>();
+    public int kickAfterAttemptsMade { get => _syncKickAfterAttemptsMade.Value; set => _syncKickAfterAttemptsMade.Value = value; } //
+    private readonly SyncVar<int> _syncKicksBlocked = new SyncVar<int>();
+    public int kicksBlocked { get => _syncKicksBlocked.Value; set => _syncKicksBlocked.Value = value; } //
+    private readonly SyncVar<int> _syncFumbles = new SyncVar<int>();
+    public int fumbles { get => _syncFumbles.Value; set => _syncFumbles.Value = value; } //
 
     [Header("Possession")]
-    [SyncVar] bool doesTeamHaveBall = false;
-    [SyncVar(hook = nameof(HandlePossessionPoints))] public float possessionPoints = 0f;
-    [SyncVar] public float gainPossessionPointsRate = 2.5f;
+    private readonly SyncVar<bool> _syncDoesTeamHaveBall = new SyncVar<bool>();
+    private bool doesTeamHaveBall { get => _syncDoesTeamHaveBall.Value; set => _syncDoesTeamHaveBall.Value = value; }
+    private readonly SyncVar<float> _syncPossessionPoints = new SyncVar<float>();
+    public float possessionPoints { get => _syncPossessionPoints.Value; set => _syncPossessionPoints.Value = value; }
+    private readonly SyncVar<float> _syncGainPossessionPointsRate = new SyncVar<float>(2.5f);
+    public float gainPossessionPointsRate { get => _syncGainPossessionPointsRate.Value; set => _syncGainPossessionPointsRate.Value = value; }
     public bool isGainingPossesionPointsRoutineRunning = false;
     IEnumerator GainPossessionPointsRoutine;
     public bool isLosingPossesionPointsRoutineRunning = false;
@@ -45,9 +68,15 @@ public class Team : NetworkBehaviour
     public bool isNoPossessionCooldownRoutineRunning = false;
     public bool didNoPossessionCooldownRoutineComplete = false;
     IEnumerator NoPossessionCooldownRoutine;
-    [SyncVar(hook = nameof(HandlePossessionBonus))] public float possessionBonus = 1.0f;
+    private readonly SyncVar<float> _syncPossessionBonus = new SyncVar<float>(1.0f);
+    public float possessionBonus { get => _syncPossessionBonus.Value; set => _syncPossessionBonus.Value = value; }
 
     // Start is called before the first frame update
+    private void Awake()
+    {
+        _syncPossessionPoints.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandlePossessionPoints(prev, next); };
+        _syncPossessionBonus.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandlePossessionBonus(prev, next); };
+    }
     void Start()
     {
         
@@ -58,21 +87,21 @@ public class Team : NetworkBehaviour
     {
         
     }
-    [ServerCallback]
+    [Server]
     public void AddPlayerToTeam(GamePlayer player)
     {
         if (player != null && !teamPlayers.Contains(player))
         {
             teamPlayers.Add(player);
-            teammateNetIds.Add(player.GetComponent<NetworkIdentity>().netId);
+            teammateNetIds.Add(player.GetComponent<NetworkObject>().ObjectId);
         }
     }
-    [ServerCallback]
+    [Server]
     public void SendYeehawsToTeammates()
     {
         foreach (GamePlayer player in teamPlayers)
         {
-            RpcPlayYeehawSound(player.connectionToClient);
+            RpcPlayYeehawSound(player.Owner);
         }
     }
     [TargetRpc]
@@ -85,12 +114,11 @@ public class Team : NetworkBehaviour
     }
     void HandlePossessionPoints(float oldValue, float newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            possessionPoints = newValue;
             SetPossessionPointsForAllTeamPlayers(newValue);
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (!this.isGrey)
                 GameplayManager.instance.UpdatePossessionBar(true, newValue);
@@ -102,19 +130,18 @@ public class Team : NetworkBehaviour
     {
         foreach (GamePlayer player in this.teamPlayers)
         {
-            player.HandlePossessionPoints(player.possessionPoints, newPointsValue);
+            player.possessionPoints = newPointsValue;
         }
 
     }
     void HandlePossessionBonus(float oldValue, float newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            possessionBonus = newValue;
             SetPossessionBonusForAllTeamPlayers(newValue);
             UpdatePossessionSpeedBonusForGoblinTeam(newValue);
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
             
         }
@@ -123,10 +150,10 @@ public class Team : NetworkBehaviour
     {
         foreach (GamePlayer player in this.teamPlayers)
         {
-            player.HandlePossessionBonus(player.possessionBonus, newBonusValue);
+            player.possessionBonus = newBonusValue;
         }
     }
-    [ServerCallback]
+    [Server]
     public void UpdatePlayerPossessionTracker(bool hasPosession)
     {
         Debug.Log("UpdatePlayerPossessionTracker: Does " + this.name + " have possession of the ball: " + hasPosession.ToString());
@@ -168,7 +195,7 @@ public class Team : NetworkBehaviour
             }
         }
     }
-    [ServerCallback]
+    [Server]
     IEnumerator GainPossessionPoints()
     {
         isGainingPossesionPointsRoutineRunning = true;
@@ -212,7 +239,7 @@ public class Team : NetworkBehaviour
                 isMaxValue = true;
             }
             if (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time")
-                HandlePossessionPoints(this.possessionPoints, possessionPointTracker);
+                possessionPoints = possessionPointTracker;
             if (isMaxValue)
             {
                 isGainingPossesionPointsRoutineRunning = false;
@@ -220,7 +247,7 @@ public class Team : NetworkBehaviour
         }
         yield break;
     }
-    [ServerCallback]
+    [Server]
     IEnumerator NoPossessionCooldown()
     {
         didNoPossessionCooldownRoutineComplete = false;
@@ -235,7 +262,7 @@ public class Team : NetworkBehaviour
             StartCoroutine(LosePossessionPointsRoutine);
         }
     }
-    [ServerCallback]
+    [Server]
     IEnumerator LosePossessionPoints()
     {
         isLosingPossesionPointsRoutineRunning = true;
@@ -279,7 +306,7 @@ public class Team : NetworkBehaviour
                 isMinValue = true;
             }
             if (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time")
-                HandlePossessionPoints(this.possessionPoints, possessionPointTracker);
+                possessionPoints = possessionPointTracker;
             if (isMinValue)
             {
                 isLosingPossesionPointsRoutineRunning = false;
@@ -287,7 +314,7 @@ public class Team : NetworkBehaviour
         }
         yield break;
     }
-    [ServerCallback]
+    [Server]
     public void StopAllPossessionRoutines()
     {
         Debug.Log("StopAllPossessionRoutines for player: " + this.name);
@@ -311,10 +338,10 @@ public class Team : NetworkBehaviour
             isNoPossessionCooldownRoutineRunning = false;
         }
         didNoPossessionCooldownRoutineComplete = false;
-        HandlePossessionPoints(this.possessionPoints, 0f);
+        possessionPoints = 0f;
         possessionBonus = 1.0f;
     }
-    [ServerCallback]
+    [Server]
     void UpdatePossessionSpeedBonusForGoblinTeam(float newPossessionSpeedBonus)
     {
         // Calculate new speed bonus for goblins on this player's team to use
@@ -329,7 +356,7 @@ public class Team : NetworkBehaviour
             goblin.possessionSpeedBonus = possessionSpeedBonus;
         }
     }
-    [ServerCallback]
+    [Server]
     public void TellTeamMembersMercyRuleEndedGame(bool wonGame)
     {
         Debug.Log("TellTeamMembersMercyRuleEndedGame: for team: " + this.name + " did team win the mercy rule? " + wonGame);
@@ -342,7 +369,7 @@ public class Team : NetworkBehaviour
                 if (player.PlayerName == "AIPlayer")
                     continue;
             }
-            RpcMercyRuleAchievement(player.connectionToClient, wonGame);
+            RpcMercyRuleAchievement(player.Owner, wonGame);
         }
         sentMercyRuleToTeamServer = true;
     }

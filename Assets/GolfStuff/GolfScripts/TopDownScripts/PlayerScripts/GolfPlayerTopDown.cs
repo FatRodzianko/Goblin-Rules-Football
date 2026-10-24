@@ -267,10 +267,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public override void OnStopServer()
     {
         base.OnStopServer();
-        if (base.IsServer)
+        // Only when this player leaves a game that keeps running. When the whole server stops, the gameplay manager is
+        // shutting down too, and its [Server] methods would only log warnings.
+        GameplayManagerTopDownGolf gameplayManager = GameplayManagerTopDownGolf.instance;
+        if (IsServerStarted && gameplayManager != null && gameplayManager.IsServerInitialized)
         {
-            GameplayManagerTopDownGolf.instance.CheckIfPlayerWhoLeftHadBallInHole(this);
-            GameplayManagerTopDownGolf.instance.RemoveGolfPlayer(this);
+            gameplayManager.CheckIfPlayerWhoLeftHadBallInHole(this);
+            gameplayManager.RemoveGolfPlayer(this);
             //GameplayManagerTopDownGolf.instance.RemoveOwnerFromHost();
         }
     }

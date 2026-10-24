@@ -1,18 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using Cinemachine;
 using UnityEngine.SceneManagement;
 public class Football : NetworkBehaviour
 {
     [Header("State of the Ball")]
-    [SyncVar(hook = nameof(HandleIsHeld))] public bool isHeld;
-    [SyncVar] public bool isOnGround;
-    [SyncVar(hook = nameof(HandleIsThrown))] public bool isThrown;
-    [SyncVar] public bool isFalling;
+    private readonly SyncVar<bool> _syncIsHeld = new SyncVar<bool>();
+    public bool isHeld { get => _syncIsHeld.Value; set => _syncIsHeld.Value = value; }
+    private readonly SyncVar<bool> _syncIsOnGround = new SyncVar<bool>();
+    public bool isOnGround { get => _syncIsOnGround.Value; set => _syncIsOnGround.Value = value; }
+    private readonly SyncVar<bool> _syncIsThrown = new SyncVar<bool>();
+    public bool isThrown { get => _syncIsThrown.Value; set => _syncIsThrown.Value = value; }
+    private readonly SyncVar<bool> _syncIsFalling = new SyncVar<bool>();
+    public bool isFalling { get => _syncIsFalling.Value; set => _syncIsFalling.Value = value; }
     public GoblinScript goblinWithBall;
-    [SyncVar(hook = nameof(HandleGoblinWithBallNetId))] public uint goblinWithBallNetId;
+    private readonly SyncVar<int> _syncGoblinWithBallNetId = new SyncVar<int>(ObjectLookup.NoObject);
+    public int goblinWithBallNetId { get => _syncGoblinWithBallNetId.Value; set => _syncGoblinWithBallNetId.Value = value; }
     public Team teamWithBallLast;
 
     [Header("Ball Components")]
@@ -24,22 +33,30 @@ public class Football : NetworkBehaviour
     private GameObject ballMarkerObject;
 
     [Header("Throwing and Kicking Stuff?")]
-    [SyncVar] public Vector2 _directionToThrow = Vector2.zero;
-    [SerializeField] [SyncVar] public float speedOfThrow; //  = 15 f;
+    private readonly SyncVar<Vector2> _sync_directionToThrow = new SyncVar<Vector2>(Vector2.zero);
+    public Vector2 _directionToThrow { get => _sync_directionToThrow.Value; set => _sync_directionToThrow.Value = value; }
+    private readonly SyncVar<float> _syncSpeedOfThrow = new SyncVar<float>(12.5f);
+    public float speedOfThrow { get => _syncSpeedOfThrow.Value; set => _syncSpeedOfThrow.Value = value; } //  = 15 f;
     [SerializeField] float maxThrowDistance; // 10. 0f
-    [SyncVar] public float fallSpeed = 3f;
-    [SyncVar] public float distanceFell;
-    [SyncVar] public Vector2 startingPositionOfThrow;
-    [SyncVar] public float distanceTraveled;
+    private readonly SyncVar<float> _syncFallSpeed = new SyncVar<float>(5f);
+    public float fallSpeed { get => _syncFallSpeed.Value; set => _syncFallSpeed.Value = value; }
+    private readonly SyncVar<float> _syncDistanceFell = new SyncVar<float>();
+    public float distanceFell { get => _syncDistanceFell.Value; set => _syncDistanceFell.Value = value; }
+    private readonly SyncVar<Vector2> _syncStartingPositionOfThrow = new SyncVar<Vector2>();
+    public Vector2 startingPositionOfThrow { get => _syncStartingPositionOfThrow.Value; set => _syncStartingPositionOfThrow.Value = value; }
+    private readonly SyncVar<float> _syncDistanceTraveled = new SyncVar<float>();
+    public float distanceTraveled { get => _syncDistanceTraveled.Value; set => _syncDistanceTraveled.Value = value; }
 
     [Header("Fumble Football Stuff")]
     Vector3[] FumblePoints = new Vector3[3];
-    [SyncVar(hook = nameof(HandleIsFumbled))] public bool isFumbled = false;
+    private readonly SyncVar<bool> _syncIsFumbled = new SyncVar<bool>();
+    public bool isFumbled { get => _syncIsFumbled.Value; set => _syncIsFumbled.Value = value; }
     public float fumbleCount = 0.0f;
 
     [Header("Kicked Football")]
     Vector3[] KickedBallPoints = new Vector3[3];
-    [SyncVar(hook = nameof(HandleIsKicked))] public bool isKicked = false;
+    private readonly SyncVar<bool> _syncIsKicked = new SyncVar<bool>();
+    public bool isKicked { get => _syncIsKicked.Value; set => _syncIsKicked.Value = value; }
     public float kickCount = 0.0f;
     public float kickCountModifier = 0.5f;
     public float minKickDist = 10f;
@@ -55,8 +72,10 @@ public class Football : NetworkBehaviour
     Vector3 localShadowEndPosition = Vector3.zero;
 
     [Header("Football Bounces")]
-    [SyncVar(hook = nameof(HandleIsBouncing))] public bool isBouncing;
-    [SyncVar] public int numberOfBounces;
+    private readonly SyncVar<bool> _syncIsBouncing = new SyncVar<bool>();
+    public bool isBouncing { get => _syncIsBouncing.Value; set => _syncIsBouncing.Value = value; }
+    private readonly SyncVar<int> _syncNumberOfBounces = new SyncVar<int>();
+    public int numberOfBounces { get => _syncNumberOfBounces.Value; set => _syncNumberOfBounces.Value = value; }
     float bounceProgressCount = 0.0f;
     bool bounceForward = false;
     Vector3[] BouncingBallPoints = new Vector3[3];
@@ -64,6 +83,13 @@ public class Football : NetworkBehaviour
     [Header("Kick After Attempt")]
     public bool isKickAfterAttemptGood;
     bool hasKickAfterAttemptBeenSubmittedToGameManager;
+    // The kick-after flight only shows the result decided at the kick. The uprights stand this far either side of the
+    // goal post position (y -0.17 and -2.83 in Gameplay-768-432). A short kick lands this far in front of the posts, and a
+    // wide kick crosses the goal line between the min and max gap outside an upright.
+    [SerializeField] float goalPostHalfWidth = 1.33f;
+    [SerializeField] float kickAfterShortLandingGap = 4f;
+    [SerializeField] float kickAfterWideMinGap = 1f;
+    [SerializeField] float kickAfterWideMaxGap = 2.5f;
 
     [SerializeField] public CinemachineVirtualCamera myCamera;
     public GamePlayer localPlayer;
@@ -94,6 +120,15 @@ public class Football : NetworkBehaviour
         }
     }
 
+    private void Awake()
+    {
+        _syncIsHeld.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsHeld(prev, next); };
+        _syncIsThrown.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsThrown(prev, next); };
+        _syncGoblinWithBallNetId.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleGoblinWithBallNetId(prev, next); };
+        _syncIsFumbled.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsFumbled(prev, next); };
+        _syncIsKicked.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsKicked(prev, next); };
+        _syncIsBouncing.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsBouncing(prev, next); };
+    }
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -122,6 +157,12 @@ public class Football : NetworkBehaviour
         {
             GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
             localPlayer.ReportPlayerSpawnedFootball();
+            // The local GamePlayer may have started before this football existed (see GamePlayer.LinkFootball).
+            if (this.localPlayer == null)
+            {
+                this.localPlayer = localPlayer;
+                localPlayer.football = this;
+            }
         }
         catch
         {
@@ -215,7 +256,7 @@ public class Football : NetworkBehaviour
     }
     private void FixedUpdate()
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             if (isThrown)
             {
@@ -331,7 +372,7 @@ public class Football : NetworkBehaviour
                     if (kickCount >= 1.0f)
                     {
                         //isKicked = false;
-                        HandleIsKicked(this.isKicked, false);
+                        isKicked = false;
                         //animator.SetBool("isFumbled", false);
                         RpcActivateFootballShadow(false, this.transform.position);
                         // Send gameplay manager a notification if the kick came up short
@@ -361,7 +402,7 @@ public class Football : NetworkBehaviour
                 else
                 {
                     //isKicked = false;
-                    HandleIsKicked(this.isKicked, false);
+                    isKicked = false;
                     //animator.SetBool("isFumbled", false);
                     RpcActivateFootballShadow(false, this.transform.position);
                     // Send gameplay manager a notification if the kick came up short
@@ -406,7 +447,7 @@ public class Football : NetworkBehaviour
             }
 
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (isKicked && !isHeld)
             {
@@ -441,11 +482,11 @@ public class Football : NetworkBehaviour
         if (collision.tag == "goblin-body")
         {
             Debug.Log("Football: collided with goblin-body of goblin named: " + collision.transform.parent.name);
-            uint goblinNetId = collision.transform.parent.gameObject.GetComponent<NetworkIdentity>().netId;
+            int goblinNetId = collision.transform.parent.gameObject.GetComponent<NetworkObject>().ObjectId;
             collision.transform.parent.gameObject.GetComponent<GoblinScript>().GoblinPickUpFootball();
             //CmdPlayerPickUpFootball(goblinNetId);
         }
-        if (isServer && collision.tag == "tripObject")
+        if (IsServerInitialized && collision.tag == "tripObject")
         {
             if (!isThrown && !isKicked && !isHeld && !isFumbled && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
             {
@@ -494,12 +535,12 @@ public class Football : NetworkBehaviour
         }
     }*/
     [Server]
-    public void PlayerPickUpFootball(uint goblinNetId)
+    public void PlayerPickUpFootball(int goblinNetId)
     {
         Debug.Log("PlayerPickUpFootball: isHeld: " + this.isHeld.ToString() + " isKicked: " + this.isKicked.ToString());
         if (!isHeld && !isKicked) // replace "isKicked" with something that makes it so the football can only be caught near the beginning and end of the kicking arc
         {
-            GameObject goblinToCheck = NetworkIdentity.spawned[goblinNetId].gameObject;
+            GameObject goblinToCheck = ObjectLookup.Get(goblinNetId).gameObject;
             GoblinScript goblinToCheckScript = goblinToCheck.GetComponent<GoblinScript>();            
             
             if (!goblinToCheckScript.isGoblinKnockedOut && !goblinToCheckScript.isSliding && !goblinToCheckScript.isDiving && !goblinToCheckScript.isBlocking && !goblinToCheckScript.isPunching && !goblinToCheckScript.isKicking)
@@ -526,11 +567,11 @@ public class Football : NetworkBehaviour
                     Debug.Log("PlayerPickUpFootball: Goblin is close enough to pick up the ball");
                     //GoblinScript goblinToCheckScript = goblinToCheck.GetComponent<GoblinScript>();
 
-                    goblinToCheckScript.HandleHasBall(goblinToCheckScript.doesCharacterHaveBall, true);
-                    this.HandleIsHeld(this.isHeld, true);
+                    goblinToCheckScript.doesCharacterHaveBall = true;
+                    this.isHeld = true;
                     goblinWithBall = goblinToCheckScript;
                     //goblinWithBallNetId = goblinToCheckScript.GetComponent<NetworkIdentity>().netId;
-                    this.HandleGoblinWithBallNetId(goblinWithBallNetId, goblinToCheckScript.GetComponent<NetworkIdentity>().netId);
+                    this.goblinWithBallNetId = goblinToCheckScript.GetComponent<NetworkObject>().ObjectId;
                     RpcBallIsHeld(true);
 
                     if (teamWithBallLast == null)
@@ -568,7 +609,7 @@ public class Football : NetworkBehaviour
                 if (isKicked)
                 {
                     //isKicked = false;
-                    HandleIsKicked(this.isKicked, false);
+                    isKicked = false;
                     animator.SetBool("isFumbled", false);
                 }
                 if (isBouncing)
@@ -582,7 +623,7 @@ public class Football : NetworkBehaviour
 
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcBallIsHeld(bool isBallHeld)
     {
         myRenderer.enabled = !isBallHeld;
@@ -590,13 +631,12 @@ public class Football : NetworkBehaviour
     }
     public void HandleIsHeld(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            isHeld = newValue;
             if (!newValue)
             {
                 goblinWithBall = null;
-                goblinWithBallNetId = 0;
+                goblinWithBallNetId = ObjectLookup.NoObject;
                 //GameplayManager.instance.RpcNoTeamWithFootball();
                 /*foreach (GamePlayer player in Game.GamePlayers)
                 {
@@ -618,7 +658,7 @@ public class Football : NetworkBehaviour
                     animator.SetBool("isFumbled", false);
             }
         }            
-        if (isClient)
+        if (IsClientInitialized)
         {
             myRenderer.enabled = !newValue;
             myCollider.enabled = !newValue;
@@ -629,18 +669,18 @@ public class Football : NetworkBehaviour
             }   
         }
     }
-    [Command(requiresAuthority = false)]
-    public void CmdThrowFootball(uint throwingGoblinNetId, uint goblinToThrowToNetId)
+    [ServerRpc(RequireOwnership = false)]
+    public void CmdThrowFootball(int throwingGoblinNetId, int goblinToThrowToNetId)
     {
-        GoblinScript throwingGoblinScript = NetworkIdentity.spawned[throwingGoblinNetId].GetComponent<GoblinScript>();
-        GoblinScript goblinToThrowToScript = NetworkIdentity.spawned[goblinToThrowToNetId].GetComponent<GoblinScript>();
+        GoblinScript throwingGoblinScript = ObjectLookup.Get(throwingGoblinNetId).GetComponent<GoblinScript>();
+        GoblinScript goblinToThrowToScript = ObjectLookup.Get(goblinToThrowToNetId).GetComponent<GoblinScript>();
         if (!goblinToThrowToScript.canGoblinReceivePass)
             return;
 
         if (throwingGoblinScript.doesCharacterHaveBall && !goblinToThrowToScript.doesCharacterHaveBall && !throwingGoblinScript.isKicking && !throwingGoblinScript.isDiving && !throwingGoblinScript.isGoblinKnockedOut)
         {
-            throwingGoblinScript.HandleHasBall(throwingGoblinScript.doesCharacterHaveBall, false);
-            this.HandleIsHeld(isHeld, false);
+            throwingGoblinScript.doesCharacterHaveBall = false;
+            this.isHeld = false;
             RpcBallIsHeld(false);
 
             //Vector3 direction = (goblinToThrowToScript.transform.position - throwingGoblinScript.transform.position).normalized;
@@ -916,7 +956,7 @@ public class Football : NetworkBehaviour
     public void FumbleFootball()
     {
         Debug.Log("FumbleFootball");
-        this.HandleIsHeld(isHeld, false);
+        this.isHeld = false;
 
         int directionModifier = Random.Range(0, 2) * 2 - 1;
 
@@ -1015,13 +1055,13 @@ public class Football : NetworkBehaviour
     public void KickAfterAttemptKick(bool isKickingGoblinGrey, float kickPower, float kickAngle, float maxDistance, float minDistance, float accuracyDifficulty, float accuracySubmitted, Vector3 goblinPosition)
     {
         Debug.Log("KickAfterAttemptKick: for kick after attempt");
-        this.HandleIsHeld(isHeld, false);
+        this.isHeld = false;
 
         isKickAfterAttemptGood = true;
         hasKickAfterAttemptBeenSubmittedToGameManager = false;
 
         Vector3 goalPostPosition = Vector3.zero;
-        float inaccurateKickYModifer = 1.0f;
+        bool isKickWide = false;
         if (isKickingGoblinGrey)
             goalPostPosition = GoalPostForGrey;
         else
@@ -1045,66 +1085,28 @@ public class Football : NetworkBehaviour
         {
             Debug.Log("KickAfterAttemptKick: Kick accuracy is BAD! Kick is wide left/right. Accuracy difficulty: " + accuracyDifficulty.ToString() + " accuracy submitted: " + accuracySubmitted.ToString());
             isKickAfterAttemptGood = false;
-            if (accuracySubmitted < 0)
-            {
-                if (isKickingGoblinGrey)
-                {
-                    if (goblinPosition.y >= goalPostPosition.y)
-                        inaccurateKickYModifer = 2.1f;
-                    else
-                        inaccurateKickYModifer = 0.4f;
-                }
-                else
-                {
-                    if (goblinPosition.y >= goalPostPosition.y)
-                        inaccurateKickYModifer = 0.4f;
-                    else
-                        inaccurateKickYModifer = 2.1f;
-                }
-                
-            }
-            else
-            {
-                if (isKickingGoblinGrey)
-                {
-                    if (goblinPosition.y >= goalPostPosition.y)
-                        inaccurateKickYModifer = 0.4f;
-                    else
-                        inaccurateKickYModifer = 2.1f;
-                }
-                else
-                {
-                    if (goblinPosition.y >= goalPostPosition.y)
-                        inaccurateKickYModifer = 2.1f;
-                    else
-                        inaccurateKickYModifer = 0.4f;
-                }                
-            }
+            isKickWide = true;
         }
 
-        // look at this for calculating x,y position of endpoint when you know distance and angle:
-        //https://answers.unity.com/questions/759542/get-coordinate-with-angle-and-distance.html
-
-
-        int directionToKickModifier = 1;
-        if (isKickingGoblinGrey)
-            directionToKickModifier = -1;
-
-        int yModifier = 1;
-        if (goblinPosition.y >= goalPostPosition.y)
-            yModifier = -1;
-        Debug.Log("KickAfterAttemptKick: Calculating kick angle for kickoff using a kick angle of " + kickAngle.ToString() + " and a distance of " + distanceTraveled.ToString());
-        //var degrees = kickAngle * directionToKickModifier;
-        var degrees = (kickAngle * inaccurateKickYModifer);
-        var radians = degrees * Mathf.Deg2Rad;
-        var x = Mathf.Cos(radians);
-        var y = Mathf.Sin(radians);
-        x = x * distanceTraveled * directionToKickModifier;
-        y = y * distanceTraveled * yModifier;
-        Vector2 newPosition = new Vector2(x, y);
+        // The flight shows the result decided above, so it aims at a point on the goal line: the middle of the posts, or
+        // outside an upright for a wide kick. Scaling the kick angle, as before, did nothing when the kicker lined up with
+        // the posts, and a kick that was barely short landed under them. Negative accuracy still misses to the kicker's left.
         Vector2 goblinPosition2 = goblinPosition;
-        Vector2 newPosition2 = goblinPosition2 + newPosition;
-        Debug.Log("KickAfterAttemptKick: NEW POSITION for kick should be: " + newPosition.ToString() + " and NEW POSITION 2 is: " + newPosition2.ToString());
+        Vector2 kickTarget = goalPostPosition;
+        if (isKickWide)
+        {
+            bool missesAbovePosts = (accuracySubmitted > 0) == isKickingGoblinGrey;
+            float gapOutsideUpright = Mathf.Lerp(kickAfterWideMinGap, kickAfterWideMaxGap, Mathf.Clamp01(Mathf.Abs(accuracySubmitted) - accuracyDifficulty));
+            kickTarget.y += (goalPostHalfWidth + gapOutsideUpright) * (missesAbovePosts ? 1f : -1f);
+        }
+        float distanceToKickTarget = Vector2.Distance(goblinPosition2, kickTarget);
+        float flightDistance = distanceTraveled;
+        if (distanceTraveled < distanceToGoalPost)
+            flightDistance = Mathf.Max(1f, Mathf.Min(distanceTraveled, distanceToKickTarget - kickAfterShortLandingGap));
+        else if (isKickWide)
+            flightDistance = Mathf.Max(distanceTraveled, distanceToKickTarget + 1f);
+        Vector2 newPosition2 = goblinPosition2 + (kickTarget - goblinPosition2).normalized * flightDistance;
+        Debug.Log("KickAfterAttemptKick: kick angle " + kickAngle.ToString() + ", aiming at " + kickTarget.ToString() + ", flight distance " + flightDistance.ToString() + ", landing at " + newPosition2.ToString());
 
 
         /*float slope = (goalPostPosition.y - goblinPosition.y) / (goalPostPosition.x / goblinPosition.x);
@@ -1123,7 +1125,7 @@ public class Football : NetworkBehaviour
         KickedBallPoints[2] = newPosition2; // destination point
         float controlX = ((newPosition2.x - goblinPosition.x) / 2) + goblinPosition.x;
         //float controlY = (distanceTraveled + (differenceInY)) / 2;
-        float controlY = distanceTraveled + goblinPosition.y;
+        float controlY = flightDistance + goblinPosition.y;
         KickedBallPoints[1] = new Vector3(controlX, controlY, goblinPosition.z);// control point
 
 
@@ -1135,24 +1137,24 @@ public class Football : NetworkBehaviour
         kickCount = 0.0f;
         //kickCountModifier = 0.8f;
 
-        if (distanceTraveled < 15f)
+        if (flightDistance < 15f)
             kickCountModifier = 1.25f;
-        else if (distanceTraveled < 20f)
+        else if (flightDistance < 20f)
             kickCountModifier = 1.05f;
-        else if (distanceTraveled < 25f)
+        else if (flightDistance < 25f)
             kickCountModifier = 0.85f;
-        else if (distanceTraveled < 30f)
+        else if (flightDistance < 30f)
             kickCountModifier = 0.725f;
-        else if (distanceTraveled < 35f)
+        else if (flightDistance < 35f)
             kickCountModifier = 0.65f;
-        else if (distanceTraveled < 40f)
+        else if (flightDistance < 40f)
             kickCountModifier = 0.6f;
         else
             kickCountModifier = 0.6f;
 
-        
+
         //isKicked = true;
-        HandleIsKicked(this.isKicked, true);
+        isKicked = true;
         animator.SetBool("isFumbled", true);
         RpcActivateFootballShadow(true, KickedBallPoints[0]);
         RpcShadowPosition(KickedBallPoints[0], KickedBallPoints[2], kickCountModifier);
@@ -1165,7 +1167,7 @@ public class Football : NetworkBehaviour
     public void KickFootballDownField(bool isKickingGoblinGrey, float kickPower, float kickAngle, float maxDistance, float minDistance)
     {
         Debug.Log("KickFootballDownField with isKickingGoblinGrey: " + isKickingGoblinGrey.ToString() + " kick poweR: " + kickPower.ToString() + " max distance: " + maxDistance.ToString() + " min distance: " + minDistance.ToString());
-        this.HandleIsHeld(isHeld, false);
+        this.isHeld = false;
 
         int directionToKickModifier = 1;
         if (isKickingGoblinGrey)
@@ -1193,7 +1195,7 @@ public class Football : NetworkBehaviour
             var radians = degrees * Mathf.Deg2Rad;
             var y = Mathf.Sin(radians);
             y = y * distanceTraveled;
-            if(SceneManager.GetActiveScene().name.Contains("768-432"))
+            if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name.Contains("768-432"))
                 footballPosition.y = -1.5f;
             y += footballPosition.y;
 
@@ -1283,7 +1285,7 @@ public class Football : NetworkBehaviour
 
 
         //isKicked = true;
-        HandleIsKicked(this.isKicked, true);
+        isKicked = true;
         animator.SetBool("isFumbled", true);
         RpcActivateFootballShadow(true, KickedBallPoints[0]);
         RpcShadowPosition(KickedBallPoints[0], KickedBallPoints[2], kickCountModifier);
@@ -1295,9 +1297,7 @@ public class Football : NetworkBehaviour
     }
     void HandleIsThrown(bool oldValue, bool newValue)
     {
-        if (isServer)
-            isThrown = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (!newValue)
             {
@@ -1319,14 +1319,13 @@ public class Football : NetworkBehaviour
     }*/
     void HandleIsKicked(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            isKicked = newValue;
             if (!newValue && !isHeld)
                 BounceFootball(true);
             if (newValue && GameplayManager.instance.gamePhase == "kickoff")
             {
-                GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameplay");
+                GameplayManager.instance.gamePhase = "gameplay";
                 GameplayManager.instance.ActivateGameTimer(true);
             }
             if (newValue && GameplayManager.instance.gamePhase == "kick-after-attempt")
@@ -1339,7 +1338,7 @@ public class Football : NetworkBehaviour
             }
                 
         }        
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (!newValue)
             {
@@ -1365,7 +1364,7 @@ public class Football : NetworkBehaviour
             }
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcActivateFootballShadow(bool shadow, Vector3 shadowStartPosition)
     {
         footballShadowObject.transform.position = shadowStartPosition;
@@ -1384,7 +1383,7 @@ public class Football : NetworkBehaviour
 
         
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcShadowPosition(Vector3 startPosition, Vector3 endPosition, float kickCountModifier)
     {
         //footballShadowObject.transform.position = newRpcShadowPosition;
@@ -1478,29 +1477,28 @@ public class Football : NetworkBehaviour
             
     }
     [Server]
-    public void MoveFootballToKickoffGoblin(uint goblinNetId)
+    public void MoveFootballToKickoffGoblin(int goblinNetId)
     {
-        GoblinScript goblin = NetworkIdentity.spawned[goblinNetId].GetComponent<GoblinScript>();
+        GoblinScript goblin = ObjectLookup.Get(goblinNetId).GetComponent<GoblinScript>();
         if(GameplayManager.instance.gamePhase == "kickoff")
             this.transform.position = new Vector3(0f,-2f,0f);
         else
             this.transform.position = goblin.transform.position;
         if (this.isHeld)
         {
-            goblinWithBall.HandleHasBall(goblinWithBall.doesCharacterHaveBall, false);
-            HandleIsHeld(this.isHeld, false);
+            goblinWithBall.doesCharacterHaveBall = false;
+            isHeld = false;
         }
     }
-    void HandleGoblinWithBallNetId(uint oldValue, uint newValue)
+    void HandleGoblinWithBallNetId(int oldValue, int newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            goblinWithBallNetId = newValue;
-            if ((GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time") && this.isHeld && newValue != 0)
+            if ((GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time") && this.isHeld && newValue != ObjectLookup.NoObject)
             {
                 try
                 {
-                    GoblinScript goblinScript = NetworkIdentity.spawned[goblinWithBallNetId].GetComponent<GoblinScript>();
+                    GoblinScript goblinScript = ObjectLookup.Get(goblinWithBallNetId).GetComponent<GoblinScript>();
                     /*foreach (GamePlayer player in Game.GamePlayers)
                     {
                         if (player.ConnectionId == goblinScript.serverGamePlayer.ConnectionId)
@@ -1530,13 +1528,13 @@ public class Football : NetworkBehaviour
 
             }
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if ((GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time") && this.isHeld && newValue != 0)
+            if ((GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time") && this.isHeld && newValue != ObjectLookup.NoObject)
             {
                 try
                 {
-                    GameplayManager.instance.UpdatePossessionOfFootballtoTeam(NetworkIdentity.spawned[goblinWithBallNetId].GetComponent<GoblinScript>().isGoblinGrey);
+                    GameplayManager.instance.UpdatePossessionOfFootballtoTeam(ObjectLookup.Get(goblinWithBallNetId).GetComponent<GoblinScript>().isGoblinGrey);
                 }
                 catch
                 {
@@ -1552,37 +1550,35 @@ public class Football : NetworkBehaviour
     }
     void HandleIsFumbled(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            isFumbled = newValue;
             if (!newValue)
             {
                 myCollider.enabled = false;
                 myCollider.enabled = true;
             }
         }
-        if (isClient)
+        if (IsClientInitialized)
         { 
 
         }
     }
     void HandleIsBouncing(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            isBouncing = newValue;
             if (!newValue)
             {
                 myCollider.enabled = false;
                 myCollider.enabled = true;
             }
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
 
         }
     }
-    [ServerCallback]
+    [Server]
     IEnumerator CountdownToEndGame()
     {
         yield return new WaitForSeconds(0.25f);
@@ -1590,27 +1586,27 @@ public class Football : NetworkBehaviour
         {
             if (!GameplayManager.instance.firstHalfCompleted)
             {
-                GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "halftime");
+                GameplayManager.instance.gamePhase = "halftime";
             }
             else
             {
-                GameplayManager.instance.HandleGamePhase(GameplayManager.instance.gamePhase, "gameover");
+                GameplayManager.instance.gamePhase = "gameover";
             }            
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcChangePossessionSFX(bool doesGreyTeamHaveBallNow)
     {
         Debug.Log("Football.cs RpcChangePossessionSFX: is team with ball grey? " + doesGreyTeamHaveBallNow.ToString());
         if(GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time")
             GameplayManager.instance.PlayPossessionChangedSFX(doesGreyTeamHaveBallNow);
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcBounceFootballSFX()
     {
         this.BounceFootballSFX();
     }
-    [ClientCallback]
+    [Client]
     void BounceFootballSFX()
     {
         if (this.IsFootballOnScreen())

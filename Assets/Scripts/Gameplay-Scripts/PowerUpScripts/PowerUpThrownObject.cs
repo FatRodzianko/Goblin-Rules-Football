@@ -1,7 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Component.Animating;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System;
 
 public class PowerUpThrownObject : NetworkBehaviour
@@ -9,6 +14,7 @@ public class PowerUpThrownObject : NetworkBehaviour
     [Header("Sprite Stuff")]
     [SerializeField] SpriteRenderer mySpriteRenderer;
     [SerializeField] Animator myAnimator;
+    NetworkAnimator networkAnimator;
     [SerializeField] Sprite onGroundSprite;
     [SerializeField] Sprite collisionSprite; // change this to an animation thing? Like a bottle hits something, then there is an animation of glass breaking that plays?
     [SerializeField] string playerCollisionAnimationName;
@@ -18,10 +24,12 @@ public class PowerUpThrownObject : NetworkBehaviour
     public GamePlayer myPlayerOwner;
 
     [Header("Throw/drop info")]
-    [SyncVar] public bool isDroppedObject;
-    [SyncVar] public bool slowObject;
+    private readonly SyncVar<bool> _syncIsDroppedObject = new SyncVar<bool>();
+    public bool isDroppedObject { get => _syncIsDroppedObject.Value; set => _syncIsDroppedObject.Value = value; }
+    public bool slowObject;
     Vector3[] throwPoints = new Vector3[3];
-    [SyncVar(hook = nameof(HandleIsThrown))] public bool isThrown = false;
+    private readonly SyncVar<bool> _syncIsThrown = new SyncVar<bool>();
+    public bool isThrown { get => _syncIsThrown.Value; set => _syncIsThrown.Value = value; }
     public float throwCount = 0.0f;
     public float throwSpeed;
     public float dropTime = 0f;
@@ -40,6 +48,11 @@ public class PowerUpThrownObject : NetworkBehaviour
     public List<GoblinScript> goblinsWhoSteppedInIt = new List<GoblinScript>();
 
     // Start is called before the first frame update
+    private void Awake()
+    {
+        networkAnimator = GetComponent<NetworkAnimator>();
+        _syncIsThrown.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsThrown(prev, next); };
+    }
     void Start()
     {
 
@@ -55,7 +68,7 @@ public class PowerUpThrownObject : NetworkBehaviour
     {
         
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void FixedUpdate()
     {
         if (isThrown)
@@ -80,7 +93,7 @@ public class PowerUpThrownObject : NetworkBehaviour
             }
         }
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log("OnTriggerEnter2D for PowerUpThrownObject: " + this.name);
@@ -93,13 +106,13 @@ public class PowerUpThrownObject : NetworkBehaviour
                 return;
 
             Debug.Log("PowerUpThrownObject: collided with goblin named: " + collision.transform.name);
-            uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+            int goblinNetId = collision.transform.gameObject.GetComponent<NetworkObject>().ObjectId;
 
             GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
             if (goblinScript.canCollide)
             {
                 goblinScript.KnockOutGoblin(false);
-                NetworkServer.Destroy(this.gameObject);
+                InstanceFinder.ServerManager.Despawn(this.gameObject);
             }
 
 
@@ -114,14 +127,15 @@ public class PowerUpThrownObject : NetworkBehaviour
         if (collision.tag == "goblin-body" && !isDroppedObject)
         {
             Debug.Log("PowerUpThrownObject: collided with goblin named: " + collision.transform.parent.name);
-            uint goblinNetId = collision.transform.parent.gameObject.GetComponent<NetworkIdentity>().netId;
+            int goblinNetId = collision.transform.parent.gameObject.GetComponent<NetworkObject>().ObjectId;
             collision.transform.parent.gameObject.GetComponent<GoblinScript>().KnockOutGoblin(false);
             isThrown = false;
             this.GetComponent<BoxCollider2D>().enabled = false;
-            myAnimator.Play(playerCollisionAnimationName);
+        // Through the NetworkAnimator, so clients see it: FishNet only sends state changes made through it.
+            networkAnimator.Play(playerCollisionAnimationName, 0, float.NegativeInfinity);
         }
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void OnTriggerStay2D(Collider2D collision)
     {
         Debug.Log("OnTriggerStay2D for ObstacleObject: " + this.name);
@@ -143,7 +157,7 @@ public class PowerUpThrownObject : NetworkBehaviour
             }
         }
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void OnTriggerExit2D(Collider2D collision)
     {
         Debug.Log("OnTriggerStay2D for ObstacleObject: " + this.name);
@@ -162,7 +176,7 @@ public class PowerUpThrownObject : NetworkBehaviour
                 {
                     goblinsWhoSteppedInIt.Remove(collision.transform.gameObject.GetComponent<GoblinScript>());
                 }
-                NetworkServer.Destroy(this.gameObject);
+                InstanceFinder.ServerManager.Despawn(this.gameObject);
             }
         }
     }
@@ -243,11 +257,7 @@ public class PowerUpThrownObject : NetworkBehaviour
     }
     void HandleIsThrown(bool oldValue, bool newValue)
     {
-        if (isServer)
-        {
-            isThrown = newValue;                
-        }            
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (!newValue)
             {
@@ -262,19 +272,19 @@ public class PowerUpThrownObject : NetworkBehaviour
                 
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcFlipXOfSpriteRenderer(bool flip)
     {
         mySpriteRenderer.flipX = flip;
     }
     public void DestroyObjectOnServer()
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            NetworkServer.Destroy(this.gameObject);
+            InstanceFinder.ServerManager.Despawn(this.gameObject);
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcEnableSpriteRenderer(bool activate)
     {
         mySpriteRenderer.enabled = activate;
@@ -299,7 +309,7 @@ public class PowerUpThrownObject : NetworkBehaviour
             onscreen = true;
         return onscreen;
     }
-    [ClientCallback]
+    [Client]
     void PlaySFXClip(string clipName)
     {
         Debug.Log("PowerUpThrownObject: RpcPlaySFXClip for " + this.name);
@@ -308,30 +318,37 @@ public class PowerUpThrownObject : NetworkBehaviour
             SoundManager.instance.PlaySound(clipName, 0.75f);
         }
     }
-    private void OnDestroy()
+    // These ran in OnDestroy under Mirror. FishNet has already deinitialized the object by OnDestroy, so they live in the
+    // stop callbacks. Without this the goblins still in a glue or water puddle stayed slowed after it despawned.
+    public override void OnStopClient()
     {
-        if (isClient && playSoundOnDestroy)
+        base.OnStopClient();
+        if (playSoundOnDestroy)
         {
             this.PlaySFXClip(sfxClipName);
         }
-        if (isServer)
+    }
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        if (slowObject && goblinsWhoSteppedInIt.Count > 0)
         {
-            if (slowObject && goblinsWhoSteppedInIt.Count > 0)
+            try
             {
-                try
+                foreach (GoblinScript goblin in goblinsWhoSteppedInIt)
                 {
-                    foreach (GoblinScript goblin in goblinsWhoSteppedInIt)
-                    {
-                        goblin.SlowDownObstacleEffect(false);
-                        goblin.onGlueSlowDown = false;
-                        goblin.onWaterSlowDown = false;
-                        goblin.onBrushSlowDown = false;
-                    }
+                    // At the end of a match the goblins can be despawning too.
+                    if (goblin == null || !goblin.IsServerInitialized)
+                        continue;
+                    goblin.SlowDownObstacleEffect(false);
+                    goblin.onGlueSlowDown = false;
+                    goblin.onWaterSlowDown = false;
+                    goblin.onBrushSlowDown = false;
                 }
-                catch (Exception e)
-                {
-                    Debug.Log("PowerupThrownObject: OnDestroy: Couldn't get goblinsWhoSteppedInIt. Error: " + e);
-                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log("PowerupThrownObject: OnStopServer: Couldn't get goblinsWhoSteppedInIt. Error: " + e);
             }
         }
     }

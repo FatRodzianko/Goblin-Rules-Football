@@ -98,23 +98,23 @@ public class LobbyPlayer : NetworkBehaviour
             playerNameToSet = PlayerNameSubmitted.Substring(0, 12);
         else
             playerNameToSet = PlayerNameSubmitted;
-        this.HandlePlayerNameUpdate(this.PlayerName, playerNameToSet);
+        this.PlayerName = playerNameToSet;
     }
     [ServerRpc]
     void CmdSetPlayerInitialTeam()
     {
         // set the host as team grey
         if (this.IsGameLeader)
-            HandleIsTeamGrey(this.isTeamGrey, false);
+            isTeamGrey = false;
         else
         {
             if (LobbyManager.instance.GreenTeamMembers.Count > LobbyManager.instance.GreyTeamMembers.Count)
             {
-                this.HandleIsTeamGrey(this.isTeamGrey, true);
+                this.isTeamGrey = true;
             }
             else if (LobbyManager.instance.GreenTeamMembers.Count < LobbyManager.instance.GreyTeamMembers.Count)
             {
-                this.HandleIsTeamGrey(this.isTeamGrey, false);
+                this.isTeamGrey = false;
             }
             else
             {
@@ -124,11 +124,11 @@ public class LobbyPlayer : NetworkBehaviour
                 string result = headsTails[rng.Next(headsTails.Length)];
                 if (result == "green")
                 {
-                    this.HandleIsTeamGrey(this.isTeamGrey, false);
+                    this.isTeamGrey = false;
                 }
                 else
                 {
-                    this.HandleIsTeamGrey(this.isTeamGrey, true);
+                    this.isTeamGrey = true;
                 }
             }
         }
@@ -138,8 +138,6 @@ public class LobbyPlayer : NetworkBehaviour
     public void HandlePlayerNameUpdate(string oldValue, string newValue)
     {
         Debug.Log("Player name has been updated for: " + oldValue + " to new value: " + newValue);
-        if (IsServerInitialized)
-            this.PlayerName = newValue;
         if (IsClientInitialized)
         {
             LobbyManager.instance.UpdateUI();
@@ -172,24 +170,24 @@ public class LobbyPlayer : NetworkBehaviour
             if (isGrey && LobbyManager.instance.GreyTeamMembers.Count >= 3)
             {
                 Debug.Log("CmdUpdateTeam: " + this.PlayerName + " is trying to switch to GREY but GREY is full. Setting wantsToSwitch To True");
-                this.HandleWantsToSwitchTeams(this.wantsToSwitchTeams, true);
+                this.wantsToSwitchTeams = true;
                 CheckIfOtherPlayersWantToSwitch(this);
                 return;
             }
             else if (!isGrey && LobbyManager.instance.GreenTeamMembers.Count >= 3)
             {
                 Debug.Log("CmdUpdateTeam: " + this.PlayerName + " is trying to switch to GREEN but GREEN is full. Setting wantsToSwitch To True");
-                this.HandleWantsToSwitchTeams(this.wantsToSwitchTeams, true);
+                this.wantsToSwitchTeams = true;
                 CheckIfOtherPlayersWantToSwitch(this);
                 return;
             }
-            this.HandleIsTeamGrey(this.isTeamGrey, isGrey);
+            this.isTeamGrey = isGrey;
             if (this.wantsToSwitchTeams)
-                this.HandleWantsToSwitchTeams(this.wantsToSwitchTeams, false);
+                this.wantsToSwitchTeams = false;
             UpdateAllPlayersOnAvailableGoblins(isGrey);
         }
     }
-    [Server(Logging = LoggingType.Off, UseIsStarted = true)]
+    [Server]
     void CheckIfOtherPlayersWantToSwitch(LobbyPlayer playerRequestingSwitch)
     {
         Debug.Log("CheckIfOtherPlayersWantToSwitch for player: " + playerRequestingSwitch.PlayerName);
@@ -203,8 +201,8 @@ public class LobbyPlayer : NetworkBehaviour
                     playerRequestingSwitch.UnselectGoblinOnServer();
                 }
                 UpdateAllPlayersOnAvailableGoblins(playerRequestingSwitch.isTeamGrey);
-                playerRequestingSwitch.HandleIsTeamGrey(playerRequestingSwitch.isTeamGrey, !playerRequestingSwitch.isTeamGrey);
-                playerRequestingSwitch.HandleWantsToSwitchTeams(playerRequestingSwitch.wantsToSwitchTeams, false);
+                playerRequestingSwitch.isTeamGrey = !playerRequestingSwitch.isTeamGrey;
+                playerRequestingSwitch.wantsToSwitchTeams = false;
 
 
                 if (player.isGoblinSelected && !string.IsNullOrWhiteSpace(player.goblinType))
@@ -212,13 +210,13 @@ public class LobbyPlayer : NetworkBehaviour
                     player.UnselectGoblinOnServer();
                 }
                 UpdateAllPlayersOnAvailableGoblins(player.isTeamGrey);
-                player.HandleIsTeamGrey(player.isTeamGrey, !player.isTeamGrey);
-                player.HandleWantsToSwitchTeams(player.wantsToSwitchTeams, false);
+                player.isTeamGrey = !player.isTeamGrey;
+                player.wantsToSwitchTeams = false;
                 break;
             }
         }
     }
-    [Server(Logging = LoggingType.Off, UseIsStarted = true)]
+    [Server]
     void CheckIfTeamIsNoLongerFull()
     {
         foreach (LobbyPlayer player in Game.LobbyPlayers)
@@ -241,8 +239,8 @@ public class LobbyPlayer : NetworkBehaviour
                             player.UnselectGoblinOnServer();
                         }
                         UpdateAllPlayersOnAvailableGoblins(player.isTeamGrey);
-                        player.HandleIsTeamGrey(player.isTeamGrey, !player.isTeamGrey);
-                        player.HandleWantsToSwitchTeams(player.wantsToSwitchTeams, false);
+                        player.isTeamGrey = !player.isTeamGrey;
+                        player.wantsToSwitchTeams = false;
                     }
                 }
                 else
@@ -261,8 +259,8 @@ public class LobbyPlayer : NetworkBehaviour
                             player.UnselectGoblinOnServer();
                         }
                         UpdateAllPlayersOnAvailableGoblins(player.isTeamGrey);
-                        player.HandleIsTeamGrey(player.isTeamGrey, !player.isTeamGrey);
-                        player.HandleWantsToSwitchTeams(player.wantsToSwitchTeams, false);
+                        player.isTeamGrey = !player.isTeamGrey;
+                        player.wantsToSwitchTeams = false;
                     }
                 }
             }
@@ -279,7 +277,7 @@ public class LobbyPlayer : NetworkBehaviour
     {
         UpdateTeamListsOnLobbyManager();
     }
-    [Server(Logging = LoggingType.Off, UseIsStarted = true)]
+    [Server]
     void UpdateTeamListsOnLobbyManager()
     {
         Debug.Log("UpdateTeamListsOnLobbyManager: for this many players: " + Game.LobbyPlayers.Count.ToString());
@@ -310,7 +308,6 @@ public class LobbyPlayer : NetworkBehaviour
         {
             if (!this.isSinglePlayer)
             {
-                this.isTeamGrey = newValue;
                 UpdateTeamListsOnLobbyManager();
                 UpdateAllPlayersOnAvailableGoblins(newValue);
             }
@@ -355,12 +352,10 @@ public class LobbyPlayer : NetworkBehaviour
     void CmdChangePlayerReadyStatus()
     {
         Debug.Log("Executing CmdChangePlayerReadyStatus on the server for player: " + this.PlayerName);
-        this.HandlePlayerReadyStatusChange(this.isPlayerReady, !this.isPlayerReady);
+        this.isPlayerReady = !this.isPlayerReady;
     }
     void HandlePlayerReadyStatusChange(bool oldValue, bool newValue)
     {
-        if (IsServerInitialized)
-            this.isPlayerReady = newValue;
         if (IsClientInitialized && ! this.isSinglePlayer)
             LobbyManager.instance.UpdateUI();
     }
@@ -413,7 +408,7 @@ public class LobbyPlayer : NetworkBehaviour
         this.HandleGoblinType(this.goblinType, "");*/
         UnselectGoblinOnServer();
     }
-    [Server(Logging = LoggingType.Off, UseIsStarted = true)]
+    [Server]
     void UnselectGoblinOnServer()
     {
         if (this.isTeamGrey)
@@ -437,8 +432,8 @@ public class LobbyPlayer : NetworkBehaviour
             }
         }
         UpdateAllPlayersOnAvailableGoblins(this.isTeamGrey);
-        this.HandleIsGoblinSelected(this.isGoblinSelected, false);
-        this.HandleGoblinType(this.goblinType, "");
+        this.isGoblinSelected = false;
+        this.goblinType = "";
     }
     public void SelectGoblin(string typeOfGoblin)
     {
@@ -473,14 +468,12 @@ public class LobbyPlayer : NetworkBehaviour
                     return;
             }
             UpdateAllPlayersOnAvailableGoblins(this.isTeamGrey);
-            this.HandleGoblinType(this.goblinType, typeOfGoblin);
-            this.HandleIsGoblinSelected(this.isGoblinSelected, true);
+            this.goblinType = typeOfGoblin;
+            this.isGoblinSelected = true;
         }   
     }
     public void HandleIsGoblinSelected(bool oldValue, bool newValue)
     {
-        if (IsServerInitialized)
-            this.isGoblinSelected = newValue;
         if (IsClientInitialized)
         {
             if (IsOwner)
@@ -503,8 +496,6 @@ public class LobbyPlayer : NetworkBehaviour
     }
     void HandleGoblinType(string oldValue, string newValue)
     {
-        if (IsServerInitialized)
-            this.goblinType = newValue;
         if (IsClientInitialized)
         {
             if (IsOwner)
@@ -523,7 +514,7 @@ public class LobbyPlayer : NetworkBehaviour
             LobbyManager.instance.UpdateGoblinSelectedTextOnPlayerListItems(this);
         }
     }
-    [Server(Logging = LoggingType.Off, UseIsStarted = true)]
+    [Server]
     void UpdateAllPlayersOnAvailableGoblins(bool isGrey)
     {
         foreach (LobbyPlayer player in Game.LobbyPlayers)
@@ -548,7 +539,8 @@ public class LobbyPlayer : NetworkBehaviour
     public void RpcSendPlayersUpdatedAvailableGoblinList(NetworkConnection target, List<string> availableGoblins)
     {
         Debug.Log("RpcSendPlayersUpdatedAvailableGoblinList: for player: " + this.PlayerName + " is team grey? " + this.isTeamGrey.ToString() + " and list available: " + availableGoblins.Count.ToString() + " for UpdateGoblinsAvailable");
-        if(IsOwner && !LobbyManager.instance.is1v1)
+        // Single player has no player list item. An exception here would make FishNet drop the rest of the packet.
+        if(IsOwner && !LobbyManager.instance.is1v1 && this.myPlayerListItem != null)
             this.myPlayerListItem.UpdateGoblinsAvailable(availableGoblins);
     }
     /*[ObserversRpc]
@@ -562,10 +554,6 @@ public class LobbyPlayer : NetworkBehaviour
     }*/
     void HandleWantsToSwitchTeams(bool oldValue, bool newValue)
     {
-        if (IsServerInitialized)
-        {
-            wantsToSwitchTeams = newValue;
-        }
         if (IsClientInitialized)
         { 
 
@@ -591,7 +579,10 @@ public class LobbyPlayer : NetworkBehaviour
         {
             try
             {
-                LobbyManager.instance.DestroyPlayerListItems();
+                // On a FishNet host, LobbyScene can unload before this is destroyed at game start. Skip its UI then,
+                // but still leave the Steam lobby as Mirror did.
+                if (LobbyManager.instance != null)
+                    LobbyManager.instance.DestroyPlayerListItems();
                 SteamMatchmaking.LeaveLobby((CSteamID)LobbyManager.instance.currentLobbyId);
             }
             catch (Exception e)
@@ -612,6 +603,10 @@ public class LobbyPlayer : NetworkBehaviour
         Debug.Log(PlayerName + " is quiting the game.");
         Game.LobbyPlayers.Remove(this);
         Debug.Log("Removed player from the GamePlayer list: " + this.PlayerName);
+        // On a FishNet host, the despawn at game start reaches the client side after LobbyScene has unloaded.
+        // Skip the lobby UI then: an exception here would stop FishNet from starting the GamePlayer spawned with it.
+        if (LobbyManager.instance == null)
+            return;
         LobbyManager.instance.UpdateUI();
         // FishNet stops the server side of a despawned object before its client side, so check the server itself here.
         if (IsServerStarted)
@@ -628,7 +623,7 @@ public class LobbyPlayer : NetworkBehaviour
             }
         }
     }
-    [Client(Logging = LoggingType.Off, UseIsStarted = true)]
+    [Client]
     void CheckIfDLCsAreInstalled()
     {
         if (IsOwner)
@@ -648,19 +643,19 @@ public class LobbyPlayer : NetworkBehaviour
         //RpcUpdateDLCImages(dlc_99, dlc_1_99);
         if (!dlc_99 && !dlc_1_99)
         {
-            this.HandleWhatDLCsAreInstalled(this.whatDLCsAreInstalled, "none");
+            this.whatDLCsAreInstalled = "none";
         }
         if (dlc_99 && !dlc_1_99)
         {
-            this.HandleWhatDLCsAreInstalled(this.whatDLCsAreInstalled, "99");
+            this.whatDLCsAreInstalled = "99";
         }
         if (!dlc_99 && dlc_1_99)
         {
-            this.HandleWhatDLCsAreInstalled(this.whatDLCsAreInstalled, "1_99");
+            this.whatDLCsAreInstalled = "1_99";
         }
         if (dlc_99 && dlc_1_99)
         {
-            this.HandleWhatDLCsAreInstalled(this.whatDLCsAreInstalled, "both");
+            this.whatDLCsAreInstalled = "both";
         }
     }
     [ObserversRpc]
@@ -682,8 +677,6 @@ public class LobbyPlayer : NetworkBehaviour
     }
     public void HandleWhatDLCsAreInstalled(string oldValue, string newValue)
     {
-        if (IsServerInitialized)
-            whatDLCsAreInstalled = newValue;
         if (IsClientInitialized)
         {
             Debug.Log("HandleWhatDLCsAreInstalled. For player: " + this.PlayerName + " newValue: " + newValue);

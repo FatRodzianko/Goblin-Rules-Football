@@ -1,13 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System;
 
 public class LightningBlueShell : NetworkBehaviour
 {
-    [SyncVar(hook = nameof(HandleGoblinToStrikeNetId))] public uint goblinToStrikeNetId;
+    private readonly SyncVar<int> _syncGoblinToStrikeNetId = new SyncVar<int>(ObjectLookup.NoObject);
+    public int goblinToStrikeNetId { get => _syncGoblinToStrikeNetId.Value; set => _syncGoblinToStrikeNetId.Value = value; }
     // Start is called before the first frame update
+    private void Awake()
+    {
+        _syncGoblinToStrikeNetId.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleGoblinToStrikeNetId(prev, next); };
+    }
     void Start()
     {
         
@@ -17,7 +26,7 @@ public class LightningBlueShell : NetworkBehaviour
         base.OnStartClient();
         try
         {
-            GameObject goblinToStrikeObject = NetworkIdentity.spawned[goblinToStrikeNetId].gameObject;
+            GameObject goblinToStrikeObject = ObjectLookup.Get(goblinToStrikeNetId).gameObject;
             this.transform.parent = goblinToStrikeObject.transform;
             this.transform.localPosition = new Vector3(0.33f, 1f, 0f);
         }
@@ -34,12 +43,12 @@ public class LightningBlueShell : NetworkBehaviour
     }
     public void StrikeGoblin()
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             Debug.Log("LightningBlueShell.cs Strike Goblin: Will try to strike goblin with net id of " + goblinToStrikeNetId.ToString());
             try
             {
-                GoblinScript goblinToStrike = NetworkIdentity.spawned[goblinToStrikeNetId].GetComponent<GoblinScript>();
+                GoblinScript goblinToStrike = ObjectLookup.Get(goblinToStrikeNetId).GetComponent<GoblinScript>();
                 goblinToStrike.KnockOutGoblin(true);
             }
             catch (Exception e)
@@ -47,25 +56,23 @@ public class LightningBlueShell : NetworkBehaviour
                 Debug.Log("LightningBlueShell.cs Strike Goblin: failed to strike goblin: " + e);
             }
         }
-        if (isClient)
+        if (IsClientInitialized)
             PlayThunderSound();
     }
     public void DestroyAnimationObject()
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            NetworkServer.Destroy(this.gameObject);
+            InstanceFinder.ServerManager.Despawn(this.gameObject);
         }        
     }
-    public void HandleGoblinToStrikeNetId(uint oldValue, uint newValue)
+    public void HandleGoblinToStrikeNetId(int oldValue, int newValue)
     {
-        if (isServer)
-            goblinToStrikeNetId = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             try
             {
-                GameObject goblinToStrikeObject = NetworkIdentity.spawned[goblinToStrikeNetId].gameObject;
+                GameObject goblinToStrikeObject = ObjectLookup.Get(goblinToStrikeNetId).gameObject;
                 this.transform.parent = goblinToStrikeObject.transform;
                 this.transform.localPosition = new Vector3(0.33f, 1f, 0f);
                 //this.gameObject.SetActive(true);
@@ -76,7 +83,7 @@ public class LightningBlueShell : NetworkBehaviour
             }
         }
     }
-    [ClientCallback]
+    [Client]
     public void PlayThunderSound()
     {
         if (IsOnScreen())

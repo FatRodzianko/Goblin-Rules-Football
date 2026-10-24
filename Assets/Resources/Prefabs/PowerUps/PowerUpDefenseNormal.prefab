@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 6338328385301744607}
   - component: {fileID: 6338328385301744605}
   - component: {fileID: 6338328385301744604}
-  - component: {fileID: 6338328385301744602}
+  - component: {fileID: 3526333772064911047}
   m_Layer: 17
   m_Name: PowerUpDefenseNormal
   m_TagString: PowerUp
@@ -133,16 +133,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 296298294de4cd64bb191ee2a9aa36fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 3526333772064911047}
+  _networkObjectCache: {fileID: 0}
+  borderOffset: {x: 0, y: -0.062, z: 0}
   mySprite: {fileID: 21300000, guid: 05484a0fd7fcbd84fac97fcc9104eda6, type: 3}
   powerUpAbility: defenseNormal
   isBlueShell: 0
-  remainingUses: 1
+  _initialRemainingUses: 1
   multipleUses: 0
   aiPowerUpType: defense
   PowerUpImageObject: {fileID: 6338328384912614004}
   PowerUpBorderObject: {fileID: 6338328385406385039}
+  PowerUpShadowObject: {fileID: 0}
   bounceSpeed: 0.25
   powerUpAnimationPrefab: {fileID: 0}
   thrownObjectPrefab: {fileID: 0}
@@ -174,7 +177,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.5, y: 1.5}
   m_EdgeRadius: 0
---- !u!114 &6338328385301744602
+--- !u!114 &3526333772064911047
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -183,14 +186,54 @@ MonoBehaviour:
   m_GameObject: {fileID: 6338328385301744606}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  visible: 0
-  m_AssetId: b111dfb0f7595b1459f7831a57d01a92
-  hasSpawned: 0
+  <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 65535
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 1724815030149446219
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
 --- !u!1 &6338328385406385039
 GameObject:
   m_ObjectHideFlags: 0

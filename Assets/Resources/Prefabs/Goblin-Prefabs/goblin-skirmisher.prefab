@@ -5496,12 +5496,12 @@ GameObject:
   - component: {fileID: 6877901074420270404}
   - component: {fileID: 6877901074420270405}
   - component: {fileID: 6877901074420270406}
-  - component: {fileID: 5096101523183400086}
   - component: {fileID: 7331738822888161285}
-  - component: {fileID: 2300833731266782456}
   - component: {fileID: 5128232167220223196}
   - component: {fileID: -2641077922915985335}
-  - component: {fileID: 7229146345318371590}
+  - component: {fileID: 4602389167676144919}
+  - component: {fileID: 838839579481094613}
+  - component: {fileID: 9137906919485296293}
   m_Layer: 22
   m_Name: goblin-skirmisher
   m_TagString: Goblin
@@ -5643,7 +5643,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!95 &6877901074420270406
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5660,24 +5660,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &5096101523183400086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6877901074420270458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  visible: 0
-  m_AssetId: 34a417c9969d212469e52634d54a7943
-  hasSpawned: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &7331738822888161285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5690,15 +5674,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed2fbedd52c9464791bbb8b41fbcb18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 4602389167676144919}
+  _networkObjectCache: {fileID: 0}
   pressedTime: 0
   releasedTime: 0
   PowerUpParticleSystemPrefab: {fileID: 8322833437944110266, guid: c3a63d0e2c40469468188066ca375472, type: 3}
-  ownerName: 
-  ownerConnectionId: 0
-  ownerPlayerNumber: 0
-  ownerNetId: 0
   myGamePlayer: {fileID: 0}
   serverGamePlayer: {fileID: 0}
   MaxHealth: 75
@@ -5707,26 +5688,11 @@ MonoBehaviour:
   StaminaRecovery: 1.5
   MaxSpeed: 9
   MaxDamage: 30
-  canCollide: 1
   soundType: skirmisher
-  health: 0
-  stamina: 0
-  speed: 0
-  damage: 0
-  ballCarrySpeedModifier: 1
-  blockingSpeedModifier: 1
-  defenseModifier: 0
-  speedModifierFromPowerUps: 1
-  slowDownObstacleModifier: 1
-  possessionSpeedBonus: 1
-  isCharacterSelected: 0
-  isQGoblin: 0
-  isEGoblin: 0
   isQGoblinLocally3v3: 0
   isEGoblinLocally3v3: 0
   canGoblinMove: 1
   isGoblinPunching: 0
-  isPunching: 0
   eMarkerPrefab: {fileID: 3718499330716654528, guid: 764a42fe423f10f4e80ab9e989af2463, type: 3}
   qMarkerPrefab: {fileID: 7215489222767727815, guid: f42ce2cbcc7b04f4db61749caeea4077, type: 3}
   eMarker: {fileID: 0}
@@ -5740,7 +5706,6 @@ MonoBehaviour:
   previousInput: {x: 0, y: 0}
   myRenderer: {fileID: 6877901074420270457}
   golbinBodyCollider: {fileID: 8766738489087183215}
-  goblinType: 
   myStatusBars: {fileID: 1014713823953464259}
   touchdownHitbox: {fileID: 6054045470784628437}
   divingHitbox: {fileID: 637862076695335927}
@@ -5752,26 +5717,11 @@ MonoBehaviour:
   spriteOutlineYellow: {fileID: 2100000, guid: 3a0b3ff54a504b1428ce061f13590bb3, type: 2}
   greenGoblinLayer: greenGoblin
   greyGoblinLayer: greyGoblin
-  isGoblinGrey: 0
-  doesCharacterHaveBall: 0
-  isThrowing: 0
-  isRunningOnServer: 0
   isRunning: 0
   isSprinting: 0
   shiftHeldDown: 0
-  isSprintingOnServer: 0
-  canRecoveryStamina: 1
-  isFatigued: 0
-  isGoblinKnockedOut: 0
-  isSliding: 0
-  slideDirection: {x: 0, y: 0}
-  isSlidingRoutineRunning: 0
   slideSpeedModifer: 1
-  isDiving: 0
-  DivingRoutineRunning: 0
   throwingRoutine: 0
-  isBlocking: 0
-  isKicking: 0
   KickPowerBarHolder: {fileID: 5489254380469092858}
   KickPowerBarFillerImage: {fileID: 5489254381653759693}
   KickoffAimArrow: {fileID: 5421458980286032850}
@@ -5779,37 +5729,22 @@ MonoBehaviour:
   GoblinMaxKickDistance: 25
   GoblinMinKickDistance: 8
   GoblinPowerBarSpeed: 3
-  GoblinKickPower: 0
   currentPowerBarScale: 0
   powerBarDirection: 1
   kickoffAngle: 0
-  GoblinKickoffAngle: 0
   aimArrowButtonHeldDown: 0
   aimArrowUp: 0
-  isKickAfterGoblin: 0
-  isKickAfterPositionSet: 0
-  angleOfKickAttempt: 0
-  kickAfterAccuracyDifficulty: 0
   repositioningButtonHeldDown: 0
   repositioningToLeft: 0
-  kickAfterFinalPosition: {x: 0, y: 0}
   hasGoblinBeenRepositionedForKickAfter: 0
   kickAfterAccuracyBar: {fileID: 3528604712698556757}
   kickAfterGuageLine: {fileID: 8623424958151274391}
   kickAfterMarkerLeft: {fileID: 4241995745418402742}
   kickAfterMarkerRight: {fileID: 6654117388901068638}
-  accuracyValueSubmitted: 0
-  powerValueSubmitted: 0
   isGoblinDoingKickAfterAttempt: 0
   AccuracyBarSpeed: 7.25
-  isWasPunchedRoutineRunning: 0
   wasPunchedSpeedModifier: 1
   gameFootball: {fileID: 0}
-  canGoblinReceivePass: 0
-  isStaminaRecoveryRoutineRunning: 0
-  isHealthRecoveryRoutineRunning: 0
-  canGoblinRegainHealth: 0
-  isRegainHealthRoutineRunning: 0
   isTrippedTimerRunning: 0
   punchBoxCollider: {fileID: 1434055712533138084}
   hurtBoxCollider: {fileID: 113806167033823833}
@@ -5821,9 +5756,6 @@ MonoBehaviour:
   spriteFlash: {fileID: -2641077922915985335}
   fatigueSweatDrop: {fileID: 9030179477220425553}
   wasPunchedBandAid: {fileID: 659607411446039491}
-  onWaterSlowDown: 0
-  onBrushSlowDown: 0
-  onGlueSlowDown: 0
   firstFootStep: 0
   mySoundManager: {fileID: 4779183014886081214}
   state: 0
@@ -5863,22 +5795,6 @@ MonoBehaviour:
   teammateCollisionDirectionModifer: {x: 0, y: 0}
   diveCheckTime: 0
   diveCheckRate: 0.25
---- !u!114 &2300833731266782456
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6877901074420270458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f6f3bf89aa97405989c802ba270f815, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  clientAuthority: 1
-  animator: {fileID: 6877901074420270406}
 --- !u!114 &5128232167220223196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5919,7 +5835,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flashMaterial: {fileID: 2100000, guid: 3cd0b6c203e71604690af0ec8cbbd256, type: 2}
   duration: 0.125
---- !u!114 &7229146345318371590
+--- !u!114 &4602389167676144919
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5928,54 +5844,123 @@ MonoBehaviour:
   m_GameObject: {fileID: 6877901074420270458}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad225009ad414e1428332cab226f38fd, type: 3}
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  interpolationBackTime: 0.1
-  extrapolationMode: 1
-  useExtrapolationTimeLimit: 1
-  extrapolationTimeLimit: 5
-  useExtrapolationDistanceLimit: 0
-  extrapolationDistanceLimit: 20
-  sendPositionThreshold: 0
-  sendRotationThreshold: 0
-  sendScaleThreshold: 0
-  sendVelocityThreshold: 0
-  sendAngularVelocityThreshold: 0
-  receivedPositionThreshold: 0
-  receivedRotationThreshold: 0
-  snapPositionThreshold: 0
-  snapRotationThreshold: 0
-  snapScaleThreshold: 0
-  positionLerpSpeed: 0.85
-  rotationLerpSpeed: 0.85
-  scaleLerpSpeed: 0.85
-  timeCorrectionSpeed: 0.1
-  snapTimeThreshold: 0.3
-  syncPosition: 1
-  syncRotation: 7
-  syncScale: 7
-  syncVelocity: 1
-  syncAngularVelocity: 1
-  isPositionCompressed: 0
-  isRotationCompressed: 0
-  isScaleCompressed: 0
-  isVelocityCompressed: 0
-  isAngularVelocityCompressed: 0
-  automaticallyResetTime: 1
-  isSmoothingAuthorityChanges: 0
-  transformSource: 0
-  whenToUpdateTransform: 0
-  sendRate: 30
-  networkChannel: 1
-  childObjectToSync: {fileID: 0}
-  setVelocityInsteadOfPositionOnNonOwners: 0
-  maxPositionDifferenceForVelocitySyncing: 10
-  useLocalTransformOnly: 0
-  ownerChangeIndicator: 1
-  receivedStatesCounter: 0
+  <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 65535
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 4928511553074952642
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
+--- !u!114 &838839579481094613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6877901074420270458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 4602389167676144919}
+  _networkObjectCache: {fileID: 0}
+  _componentConfiguration: 0
+  _synchronizeParent: 0
+  _packing:
+    Position: 1
+    Rotation: 1
+    Scale: 0
+  _useScaledTime: 1
+  _interpolation: 2
+  _extrapolation: 2
+  _enableTeleport: 1
+  _teleportThreshold: 3
+  _clientAuthoritative: 1
+  _sendToOwner: 1
+  _useLevelOfDetail: 0
+  _interval: 3
+  _synchronizePosition: 1
+  _positionSensitivity: 0.001
+  _positionSnapping:
+    X: 0
+    Y: 0
+    Z: 0
+  _synchronizeRotation: 0
+  _rotationSnapping:
+    X: 0
+    Y: 0
+    Z: 0
+  _synchronizeScale: 0
+  _scaleSensitivity: 0.001
+  _scaleSnapping:
+    X: 0
+    Y: 0
+    Z: 0
+--- !u!114 &9137906919485296293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6877901074420270458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 4602389167676144919}
+  _networkObjectCache: {fileID: 0}
+  IgnoredParameters: []
+  _animator: {fileID: 6877901074420270406}
+  _synchronizeWhenDisabled: 0
+  _smoothFloats: 1
+  _interpolation: 2
+  _clientAuthoritative: 1
+  _sendToOwner: 0
 --- !u!1 &7893613754978918313
 GameObject:
   m_ObjectHideFlags: 0
@@ -6147,7 +6132,7 @@ SpriteRenderer:
   m_SpriteSortPoint: 1
 --- !u!95 &4342542764532951522
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -6164,7 +6149,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &512584641651856499
 PrefabInstance:
   m_ObjectHideFlags: 0

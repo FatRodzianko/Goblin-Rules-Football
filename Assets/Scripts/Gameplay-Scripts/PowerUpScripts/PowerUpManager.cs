@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using UnityEngine.UI;
 using TMPro;
 
@@ -34,13 +38,13 @@ public class PowerUpManager : NetworkBehaviour
 
     [Header("Active Power Ups")]
     public List<GameObject> ActivePowerUps = new List<GameObject>();
-    public List<uint> ActivePowerUpNetIds = new List<uint>();
+    public List<int> ActivePowerUpNetIds = new List<int>();
     public int blueShellCount = 0;
     [SerializeField] float _timeSinceLastBlueShell = 0f;
 
     [Header("Player Picked Up Power Ups")]
     public List<GameObject> PlayerPickedUpPowerUps = new List<GameObject>();
-    public Dictionary<uint, uint> PowerUpPlayerOwnerDictionary = new Dictionary<uint, uint>();
+    public Dictionary<int, int> PowerUpPlayerOwnerDictionary = new Dictionary<int, int>();
 
     [Header("UI to update for gamepad/keyboard controls")]
     [SerializeField] private GameObject PowerUpText1;
@@ -110,7 +114,7 @@ public class PowerUpManager : NetworkBehaviour
     {
         
     }
-    [ServerCallback]
+    [Server]
     public void StartGeneratingPowerUps(bool generate)
     {
         Debug.Log("StartGeneratingPowerUps: " + generate.ToString());
@@ -131,7 +135,7 @@ public class PowerUpManager : NetworkBehaviour
             StopCoroutine(powerUpGeneartor);            
         }
     }
-    [ServerCallback]
+    [Server]
     IEnumerator GeneratePowerUpsRoutine()
     {
         isPowerUpGeneratorRunning = true;
@@ -146,7 +150,7 @@ public class PowerUpManager : NetworkBehaviour
         //yield return new WaitForSeconds(1.0f);
         yield break;
     }
-    [ServerCallback]
+    [Server]
     void CheckIfAPowerUpDrops()
     {
         if (ActivePowerUpNetIds.Count < 13)
@@ -210,7 +214,7 @@ public class PowerUpManager : NetworkBehaviour
                 NormalPowerUpDrop();
         }
     }
-    [ServerCallback]
+    [Server]
     void NormalPowerUpDrop()
     {
         Debug.Log("NormalPowerUpDrop");
@@ -280,12 +284,12 @@ public class PowerUpManager : NetworkBehaviour
             powerUp.transform.position = new Vector3(xPosition, yPosition, 0f);
         }
 
-        NetworkServer.Spawn(powerUp);
+        InstanceFinder.ServerManager.Spawn(powerUp);
         ActivePowerUps.Add(powerUp);
-        ActivePowerUpNetIds.Add(powerUp.GetComponent<NetworkIdentity>().netId);
+        ActivePowerUpNetIds.Add(powerUp.GetComponent<NetworkObject>().ObjectId);
 
     }
-    [ServerCallback]
+    [Server]
     void BlueShellPowerUpDrop(GamePlayer playerDownBad)
     {   
         if (playerDownBad != null && blueShellCount < 2)
@@ -364,53 +368,53 @@ public class PowerUpManager : NetworkBehaviour
                 powerUp.transform.position = new Vector3(xPosition, yPosition, 0f);
             }
 
-            NetworkServer.Spawn(powerUp);
+            InstanceFinder.ServerManager.Spawn(powerUp);
             ActivePowerUps.Add(powerUp);
-            ActivePowerUpNetIds.Add(powerUp.GetComponent<NetworkIdentity>().netId);
+            ActivePowerUpNetIds.Add(powerUp.GetComponent<NetworkObject>().ObjectId);
             blueShellCount++;
         }        
     }
     [Server]
-    public void DestroyPowerUp(uint powerUpNetId)
+    public void DestroyPowerUp(int powerUpNetId)
     {
-        GameObject powerUptoDestroy = NetworkIdentity.spawned[powerUpNetId].gameObject;
+        GameObject powerUptoDestroy = ObjectLookup.Get(powerUpNetId).gameObject;
         //ActivePowerUps.Remove(powerUptoDestroy);
         //ActivePowerUpNetIds.Remove(powerUpNetId);
         RemovePowerUpFromLists(powerUpNetId);
         RemovePowerUpOwnedByPlayer(powerUpNetId);
         if (powerUptoDestroy.GetComponent<PowerUp>().isBlueShell)
             blueShellCount--;
-        NetworkServer.Destroy(powerUptoDestroy);
+        InstanceFinder.ServerManager.Despawn(powerUptoDestroy);
     }
     [Server]
-    public void RemovePowerUpFromLists(uint powerUpNetId)
+    public void RemovePowerUpFromLists(int powerUpNetId)
     {        
         if (ActivePowerUpNetIds.Contains(powerUpNetId))
         {
-            GameObject powerUpToRemove = NetworkIdentity.spawned[powerUpNetId].gameObject;
+            GameObject powerUpToRemove = ObjectLookup.Get(powerUpNetId).gameObject;
             ActivePowerUps.Remove(powerUpToRemove);
             ActivePowerUpNetIds.Remove(powerUpNetId);
         }
         
     }
-    public void RemovePowerUpOwnedByPlayer(uint powerUpNetId)
+    public void RemovePowerUpOwnedByPlayer(int powerUpNetId)
     {
         if (PowerUpPlayerOwnerDictionary.ContainsKey(powerUpNetId))
         {
-            GameObject powerUpToRemove = NetworkIdentity.spawned[powerUpNetId].gameObject;
+            GameObject powerUpToRemove = ObjectLookup.Get(powerUpNetId).gameObject;
             PlayerPickedUpPowerUps.Remove(powerUpToRemove);
             PowerUpPlayerOwnerDictionary.Remove(powerUpNetId);
         }
     }
-    public void AddPowerupOwnedByPlayer(uint powerUpNetId, uint playerOwner)
+    public void AddPowerupOwnedByPlayer(int powerUpNetId, int playerOwner)
     {
         if (!PowerUpPlayerOwnerDictionary.ContainsKey(powerUpNetId))
         {
             PowerUpPlayerOwnerDictionary.Add(powerUpNetId, playerOwner);
-            GameObject powerUpToAdd = NetworkIdentity.spawned[powerUpNetId].gameObject;
+            GameObject powerUpToAdd = ObjectLookup.Get(powerUpNetId).gameObject;
             PlayerPickedUpPowerUps.Add(powerUpToAdd);
             // Track when a team has picked up a power up
-            GamePlayer player = NetworkIdentity.spawned[playerOwner].GetComponent<GamePlayer>();
+            GamePlayer player = ObjectLookup.Get(playerOwner).GetComponent<GamePlayer>();
             TeamManager.instance.PowerUpCollectedOrUsed(player, false);
         }
     }
@@ -481,13 +485,13 @@ public class PowerUpManager : NetworkBehaviour
             }
         }
     }
-    [ServerCallback]
-    public void PlayerUsePowerUp(uint powerUpNetId, uint playerNetId)
+    [Server]
+    public void PlayerUsePowerUp(int powerUpNetId, int playerNetId)
     {
         if (PowerUpPlayerOwnerDictionary.ContainsKey(powerUpNetId) && PowerUpPlayerOwnerDictionary[powerUpNetId] == playerNetId)
         {
             Debug.Log("PowerUpManager PlayerUsePowerUp: The player with netid " + playerNetId.ToString() + " owns the powerup with net id: " + powerUpNetId.ToString());
-            GameObject powerUpToUse = NetworkIdentity.spawned[powerUpNetId].gameObject;
+            GameObject powerUpToUse = ObjectLookup.Get(powerUpNetId).gameObject;
             PowerUp powerUpToUseScript = powerUpToUse.GetComponent<PowerUp>();
 
             //bool canPlayerUsePowerUp = powerUpToUse.GetComponent<PowerUp>().UsePowerUp();
@@ -496,7 +500,7 @@ public class PowerUpManager : NetworkBehaviour
             if (canPlayerUsePowerUp)
             {
                 powerUpToUseScript.remainingUses--;
-                GamePlayer player = NetworkIdentity.spawned[playerNetId].GetComponent<GamePlayer>();
+                GamePlayer player = ObjectLookup.Get(playerNetId).GetComponent<GamePlayer>();
                 if (powerUpToUseScript.remainingUses <= 0)
                 {
                     Debug.Log("PlayerUsePowerUp: Player successfully used their powerup. Removing the powerup from the game.");
@@ -512,7 +516,7 @@ public class PowerUpManager : NetworkBehaviour
                         blueShellCount--;
                     }
                         
-                    NetworkServer.Destroy(powerUpToUse);
+                    InstanceFinder.ServerManager.Despawn(powerUpToUse);
                     // Track when a team has picked up a power up
                     TeamManager.instance.PowerUpCollectedOrUsed(player, true);
                 }
@@ -531,7 +535,7 @@ public class PowerUpManager : NetworkBehaviour
             }
         }
     }
-    [ClientCallback]
+    [Client]
     public void GamepadActivateSelectedPowerUpBorder(int index)
     {
         if (index <= 4)

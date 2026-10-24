@@ -1,17 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Component.Animating;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class BottleBlueShellScript : NetworkBehaviour
 {
     [Header("Target Info")]
     public GameObject myTarget;
-    [SyncVar] public uint myTargetNetId;
+    private readonly SyncVar<int> _syncMyTargetNetId = new SyncVar<int>(ObjectLookup.NoObject);
+    public int myTargetNetId { get => _syncMyTargetNetId.Value; set => _syncMyTargetNetId.Value = value; }
 
     [Header("Animation Stuff")]
     [SerializeField] SpriteRenderer mySpriteRenderer;
     [SerializeField] Animator myAnimator;
+    NetworkAnimator networkAnimator;
     [SerializeField] string playerCollisionAnimationName;
 
     [Header("Other stuff???")]
@@ -26,6 +33,7 @@ public class BottleBlueShellScript : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        networkAnimator = GetComponent<NetworkAnimator>();
         Debug.Log("Start function for BottleBlueShellScript on: " + this.name);
     }
 
@@ -34,14 +42,14 @@ public class BottleBlueShellScript : NetworkBehaviour
     {
 
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void FixedUpdate()
     {
         if (!myTarget)
             return;
         if (!(GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
         {
-            NetworkServer.Destroy(this.gameObject);
+            InstanceFinder.ServerManager.Despawn(this.gameObject);
         }
         if (Vector2.Distance(this.transform.position, myTarget.transform.position) > 0.15f && !this.hasHitTargetYet)
         {
@@ -72,13 +80,13 @@ public class BottleBlueShellScript : NetworkBehaviour
             rb.MovePosition(rb.position + directionToFly * speed * Time.fixedDeltaTime);
         }
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log("OnTriggerEnter2D for BottleBlueShellScript: " + this.name);
         if (!(GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
         {
-            NetworkServer.Destroy(this.gameObject);
+            InstanceFinder.ServerManager.Despawn(this.gameObject);
         }
 
         //if ((collision.tag == "goblin-body" || collision.name == "diving-hitbox") && collision.transform.parent.gameObject == myTarget)
@@ -86,20 +94,21 @@ public class BottleBlueShellScript : NetworkBehaviour
         {
             Debug.Log("BottleBlueShellScript: collided with goblin named: " + collision.transform.parent.name);
             hasHitTargetYet = true;
-            uint goblinNetId = collision.transform.parent.gameObject.GetComponent<NetworkIdentity>().netId;
+            int goblinNetId = collision.transform.parent.gameObject.GetComponent<NetworkObject>().ObjectId;
             GoblinScript goblinHit = collision.transform.parent.gameObject.GetComponent<GoblinScript>();
             if(!goblinHit.isGoblinKnockedOut)
                 goblinHit.KnockOutGoblin(true);
             this.GetComponent<BoxCollider2D>().enabled = false;
             this.transform.Rotate(0f, 0f, -90f, Space.Self);
-            myAnimator.Play(playerCollisionAnimationName);
+            // Through the NetworkAnimator, so clients see it: FishNet only sends state changes made through it.
+            networkAnimator.Play(playerCollisionAnimationName, 0, float.NegativeInfinity);
         }
     }
     public void PlayHitClip()
     {
         this.PlaySFXClip(sfxCollisionName);
     }
-    [ClientCallback]
+    [Client]
     void PlaySFXClip(string clipName)
     {
         Debug.Log("PowerUpThrownObject: RpcPlaySFXClip for " + this.name);
@@ -122,9 +131,9 @@ public class BottleBlueShellScript : NetworkBehaviour
     }
     public void DestroyObjectOnServer()
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            NetworkServer.Destroy(this.gameObject);
+            InstanceFinder.ServerManager.Despawn(this.gameObject);
         }
     }
 }

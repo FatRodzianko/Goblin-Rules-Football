@@ -264,15 +264,17 @@ public class GolfSteamLobby : MonoBehaviour
         Debug.Log("GolfSteamLobby: OnLobbyEntered: game status: " + lobbyGameStatus);
         if (!lobbyGameStatus.Equals("Lobby"))
             return;
-        SceneLoadData sld = new SceneLoadData("Golf-prototype-topdown");
-        sld.ReplaceScenes = ReplaceOption.All;
-        FishNet.InstanceFinder.SceneManager.LoadGlobalScenes(sld);
 
+        // Only the host loads the Golf scene. Clients get it from the server once they connect; FishNet ignores (and warns
+        // about) a client calling LoadGlobalScenes.
         // The host's own client waits until the Golf scene has loaded on the server. Started now, FishNet could spawn the
         // host's NetworkPlayer while the scene was still loading: before LobbyManagerGolf existed, or into FishNet's temporary
         // MovedObjectsHolder scene, where other players never see it.
         if (FishNet.InstanceFinder.IsServerStarted)
         {
+            SceneLoadData sld = new SceneLoadData("Golf-prototype-topdown");
+            sld.ReplaceScenes = ReplaceOption.All;
+            FishNet.InstanceFinder.SceneManager.LoadGlobalScenes(sld);
             _startHostClientWhenGolfSceneLoads = true;
             return;
         }

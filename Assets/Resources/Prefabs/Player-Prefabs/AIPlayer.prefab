@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 677765127462633066}
   - component: {fileID: 554441546451090241}
-  - component: {fileID: 5546099445483979728}
   - component: {fileID: 8925233755424393115}
+  - component: {fileID: 6563871229202307048}
   m_Layer: 0
   m_Name: AIPlayer
   m_TagString: GamePlayer
@@ -46,33 +46,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5656914e82f7a914fb06f9e07604ebda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  PlayerName: AIPlayer
-  ConnectionId: 0
-  playerNumber: 0
-  IsGameLeader: 0
-  playerSteamId: 0
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 6563871229202307048}
+  _networkObjectCache: {fileID: 0}
   inputSystemUIInputModule: {fileID: 0}
   moveReference: {fileID: 2739214424016785584, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
   submitReference: {fileID: 8772204883310439263, guid: 299f8c0cd36b2b74f8be31b1ac5d986c, type: 3}
   defaultInputActions: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   isGamePaused: 0
   lastBlockTime: 0
-  is1v1: 0
-  isSinglePlayer: 0
-  goblinType: 
   inputManagerActivated: 0
-  doesPlayerChooseCoin: 0
-  headsOrTailsPlayer: 
-  didPlayerChooseCoinYet: 0
-  doesPlayerChooseKickOrReceive: 0
-  kickOrReceivePlayer: 
-  didPlayerChooseKickOrReceiveYet: 0
   grenadierPrefab: {fileID: 2813347414334592412, guid: f7720441b1bc157408ea0350600bb10c, type: 3}
   skrimisherPrefab: {fileID: 6877901074420270458, guid: 34a417c9969d212469e52634d54a7943, type: 3}
   berserkerPrefab: {fileID: 6607051740916151457, guid: 69a9098d43dc0264282833d6ed2fe98e, type: 3}
-  areCharactersSpawnedYet: 0
   goblinTeam: []
   goblinTeamOnServer: []
   selectGoblin: {fileID: 0}
@@ -82,9 +68,6 @@ MonoBehaviour:
   serverSelectGoblin: {fileID: 0}
   qeTime: 0
   myTeam: {fileID: 0}
-  teamName: 
-  doesTeamHaveBall: 0
-  isTeamGrey: 0
   myPowerUps: []
   serverPowerUpUints: 
   powerUpSelectedIndexNumber: 0
@@ -108,23 +91,10 @@ MonoBehaviour:
   kickAfterKickingEnabled: 0
   powerUpsEnabled: 0
   menuNavigationEnabled: 0
-  coinTossControlsOnServer: 0
-  kickOrReceiveControlsOnServer: 0
-  qeSwitchingControlsOnServer: 0
-  kickingControlsOnServer: 0
-  kickOffAimArrowControlsOnServer: 0
-  goblinMovementControlsOnServer: 0
-  gameplayActionControlsOnServer: 0
-  kickAfterPositioningControlsOnServer: 0
-  kickAfterKickingControlsOnServer: 0
-  powerupsControlsOnServer: 0
-  possessionPoints: 0
-  gainPossessionPointsRate: 2.5
   isGainingPossesionPointsRoutineRunning: 0
   isLosingPossesionPointsRoutineRunning: 0
   isNoPossessionCooldownRoutineRunning: 0
   didNoPossessionCooldownRoutineComplete: 0
-  possessionBonus: 1
   isErrorMessageDisplayed: 0
   myAiPlayer: {fileID: 8925233755424393115}
   GreenGrenadierStartingPosition: {x: -9, y: 2.45, z: 0}
@@ -145,23 +115,6 @@ MonoBehaviour:
   ReceivingPositionGreyGrenadier: {x: 11, y: 3, z: 0}
   ReceivingPositionGreyBerserker: {x: 11, y: -5, z: 0}
   ReceivingPositionGreySkirmisher: {x: 22.5, y: -1, z: 0}
---- !u!114 &5546099445483979728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 746005145141606358}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  visible: 0
-  m_AssetId: 99ad0a2136d863b43b69c51e64ec3a12
-  hasSpawned: 0
 --- !u!114 &8925233755424393115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,8 +127,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68a900518080f104881aadf254242c78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 6563871229202307048}
+  _networkObjectCache: {fileID: 0}
   myPlayerScript: {fileID: 0}
   minKickAngle: -45
   maxKickAngle: 45
@@ -256,3 +210,60 @@ MonoBehaviour:
   blueShellSelfIndex: 0
   hasBottlePowerUp: 0
   bottlePowerUpIndex: 0
+--- !u!114 &6563871229202307048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746005145141606358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 1
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
+  _initializedTimestamp: 0
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 65535
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 17636702036572141300
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0

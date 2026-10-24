@@ -135,7 +135,10 @@ public class LightningManager : NetworkBehaviour
         {
             Debug.Log("LightningManager: UpdateWeather: is there rain?: " + isRain.ToString());
             StopLightningRoutineStuff();
-            IsThereLightning = false;
+            // This runs on every machine when the weather changes, but only the server writes the SyncVar. Clients get
+            // the value from it.
+            if (IsServerInitialized)
+                IsThereLightning = false;
 
         }
     }

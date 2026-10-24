@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class TeamManager : NetworkBehaviour
 {
@@ -236,7 +240,7 @@ public class TeamManager : NetworkBehaviour
                     team.SendYeehawsToTeammates();
                 }
             }
-            player.RpcYeehawAchievement(player.connectionToClient);
+            player.RpcYeehawAchievement(player.Owner);
         }
     }
 }

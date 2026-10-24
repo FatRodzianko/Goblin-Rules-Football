@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class BottleBlueShellSpawner : NetworkBehaviour
 {
@@ -56,15 +60,15 @@ public class BottleBlueShellSpawner : NetworkBehaviour
             bottleObject.transform.localRotation = Quaternion.Euler(0, 0f, (90f * directionModifier));
 
             bottleObject.transform.position = startingPosition;
-            NetworkServer.Spawn(bottleObject);
+            InstanceFinder.ServerManager.Spawn(bottleObject);
 
             BottleBlueShellScript bottleObjectScript = bottleObject.GetComponent<BottleBlueShellScript>();
             bottleObjectScript.myTarget = goblin.gameObject;
-            bottleObjectScript.myTargetNetId = goblin.GetComponent<NetworkIdentity>().netId;
+            bottleObjectScript.myTargetNetId = goblin.GetComponent<NetworkObject>().ObjectId;
 
             yield return new WaitForSeconds(0.5f);
         }
-        NetworkServer.Destroy(this.gameObject);
+        InstanceFinder.ServerManager.Despawn(this.gameObject);
         yield break;
     }
 

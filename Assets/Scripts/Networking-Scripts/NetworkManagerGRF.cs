@@ -78,6 +78,7 @@ public class NetworkManagerGRF : MonoBehaviour
         _networkManager.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
         _networkManager.ServerManager.OnRemoteConnectionState += ServerManager_OnRemoteConnectionState;
         _networkManager.ClientManager.OnClientConnectionState += ClientManager_OnClientConnectionState;
+        _networkManager.SceneManager.OnLoadStart += SceneManager_OnLoadStart;
         _networkManager.SceneManager.OnLoadEnd += SceneManager_OnLoadEnd;
     }
     private void OnDestroy()
@@ -90,6 +91,7 @@ public class NetworkManagerGRF : MonoBehaviour
         _networkManager.ServerManager.OnServerConnectionState -= ServerManager_OnServerConnectionState;
         _networkManager.ServerManager.OnRemoteConnectionState -= ServerManager_OnRemoteConnectionState;
         _networkManager.ClientManager.OnClientConnectionState -= ClientManager_OnClientConnectionState;
+        _networkManager.SceneManager.OnLoadStart -= SceneManager_OnLoadStart;
         _networkManager.SceneManager.OnLoadEnd -= SceneManager_OnLoadEnd;
     }
     // Mirror's StartHost loaded the online scene (LobbyScene) and then added the host's player there. Start the server now;
@@ -180,8 +182,29 @@ public class NetworkManagerGRF : MonoBehaviour
     {
         _isFootballSession = false;
         _startHostClientWhenLobbyLoads = false;
+        // This object outlives the session, so clear what the last one left behind, on clients too.
+        LobbyPlayers.Clear();
+        GamePlayers.Clear();
+        ResetWaitingForPlayersToLoadStuff();
+        DestroyWaitingForPlayersCanvas();
         if (SceneManager.GetActiveScene().name != "TitleScreen")
             SceneManager.LoadScene("TitleScreen");
+    }
+    // Shows the waiting-for-players screen while the gameplay scene loads, as Mirror's OnClientChangeScene did.
+    // On the host FishNet may raise this for both its server and client side, so only show it once.
+    private void SceneManager_OnLoadStart(FishNet.Managing.Scened.SceneLoadStartEventArgs args)
+    {
+        if (!_isFootballSession || !_networkManager.IsClientStarted || waitingForPlayersObject != null)
+            return;
+        foreach (FishNet.Managing.Scened.SceneLookupData sceneData in args.QueueData.SceneLoadData.SceneLookupDatas)
+        {
+            if (System.IO.Path.GetFileNameWithoutExtension(sceneData.FullName) == "Gameplay-768-432")
+            {
+                waitingForPlayersObject = Instantiate(WaitingForPlayersCanvas);
+                DontDestroyOnLoad(waitingForPlayersObject);
+                return;
+            }
+        }
     }
     private void SceneManager_OnLoadEnd(FishNet.Managing.Scened.SceneLoadEndEventArgs args)
     {
@@ -222,9 +245,43 @@ public class NetworkManagerGRF : MonoBehaviour
     {
         if (CanStartGame() && SceneManager.GetActiveScene().name == "LobbyScene")
         {
-            // Loading the gameplay scene, and spawning a GamePlayer for each LobbyPlayer, moves to FishNet in the
-            // core match step of the conversion. Until then the lobby stays open.
-            Debug.Log("StartGame: everyone is ready, but gameplay isn't converted to FishNet yet. Staying in the lobby.");
+            // Mirror's ServerChangeScene override built a GamePlayer for each LobbyPlayer and swapped it in as that
+            // connection's player. FishNet has no player slot, so each GamePlayer is spawned with the same owner and the
+            // LobbyPlayer is removed (its OnDestroy still leaves the Steam lobby). GamePlayer is a global object, so it
+            // survives the scene change.
+            List<LobbyPlayer> lobbyPlayers = new List<LobbyPlayer>(LobbyPlayers);
+            for (int i = lobbyPlayers.Count - 1; i >= 0; i--)
+            {
+                LobbyPlayer lobbyPlayer = lobbyPlayers[i];
+                NetworkConnection conn = lobbyPlayer.Owner;
+                GamePlayer gamePlayerInstance = Instantiate(gamePlayerPrefab);
+
+                // Set before Spawn so the values go out with the spawn. The [Server] setters would skip here: the object
+                // isn't spawned yet.
+                gamePlayerInstance.PlayerName = lobbyPlayer.PlayerName;
+                gamePlayerInstance.ConnectionId = lobbyPlayer.ConnectionId;
+                gamePlayerInstance.playerNumber = lobbyPlayer.playerNumber;
+                gamePlayerInstance.IsGameLeader = lobbyPlayer.IsGameLeader;
+                gamePlayerInstance.playerSteamId = lobbyPlayer.playerSteamId;
+                gamePlayerInstance.is1v1 = lobbyPlayer.is1v1;
+                gamePlayerInstance.isSinglePlayer = lobbyPlayer.isSinglePlayer;
+                if (!this.is1v1 && !this.isSinglePlayer)
+                {
+                    gamePlayerInstance.isTeamGrey = lobbyPlayer.isTeamGrey;
+                    gamePlayerInstance.goblinType = lobbyPlayer.goblinType;
+                }
+                else if (this.isSinglePlayer)
+                {
+                    gamePlayerInstance.isTeamGrey = lobbyPlayer.isTeamGrey;
+                }
+
+                _networkManager.ServerManager.Spawn(gamePlayerInstance.gameObject, conn);
+                _networkManager.ServerManager.Despawn(lobbyPlayer.gameObject);
+                Debug.Log("Spawned new GamePlayer: " + gamePlayerInstance.PlayerName);
+            }
+            FishNet.Managing.Scened.SceneLoadData gameplayScene = new FishNet.Managing.Scened.SceneLoadData("Gameplay-768-432");
+            gameplayScene.ReplaceScenes = FishNet.Managing.Scened.ReplaceOption.All;
+            _networkManager.SceneManager.LoadGlobalScenes(gameplayScene);
         }
     }
     private bool CanStartGame()
@@ -313,6 +370,10 @@ public class NetworkManagerGRF : MonoBehaviour
         // Check if all players have finished loading
         foreach (GamePlayer player in GamePlayers)
         {
+            // The AI has no client to report its football, as with the goblin check below. Mirror's host reported the
+            // football before the AI was spawned, so it never had to wait for the AI. FishNet's report arrives after.
+            if (this.isSinglePlayer && player.playerNumber == 2)
+                continue;
             if (!playersWithFootballSpawned.Contains(player.playerNumber))
             {
                 areFootballsSpawned = false;

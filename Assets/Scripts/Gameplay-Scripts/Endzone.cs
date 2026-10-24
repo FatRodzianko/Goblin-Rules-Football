@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class Endzone : NetworkBehaviour
 {
@@ -18,7 +22,7 @@ public class Endzone : NetworkBehaviour
     {
         
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log("OnTriggerEnter2D for " + this.name);
@@ -41,7 +45,7 @@ public class Endzone : NetworkBehaviour
             if (goblin.doesCharacterHaveBall && isGrey != goblin.isGoblinGrey)
             {
                 Debug.Log(this.name + ": Goblin with ball touched down in opposite endzone. This should be a touchdown. Goblin: " + goblin.name);
-                GameplayManager.instance.TouchDownScored(goblin.isGoblinGrey, goblin.GetComponent<NetworkIdentity>().netId, goblin.transform.position.y);
+                GameplayManager.instance.TouchDownScored(goblin.isGoblinGrey, goblin.GetComponent<NetworkObject>().ObjectId, goblin.transform.position.y);
                 GameplayManager.instance.ActivateGameTimer(false);
             }
         }

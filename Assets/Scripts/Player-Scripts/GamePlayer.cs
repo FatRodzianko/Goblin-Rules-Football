@@ -1,7 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System.Linq;
 using System;
 using Cinemachine;
@@ -13,11 +17,16 @@ using TMPro;
 public class GamePlayer : NetworkBehaviour
 {
     [Header("Player Info")]
-    [SyncVar] public string PlayerName;
-    [SyncVar] public int ConnectionId;
-    [SyncVar] public int playerNumber;
-    [SyncVar] public bool IsGameLeader;
-    [SyncVar] public ulong playerSteamId;
+    private readonly SyncVar<string> _syncPlayerName = new SyncVar<string>();
+    public string PlayerName { get => _syncPlayerName.Value; set => _syncPlayerName.Value = value; }
+    private readonly SyncVar<int> _syncConnectionId = new SyncVar<int>();
+    public int ConnectionId { get => _syncConnectionId.Value; set => _syncConnectionId.Value = value; }
+    private readonly SyncVar<int> _syncPlayerNumber = new SyncVar<int>();
+    public int playerNumber { get => _syncPlayerNumber.Value; set => _syncPlayerNumber.Value = value; }
+    private readonly SyncVar<bool> _syncIsGameLeader = new SyncVar<bool>();
+    public bool IsGameLeader { get => _syncIsGameLeader.Value; set => _syncIsGameLeader.Value = value; }
+    private readonly SyncVar<ulong> _syncPlayerSteamId = new SyncVar<ulong>();
+    public ulong playerSteamId { get => _syncPlayerSteamId.Value; set => _syncPlayerSteamId.Value = value; }
     [SerializeField] InputSystemUIInputModule inputSystemUIInputModule;
     [SerializeField] InputActionReference moveReference;
     [SerializeField] InputActionReference submitReference;
@@ -29,30 +38,40 @@ public class GamePlayer : NetworkBehaviour
     float blockedKickTime = 0f;
 
     [Header("1v1 or 3v3 stuff")]
-    [SyncVar] public bool is1v1 = false;
-    [SyncVar] public bool isSinglePlayer = false;
-    [SyncVar] public string goblinType;
+    private readonly SyncVar<bool> _syncIs1v1 = new SyncVar<bool>();
+    public bool is1v1 { get => _syncIs1v1.Value; set => _syncIs1v1.Value = value; }
+    private readonly SyncVar<bool> _syncIsSinglePlayer = new SyncVar<bool>();
+    public bool isSinglePlayer { get => _syncIsSinglePlayer.Value; set => _syncIsSinglePlayer.Value = value; }
+    private readonly SyncVar<string> _syncGoblinType = new SyncVar<string>();
+    public string goblinType { get => _syncGoblinType.Value; set => _syncGoblinType.Value = value; }
 
     [Header("Coin Toss Info")]
     public bool inputManagerActivated = false;
-    [SyncVar(hook = nameof(HandleDoesPlayerChooseCoin))] public bool doesPlayerChooseCoin;
-    [SyncVar(hook = nameof(HandleHeadsOrTails))] public string headsOrTailsPlayer;
-    [SyncVar(hook = nameof(HandleDidPlayerChooseCoinYet))] public bool didPlayerChooseCoinYet;
+    private readonly SyncVar<bool> _syncDoesPlayerChooseCoin = new SyncVar<bool>();
+    public bool doesPlayerChooseCoin { get => _syncDoesPlayerChooseCoin.Value; set => _syncDoesPlayerChooseCoin.Value = value; }
+    private readonly SyncVar<string> _syncHeadsOrTailsPlayer = new SyncVar<string>();
+    public string headsOrTailsPlayer { get => _syncHeadsOrTailsPlayer.Value; set => _syncHeadsOrTailsPlayer.Value = value; }
+    private readonly SyncVar<bool> _syncDidPlayerChooseCoinYet = new SyncVar<bool>();
+    public bool didPlayerChooseCoinYet { get => _syncDidPlayerChooseCoinYet.Value; set => _syncDidPlayerChooseCoinYet.Value = value; }
 
     [Header("Kick or Receive Stuff")]
-    [SyncVar(hook = nameof(HandleDoesPlayerChooseKickOrReceive))] public bool doesPlayerChooseKickOrReceive;
-    [SyncVar(hook = nameof(HandleKickOrReceivePlayer))] public string kickOrReceivePlayer;
-    [SyncVar(hook = nameof(HandleDidPlayerChooseKickOrReceiveYet))] public bool didPlayerChooseKickOrReceiveYet;
+    private readonly SyncVar<bool> _syncDoesPlayerChooseKickOrReceive = new SyncVar<bool>();
+    public bool doesPlayerChooseKickOrReceive { get => _syncDoesPlayerChooseKickOrReceive.Value; set => _syncDoesPlayerChooseKickOrReceive.Value = value; }
+    private readonly SyncVar<string> _syncKickOrReceivePlayer = new SyncVar<string>();
+    public string kickOrReceivePlayer { get => _syncKickOrReceivePlayer.Value; set => _syncKickOrReceivePlayer.Value = value; }
+    private readonly SyncVar<bool> _syncDidPlayerChooseKickOrReceiveYet = new SyncVar<bool>();
+    public bool didPlayerChooseKickOrReceiveYet { get => _syncDidPlayerChooseKickOrReceiveYet.Value; set => _syncDidPlayerChooseKickOrReceiveYet.Value = value; }
 
     [Header("Characters")]
     [SerializeField] private GameObject grenadierPrefab;
     [SerializeField] private GameObject skrimisherPrefab;
     [SerializeField] private GameObject berserkerPrefab;
-    [SyncVar] public bool areCharactersSpawnedYet = false;
+    private readonly SyncVar<bool> _syncAreCharactersSpawnedYet = new SyncVar<bool>();
+    public bool areCharactersSpawnedYet { get => _syncAreCharactersSpawnedYet.Value; set => _syncAreCharactersSpawnedYet.Value = value; }
     
 
     [Header("My Goblin Team")]
-    public SyncList<uint> goblinTeamNetIds = new SyncList<uint>();
+    public readonly SyncList<int> goblinTeamNetIds = new SyncList<int>();
     public List<GoblinScript> goblinTeam = new List<GoblinScript>();
     public List<GoblinScript> goblinTeamOnServer = new List<GoblinScript>();
     public GoblinScript selectGoblin;
@@ -64,13 +83,16 @@ public class GamePlayer : NetworkBehaviour
     public Team myTeam;
 
     [Header("Team Info")]
-    [SyncVar] public string teamName;
-    [SyncVar] public bool doesTeamHaveBall;
-    [SyncVar(hook = nameof(HandleIsTeamGrey))] public bool isTeamGrey;
+    private readonly SyncVar<string> _syncTeamName = new SyncVar<string>();
+    public string teamName { get => _syncTeamName.Value; set => _syncTeamName.Value = value; }
+    private readonly SyncVar<bool> _syncDoesTeamHaveBall = new SyncVar<bool>();
+    public bool doesTeamHaveBall { get => _syncDoesTeamHaveBall.Value; set => _syncDoesTeamHaveBall.Value = value; }
+    private readonly SyncVar<bool> _syncIsTeamGrey = new SyncVar<bool>();
+    public bool isTeamGrey { get => _syncIsTeamGrey.Value; set => _syncIsTeamGrey.Value = value; }
 
     [Header("Power Ups")]
     public List<PowerUp> myPowerUps = new List<PowerUp>();
-    public List<uint> serverPowerUpUints = new List<uint>();
+    public List<int> serverPowerUpUints = new List<int>();
     public int powerUpSelectedIndexNumber = 0;
     public bool canSelectWithRightStickAgain = true;
     public float nextPowerUpSelectTime = 0f;
@@ -101,20 +123,32 @@ public class GamePlayer : NetworkBehaviour
     public bool menuNavigationEnabled = false;
     
     [Header("Controls From Server")]
-    [SyncVar] public bool coinTossControlsOnServer = false;
-    [SyncVar] public bool kickOrReceiveControlsOnServer = false;
-    [SyncVar] public bool qeSwitchingControlsOnServer = false;
-    [SyncVar] public bool kickingControlsOnServer = false;
-    [SyncVar] public bool kickOffAimArrowControlsOnServer = false;
-    [SyncVar] public bool goblinMovementControlsOnServer = false;
-    [SyncVar] public bool gameplayActionControlsOnServer = false;
-    [SyncVar] public bool kickAfterPositioningControlsOnServer = false;
-    [SyncVar] public bool kickAfterKickingControlsOnServer = false;
-    [SyncVar] public bool powerupsControlsOnServer = false;
+    private readonly SyncVar<bool> _syncCoinTossControlsOnServer = new SyncVar<bool>();
+    public bool coinTossControlsOnServer { get => _syncCoinTossControlsOnServer.Value; set => _syncCoinTossControlsOnServer.Value = value; }
+    private readonly SyncVar<bool> _syncKickOrReceiveControlsOnServer = new SyncVar<bool>();
+    public bool kickOrReceiveControlsOnServer { get => _syncKickOrReceiveControlsOnServer.Value; set => _syncKickOrReceiveControlsOnServer.Value = value; }
+    private readonly SyncVar<bool> _syncQeSwitchingControlsOnServer = new SyncVar<bool>();
+    public bool qeSwitchingControlsOnServer { get => _syncQeSwitchingControlsOnServer.Value; set => _syncQeSwitchingControlsOnServer.Value = value; }
+    private readonly SyncVar<bool> _syncKickingControlsOnServer = new SyncVar<bool>();
+    public bool kickingControlsOnServer { get => _syncKickingControlsOnServer.Value; set => _syncKickingControlsOnServer.Value = value; }
+    private readonly SyncVar<bool> _syncKickOffAimArrowControlsOnServer = new SyncVar<bool>();
+    public bool kickOffAimArrowControlsOnServer { get => _syncKickOffAimArrowControlsOnServer.Value; set => _syncKickOffAimArrowControlsOnServer.Value = value; }
+    private readonly SyncVar<bool> _syncGoblinMovementControlsOnServer = new SyncVar<bool>();
+    public bool goblinMovementControlsOnServer { get => _syncGoblinMovementControlsOnServer.Value; set => _syncGoblinMovementControlsOnServer.Value = value; }
+    private readonly SyncVar<bool> _syncGameplayActionControlsOnServer = new SyncVar<bool>();
+    public bool gameplayActionControlsOnServer { get => _syncGameplayActionControlsOnServer.Value; set => _syncGameplayActionControlsOnServer.Value = value; }
+    private readonly SyncVar<bool> _syncKickAfterPositioningControlsOnServer = new SyncVar<bool>();
+    public bool kickAfterPositioningControlsOnServer { get => _syncKickAfterPositioningControlsOnServer.Value; set => _syncKickAfterPositioningControlsOnServer.Value = value; }
+    private readonly SyncVar<bool> _syncKickAfterKickingControlsOnServer = new SyncVar<bool>();
+    public bool kickAfterKickingControlsOnServer { get => _syncKickAfterKickingControlsOnServer.Value; set => _syncKickAfterKickingControlsOnServer.Value = value; }
+    private readonly SyncVar<bool> _syncPowerupsControlsOnServer = new SyncVar<bool>();
+    public bool powerupsControlsOnServer { get => _syncPowerupsControlsOnServer.Value; set => _syncPowerupsControlsOnServer.Value = value; }
 
     [Header("Possession Tracker")]
-    [SyncVar(hook = nameof(HandlePossessionPoints))] public float possessionPoints = 0f;
-    [SyncVar] public float gainPossessionPointsRate = 2.5f;
+    private readonly SyncVar<float> _syncPossessionPoints = new SyncVar<float>();
+    public float possessionPoints { get => _syncPossessionPoints.Value; set => _syncPossessionPoints.Value = value; }
+    private readonly SyncVar<float> _syncGainPossessionPointsRate = new SyncVar<float>(2.5f);
+    public float gainPossessionPointsRate { get => _syncGainPossessionPointsRate.Value; set => _syncGainPossessionPointsRate.Value = value; }
     public bool isGainingPossesionPointsRoutineRunning = false;
     IEnumerator GainPossessionPointsRoutine;
     public bool isLosingPossesionPointsRoutineRunning = false;
@@ -122,7 +156,8 @@ public class GamePlayer : NetworkBehaviour
     public bool isNoPossessionCooldownRoutineRunning = false;
     public bool didNoPossessionCooldownRoutineComplete = false;
     IEnumerator NoPossessionCooldownRoutine;
-    [SyncVar(hook = nameof(HandlePossessionBonus))] public float possessionBonus = 1.0f;
+    private readonly SyncVar<float> _syncPossessionBonus = new SyncVar<float>(1.0f);
+    public float possessionBonus { get => _syncPossessionBonus.Value; set => _syncPossessionBonus.Value = value; }
 
     [Header("Error Message Stuff")]
     public bool isErrorMessageDisplayed = false;
@@ -167,10 +202,28 @@ public class GamePlayer : NetworkBehaviour
             return game = NetworkManagerGRF.singleton as NetworkManagerGRF;
         }
     }
-    public override void OnStartAuthority()
+    // The single-player AI's GamePlayer is owned by the host, so IsOwner alone can't tell it from the host's own player.
+    public bool isAIPlayer { get; private set; }
+    // Mirror's isLocalPlayer: the GamePlayer that this machine's player controls.
+    public bool isLocalPlayer => IsOwner && !isAIPlayer;
+
+    private void Awake()
     {
-        Debug.Log("OnStartAuthority for " + this.PlayerName);
-        base.OnStartAuthority();
+        isAIPlayer = GetComponent<AIPlayer>() != null;
+        _syncDoesPlayerChooseCoin.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleDoesPlayerChooseCoin(prev, next); };
+        _syncHeadsOrTailsPlayer.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleHeadsOrTails(prev, next); };
+        _syncDidPlayerChooseCoinYet.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleDidPlayerChooseCoinYet(prev, next); };
+        _syncDoesPlayerChooseKickOrReceive.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleDoesPlayerChooseKickOrReceive(prev, next); };
+        _syncKickOrReceivePlayer.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleKickOrReceivePlayer(prev, next); };
+        _syncDidPlayerChooseKickOrReceiveYet.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleDidPlayerChooseKickOrReceiveYet(prev, next); };
+        _syncIsTeamGrey.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsTeamGrey(prev, next); };
+        _syncPossessionPoints.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandlePossessionPoints(prev, next); };
+        _syncPossessionBonus.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandlePossessionBonus(prev, next); };
+    }
+    // This was Mirror's OnStartAuthority. OnStartClient calls it first for the owner, since Mirror ran it before OnStartClient.
+    void StartAsOwner()
+    {
+        Debug.Log("StartAsOwner for " + this.PlayerName);
         if (!this.isSinglePlayer)
         {
             gameObject.name = "LocalGamePlayer";
@@ -260,8 +313,11 @@ public class GamePlayer : NetworkBehaviour
     public override void OnStartClient()
     {
         Debug.Log("OnStartClient Spawned GamePlayer with ConnectionId: " + ConnectionId.ToString() + this.PlayerName);
-        DontDestroyOnLoad(gameObject);
+        // Mirror's DontDestroyOnLoad is now IsGlobal on the GamePlayer and AIPlayer prefabs. Moving a networked object
+        // by hand would take it out of the gameplay scene, and other players would stop seeing it.
         base.OnStartClient();
+        if (IsOwner)
+            StartAsOwner();
         Game.GamePlayers.Add(this);
         Debug.Log("OnStartClient: Will check if player has authority GamePlayer with ConnectionId: " + ConnectionId.ToString());
         /*if (hasAuthority)
@@ -288,6 +344,20 @@ public class GamePlayer : NetworkBehaviour
                 football.localPlayer = this;
         }*/
 
+        // GameplayManager.SpawnAIPlayer used to call this right after spawning the AI. It sends ServerRpcs, so it runs
+        // here instead, once the host's client side has started the AI.
+        if (isAIPlayer && IsServerInitialized)
+            InitializeAIPlayer();
+
+        // FishNet 4 can start the gameplay scene's managers before this player. If they did, they couldn't find the
+        // local GamePlayer yet, so let them catch up now.
+        if (isLocalPlayer)
+        {
+            if (GameplayManager.instance != null && GameplayManager.instance.IsClientInitialized)
+                GameplayManager.instance.StartWithLocalGamePlayer();
+            if (CoinTossManager.instance != null && CoinTossManager.instance.IsClientInitialized)
+                CoinTossManager.instance.StartWithLocalGamePlayer();
+        }
     }
     [Server]
     public void SetPlayerName(string playerName)
@@ -306,7 +376,7 @@ public class GamePlayer : NetworkBehaviour
     }
     public void InitializeLocalGamePlayer()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             Debug.Log("InitializeLocalGamePlayer: Get camera stuff");
             myCamera = GameObject.FindGameObjectWithTag("camera").GetComponent<CinemachineVirtualCamera>();
@@ -323,9 +393,7 @@ public class GamePlayer : NetworkBehaviour
             CmdSpawnPlayerCharacters();
 
             Debug.Log("InitializeLocalGamePlayer: try to find football for connection id: " + ConnectionId.ToString() + this.PlayerName);
-            football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
-            if (football)
-                football.localPlayer = this;
+            LinkFootball();
 
             CmdPlayerFinishedLoading();
             //Disable movement controls and stuff>?
@@ -354,17 +422,26 @@ public class GamePlayer : NetworkBehaviour
         CmdGetTeamName();
         CmdDoesPlayerChooseCoin();
         CmdSpawnPlayerCharacters();
-        football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
-        if (football)
-            football.localPlayer = this;
+        LinkFootball();
         CmdPlayerFinishedLoading();
     }
-    [Command]
+    // Mirror ran a host's Commands right away, so CmdSpawnFootball had spawned the football by now. FishNet runs
+    // ServerRpcs on a later tick, so it may not exist yet. Football.OnStartClient links itself to the local player then.
+    void LinkFootball()
+    {
+        GameObject footballObject = GameObject.FindGameObjectWithTag("football");
+        if (footballObject == null)
+            return;
+        football = footballObject.GetComponent<Football>();
+        if (football)
+            football.localPlayer = this;
+    }
+    [ServerRpc]
     void CmdPlayerFinishedLoading()
     {
         Game.ReportPlayerFinishedLoading(this.playerNumber);
     }
-    [Command]
+    [ServerRpc]
     void CmdSpawnFootball()
     {
         Debug.Log("CmdSpawnFootball for GamePlayer with ConnectionId: " + ConnectionId.ToString());
@@ -374,10 +451,10 @@ public class GamePlayer : NetworkBehaviour
         {
             GameObject newFootball = Instantiate(footballPrefab);
             newFootball.transform.position = footballStartingPosition;
-            NetworkServer.Spawn(newFootball);
+            InstanceFinder.ServerManager.Spawn(newFootball);
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdGetTeamName()
     {
         Debug.Log("CmdGetTeamName for GamePlayer with ConnectionId: " + ConnectionId.ToString());
@@ -417,7 +494,7 @@ public class GamePlayer : NetworkBehaviour
             }   
         }   
     }
-    [Command]
+    [ServerRpc]
     void CmdSpawnPlayerCharacters()
     {
         Debug.Log("CmdSpawnPlayerCharacters for GamePlayer with ConnectionId: " + ConnectionId.ToString());
@@ -439,11 +516,11 @@ public class GamePlayer : NetworkBehaviour
                     //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
                     //teamOnServer = TeamManager.instance.greyTeam;
                 }
-                NetworkServer.Spawn(newGrenadier, connectionToClient);
-                goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkIdentity>().netId);
+                InstanceFinder.ServerManager.Spawn(newGrenadier, Owner);
+                goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
                 newGrenadierScript.ownerConnectionId = this.ConnectionId;
-                newGrenadierScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newGrenadierScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
                 newGrenadierScript.health = newGrenadierScript.MaxHealth;
                 newGrenadierScript.stamina = newGrenadierScript.MaxStamina;
                 newGrenadierScript.speed = newGrenadierScript.MaxSpeed;
@@ -465,11 +542,11 @@ public class GamePlayer : NetworkBehaviour
                     newBerserker.transform.position = GreyBerserkerStartingPosition;
                     //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
                 }
-                NetworkServer.Spawn(newBerserker, connectionToClient);
-                goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkIdentity>().netId);
+                InstanceFinder.ServerManager.Spawn(newBerserker, Owner);
+                goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
                 newBerserkerScript.ownerConnectionId = this.ConnectionId;
-                newBerserkerScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newBerserkerScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
                 newBerserkerScript.health = newBerserkerScript.MaxHealth;
                 newBerserkerScript.stamina = newBerserkerScript.MaxStamina;
                 newBerserkerScript.speed = newBerserkerScript.MaxSpeed;
@@ -490,11 +567,11 @@ public class GamePlayer : NetworkBehaviour
                     newSkirmisher.transform.position = GreySkirmisherStartingPosition;
                     //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
                 }
-                NetworkServer.Spawn(newSkirmisher, connectionToClient);
-                goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkIdentity>().netId);
+                InstanceFinder.ServerManager.Spawn(newSkirmisher, Owner);
+                goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
                 newSkirmisherScript.ownerConnectionId = this.ConnectionId;
-                newSkirmisherScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newSkirmisherScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
                 newSkirmisherScript.health = newSkirmisherScript.MaxHealth;
                 newSkirmisherScript.stamina = newSkirmisherScript.MaxStamina;
                 newSkirmisherScript.speed = newSkirmisherScript.MaxSpeed;
@@ -524,11 +601,11 @@ public class GamePlayer : NetworkBehaviour
                     //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
                     //teamOnServer = TeamManager.instance.greyTeam;
                 }
-                NetworkServer.Spawn(newGrenadier, connectionToClient);
-                goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkIdentity>().netId);
+                InstanceFinder.ServerManager.Spawn(newGrenadier, Owner);
+                goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
                 newGrenadierScript.ownerConnectionId = this.ConnectionId;
-                newGrenadierScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newGrenadierScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
                 newGrenadierScript.health = newGrenadierScript.MaxHealth;
                 newGrenadierScript.stamina = newGrenadierScript.MaxStamina;
                 newGrenadierScript.speed = newGrenadierScript.MaxSpeed;
@@ -550,11 +627,11 @@ public class GamePlayer : NetworkBehaviour
                     newBerserker.transform.position = GreyBerserkerStartingPosition;
                     //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
                 }
-                NetworkServer.Spawn(newBerserker, connectionToClient);
-                goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkIdentity>().netId);
+                InstanceFinder.ServerManager.Spawn(newBerserker, Owner);
+                goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
                 newBerserkerScript.ownerConnectionId = this.ConnectionId;
-                newBerserkerScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newBerserkerScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
                 newBerserkerScript.health = newBerserkerScript.MaxHealth;
                 newBerserkerScript.stamina = newBerserkerScript.MaxStamina;
                 newBerserkerScript.speed = newBerserkerScript.MaxSpeed;
@@ -575,11 +652,11 @@ public class GamePlayer : NetworkBehaviour
                     newSkirmisher.transform.position = GreySkirmisherStartingPosition;
                     //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
                 }
-                NetworkServer.Spawn(newSkirmisher, connectionToClient);
-                goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkIdentity>().netId);
+                InstanceFinder.ServerManager.Spawn(newSkirmisher, Owner);
+                goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
                 newSkirmisherScript.ownerConnectionId = this.ConnectionId;
-                newSkirmisherScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                newSkirmisherScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
                 newSkirmisherScript.health = newSkirmisherScript.MaxHealth;
                 newSkirmisherScript.stamina = newSkirmisherScript.MaxStamina;
                 newSkirmisherScript.speed = newSkirmisherScript.MaxSpeed;
@@ -608,11 +685,11 @@ public class GamePlayer : NetworkBehaviour
                         newGrenadier.transform.position = GreyGrenadierStartingPosition;
                         //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
                     }
-                    NetworkServer.Spawn(newGrenadier, connectionToClient);
-                    goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkIdentity>().netId);
+                    InstanceFinder.ServerManager.Spawn(newGrenadier, Owner);
+                    goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkObject>().ObjectId);
                     GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
                     newGrenadierScript.ownerConnectionId = this.ConnectionId;
-                    newGrenadierScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                    newGrenadierScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
                     newGrenadierScript.health = newGrenadierScript.MaxHealth;
                     newGrenadierScript.stamina = newGrenadierScript.MaxStamina;
                     newGrenadierScript.speed = newGrenadierScript.MaxSpeed;
@@ -634,11 +711,11 @@ public class GamePlayer : NetworkBehaviour
                         newBerserker.transform.position = GreyBerserkerStartingPosition;
                         //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
                     }
-                    NetworkServer.Spawn(newBerserker, connectionToClient);
-                    goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkIdentity>().netId);
+                    InstanceFinder.ServerManager.Spawn(newBerserker, Owner);
+                    goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkObject>().ObjectId);
                     GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
                     newBerserkerScript.ownerConnectionId = this.ConnectionId;
-                    newBerserkerScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                    newBerserkerScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
                     newBerserkerScript.health = newBerserkerScript.MaxHealth;
                     newBerserkerScript.stamina = newBerserkerScript.MaxStamina;
                     newBerserkerScript.speed = newBerserkerScript.MaxSpeed;
@@ -661,11 +738,11 @@ public class GamePlayer : NetworkBehaviour
                         newSkirmisher.transform.position = GreySkirmisherStartingPosition;
                         //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
                     }
-                    NetworkServer.Spawn(newSkirmisher, connectionToClient);
-                    goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkIdentity>().netId);
+                    InstanceFinder.ServerManager.Spawn(newSkirmisher, Owner);
+                    goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkObject>().ObjectId);
                     GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
                     newSkirmisherScript.ownerConnectionId = this.ConnectionId;
-                    newSkirmisherScript.ownerNetId = this.GetComponent<NetworkIdentity>().netId;
+                    newSkirmisherScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
                     newSkirmisherScript.health = newSkirmisherScript.MaxHealth;
                     newSkirmisherScript.stamina = newSkirmisherScript.MaxStamina;
                     newSkirmisherScript.speed = newSkirmisherScript.MaxSpeed;
@@ -694,8 +771,8 @@ public class GamePlayer : NetworkBehaviour
                 GoblinToAdd.SelectThisCharacter();
                 selectGoblin = GoblinToAdd;
                 FollowSelectedGoblin(selectGoblin.transform);
-                if (hasAuthority)
-                    CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
+                if (IsOwner)
+                    CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkObject>().ObjectId);
             }
             else if (!qGoblin)
             {
@@ -714,7 +791,7 @@ public class GamePlayer : NetworkBehaviour
                 myTeam = TeamManager.instance.greyTeam;
             else
                 myTeam = TeamManager.instance.greenTeam;
-            CmdAddToGoblinTeamOnTeamObject(GoblinToAdd.GetComponent<NetworkIdentity>().netId);
+            CmdAddToGoblinTeamOnTeamObject(GoblinToAdd.GetComponent<NetworkObject>().ObjectId);
         }
         else
         {
@@ -724,9 +801,9 @@ public class GamePlayer : NetworkBehaviour
                 GoblinToAdd.SelectThisCharacter();
                 selectGoblin = GoblinToAdd;
                 FollowSelectedGoblin(selectGoblin.transform);
-                if (hasAuthority)
+                if (IsOwner)
                 {
-                    uint goblinNetId = selectGoblin.GetComponent<NetworkIdentity>().netId;
+                    int goblinNetId = selectGoblin.GetComponent<NetworkObject>().ObjectId;
                     CmdSetSelectedGoblinOnServer(goblinNetId);
                     CmdAddToGoblinTeamOnTeamObject(goblinNetId);
                 }
@@ -734,10 +811,10 @@ public class GamePlayer : NetworkBehaviour
             }
         }
     }
-    [Command]
-    void CmdAddToGoblinTeamOnTeamObject(uint goblinNetId)
+    [ServerRpc]
+    void CmdAddToGoblinTeamOnTeamObject(int goblinNetId)
     {
-        GoblinScript goblinScript = NetworkIdentity.spawned[goblinNetId].gameObject.GetComponent<GoblinScript>();
+        GoblinScript goblinScript = ObjectLookup.Get(goblinNetId).gameObject.GetComponent<GoblinScript>();
         if (this.isTeamGrey)
         {
             if (!TeamManager.instance.greyTeam.goblins.Contains(goblinScript))
@@ -771,9 +848,9 @@ public class GamePlayer : NetworkBehaviour
         try
         {
             Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " size of my team " + myTeam.goblinNetIds.Count.ToString());
-            foreach (uint goblinNetId in myTeam.goblinNetIds)
+            foreach (int goblinNetId in myTeam.goblinNetIds)
             {
-                GoblinScript goblinScript = NetworkIdentity.spawned[goblinNetId].gameObject.GetComponent<GoblinScript>();
+                GoblinScript goblinScript = ObjectLookup.Get(goblinNetId).gameObject.GetComponent<GoblinScript>();
                 if (goblinScript != selectGoblin)
                 {
                     if (qGoblin == null)
@@ -797,7 +874,7 @@ public class GamePlayer : NetworkBehaviour
         }
         CmdGetGoblinTeammatesFor3v3OnServer();
     }
-    [Command]
+    [ServerRpc]
     void CmdGetGoblinTeammatesFor3v3OnServer()
     {
         Team myTeamForServer;
@@ -808,7 +885,7 @@ public class GamePlayer : NetworkBehaviour
 
         if (myTeamForServer)
         {
-            foreach (uint goblinTeammate in myTeamForServer.goblinNetIds)
+            foreach (int goblinTeammate in myTeamForServer.goblinNetIds)
             {
                 if (!this.goblinTeamNetIds.Contains(goblinTeammate))
                 {
@@ -866,7 +943,7 @@ public class GamePlayer : NetworkBehaviour
                         FollowSelectedGoblin(selectGoblin.transform);
                 }
                 Debug.Log("SwitchToQGoblin switching to goblin: " + selectGoblin.name);
-                CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
+                CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkObject>().ObjectId);
             }
         }
         else
@@ -937,7 +1014,7 @@ public class GamePlayer : NetworkBehaviour
                         FollowSelectedGoblin(selectGoblin.transform);
                 }
                 Debug.Log("SwitchToEGoblin switching to goblin: " + selectGoblin.name);
-                CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkIdentity>().netId);
+                CmdSetSelectedGoblinOnServer(selectGoblin.GetComponent<NetworkObject>().ObjectId);
 
             }
         }
@@ -1014,7 +1091,7 @@ public class GamePlayer : NetworkBehaviour
             if (!selectGoblin.isSliding && !selectGoblin.isDiving && !selectGoblin.isGoblinKnockedOut && !selectGoblin.isPunching)
             {
                 selectGoblin.StartBlocking();
-                if (hasAuthority)
+                if (IsOwner)
                 {
                     try
                     {
@@ -1091,11 +1168,11 @@ public class GamePlayer : NetworkBehaviour
             }
         }
     }
-    [Command]
-    public void CmdSetSelectedGoblinOnServer(uint goblinNetId)
+    [ServerRpc]
+    public void CmdSetSelectedGoblinOnServer(int goblinNetId)
     {
         Debug.Log("CmdSetSelectedGoblinOnServer: player " + this.PlayerName + " is switching to goblin with netid " + goblinNetId.ToString());
-        serverSelectGoblin = NetworkIdentity.spawned[goblinNetId].gameObject.GetComponent<GoblinScript>();
+        serverSelectGoblin = ObjectLookup.Get(goblinNetId).gameObject.GetComponent<GoblinScript>();
     }
     void StartKickPower()
     {
@@ -1111,20 +1188,20 @@ public class GamePlayer : NetworkBehaviour
     }
     public void ReportPlayerSpawnedFootball()
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdReportFootballSpawned();
     }
-    [Command]
+    [ServerRpc]
     void CmdReportFootballSpawned()
     {
         Game.ReportFootballSpawnedForPlayer(this.playerNumber);
     }
     public void ReportPlayerGoblinSpawned()
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdReportPlayerGoblinSpawned();
     }
-    [Command]
+    [ServerRpc]
     void CmdReportPlayerGoblinSpawned()
     {
         Game.ReportGoblinSpawnedForPlayer(this.playerNumber);
@@ -1133,11 +1210,11 @@ public class GamePlayer : NetworkBehaviour
     {
         RpcDoneLoadingGameplayStuff();
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcDoneLoadingGameplayStuff()
     {
         Debug.Log("RpcDoneLoadingGameplayStuff: for player: " + this.PlayerName + " and is 1v1? " + this.is1v1);
-        if (hasAuthority)
+        if (IsOwner)
         {
             Game.DestroyWaitingForPlayersCanvas();
             GameplayManager.instance.ActivateCoinTossUI(true);
@@ -1150,7 +1227,7 @@ public class GamePlayer : NetworkBehaviour
     }
     public void EnableGoblinMovement(bool enableOrDisable)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (enableOrDisable)
             {
@@ -1184,51 +1261,50 @@ public class GamePlayer : NetworkBehaviour
     }
     public void EnableGoblinMovementControlsServerValues(bool activate)
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdEnableGoblinMovementControlsServerValues(activate);
     }
-    [Command]
+    [ServerRpc]
     void CmdEnableGoblinMovementControlsServerValues(bool activate)
     {
         this.goblinMovementControlsOnServer = activate;
     }
-    [Command]
+    [ServerRpc]
     void CmdDoesPlayerChooseCoin()
     {
         if (this.is1v1)
         {
             if (this.playerNumber == 2)
-                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, true);
+                doesPlayerChooseCoin = true;
             else
-                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, false);
+                doesPlayerChooseCoin = false;
         }
         else if (this.isSinglePlayer)
         {
             if (this.isTeamGrey)
             {
-                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, true);
+                doesPlayerChooseCoin = true;
             }
             else
             {
-                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, false);
+                doesPlayerChooseCoin = false;
             }
         }
         else
         {
             if (this.isTeamGrey && this.goblinType == "Grenadier")
             {
-                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, true);
+                doesPlayerChooseCoin = true;
             }
             else
-                HandleDoesPlayerChooseCoin(doesPlayerChooseCoin, false);
+                doesPlayerChooseCoin = false;
         }
         
     }
     public void HandleDoesPlayerChooseCoin(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            doesPlayerChooseCoin = newValue;
             coinTossControlsOnServer = newValue;
             /*if (newValue)
             {
@@ -1236,9 +1312,9 @@ public class GamePlayer : NetworkBehaviour
             }*/
             CoinTossManager.instance.StartCoinTossTimeOutTimer();
         }   
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 Debug.Log("HandleDoesPlayerChooseCoin: " + newValue.ToString() + " for player: " + this.name);
                 if (this.isSinglePlayer && !this.isLocalPlayer)
@@ -1323,10 +1399,10 @@ public class GamePlayer : NetworkBehaviour
     }
     public void DisableKickOrReceiveControls()
     {
-        if (hasAuthority)
+        if (IsOwner)
             CmdDisableKickOrReceiveControls();
     }
-    [Command]
+    [ServerRpc]
     void CmdDisableKickOrReceiveControls()
     {
         this.kickOrReceiveControlsOnServer = false;
@@ -1334,10 +1410,10 @@ public class GamePlayer : NetworkBehaviour
     void SelectCoin(string headsOrTails)
     {
         Debug.Log("SelectCoin: " + headsOrTails);
-        if (hasAuthority)
+        if (IsOwner)
             CmdSelectCoin(headsOrTails);
     }
-    [Command]
+    [ServerRpc]
     void CmdSelectCoin(string headsOrTails)
     {
         if (doesPlayerChooseCoin && !didPlayerChooseCoinYet)
@@ -1347,11 +1423,9 @@ public class GamePlayer : NetworkBehaviour
     }
     void HandleHeadsOrTails(string oldValue, string newValue)
     {
-        if (isServer)
-            headsOrTailsPlayer = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority && doesPlayerChooseCoin)
+            if (IsOwner && doesPlayerChooseCoin)
             {
                 CoinTossManager.instance.SelectionArrow(newValue);
             }
@@ -1360,12 +1434,12 @@ public class GamePlayer : NetworkBehaviour
     public void SubmitCoinSelection()
     {
         Debug.Log("SubmitCoinSelection: " + headsOrTailsPlayer);
-        if (!String.IsNullOrWhiteSpace(headsOrTailsPlayer) && hasAuthority)
+        if (!String.IsNullOrWhiteSpace(headsOrTailsPlayer) && IsOwner)
         {
             CmdSubmitCoinSelection();
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdSubmitCoinSelection()
     {
         //didPlayerChooseCoinYet = true;
@@ -1377,7 +1451,7 @@ public class GamePlayer : NetworkBehaviour
                 CoinTossManager.instance.playerSelectedCoin = "heads";
             CoinTossManager.instance.ServerPlayerSelectedTheirCoin();
             CoinTossManager.instance.FlipCoin();
-            HandleDidPlayerChooseCoinYet(didPlayerChooseCoinYet, true);
+            didPlayerChooseCoinYet = true;
             CoinTossManager.instance.StopTimeoutCointossRoutine();
         }
         
@@ -1387,7 +1461,7 @@ public class GamePlayer : NetworkBehaviour
     {
         if (GameplayManager.instance.isSinglePlayer)
             return;
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (String.IsNullOrWhiteSpace(headsOrTailsPlayer))
             {
@@ -1398,26 +1472,23 @@ public class GamePlayer : NetworkBehaviour
     }
     void HandleDidPlayerChooseCoinYet(bool oldValue, bool newValue)
     {
-        if (isServer)
-            didPlayerChooseCoinYet = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             CoinTossManager.instance.PlayerSelectedCoin(headsOrTailsPlayer);
         }
     }
     public void HandleDoesPlayerChooseKickOrReceive(bool oldValue, bool newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            doesPlayerChooseKickOrReceive = newValue;
             if (newValue)
             {
                 CoinTossManager.instance.StartCoinTossTimeOutTimer();
             }
         }   
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority)
+            if (IsOwner)
             {
                 //if(newValue)
                 // CoinTossControlls(!newValue);
@@ -1438,10 +1509,10 @@ public class GamePlayer : NetworkBehaviour
     void SelectKickOrReceive(string kickOrReceive)
     {
         Debug.Log("SelectKickOrReceive: " + kickOrReceive);
-        if (hasAuthority)
+        if (IsOwner)
             CmdSelectKickOrReceive(kickOrReceive);
     }
-    [Command]
+    [ServerRpc]
     void CmdSelectKickOrReceive(string kickOrReceive)
     {
         Debug.Log("CmdSelectKickOrReceive: " + kickOrReceive + " from player " + this.PlayerName);
@@ -1453,12 +1524,12 @@ public class GamePlayer : NetworkBehaviour
     public void SubmitKickOrReceiveSelection()
     {
         Debug.Log("SubmitKickOrReceiveSelection: " + kickOrReceivePlayer);
-        if (!String.IsNullOrWhiteSpace(kickOrReceivePlayer) && hasAuthority)
+        if (!String.IsNullOrWhiteSpace(kickOrReceivePlayer) && IsOwner)
         {
             CmdSubmitKickOrReceiveSelection();
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdSubmitKickOrReceiveSelection()
     {
         //didPlayerChooseCoinYet = true;
@@ -1469,7 +1540,7 @@ public class GamePlayer : NetworkBehaviour
             else
                 CoinTossManager.instance.playerKickOrReceive = "kick";
             CoinTossManager.instance.ServerPlayerSelectedKickOrReceive();
-            HandleDidPlayerChooseKickOrReceiveYet(didPlayerChooseKickOrReceiveYet, true);
+            didPlayerChooseKickOrReceiveYet = true;
             CoinTossManager.instance.StopTimeoutCointossRoutine();
         }
     }
@@ -1478,7 +1549,7 @@ public class GamePlayer : NetworkBehaviour
     {
         if (GameplayManager.instance.isSinglePlayer)
             return;
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (String.IsNullOrWhiteSpace(kickOrReceivePlayer))
             {
@@ -1487,10 +1558,10 @@ public class GamePlayer : NetworkBehaviour
             CmdSubmitKickOrReceiveSelection();
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcCoinTossAndKickOrReceiveControllerActivation(bool activateCoinTossControlls, bool activateKickOrReceiveControlls)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             Debug.Log("RpcCoinTossAndKickOrReceiveControllerActivation: " + activateCoinTossControlls.ToString() + " " + activateKickOrReceiveControlls.ToString() + " for player: " + this.name);
             if (this.isSinglePlayer && !this.isLocalPlayer)
@@ -1507,11 +1578,9 @@ public class GamePlayer : NetworkBehaviour
     }
     void HandleKickOrReceivePlayer(string oldValue, string newValue)
     {
-        if (isServer)
-            kickOrReceivePlayer = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
-            if (hasAuthority && doesPlayerChooseKickOrReceive)
+            if (IsOwner && doesPlayerChooseKickOrReceive)
             {
                 CoinTossManager.instance.KickOrReceiveSelectionArrow(newValue);
             }
@@ -1519,18 +1588,16 @@ public class GamePlayer : NetworkBehaviour
     }
     void HandleDidPlayerChooseKickOrReceiveYet(bool oldValue, bool newValue)
     {
-        if (isServer)
-            didPlayerChooseKickOrReceiveYet = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             CoinTossManager.instance.PlayerSelectedKickOrReceive(kickOrReceivePlayer, teamName);
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcRepositionTeamForKickOff(bool isKicking)
     {
         Debug.Log("PositionTeamForKickOff: for player " + this.PlayerName + ". Is the player kicking? " + isKicking.ToString());
-        if (hasAuthority)
+        if (IsOwner)
         {
             EnableGameplayActions(false);
             EnableGoblinMovement(false);
@@ -1554,7 +1621,7 @@ public class GamePlayer : NetworkBehaviour
                             goblin.transform.position = KickingPositionGreyGrenadier;
                             //goblin.ToggleGoblinBodyCollider();
                             goblin.EnableKickoffAimArrow(true);
-                            CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkIdentity>().netId);
+                            CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkObject>().ObjectId);
                         }
                         else if (goblin.goblinType.Contains("berserker"))
                         {
@@ -1576,7 +1643,7 @@ public class GamePlayer : NetworkBehaviour
                         {
                             goblin.transform.position = KickingPositionGreenGrenadier;
                             goblin.EnableKickoffAimArrow(true);
-                            CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkIdentity>().netId);
+                            CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkObject>().ObjectId);
                         }
                         else if (goblin.goblinType.Contains("berserker"))
                         {
@@ -1656,7 +1723,7 @@ public class GamePlayer : NetworkBehaviour
     public void RpcRepositionTeamForKickOff3v3(NetworkConnection target, bool isTeamKicking, bool isKickingPlayer)
     {
         Debug.Log("RpcRepositionTeamForKickOff3v3: for player: " + this.PlayerName + " is their team kicking? " + isTeamKicking.ToString() + " are they the kicking player? " + isKickingPlayer.ToString());
-        if (hasAuthority)
+        if (IsOwner)
         {
             EnableKickingControls(isKickingPlayer);
             EnableKickoffAimArrowControls(isKickingPlayer);
@@ -1681,7 +1748,7 @@ public class GamePlayer : NetworkBehaviour
                     if (isKickingPlayer)
                     {
                         selectGoblin.EnableKickoffAimArrow(true);
-                        CmdRequestFootballForKickOffGoblin(selectGoblin.GetComponent<NetworkIdentity>().netId);
+                        CmdRequestFootballForKickOffGoblin(selectGoblin.GetComponent<NetworkObject>().ObjectId);
                     }
                 }
                 else if (this.goblinType == "Berserker")
@@ -1759,10 +1826,10 @@ public class GamePlayer : NetworkBehaviour
             this.FollowSelectedGoblin(this.selectGoblin.transform);
         }
     }
-    [Command]
-    void CmdRequestFootballForKickOffGoblin(uint goblinNetId)
+    [ServerRpc]
+    void CmdRequestFootballForKickOffGoblin(int goblinNetId)
     {
-        GoblinScript goblin = NetworkIdentity.spawned[goblinNetId].GetComponent<GoblinScript>();
+        GoblinScript goblin = ObjectLookup.Get(goblinNetId).GetComponent<GoblinScript>();
         if (!goblin.doesCharacterHaveBall)
         {
             Football football = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
@@ -1877,10 +1944,10 @@ public class GamePlayer : NetworkBehaviour
     {
         selectGoblin.EndAimArrowDirection();
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcActivateGameplayControls(bool activate)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             Debug.Log("ActivateGameplayControls for player " + this.PlayerName);
             EnableKickoffAimArrowControls(false);
@@ -1891,10 +1958,10 @@ public class GamePlayer : NetworkBehaviour
             EnablePowerUpControls(activate);
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcActivateMenuNavigationControls(bool activate)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             Debug.Log("RpcActivateMenuNavigationControls for player " + this.PlayerName);
             EnableMenuNavigationControls(activate);
@@ -1941,14 +2008,14 @@ public class GamePlayer : NetworkBehaviour
         }
     }
     [TargetRpc]
-    public void RpcRepositionForKickAfter(NetworkConnection target, bool isKickingPlayer, uint scoringGoblin, float yPosition)
+    public void RpcRepositionForKickAfter(NetworkConnection target, bool isKickingPlayer, int scoringGoblin, float yPosition)
     {
-        if (hasAuthority && !areGoblinsRepositionedForKickAfter)
+        if (IsOwner && !areGoblinsRepositionedForKickAfter)
         {
             Debug.Log("RpcRepositionForKickAfter: " + isKickingPlayer.ToString() + " for player: " + this.name + " y position: " + yPosition.ToString());
             if (isKickingPlayer)
             {
-                GameObject scoringGoblinObject = NetworkIdentity.spawned[scoringGoblin].gameObject;
+                GameObject scoringGoblinObject = ObjectLookup.Get(scoringGoblin).gameObject;
                 Vector3 kickingPosition = scoringGoblinObject.transform.position;
                 if (teamName == "Grey")
                 {
@@ -1967,7 +2034,7 @@ public class GamePlayer : NetworkBehaviour
                 foreach (GoblinScript goblin in goblinTeam)
                 {
                     goblin.CheckIfGoblinNeedsToFlipForKickAfter(isKickingPlayer);
-                    if (goblin.GetComponent<NetworkIdentity>().netId == scoringGoblin)
+                    if (goblin.GetComponent<NetworkObject>().ObjectId == scoringGoblin)
                     {
                         if (goblin.isCharacterSelected)
                             FollowSelectedGoblin(goblin.transform);
@@ -1976,7 +2043,7 @@ public class GamePlayer : NetworkBehaviour
                         else if (goblin.isEGoblin)
                             SwitchToEGoblin(false, Time.time);
 
-                        CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkIdentity>().netId);
+                        CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkObject>().ObjectId);
 
                         if (!this.isSinglePlayer)
                         {
@@ -2061,15 +2128,15 @@ public class GamePlayer : NetworkBehaviour
         }
     }
     [TargetRpc]
-    public void RpcRepositionForKickAfterFor3v3(NetworkConnection target, bool isKickingPlayer, bool isKickingTeam, uint scoringGoblin, float yPosition, int yPositionModifier)
+    public void RpcRepositionForKickAfterFor3v3(NetworkConnection target, bool isKickingPlayer, bool isKickingTeam, int scoringGoblin, float yPosition, int yPositionModifier)
     {
         Debug.Log("RpcRepositionForKickAfterFor3v3: for player: " + this.PlayerName);
-        if (hasAuthority && !areGoblinsRepositionedForKickAfter)
+        if (IsOwner && !areGoblinsRepositionedForKickAfter)
         {
             if (isKickingTeam)
             {
                 // Set the position of the kicking goblin and all that???
-                GameObject scoringGoblinObject = NetworkIdentity.spawned[scoringGoblin].gameObject;
+                GameObject scoringGoblinObject = ObjectLookup.Get(scoringGoblin).gameObject;
                 Vector3 kickingPosition = scoringGoblinObject.transform.position;
                 if (this.isTeamGrey)
                 {
@@ -2083,7 +2150,7 @@ public class GamePlayer : NetworkBehaviour
                 if (isKickingPlayer)
                 {
                     Debug.Log("RpcRepositionForKickAfterFor3v3: this player is the kicking player on the kicking team: " + this.PlayerName);
-                    CmdRequestFootballForKickOffGoblin(selectGoblin.GetComponent<NetworkIdentity>().netId);
+                    CmdRequestFootballForKickOffGoblin(selectGoblin.GetComponent<NetworkObject>().ObjectId);
                     selectGoblin.transform.position = kickingPosition;
                     selectGoblin.UpdateHasGoblinRepositionedForKickAfter();
                     selectGoblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
@@ -2140,6 +2207,9 @@ public class GamePlayer : NetworkBehaviour
             areGoblinsRepositionedForKickAfter = true;
         }
     }
+    // These two were plain methods under Mirror too, so the client only changed its own copy. FishNet rejects that, and
+    // EscMenuManager reads these flags to restore the kick-after controls after the menu closes. Now the server sets them.
+    [ServerRpc]
     void CmdKickAfterPositioningControlsOnServerValues(bool activate)
     {
         this.kickAfterPositioningControlsOnServer = activate;
@@ -2180,7 +2250,7 @@ public class GamePlayer : NetworkBehaviour
     [TargetRpc]
     public void RpcDisableKickAfterPositioningControls(NetworkConnection target)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             EnableKickAfterPositioning(false);
             this.CmdKickAfterPositioningControlsOnServerValues(false);
@@ -2205,13 +2275,13 @@ public class GamePlayer : NetworkBehaviour
     public void RpcStartKickAfterTimer(NetworkConnection target, bool isKickingPlayer)
     {
         Debug.Log("RpcStartKickAfterTimer: for player: " + this.PlayerName + " is kicking playeR: " + isKickingPlayer.ToString());
-        if (hasAuthority)
+        if (IsOwner)
             GameplayManager.instance.ActivateKickAfterTimerUI(isKickingPlayer);
     }
     [TargetRpc]
     public void RpcKickAfterUpdateInsctructionsText(NetworkConnection target, bool isKickingPlayer)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             localIsKickingPlayer = isKickingPlayer;
             GameplayManager.instance.KickAfterUpdateInsctructionsText(isKickingPlayer);
@@ -2221,7 +2291,7 @@ public class GamePlayer : NetworkBehaviour
     [TargetRpc]
     public void RpcActivateKickAfterKickingControls(NetworkConnection target, bool activate)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             Debug.Log("RpcActivateKickAfterKickingControls: for player: " + this.PlayerName + " " + activate.ToString());
             EnableKickAfterKicking(activate);
@@ -2230,6 +2300,7 @@ public class GamePlayer : NetworkBehaviour
                 selectGoblin.StartKickAfterKickAttempt();
         }
     }
+    [ServerRpc]
     void CmdKickAfterKickingControlsOnServerValues(bool activate)
     {
         this.kickAfterKickingControlsOnServer = activate;
@@ -2237,7 +2308,7 @@ public class GamePlayer : NetworkBehaviour
     [TargetRpc]
     public void RpcActivateKickAfterBlockingControls(NetworkConnection target, bool activate)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             Debug.Log("RpcActivateKickAfterBlockingControls: for player: " + this.PlayerName + " " + activate.ToString());
             EnableGoblinMovement(activate);
@@ -2246,7 +2317,7 @@ public class GamePlayer : NetworkBehaviour
             CmdEnableGameplayControlsForServerValues(activate);
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdEnableGameplayControlsForServerValues(bool activate)
     {
         this.goblinMovementControlsOnServer = activate;
@@ -2292,12 +2363,12 @@ public class GamePlayer : NetworkBehaviour
         selectGoblin.SubmitKickAfterKicking();
     }
     [TargetRpc]
-    public void RpcPowerUpPickedUp(NetworkConnection target, uint powerUpNetId)
+    public void RpcPowerUpPickedUp(NetworkConnection target, int powerUpNetId)
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             Debug.Log("RpcPowerUpPickedUp: " + this.PlayerName + " to pick up power up with this network id: " + powerUpNetId.ToString());
-            PowerUp powerUptoAdd = NetworkIdentity.spawned[powerUpNetId].GetComponent<PowerUp>();
+            PowerUp powerUptoAdd = ObjectLookup.Get(powerUpNetId).GetComponent<PowerUp>();
             myPowerUps.Add(powerUptoAdd);
             // Make sure not to add powerups picked up by the AI to the player's PowerUp UI
             if (this.isSinglePlayer && !this.isLocalPlayer)
@@ -2315,11 +2386,11 @@ public class GamePlayer : NetworkBehaviour
         if (powerUpNumber < myPowerUps.Count && powerUpNumber >= 0)
         {
             Debug.Log("UsePowerUp: Player is able to use power up: " + powerUpNumber.ToString());
-            if (hasAuthority)
+            if (IsOwner)
             {
                 try
                 {
-                    uint powerUpNetId = myPowerUps[powerUpNumber].GetComponent<NetworkIdentity>().netId;
+                    int powerUpNetId = myPowerUps[powerUpNumber].GetComponent<NetworkObject>().ObjectId;
                     CmdUsePowerUp(powerUpNetId);
                 }
                 catch (Exception e)
@@ -2405,14 +2476,14 @@ public class GamePlayer : NetworkBehaviour
             powerUpsEnabled = false;
         }
     }
-    [Command]
-    void CmdUsePowerUp(uint powerUpNetId)
+    [ServerRpc]
+    void CmdUsePowerUp(int powerUpNetId)
     {
         if (serverPowerUpUints.Contains(powerUpNetId))
         {
             Debug.Log("CmdUsePowerUp: Player: " + this.PlayerName + " can use powerup with netid of: " + powerUpNetId.ToString());
             //this.serverPowerUpUints.Remove(powerUpNetId);
-            PowerUpManager.instance.PlayerUsePowerUp(powerUpNetId, this.GetComponent<NetworkIdentity>().netId);
+            PowerUpManager.instance.PlayerUsePowerUp(powerUpNetId, this.GetComponent<NetworkObject>().ObjectId);
         }
         else
         {
@@ -2420,7 +2491,7 @@ public class GamePlayer : NetworkBehaviour
         }
     }
     [TargetRpc]
-    public void RpcRemoveUsedPowerUp(NetworkConnection target, uint powerUpNetId)
+    public void RpcRemoveUsedPowerUp(NetworkConnection target, int powerUpNetId)
     {
         if (myPowerUps.Count > 0)
         {
@@ -2441,7 +2512,7 @@ public class GamePlayer : NetworkBehaviour
     }
     public void RemoveUsedPowerUps()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             // Make sure to remove "null" powerups? This appears to be an issue sometimes where the server destroys the powerup but it isn't removed from the player's list of powerups? Causing it to still be displayed in the UI
             try
@@ -2560,7 +2631,7 @@ public class GamePlayer : NetworkBehaviour
         if (powerUpSelectedIndexNumber < myPowerUps.Count && powerUpSelectedIndexNumber >= 0)
             UsePowerUp(powerUpSelectedIndexNumber);
     }*/
-    [ServerCallback]
+    [Server]
     public void UpdatePlayerPossessionTracker(bool hasPosession)
     {
         Debug.Log("UpdatePlayerPossessionTracker: Does " + this.PlayerName + " have possession of the ball: " + hasPosession.ToString());
@@ -2604,11 +2675,7 @@ public class GamePlayer : NetworkBehaviour
     }
     public void HandlePossessionPoints(float oldValue, float newValue)
     {
-        if (isServer)
-        {
-            possessionPoints = newValue;
-        }
-        if (isClient)
+        if (IsClientInitialized)
         {
             /*if (this.teamName.ToLower().Contains("green"))
                 GameplayManager.instance.UpdatePossessionBar(true, newValue);
@@ -2616,7 +2683,7 @@ public class GamePlayer : NetworkBehaviour
                 GameplayManager.instance.UpdatePossessionBar(false, newValue);*/
         }
     }
-    [ServerCallback]
+    [Server]
     IEnumerator GainPossessionPoints()
     {
         isGainingPossesionPointsRoutineRunning = true;
@@ -2660,7 +2727,7 @@ public class GamePlayer : NetworkBehaviour
                 isMaxValue = true;
             }
             if(GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time")
-                HandlePossessionPoints(this.possessionPoints, possessionPointTracker);
+                possessionPoints = possessionPointTracker;
             if (isMaxValue)
             {
                 isGainingPossesionPointsRoutineRunning = false;
@@ -2668,7 +2735,7 @@ public class GamePlayer : NetworkBehaviour
         }
         yield break;
     }
-    [ServerCallback]
+    [Server]
     IEnumerator NoPossessionCooldown()
     {
         didNoPossessionCooldownRoutineComplete = false;
@@ -2683,7 +2750,7 @@ public class GamePlayer : NetworkBehaviour
             StartCoroutine(LosePossessionPointsRoutine);
         }
     }
-    [ServerCallback]
+    [Server]
     IEnumerator LosePossessionPoints()
     {
         isLosingPossesionPointsRoutineRunning = true;
@@ -2727,7 +2794,7 @@ public class GamePlayer : NetworkBehaviour
                 isMinValue = true;
             }
             if (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time")
-                HandlePossessionPoints(this.possessionPoints, possessionPointTracker);
+                possessionPoints = possessionPointTracker;
             if (isMinValue)
             {
                 isLosingPossesionPointsRoutineRunning = false;
@@ -2735,7 +2802,7 @@ public class GamePlayer : NetworkBehaviour
         }
         yield break;
     }
-    [ServerCallback]
+    [Server]
     public void StopAllPossessionRoutines()
     {
         Debug.Log("StopAllPossessionRoutines for player: " + this.PlayerName);
@@ -2759,23 +2826,22 @@ public class GamePlayer : NetworkBehaviour
             isNoPossessionCooldownRoutineRunning = false;
         }
         didNoPossessionCooldownRoutineComplete = false;
-        HandlePossessionPoints(this.possessionPoints, 0f);
+        possessionPoints = 0f;
         possessionBonus = 1.0f;
     }
     public void HandlePossessionBonus(float oldValue, float newValue)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
-            possessionBonus = newValue;
             //UpdatePossessionSpeedBonusForGoblinTeam(newValue);
         }
-        if (isClient)
+        if (IsClientInitialized)
         { 
 
         }
     }
     // Get speed modifer for the possession bonus from this goblin's player owner. Possession bonus is divided by 3. So, of possession bonus is 20% (aka 1.2f) then it should make them 6.7% faster (1.067f)
-    [ServerCallback]
+    [Server]
     void UpdatePossessionSpeedBonusForGoblinTeam(float newPossessionSpeedBonus)
     {
         // Calculate new speed bonus for goblins on this player's team to use
@@ -2790,7 +2856,7 @@ public class GamePlayer : NetworkBehaviour
             goblin.possessionSpeedBonus = possessionSpeedBonus;
         }
     }
-    [Command]
+    [ServerRpc]
     void CmdTryToGiveCowboyYeehaw()
     {
         if ((GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time" || GameplayManager.instance.gamePhase == "kick-after-attempt") && CowboyManager.instance.isCowboySpawned)
@@ -2802,7 +2868,7 @@ public class GamePlayer : NetworkBehaviour
                 if (Vector2.Distance(cowboy.transform.position, this.serverSelectGoblin.transform.position) <= 32.5f)
                 {
                     Debug.Log("CmdTryToGiveCowboyYeehaw: Goblin and cowboy should be within range? Trying to give a yeehaw");
-                    cowboy.GetComponent<CowboyScript>().PlayerIsGivingYeehaw(this.GetComponent<NetworkIdentity>().netId);
+                    cowboy.GetComponent<CowboyScript>().PlayerIsGivingYeehaw(this.GetComponent<NetworkObject>().ObjectId);
                 }
             }
             catch (Exception e)
@@ -2814,9 +2880,9 @@ public class GamePlayer : NetworkBehaviour
     }
     public void ExitToMainMenu()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
-            if (isServer)
+            if (IsServerInitialized)
             {
                 Game.StopHost();
                 //Game.HostShutDownServer();
@@ -2863,7 +2929,7 @@ public class GamePlayer : NetworkBehaviour
     }
     public void UpdatePowerUpRemainingUses()
     {
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (this.isSinglePlayer && !this.isLocalPlayer)
             {
@@ -2873,33 +2939,33 @@ public class GamePlayer : NetworkBehaviour
             PowerUpManager.instance.UpdatePowerUpUIImages(myPowerUps);
         }   
     }
-    [ClientCallback]
+    [Client]
     public void PauseGamePlayer()
     {
-        if (hasAuthority && this.isLocalPlayer)
+        if (IsOwner && this.isLocalPlayer)
             CmdPauseGamePlayer();
     }
-    [Command]
+    [ServerRpc]
     void CmdPauseGamePlayer()
     {
-        GameplayManager.instance.PauseGameOnServer(this, this.GetComponent<NetworkIdentity>().netId);
+        GameplayManager.instance.PauseGameOnServer(this, this.GetComponent<NetworkObject>().ObjectId);
     }
-    [ClientCallback]
+    [Client]
     public void ResumeGamePlayer()
     {
-        if (hasAuthority && this.isLocalPlayer)
+        if (IsOwner && this.isLocalPlayer)
             CmdResumeGamePlayer();
     }
-    [Command]
+    [ServerRpc]
     void CmdResumeGamePlayer()
     {
-        GameplayManager.instance.ResumeGameOnServer(this, this.GetComponent<NetworkIdentity>().netId);
+        GameplayManager.instance.ResumeGameOnServer(this, this.GetComponent<NetworkObject>().ObjectId);
     }
     [TargetRpc]
     public void RpcGamePausedByServer(NetworkConnection target, bool wasPaused)
     {
         Debug.Log("RpcGamePausedByServer: for player: " + this.PlayerName + ":" + this.ConnectionId.ToString() + ". Will pause game? " + wasPaused.ToString());
-        if (hasAuthority && this.isLocalPlayer)
+        if (IsOwner && this.isLocalPlayer)
         {
             if (wasPaused)
                 Time.timeScale = 0f;
@@ -2931,18 +2997,18 @@ public class GamePlayer : NetworkBehaviour
     [TargetRpc]
     public void RpcErrorMessageToDisplayFromServer(NetworkConnection target, string message)
     {
-        if (hasAuthority && this.isLocalPlayer)
+        if (IsOwner && this.isLocalPlayer)
         {
             GameplayManager.instance.DisplayErrorMessage(message);
         }
     }
-    [ClientCallback]
+    [Client]
     public void WinnerOfGameSteamAchievementChecks(string winnerName)
     {
         Debug.Log("Gameplayer.cs: WinnerOfGameSteamAchievementChecks: " + winnerName);
         if (winnerName == "draw")
             return;
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (winnerName == "green")
             {
@@ -2980,7 +3046,7 @@ public class GamePlayer : NetworkBehaviour
     public void RpcKickAfterAttemptAchievement(NetworkConnection target)
     {
         Debug.Log("RpcKickAfterAttemptAchievement: Player made their kick after attempt: " + this.PlayerName);
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (GameplayManager.instance.isSinglePlayer)
             {
@@ -2999,7 +3065,7 @@ public class GamePlayer : NetworkBehaviour
     public void RpcYeehawAchievement(NetworkConnection target)
     {
         Debug.Log("RpcYeehawAchievement: Player sent a YEEHAW to their team: " + this.PlayerName);
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (GameplayManager.instance.isSinglePlayer)
             {
@@ -3018,7 +3084,7 @@ public class GamePlayer : NetworkBehaviour
     public void RpcBlockedKickAchievement(NetworkConnection target)
     {
         Debug.Log("RpcBlockedKickAchievement: Player blocked kick: " + this.name);
-        if (hasAuthority)
+        if (IsOwner)
         {
             if (GameplayManager.instance.isSinglePlayer)
             {
@@ -3035,9 +3101,7 @@ public class GamePlayer : NetworkBehaviour
     }
     public void HandleIsTeamGrey(bool oldValue, bool newValue)
     {
-        if (isServer)
-            this.isTeamGrey = newValue;
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (newValue)
             {

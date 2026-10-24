@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class ObstacleObject : NetworkBehaviour
 {
@@ -28,7 +32,7 @@ public class ObstacleObject : NetworkBehaviour
     {
         
     }
-    [ServerCallback]
+    [Server]
     public void DisableColliderDuringPhase(bool enable)
     {
         myCollider.enabled = enable;
@@ -36,7 +40,7 @@ public class ObstacleObject : NetworkBehaviour
     //[ServerCallback]
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             Debug.Log("OnTriggerEnter2D for ObstacleObject: " + this.name);
             if (collision.tag == "Goblin")
@@ -44,7 +48,7 @@ public class ObstacleObject : NetworkBehaviour
                 if (isTripObject)
                 {
                     Debug.Log("ObstacleObject: collided with goblin named: " + collision.transform.name);
-                    uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+                    int goblinNetId = collision.transform.gameObject.GetComponent<NetworkObject>().ObjectId;
 
                     GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
                     if (goblinScript.canCollide && !goblinScript.isGoblinKnockedOut)
@@ -58,14 +62,14 @@ public class ObstacleObject : NetworkBehaviour
                 }
             }
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (collision.tag == "Goblin")
             {
                 if (isTripObject)
                 {
                     this.PlaySFXClip();
-                    uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+                    int goblinNetId = collision.transform.gameObject.GetComponent<NetworkObject>().ObjectId;
 
                     GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
                     if (goblinScript.canCollide)
@@ -76,7 +80,7 @@ public class ObstacleObject : NetworkBehaviour
         }
         
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void OnTriggerStay2D(Collider2D collision)
     {
         Debug.Log("OnTriggerStay2D for ObstacleObject: " + this.name);
@@ -96,6 +100,8 @@ public class ObstacleObject : NetworkBehaviour
             }
         }
     }
+    // Server only, like OnTriggerStay2D: the slowdown and footstep values are server-owned SyncVars that clients receive.
+    [Server(Logging = LoggingType.Off)]
     private void OnTriggerExit2D(Collider2D collision)
     {
         Debug.Log("OnTriggerStay2D for ObstacleObject: " + this.name);
@@ -126,7 +132,7 @@ public class ObstacleObject : NetworkBehaviour
             onscreen = true;
         return onscreen;
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcPlaySFXClip()
     {
         if (this.IsOnScreen() && !string.IsNullOrWhiteSpace(sfxClipName))
@@ -134,7 +140,7 @@ public class ObstacleObject : NetworkBehaviour
             SoundManager.instance.PlaySound(sfxClipName, 0.75f);
         }
     }
-    [ClientCallback]
+    [Client]
     void PlaySFXClip()
     {
         if (GameplayManager.instance.gamePhase == "touchdown-transition")

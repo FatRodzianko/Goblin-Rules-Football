@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class SplitGroundEvent : NetworkBehaviour
 {
@@ -23,7 +27,7 @@ public class SplitGroundEvent : NetworkBehaviour
     {
         
     }
-    [ClientCallback]
+    [Client(Logging = LoggingType.Off)]
     private void FixedUpdate()
     {
         if (this.IsOnScreen() && playZombieSound)
@@ -44,13 +48,13 @@ public class SplitGroundEvent : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             Debug.Log("OnTriggerEnter2D for SplitGroundEvent: " + this.name);
             if (collision.tag == "Goblin")
             {
                 Debug.Log("SplitGroundEvent: collided with goblin named: " + collision.transform.name);
-                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+                int goblinNetId = collision.transform.gameObject.GetComponent<NetworkObject>().ObjectId;
 
                 GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
                 if (goblinScript.canCollide && !goblinScript.isGoblinKnockedOut)
@@ -58,12 +62,12 @@ public class SplitGroundEvent : NetworkBehaviour
 
             }
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (collision.tag == "Goblin")
             {
                 //this.PlaySFXClip();
-                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+                int goblinNetId = collision.transform.gameObject.GetComponent<NetworkObject>().ObjectId;
 
                 GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
                 if (goblinScript.canCollide)
@@ -72,7 +76,7 @@ public class SplitGroundEvent : NetworkBehaviour
         }
 
     }
-    [ClientCallback]
+    [Client]
     void PlaySFXClip()
     {
         if (GameplayManager.instance.gamePhase == "touchdown-transition")
@@ -94,25 +98,28 @@ public class SplitGroundEvent : NetworkBehaviour
             onscreen = true;
         return onscreen;
     }
-    [ServerCallback]
+    [Server]
     public void DestroyMe()
     {
-        if (isServer)
-            NetworkServer.Destroy(this.gameObject);
+        if (IsServerInitialized)
+            InstanceFinder.ServerManager.Despawn(this.gameObject);
     }
-    [ClientCallback]
+    // Animation event: it fires on every machine that plays the clip, so it skips quietly where it doesn't apply.
+    [Client(Logging = LoggingType.Off)]
     public void PlayGroundSplitOpenSound()
     {
         Debug.Log("PlayGroundSplitOpenSound");
         if (this.IsOnScreen())
             myAudioManager.PlaySound("ground-split-open", 1.0f);
     }
-    [ClientCallback]
+    // Animation event: it fires on every machine that plays the clip, so it skips quietly where it doesn't apply.
+    [Client(Logging = LoggingType.Off)]
     public void SetPlayZombieSoundTrue()
     {
         playZombieSound = true;
     }
-    [ClientCallback]
+    // Animation event: it fires on every machine that plays the clip, so it skips quietly where it doesn't apply.
+    [Client(Logging = LoggingType.Off)]
     public void SetPlayZombieSoundFalse()
     {
         playZombieSound = false;

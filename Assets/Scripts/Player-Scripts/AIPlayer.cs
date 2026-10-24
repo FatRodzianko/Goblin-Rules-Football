@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System;
 
 public class AIPlayer : NetworkBehaviour
@@ -103,11 +107,20 @@ public class AIPlayer : NetworkBehaviour
             Debug.Log("AIPlayer: Error getting GamePlayer script from object: " + e);
         }
         if (!gameFootball)
-        {
-            gameFootball = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
-            this.GetMyGoalPost();
-        }
+            StartCoroutine(WaitForGameFootball());
 
+    }
+    // Mirror's host had already spawned the football when this started. FishNet spawns it a tick or two later.
+    IEnumerator WaitForGameFootball()
+    {
+        GameObject footballObject = GameObject.FindGameObjectWithTag("football");
+        while (footballObject == null)
+        {
+            yield return null;
+            footballObject = GameObject.FindGameObjectWithTag("football");
+        }
+        gameFootball = footballObject.GetComponent<Football>();
+        this.GetMyGoalPost();
     }
 
     // Update is called once per frame

@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class CowboyScript : NetworkBehaviour
 {
@@ -25,7 +29,7 @@ public class CowboyScript : NetworkBehaviour
     Vector2 directionToMove = Vector2.zero;
     IEnumerator waitingToSmokeRoutine;
     public int numberOfSmokes = 0;
-    List<uint> playersReceivedYeehawFromNetIds = new List<uint>();
+    List<int> playersReceivedYeehawFromNetIds = new List<int>();
     public bool isVisibileToClient = false;
 
     // Start is called before the first frame update
@@ -39,7 +43,7 @@ public class CowboyScript : NetworkBehaviour
     {
         
     }
-    [ServerCallback]
+    [Server(Logging = LoggingType.Off)]
     private void FixedUpdate()
     {
         if (!waitingToSmoke)
@@ -75,7 +79,9 @@ public class CowboyScript : NetworkBehaviour
 
                 if (Vector2.Distance(myRb.position, exitPoint) <= 0.1f)
                 {
-                    NetworkServer.Destroy(this.gameObject);
+                    InstanceFinder.ServerManager.Despawn(this.gameObject);
+                    // The RPC below would run on the despawned cowboy.
+                    return;
                 }
             }
             myRb.MovePosition(myRb.position + directionToMove * walkingSpeed * Time.fixedDeltaTime);
@@ -95,7 +101,7 @@ public class CowboyScript : NetworkBehaviour
             }
         }
     }
-    [ClientRpc]
+    [ObserversRpc]
     void RpcFlipRenderer(bool flip)
     {
         if (myRenderer.flipX != flip)
@@ -109,7 +115,7 @@ public class CowboyScript : NetworkBehaviour
         }
             
     }
-    [ServerCallback]
+    [Server]
     IEnumerator WaitingToSmokeRoutine()
     {
         waitingToSmoke = true;
@@ -129,7 +135,7 @@ public class CowboyScript : NetworkBehaviour
     }
     public void EndOfOneWait()
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             Debug.Log("CowboyScript.cs EndOfOneWait started: " + numberOfSmokes.ToString());
             numberOfSmokes--;
@@ -149,21 +155,24 @@ public class CowboyScript : NetworkBehaviour
             }
         }
     }
-    private void OnDestroy()
+    // This was OnDestroy under Mirror. FishNet has already deinitialized the object by OnDestroy, so the flag never reset and
+    // only one cowboy could spawn per game. The manager can be gone when the scene unloads.
+    public override void OnStopServer()
     {
-        if (isServer)
+        base.OnStopServer();
+        if (CowboyManager.instance != null)
             CowboyManager.instance.isCowboySpawned = false;
     }
-    [ServerCallback]
-    public void PlayerIsGivingYeehaw(uint playerNetId)
+    [Server]
+    public void PlayerIsGivingYeehaw(int playerNetId)
     {
-        if (playerNetId != 0)
+        if (playerNetId != ObjectLookup.NoObject)
         {
             if (!playersReceivedYeehawFromNetIds.Contains(playerNetId))
             {
                 Debug.Log("CowboyScript.cs PlayerIsGivingYeehaw: Player with netid: " + playerNetId.ToString() + " has NOT tried to yeehaw this cowboy yet.");
                 playersReceivedYeehawFromNetIds.Add(playerNetId);
-                GamePlayer player = NetworkIdentity.spawned[playerNetId].GetComponent<GamePlayer>();
+                GamePlayer player = ObjectLookup.Get(playerNetId).GetComponent<GamePlayer>();
                 TeamManager.instance.YeehawCowboy(player);
             }
             else
@@ -176,12 +185,12 @@ public class CowboyScript : NetworkBehaviour
     {
         exhaleSmokePS.Play();
     }
-    [ClientCallback]
+    [Client(Logging = LoggingType.Off)]
     private void OnBecameVisible()
     {
         isVisibileToClient = true;
     }
-    [ClientCallback]
+    [Client(Logging = LoggingType.Off)]
     private void OnBecameInvisible()
     {
         isVisibileToClient = false;

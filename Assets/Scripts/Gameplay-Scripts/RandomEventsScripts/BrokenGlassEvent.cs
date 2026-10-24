@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class BrokenGlassEvent : NetworkBehaviour
 {
@@ -30,7 +34,7 @@ public class BrokenGlassEvent : NetworkBehaviour
         StartCoroutine(lifeTimeCounterRoutine);
         ThrowBottlesAtField();
     }
-    [ServerCallback]
+    [Server]
     IEnumerator LifeTimeCounter()
     {
         while (lifeTimeCount < 5.5)
@@ -39,19 +43,19 @@ public class BrokenGlassEvent : NetworkBehaviour
             lifeTimeCount++;
         }
         //PowerUpManager.instance.DestroyPowerUp(this.GetComponent<NetworkIdentity>().netId);
-        NetworkServer.Destroy(this.gameObject);
+        InstanceFinder.ServerManager.Despawn(this.gameObject);
         yield break;
     }
     //[ServerCallback]
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isServer)
+        if (IsServerInitialized)
         {
             Debug.Log("OnTriggerEnter2D for PowerUpThrownObject: " + this.name);
             if (collision.tag == "Goblin")
             {
                 Debug.Log("PowerUpThrownObject: collided with goblin named: " + collision.transform.name);
-                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+                int goblinNetId = collision.transform.gameObject.GetComponent<NetworkObject>().ObjectId;
                 GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
                 if (goblinScript.canCollide && !goblinScript.isGoblinKnockedOut)
                     goblinScript.KnockOutGoblin(false);
@@ -59,12 +63,12 @@ public class BrokenGlassEvent : NetworkBehaviour
                 //CmdPlayerPickUpFootball(goblinNetId);
             }
         }
-        if (isClient)
+        if (IsClientInitialized)
         {
             if (collision.tag == "Goblin")
             {
                 //this.PlaySFXClip();
-                uint goblinNetId = collision.transform.gameObject.GetComponent<NetworkIdentity>().netId;
+                int goblinNetId = collision.transform.gameObject.GetComponent<NetworkObject>().ObjectId;
 
                 GoblinScript goblinScript = collision.transform.gameObject.GetComponent<GoblinScript>();
                 if (goblinScript.canCollide)
@@ -86,7 +90,7 @@ public class BrokenGlassEvent : NetworkBehaviour
         IEnumerator throwBottleRoutine = ThrowBottlesRoutine(yPosition, xPosition);
         StartCoroutine(throwBottleRoutine);
     }
-    [ServerCallback]
+    [Server]
     IEnumerator ThrowBottlesRoutine(float yPosition, float xPosition)
     {
         /*float negOrPos = Random.Range(0, 2) * 2 - 1;
@@ -117,7 +121,7 @@ public class BrokenGlassEvent : NetworkBehaviour
         yield return new WaitForSeconds(randomTime);
 
     }
-    [ServerCallback]
+    [Server]
     void CreateThrownBottle(float yPosition, float xPosition, Vector3 endPosition)
     {
         float negOrPos = Random.Range(0, 2) * 2 - 1;
@@ -125,7 +129,7 @@ public class BrokenGlassEvent : NetworkBehaviour
         //GameObject thrownBottle = Instantiate(ThrownBottlePrefab, this.transform);
         GameObject thrownBottle = Instantiate(ThrownBottlePrefab);
         thrownBottle.transform.position = bottleStartPosition;
-        NetworkServer.Spawn(thrownBottle);
+        InstanceFinder.ServerManager.Spawn(thrownBottle);
         endPosition.x += (Random.Range(0f, 0.8f) * negOrPos);
         negOrPos = Random.Range(0, 2) * 2 - 1;
         endPosition.y += (Random.Range(0f, 0.8f) * negOrPos);
@@ -133,7 +137,7 @@ public class BrokenGlassEvent : NetworkBehaviour
         thrownBottleScript.myParentEvent = this.gameObject;
         thrownBottleScript.StartThrow(bottleStartPosition, endPosition);
     }
-    [ClientRpc]
+    [ObserversRpc]
     public void RpcActivateRenderer()
     {
         if (!myRenderer.enabled)

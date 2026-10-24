@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using FishNet;
+using FishNet.Connection;
+using FishNet.Managing.Logging;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public class CowboyManager : NetworkBehaviour
 {
@@ -36,7 +40,7 @@ public class CowboyManager : NetworkBehaviour
     {
         
     }
-	[ServerCallback]
+	[Server]
 	public void StartGeneratingCowboys(bool generate)
 	{
 		Debug.Log("StartGeneratingCowboys: " + generate.ToString());
@@ -53,7 +57,7 @@ public class CowboyManager : NetworkBehaviour
 			StopCoroutine(cowboyGeneartor);
 		}
 	}
-	[ServerCallback]
+	[Server]
 	IEnumerator GenerateCowboysRoutine()
 	{
 		isCowboyGeneratorRunning = true;
@@ -68,7 +72,7 @@ public class CowboyManager : NetworkBehaviour
 		//yield return new WaitForSeconds(1.0f);
 		yield break;
 	}
-	[ServerCallback]
+	[Server]
 	void CheckIfACowboySpawns()
 	{
 		if (!isCowboySpawned)
@@ -90,7 +94,7 @@ public class CowboyManager : NetworkBehaviour
 				// Spawn the cowboy
 				goblinCowboyObject = Instantiate(goblinCowboyPrefab);
 				goblinCowboyObject.transform.position = cowboySpawnPoint;
-				NetworkServer.Spawn(goblinCowboyObject);
+				InstanceFinder.ServerManager.Spawn(goblinCowboyObject);
 				isCowboySpawned = true;
 
 				// Set the cowboy scripts paramaters
