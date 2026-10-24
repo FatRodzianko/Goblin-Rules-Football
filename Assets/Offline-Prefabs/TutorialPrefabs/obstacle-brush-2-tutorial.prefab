@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 49278375553431793}
   - component: {fileID: 49278375553431806}
   - component: {fileID: 49278375553431794}
-  - component: {fileID: 49278375553431795}
-  - component: {fileID: 49278375553431792}
   - component: {fileID: 7460745798923717208}
   m_Layer: 19
   m_Name: obstacle-brush-2-tutorial
@@ -31,6 +29,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -113,46 +112,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 3.1190093, y: 0.3159647}
   m_EdgeRadius: 0
---- !u!114 &49278375553431795
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 49278375553431807}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  visible: 0
-  m_AssetId: c8e652702c9b63d4f8aa9af081a18a91
-  hasSpawned: 0
---- !u!114 &49278375553431792
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 49278375553431807}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f74aedd71d9a4f55b3ce499326d45fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  clientAuthority: 0
-  localPositionSensitivity: 0.01
-  localRotationSensitivity: 0.01
-  localScaleSensitivity: 0.01
-  compressRotation: 0
-  interpolatePosition: 1
-  interpolateRotation: 1
-  interpolateScale: 1
-  syncScale: 0
 --- !u!114 &7460745798923717208
 MonoBehaviour:
   m_ObjectHideFlags: 0
