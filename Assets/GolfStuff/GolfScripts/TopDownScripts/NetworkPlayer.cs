@@ -74,11 +74,6 @@ public class NetworkPlayer : NetworkBehaviour
     {
         
     }
-    private void OnDestroy()
-    {
-        if (_networkManager != null)
-            _networkManager.SceneManager.OnClientLoadedStartScenes -= SceneManager_OnClientLoadedStartScenes;
-    }
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -138,6 +133,9 @@ public class NetworkPlayer : NetworkBehaviour
             SetPlayerName();
             _ballColorPicker.GetPlayerPrefValues();
             SetPlayerSteamID();
+            // The Steam lobby was entered before this player's connection started, so the name is known by now. This used
+            // to wait for OnClientLoadedStartScenes, but that fires before the player is spawned, so it never ran.
+            SetLobbyNameText(SteamLobby.instance.CurrentLobbyName);
         }
         
         _startGameButton.gameObject.SetActive(false);
@@ -154,13 +152,8 @@ public class NetworkPlayer : NetworkBehaviour
         //sld.ReplaceScenes = ReplaceOption.All;
         //FishNet.InstanceFinder.SceneManager.LoadGlobalScenes(sld);
         UnityEngine.SceneManagement.SceneManager.LoadScene("TitleScreen");
-        GolfSteamLobby.instance.LeaveLobby();
+        SteamLobby.instance.LeaveLobby();
 
-    }
-    private void SceneManager_OnClientLoadedStartScenes(NetworkConnection conn, bool asServer)
-    {
-        Debug.Log("NetworkPlayer: SceneManager_OnClientLoadedStartScenes: as server: " + asServer.ToString());
-        SetLobbyNameText(GolfSteamLobby.instance.CurrentLobbyName);
     }
     void SetLobbyNameText(string lobbyName)
     {
@@ -295,7 +288,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (!this.IsHost)
             return;
-        GolfSteamLobby.instance.SetGameStatusToInGame();
+        SteamLobby.instance.SetGameStatusToInGame();
         SpawnGolfPlayerObjectsForEachPlayer();
         GameplayManagerTopDownGolf.instance.HostStartGame(base.Owner);
     }
@@ -462,14 +455,14 @@ public class NetworkPlayer : NetworkBehaviour
         if (base.IsServer)
         {
             _networkManager.ServerManager.StopConnection(true);
-            GolfSteamLobby.instance.LeaveLobby();
+            SteamLobby.instance.LeaveLobby();
         }
 
 
         if (base.IsClient)
         {
             _networkManager.ClientManager.StopConnection();
-            GolfSteamLobby.instance.LeaveLobby();
+            SteamLobby.instance.LeaveLobby();
         }
             
     }

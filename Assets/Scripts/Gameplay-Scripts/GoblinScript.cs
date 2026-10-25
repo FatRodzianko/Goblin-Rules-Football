@@ -412,6 +412,35 @@ public class GoblinScript : NetworkBehaviour
             gameFootball = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
         }
     }
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        DropFootballForDespawn();
+    }
+    // The carried football is parented to the goblin holding it (see ParentFootballOnServer). FishNet despawns a
+    // disconnecting player's goblins, and despawning an object takes its child NetworkObjects with it, so a player who
+    // quit while carrying the ball used to take the football with them. OnStopServer runs before the object is destroyed
+    // and before its children despawn, so the ball can still be handed back. Dropped as a fumble, the way a knockout does
+    // it, so either team can pick it up.
+    // Not [Server]: this object is already deinitializing here, so that check would refuse to run the method.
+    void DropFootballForDespawn()
+    {
+        // False while the server is shutting down, when every object is despawning and there is no ball to drop.
+        if (!IsServerStarted)
+            return;
+        GameObject football = GameObject.FindGameObjectWithTag("football");
+        if (football == null || football.transform.parent != this.transform)
+            return;
+        NetworkObject footballNetworkObject = football.GetComponent<NetworkObject>();
+        if (footballNetworkObject == null || !footballNetworkObject.IsSpawned)
+            return;
+
+        Debug.Log("DropFootballForDespawn: " + this.name + " was carrying the football as it despawned. Dropping the ball.");
+        footballNetworkObject.UnsetParent();
+        football.GetComponent<Football>().FumbleFootball();
+        if (TeamManager.instance != null && this.serverGamePlayer != null && GameplayManager.instance != null && GameplayManager.instance.gamePhase != "kick-after-attempt")
+            TeamManager.instance.FumbleBall(this.serverGamePlayer.isTeamGrey);
+    }
 
     public void EnableGoblinMovement(bool allowMovement)
     {
@@ -948,7 +977,9 @@ public class GoblinScript : NetworkBehaviour
             Vector2 direction = Vector2.ClampMagnitude(slideDirection, 1);
             rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
         }
-        if (IsOwner && !isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+        // gameFootball can be gone for a frame or two when a game is ending or a player has just left, and the goblin
+        // chasing code below reads it every physics frame.
+        if (IsOwner && !isCharacterSelected && gameFootball != null && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
         {
             // Important thing here is "&& !isCharacterSelected"
             // This will be what the goblin does when they are not selected. AI code will go here?
@@ -1049,7 +1080,7 @@ public class GoblinScript : NetworkBehaviour
             }
         }
         // Check for the AI character for what to do with their goblin that they have selected?
-        else if (IsOwner && this.isCharacterSelected && !this.myGamePlayer.isLocalPlayer && this.myGamePlayer.isSinglePlayer && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+        else if (IsOwner && this.isCharacterSelected && !this.myGamePlayer.isLocalPlayer && this.myGamePlayer.isSinglePlayer && gameFootball != null && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
         {
             if (this.doesCharacterHaveBall)
                 state = State.RunTowardEndzone;

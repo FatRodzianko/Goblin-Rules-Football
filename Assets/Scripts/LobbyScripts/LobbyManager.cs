@@ -144,7 +144,7 @@ public class LobbyManager : MonoBehaviour
     public void UpdateLobbyName()
     {
         Debug.Log("UpdateLobbyName");
-        currentLobbyId = Game.GetComponent<SteamLobby>().current_lobbyID;
+        currentLobbyId = SteamLobby.instance.CurrentLobbyID;
         string lobbyName = SteamMatchmaking.GetLobbyData((CSteamID)currentLobbyId, "name");
         Debug.Log("UpdateLobbyName: new lobby name will be: " + lobbyName);
         //LobbyNameText.SetText(lobbyName);

@@ -101,7 +101,6 @@ public class TitleScreenManager : MonoBehaviour
 
 
     [Header("Game Option Values")]
-    public string lobbyName;
     public bool is1v1;
     public int secondsPerHalf;
     public bool powerUpsEnabled;
@@ -138,7 +137,6 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] private GameObject CreateLobbyCanvas;
     [SerializeField] private TMP_InputField lobbyNameInputField;
     [SerializeField] private Toggle friendsOnlyToggle;
-    public bool didPlayerNameTheLobby = false;
     public List<GameObject> listOfLobbyListItems = new List<GameObject>();
 
     [Header("Golf Stuff?")]
@@ -639,13 +637,6 @@ public class TitleScreenManager : MonoBehaviour
             newLobbyType = ELobbyType.k_ELobbyTypePublic;
         }
 
-        if (!string.IsNullOrEmpty(lobbyNameInputField.text))
-        {
-            Debug.Log("CreateNewLobby: player created a lobby name of: " + lobbyNameInputField.text);
-            didPlayerNameTheLobby = true;
-            lobbyName = lobbyNameInputField.text;
-        }
-
         if (multiplayer3v3Toggle.isOn)
         {
             Game.is1v1 = false;
@@ -662,10 +653,8 @@ public class TitleScreenManager : MonoBehaviour
         }
         SetGameSettings(false);
 
-        GolfSteamLobby.instance.JoiningFishNet = false;
-        SteamLobby.instance.JoiningMirror = true;
-        
-        SteamLobby.instance.CreateNewLobby(newLobbyType);
+        // An empty name gets SteamLobby's default, "<Steam name>'s lobby".
+        SteamLobby.instance.CreateFootballLobby(newLobbyType, lobbyNameInputField.text);
     }
     public void ResetGameServerSettings()
     {
@@ -693,8 +682,6 @@ public class TitleScreenManager : MonoBehaviour
     public void CreateNewGolfLobby()
     {
         Debug.Log("CreateNewGolfLobby: ");
-        SteamLobby.instance.JoiningMirror = false;
-        GolfSteamLobby.instance.JoiningFishNet = true;
         int numberOfPlayers = 1;
         if (String.IsNullOrWhiteSpace(_golfNumberOfPlayersInputField.text))
         {
@@ -716,7 +703,7 @@ public class TitleScreenManager : MonoBehaviour
             customeHoleSelection.AddRange(GetCustomHoleSelection());
         }
         Debug.Log("CreateNewGolfLobby: Rain Mode will be: " + _rainModeDropDown.options[_rainModeDropDown.value].text + " Wind Mode will be: " + _windModeDropDown.options[_windModeDropDown.value].text);
-        GolfSteamLobby.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text, _courseHoleSelectionDropdown.options[_courseHoleSelectionDropdown.value].text, customeHoleSelection, _golfParPenaltyFavorToggle.isOn, this._selectedCourseId, this._selectedCourseName, this._selectedCourseWorkshopID);
+        GolfLobbySettings.instance.CreateLobby(_golfMultiplayerLobbyNameInputField.text, numberOfPlayers, _golfFriendsOnlyToggle.isOn, _golfPowerUpsToggle.isOn, _spawnWeatherStatueToggle.isOn, _strokeLimitToggle.isOn, strokeLimitValue, _rainModeDropDown.options[_rainModeDropDown.value].text, _windModeDropDown.options[_windModeDropDown.value].text, _courseHoleSelectionDropdown.options[_courseHoleSelectionDropdown.value].text, customeHoleSelection, _golfParPenaltyFavorToggle.isOn, this._selectedCourseId, this._selectedCourseName, this._selectedCourseWorkshopID);
     }
     private void RainModeDropdownValueChanged(TMP_Dropdown change)
     {

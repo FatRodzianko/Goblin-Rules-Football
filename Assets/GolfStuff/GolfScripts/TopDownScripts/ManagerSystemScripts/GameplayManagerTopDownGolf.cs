@@ -310,21 +310,21 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [Server]
     void GetGameSettings()
     {
-        this.PowerUpsEnabled = GolfSteamLobby.instance.PowerUpsEnabled;
-        this.WeatherStatuesEnabled = GolfSteamLobby.instance.WeatherStatuesEnabled;
-        this.ParFavorPenalty = GolfSteamLobby.instance.ParFavorPenalty;
-        this.IsThereAStrokeLimit = GolfSteamLobby.instance.StrokeLimitEnabled;
-        this.StrokeLimitNumber = GolfSteamLobby.instance.StrokeLimitNumber;
-        RainManager.instance.SetGameRainMode(GolfSteamLobby.instance.GameRainMode);
-        WindManager.instance.SetGameWindMode(GolfSteamLobby.instance.GameWindMode);
-        this.SelectedCourseId = GolfSteamLobby.instance.SelectedCourseID;
-        Debug.Log("GetGameSettings: this.SelectedCourseId: " + this.SelectedCourseId+ " GolfSteamLobby.instance.SelectedCourseId: " + GolfSteamLobby.instance.SelectedCourseID);
-        this.CourseHolesToPlay = GolfSteamLobby.instance.CourseHoleSelection;
-        this.CourseName = GolfSteamLobby.instance.CourseName;
-        this.CourseWorkshopID = GolfSteamLobby.instance.CourseWorkshopID;
+        this.PowerUpsEnabled = GolfLobbySettings.instance.PowerUpsEnabled;
+        this.WeatherStatuesEnabled = GolfLobbySettings.instance.WeatherStatuesEnabled;
+        this.ParFavorPenalty = GolfLobbySettings.instance.ParFavorPenalty;
+        this.IsThereAStrokeLimit = GolfLobbySettings.instance.StrokeLimitEnabled;
+        this.StrokeLimitNumber = GolfLobbySettings.instance.StrokeLimitNumber;
+        RainManager.instance.SetGameRainMode(GolfLobbySettings.instance.GameRainMode);
+        WindManager.instance.SetGameWindMode(GolfLobbySettings.instance.GameWindMode);
+        this.SelectedCourseId = GolfLobbySettings.instance.SelectedCourseID;
+        Debug.Log("GetGameSettings: this.SelectedCourseId: " + this.SelectedCourseId+ " GolfLobbySettings.instance.SelectedCourseId: " + GolfLobbySettings.instance.SelectedCourseID);
+        this.CourseHolesToPlay = GolfLobbySettings.instance.CourseHoleSelection;
+        this.CourseName = GolfLobbySettings.instance.CourseName;
+        this.CourseWorkshopID = GolfLobbySettings.instance.CourseWorkshopID;
 
         this.CustomHolesSelectedToPlay.Clear();
-        this.CustomHolesSelectedToPlay.AddRange(GolfSteamLobby.instance.CustomHolesToPlay);
+        this.CustomHolesSelectedToPlay.AddRange(GolfLobbySettings.instance.CustomHolesToPlay);
     }
     [ObserversRpc(BufferLast = true)]
     void RpcTellClientsToLoadCourse(string courseID,string courseName, string courseHolesToPlay, List<int> customHoles)

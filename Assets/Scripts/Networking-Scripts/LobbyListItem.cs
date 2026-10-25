@@ -53,19 +53,7 @@ public class LobbyListItem : MonoBehaviour
             Destroy(this.gameObject);
             return;
         }
-        else if (this.GameMode == "Football")
-        {
-            GolfSteamLobby.instance.JoiningFishNet = false;
-            SteamLobby.instance.JoiningMirror = true;
-            SteamLobby.instance.JoinLobby(lobbySteamId);
-        }
-        else
-        {
-            GolfSteamLobby.instance.JoiningFishNet = true;
-            SteamLobby.instance.JoiningMirror = false;
-            GolfSteamLobby.instance.JoinLobby(lobbySteamId);
-        }
-        
-        
+        // SteamLobby starts the right game from the lobby's GameMode once it has joined.
+        SteamLobby.instance.JoinLobby(lobbySteamId);
     }
 }

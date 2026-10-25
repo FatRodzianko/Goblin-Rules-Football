@@ -44,8 +44,6 @@ public class LobbyMenu : MonoBehaviour
     public void CreateLobby()
     {
         Debug.Log("LobbyMenu: CreateLobby: ");
-        GolfSteamLobby.instance.JoiningFishNet = true;
-        //GolfSteamLobby.instance.CreateLobby(10);
         EnableLobbyMenu(false);
     }
     public void JoinLobby()
@@ -53,8 +51,7 @@ public class LobbyMenu : MonoBehaviour
         if (string.IsNullOrEmpty(_joinLobbyID.text))
             return;
         ulong id = Convert.ToUInt64(_joinLobbyID.text);
-        GolfSteamLobby.instance.JoiningFishNet = true;
-        GolfSteamLobby.instance.JoinLobby(new Steamworks.CSteamID(id));
+        SteamLobby.instance.JoinLobby(new Steamworks.CSteamID(id));
         EnableLobbyMenu(false);
     }
 }

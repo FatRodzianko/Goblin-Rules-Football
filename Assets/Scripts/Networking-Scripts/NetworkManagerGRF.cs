@@ -233,7 +233,7 @@ public class NetworkManagerGRF : MonoBehaviour
             lobbyPlayerInstance.IsGameLeader = isGameLeader;
             lobbyPlayerInstance.ConnectionId = conn.ClientId;
             lobbyPlayerInstance.playerNumber = LobbyPlayers.Count + 1;
-            lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.current_lobbyID, LobbyPlayers.Count);
+            lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.CurrentLobbyID, LobbyPlayers.Count);
             lobbyPlayerInstance.is1v1 = this.is1v1;
             lobbyPlayerInstance.isSinglePlayer = this.isSinglePlayer;
 
@@ -245,6 +245,9 @@ public class NetworkManagerGRF : MonoBehaviour
     {
         if (CanStartGame() && SceneManager.GetActiveScene().name == "LobbyScene")
         {
+            // Players stay in the Steam lobby until their session ends. This hides it from the lobby list.
+            SteamLobby.instance.SetGameStatusToInGame();
+
             // Mirror's ServerChangeScene override built a GamePlayer for each LobbyPlayer and swapped it in as that
             // connection's player. FishNet has no player slot, so each GamePlayer is spawned with the same owner and the
             // LobbyPlayer is removed (its OnDestroy still leaves the Steam lobby). GamePlayer is a global object, so it

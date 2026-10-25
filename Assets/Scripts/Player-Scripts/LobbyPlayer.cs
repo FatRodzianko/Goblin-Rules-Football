@@ -579,11 +579,11 @@ public class LobbyPlayer : NetworkBehaviour
         {
             try
             {
-                // On a FishNet host, LobbyScene can unload before this is destroyed at game start. Skip its UI then,
-                // but still leave the Steam lobby as Mirror did.
+                // On a FishNet host, LobbyScene can unload before this is destroyed at game start. Skip its UI then.
+                // The Steam lobby isn't left here: players stay in it for the match, and SteamLobby leaves it when the
+                // session ends.
                 if (LobbyManager.instance != null)
                     LobbyManager.instance.DestroyPlayerListItems();
-                SteamMatchmaking.LeaveLobby((CSteamID)LobbyManager.instance.currentLobbyId);
             }
             catch (Exception e)
             {

@@ -310,6 +310,26 @@ public class GamePlayer : NetworkBehaviour
         //InputManager.Controls.SelectPowerUps.SubmitSelection.performed += _ => GamepadPowerUpSubmitSelection();
     }
 
+    // A player who leaves mid-match used to stay in these lists with all of their objects destroyed, so anything walking
+    // them touched a destroyed player or goblin. PowerUpManager.NormalPowerUpDrop did, picking a random player to drop a
+    // power-up beside.
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        Debug.Log("GamePlayer " + this.PlayerName + " left the game.");
+        if (Game != null)
+            Game.GamePlayers.Remove(this);
+    }
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        // IsServerStarted is false while the server is shutting down, when the teams are being despawned as well and
+        // their [Server] methods would only log warnings.
+        if (!IsServerStarted || TeamManager.instance == null)
+            return;
+        foreach (Team team in TeamManager.instance.teams)
+            team.RemovePlayerFromTeam(this);
+    }
     public override void OnStartClient()
     {
         Debug.Log("OnStartClient Spawned GamePlayer with ConnectionId: " + ConnectionId.ToString() + this.PlayerName);

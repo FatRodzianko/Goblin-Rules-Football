@@ -96,6 +96,20 @@ public class Team : NetworkBehaviour
             teammateNetIds.Add(player.GetComponent<NetworkObject>().ObjectId);
         }
     }
+    // Called from GamePlayer.OnStopServer, so a player who left the game doesn't stay on the team. The loops over
+    // teamPlayers read the player (Owner, possessionPoints), which throws once that object is destroyed.
+    [Server]
+    public void RemovePlayerFromTeam(GamePlayer player)
+    {
+        if (player == null || !teamPlayers.Contains(player))
+            return;
+        teamPlayers.Remove(player);
+        int playerObjectId = player.ObjectId;
+        if (teammateNetIds.Contains(playerObjectId))
+            teammateNetIds.Remove(playerObjectId);
+        if (captain == player)
+            captain = null;
+    }
     [Server]
     public void SendYeehawsToTeammates()
     {
