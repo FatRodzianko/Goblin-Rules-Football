@@ -328,7 +328,14 @@ public class GamePlayer : NetworkBehaviour
         if (!IsServerStarted || TeamManager.instance == null)
             return;
         foreach (Team team in TeamManager.instance.teams)
-            team.RemovePlayerFromTeam(this);
+        {
+            if (!team.RemovePlayerFromTeam(this))
+                continue;
+            // RemovePlayerFromTeam hands the captain's job to a teammate. With nobody left there is no one to kick off
+            // or take a kick-after, so the match is over for both sides.
+            if (team.teamPlayers.Count == 0 && GameplayManager.instance != null)
+                GameplayManager.instance.HandleTeamAbandoned(team.isGrey);
+        }
     }
     public override void OnStartClient()
     {
@@ -856,8 +863,9 @@ public class GamePlayer : NetworkBehaviour
     public void GetGoblinTeammatesFor3v3()
     {
         Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " are they grey team? " + this.isTeamGrey.ToString());
-        if (TeamManager.instance.greyTeam == null || TeamManager.instance.greenTeam)
-            TeamManager.instance.GetLocalTeamObjects();
+        // The second half of this test used to read "|| TeamManager.instance.greenTeam", which is true whenever the green
+        // team exists, so the call was never actually conditional. GetLocalTeamObjects has its own, stricter check.
+        TeamManager.instance.GetLocalTeamObjects();
         if (this.isTeamGrey)
             myTeam = TeamManager.instance.greyTeam;
         else
@@ -3123,6 +3131,12 @@ public class GamePlayer : NetworkBehaviour
     {
         if (IsClientInitialized)
         {
+            // In a 3v3 the team is set before the GamePlayer is spawned, so this hook arrives with the spawn, while the
+            // client is still in LobbyScene. TeamManager is a gameplay-scene object and doesn't exist yet. There is
+            // nothing to catch up on: myTeam is only read in GetGoblinTeammatesFor3v3, which sets it from TeamManager
+            // itself at the kickoff.
+            if (TeamManager.instance == null)
+                return;
             if (newValue)
             {
                 myTeam = TeamManager.instance.greyTeam;

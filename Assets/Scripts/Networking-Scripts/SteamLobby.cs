@@ -62,6 +62,10 @@ public class SteamLobby : MonoBehaviour
         _networkManager.ClientManager.OnClientConnectionState += ClientManager_OnClientConnectionState;
         _networkManager.SceneManager.OnLoadEnd += SceneManager_OnLoadEnd;
 
+        // Steam is how the game connects unless a test session says otherwise. Multipass logs an error if anything reads
+        // ClientTransport before it has been set, and FishNet reads it earlier than the first host or join, so set it here.
+        UseSteamTransport();
+
         if (!SteamManager.Initialized) { return; }
 
         lobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
@@ -188,6 +192,7 @@ public class SteamLobby : MonoBehaviour
             SteamMatchmaking.SetLobbyData(lobbyId, "CourseName", _pendingCourseName);
         SteamMatchmaking.SetLobbyData(lobbyId, "GameStatus", "Lobby");
 
+        UseSteamTransport();
         if (gameMode == GameModeFootball)
         {
             NetworkManagerGRF.singleton.StartHost();
@@ -198,6 +203,15 @@ public class SteamLobby : MonoBehaviour
         {
             StartGolfHost();
         }
+    }
+    // The NetworkManager's transport is Multipass, holding FishySteamworks and Tugboat. The server opens both, but a client
+    // has to be told which one to connect with, and DevDirectConnect may have left it on Tugboat. Everything that goes
+    // through a Steam lobby belongs on FishySteamworks, so say so before each host or join.
+    private void UseSteamTransport()
+    {
+        FishNet.Transporting.Multipass.Multipass multipass = _networkManager.TransportManager.Transport as FishNet.Transporting.Multipass.Multipass;
+        if (multipass != null)
+            multipass.SetClientTransport<FishySteamworks.FishySteamworks>();
     }
     // Steam invites and "Join Game" in the Steam overlay.
     private void OnGameLobbyJoinRequested(GameLobbyJoinRequested_t callback)
@@ -241,6 +255,7 @@ public class SteamLobby : MonoBehaviour
             LeaveLobby();
             return;
         }
+        UseSteamTransport();
         if (gameMode == GameModeFootball)
         {
             NetworkManagerGRF.singleton.networkAddress = hostAddress;

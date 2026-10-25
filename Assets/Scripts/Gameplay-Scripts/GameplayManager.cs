@@ -123,6 +123,9 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] GameObject GameOverScrollPanelObject;
     public bool gameWinnersNotified = false;
     public bool mercyRuleResultsSent = false;
+    // Set by HandleTeamAbandoned when a team has no players left, and read by DetermineWinnerOfGame. Server only: the
+    // clients hear about a forfeit through RpcWinnerOfGameDetermined.
+    string forfeitWinner = "";
 
     [Header("UI Stuff")]
     [SerializeField] GameObject PossessionFootballGreen;
@@ -832,6 +835,8 @@ public class GameplayManager : NetworkBehaviour
                 scoringTeam = TeamManager.instance.greenTeam;
                 blockingTeam = TeamManager.instance.greyTeam;
             }
+            if (IsTeamMissingItsCaptain(scoringTeam) || IsTeamMissingItsCaptain(blockingTeam))
+                return;
             // Set kicking and receiving team/player based on who scored and who will be blocking
             kickingTeam = scoringTeam;
             kickingPlayer = scoringTeam.captain;
@@ -1273,6 +1278,13 @@ public class GameplayManager : NetworkBehaviour
     [Server]
     void DetermineWinnerOfGame()
     {
+        // A team with no players left loses whatever the score was, so quitting while behind can't avoid the loss.
+        if (forfeitWinner != "")
+        {
+            winningTeam = forfeitWinner;
+            RpcWinnerOfGameDetermined(winningTeam, true);
+            return;
+        }
         if (greenScore > greyScore)
         {
             winningTeam = "green";
@@ -1299,12 +1311,12 @@ public class GameplayManager : NetworkBehaviour
             winningTeam = "draw";
             //gameWinnersNotified = true;
         }
-        RpcWinnerOfGameDetermined(winningTeam);
+        RpcWinnerOfGameDetermined(winningTeam, false);
     }
     [ObserversRpc]
-    void RpcWinnerOfGameDetermined(string winnerOfGame)
+    void RpcWinnerOfGameDetermined(string winnerOfGame, bool wasForfeit)
     {
-        Debug.Log("RpcWinnerOfGameDetermined: " + winnerOfGame);
+        Debug.Log("RpcWinnerOfGameDetermined: " + winnerOfGame + ", by forfeit? " + wasForfeit.ToString());
         theFinalScoreText.text = "THE FINAL SCORE";
         greenTeamScoreText.text = greenScore.ToString();
         greyTeamScoreText.text = greyScore.ToString();
@@ -1316,9 +1328,11 @@ public class GameplayManager : NetworkBehaviour
             //teamWinnerText.GetComponent<TouchDownTextGradient>().ActivateGradient();
             if (!gameWinnersNotified)
             {
-                LocalGamePlayerScript.WinnerOfGameSteamAchievementChecks(winnerOfGame);
+                // A win by forfeit doesn't count toward achievements, so they can't be farmed with a second account.
+                if (!wasForfeit)
+                    LocalGamePlayerScript.WinnerOfGameSteamAchievementChecks(winnerOfGame);
                 gameWinnersNotified = true;
-            } 
+            }
         }
         else if (winnerOfGame == "grey")
         {
@@ -1326,7 +1340,8 @@ public class GameplayManager : NetworkBehaviour
             //teamWinnerText.GetComponent<TouchDownTextGradient>().ActivateGradient();
             if (!gameWinnersNotified)
             {
-                LocalGamePlayerScript.WinnerOfGameSteamAchievementChecks(winnerOfGame);
+                if (!wasForfeit)
+                    LocalGamePlayerScript.WinnerOfGameSteamAchievementChecks(winnerOfGame);
                 gameWinnersNotified = true;
             }
         }
@@ -1493,6 +1508,8 @@ public class GameplayManager : NetworkBehaviour
     void GetSecondHalfKickingTeam()
     {
         Debug.Log("GetSecondHalfKickingTeam");
+        if (IsTeamMissingItsCaptain(TeamManager.instance.greenTeam) || IsTeamMissingItsCaptain(TeamManager.instance.greyTeam))
+            return;
 
         /*foreach (GamePlayer player in Game.GamePlayers)
         {
@@ -2040,6 +2057,31 @@ public class GameplayManager : NetworkBehaviour
         errorCanvas.SetActive(false);
         errorCanvasText.text = "";
         isErrorMessageDisplayed = false;
+    }
+    // Called from GamePlayer.OnStopServer once the last player on a team has left, and from IsTeamMissingItsCaptain.
+    // That team can't kick off or take a kick-after, since both read team.captain, so the match ends and the other
+    // team takes the win. This is the one place that decides what an abandoned team means: when the "forfeit, or let
+    // an AI take over?" prompt is added, it replaces the body of this method and nothing else has to change.
+    [Server]
+    public void HandleTeamAbandoned(bool isTeamGrey)
+    {
+        if (this.gamePhase == "gameover" || forfeitWinner != "")
+            return;
+        Debug.Log("HandleTeamAbandoned: the " + (isTeamGrey ? "grey" : "green") + " team has no players left. Ending the game.");
+        forfeitWinner = isTeamGrey ? "green" : "grey";
+        SendErrorMessageToTeam(!isTeamGrey, "Your opponent left the game.");
+        this.gamePhase = "gameover";
+    }
+    // team.captain is null only if the captain left and no teammate was there to take over, which PromoteNewCaptain
+    // normally handles. Both kickoff paths read it, so check before reading rather than throwing on the next line.
+    [Server]
+    bool IsTeamMissingItsCaptain(Team team)
+    {
+        if (team == null || team.captain != null)
+            return false;
+        Debug.Log("IsTeamMissingItsCaptain: the " + (team.isGrey ? "grey" : "green") + " team has no captain left.");
+        HandleTeamAbandoned(team.isGrey);
+        return true;
     }
     [Server]
     bool CheckForMercyRule()

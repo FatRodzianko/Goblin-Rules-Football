@@ -328,7 +328,12 @@ public class LobbyPlayer : NetworkBehaviour
         if (IsOwner)
         {
             _isOwnedLocally = true;
-            CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
+            // Local instances in a dev session all share one Steam account, so Steam would give them the same name and the
+            // lobby list would be unreadable. The process id tells them apart.
+            if (NetworkManagerGRF.singleton != null && NetworkManagerGRF.singleton.isDevSession)
+                CmdSetPlayerName("Dev-" + (System.Diagnostics.Process.GetCurrentProcess().Id % 10000).ToString());
+            else
+                CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
             //CmdSetPlayerName(PlayerPrefs.GetString(PlayerPrefsNameKey));
             gameObject.name = "LocalLobbyPlayer";
             LobbyManager.instance.FindLocalLobbyPlayer();

@@ -56,6 +56,10 @@ public class NetworkManagerGRF : MonoBehaviour
     public List<GamePlayer> GamePlayers { get; } = new List<GamePlayer>();
     public List<LobbyPlayer> LobbyPlayers { get; } = new List<LobbyPlayer>();
 
+    // Set by DevDirectConnect when a session was started over Tugboat instead of Steam, so the Steam lobby calls below are
+    // skipped. Always false in a release build, where DevDirectConnect doesn't exist.
+    public bool isDevSession = false;
+
     private NetworkManager _networkManager;
     // True from StartHost/StartClient until the connection stops, so Golf sessions on the shared NetworkManager are left alone.
     private bool _isFootballSession = false;
@@ -182,6 +186,7 @@ public class NetworkManagerGRF : MonoBehaviour
     {
         _isFootballSession = false;
         _startHostClientWhenLobbyLoads = false;
+        isDevSession = false;
         // This object outlives the session, so clear what the last one left behind, on clients too.
         LobbyPlayers.Clear();
         GamePlayers.Clear();
@@ -233,7 +238,9 @@ public class NetworkManagerGRF : MonoBehaviour
             lobbyPlayerInstance.IsGameLeader = isGameLeader;
             lobbyPlayerInstance.ConnectionId = conn.ClientId;
             lobbyPlayerInstance.playerNumber = LobbyPlayers.Count + 1;
-            lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.CurrentLobbyID, LobbyPlayers.Count);
+            // A dev session has no Steam lobby to read members from, so there is no Steam id and no avatar.
+            if (!isDevSession)
+                lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.CurrentLobbyID, LobbyPlayers.Count);
             lobbyPlayerInstance.is1v1 = this.is1v1;
             lobbyPlayerInstance.isSinglePlayer = this.isSinglePlayer;
 
@@ -246,7 +253,8 @@ public class NetworkManagerGRF : MonoBehaviour
         if (CanStartGame() && SceneManager.GetActiveScene().name == "LobbyScene")
         {
             // Players stay in the Steam lobby until their session ends. This hides it from the lobby list.
-            SteamLobby.instance.SetGameStatusToInGame();
+            if (!isDevSession)
+                SteamLobby.instance.SetGameStatusToInGame();
 
             // Mirror's ServerChangeScene override built a GamePlayer for each LobbyPlayer and swapped it in as that
             // connection's player. FishNet has no player slot, so each GamePlayer is spawned with the same owner and the

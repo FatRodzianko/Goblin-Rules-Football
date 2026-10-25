@@ -98,17 +98,40 @@ public class Team : NetworkBehaviour
     }
     // Called from GamePlayer.OnStopServer, so a player who left the game doesn't stay on the team. The loops over
     // teamPlayers read the player (Owner, possessionPoints), which throws once that object is destroyed.
+    // Returns true if the player was on this team, so the caller knows which team to check for being abandoned.
     [Server]
-    public void RemovePlayerFromTeam(GamePlayer player)
+    public bool RemovePlayerFromTeam(GamePlayer player)
     {
         if (player == null || !teamPlayers.Contains(player))
-            return;
+            return false;
         teamPlayers.Remove(player);
         int playerObjectId = player.ObjectId;
         if (teammateNetIds.Contains(playerObjectId))
             teammateNetIds.Remove(playerObjectId);
         if (captain == player)
+        {
             captain = null;
+            PromoteNewCaptain();
+        }
+        return true;
+    }
+    // In a 3v3 the captain is whoever picked the Grenadier (GamePlayer.CmdGetTeamName), and GameplayManager reads
+    // team.captain for the kicking, receiving and blocking player at every kickoff and kick-after. If the captain
+    // leaves mid-match, hand the job to a teammate who is still here. Nobody left means the team can't kick at all,
+    // which GamePlayer.OnStopServer handles by ending the match.
+    [Server]
+    public void PromoteNewCaptain()
+    {
+        if (captain != null)
+            return;
+        foreach (GamePlayer player in teamPlayers)
+        {
+            if (player == null)
+                continue;
+            captain = player;
+            Debug.Log("PromoteNewCaptain: " + player.PlayerName + " is now the captain of the " + (isGrey ? "grey" : "green") + " team.");
+            return;
+        }
     }
     [Server]
     public void SendYeehawsToTeammates()

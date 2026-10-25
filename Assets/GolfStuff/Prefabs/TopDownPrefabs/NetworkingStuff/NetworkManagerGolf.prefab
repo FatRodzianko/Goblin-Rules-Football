@@ -2221,6 +2221,8 @@ GameObject:
   - component: {fileID: 5746368019743588139}
   - component: {fileID: 5024017012025825574}
   - component: {fileID: 1531992552086719743}
+  - component: {fileID: 8562962732157465894}
+  - component: {fileID: 4074078416168303429}
   m_Layer: 0
   m_Name: NetworkManagerGolf
   m_TagString: Untagged
@@ -2322,7 +2324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34e4a322dca349547989b14021da4e23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Transport: {fileID: 7983715474653844588}
+  Transport: {fileID: 4074078416168303429}
   _maximumClientPacketSize: 20480
   _intermediateLayer: {fileID: 0}
   _latencySimulator:
@@ -2392,12 +2394,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99a52ef59d5b6a740b1608f6e79e40bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _networkManager: {fileID: 7983715474653844597}
-  _fishySteamWorks: {fileID: 7983715474653844588}
-  _lobbyNumber: {fileID: 0}
-  CurrentLobbyName: 
-  JoiningFishNet: 0
-  LobbyName: 
   NumberOfPlayers: 1
   MinNumberOfPlayers: 1
   MaxNumberOfPlayers: 10
@@ -2479,9 +2475,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c1ce63880171e045a469bceddb2e4dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  current_lobbyID: 0
   lobbyIDS: []
-  JoiningMirror: 0
 --- !u!114 &1531992552086719743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2497,3 +2491,40 @@ MonoBehaviour:
   _playerPrefab: {fileID: 383208058805492564, guid: ac146805612437a4986dd0485f322a8f, type: 3}
   _addToDefaultScene: 1
   Spawns: []
+--- !u!114 &8562962732157465894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7983715474653844596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f48f002b825cbd45a19bd96d90f9edb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stopSocketsOnThread: 0
+  _dontRoute: 0
+  _reuseAddress: 0
+  _ipv4BindAddress: 
+  _enableIpv6: 1
+  _ipv6BindAddress: 
+  _port: 7777
+  _maximumClients: 4095
+  _clientAddress: localhost
+--- !u!114 &4074078416168303429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7983715474653844596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 314b449d3505bd24487ba69b61c2fda5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalServerActions: 1
+  _transports:
+  - {fileID: 7983715474653844588}
+  - {fileID: 8562962732157465894}
