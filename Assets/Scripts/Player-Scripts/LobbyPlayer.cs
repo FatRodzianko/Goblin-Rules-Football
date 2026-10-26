@@ -633,6 +633,11 @@ public class LobbyPlayer : NetworkBehaviour
     {
         if (IsOwner)
         {
+            // BIsDlcInstalled throws when Steam isn't running, and this is called from OnStartClient, where an exception
+            // aborts the rest of the start callbacks. The DLC check is a local one, so it still works in a dev session
+            // as long as Steam is up; with Steam down there is nothing to ask and the icons stay hidden.
+            if (!SteamManager.Initialized)
+                return;
             Steamworks.AppId_t dlc_99 = new Steamworks.AppId_t(2174640);
             bool dlc99Installed = SteamApps.BIsDlcInstalled(dlc_99);
             Steamworks.AppId_t dlc_1_99 = new Steamworks.AppId_t(2174641);

@@ -43,6 +43,11 @@ public class SoundManager : MonoBehaviour
         if (s == null)
             return;
         //Debug.Log("PlaySound: " + name);
+        // The AudioSources live on this object and are destroyed with the scene, while instance still points here. A
+        // despawn sound played from a FishNet stop callback during teardown would throw on a destroyed source, and an
+        // exception in OnStopClient drops the rest of that batch (PowerUpThrownObject did this).
+        if (s.source == null)
+            return;
         if (!s.source.enabled)
             s.source.enabled = true;
         s.source.volume = volume;
@@ -58,6 +63,9 @@ public class SoundManager : MonoBehaviour
             return;
         //Debug.Log("StopSound: " + name + " " + s.source.isPlaying.ToString());
         //s.source.mute = true;
+        // Same teardown case as PlaySound: this is also called from despawn paths.
+        if (s.source == null)
+            return;
         s.source.Stop();
         s.source.enabled = false;
         

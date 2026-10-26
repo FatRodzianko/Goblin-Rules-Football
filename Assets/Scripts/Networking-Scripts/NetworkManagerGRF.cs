@@ -104,8 +104,21 @@ public class NetworkManagerGRF : MonoBehaviour
     {
         _isFootballSession = true;
         _startHostClientWhenLobbyLoads = true;
-        if (!_networkManager.ServerManager.StartConnection())
+        if (!StartServerConnection())
             EndFootballSession();
+    }
+    // Multipass's own StartConnection(true) starts every transport it holds and reports failure if any one of them fails.
+    // That let FishySteamworks take the whole host down whenever Steam wasn't running, even though Tugboat had started,
+    // which killed the Steam-less dev sessions. A session only ever uses one transport, the one the local client was
+    // pointed at (SteamLobby sets FishySteamworks, DevDirectConnect sets Tugboat), so start just that one. A Steam
+    // session no longer binds Tugboat's port either. ServerManager.StartConnection() is itself nothing more than
+    // Transport.StartConnection(true), so going through Multipass directly skips no setup.
+    private bool StartServerConnection()
+    {
+        FishNet.Transporting.Multipass.Multipass multipass = _networkManager.TransportManager.Transport as FishNet.Transporting.Multipass.Multipass;
+        if (multipass == null || multipass.ClientTransport == null)
+            return _networkManager.ServerManager.StartConnection();
+        return multipass.StartConnection(true, multipass.ClientTransport.Index);
     }
     public void StartClient()
     {

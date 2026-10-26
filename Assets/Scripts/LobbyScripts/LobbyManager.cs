@@ -144,6 +144,14 @@ public class LobbyManager : MonoBehaviour
     public void UpdateLobbyName()
     {
         Debug.Log("UpdateLobbyName");
+        // A dev session has no Steam lobby to read a name from, and GetLobbyData throws outright when Steam isn't
+        // running at all. This is called from LobbyPlayer.OnStartClient, where an exception aborts the rest of FishNet's
+        // start callbacks, so the player never reached Game.LobbyPlayers and the lobby came up empty.
+        if (NetworkManagerGRF.singleton != null && NetworkManagerGRF.singleton.isDevSession)
+        {
+            LobbyNameText.SetText("Local test lobby");
+            return;
+        }
         currentLobbyId = SteamLobby.instance.CurrentLobbyID;
         string lobbyName = SteamMatchmaking.GetLobbyData((CSteamID)currentLobbyId, "name");
         Debug.Log("UpdateLobbyName: new lobby name will be: " + lobbyName);

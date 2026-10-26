@@ -1381,7 +1381,10 @@ public class GoblinScript : NetworkBehaviour
     [ServerRpc]
     void CmdCheckIfTeamStillHasBall()
     {
-        GamePlayer goblinOwnerScript = ObjectLookup.Get(ownerNetId).gameObject.GetComponent<GamePlayer>();
+        // A goblin's own ServerRpc can land a tick after its player has disconnected, and FishNet has already despawned
+        // everything that player owned by then. Nothing is left to update, so drop it.
+        if (!ObjectLookup.TryGet(ownerNetId, out GamePlayer goblinOwnerScript))
+            return;
         if (this.doesCharacterHaveBall)
         {
             //Debug.Log("CmdCheckIfTeamStillHasBall: Goblin has ball. Goblin's team still has ball. Setting doesTeamHaveBall to true for player: " + goblinOwnerScript.PlayerName);
@@ -1410,7 +1413,11 @@ public class GoblinScript : NetworkBehaviour
             List<int> goblinNetIds = new List<int>();
             foreach (int goblinNetId in goblinOwnerScript.goblinTeamNetIds)
             {
-                GoblinScript goblinNetIdScript = ObjectLookup.Get(goblinNetId).gameObject.GetComponent<GoblinScript>();
+                // A player who leaves has their goblins despawned, but their ids stay in this list, so skip the ones
+                // that are no longer spawned rather than throwing on the server. This was two null references in the
+                // six-instance 3v3, at the moments players left.
+                if (!ObjectLookup.TryGet(goblinNetId, out GoblinScript goblinNetIdScript))
+                    continue;
                 if (goblinNetIdScript.doesCharacterHaveBall)
                 {
                     anyGoblinHaveBall = true;

@@ -156,6 +156,11 @@ public class PlayerListItem : MonoBehaviour
     }
     void GetPlayerAvatar()
     {
+        // GetLargeFriendAvatar throws when Steam isn't running. This runs from LobbyManager.UpdateUI, which
+        // LobbyPlayer.OnStartClient calls, and an exception there aborts the rest of FishNet's start callbacks. A dev
+        // session has no Steam ids anyway, so there is no avatar to fetch.
+        if (!SteamManager.Initialized)
+            return;
         int imageId = SteamFriends.GetLargeFriendAvatar((CSteamID)playerSteamId);
 
         if (imageId == -1)

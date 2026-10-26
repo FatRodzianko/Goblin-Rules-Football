@@ -29,8 +29,14 @@ public class SteamAchievementManager : MonoBehaviour
     {
         
     }
+    // Every method here calls into SteamUserStats, which throws when Steam isn't running, and they are called
+    // from gameplay code (Play3v3 at game start, TouchdownScored on every score). An exception in a FishNet start
+    // callback or RPC drops the rest of that batch, so each one returns early instead. There are no achievements
+    // to record without Steam.
     public void TutorialCompleted()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: TutorialCompleted");
         bool isAchieved = false;
         SteamUserStats.GetAchievement("GRF_TUTORIAL", out isAchieved);
@@ -42,6 +48,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void WinSinglePlayer()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: WinSinglePlayer");
         bool winSingle = false;
         SteamUserStats.GetAchievement("GRF_WIN_SINGLE", out winSingle);
@@ -50,6 +58,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void WinningPlayer()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: WinningPlayer");
 
         int wins = 0;
@@ -75,6 +85,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void LoseSinglePlayer()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: LoseSinglePlayer");
         bool loseSingle = false;
         SteamUserStats.GetAchievement("GRF_LOSE_SINGLE", out loseSingle);
@@ -83,6 +95,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void LosingPlayer()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: LosingPlayer");
         
 
@@ -109,6 +123,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void TouchdownScored()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: TouchdownScored");
         bool firstTouchdown = false;
         SteamUserStats.GetAchievement("GRF_FIRST_TOUCHDOWN", out firstTouchdown);
@@ -140,6 +156,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void KickAfterAttemptMade()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: KickAfterAttemptMade");
         bool firstKick = false;
         SteamUserStats.GetAchievement("GRF_MADE_KICK", out firstKick);
@@ -171,6 +189,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void YeehawGiven()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: YeehawGiven");
         bool yeehawGiven = false;
         SteamUserStats.GetAchievement("GRF_YEEHAW", out yeehawGiven);
@@ -196,6 +216,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void Play1v1()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: Play1v1");
         bool did1v1 = false;
         SteamUserStats.GetAchievement("GRF_PLAY_1v1", out did1v1);
@@ -205,6 +227,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void Play3v3()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: Play3v3");
         bool did3v3 = false;
         SteamUserStats.GetAchievement("GRF_PLAY_3v3", out did3v3);
@@ -214,6 +238,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void MercyRuleLose()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: MercyRuleLose");
         bool mercyLose = false;
         SteamUserStats.GetAchievement("GRF_MERCYRULE_LOSE", out mercyLose);
@@ -223,6 +249,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void MercyRuleWin()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: MercyRuleWin");
         bool mercyWin = false;
         SteamUserStats.GetAchievement("GRF_MERCYRULE_WIN", out mercyWin);
@@ -232,6 +260,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void StubbedToe()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: StubbedToe");
         bool stubbedToe = false;
         SteamUserStats.GetAchievement("GRF_STUBBED_TOE", out stubbedToe);
@@ -241,6 +271,8 @@ public class SteamAchievementManager : MonoBehaviour
     }
     public void BlockedKick()
     {
+        if (!SteamManager.Initialized)
+            return;
         Debug.Log("SteamAchievementManager: BlockedKick");
         bool blockedKick = false;
         SteamUserStats.GetAchievement("GRF_BLOCKED_KICK", out blockedKick);
