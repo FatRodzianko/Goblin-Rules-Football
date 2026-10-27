@@ -721,7 +721,7 @@ public class AIPlayer : NetworkBehaviour
             Debug.Log("BlockKickAfterAttempt: could not get goblinWithBall from the game football. Error: " + e);
             return;
         }
-        foreach (GoblinScript goblin in myPlayerScript.goblinTeam)
+        foreach (GoblinScript goblin in myPlayerScript.myGoblins)
         {
             if (goblin.soundType != "skirmisher")
                 continue;
@@ -1073,7 +1073,7 @@ public class AIPlayer : NetworkBehaviour
         bool goblinBelowMin = false;
         float minHealthThreshold = 0.2f;
         float combinedHealthPercentage = 0f;
-        foreach (GoblinScript goblin in myPlayerScript.goblinTeam)
+        foreach (GoblinScript goblin in myPlayerScript.myGoblins)
         {
             float goblinHealthPercent = goblin.health / goblin.MaxHealth;
             if (goblin.isGoblinKnockedOut)
@@ -1091,7 +1091,7 @@ public class AIPlayer : NetworkBehaviour
         // The average divided by a hardcoded 3. A 3v3 bot owns one goblin, so this came out at a third of the real
         // figure and could not reach 0.5 unless that goblin were over 150% health, which had every bot spending its
         // health power-up as soon as it had one. A 1v1 and single player still divide by 3, since Count is 3 there.
-        int healthGoblinCount = myPlayerScript.goblinTeam.Count;
+        int healthGoblinCount = myPlayerScript.myGoblins.Count;
         if (goblinBelowMin || (healthGoblinCount > 0 && (combinedHealthPercentage / healthGoblinCount) < 0.5f))
         {
             UsePowerUp(healthPowerUpIndex);
@@ -1103,7 +1103,7 @@ public class AIPlayer : NetworkBehaviour
         bool goblinBelowMin = false;
         float minStaminaThreshold = 0.15f;
         float combinedStaminaPercentage = 0f;
-        foreach (GoblinScript goblin in myPlayerScript.goblinTeam)
+        foreach (GoblinScript goblin in myPlayerScript.myGoblins)
         {
             float goblinStaminaPercent = goblin.stamina / goblin.MaxStamina;
             if (goblinStaminaPercent <= minStaminaThreshold)
@@ -1114,7 +1114,7 @@ public class AIPlayer : NetworkBehaviour
             combinedStaminaPercentage += goblinStaminaPercent;
         }
         // Divided by a hardcoded 3, as the health check above was; same effect on a 3v3 bot's stamina power-up.
-        int staminaGoblinCount = myPlayerScript.goblinTeam.Count;
+        int staminaGoblinCount = myPlayerScript.myGoblins.Count;
         if (goblinBelowMin || (staminaGoblinCount > 0 && (combinedStaminaPercentage / staminaGoblinCount) < 0.5f))
         {
             UsePowerUp(staminaPowerUpIndex);
@@ -1125,7 +1125,7 @@ public class AIPlayer : NetworkBehaviour
     {
         bool goblinsNearby = false;
 
-        foreach (GoblinScript goblin in myPlayerScript.goblinTeam)
+        foreach (GoblinScript goblin in myPlayerScript.myGoblins)
         {
             GetSurroundingGoblins(goblin.transform.position, goblin.isGoblinGrey);
             if (areEnemyGoblinsNearby)
@@ -1145,7 +1145,7 @@ public class AIPlayer : NetworkBehaviour
         bool wasTeammateHit = false;
         float distToTeammate = 0f;
         float distToEnemy = 0f;
-        foreach (GoblinScript goblin in myPlayerScript.goblinTeam)
+        foreach (GoblinScript goblin in myPlayerScript.myGoblins)
         {
             Vector2 directionToCast = new Vector2(1f, 0f);
             if(goblin.myRenderer.flipX)
@@ -1218,7 +1218,7 @@ public class AIPlayer : NetworkBehaviour
     }
     public void StopBlockingGoblinFromRunning()
     {
-        foreach (GoblinScript goblin in myPlayerScript.goblinTeam)
+        foreach (GoblinScript goblin in myPlayerScript.myGoblins)
         {
             if (goblin.soundType != "skirmisher")
                 continue;

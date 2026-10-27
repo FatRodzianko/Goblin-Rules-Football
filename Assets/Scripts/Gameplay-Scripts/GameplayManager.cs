@@ -1420,7 +1420,7 @@ public class GameplayManager : NetworkBehaviour
     {
         foreach (GamePlayer player in Game.GamePlayers)
         {
-            foreach (GoblinScript goblin in player.goblinTeamOnServer)
+            foreach (GoblinScript goblin in player.myGoblinsOnServer)
             {
                 goblin.hasGoblinBeenRepositionedForKickAfter = false;
             }
@@ -1435,7 +1435,7 @@ public class GameplayManager : NetworkBehaviour
         {
             if (doneRepositioning)
             {
-                foreach (GoblinScript goblin in player.goblinTeamOnServer)
+                foreach (GoblinScript goblin in player.myGoblinsOnServer)
                 {
                     if (!goblin.hasGoblinBeenRepositionedForKickAfter)
                     {
@@ -1744,7 +1744,7 @@ public class GameplayManager : NetworkBehaviour
             {
                 if (player == null || !player.isAIPlayer || player.myAIPlayer == null)
                     continue;
-                foreach (GoblinScript goblin in player.goblinTeam)
+                foreach (GoblinScript goblin in player.myGoblins)
                 {
                     if (goblin != null && goblin.soundType == "skirmisher")
                         return player.myAIPlayer;
@@ -1756,7 +1756,7 @@ public class GameplayManager : NetworkBehaviour
         // nothing at the kicker, since AIPlayer.BlockKickAfterAttempt only ever moves a skirmisher.
         if (blockingPlayer != null && blockingPlayer.isAIPlayer && blockingPlayer.myAIPlayer != null)
         {
-            foreach (GoblinScript goblin in blockingPlayer.goblinTeam)
+            foreach (GoblinScript goblin in blockingPlayer.myGoblins)
             {
                 if (goblin != null && goblin.soundType == "skirmisher")
                     return blockingPlayer.myAIPlayer;
@@ -2237,7 +2237,7 @@ public class GameplayManager : NetworkBehaviour
         {
             if (this.is1v1 || this.isSinglePlayer)
             {
-                foreach (GoblinScript goblin in LocalGamePlayerScript.goblinTeam)
+                foreach (GoblinScript goblin in LocalGamePlayerScript.myGoblins)
                 {
                     goblin.UpdateGamePadUIMarkersForGoblins(enableGamepadUI);
                 }

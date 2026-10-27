@@ -3476,7 +3476,7 @@ public class GoblinScript : NetworkBehaviour
                 else
                 {
                     // Take this opposing goblin only if nobody else on the team is already on it. Two bugs lived here.
-                    // The list was myGamePlayer.goblinTeam, which in a 3v3 holds only this goblin, so the loop always
+                    // The list was myGamePlayer.myGoblins, which in a 3v3 holds only this goblin, so the loop always
                     // skipped itself, set nothing and returned false - the berserker could never brawl. And it took the
                     // target as soon as ONE teammate was not on it rather than when none were, which the comment it
                     // replaced describes correctly.
@@ -3987,9 +3987,9 @@ public class GoblinScript : NetworkBehaviour
         // Get the ball carrier goblin
         GoblinScript ballCarrier = ObjectLookup.Get(gameFootball.goblinWithBallNetId).GetComponent<GoblinScript>();
 
-        // Go through each goblin in the player's goblinTeam and check who they are targetting (if any) and track how many are targetting the ball carrier
+        // Go through each goblin in the player's myGoblins and check who they are targetting (if any) and track how many are targetting the ball carrier
         int numberTargetingBallCarrier = 0;
-        foreach (GoblinScript goblin in myGamePlayer.goblinTeam)
+        foreach (GoblinScript goblin in myGamePlayer.myGoblins)
         {
             // don't count this goblin in this count
             if (goblin == this)

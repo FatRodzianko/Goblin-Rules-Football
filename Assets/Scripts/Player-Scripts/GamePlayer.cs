@@ -71,8 +71,8 @@ public class GamePlayer : NetworkBehaviour
     
 
     [Header("My Goblin Team")]
-    public List<GoblinScript> goblinTeam = new List<GoblinScript>();
-    public List<GoblinScript> goblinTeamOnServer = new List<GoblinScript>();
+    public List<GoblinScript> myGoblins = new List<GoblinScript>();
+    public List<GoblinScript> myGoblinsOnServer = new List<GoblinScript>();
     public GoblinScript selectGoblin;
     public GoblinScript qGoblin;
     public GoblinScript eGoblin;
@@ -559,7 +559,7 @@ public class GamePlayer : NetworkBehaviour
                 if (!IsGameLeader)
                     newGrenadierScript.goblinType += "-grey";
                 newGrenadierScript.serverGamePlayer = this;
-                goblinTeamOnServer.Add(newGrenadierScript);
+                myGoblinsOnServer.Add(newGrenadierScript);
                 //teamOnServer.add
 
 
@@ -585,7 +585,7 @@ public class GamePlayer : NetworkBehaviour
                 if (!IsGameLeader)
                     newBerserkerScript.goblinType += "-grey";
                 newBerserkerScript.serverGamePlayer = this;
-                goblinTeamOnServer.Add(newBerserkerScript);
+                myGoblinsOnServer.Add(newBerserkerScript);
 
                 GameObject newSkirmisher = Instantiate(skrimisherPrefab, transform.position, Quaternion.identity);
                 if (IsGameLeader)
@@ -607,7 +607,7 @@ public class GamePlayer : NetworkBehaviour
                 newSkirmisherScript.goblinType = "skirmisher";
                 if (!IsGameLeader)
                     newSkirmisherScript.goblinType += "-grey";
-                goblinTeamOnServer.Add(newSkirmisherScript);
+                myGoblinsOnServer.Add(newSkirmisherScript);
 
                 newSkirmisherScript.serverGamePlayer = this;
 
@@ -641,7 +641,7 @@ public class GamePlayer : NetworkBehaviour
                 if (this.isTeamGrey)
                     newGrenadierScript.goblinType += "-grey";
                 newGrenadierScript.serverGamePlayer = this;
-                goblinTeamOnServer.Add(newGrenadierScript);
+                myGoblinsOnServer.Add(newGrenadierScript);
                 //teamOnServer.add
 
 
@@ -667,7 +667,7 @@ public class GamePlayer : NetworkBehaviour
                 if (this.isTeamGrey)
                     newBerserkerScript.goblinType += "-grey";
                 newBerserkerScript.serverGamePlayer = this;
-                goblinTeamOnServer.Add(newBerserkerScript);
+                myGoblinsOnServer.Add(newBerserkerScript);
 
                 GameObject newSkirmisher = Instantiate(skrimisherPrefab, transform.position, Quaternion.identity);
                 if (!this.isTeamGrey)
@@ -689,7 +689,7 @@ public class GamePlayer : NetworkBehaviour
                 newSkirmisherScript.goblinType = "skirmisher";
                 if (this.isTeamGrey)
                     newSkirmisherScript.goblinType += "-grey";
-                goblinTeamOnServer.Add(newSkirmisherScript);
+                myGoblinsOnServer.Add(newSkirmisherScript);
 
                 newSkirmisherScript.serverGamePlayer = this;
 
@@ -722,7 +722,7 @@ public class GamePlayer : NetworkBehaviour
                     if (this.isTeamGrey)
                         newGrenadierScript.goblinType += "-grey";
                     newGrenadierScript.serverGamePlayer = this;
-                    goblinTeamOnServer.Add(newGrenadierScript);
+                    myGoblinsOnServer.Add(newGrenadierScript);
                 }
                 else if (this.goblinType == "Berserker")
                 {
@@ -748,7 +748,7 @@ public class GamePlayer : NetworkBehaviour
                     if (this.isTeamGrey)
                         newBerserkerScript.goblinType += "-grey";
                     newBerserkerScript.serverGamePlayer = this;
-                    goblinTeamOnServer.Add(newBerserkerScript);
+                    myGoblinsOnServer.Add(newBerserkerScript);
                 }
                 else if (this.goblinType == "Skirmisher")
                 {
@@ -772,7 +772,7 @@ public class GamePlayer : NetworkBehaviour
                     newSkirmisherScript.goblinType = "skirmisher";
                     if (this.isTeamGrey)
                         newSkirmisherScript.goblinType += "-grey";
-                    goblinTeamOnServer.Add(newSkirmisherScript);
+                    myGoblinsOnServer.Add(newSkirmisherScript);
 
                     newSkirmisherScript.serverGamePlayer = this;
                 }
@@ -783,8 +783,8 @@ public class GamePlayer : NetworkBehaviour
     public void AddToGoblinTeam(GoblinScript GoblinToAdd)
     {
         Debug.Log("AddToGoblinTeam: for player: " + this.PlayerName + " is their team grey? " + this.isTeamGrey.ToString());
-        if (!goblinTeam.Contains(GoblinToAdd))
-            goblinTeam.Add(GoblinToAdd);
+        if (!myGoblins.Contains(GoblinToAdd))
+            myGoblins.Add(GoblinToAdd);
         if (this.is1v1 || this.isSinglePlayer)
         {
             if (GoblinToAdd.gameObject.name.ToLower().Contains("grenadier"))
@@ -1249,7 +1249,7 @@ public class GamePlayer : NetworkBehaviour
                 }
                 if (!goblinMovementEnabled)
                 {
-                    foreach (GoblinScript goblin in goblinTeam)
+                    foreach (GoblinScript goblin in myGoblins)
                     {
                         goblin.EnableGoblinMovement(enableOrDisable);
                     }
@@ -1258,7 +1258,7 @@ public class GamePlayer : NetworkBehaviour
             }
             else
             {
-                foreach (GoblinScript goblin in goblinTeam)
+                foreach (GoblinScript goblin in myGoblins)
                 {
                     goblin.EnableGoblinMovement(enableOrDisable);
                 }
@@ -1627,7 +1627,7 @@ public class GamePlayer : NetworkBehaviour
             {
                 if (teamName == "Grey")
                 {
-                    foreach (GoblinScript goblin in goblinTeam)
+                    foreach (GoblinScript goblin in myGoblins)
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
@@ -1650,7 +1650,7 @@ public class GamePlayer : NetworkBehaviour
                 }
                 else
                 {
-                    foreach (GoblinScript goblin in goblinTeam)
+                    foreach (GoblinScript goblin in myGoblins)
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
@@ -1680,7 +1680,7 @@ public class GamePlayer : NetworkBehaviour
             {
                 if (teamName == "Grey")
                 {
-                    foreach (GoblinScript goblin in goblinTeam)
+                    foreach (GoblinScript goblin in myGoblins)
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
@@ -1703,7 +1703,7 @@ public class GamePlayer : NetworkBehaviour
                 }
                 else
                 {
-                    foreach (GoblinScript goblin in goblinTeam)
+                    foreach (GoblinScript goblin in myGoblins)
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
@@ -2064,7 +2064,7 @@ public class GamePlayer : NetworkBehaviour
                 scoringGoblinObject.transform.position = kickingPosition;
 
                 int yPositionModifier = 1;
-                foreach (GoblinScript goblin in goblinTeam)
+                foreach (GoblinScript goblin in myGoblins)
                 {
                     goblin.CheckIfGoblinNeedsToFlipForKickAfter(isKickingPlayer);
                     if (goblin.GetComponent<NetworkObject>().ObjectId == scoringGoblin)
@@ -2097,7 +2097,7 @@ public class GamePlayer : NetworkBehaviour
             else
             {
                 int yPositionModifier = 1;
-                foreach (GoblinScript goblin in goblinTeam)
+                foreach (GoblinScript goblin in myGoblins)
                 {
                     goblin.CheckIfGoblinNeedsToFlipForKickAfter(isKickingPlayer);
                     Vector3 newPosition = goblin.transform.position;
@@ -2895,7 +2895,7 @@ public class GamePlayer : NetworkBehaviour
             possessionSpeedBonus /= 3f;
         }
         possessionSpeedBonus += 1.0f;
-        foreach (GoblinScript goblin in goblinTeamOnServer)
+        foreach (GoblinScript goblin in myGoblinsOnServer)
         {
             goblin.possessionSpeedBonus = possessionSpeedBonus;
         }
