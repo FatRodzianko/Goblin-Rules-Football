@@ -457,7 +457,18 @@ public class GameplayManager : NetworkBehaviour
                 LocalGamePlayerScript.KickOrReceiveControls(false);
                 LocalGamePlayerScript.DisableKickOrReceiveControls();
                 if(!this.is1v1 && !this.isSinglePlayer)
+                {
                     LocalGamePlayerScript.GetGoblinTeammatesFor3v3();
+                    // A bot needs the same Q/E mapping, and this was only ever called for the person's own player, so
+                    // a bot's qGoblin and eGoblin stayed null: AIPlayer picked a teammate to pass to, matched neither
+                    // slot and dropped the pass. Only for the bots this machine owns, since the mapping is per player
+                    // and a client has no business building one for a bot.
+                    foreach (GamePlayer player in Game.GamePlayers)
+                    {
+                        if (player != null && player.isAIPlayer && player.IsOwner)
+                            player.GetGoblinTeammatesFor3v3();
+                    }
+                }
             }
             if (newValue == "kick-after-attempt")
             {

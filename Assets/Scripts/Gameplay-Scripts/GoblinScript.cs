@@ -303,6 +303,16 @@ public class GoblinScript : NetworkBehaviour
     // here changes them for every goblin.
     const float spyStandoffDistance = 8f;
     const float teammateContestingBallDistance = 10f;
+    // A carrier closer than this has the spy cutting them off instead of holding station, and closer still has it
+    // making the tackle like the chaser would. The red zone is how near the carrier may get to the endzone they
+    // score in before everyone chases, spy included.
+    const float spyInterceptDistance = 10f;
+    const float spyTackleDistance = 4f;
+    const float redZoneDistance = 15f;
+    // Where the carrier was on the spy's previous physics tick, for estimating their direction and speed.
+    Vector3 lastSpiedCarrierPosition = Vector3.zero;
+    // The spy's last logged decision, so the log shows changes rather than every physics tick.
+    string lastSpyDecision = "";
     [SerializeField] float fieldMaxY; // = 6.25f;
     [SerializeField] float fieldMinY; // = -5f;
     //float fieldMaxY = 5.99f;
@@ -1411,8 +1421,10 @@ public class GoblinScript : NetworkBehaviour
         else
         {
             bool anyGoblinHaveBall = false;
-            List<int> goblinNetIds = new List<int>();
-            foreach (int goblinNetId in goblinOwnerScript.goblinTeamNetIds)
+            Team ballCheckTeamRoster = TeamOf(goblinOwnerScript.isTeamGrey);
+            if (ballCheckTeamRoster == null)
+                return;
+            foreach (int goblinNetId in ballCheckTeamRoster.goblinNetIds)
             {
                 // A player who leaves has their goblins despawned, but their ids stay in this list, so skip the ones
                 // that are no longer spawned rather than throwing on the server. This was two null references in the
@@ -3444,6 +3456,9 @@ public class GoblinScript : NetworkBehaviour
     {
         // Get all goblins within 10f of this goblin
         bool goblinNearBy = false;
+        Team myTeamRoster = TeamOf(this.isGoblinGrey);
+        if (myTeamRoster == null)
+            return false;
         Collider2D[] colliders = Physics2D.OverlapCircleAll(this.transform.position, 10f, goblinLayerMask);
         if (colliders.Length > 0)
         {
@@ -3464,10 +3479,9 @@ public class GoblinScript : NetworkBehaviour
                     // The list was myGamePlayer.goblinTeam, which in a 3v3 holds only this goblin, so the loop always
                     // skipped itself, set nothing and returned false - the berserker could never brawl. And it took the
                     // target as soon as ONE teammate was not on it rather than when none were, which the comment it
-                    // replaced describes correctly. goblinTeamNetIds is the team's goblins in a 3v3 and the player's
-                    // three in a 1v1.
+                    // replaced describes correctly.
                     bool alreadyTargetedByTeammate = false;
-                    foreach (int goblinNetId in myGamePlayer.goblinTeamNetIds)
+                    foreach (int goblinNetId in myTeamRoster.goblinNetIds)
                     {
                         if (!ObjectLookup.TryGet(goblinNetId, out GoblinScript goblinOnMyTeam))
                             continue;
@@ -4002,12 +4016,16 @@ public class GoblinScript : NetworkBehaviour
     // AttackNearbyGoblin could never be reached. That method is left in place but is no longer called.
     void AIGetGoblinTarget()
     {
-        if (this.goblinType == "grenadier")
+        // A grey goblin's goblinType carries a team suffix: CmdSpawnPlayerCharacters sets "grenadier" and then
+        // appends "-grey". An exact match here only ever fired for the green team, so every grey bot fell through
+        // to the berserker branch in the first run with roles - attacking whoever was nearby instead of spying or
+        // always-chasing. The rest of the codebase asks Contains for the same reason.
+        if (this.goblinType.Contains("grenadier"))
         {
             AIGrenadierSpyOrChase();
             return;
         }
-        if (this.goblinType == "skirmisher")
+        if (this.goblinType.Contains("skirmisher"))
         {
             goblinTarget = null;
             state = State.ChaseBallCarrier;
@@ -4040,6 +4058,17 @@ public class GoblinScript : NetworkBehaviour
             state = State.AttackNearbyGoblin;
         }
     }
+    // The team a goblin belongs to. Pair it with Team.goblinNetIds: the server adds each goblin to that SyncList as it
+    // joins, so it is the roster, correct on every machine for people and bots alike. GamePlayer.goblinTeamNetIds used
+    // to be asked instead, but that is a per-player copy of the same thing, built only for players that ran
+    // GetGoblinTeammatesFor3v3 - which was the person alone, so a bot's copy held just its own goblin.
+    // Resolve ids with ObjectLookup and skip the misses: the roster is not pruned when a player leaves.
+    static Team TeamOf(bool isGrey)
+    {
+        if (TeamManager.instance == null)
+            return null;
+        return isGrey ? TeamManager.instance.greyTeam : TeamManager.instance.greenTeam;
+    }
     // +1 for a grey goblin, -1 for a green one: the way its own endzone lies, the one the other team scores in. The
     // same convention GetOpenForPass uses to put a receiver behind its own ball carrier.
     float DirectionOfMyEndzone()
@@ -4054,6 +4083,7 @@ public class GoblinScript : NetworkBehaviour
         GoblinScript ballCarrier = gameFootball != null ? gameFootball.goblinWithBall : null;
         if (ballCarrier == null)
         {
+            LogSpyDecision("chase - no carrier resolved");
             state = State.ChaseBallCarrier;
             return;
         }
@@ -4061,24 +4091,42 @@ public class GoblinScript : NetworkBehaviour
         float carrierLeadTowardMyEndzone = (ballCarrier.transform.position.x - this.transform.position.x) * DirectionOfMyEndzone();
         if (carrierLeadTowardMyEndzone > 0f)
         {
+            LogSpyDecision("chase - carrier is past me");
+            state = State.ChaseBallCarrier;
+            return;
+        }
+        // The carrier is near the endzone they score in: nothing is left to spy for, so everyone chases.
+        float carrierDistanceToMyEndzone = fieldMaxX - (ballCarrier.transform.position.x * DirectionOfMyEndzone());
+        if (carrierDistanceToMyEndzone <= redZoneDistance)
+        {
+            LogSpyDecision("chase - carrier in the red zone");
             state = State.ChaseBallCarrier;
             return;
         }
         // Nobody else is contesting the ball, so the spy takes it on itself.
         if (!IsTeammateNearBallCarrier(ballCarrier))
         {
+            LogSpyDecision("chase - no teammate near the carrier");
             state = State.ChaseBallCarrier;
             return;
         }
+        LogSpyDecision("spy");
         state = State.SpyBallCarrier;
     }
-    // Is anyone else on this goblin's team contesting the ball? goblinTeamNetIds is the right list in both modes: the
-    // team's three goblins in a 3v3, and the player's own three in a 1v1, which there is the same set.
+    void LogSpyDecision(string decision)
+    {
+        if (decision == lastSpyDecision)
+            return;
+        lastSpyDecision = decision;
+        Debug.Log("AIGrenadierSpyOrChase: " + this.name + " (" + (this.isGoblinGrey ? "grey" : "green") + ") at x " + this.transform.position.x.ToString("F1") + ": " + decision);
+    }
+    // Is anyone else on this goblin's team contesting the ball?
     bool IsTeammateNearBallCarrier(GoblinScript ballCarrier)
     {
-        if (myGamePlayer == null)
+        Team myTeamRoster = TeamOf(this.isGoblinGrey);
+        if (myTeamRoster == null)
             return false;
-        foreach (int goblinNetId in myGamePlayer.goblinTeamNetIds)
+        foreach (int goblinNetId in myTeamRoster.goblinNetIds)
         {
             if (!ObjectLookup.TryGet(goblinNetId, out GoblinScript teammate))
                 continue;
@@ -4104,11 +4152,40 @@ public class GoblinScript : NetworkBehaviour
         this.goblinTarget = null;
 
         Vector3 carrierPosition = ballCarrier.transform.position;
-        Vector3 spyPosition = carrierPosition;
-        spyPosition.x = Mathf.Clamp(carrierPosition.x + (DirectionOfMyEndzone() * spyStandoffDistance), -fieldMaxX, fieldMaxX);
-        spyPosition.y = Mathf.Clamp(carrierPosition.y, -fieldMaxY, fieldMaxY);
-
         Vector3 myPosition = this.transform.position;
+        float distanceToCarrier = Vector3.Distance(myPosition, carrierPosition);
+
+        // How the carrier is moving, from how far they travelled since the spy's last physics tick. A jump too big
+        // to be running - stale history, or a reposition - counts as standing still for one tick.
+        Vector3 carrierVelocity = (carrierPosition - lastSpiedCarrierPosition) / Time.fixedDeltaTime;
+        if (carrierVelocity.magnitude > MaxSpeed * 3f)
+            carrierVelocity = Vector3.zero;
+        lastSpiedCarrierPosition = carrierPosition;
+
+        if (distanceToCarrier <= spyTackleDistance)
+        {
+            // Close enough to make the play: do what the chaser does, slide and punch included.
+            MoveTowrdBallCarrier();
+            return;
+        }
+
+        Vector3 spyPosition;
+        if (distanceToCarrier <= spyInterceptDistance)
+        {
+            // The carrier is bearing down on the spy: cut them off. Aim at where they will be by the time this
+            // goblin can get there, from their current direction and speed, instead of where they are now.
+            float timeToReach = distanceToCarrier / Mathf.Max(MaxSpeed, 0.1f);
+            spyPosition = carrierPosition + (carrierVelocity * timeToReach);
+        }
+        else
+        {
+            // Hold station goal-side of the carrier, tracking them up and down the field.
+            spyPosition = carrierPosition;
+            spyPosition.x = carrierPosition.x + (DirectionOfMyEndzone() * spyStandoffDistance);
+        }
+        spyPosition.x = Mathf.Clamp(spyPosition.x, -fieldMaxX, fieldMaxX);
+        spyPosition.y = Mathf.Clamp(spyPosition.y, -fieldMaxY, fieldMaxY);
+
         float distanceToSpyPosition = Vector3.Distance(myPosition, spyPosition);
         if (distanceToSpyPosition <= 0.5f)
         {
@@ -4121,7 +4198,10 @@ public class GoblinScript : NetworkBehaviour
             }
             return;
         }
-        if (distanceToSpyPosition > 10f)
+        // Sprint like the chaser does (MoveTowrdBallCarrier), and match a sprinting carrier. The first run only
+        // sprinted when 10 units off station, so a sprinting carrier dragged the station away faster than the spy
+        // walked, overtook it, and "carrier is past me" turned every spy into a chaser within moments.
+        if (distanceToSpyPosition > 3f || ballCarrier.isSprintingOnServer)
             WillAIGoblinSprint(true);
         AIMoveTowardDirection((spyPosition - myPosition).normalized, spyPosition);
     }

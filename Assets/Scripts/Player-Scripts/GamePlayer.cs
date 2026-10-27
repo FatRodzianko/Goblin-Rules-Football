@@ -71,7 +71,6 @@ public class GamePlayer : NetworkBehaviour
     
 
     [Header("My Goblin Team")]
-    public readonly SyncList<int> goblinTeamNetIds = new SyncList<int>();
     public List<GoblinScript> goblinTeam = new List<GoblinScript>();
     public List<GoblinScript> goblinTeamOnServer = new List<GoblinScript>();
     public GoblinScript selectGoblin;
@@ -548,7 +547,6 @@ public class GamePlayer : NetworkBehaviour
                     //teamOnServer = TeamManager.instance.greyTeam;
                 }
                 InstanceFinder.ServerManager.Spawn(newGrenadier, Owner);
-                goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
                 newGrenadierScript.ownerConnectionId = this.ConnectionId;
                 newGrenadierScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
@@ -574,7 +572,6 @@ public class GamePlayer : NetworkBehaviour
                     //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
                 }
                 InstanceFinder.ServerManager.Spawn(newBerserker, Owner);
-                goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
                 newBerserkerScript.ownerConnectionId = this.ConnectionId;
                 newBerserkerScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
@@ -599,7 +596,6 @@ public class GamePlayer : NetworkBehaviour
                     //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
                 }
                 InstanceFinder.ServerManager.Spawn(newSkirmisher, Owner);
-                goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
                 newSkirmisherScript.ownerConnectionId = this.ConnectionId;
                 newSkirmisherScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
@@ -633,7 +629,6 @@ public class GamePlayer : NetworkBehaviour
                     //teamOnServer = TeamManager.instance.greyTeam;
                 }
                 InstanceFinder.ServerManager.Spawn(newGrenadier, Owner);
-                goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
                 newGrenadierScript.ownerConnectionId = this.ConnectionId;
                 newGrenadierScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
@@ -659,7 +654,6 @@ public class GamePlayer : NetworkBehaviour
                     //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
                 }
                 InstanceFinder.ServerManager.Spawn(newBerserker, Owner);
-                goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
                 newBerserkerScript.ownerConnectionId = this.ConnectionId;
                 newBerserkerScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
@@ -684,7 +678,6 @@ public class GamePlayer : NetworkBehaviour
                     //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
                 }
                 InstanceFinder.ServerManager.Spawn(newSkirmisher, Owner);
-                goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkObject>().ObjectId);
                 GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
                 newSkirmisherScript.ownerConnectionId = this.ConnectionId;
                 newSkirmisherScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
@@ -717,7 +710,6 @@ public class GamePlayer : NetworkBehaviour
                         //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
                     }
                     InstanceFinder.ServerManager.Spawn(newGrenadier, Owner);
-                    goblinTeamNetIds.Add(newGrenadier.GetComponent<NetworkObject>().ObjectId);
                     GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
                     newGrenadierScript.ownerConnectionId = this.ConnectionId;
                     newGrenadierScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
@@ -743,7 +735,6 @@ public class GamePlayer : NetworkBehaviour
                         //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
                     }
                     InstanceFinder.ServerManager.Spawn(newBerserker, Owner);
-                    goblinTeamNetIds.Add(newBerserker.GetComponent<NetworkObject>().ObjectId);
                     GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
                     newBerserkerScript.ownerConnectionId = this.ConnectionId;
                     newBerserkerScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
@@ -770,7 +761,6 @@ public class GamePlayer : NetworkBehaviour
                         //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
                     }
                     InstanceFinder.ServerManager.Spawn(newSkirmisher, Owner);
-                    goblinTeamNetIds.Add(newSkirmisher.GetComponent<NetworkObject>().ObjectId);
                     GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
                     newSkirmisherScript.ownerConnectionId = this.ConnectionId;
                     newSkirmisherScript.ownerNetId = this.GetComponent<NetworkObject>().ObjectId;
@@ -888,13 +878,17 @@ public class GamePlayer : NetworkBehaviour
                     if (qGoblin == null)
                     {
                         qGoblin = goblinScript;
-                        qGoblin.SetQGoblinLocally3v3(true);
+                        // The marker objects live on the goblin, not on the player that mapped it, so only the
+                        // person's own mapping may switch them on. A bot needs the mapping but must not mark anyone.
+                        if (!this.isAIPlayer)
+                            qGoblin.SetQGoblinLocally3v3(true);
                         Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " setting qGoblin to: " + qGoblin.name);
                     }
                     else if (eGoblin == null)
                     {
                         eGoblin = goblinScript;
-                        eGoblin.SetEGoblinLocally3v3(true);
+                        if (!this.isAIPlayer)
+                            eGoblin.SetEGoblinLocally3v3(true);
                         Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " setting eGoblin to: " + eGoblin.name);
                     }
                 }
@@ -904,27 +898,12 @@ public class GamePlayer : NetworkBehaviour
         {
             Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " error: " + e);
         }
-        CmdGetGoblinTeammatesFor3v3OnServer();
-    }
-    [ServerRpc]
-    void CmdGetGoblinTeammatesFor3v3OnServer()
-    {
-        Team myTeamForServer;
-        if (this.isTeamGrey)
-            myTeamForServer = TeamManager.instance.greyTeam;
-        else
-            myTeamForServer = TeamManager.instance.greenTeam;
-
-        if (myTeamForServer)
-        {
-            foreach (int goblinTeammate in myTeamForServer.goblinNetIds)
-            {
-                if (!this.goblinTeamNetIds.Contains(goblinTeammate))
-                {
-                    goblinTeamNetIds.Add(goblinTeammate);
-                }
-            }
-        }
+        // This used to end in CmdGetGoblinTeammatesFor3v3OnServer, which copied Team.goblinNetIds into this player's
+        // own goblinTeamNetIds. That copy was the only team-wide thing about goblinTeamNetIds, and it existed only for
+        // players that reached here, so every bot's list held one goblin and anything reading it got the wrong answer.
+        // The readers now ask Team.goblinNetIds directly, through GoblinScript.TeamOf, so there is nothing to copy.
+        // What this method still does, and what only it can do, is the Q/E mapping above: which teammate is this
+        // player's Q and which is its E. That is per player and has no global equivalent.
     }
     public void SwitchToQGoblin(bool fromKeyPress, double startTimeSubmitted)
     {
