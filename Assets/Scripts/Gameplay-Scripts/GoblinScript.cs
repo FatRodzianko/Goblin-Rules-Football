@@ -19,6 +19,7 @@ public class GoblinScript : NetworkBehaviour
         AttackNearbyGoblin,
         RunTowardEndzone,
         BlockKick,
+        SpyBallCarrier,
     }
 
     public float pressedTime = 0f;
@@ -297,6 +298,11 @@ public class GoblinScript : NetworkBehaviour
     public float minDistanceFromTarget = 1.7f;
     public float punchYMax = 1.15f;
     public Vector3 positionToRunTo = Vector3.zero;
+    // How far goal-side of the ball carrier a spying grenadier holds station, and how close a teammate has to be to
+    // the carrier before the spy trusts them to make the tackle. Tuning numbers, not serialized, so changing them
+    // here changes them for every goblin.
+    const float spyStandoffDistance = 8f;
+    const float teammateContestingBallDistance = 10f;
     [SerializeField] float fieldMaxY; // = 6.25f;
     [SerializeField] float fieldMinY; // = -5f;
     //float fieldMaxY = 5.99f;
@@ -337,57 +343,40 @@ public class GoblinScript : NetworkBehaviour
     // This was Mirror's OnStartAuthority. OnStartClient calls it first for the owner, since Mirror ran it before OnStartClient.
     void StartAsOwner()
     {
-        GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
-        if (localPlayer && !localPlayer.isSinglePlayer)
+        // A goblin belongs to the player whose CmdSpawnPlayerCharacters made it, which the server records in ownerNetId.
+        // This used to take "the local player" from a tag, which is only right while a machine owns one player's
+        // goblins: with bots filling a 3v3 the host owns several players' goblins at once and all six landed on the
+        // human's team. The single player branch this replaces already resolved by ownerNetId, just with a tag lookup
+        // for its one AI, so the id is known to be here by now.
+        if (!ObjectLookup.TryGet(ownerNetId, out myGamePlayer) || myGamePlayer == null)
         {
-            myGamePlayer = localPlayer;
-            myGamePlayer.AddToGoblinTeam(this);
-            if (GameplayManager.instance.is1v1)
-            {
-                if (!myGamePlayer.IsGameLeader)
-                    CmdMakeGoblinGrey();
-            }
-            else
-            {
-                if (myGamePlayer.isTeamGrey)
-                    CmdMakeGoblinGrey();
-            }
-
-
-            //GoblinStartingPosition(myGamePlayer.IsGameLeader);
-            if (transform.position.x > 0f)
-                CmdFlipRenderer(true);
+            // Last resort if the id hasn't arrived: the local player is right in every case except a host with bots.
+            GameObject localPlayerObject = GameObject.FindGameObjectWithTag("LocalGamePlayer");
+            if (localPlayerObject != null)
+                myGamePlayer = localPlayerObject.GetComponent<GamePlayer>();
         }
-        else if (localPlayer && localPlayer.isSinglePlayer)
+        if (myGamePlayer == null)
         {
-            GamePlayer aiPlayer = null;
-            try
-            {
-                aiPlayer = GameObject.FindGameObjectWithTag("GamePlayer").GetComponent<GamePlayer>();
-            }
-            catch (Exception e)
-            {
-                Debug.Log("OnStartAuthority for " + this.name + " could not find AIPlayer object. " + e);
-            }
-            if (this.ownerNetId == localPlayer.GetComponent<NetworkObject>().ObjectId)
-            {
-                myGamePlayer = localPlayer;
-                myGamePlayer.AddToGoblinTeam(this);
-            }
-            else
-            {
-                myGamePlayer = aiPlayer;
-                myGamePlayer.AddToGoblinTeam(this);
-            }
+            Debug.Log("StartAsOwner: " + this.name + " could not find its GamePlayer from ownerNetId " + ownerNetId.ToString());
+            return;
+        }
+        myGamePlayer.AddToGoblinTeam(this);
+        if (GameplayManager.instance.is1v1)
+        {
+            if (!myGamePlayer.IsGameLeader)
+                CmdMakeGoblinGrey();
+        }
+        else
+        {
             if (myGamePlayer.isTeamGrey)
                 CmdMakeGoblinGrey();
-            if (transform.position.x > 0f)
-                CmdFlipRenderer(true);
         }
+        if (transform.position.x > 0f)
+            CmdFlipRenderer(true);
 
         myGoblinAIPathFindingScript = this.GetComponent<GoblinAIPathFinding>();
 
-        if (this.myGamePlayer.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
+        if (this.myGamePlayer.isAIPlayer)
         {
             this.AIResetSprintingParameters();
             //youMarkerObject.SetActive(false);
@@ -621,12 +610,9 @@ public class GoblinScript : NetworkBehaviour
                 {
                     //rb.bodyType = RigidbodyType2D.Dynamic;
                     Debug.Log("HandleCharacterSelected: Following new selected character " + this.name + " is this goblin grey? " + this.isGoblinGrey.ToString());
-                    if (GameplayManager.instance.isSinglePlayer)
-                    { 
-                        if(myGamePlayer.isLocalPlayer)
-                            myGamePlayer.FollowSelectedGoblin(this.transform);
-                    }
-                    else
+                    // Don't move the camera onto a goblin an AI is playing. This asked "single player and not my
+                    // player", which was the same thing while the AI only existed in single player.
+                    if (!myGamePlayer.isAIPlayer)
                         myGamePlayer.FollowSelectedGoblin(this.transform);
                     try
                     {
@@ -685,7 +671,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (IsOwner)
                 {
-                    if (GameplayManager.instance.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
+                    if (this.myGamePlayer.isAIPlayer)
                     {
                         qMarker.SetActive(false);
                         return;
@@ -737,7 +723,7 @@ public class GoblinScript : NetworkBehaviour
         {
             if (IsOwner)
             {
-                if (GameplayManager.instance.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
+                if (this.myGamePlayer.isAIPlayer)
                 {
                     eMarker.SetActive(false);
                     return;
@@ -930,7 +916,7 @@ public class GoblinScript : NetworkBehaviour
                 CmdRecoverHealth();*/
         }
         //if (hasAuthority && isCharacterSelected && canGoblinMove && !isGoblinPunching && !isGoblinKnockedOut && !isSliding && !isDiving)
-        if (IsOwner && isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && !(GameplayManager.instance.isSinglePlayer && !this.myGamePlayer.isLocalPlayer) && GameplayManager.instance.gamePhase != "kickoff")
+        if (IsOwner && isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && !this.myGamePlayer.isAIPlayer && GameplayManager.instance.gamePhase != "kickoff")
         {
             CmdIsPlayerSprinting(isSprinting);
             isRunning = false;
@@ -1077,13 +1063,25 @@ public class GoblinScript : NetworkBehaviour
                 case State.AttackNearbyGoblin:
                     MoveTowardGoblinTarget();
                     break;
+                case State.SpyBallCarrier:
+                    MoveTowardSpyPosition();
+                    break;
             }
         }
         // Check for the AI character for what to do with their goblin that they have selected?
-        else if (IsOwner && this.isCharacterSelected && !this.myGamePlayer.isLocalPlayer && this.myGamePlayer.isSinglePlayer && gameFootball != null && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+        else if (IsOwner && this.isCharacterSelected && this.myGamePlayer.isAIPlayer && gameFootball != null && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
         {
             if (this.doesCharacterHaveBall)
                 state = State.RunTowardEndzone;
+            // A teammate holding the ball is not something to run at. The branch above, for an AI's unselected
+            // goblins, asks this first; this one never did. While one player owned all three goblins its selected
+            // goblin was usually the carrier itself, so it never showed. In a 3v3 a bot owns one goblin and the
+            // carrier is always another player's, so every bot charged its own ball carrier.
+            else if (myGamePlayer.doesTeamHaveBall)
+            {
+                state = State.TeamHasBall;
+                goblinTarget = null;
+            }
             else if (gameFootball.isHeld && !this.doesCharacterHaveBall)
             {
                 AIGetGoblinTarget();
@@ -1105,6 +1103,9 @@ public class GoblinScript : NetworkBehaviour
                     break;
                 case State.AttackNearbyGoblin:
                     MoveTowardGoblinTarget();
+                    break;
+                case State.SpyBallCarrier:
+                    MoveTowardSpyPosition();
                     break;
                 case State.RunTowardEndzone:
                     myGamePlayer.myAiPlayer.RunTowardEndZone();
@@ -1240,7 +1241,7 @@ public class GoblinScript : NetworkBehaviour
                     youMarkerObject.SetActive(true);
                 try
                 {
-                    if (this.myGamePlayer.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
+                    if (this.myGamePlayer.isAIPlayer)
                     {
                         if (!newValue)
                         {
@@ -1656,7 +1657,7 @@ public class GoblinScript : NetworkBehaviour
             FatigueIndicators(newValue);
             if (IsOwner)
             {
-                if (this.myGamePlayer.isSinglePlayer && !myGamePlayer.isLocalPlayer)
+                if (this.myGamePlayer.isAIPlayer)
                 {
                     if (newValue)
                     {
@@ -2044,7 +2045,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (IsOwner)
                 {
-                    if (this.myGamePlayer.isSinglePlayer && !this.myGamePlayer.isLocalPlayer)
+                    if (this.myGamePlayer.isAIPlayer)
                     {
                         if (newValue >= this.MaxStamina)
                             this.AIResetSprintingParameters();
@@ -2587,12 +2588,9 @@ public class GoblinScript : NetworkBehaviour
     }
     public void EnableKickoffAimArrow(bool activate)
     {
-        if(!GameplayManager.instance.isSinglePlayer)
-            KickoffAimArrow.SetActive(activate);
-        else if (this.myGamePlayer.isLocalPlayer && GameplayManager.instance.isSinglePlayer)
-            KickoffAimArrow.SetActive(activate);
-        else if(!this.myGamePlayer.isLocalPlayer && GameplayManager.instance.isSinglePlayer)
-            KickoffAimArrow.SetActive(false);
+        // An AI never aims, so its goblin never shows the arrow. The three cases this replaced came to the same
+        // thing while the AI only existed in single player.
+        KickoffAimArrow.SetActive(activate && !this.myGamePlayer.isAIPlayer);
     }
     public void StartAimArrowDirection(bool aimUp)
     {
@@ -3233,7 +3231,11 @@ public class GoblinScript : NetworkBehaviour
             directionModifier = 1;
 
         // Check to see if the saved position is too far away from the current ball carrier. If it is, get a new position
-        Vector3 ballCarrierPosition = myGamePlayer.selectGoblin.transform.position;
+        // The carrier was read as myGamePlayer.selectGoblin, which is the carrier only while one player owns all
+        // three goblins. A 3v3 bot owns one, so that was this goblin's own position and it tried to get behind
+        // itself. The football knows who is actually carrying.
+        GoblinScript ballCarrier = gameFootball.goblinWithBall;
+        Vector3 ballCarrierPosition = ballCarrier != null ? ballCarrier.transform.position : myGamePlayer.selectGoblin.transform.position;
         Vector3 currentPosition = this.transform.position;
         bool newPositionToRunTo = false;
         bool isBehindBallCarrier = false;
@@ -3458,18 +3460,34 @@ public class GoblinScript : NetworkBehaviour
                     continue;
                 else
                 {
-                    // If it is an opposing goblin, check to see if any other goblin on your team is targetting that goblin. If not, target them
-                    foreach (GoblinScript goblinOnMyTeam in myGamePlayer.goblinTeam)
+                    // Take this opposing goblin only if nobody else on the team is already on it. Two bugs lived here.
+                    // The list was myGamePlayer.goblinTeam, which in a 3v3 holds only this goblin, so the loop always
+                    // skipped itself, set nothing and returned false - the berserker could never brawl. And it took the
+                    // target as soon as ONE teammate was not on it rather than when none were, which the comment it
+                    // replaced describes correctly. goblinTeamNetIds is the team's goblins in a 3v3 and the player's
+                    // three in a 1v1.
+                    bool alreadyTargetedByTeammate = false;
+                    foreach (int goblinNetId in myGamePlayer.goblinTeamNetIds)
                     {
-                        // Don't check for this goblin or on the goblin the player has selected
-                        if (goblinOnMyTeam == this || goblinOnMyTeam.isCharacterSelected)
+                        if (!ObjectLookup.TryGet(goblinNetId, out GoblinScript goblinOnMyTeam))
                             continue;
-                        if (goblinOnMyTeam.goblinTarget != goblinBodyColliderScript)
+                        if (goblinOnMyTeam == null || goblinOnMyTeam == this)
+                            continue;
+                        // A goblin a person is driving does not keep goblinTarget up to date. isCharacterSelected on
+                        // its own is no longer that test: in a 3v3 every goblin is its owner's selected one.
+                        if (goblinOnMyTeam.isCharacterSelected && goblinOnMyTeam.myGamePlayer != null && !goblinOnMyTeam.myGamePlayer.isAIPlayer)
+                            continue;
+                        if (goblinOnMyTeam.goblinTarget == goblinBodyColliderScript)
                         {
-                            this.goblinTarget = goblinBodyColliderScript;
-                            goblinNearBy = true;
+                            alreadyTargetedByTeammate = true;
                             break;
                         }
+                    }
+                    if (!alreadyTargetedByTeammate)
+                    {
+                        this.goblinTarget = goblinBodyColliderScript;
+                        goblinNearBy = true;
+                        break;
                     }
                 }
             }
@@ -3937,7 +3955,7 @@ public class GoblinScript : NetworkBehaviour
 
         int minToTargetBallCarrier = 1;
         // For single player games. The AI will need to have at least 2 goblins targeting the ball carrier. The playter controlled teams only need 1 AI to target the ball carrier, and the player will (hopefully) target the ball carrier themselves
-        if (myGamePlayer.isSinglePlayer && !myGamePlayer.isLocalPlayer)
+        if (myGamePlayer.isAIPlayer)
         {
             minToTargetBallCarrier = 2;
         }
@@ -3979,8 +3997,24 @@ public class GoblinScript : NetworkBehaviour
         return targetBallCarrier;
     }
     // Checks to see if the AI should target the ball carrier or a random other goblin. Sets goblin state to either ChaseBallCarrier or AttackNearbyGoblin
+    // The goblin's role decides what it does while the other team has the ball. This used to ask
+    // AIShouldGoblinTargetBallCarrier, which opens with "return true", so every goblin always chased the carrier and
+    // AttackNearbyGoblin could never be reached. That method is left in place but is no longer called.
     void AIGetGoblinTarget()
     {
+        if (this.goblinType == "grenadier")
+        {
+            AIGrenadierSpyOrChase();
+            return;
+        }
+        if (this.goblinType == "skirmisher")
+        {
+            goblinTarget = null;
+            state = State.ChaseBallCarrier;
+            return;
+        }
+        // The berserker brawls. It keeps a target for as long as that target is worth keeping, and falls back to the
+        // carrier when there is nobody to hit, so the defence is never all standing off the ball.
         bool newTargetNeeded = false;
         if (goblinTarget != null)
         {
@@ -3993,29 +4027,103 @@ public class GoblinScript : NetworkBehaviour
         {
             newTargetNeeded = true;
         }
-        // If a new target is needed, check to see if any goblins are nearby (<10f units away). If none are, then target the ball carrier
         if (newTargetNeeded)
         {
             goblinTarget = null;
-            //Prioritize chasing goblin with ball instead of random goblin
-            bool targetBallCarrier = AIShouldGoblinTargetBallCarrier();
-            if (targetBallCarrier)
-            {
-                state = State.ChaseBallCarrier;
-            }
+            if (FindNearByGoblinToTarget())
+                state = State.AttackNearbyGoblin;
             else
-            {
-                bool isOpposingGoblinNearBy = FindNearByGoblinToTarget();
-                if (isOpposingGoblinNearBy)
-                {
-                    state = State.AttackNearbyGoblin;
-                }
-                else
-                {
-                    state = State.ChaseBallCarrier;
-                }
-            }
+                state = State.ChaseBallCarrier;
         }
+        else
+        {
+            state = State.AttackNearbyGoblin;
+        }
+    }
+    // +1 for a grey goblin, -1 for a green one: the way its own endzone lies, the one the other team scores in. The
+    // same convention GetOpenForPass uses to put a receiver behind its own ball carrier.
+    float DirectionOfMyEndzone()
+    {
+        return this.isGoblinGrey ? 1f : -1f;
+    }
+    // The grenadier plays a spy. It holds off the ball only while a teammate is contesting it and while it is still
+    // between the carrier and the endzone it defends; otherwise it goes for the tackle itself.
+    void AIGrenadierSpyOrChase()
+    {
+        goblinTarget = null;
+        GoblinScript ballCarrier = gameFootball != null ? gameFootball.goblinWithBall : null;
+        if (ballCarrier == null)
+        {
+            state = State.ChaseBallCarrier;
+            return;
+        }
+        // Has the carrier got past this goblin, toward the endzone it is defending? Then the spy is beaten and chases.
+        float carrierLeadTowardMyEndzone = (ballCarrier.transform.position.x - this.transform.position.x) * DirectionOfMyEndzone();
+        if (carrierLeadTowardMyEndzone > 0f)
+        {
+            state = State.ChaseBallCarrier;
+            return;
+        }
+        // Nobody else is contesting the ball, so the spy takes it on itself.
+        if (!IsTeammateNearBallCarrier(ballCarrier))
+        {
+            state = State.ChaseBallCarrier;
+            return;
+        }
+        state = State.SpyBallCarrier;
+    }
+    // Is anyone else on this goblin's team contesting the ball? goblinTeamNetIds is the right list in both modes: the
+    // team's three goblins in a 3v3, and the player's own three in a 1v1, which there is the same set.
+    bool IsTeammateNearBallCarrier(GoblinScript ballCarrier)
+    {
+        if (myGamePlayer == null)
+            return false;
+        foreach (int goblinNetId in myGamePlayer.goblinTeamNetIds)
+        {
+            if (!ObjectLookup.TryGet(goblinNetId, out GoblinScript teammate))
+                continue;
+            if (teammate == null || teammate == this || teammate.isGoblinKnockedOut)
+                continue;
+            if (Vector3.Distance(teammate.transform.position, ballCarrier.transform.position) <= teammateContestingBallDistance)
+                return true;
+        }
+        return false;
+    }
+    // Hold station goal-side of the carrier, tracking them up and down the field, rather than committing to a tackle.
+    // AIGrenadierSpyOrChase has already decided a teammate is on the ball and that the carrier has not got past.
+    void MoveTowardSpyPosition()
+    {
+        GoblinScript ballCarrier = gameFootball != null ? gameFootball.goblinWithBall : null;
+        if (ballCarrier == null)
+        {
+            state = State.ChaseBallCarrier;
+            return;
+        }
+        myGoblinAIPathFindingScript.goblinTarget = null;
+        myGoblinAIPathFindingScript.isTargetingAGoblin = false;
+        this.goblinTarget = null;
+
+        Vector3 carrierPosition = ballCarrier.transform.position;
+        Vector3 spyPosition = carrierPosition;
+        spyPosition.x = Mathf.Clamp(carrierPosition.x + (DirectionOfMyEndzone() * spyStandoffDistance), -fieldMaxX, fieldMaxX);
+        spyPosition.y = Mathf.Clamp(carrierPosition.y, -fieldMaxY, fieldMaxY);
+
+        Vector3 myPosition = this.transform.position;
+        float distanceToSpyPosition = Vector3.Distance(myPosition, spyPosition);
+        if (distanceToSpyPosition <= 0.5f)
+        {
+            // Already in position. AIMoveTowardDirection is what normally clears isRunning, so simply not moving
+            // would leave the goblin playing its run animation on the spot.
+            if (isRunning)
+            {
+                isRunning = false;
+                CmdSetIsRunningOnServer(false, Vector2.zero);
+            }
+            return;
+        }
+        if (distanceToSpyPosition > 10f)
+            WillAIGoblinSprint(true);
+        AIMoveTowardDirection((spyPosition - myPosition).normalized, spyPosition);
     }
     public void WillAIGoblinSprint(bool chasingBall)
     {
@@ -4198,12 +4306,9 @@ public class GoblinScript : NetworkBehaviour
             // Don't give the achievement for a goblin that the player isn't controlling
             if (!this.isCharacterSelected)
                 return;
-            // IF it is singleplayer, make sure that the goblin is the AI's goblin
-            if (GameplayManager.instance.isSinglePlayer)
-            {
-                if (!myGamePlayer.isLocalPlayer)
-                    return;
-            }
+            // Never award this for a goblin an AI played.
+            if (myGamePlayer.isAIPlayer)
+                return;
 
             SteamAchievementManager.instance.StubbedToe();
         }
@@ -4213,11 +4318,9 @@ public class GoblinScript : NetworkBehaviour
         Debug.Log("TouchdownScoredAchievement");
         if (serverGamePlayer)
         {
-            if (GameplayManager.instance.isSinglePlayer)
-            {
-                if (serverGamePlayer.PlayerName == "AIPlayer")
-                    return;
-            }
+            // Was a check against the name "AIPlayer", which only held while there was exactly one bot.
+            if (serverGamePlayer.isAIPlayer)
+                return;
             RpcTouchdownScoredAchievement(serverGamePlayer.Owner);
         }
     }
@@ -4227,11 +4330,8 @@ public class GoblinScript : NetworkBehaviour
         Debug.Log("RpcTouchdownScoredAchievement: goblin scored touchdown: " + this.name);
         if (IsOwner)
         {
-            if (GameplayManager.instance.isSinglePlayer)
-            {
-                if (!myGamePlayer.isLocalPlayer)
-                    return;
-            }
+            if (myGamePlayer.isAIPlayer)
+                return;
             if (Time.time >= (touchdownScoredtime + 1f))
             {
                 SteamAchievementManager.instance.TouchdownScored();

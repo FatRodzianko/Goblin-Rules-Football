@@ -204,12 +204,15 @@ public class GamePlayer : NetworkBehaviour
     }
     // The single-player AI's GamePlayer is owned by the host, so IsOwner alone can't tell it from the host's own player.
     public bool isAIPlayer { get; private set; }
+    // The AI brain sitting on this same object, when this player is a bot. Null for a human.
+    public AIPlayer myAIPlayer { get; private set; }
     // Mirror's isLocalPlayer: the GamePlayer that this machine's player controls.
     public bool isLocalPlayer => IsOwner && !isAIPlayer;
 
     private void Awake()
     {
-        isAIPlayer = GetComponent<AIPlayer>() != null;
+        myAIPlayer = GetComponent<AIPlayer>();
+        isAIPlayer = myAIPlayer != null;
         _syncDoesPlayerChooseCoin.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleDoesPlayerChooseCoin(prev, next); };
         _syncHeadsOrTailsPlayer.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleHeadsOrTails(prev, next); };
         _syncDidPlayerChooseCoinYet.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleDidPlayerChooseCoinYet(prev, next); };
@@ -224,21 +227,14 @@ public class GamePlayer : NetworkBehaviour
     void StartAsOwner()
     {
         Debug.Log("StartAsOwner for " + this.PlayerName);
-        if (!this.isSinglePlayer)
-        {
-            gameObject.name = "LocalGamePlayer";
-            gameObject.tag = "LocalGamePlayer";
-        }
-        else
-        {
-            if (this.name.Contains("AI"))
-                return;
-            else
-            {
-                gameObject.name = "LocalGamePlayer";
-                gameObject.tag = "LocalGamePlayer";
-            }
-        }
+        // An AI is never the local player. This used to ask whether the object's name contained "AI", and only in single
+        // player, because only single player had a host-owned AI. A 3v3 bot is host-owned too, so without this the
+        // first bot to start claimed the name and tag "LocalGamePlayer" and GameplayManager initialised that bot as the
+        // person's player, leaving the person with no goblin at all.
+        if (isAIPlayer)
+            return;
+        gameObject.name = "LocalGamePlayer";
+        gameObject.tag = "LocalGamePlayer";
 
 
         //Have these enabled when the "Gameplay" phase starts?
@@ -373,7 +369,10 @@ public class GamePlayer : NetworkBehaviour
 
         // GameplayManager.SpawnAIPlayer used to call this right after spawning the AI. It sends ServerRpcs, so it runs
         // here instead, once the host's client side has started the AI.
-        if (isAIPlayer && IsServerInitialized)
+        // Single player's AI is spawned by GameplayManager, so the gameplay scene is already up and this runs here. A
+        // 3v3 bot is spawned in the lobby at Start Game, before that scene loads, and CmdGetTeamName would find
+        // TeamManager.instance null. GameplayManager initialises anything still waiting once the managers exist.
+        if (isAIPlayer && IsServerInitialized && TeamManager.instance != null)
             InitializeAIPlayer();
 
         // FishNet 4 can start the gameplay scene's managers before this player. If they did, they couldn't find the
@@ -444,8 +443,13 @@ public class GamePlayer : NetworkBehaviour
             }
         }
     }
+    // True once this AI has had its team, coin role and goblins set up, so the deferred path below cannot do it twice.
+    public bool aiInitialized { get; private set; }
     public void InitializeAIPlayer()
     {
+        if (aiInitialized)
+            return;
+        aiInitialized = true;
         CmdGetTeamName();
         CmdDoesPlayerChooseCoin();
         CmdSpawnPlayerCharacters();
@@ -965,9 +969,7 @@ public class GamePlayer : NetworkBehaviour
                 }
                 else
                 {
-                    if(!this.isSinglePlayer)
-                        FollowSelectedGoblin(selectGoblin.transform);
-                    else if (this.isSinglePlayer && this.isLocalPlayer)
+                    if (!this.isAIPlayer)
                         FollowSelectedGoblin(selectGoblin.transform);
                 }
                 Debug.Log("SwitchToQGoblin switching to goblin: " + selectGoblin.name);
@@ -1036,9 +1038,7 @@ public class GamePlayer : NetworkBehaviour
                 else
                 {
                     Debug.Log("SwitchToEGoblin: Throwing: set the GOBLIN to follow");
-                    if (!this.isSinglePlayer)
-                        FollowSelectedGoblin(selectGoblin.transform);
-                    else if (this.isSinglePlayer && this.isLocalPlayer)
+                    if (!this.isAIPlayer)
                         FollowSelectedGoblin(selectGoblin.transform);
                 }
                 Debug.Log("SwitchToEGoblin switching to goblin: " + selectGoblin.name);
@@ -1156,8 +1156,8 @@ public class GamePlayer : NetworkBehaviour
     }
     public void FollowSelectedGoblin(Transform goblinToFollow)
     {
-        // For single player mode, make sure that the AI gameplayer object doesn't try to modify what the camera is following or whatever
-        if (this.isSinglePlayer && !this.isLocalPlayer)
+        // An AI GamePlayer has no camera of its own, so it must not touch what the camera is following.
+        if (this.isAIPlayer)
             return;
         if (GameplayManager.instance.gamePhase != "cointoss")
         {
@@ -1178,7 +1178,7 @@ public class GamePlayer : NetworkBehaviour
         newPosition.x = 0;
         newPosition.y = 0f;
         myCamera.transform.position = newPosition;*/
-        if (this.isSinglePlayer && !this.isLocalPlayer)
+        if (this.isAIPlayer)
             return;
         float xDamping = myCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping;
         myCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0f;
@@ -1345,10 +1345,10 @@ public class GamePlayer : NetworkBehaviour
             if (IsOwner)
             {
                 Debug.Log("HandleDoesPlayerChooseCoin: " + newValue.ToString() + " for player: " + this.name);
-                if (this.isSinglePlayer && !this.isLocalPlayer)
+                if (this.isAIPlayer)
                 {
                     if(newValue)
-                        GameplayManager.instance.AIChoosesCoinToss();
+                        GameplayManager.instance.AIChoosesCoinToss(this);
                     return;
                 }
                 CoinTossControlls(newValue);
@@ -1360,6 +1360,9 @@ public class GamePlayer : NetworkBehaviour
     }
     public void CoinTossControlls(bool activate)
     {
+        // A bot never drives this machine's input; see EnableQESwitchingControls.
+        if (this.isAIPlayer)
+            return;
         if (activate)
         {
             try
@@ -1392,6 +1395,9 @@ public class GamePlayer : NetworkBehaviour
     }
     public void KickOrReceiveControls(bool activate)
     {
+        // A bot never drives this machine's input; see EnableQESwitchingControls.
+        if (this.isAIPlayer)
+            return;
         Debug.Log("KickOrReceiveControls: " + activate.ToString());
         if (activate)
         {
@@ -1522,7 +1528,7 @@ public class GamePlayer : NetworkBehaviour
                 // CoinTossControlls(!newValue);
                 //KickOrReceiveControls(newValue);
                 Debug.Log("HandleDoesPlayerChooseKickOrReceive: " + newValue.ToString() + " for player: " + this.name);
-                if (this.isSinglePlayer && !this.isLocalPlayer)
+                if (this.isAIPlayer)
                 {
                     /*if (newValue)
                         GameplayManager.instance.AIChoosesKickOrReceive();*/
@@ -1592,11 +1598,11 @@ public class GamePlayer : NetworkBehaviour
         if (IsOwner)
         {
             Debug.Log("RpcCoinTossAndKickOrReceiveControllerActivation: " + activateCoinTossControlls.ToString() + " " + activateKickOrReceiveControlls.ToString() + " for player: " + this.name);
-            if (this.isSinglePlayer && !this.isLocalPlayer)
+            if (this.isAIPlayer)
             {
                 if (activateKickOrReceiveControlls)
                 {
-                    GameplayManager.instance.AIChoosesKickOrReceive();
+                    GameplayManager.instance.AIChoosesKickOrReceive(this);
                 }
                 return;
             }
@@ -1686,9 +1692,9 @@ public class GamePlayer : NetworkBehaviour
                     }
                 }
                 // Start process for AI to kick ball if they are the kicking team
-                if (this.isSinglePlayer && !this.isLocalPlayer)
+                if (this.isAIPlayer)
                 {
-                    GameplayManager.instance.AIPlayerKickOff();
+                    GameplayManager.instance.AIPlayerKickOff(this);
                 }
             }
             else
@@ -1777,6 +1783,10 @@ public class GamePlayer : NetworkBehaviour
                     {
                         selectGoblin.EnableKickoffAimArrow(true);
                         CmdRequestFootballForKickOffGoblin(selectGoblin.GetComponent<NetworkObject>().ObjectId);
+                        // A bot captain takes its own kickoff, the same way the 1v1 and single player path does.
+                        // Without this a 3v3 with a bot captain on the kicking team sat at the kickoff for ever.
+                        if (this.isAIPlayer)
+                            GameplayManager.instance.AIPlayerKickOff(this);
                     }
                 }
                 else if (this.goblinType == "Berserker")
@@ -1866,6 +1876,13 @@ public class GamePlayer : NetworkBehaviour
     }
     public void EnableQESwitchingControls(bool activate)
     {
+        // These controls are this machine's one InputManager.Controls object, not per-player state, so a bot
+        // must never touch them. A bot's GamePlayer is owned by the host, so every IsOwner block that calls
+        // these runs on the host's machine for each bot as well as for the person. At a 3v3 kickoff the person's
+        // GamePlayer enabled the kicking controls and then the five bots' RPCs disabled them again, which left a
+        // human kicking player unable to aim or build power. The receiving bots enabled Q/E switching on top.
+        if (this.isAIPlayer)
+            return;
         Debug.Log("EnableQESwitchingControls: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
@@ -1901,6 +1918,9 @@ public class GamePlayer : NetworkBehaviour
     }
     public void EnableKickingControls(bool activate)
     {
+        // A bot never drives this machine's input; see EnableQESwitchingControls.
+        if (this.isAIPlayer)
+            return;
         Debug.Log("EnableKickingControls: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
@@ -1929,6 +1949,9 @@ public class GamePlayer : NetworkBehaviour
     }
     public void EnableKickoffAimArrowControls(bool activate)
     {
+        // A bot never drives this machine's input; see EnableQESwitchingControls.
+        if (this.isAIPlayer)
+            return;
         Debug.Log("EnableKickoffAimArrowControls: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
@@ -1997,6 +2020,9 @@ public class GamePlayer : NetworkBehaviour
     }
     public void EnableGameplayActions(bool activate)
     {
+        // A bot never drives this machine's input; see EnableQESwitchingControls.
+        if (this.isAIPlayer)
+            return;
         Debug.Log("EnableGameplayActions: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
@@ -2073,11 +2099,7 @@ public class GamePlayer : NetworkBehaviour
 
                         CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkObject>().ObjectId);
 
-                        if (!this.isSinglePlayer)
-                        {
-                            goblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
-                        }
-                        else if (this.isSinglePlayer && this.isLocalPlayer)
+                        if (!this.isAIPlayer)
                         {
                             goblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
                         }
@@ -2143,7 +2165,7 @@ public class GamePlayer : NetworkBehaviour
                 }
             }
             // Enable positioning controls if the player is the kicking player
-            if (this.isSinglePlayer && !this.isLocalPlayer)
+            if (this.isAIPlayer)
             {
                 areGoblinsRepositionedForKickAfter = true;
                 //GameplayManager.instance.AIStartKickAfterPositioning();
@@ -2181,7 +2203,10 @@ public class GamePlayer : NetworkBehaviour
                     CmdRequestFootballForKickOffGoblin(selectGoblin.GetComponent<NetworkObject>().ObjectId);
                     selectGoblin.transform.position = kickingPosition;
                     selectGoblin.UpdateHasGoblinRepositionedForKickAfter();
-                    selectGoblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
+                    // A bot is owned by the host, so this Rpc runs on the host's machine. Without the check the host
+                    // was shown the accuracy bar for a goblin a bot is kicking, which it cannot aim with anyway.
+                    if (!this.isAIPlayer)
+                        selectGoblin.ActivateKickAfterAccuracyBar(isKickingPlayer);
                 }
                 else
                 {
@@ -2244,6 +2269,9 @@ public class GamePlayer : NetworkBehaviour
     }
     public void EnableKickAfterPositioning(bool activate)
     {
+        // A bot never drives this machine's input; see EnableQESwitchingControls.
+        if (this.isAIPlayer)
+            return;
         Debug.Log("EnableKickAfterPositioning: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
@@ -2312,7 +2340,10 @@ public class GamePlayer : NetworkBehaviour
         if (IsOwner)
         {
             localIsKickingPlayer = isKickingPlayer;
-            GameplayManager.instance.KickAfterUpdateInsctructionsText(isKickingPlayer);
+            // The instruction banner is one shared UI element, and a host-owned bot runs this on the host's machine,
+            // so the blocking team's bots overwrote the person's "kick" instruction with "block the kick".
+            if (!this.isAIPlayer)
+                GameplayManager.instance.KickAfterUpdateInsctructionsText(isKickingPlayer);
         }
             
     }
@@ -2354,6 +2385,9 @@ public class GamePlayer : NetworkBehaviour
     }
     public void EnableKickAfterKicking(bool activate)
     {
+        // A bot never drives this machine's input; see EnableQESwitchingControls.
+        if (this.isAIPlayer)
+            return;
         Debug.Log("EnableKickAfterKicking: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
@@ -2399,7 +2433,7 @@ public class GamePlayer : NetworkBehaviour
             PowerUp powerUptoAdd = ObjectLookup.Get(powerUpNetId).GetComponent<PowerUp>();
             myPowerUps.Add(powerUptoAdd);
             // Make sure not to add powerups picked up by the AI to the player's PowerUp UI
-            if (this.isSinglePlayer && !this.isLocalPlayer)
+            if (this.isAIPlayer)
             {
                 PowerUpManager.instance.AIUpdateAIPowerUpUIImages(myPowerUps);
                 return;
@@ -2466,6 +2500,9 @@ public class GamePlayer : NetworkBehaviour
     }
     public void EnablePowerUpControls(bool activate)
     {
+        // A bot never drives this machine's input; see EnableQESwitchingControls.
+        if (this.isAIPlayer)
+            return;
         Debug.Log("EnablePowerUpControls: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
@@ -2531,7 +2568,7 @@ public class GamePlayer : NetworkBehaviour
                 }
             }*/
         }
-        if (this.isSinglePlayer && !this.isLocalPlayer)
+        if (this.isAIPlayer)
         {
             PowerUpManager.instance.AIUpdateAIPowerUpUIImages(myPowerUps);
             return;
@@ -2551,7 +2588,7 @@ public class GamePlayer : NetworkBehaviour
             {
                 Debug.Log("RemoveUsedPowerUps: Failed to find and remove NULL powerups from myPowerUps list. Error: " + e);
             }
-            if (this.isSinglePlayer && !this.isLocalPlayer)
+            if (this.isAIPlayer)
             {
                 PowerUpManager.instance.AIUpdateAIPowerUpUIImages(myPowerUps);
                 return;
@@ -2926,6 +2963,9 @@ public class GamePlayer : NetworkBehaviour
     }
     public void EnableMenuNavigationControls(bool activate)
     {
+        // A bot never drives this machine's input; see EnableQESwitchingControls.
+        if (this.isAIPlayer)
+            return;
         Debug.Log("EnableMenuNavigationControls: for player " + this.PlayerName + " " + activate.ToString());
         if (activate)
         {
@@ -2959,7 +2999,7 @@ public class GamePlayer : NetworkBehaviour
     {
         if (IsOwner)
         {
-            if (this.isSinglePlayer && !this.isLocalPlayer)
+            if (this.isAIPlayer)
             {
                 PowerUpManager.instance.AIUpdateAIPowerUpUIImages(myPowerUps);
                 return;

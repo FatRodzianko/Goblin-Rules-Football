@@ -150,9 +150,6 @@ public class GameplayManager : NetworkBehaviour
 
     [Header("AIPlayer Stuff")]
     [SerializeField] GameObject aiPlayerPrefab;
-    public GameObject aiPlayerObject;
-    public GamePlayer aiGamePlayerScript;
-    public AIPlayer aiPlayerScript;
 
     [Header("Pause/Resume Game")]
     [SerializeField] GameObject GamePausedTextObject;
@@ -243,7 +240,25 @@ public class GameplayManager : NetworkBehaviour
         // Spawn the AIPlayer if this is a singleplayer game
         if (IsServerInitialized && this.isSinglePlayer && !this.is1v1)
         {
-            SpawnAIPlayer();
+            SpawnAIPlayer(!LocalGamePlayerScript.isTeamGrey, 2, "AIPlayer", "");
+        }
+        else if (IsServerInitialized && !this.is1v1 && !this.isSinglePlayer)
+        {
+            InitializeWaitingAIPlayers();
+        }
+    }
+    // A 3v3 bot is spawned in the lobby, before this scene and its managers exist, so it could not set up its team,
+    // coin role or goblins there. Now it can. Single player's AI never waits: GameplayManager spawns it from here.
+    void InitializeWaitingAIPlayers()
+    {
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            if (player != null && player.isAIPlayer && !player.aiInitialized)
+            {
+                Debug.Log("InitializeWaitingAIPlayers: setting up the bot playing the " + player.goblinType + " for the "
+                    + (player.isTeamGrey ? "grey" : "green") + " team.");
+                player.InitializeAIPlayer();
+            }
         }
     }
     public override void OnStartServer()
@@ -292,20 +307,25 @@ public class GameplayManager : NetworkBehaviour
         }
         
     }
-    void SpawnAIPlayer()
+    // Step 3 calls this once per goblin nobody picked, so the team, number and name are the caller's choice. The
+    // values are still set after Spawn: SetPlayerName and the others are [Server] methods, which FishNet skips
+    // until the object is network-initialized.
+    GamePlayer SpawnAIPlayer(bool isTeamGrey, int playerNumber, string playerName, string goblinType)
     {
-        aiPlayerObject = Instantiate(aiPlayerPrefab);
+        GameObject aiPlayerObject = Instantiate(aiPlayerPrefab);
         InstanceFinder.ServerManager.Spawn(aiPlayerObject,LocalGamePlayerScript.Owner);
-        aiGamePlayerScript = aiPlayerObject.GetComponent<GamePlayer>();
+        GamePlayer aiGamePlayerScript = aiPlayerObject.GetComponent<GamePlayer>();
         aiGamePlayerScript.isSinglePlayer = LocalGamePlayerScript.isSinglePlayer;
-        aiGamePlayerScript.isTeamGrey = !LocalGamePlayerScript.isTeamGrey;
-        aiGamePlayerScript.SetPlayerName("AIPlayer");
+        aiGamePlayerScript.isTeamGrey = isTeamGrey;
+        aiGamePlayerScript.goblinType = goblinType;
+        aiGamePlayerScript.SetPlayerName(playerName);
         aiGamePlayerScript.SetConnectionId(-1);
-        aiGamePlayerScript.SetPlayerNumber(2);
+        aiGamePlayerScript.SetPlayerNumber(playerNumber);
         // InitializeAIPlayer sends ServerRpcs, which FishNet only sends once the host's client side has started this
         // object, so the AI GamePlayer calls it from its own OnStartClient.
-        aiPlayerScript = aiPlayerObject.GetComponent<AIPlayer>();
+        return aiGamePlayerScript;
     }
+
     public void ActivateCoinTossUI(bool activate)
     {
         Debug.Log("ActivateCoinTossUI: " + activate.ToString());
@@ -359,6 +379,10 @@ public class GameplayManager : NetworkBehaviour
             }                
             if (newValue == "kick-after-attempt")
             {
+                // Before anything else: a blockKick left set by the previous kick-after would send that skirmisher at
+                // the kicker the instant this one starts, before a position has been chosen, and block it. This is the
+                // server's hook, which runs ahead of the client one and of the blocking being armed.
+                ClearAllAIBlockKick();
                 SetKickAfterPlayers(scoringGoblinNetId);
                 RpcNoTeamWithFootball();
                 ObstacleManager.instance.KickAfterWaitToEnableObstacleColliders();
@@ -439,12 +463,10 @@ public class GameplayManager : NetworkBehaviour
             {
                 HideTouchDownText();
 
-                // Have the AI start their kick after attempt if they are the scoring player
-                if (this.isSinglePlayer && !this.is1v1)
-                {
-                    if (scoringPlayer == aiGamePlayerScript)
-                        AIKickAfterKickingPlayer();
-                }
+                // Have the AI start their kick after attempt if they are the scoring player. The mode check this used
+                // to carry said "single player", which stopped a 3v3 bot from ever taking its own kick-after.
+                if (scoringPlayer != null && scoringPlayer.isAIPlayer)
+                    AIKickAfterKickingPlayer();
             }
             if (oldValue == "kick-after-attempt")
             {
@@ -669,11 +691,13 @@ public class GameplayManager : NetworkBehaviour
             isGameTimerRunning = false;
             StopCoroutine(gameTimeRoutine);
         }
-        if (this.isSinglePlayer && this.aiPlayerScript != null)
+        foreach (GamePlayer aiPlayer in Game.GamePlayers)
         {
+            if (aiPlayer == null || !aiPlayer.isAIPlayer || aiPlayer.myAIPlayer == null)
+                continue;
             try
             {
-                aiPlayerScript.ActivateAIPowerUpRoutine(activate);
+                aiPlayer.myAIPlayer.ActivateAIPowerUpRoutine(activate);
             }
             catch (Exception e)
             {
@@ -791,7 +815,8 @@ public class GameplayManager : NetworkBehaviour
         {
             foreach (GamePlayer player in Game.GamePlayers)
             {
-                if (scoringGoblinScript.ownerConnectionId == player.ConnectionId)
+                // ConnectionId is -1 on every bot's GamePlayer, so it cannot identify one; ownerNetId can.
+                if (scoringGoblinScript.ownerNetId == player.ObjectId)
                 {
                     scoringPlayer = player;
                     kickingPlayer = player;
@@ -809,7 +834,8 @@ public class GameplayManager : NetworkBehaviour
         {
             foreach (GamePlayer player in Game.GamePlayers)
             {
-                if (scoringGoblinScript.ownerConnectionId == player.ConnectionId)
+                // ConnectionId is -1 on every bot's GamePlayer, so it cannot identify one; ownerNetId can.
+                if (scoringGoblinScript.ownerNetId == player.ObjectId)
                 {
                     scoringPlayer = player;
                     kickingPlayer = player;
@@ -843,15 +869,14 @@ public class GameplayManager : NetworkBehaviour
             receivingTeam = blockingTeam;
             receivingPlayer = blockingTeam.captain;
             blockingPlayer = blockingTeam.captain;
-            // get the owner of the goblin who scored to know who to give kick after controls to and so on
-            foreach (GamePlayer player in Game.GamePlayers)
-            {
-                if (scoringGoblinScript.ownerConnectionId == player.ConnectionId)
-                {
-                    scoringPlayer = player;
-                    break;
-                }
-            }
+            // Get the owner of the goblin who scored, to know who to give the kick after controls to and so on.
+            // This matched ownerConnectionId against each player's ConnectionId, which cannot tell host-owned bots
+            // apart: every bot's GamePlayer is given ConnectionId -1, so their goblins carry -1 too, and the first
+            // bot in GamePlayers won - often one on the other team. Nobody on the scoring team was then the kicking
+            // player, so all three of its goblins took the "not the kicker" branch and lined up at midfield with no
+            // kick ever taken. ownerNetId is the owning GamePlayer's own ObjectId, which is unique.
+            if (ObjectLookup.TryGet(scoringGoblinScript.ownerNetId, out GamePlayer scoringGoblinOwner) && scoringGoblinOwner != null)
+                scoringPlayer = scoringGoblinOwner;
             int yModifier = 1;
             // Reposition goblins for scoring team
             foreach (GamePlayer player in scoringTeam.teamPlayers)
@@ -984,11 +1009,14 @@ public class GameplayManager : NetworkBehaviour
                 blockingPlayer.RpcActivateKickAfterBlockingControls(blockingPlayer.Owner, true);
                 blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.Owner, false);
             }
-            if (blockingPlayer == aiGamePlayerScript)
+            // This asked whether the blocking team's captain is a bot. The captain is the Grenadier's owner,
+            // while the goblin that blocks is the skirmisher, so a person playing the Grenadier left the bot
+            // skirmisher behind it unarmed and nothing contested the kick. Ask who actually has the skirmisher.
+            if (BlockingSkirmisherAI() != null)
             {
                 AIBlockingPlayer();
             }
-            else if (scoringPlayer == aiGamePlayerScript)
+            else if (scoringPlayer != null && scoringPlayer.isAIPlayer)
             {
                 AIKickAfterAttempt();
             }
@@ -1010,6 +1038,17 @@ public class GameplayManager : NetworkBehaviour
                 player.RpcActivateKickAfterKickingControls(player.Owner, false);
                 player.RpcActivateKickAfterBlockingControls(player.Owner, true);
                 player.RpcKickAfterUpdateInsctructionsText(player.Owner, false);
+            }
+            // A bot on either end of a 3v3 kick-after has to be told to act, the same as the single player branch
+            // above does. Without this a kick-after between two bot captains never resolved. The blocker is asked
+            // for by its skirmisher rather than by the captain, for the reason given on the branch above.
+            if (BlockingSkirmisherAI() != null)
+            {
+                AIBlockingPlayer();
+            }
+            if (scoringPlayer != null && scoringPlayer.isAIPlayer)
+            {
+                AIKickAfterAttempt();
             }
         }
         
@@ -1218,8 +1257,11 @@ public class GameplayManager : NetworkBehaviour
     void ResetKickAfterPositionBoolValue()
     {
         LocalGamePlayerScript.areGoblinsRepositionedForKickAfter = false;
-        if (this.isSinglePlayer)
-            aiGamePlayerScript.areGoblinsRepositionedForKickAfter = false;
+        foreach (GamePlayer aiPlayer in Game.GamePlayers)
+        {
+            if (aiPlayer != null && aiPlayer.isAIPlayer)
+                aiPlayer.areGoblinsRepositionedForKickAfter = false;
+        }
     }
     [Server]
     public void KickAfterAttemptWasBlocked()
@@ -1613,59 +1655,59 @@ public class GameplayManager : NetworkBehaviour
     {
         Application.Quit();
     }
-    public void AIChoosesCoinToss()
+    // The bot whose hook fired passes itself in, so this works whether it is single player's one AI or a 3v3
+    // team's bot captain.
+    public void AIChoosesCoinToss(GamePlayer chooser)
     {
-        if (this.isSinglePlayer)
-        {
-            Debug.Log("AIChoosesCoinToss: The AI will choose the coin toss, not the player");
-            IEnumerator aiWaitToChooseCoin = AIWaitToChooseCoin();
-            StartCoroutine(aiWaitToChooseCoin);
-        }
+        if (chooser == null)
+            return;
+        Debug.Log("AIChoosesCoinToss: The AI will choose the coin toss, not the player");
+        IEnumerator aiWaitToChooseCoin = AIWaitToChooseCoin(chooser);
+        StartCoroutine(aiWaitToChooseCoin);
     }
-    IEnumerator AIWaitToChooseCoin()
+    IEnumerator AIWaitToChooseCoin(GamePlayer chooser)
     {
         yield return new WaitForSeconds(2.0f);
         string[] headsTails = new[]
         { "heads","tails"};
         var rng = new System.Random();
-        aiGamePlayerScript.headsOrTailsPlayer = headsTails[rng.Next(headsTails.Length)];
-        //aiGamePlayerScript.headsOrTailsPlayer = "tails";
-        aiGamePlayerScript.SubmitCoinSelection();
+        chooser.headsOrTailsPlayer = headsTails[rng.Next(headsTails.Length)];
+        chooser.SubmitCoinSelection();
     }
-    public void AIChoosesKickOrReceive()
+    public void AIChoosesKickOrReceive(GamePlayer chooser)
     {
-        if (this.isSinglePlayer)
-        {
-            Debug.Log("AIChoosesKickOrReceive: The AI will choose to kick or receive, not the player");
-            IEnumerator aiWaitToChooseKickOrReceive = AIWaitToChooseKickOrReceive();
-            StartCoroutine(aiWaitToChooseKickOrReceive);
-        }
+        if (chooser == null)
+            return;
+        Debug.Log("AIChoosesKickOrReceive: The AI will choose to kick or receive, not the player");
+        IEnumerator aiWaitToChooseKickOrReceive = AIWaitToChooseKickOrReceive(chooser);
+        StartCoroutine(aiWaitToChooseKickOrReceive);
     }
-    IEnumerator AIWaitToChooseKickOrReceive()
+    IEnumerator AIWaitToChooseKickOrReceive(GamePlayer chooser)
     {
         yield return new WaitForSeconds(5.0f);
         string[] headsTails = new[]
         { "kick","receive"};
         var rng = new System.Random();
-        aiGamePlayerScript.kickOrReceivePlayer = headsTails[rng.Next(headsTails.Length)];
-        //aiGamePlayerScript.kickOrReceivePlayer = "kick";
-        aiGamePlayerScript.SubmitKickOrReceiveSelection();
+        chooser.kickOrReceivePlayer = headsTails[rng.Next(headsTails.Length)];
+        chooser.SubmitKickOrReceiveSelection();
     }
-    public void AIPlayerKickOff()
+    public void AIPlayerKickOff(GamePlayer kickingAIPlayer)
     {
         Debug.Log("AIPlayerKickOff");
-        IEnumerator aiKickOffSequence = AIKickOffSequence();
+        if (kickingAIPlayer == null || kickingAIPlayer.myAIPlayer == null)
+            return;
+        IEnumerator aiKickOffSequence = AIKickOffSequence(kickingAIPlayer.myAIPlayer);
         StartCoroutine(aiKickOffSequence);
     }
-    IEnumerator AIKickOffSequence()
+    IEnumerator AIKickOffSequence(AIPlayer kicker)
     {
         yield return new WaitForSeconds(3.0f);
-        aiPlayerScript.KickOffSequence();
+        kicker.KickOffSequence();
     }
     public void AIStartKickAfterPositioning()
     {
         Debug.Log("AIStartKickAfterPositioning");
-        if (scoringPlayer == aiGamePlayerScript)
+        if (scoringPlayer != null && scoringPlayer.isAIPlayer)
         {
             Debug.Log("AIStartKickAfterPositioning: The AI will be doing the kick after attempt. Starting on choosing position for kick");
         }
@@ -1676,15 +1718,69 @@ public class GameplayManager : NetworkBehaviour
         IEnumerator aiBlockKickDelay = AIBlockKickDelay();
         StartCoroutine(aiBlockKickDelay);
     }
+    // AIPlayer.BlockKickAfterAttempt looks through its own goblins for the skirmisher, because in single player
+    // and a 1v1 one player owns all three. In a 3v3 each player owns one, and the blocking player is the team
+    // captain, so it searched a single Grenadier, found no skirmisher and nothing blocked the kick. Ask the team
+    // who actually has the skirmisher.
+    // The AI that was told to block this kick-after. BlockingSkirmisherAI resolves from the current blockingTeam,
+    // which is the other team by the next kick-after, so the stop has to clear the one that was actually set.
+    private AIPlayer _blockingAI;
+    AIPlayer BlockingSkirmisherAI()
+    {
+        if (blockingTeam != null)
+        {
+            foreach (GamePlayer player in blockingTeam.teamPlayers)
+            {
+                if (player == null || !player.isAIPlayer || player.myAIPlayer == null)
+                    continue;
+                foreach (GoblinScript goblin in player.goblinTeam)
+                {
+                    if (goblin != null && goblin.soundType == "skirmisher")
+                        return player.myAIPlayer;
+                }
+            }
+        }
+        // The blocking player owns all three goblins in a 1v1 or single player, so it is the blocker there,
+        // but only if it really has the skirmisher. In a 3v3 it owns the Grenadier alone, and arming it sends
+        // nothing at the kicker, since AIPlayer.BlockKickAfterAttempt only ever moves a skirmisher.
+        if (blockingPlayer != null && blockingPlayer.isAIPlayer && blockingPlayer.myAIPlayer != null)
+        {
+            foreach (GoblinScript goblin in blockingPlayer.goblinTeam)
+            {
+                if (goblin != null && goblin.soundType == "skirmisher")
+                    return blockingPlayer.myAIPlayer;
+            }
+        }
+        return null;
+    }
     IEnumerator AIBlockKickDelay()
     {
+        _blockingAI = BlockingSkirmisherAI();
         yield return new WaitForSeconds(0.25f);
-        aiPlayerScript.blockKick = true;
+        if (_blockingAI != null)
+            _blockingAI.blockKick = true;
     }
     void AIStopBlockingKickAfter()
     {
-        aiPlayerScript.blockKick = false;
-        aiPlayerScript.StopBlockingGoblinFromRunning();
+        if (_blockingAI == null)
+            return;
+        _blockingAI.blockKick = false;
+        _blockingAI.StopBlockingGoblinFromRunning();
+        _blockingAI = null;
+    }
+    // Belt and braces for the above: a blockKick left set from a previous kick-after sends that skirmisher at the
+    // kicker the moment the next one begins, before the kicker has even chosen a position, and blocks it.
+    void ClearAllAIBlockKick()
+    {
+        _blockingAI = null;
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            if (player != null && player.isAIPlayer && player.myAIPlayer != null)
+            {
+                player.myAIPlayer.blockKick = false;
+                player.myAIPlayer.StopBlockingGoblinFromRunning();
+            }
+        }
     }
     void AIKickAfterKickingPlayer()
     {
@@ -1694,18 +1790,28 @@ public class GameplayManager : NetworkBehaviour
     }
     IEnumerator AIKickAfterKickingPlayerDelay()
     {
-        aiPlayerScript.kickAfterGoblin = ObjectLookup.Get(scoringGoblinNetId).GetComponent<GoblinScript>();
+        AIPlayer kicker = scoringPlayer != null ? scoringPlayer.myAIPlayer : null;
+        if (kicker == null)
+            yield break;
+        // The goblin that kicks is the one the reposition put on the spot, which is the kicking player's own selected
+        // goblin. This used to look the goblin up from scoringGoblinNetId, which in a 3v3 handed the AI a different
+        // goblin altogether - observed as a grenadier at midfield while the skirmisher stood on the kick spot - so the
+        // AI walked and kicked with the wrong one and the ball came in from across the pitch.
+        kicker.kickAfterGoblin = scoringPlayer.selectGoblin;
+        if (kicker.kickAfterGoblin == null)
+            yield break;
         yield return new WaitForSeconds(1.0f);
         Debug.Log("AIKickAfterKickingPlayerDelay");
-        aiPlayerScript.finalPositionReached = false;
-        aiPlayerScript.kickKickAfter = true;
+        kicker.finalPositionReached = false;
+        kicker.kickKickAfter = true;
         
         
     }
     void AIKickAfterAttempt()
     {
         Debug.Log("AIKickAfterAttempt");
-        aiPlayerScript.KickAfterAttempt();
+        if (scoringPlayer != null && scoringPlayer.myAIPlayer != null)
+            scoringPlayer.myAIPlayer.KickAfterAttempt();
     }
     [ObserversRpc]
     void RpcKickOffWhistle()

@@ -49,7 +49,8 @@ public class DevDirectConnect : MonoBehaviour
         if (GUILayout.Button("Host 1v1"))
             StartDevHost(true);
 
-        if (GUILayout.Button("Host 3v3 (needs 6)"))
+
+        if (GUILayout.Button("Host 3v3"))
             StartDevHost(false);
 
         GUILayout.BeginHorizontal();

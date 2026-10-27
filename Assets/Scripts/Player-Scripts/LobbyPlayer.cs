@@ -40,6 +40,10 @@ public class LobbyPlayer : NetworkBehaviour
     public bool isGoblinSelected { get => _syncIsGoblinSelected.Value; set => _syncIsGoblinSelected.Value = value; }
     private readonly SyncVar<bool> _syncWantsToSwitchTeams = new SyncVar<bool>(false);
     public bool wantsToSwitchTeams { get => _syncWantsToSwitchTeams.Value; set => _syncWantsToSwitchTeams.Value = value; }
+    // A bot the host added to fill a 3v3 slot. It is an ordinary LobbyPlayer so the team lists, the lobby rows and
+    // Start Game all handle it with no special cases. Set before Spawn, so it is already true in OnStartClient.
+    private readonly SyncVar<bool> _syncIsBot = new SyncVar<bool>(false);
+    public bool isBot { get => _syncIsBot.Value; set => _syncIsBot.Value = value; }
 
     [Header("DLC Installed SyncVars")]
     private readonly SyncVar<string> _syncWhatDLCsAreInstalled = new SyncVar<string>("");
@@ -108,11 +112,16 @@ public class LobbyPlayer : NetworkBehaviour
             isTeamGrey = false;
         else
         {
-            if (LobbyManager.instance.GreenTeamMembers.Count > LobbyManager.instance.GreyTeamMembers.Count)
+            // Balance by players, not by members: with the lobby filled out by bots both teams always look equal, and a
+            // joining player should land on whichever side has fewer actual people. Ignore this player while counting:
+            // it is still sitting on the default team, green, so counting it made green look one heavier than it is and
+            // the two sides tie. That tie fell to the coin flip below, which is how a second player sometimes landed on
+            // the same team as the first. Whether it counted at all depended on tick order, so the bug came and went.
+            if (LobbyManager.instance.HumansOnTeam(false, this) > LobbyManager.instance.HumansOnTeam(true, this))
             {
                 this.isTeamGrey = true;
             }
-            else if (LobbyManager.instance.GreenTeamMembers.Count < LobbyManager.instance.GreyTeamMembers.Count)
+            else if (LobbyManager.instance.HumansOnTeam(false, this) < LobbyManager.instance.HumansOnTeam(true, this))
             {
                 this.isTeamGrey = false;
             }
@@ -134,6 +143,8 @@ public class LobbyPlayer : NetworkBehaviour
         }
         UpdateTeamListsOnLobbyManager();
         UpdateAllPlayersOnAvailableGoblins(this.isTeamGrey);
+        // The team now has one more player than it had room for, since the lobby let this one in past the bots.
+        Game.EnforceTeamCapacity();
     }
     public void HandlePlayerNameUpdate(string oldValue, string newValue)
     {
@@ -167,14 +178,14 @@ public class LobbyPlayer : NetworkBehaviour
         Debug.Log("CmdUpdateTeam to grey? " + isGrey.ToString() + " for player " + this.PlayerName + " are they already grey? " + isGrey.ToString());
         if (this.isTeamGrey != isGrey)
         {
-            if (isGrey && LobbyManager.instance.GreyTeamMembers.Count >= 3)
+            if (isGrey && LobbyManager.instance.HumansOnTeam(true) >= 3)
             {
                 Debug.Log("CmdUpdateTeam: " + this.PlayerName + " is trying to switch to GREY but GREY is full. Setting wantsToSwitch To True");
                 this.wantsToSwitchTeams = true;
                 CheckIfOtherPlayersWantToSwitch(this);
                 return;
             }
-            else if (!isGrey && LobbyManager.instance.GreenTeamMembers.Count >= 3)
+            else if (!isGrey && LobbyManager.instance.HumansOnTeam(false) >= 3)
             {
                 Debug.Log("CmdUpdateTeam: " + this.PlayerName + " is trying to switch to GREEN but GREEN is full. Setting wantsToSwitch To True");
                 this.wantsToSwitchTeams = true;
@@ -185,6 +196,9 @@ public class LobbyPlayer : NetworkBehaviour
             if (this.wantsToSwitchTeams)
                 this.wantsToSwitchTeams = false;
             UpdateAllPlayersOnAvailableGoblins(isGrey);
+            // The team this player just joined may now be four deep, since admission only counted humans. A bot gives
+            // way. Joining the lobby does this in SpawnLobbyPlayer; switching team needs it too.
+            Game.EnforceTeamCapacity();
         }
     }
     [Server]
@@ -226,7 +240,7 @@ public class LobbyPlayer : NetworkBehaviour
                 if (player.isTeamGrey)
                 {
                     Debug.Log("CheckIfTeamIsNoLongerFull: player " + player.PlayerName + " is on team grey and wants to switch to team green.");
-                    if (LobbyManager.instance.GreenTeamMembers.Count >= 3)
+                    if (LobbyManager.instance.HumansOnTeam(false) >= 3)
                     {
                         Debug.Log("CheckIfTeamIsNoLongerFull: player " + player.PlayerName + " is on team grey and wants to switch to team green BUT green is full. checking next player...");
                         continue;
@@ -241,12 +255,13 @@ public class LobbyPlayer : NetworkBehaviour
                         UpdateAllPlayersOnAvailableGoblins(player.isTeamGrey);
                         player.isTeamGrey = !player.isTeamGrey;
                         player.wantsToSwitchTeams = false;
+                        Game.EnforceTeamCapacity();
                     }
                 }
                 else
                 {
                     Debug.Log("CheckIfTeamIsNoLongerFull: player " + player.PlayerName + " is on team green and wants to switch to team grey.");
-                    if (LobbyManager.instance.GreyTeamMembers.Count >= 3)
+                    if (LobbyManager.instance.HumansOnTeam(true) >= 3)
                     {
                         Debug.Log("CheckIfTeamIsNoLongerFull: player " + player.PlayerName + " is on team green and wants to switch to team grey BUT green is full. checking next player...");
                         continue;
@@ -261,6 +276,7 @@ public class LobbyPlayer : NetworkBehaviour
                         UpdateAllPlayersOnAvailableGoblins(player.isTeamGrey);
                         player.isTeamGrey = !player.isTeamGrey;
                         player.wantsToSwitchTeams = false;
+                        Game.EnforceTeamCapacity();
                     }
                 }
             }
@@ -325,7 +341,7 @@ public class LobbyPlayer : NetworkBehaviour
         base.OnStartClient();
         // This was OnStartAuthority with Mirror, which ran right before OnStartClient. FindLocalLobbyPlayer has to run first
         // so LobbyManager knows if this is a 1v1 lobby before UpdateUI makes this player's list item.
-        if (IsOwner)
+        if (IsOwner && !isBot)
         {
             _isOwnedLocally = true;
             // Local instances in a dev session all share one Steam account, so Steam would give them the same name and the
@@ -481,7 +497,9 @@ public class LobbyPlayer : NetworkBehaviour
     {
         if (IsClientInitialized)
         {
-            if (IsOwner)
+            // A bot has no row of its own to drive and no dropdown. Start Game hands bots a goblin, which fired this
+            // hook and logged a caught null reference per bot.
+            if (IsOwner && !isBot)
             {
                 LobbyManager.instance.ActivateChangeGoblinButton();
                 try
@@ -503,7 +521,9 @@ public class LobbyPlayer : NetworkBehaviour
     {
         if (IsClientInitialized)
         {
-            if (IsOwner)
+            // A bot has no row of its own to drive and no dropdown. Start Game hands bots a goblin, which fired this
+            // hook and logged a caught null reference per bot.
+            if (IsOwner && !isBot)
             {
                 LobbyManager.instance.ActivateChangeGoblinButton();
                 try

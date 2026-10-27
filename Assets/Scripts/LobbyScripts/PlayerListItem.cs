@@ -11,6 +11,10 @@ public class PlayerListItem : MonoBehaviour
 
     public string PlayerName;
     public int ConnectionId;
+    // Which LobbyPlayer this row is for. ConnectionId cannot identify a row once bots exist: every bot has -1,
+    // so matching on it gave the first bot a row and silently treated every later bot as already present.
+    public int lobbyPlayerObjectId = -1;
+    public bool isBot;
     public bool isPlayerReady;
     public ulong playerSteamId;
     private bool avatarRetrieved;
@@ -19,9 +23,14 @@ public class PlayerListItem : MonoBehaviour
     [SerializeField] private TextMeshProUGUI PlayerNameText;
     [SerializeField] private TextMeshProUGUI PlayerReadyStatus;
     [SerializeField] private RawImage playerAvatar;
+    // Shown in the avatar slot for a bot, which has no Steam account to fetch one from. playerAvatar is a RawImage, so
+    // this is the sprite's texture rather than the sprite.
+    [SerializeField] private Texture botAvatar;
     [SerializeField] Color readyColor;
     [SerializeField] Color notReadyColor;
     [SerializeField] private GameObject GoblinTypeDropdown;
+    // Sits where GoblinTypeDropdown does, since a bot has no goblin to pick in the lobby. Only the host sees it.
+    [SerializeField] private GameObject KickBotButton;
     [SerializeField] private TextMeshProUGUI goblinSelected;
 
     [Header("DLC Image Stuff")]
@@ -54,9 +63,71 @@ public class PlayerListItem : MonoBehaviour
     {
         PlayerNameText.text = PlayerName;
         UpdatePlayerItemReadyStatus();
+        if (isBot)
+        {
+            ApplyBotLook();
+            return;
+        }
+        // Say it rather than relying on the prefab being saved with it off: a player's row never has a kick button.
+        if (KickBotButton != null)
+            KickBotButton.SetActive(false);
         if (!avatarRetrieved)
             GetPlayerAvatar();
         GetDLCImageInfoFromLobbyPlayer();
+    }
+    // A bot has no Steam account, so no avatar to fetch and no DLC to own, and no goblin to pick in the lobby: it takes
+    // whatever roles are left at Start Game. So the icon stands in for the avatar, the DLC badge goes, and the kick
+    // button takes the goblin dropdown's place - for the host only, since only the host can remove it.
+    void ApplyBotLook()
+    {
+        if (playerAvatar != null)
+        {
+            playerAvatar.texture = botAvatar;
+            playerAvatar.enabled = botAvatar != null;
+            // The prefab flips the avatar vertically because Steam hands its images back upside down. The bot icon is
+            // an ordinary sprite, so it has to be flipped back the right way up.
+            SetAvatarUpsideDown(false);
+        }
+        if (dlcImage != null)
+            dlcImage.enabled = false;
+        if (GoblinTypeDropdown != null)
+            GoblinTypeDropdown.SetActive(false);
+        if (goblinSelected != null)
+            goblinSelected.gameObject.SetActive(false);
+        if (KickBotButton != null)
+            KickBotButton.SetActive(IsLocalPlayerTheHost());
+    }
+    // Steam's avatar images arrive upside down, which the prefab corrects with a Y scale of -1. Anything that is not a
+    // Steam image, like the bot icon, needs that undone.
+    void SetAvatarUpsideDown(bool upsideDown)
+    {
+        if (playerAvatar == null)
+            return;
+        Vector3 scale = playerAvatar.transform.localScale;
+        scale.y = upsideDown ? -Mathf.Abs(scale.y) : Mathf.Abs(scale.y);
+        playerAvatar.transform.localScale = scale;
+    }
+    bool IsLocalPlayerTheHost()
+    {
+        GameObject localPlayerObject = GameObject.Find("LocalLobbyPlayer");
+        if (localPlayerObject == null)
+            return false;
+        LobbyPlayer localPlayer = localPlayerObject.GetComponent<LobbyPlayer>();
+        return localPlayer != null && localPlayer.IsGameLeader;
+    }
+    // Wired to KickBotButton. Only the host has the button, and the host is the server, so this can remove the bot
+    // directly instead of going through an Rpc.
+    public void KickBotButtonPressed()
+    {
+        if (!isBot)
+            return;
+        LobbyPlayer bot;
+        if (!ObjectLookup.TryGet(lobbyPlayerObjectId, out bot))
+        {
+            Debug.Log("KickBotButtonPressed: could not find the bot for row " + lobbyPlayerObjectId.ToString());
+            return;
+        }
+        NetworkManagerGRF.singleton.RemoveBot(bot);
     }
     public void UpdatePlayerItemReadyStatus()
     {
@@ -170,6 +241,7 @@ public class PlayerListItem : MonoBehaviour
         }
 
         playerAvatar.texture = GetSteamImageAsTexture(imageId);
+        SetAvatarUpsideDown(true);
     }
     private Texture2D GetSteamImageAsTexture(int iImage)
     {
@@ -201,6 +273,7 @@ public class PlayerListItem : MonoBehaviour
         {
             Debug.Log("OnAvatarImageLoaded: Avatar downloaded from steam.");
             playerAvatar.texture = GetSteamImageAsTexture(callback.m_iImage);
+            SetAvatarUpsideDown(true);
         }
         else
         {

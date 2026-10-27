@@ -130,6 +130,9 @@ public class AIPlayer : NetworkBehaviour
     }
     private void FixedUpdate()
     {
+        // A 3v3 bot is spawned in the lobby, so this ticks before the gameplay scene and its managers exist.
+        if (GameplayManager.instance == null)
+            return;
         if (GameplayManager.instance.gamePhase == "kick-after-attempt")
         {
             if (blockKick)
@@ -248,9 +251,14 @@ public class AIPlayer : NetworkBehaviour
         }
         if (willPass)
         {
-            if (goblinToPassTo.isEGoblin)
+            // This tested the isEGoblin and isQGoblin SyncVars, which GoblinScript.SetQGoblin and SetEGoblin only
+            // write in a 1v1 or single player; a 3v3 sets the Locally3v3 flags instead. Both stayed false there, so
+            // neither branch ran and a bot that had decided to pass simply kept running with the ball. The player's
+            // own qGoblin and eGoblin are set in both modes, by AddToGoblinTeam and by GetGoblinTeammatesFor3v3,
+            // and SwitchToQGoblin keeps them in step with the SyncVars when it swaps.
+            if (goblinToPassTo == myPlayerScript.eGoblin)
                 myPlayerScript.SwitchToEGoblin(false, Time.time);
-            else if (goblinToPassTo.isQGoblin)
+            else if (goblinToPassTo == myPlayerScript.qGoblin)
                 myPlayerScript.SwitchToQGoblin(false, Time.time);
 
         }
@@ -1080,7 +1088,11 @@ public class AIPlayer : NetworkBehaviour
             }
             combinedHealthPercentage += goblinHealthPercent;
         }
-        if (goblinBelowMin || (combinedHealthPercentage / 3) < 0.5f)
+        // The average divided by a hardcoded 3. A 3v3 bot owns one goblin, so this came out at a third of the real
+        // figure and could not reach 0.5 unless that goblin were over 150% health, which had every bot spending its
+        // health power-up as soon as it had one. A 1v1 and single player still divide by 3, since Count is 3 there.
+        int healthGoblinCount = myPlayerScript.goblinTeam.Count;
+        if (goblinBelowMin || (healthGoblinCount > 0 && (combinedHealthPercentage / healthGoblinCount) < 0.5f))
         {
             UsePowerUp(healthPowerUpIndex);
         }
@@ -1101,7 +1113,9 @@ public class AIPlayer : NetworkBehaviour
             }
             combinedStaminaPercentage += goblinStaminaPercent;
         }
-        if (goblinBelowMin || (combinedStaminaPercentage / 3) < 0.5f)
+        // Divided by a hardcoded 3, as the health check above was; same effect on a 3v3 bot's stamina power-up.
+        int staminaGoblinCount = myPlayerScript.goblinTeam.Count;
+        if (goblinBelowMin || (staminaGoblinCount > 0 && (combinedStaminaPercentage / staminaGoblinCount) < 0.5f))
         {
             UsePowerUp(staminaPowerUpIndex);
         }

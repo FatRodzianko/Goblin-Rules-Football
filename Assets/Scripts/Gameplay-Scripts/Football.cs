@@ -551,7 +551,9 @@ public class Football : NetworkBehaviour
                     Debug.Log("PlayerPickUpFootball: Grey team kicking football?");
                     distanceToBall = 0f;
                 }*/
-                if (GameplayManager.instance.gamePhase == "kickoff" && goblinToCheckScript.ownerConnectionId == GameplayManager.instance.kickingPlayer.ConnectionId && goblinToCheckScript.name.Contains("grenadier"))
+                // ownerConnectionId is -1 on every host-owned bot, so this matched either team's grenadier once
+                // bots were playing. ownerNetId identifies the one GamePlayer that owns the goblin.
+                if (GameplayManager.instance.gamePhase == "kickoff" && goblinToCheckScript.ownerNetId == GameplayManager.instance.kickingPlayer.ObjectId && goblinToCheckScript.name.Contains("grenadier"))
                 {
                     Debug.Log("PlayerPickUpFootball: kicking team is kicking football?");
                     distanceToBall = 0f;

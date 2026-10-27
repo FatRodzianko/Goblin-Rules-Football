@@ -2442,6 +2442,7 @@ MonoBehaviour:
   minPlayers: 2
   lobbyPlayerPrefab: {fileID: 9114685772438749880, guid: db9cd257207cc0548a0ed4cba8b158a5, type: 3}
   gamePlayerPrefab: {fileID: 554441546451090241, guid: 28687f36ab3be4e45a8cf649939dcbe1, type: 3}
+  aiGamePlayerPrefab: {fileID: 554441546451090241, guid: 99ad0a2136d863b43b69c51e64ec3a12, type: 3}
   WaitingForPlayersCanvas: {fileID: 2342166639519145750, guid: f0686eca83607064299e7e8ce9ee42ce, type: 3}
   waitingForPlayersObject: {fileID: 0}
   playersFinishedLoading: 
@@ -2463,6 +2464,7 @@ MonoBehaviour:
   playerWhoPaused: {fileID: 0}
   playerWhoPausedNetId: 0
   lastPauseTimeStamp: 0
+  isDevSession: 0
 --- !u!114 &5024017012025825574
 MonoBehaviour:
   m_ObjectHideFlags: 0

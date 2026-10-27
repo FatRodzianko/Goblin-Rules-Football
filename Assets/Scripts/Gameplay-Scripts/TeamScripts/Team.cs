@@ -401,11 +401,10 @@ public class Team : NetworkBehaviour
             return;
         foreach (GamePlayer player in teamPlayers)
         {
-            if (GameplayManager.instance.isSinglePlayer)
-            {
-                if (player.PlayerName == "AIPlayer")
-                    continue;
-            }
+            // Was a check against the name "AIPlayer", which only held while there was exactly one bot. An AI has no
+            // achievements to award.
+            if (player.isAIPlayer)
+                continue;
             RpcMercyRuleAchievement(player.Owner, wonGame);
         }
         sentMercyRuleToTeamServer = true;

@@ -40,6 +40,9 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] GameObject panel3v3;
     [SerializeField] GameObject greenContentPanel;
     [SerializeField] GameObject greyContentPanel;
+    // The "+ ADD BOT" row the host sees for each empty 3v3 slot.
+    [SerializeField] GameObject AddBotListItemPrefab;
+    private List<GameObject> addBotRows = new List<GameObject>();
     private List<PlayerListItem> greenPlayerListItems = new List<PlayerListItem>();
     private List<PlayerListItem> greyPlayerListItems = new List<PlayerListItem>();
     [SerializeField] GameObject GreenChangeGoblinButton;
@@ -171,6 +174,71 @@ public class LobbyManager : MonoBehaviour
             RemovePlayerListItems();
         if (playerListItems.Count == Game.LobbyPlayers.Count)
             UpdatePlayerListItems();
+        SortTeamRows();
+        UpdateAddBotRows();
+    }
+    // One "+ ADD BOT" row per empty slot on each team, for the host only. Rebuilt from scratch on every refresh, which
+    // is simpler than reconciling and costs nothing at six rows.
+    public void UpdateAddBotRows()
+    {
+        foreach (GameObject row in addBotRows)
+        {
+            if (row != null)
+                Destroy(row);
+        }
+        addBotRows.Clear();
+        if (AddBotListItemPrefab == null || this.is1v1 || this.isSinglePlayer)
+            return;
+        // Only the host can add a bot, so only the host is offered the row.
+        if (localLobbyPlayerScript == null || !localLobbyPlayerScript.IsGameLeader)
+            return;
+        CreateAddBotRowsForTeam(false, greenContentPanel);
+        CreateAddBotRowsForTeam(true, greyContentPanel);
+    }
+    void CreateAddBotRowsForTeam(bool isTeamGrey, GameObject contentPanel)
+    {
+        if (contentPanel == null)
+            return;
+        int freeSlots = 3 - Game.CountOnTeam(isTeamGrey);
+        for (int i = 0; i < freeSlots; i++)
+        {
+            GameObject row = Instantiate(AddBotListItemPrefab);
+            row.transform.SetParent(contentPanel.transform, false);
+            row.transform.localScale = Vector3.one;
+            // Below the players and the bots.
+            row.transform.SetAsLastSibling();
+            bool rowIsTeamGrey = isTeamGrey;
+            Button rowButton = row.GetComponent<Button>();
+            if (rowButton != null)
+                rowButton.onClick.AddListener(() => AddBotPressed(rowIsTeamGrey));
+            addBotRows.Add(row);
+        }
+    }
+    // Only the host has these rows, and the host is the server, so the bot can be added directly.
+    public void AddBotPressed(bool isTeamGrey)
+    {
+        Game.AddBot(isTeamGrey);
+    }
+    // Players always sit above bots in a team's list, whatever order they arrived in. Row order is sibling order, so
+    // this just re-indexes: every human first, then every bot.
+    void SortTeamRows()
+    {
+        SortRowsPlayersFirst(greenPlayerListItems);
+        SortRowsPlayersFirst(greyPlayerListItems);
+    }
+    void SortRowsPlayersFirst(List<PlayerListItem> rows)
+    {
+        int index = 0;
+        foreach (PlayerListItem row in rows)
+        {
+            if (row != null && !row.isBot)
+                row.transform.SetSiblingIndex(index++);
+        }
+        foreach (PlayerListItem row in rows)
+        {
+            if (row != null && row.isBot)
+                row.transform.SetSiblingIndex(index++);
+        }
     }
     private void CreatePlayerListItems()
     {
@@ -185,6 +253,8 @@ public class LobbyManager : MonoBehaviour
 
                 newPlayerListItemScript.PlayerName = player.PlayerName;
                 newPlayerListItemScript.ConnectionId = player.ConnectionId;
+                newPlayerListItemScript.lobbyPlayerObjectId = player.ObjectId;
+                newPlayerListItemScript.isBot = player.isBot;
                 newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
                 newPlayerListItemScript.playerSteamId = player.playerSteamId;
                 newPlayerListItemScript.SetPlayerListItemValues();
@@ -203,6 +273,8 @@ public class LobbyManager : MonoBehaviour
 
                 newPlayerListItemScript.PlayerName = player.PlayerName;
                 newPlayerListItemScript.ConnectionId = player.ConnectionId;
+                newPlayerListItemScript.lobbyPlayerObjectId = player.ObjectId;
+                newPlayerListItemScript.isBot = player.isBot;
                 newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
                 newPlayerListItemScript.playerSteamId = player.playerSteamId;
                 newPlayerListItemScript.SetPlayerListItemValues();
@@ -289,7 +361,7 @@ public class LobbyManager : MonoBehaviour
         Debug.Log("Executing CreateNewPlayerListItems");
         foreach (LobbyPlayer player in Game.LobbyPlayers)
         {
-            if (!playerListItems.Any(b => b.ConnectionId == player.ConnectionId))
+            if (!playerListItems.Any(b => b.lobbyPlayerObjectId == player.ObjectId))
             {
                 if (is1v1)
                 {
@@ -299,6 +371,8 @@ public class LobbyManager : MonoBehaviour
 
                     newPlayerListItemScript.PlayerName = player.PlayerName;
                     newPlayerListItemScript.ConnectionId = player.ConnectionId;
+                    newPlayerListItemScript.lobbyPlayerObjectId = player.ObjectId;
+                    newPlayerListItemScript.isBot = player.isBot;
                     newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
                     newPlayerListItemScript.playerSteamId = player.playerSteamId;
                     newPlayerListItemScript.SetPlayerListItemValues();
@@ -317,6 +391,8 @@ public class LobbyManager : MonoBehaviour
 
                     newPlayerListItemScript.PlayerName = player.PlayerName;
                     newPlayerListItemScript.ConnectionId = player.ConnectionId;
+                    newPlayerListItemScript.lobbyPlayerObjectId = player.ObjectId;
+                    newPlayerListItemScript.isBot = player.isBot;
                     newPlayerListItemScript.isPlayerReady = player.isPlayerReady;
                     newPlayerListItemScript.playerSteamId = player.playerSteamId;
                     newPlayerListItemScript.SetPlayerListItemValues();
@@ -404,7 +480,7 @@ public class LobbyManager : MonoBehaviour
         List<PlayerListItem> playerListItemsToRemove = new List<PlayerListItem>();
         foreach (PlayerListItem playerListItem in playerListItems)
         {
-            if (!Game.LobbyPlayers.Any(b => b.ConnectionId == playerListItem.ConnectionId))
+            if (!Game.LobbyPlayers.Any(b => b.ObjectId == playerListItem.lobbyPlayerObjectId))
             {
                 Debug.Log("RemovePlayerListItems: player list item fro connection id: " + playerListItem.ConnectionId.ToString() + " does not exist in the game players list");
                 playerListItemsToRemove.Add(playerListItem);
@@ -416,6 +492,10 @@ public class LobbyManager : MonoBehaviour
             {
                 GameObject playerListItemToRemoveObject = playerListItemToRemove.gameObject;
                 playerListItems.Remove(playerListItemToRemove);
+                // The team lists held the row too, and only playerListItems was being cleaned, so every removal left a
+                // destroyed entry behind in green or grey. Rare while only players left; routine once bots come and go.
+                greenPlayerListItems.Remove(playerListItemToRemove);
+                greyPlayerListItems.Remove(playerListItemToRemove);
                 Destroy(playerListItemToRemoveObject);
                 playerListItemToRemoveObject = null;
             }
@@ -428,10 +508,11 @@ public class LobbyManager : MonoBehaviour
         {
             foreach (PlayerListItem playerListItemScript in playerListItems)
             {
-                if (playerListItemScript.ConnectionId == player.ConnectionId)
+                if (playerListItemScript.lobbyPlayerObjectId == player.ObjectId)
                 {
                     playerListItemScript.PlayerName = player.PlayerName;
                     playerListItemScript.isPlayerReady = player.isPlayerReady;
+                    playerListItemScript.isBot = player.isBot;
                     playerListItemScript.SetPlayerListItemValues();
 
                     if (player == localLobbyPlayerScript)
@@ -543,6 +624,19 @@ public class LobbyManager : MonoBehaviour
                 StartGameButton.gameObject.SetActive(false);
         }
     }
+    // Bots do not keep a player out of a team, so admission counts humans only. Pass a player as "ignore" to leave them
+    // out: a player deciding which team to join must not count itself, since it sits on the default team until it has
+    // decided and would otherwise tip its own balance.
+    public int HumansOnTeam(bool isGrey, LobbyPlayer ignore = null)
+    {
+        int humans = 0;
+        foreach (LobbyPlayer player in Game.LobbyPlayers)
+        {
+            if (player != null && player != ignore && !player.isBot && player.isTeamGrey == isGrey)
+                humans++;
+        }
+        return humans;
+    }
     public void JoinTeamGreen()
     {
         Debug.Log("JoinTeamGreen");
@@ -613,7 +707,7 @@ public class LobbyManager : MonoBehaviour
     {
         foreach (PlayerListItem playerListItem in playerListItems)
         {
-            if (player.ConnectionId == playerListItem.ConnectionId && player.PlayerName == playerListItem.PlayerName)
+            if (player.ObjectId == playerListItem.lobbyPlayerObjectId)
             {
                 playerListItem.SetGoblinSelectedText(player.goblinType);
                 //playerListItem.ActivateGoblinSelectedText(player.isGoblinSelected);
@@ -624,7 +718,7 @@ public class LobbyManager : MonoBehaviour
     {
         foreach (PlayerListItem playerListItem in playerListItems)
         {
-            if (player.ConnectionId == playerListItem.ConnectionId && player.PlayerName == playerListItem.PlayerName)
+            if (player.ObjectId == playerListItem.lobbyPlayerObjectId)
             {
                 //playerListItem.SetGoblinSelectedText(player.goblinType);
                 playerListItem.ActivateGoblinSelectedText(player.isGoblinSelected);

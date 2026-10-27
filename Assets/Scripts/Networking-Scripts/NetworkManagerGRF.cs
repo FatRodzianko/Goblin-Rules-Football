@@ -22,6 +22,9 @@ public class NetworkManagerGRF : MonoBehaviour
     [SerializeField] public int minPlayers = 2;
     [SerializeField] private LobbyPlayer lobbyPlayerPrefab;
     [SerializeField] private GamePlayer gamePlayerPrefab;
+    // What a bot becomes at Start Game. The same prefab single player's AI uses: a GamePlayer with the AIPlayer brain
+    // on it, which is what makes isAIPlayer true.
+    [SerializeField] private GamePlayer aiGamePlayerPrefab;
     
 
     [Header("Waiting for players to load scene stuff")]
@@ -45,6 +48,10 @@ public class NetworkManagerGRF : MonoBehaviour
     public bool spawnObstaclesEnabled;
     public bool mercyRuleEnabled;
     public int mercyRulePointDifferential;
+    private static readonly string[] GoblinTypes = { "Grenadier", "Berserker", "Skirmisher" };
+    // Numbers handed out this frame. LobbyPlayers only gains a player once its spawn has been applied, a tick
+    // later, so filling a team with bots in one go would otherwise give every one of them the same number.
+    private List<int> reservedPlayerNumbers = new List<int>();
 
     [Header("Pause/Resume Game")]
     public bool isGamePaused = false;
@@ -163,7 +170,9 @@ public class NetworkManagerGRF : MonoBehaviour
         if (args.ConnectionState == RemoteConnectionState.Started)
         {
             Debug.Log("Connecting to server...");
-            if (LobbyPlayers.Count >= maxConnections) // prevents players joining if the game is full
+            // Humans only: a lobby filled out with bots is not full. The bot gives way once the new player has a team,
+            // in EnforceTeamCapacity. Counting everyone here turned away players from a lobby the host had filled.
+            if (CountHumans() >= maxConnections) // prevents players joining if the game is full
             {
                 Debug.Log("Too many players. Disconnecting user.");
                 conn.Disconnect(true);
@@ -200,6 +209,7 @@ public class NetworkManagerGRF : MonoBehaviour
         _isFootballSession = false;
         _startHostClientWhenLobbyLoads = false;
         isDevSession = false;
+        reservedPlayerNumbers.Clear();
         // This object outlives the session, so clear what the last one left behind, on clients too.
         LobbyPlayers.Clear();
         GamePlayers.Clear();
@@ -239,6 +249,174 @@ public class NetworkManagerGRF : MonoBehaviour
         }
     }
     // Called by GameModePlayerSpawner on the server once a connection has loaded the lobby. This was OnServerAddPlayer with Mirror.
+    // The host adds a bot to a team from the lobby. Bots are LobbyPlayers owned by the host, with no connection of
+    // their own and no goblin: they take whatever roles are left at Start Game, so they never compete with a player
+    // for a goblin in the lobby.
+    public LobbyPlayer AddBot(bool isTeamGrey)
+    {
+        if (!_networkManager.ServerManager.Started)
+            return null;
+        NetworkConnection hostConnection = HostConnection();
+        if (hostConnection == null)
+        {
+            Debug.Log("AddBot: no host connection to own the bot.");
+            return null;
+        }
+        if (CountOnTeam(isTeamGrey) >= 3)
+        {
+            Debug.Log("AddBot: the " + (isTeamGrey ? "grey" : "green") + " team is already full.");
+            return null;
+        }
+        LobbyPlayer bot = Instantiate(lobbyPlayerPrefab);
+        bot.isBot = true;
+        bot.PlayerName = "BOT";
+        bot.IsGameLeader = false;
+        bot.ConnectionId = -1;
+        bot.playerNumber = TakePlayerNumber();
+        bot.isTeamGrey = isTeamGrey;
+        bot.isPlayerReady = true;
+        bot.is1v1 = this.is1v1;
+        bot.isSinglePlayer = this.isSinglePlayer;
+        _networkManager.ServerManager.Spawn(bot.gameObject, hostConnection);
+        Debug.Log("AddBot: added a bot to the " + (isTeamGrey ? "grey" : "green") + " team.");
+        return bot;
+    }
+    // Every player and bot needs a number of its own: the loading handshake keys its dictionaries on playerNumber,
+    // so a duplicate stalls the start of a match behind the Waiting for players screen. LobbyPlayers.Count + 1 is
+    // not enough on two counts - it repeats a number once a player in the middle has left, and it repeats one for
+    // every bot added in the same frame, since the list only gains them a tick later.
+    private int TakePlayerNumber()
+    {
+        for (int number = 1; number <= maxConnections; number++)
+        {
+            if (reservedPlayerNumbers.Contains(number))
+                continue;
+            bool taken = false;
+            foreach (LobbyPlayer player in LobbyPlayers)
+            {
+                if (player != null && player.playerNumber == number)
+                {
+                    taken = true;
+                    break;
+                }
+            }
+            if (!taken)
+            {
+                reservedPlayerNumbers.Add(number);
+                return number;
+            }
+        }
+        return LobbyPlayers.Count + 1;
+    }
+    public void RemoveBot(LobbyPlayer bot)
+    {
+        if (bot == null || !bot.isBot || !_networkManager.ServerManager.Started)
+            return;
+        Debug.Log("RemoveBot: removing a bot from the " + (bot.isTeamGrey ? "grey" : "green") + " team.");
+        reservedPlayerNumbers.Remove(bot.playerNumber);
+        LobbyPlayers.Remove(bot);
+        _networkManager.ServerManager.Despawn(bot.gameObject);
+    }
+    // A player always beats a bot to a slot. Called whenever team membership changes, so a joining or switching
+    // player pushes a bot out rather than being turned away.
+    public void EnforceTeamCapacity()
+    {
+        if (!_networkManager.ServerManager.Started || this.is1v1 || this.isSinglePlayer)
+            return;
+        for (int team = 0; team < 2; team++)
+        {
+            bool isTeamGrey = team == 1;
+            while (CountOnTeam(isTeamGrey) > 3)
+            {
+                LobbyPlayer bot = FindBotOnTeam(isTeamGrey);
+                if (bot == null)
+                    break;
+                RemoveBot(bot);
+            }
+        }
+    }
+    // Bots take the goblins the players did not pick, so a player is never competing with a bot for one in the lobby.
+    // Done here, immediately before the GamePlayers are built, because that is the first moment every player's choice is
+    // final. Any goblin still spare afterwards simply has no bot for it, which can only happen on a short-handed team.
+    private void AssignGoblinsToBots(List<LobbyPlayer> lobbyPlayers)
+    {
+        for (int team = 0; team < 2; team++)
+        {
+            bool isTeamGrey = team == 1;
+            foreach (string goblinType in GoblinTypes)
+            {
+                bool takenByAPlayer = false;
+                foreach (LobbyPlayer lobbyPlayer in lobbyPlayers)
+                {
+                    if (lobbyPlayer != null && !lobbyPlayer.isBot && lobbyPlayer.isTeamGrey == isTeamGrey && lobbyPlayer.goblinType == goblinType)
+                    {
+                        takenByAPlayer = true;
+                        break;
+                    }
+                }
+                if (takenByAPlayer)
+                    continue;
+                foreach (LobbyPlayer lobbyPlayer in lobbyPlayers)
+                {
+                    if (lobbyPlayer != null && lobbyPlayer.isBot && lobbyPlayer.isTeamGrey == isTeamGrey && string.IsNullOrEmpty(lobbyPlayer.goblinType))
+                    {
+                        lobbyPlayer.goblinType = goblinType;
+                        Debug.Log("AssignGoblinsToBots: a bot on the " + (isTeamGrey ? "grey" : "green") + " team will play the " + goblinType + ".");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    public int CountHumans()
+    {
+        int humans = 0;
+        foreach (LobbyPlayer player in LobbyPlayers)
+        {
+            if (player != null && !player.isBot)
+                humans++;
+        }
+        return humans;
+    }
+    // The GamePlayers a person is actually playing. Bots have no client, so they never report loading progress.
+    public int CountHumanGamePlayers()
+    {
+        int humans = 0;
+        foreach (GamePlayer player in GamePlayers)
+        {
+            if (player != null && !player.isAIPlayer)
+                humans++;
+        }
+        return humans;
+    }
+    public int CountOnTeam(bool isTeamGrey)
+    {
+        int count = 0;
+        foreach (LobbyPlayer player in LobbyPlayers)
+        {
+            if (player != null && player.isTeamGrey == isTeamGrey)
+                count++;
+        }
+        return count;
+    }
+    private LobbyPlayer FindBotOnTeam(bool isTeamGrey)
+    {
+        foreach (LobbyPlayer player in LobbyPlayers)
+        {
+            if (player != null && player.isBot && player.isTeamGrey == isTeamGrey)
+                return player;
+        }
+        return null;
+    }
+    private NetworkConnection HostConnection()
+    {
+        foreach (LobbyPlayer player in LobbyPlayers)
+        {
+            if (player != null && player.IsGameLeader)
+                return player.Owner;
+        }
+        return null;
+    }
     public void SpawnLobbyPlayer(NetworkConnection conn)
     {
         Debug.Log("Checking if player is in correct scene. Player's scene name is: " + SceneManager.GetActiveScene().name.ToString() + ". Correct scene name is: TitleScreen");
@@ -250,7 +428,7 @@ public class NetworkManagerGRF : MonoBehaviour
 
             lobbyPlayerInstance.IsGameLeader = isGameLeader;
             lobbyPlayerInstance.ConnectionId = conn.ClientId;
-            lobbyPlayerInstance.playerNumber = LobbyPlayers.Count + 1;
+            lobbyPlayerInstance.playerNumber = TakePlayerNumber();
             // A dev session has no Steam lobby to read members from, so there is no Steam id and no avatar.
             if (!isDevSession)
                 lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.CurrentLobbyID, LobbyPlayers.Count);
@@ -259,6 +437,7 @@ public class NetworkManagerGRF : MonoBehaviour
 
             _networkManager.ServerManager.Spawn(lobbyPlayerInstance.gameObject, conn);
             Debug.Log("Player added. Player name: " + lobbyPlayerInstance.PlayerName + ". Player connection id: " + lobbyPlayerInstance.ConnectionId.ToString());
+            EnforceTeamCapacity();
         }
     }
     public void StartGame()
@@ -274,11 +453,16 @@ public class NetworkManagerGRF : MonoBehaviour
             // LobbyPlayer is removed (its OnDestroy still leaves the Steam lobby). GamePlayer is a global object, so it
             // survives the scene change.
             List<LobbyPlayer> lobbyPlayers = new List<LobbyPlayer>(LobbyPlayers);
+            if (!this.is1v1 && !this.isSinglePlayer)
+                AssignGoblinsToBots(lobbyPlayers);
             for (int i = lobbyPlayers.Count - 1; i >= 0; i--)
             {
                 LobbyPlayer lobbyPlayer = lobbyPlayers[i];
                 NetworkConnection conn = lobbyPlayer.Owner;
-                GamePlayer gamePlayerInstance = Instantiate(gamePlayerPrefab);
+                // A bot becomes an AI GamePlayer: the same prefab single player's AI uses, which carries the AIPlayer
+                // brain alongside the GamePlayer. Everything below is the same either way.
+                GamePlayer prefabToSpawn = (lobbyPlayer.isBot && aiGamePlayerPrefab != null) ? aiGamePlayerPrefab : gamePlayerPrefab;
+                GamePlayer gamePlayerInstance = Instantiate(prefabToSpawn);
 
                 // Set before Spawn so the values go out with the spawn. The [Server] setters would skip here: the object
                 // isn't spawned yet.
@@ -394,9 +578,10 @@ public class NetworkManagerGRF : MonoBehaviour
         // Check if all players have finished loading
         foreach (GamePlayer player in GamePlayers)
         {
-            // The AI has no client to report its football, as with the goblin check below. Mirror's host reported the
-            // football before the AI was spawned, so it never had to wait for the AI. FishNet's report arrives after.
-            if (this.isSinglePlayer && player.playerNumber == 2)
+            // An AI has no client of its own to report its football, as with the goblin check below. This asked
+            // whether it was single player's player 2, which meant the same thing while single player was the only
+            // mode with an AI. A 3v3 bot was then waited on for ever and the Waiting for players screen never left.
+            if (player.isAIPlayer)
                 continue;
             if (!playersWithFootballSpawned.Contains(player.playerNumber))
             {
@@ -425,13 +610,14 @@ public class NetworkManagerGRF : MonoBehaviour
         }
 
         // Check if each player has loaded all three goblins
-        if (numberOfGoblinsLoaded.Count != GamePlayers.Count  && !this.isSinglePlayer)
+        // Only a player's own client reports goblins, so this counts the people, not the bots.
+        if (numberOfGoblinsLoaded.Count != CountHumanGamePlayers() && !this.isSinglePlayer)
             return;
         else
         {
             foreach (GamePlayer player in GamePlayers)
             {
-                if (this.isSinglePlayer && player.playerNumber == 2)
+                if (player.isAIPlayer)
                     continue;
                 if (!numberOfGoblinsLoaded.ContainsKey(player.playerNumber))
                 {
