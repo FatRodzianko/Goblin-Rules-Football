@@ -1216,6 +1216,12 @@ public class AIPlayer : NetworkBehaviour
     {
         return new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
     }
+    // A respawned football calls this from its OnStartClient; the cached one is destroyed by then and compares
+    // == null, and nothing else re-finds it, which would leave this AI standing still for the rest of the match.
+    public void RelinkFootball(Football football)
+    {
+        gameFootball = football;
+    }
     public void StopBlockingGoblinFromRunning()
     {
         foreach (GoblinScript goblin in myPlayerScript.myGoblins)

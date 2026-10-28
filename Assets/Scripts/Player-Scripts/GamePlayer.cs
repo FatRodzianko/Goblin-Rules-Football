@@ -99,6 +99,8 @@ public class GamePlayer : NetworkBehaviour
 
     [Header("Football")]
     [SerializeField] private GameObject footballPrefab;
+    // The ball respawn after a carrier despawns needs the prefab; see GameplayManager.RespawnFootballForCarrierDespawn.
+    public GameObject FootballPrefab => footballPrefab;
     [SerializeField] private Vector3 footballStartingPosition; // old res position Vector3(0f, 0f, 0f);
 
     [SerializeField] CinemachineVirtualCamera myCamera;
@@ -326,10 +328,12 @@ public class GamePlayer : NetworkBehaviour
         {
             if (!team.RemovePlayerFromTeam(this))
                 continue;
-            // RemovePlayerFromTeam hands the captain's job to a teammate. With nobody left there is no one to kick off
-            // or take a kick-after, so the match is over for both sides.
-            if (team.teamPlayers.Count == 0 && GameplayManager.instance != null)
-                GameplayManager.instance.HandleTeamAbandoned(team.isGrey);
+            // RemovePlayerFromTeam hands the captain's job to a teammate. What happens next is GameplayManager's
+            // call: a 3v3 leaver whose team still has a person is replaced by a bot (AI Takeover Plan.md, part A),
+            // and a team with no people left - empty, or bots only, which a Count check would miss now that bots are
+            // teamPlayers too - has nobody playing for it, so the match is over for both sides, as before.
+            if (GameplayManager.instance != null)
+                GameplayManager.instance.HandlePlayerLeftTeam(this, team);
         }
     }
     public override void OnStartClient()
@@ -872,10 +876,17 @@ public class GamePlayer : NetworkBehaviour
             Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " size of my team " + myTeam.goblinNetIds.Count.ToString());
             foreach (int goblinNetId in myTeam.goblinNetIds)
             {
-                GoblinScript goblinScript = ObjectLookup.Get(goblinNetId).gameObject.GetComponent<GoblinScript>();
+                // A goblin whose player left stays in the roster but is no longer spawned. Get().gameObject threw
+                // on it, and the catch below sits outside this loop, so one dead id ended the whole pass and the
+                // takeover remap never refilled anything.
+                if (!ObjectLookup.TryGet(goblinNetId, out GoblinScript goblinScript) || goblinScript == null)
+                    continue;
                 if (goblinScript != selectGoblin)
                 {
-                    if (qGoblin == null)
+                    // The slot tests also skip the goblin the other slot already holds: after a teammate leaves, one
+                    // slot is a destroyed goblin (== null) and the other is alive, and refilling the empty one with
+                    // the survivor would map the same goblin to Q and E and leave the replacement unmapped.
+                    if (qGoblin == null && goblinScript != eGoblin)
                     {
                         qGoblin = goblinScript;
                         // The marker objects live on the goblin, not on the player that mapped it, so only the
@@ -884,7 +895,7 @@ public class GamePlayer : NetworkBehaviour
                             qGoblin.SetQGoblinLocally3v3(true);
                         Debug.Log("GetGoblinTeammatesFor3v3: for player: " + this.PlayerName + " setting qGoblin to: " + qGoblin.name);
                     }
-                    else if (eGoblin == null)
+                    else if (eGoblin == null && goblinScript != qGoblin)
                     {
                         eGoblin = goblinScript;
                         if (!this.isAIPlayer)
@@ -959,6 +970,9 @@ public class GamePlayer : NetworkBehaviour
         {
             if (!selectGoblin.isKicking && !selectGoblin.isDiving && !selectGoblin.isPunching && !selectGoblin.isGoblinKnockedOut && selectGoblin.doesCharacterHaveBall)
             {
+                // Between a teammate leaving and the takeover remap, this slot can hold a destroyed goblin.
+                if (qGoblin == null)
+                    return;
                 if (doesTeamHaveBall && !qGoblin.canGoblinReceivePass)
                     return;
                 selectGoblin.ThrowBall(qGoblin);
@@ -1029,6 +1043,9 @@ public class GamePlayer : NetworkBehaviour
         {
             if (!selectGoblin.isKicking && !selectGoblin.isDiving && !selectGoblin.isPunching && !selectGoblin.isGoblinKnockedOut && selectGoblin.doesCharacterHaveBall)
             {
+                // Between a teammate leaving and the takeover remap, this slot can hold a destroyed goblin.
+                if (eGoblin == null)
+                    return;
                 if (doesTeamHaveBall && !eGoblin.canGoblinReceivePass)
                     return;
                 selectGoblin.ThrowBall(eGoblin);

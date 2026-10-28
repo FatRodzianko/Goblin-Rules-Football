@@ -285,7 +285,7 @@ public class NetworkManagerGRF : MonoBehaviour
     // so a duplicate stalls the start of a match behind the Waiting for players screen. LobbyPlayers.Count + 1 is
     // not enough on two counts - it repeats a number once a player in the middle has left, and it repeats one for
     // every bot added in the same frame, since the list only gains them a tick later.
-    private int TakePlayerNumber()
+    public int TakePlayerNumber()
     {
         for (int number = 1; number <= maxConnections; number++)
         {

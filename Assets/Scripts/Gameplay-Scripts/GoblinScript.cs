@@ -439,6 +439,13 @@ public class GoblinScript : NetworkBehaviour
         football.GetComponent<Football>().FumbleFootball();
         if (TeamManager.instance != null && this.serverGamePlayer != null && GameplayManager.instance != null && GameplayManager.instance.gamePhase != "kick-after-attempt")
             TeamManager.instance.FumbleBall(this.serverGamePlayer.isTeamGrey);
+        // The unparent keeps the server's ball alive, but its replication races this goblin's despawn, and a client
+        // that processes the despawn first destroys the ball as a nested child and never sees it again - the
+        // kickoff-leaver test left the surviving client with carrying animations and no ball, and FishNet logging
+        // "Spawned NetworkObject was expected to exist but does not" at every later reference to it. A fresh ball
+        // replicates to everyone from scratch, so nobody is left watching a ghost.
+        if (GameplayManager.instance != null)
+            GameplayManager.instance.RespawnFootballForCarrierDespawn(football, this.serverGamePlayer);
     }
 
     public void EnableGoblinMovement(bool allowMovement)
