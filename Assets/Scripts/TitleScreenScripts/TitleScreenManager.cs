@@ -332,7 +332,10 @@ public class TitleScreenManager : MonoBehaviour
             Debug.Log("SinglePlayerGame: Failed to set new game values. Error: " + e);
         }
 
-        //Game.StartHost();
+        // Single player never has remote peers, so it hosts on Tugboat bound to loopback instead of FishySteamworks,
+        // which cannot start when Steam isn't running.
+        if (!Game.UseLoopbackTransport())
+            Debug.Log("SinglePlayerGame: could not point the transport at loopback Tugboat; hosting on the current transport.");
         Game.StartHost();
         CreateGameInfoPanel.SetActive(false);
         returnToMainMenu.gameObject.SetActive(false);

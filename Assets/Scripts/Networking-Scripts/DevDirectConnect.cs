@@ -130,6 +130,13 @@ public class DevDirectConnect : MonoBehaviour
             return false;
         }
         multipass.SetClientTransport<Tugboat>();
+        // Single player binds Tugboat to loopback; clear that so a dev host is reachable from other machines.
+        Tugboat tugboat = multipass.GetTransport<Tugboat>();
+        if (tugboat != null)
+        {
+            tugboat.SetServerBindAddress(string.Empty, FishNet.Transporting.IPAddressType.IPv4);
+            tugboat.SetClientAddress("localhost");
+        }
         _status = "";
         return true;
     }

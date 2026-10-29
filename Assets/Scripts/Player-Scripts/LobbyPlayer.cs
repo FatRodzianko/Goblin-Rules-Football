@@ -348,8 +348,11 @@ public class LobbyPlayer : NetworkBehaviour
             // lobby list would be unreadable. The process id tells them apart.
             if (NetworkManagerGRF.singleton != null && NetworkManagerGRF.singleton.isDevSession)
                 CmdSetPlayerName("Dev-" + (System.Diagnostics.Process.GetCurrentProcess().Id % 10000).ToString());
-            else
+            else if (SteamManager.Initialized)
                 CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
+            else
+                // Single player with Steam closed: GetPersonaName is a local query but still throws without Steam.
+                CmdSetPlayerName("Player");
             //CmdSetPlayerName(PlayerPrefs.GetString(PlayerPrefsNameKey));
             gameObject.name = "LocalLobbyPlayer";
             LobbyManager.instance.FindLocalLobbyPlayer();

@@ -66,6 +66,10 @@ public class NetworkManagerGRF : MonoBehaviour
     // Set by DevDirectConnect when a session was started over Tugboat instead of Steam, so the Steam lobby calls below are
     // skipped. Always false in a release build, where DevDirectConnect doesn't exist.
     public bool isDevSession = false;
+    // Whether this session runs inside a Steam lobby. A dev session never has one, and neither does single player:
+    // SinglePlayerGame starts the host directly, no lobby is ever created, so every call that reads lobby members,
+    // lobby data or lobby status keys on this, not on isDevSession alone.
+    public bool HasSteamLobby { get { return !isDevSession && !isSinglePlayer; } }
 
     private NetworkManager _networkManager;
     // True from StartHost/StartClient until the connection stops, so Golf sessions on the shared NetworkManager are left alone.
@@ -126,6 +130,23 @@ public class NetworkManagerGRF : MonoBehaviour
         if (multipass == null || multipass.ClientTransport == null)
             return _networkManager.ServerManager.StartConnection();
         return multipass.StartConnection(true, multipass.ClientTransport.Index);
+    }
+    // Single player has no remote peers, so it hosts on Tugboat bound to 127.0.0.1: FishySteamworks cannot start
+    // without Steam running, and a loopback-only socket is unreachable from other machines, so a shipped build
+    // raises no Windows firewall prompt. SteamLobby points the client back at FishySteamworks before every Steam
+    // host and join, and DevDirectConnect clears the bind address again for its own LAN-reachable dev hosts.
+    public bool UseLoopbackTransport()
+    {
+        FishNet.Transporting.Multipass.Multipass multipass = _networkManager.TransportManager.Transport as FishNet.Transporting.Multipass.Multipass;
+        if (multipass == null)
+            return false;
+        FishNet.Transporting.Tugboat.Tugboat tugboat = multipass.GetTransport<FishNet.Transporting.Tugboat.Tugboat>();
+        if (tugboat == null)
+            return false;
+        tugboat.SetServerBindAddress("127.0.0.1", FishNet.Transporting.IPAddressType.IPv4);
+        tugboat.SetClientAddress("127.0.0.1");
+        multipass.SetClientTransport<FishNet.Transporting.Tugboat.Tugboat>();
+        return true;
     }
     public void StartClient()
     {
@@ -429,8 +450,10 @@ public class NetworkManagerGRF : MonoBehaviour
             lobbyPlayerInstance.IsGameLeader = isGameLeader;
             lobbyPlayerInstance.ConnectionId = conn.ClientId;
             lobbyPlayerInstance.playerNumber = TakePlayerNumber();
-            // A dev session has no Steam lobby to read members from, so there is no Steam id and no avatar.
-            if (!isDevSession)
+            // Only a session with a Steam lobby has members to read a Steam id from. Single player used to pass the
+            // isDevSession check and read a junk id with Steam running, or throw with Steam closed, which aborted the
+            // spawn and left LobbyPlayers empty.
+            if (HasSteamLobby)
                 lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.CurrentLobbyID, LobbyPlayers.Count);
             lobbyPlayerInstance.is1v1 = this.is1v1;
             lobbyPlayerInstance.isSinglePlayer = this.isSinglePlayer;
@@ -445,7 +468,7 @@ public class NetworkManagerGRF : MonoBehaviour
         if (CanStartGame() && SceneManager.GetActiveScene().name == "LobbyScene")
         {
             // Players stay in the Steam lobby until their session ends. This hides it from the lobby list.
-            if (!isDevSession)
+            if (HasSteamLobby)
                 SteamLobby.instance.SetGameStatusToInGame();
 
             // Mirror's ServerChangeScene override built a GamePlayer for each LobbyPlayer and swapped it in as that
