@@ -547,6 +547,7 @@ public class GoblinScript : NetworkBehaviour
         markerPosition.y += 0.75f;
         ballMarkerObject.transform.localPosition = markerPosition;
         ballMarkerObject.SetActive(false);
+        ApplyBallMarkerTeamColors();
         if (IsOwner)
         {
             youMarkerObject.transform.SetParent(this.transform);
@@ -1528,6 +1529,36 @@ public class GoblinScript : NetworkBehaviour
     {
         isGoblinGrey = true;
     }
+    // Only the look changes here - the marker instance, its parent and its position are never touched. The two
+    // marker prefabs are one SpriteRenderer each and differ only in which BALL sprite they carry (white text for
+    // the local player's team, yellow for the opposition), so the right sprite is copied onto the existing
+    // instance. Called after the marker is built in OnStartClient, and again from HandleIsGoblinGrey because the
+    // team arrives through CmdMakeGoblinGrey, an owner ServerRpc, a tick or more after the spawn - the original
+    // ownership-based choice left a host, which owns every bot, seeing white on both teams.
+    void ApplyBallMarkerTeamColors()
+    {
+        if (ballMarkerObject == null)
+            return;
+        GamePlayer markerLocalPlayer = null;
+        try
+        {
+            markerLocalPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
+        }
+        catch
+        {
+            Debug.Log("GoblinScript.cs: Could not find the local game player for the ball marker colors");
+        }
+        if (markerLocalPlayer == null)
+            return;
+        bool onLocalPlayersTeam = markerLocalPlayer.isTeamGrey == this.isGoblinGrey;
+        GameObject markerSourcePrefab = onLocalPlayersTeam ? ballMarkerPrefab : ballMarkerOpponentPrefab;
+        SpriteRenderer markerRenderer = ballMarkerObject.GetComponent<SpriteRenderer>();
+        SpriteRenderer markerPrefabRenderer = markerSourcePrefab != null ? markerSourcePrefab.GetComponent<SpriteRenderer>() : null;
+        if (markerRenderer != null && markerPrefabRenderer != null)
+            markerRenderer.sprite = markerPrefabRenderer.sprite;
+        mySelectedCircle.color = onLocalPlayersTeam ? Color.white : Color.yellow;
+        spriteOutline = onLocalPlayersTeam ? spriteOutlineWhite : spriteOutlineYellow;
+    }
     public void HandleIsGoblinGrey(bool oldValue, bool newValue)
     {
         if (IsServerInitialized)
@@ -1560,6 +1591,8 @@ public class GoblinScript : NetworkBehaviour
             {
                 FlipKickoffAimArrow();
             }
+            // The marker's sprite was chosen before this value arrived; recolor in place, never reposition.
+            ApplyBallMarkerTeamColors();
         }
     }
     void IsPlayerSprinting(bool isPlayerSprinting)

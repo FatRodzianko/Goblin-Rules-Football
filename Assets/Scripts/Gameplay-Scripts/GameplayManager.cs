@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FishNet;
@@ -176,6 +176,10 @@ public class GameplayManager : NetworkBehaviour
     IEnumerator timeoutKickAfter;
     private readonly SyncVar<int> _syncKickAfterTimerTimeLeft = new SyncVar<int>(30);
     private int kickAfterTimerTimeLeft { get => _syncKickAfterTimerTimeLeft.Value; set => _syncKickAfterTimerTimeLeft.Value = value; }
+    // The takeover offer's countdown. The offer itself lives in TakeoverManager; this SyncVar carries the seconds
+    // to every client, where the hook hands them to the prompt's own text.
+    private readonly SyncVar<int> _syncTakeoverOfferTimeLeft = new SyncVar<int>(30);
+    private int takeoverOfferTimeLeft { get => _syncTakeoverOfferTimeLeft.Value; set => _syncTakeoverOfferTimeLeft.Value = value; }
 
     [Header("Timeouts: Kick Off")]
     public bool isKickOffTimerCountDownRunning = false;
@@ -211,6 +215,7 @@ public class GameplayManager : NetworkBehaviour
         _syncIsGamePaused.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsGamePaused(prev, next); };
         _syncKickAfterTimerTimeLeft.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleKickAfterTimerTimeLeft(prev, next); };
         _syncKickOffTimerTimeLeft.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleKickOffTimerTimeLeft(prev, next); };
+        _syncTakeoverOfferTimeLeft.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleTakeoverOfferTimeLeft(prev, next); };
         MakeInstance();
         gameplayCanvas.SetActive(false);
         coinTossCanvas.SetActive(false);
@@ -310,12 +315,15 @@ public class GameplayManager : NetworkBehaviour
     // Step 3 calls this once per goblin nobody picked, so the team, number and name are the caller's choice. The
     // values are still set after Spawn: SetPlayerName and the others are [Server] methods, which FishNet skips
     // until the object is network-initialized.
-    GamePlayer SpawnAIPlayer(bool isTeamGrey, int playerNumber, string playerName, string goblinType)
+    public GamePlayer SpawnAIPlayer(bool isTeamGrey, int playerNumber, string playerName, string goblinType)
     {
         GameObject aiPlayerObject = Instantiate(aiPlayerPrefab);
         InstanceFinder.ServerManager.Spawn(aiPlayerObject,LocalGamePlayerScript.Owner);
         GamePlayer aiGamePlayerScript = aiPlayerObject.GetComponent<GamePlayer>();
         aiGamePlayerScript.isSinglePlayer = LocalGamePlayerScript.isSinglePlayer;
+        // CmdSpawnPlayerCharacters keys its all-three-goblins branch on is1v1, which a 1v1 takeover bot needs.
+        // Single player's is1v1 is false, so its AI keeps using the isSinglePlayer branch exactly as before.
+        aiGamePlayerScript.is1v1 = this.is1v1;
         aiGamePlayerScript.isTeamGrey = isTeamGrey;
         aiGamePlayerScript.goblinType = goblinType;
         aiGamePlayerScript.SetPlayerName(playerName);
@@ -493,6 +501,12 @@ public class GameplayManager : NetworkBehaviour
             }
             if (newValue == "gameover")
             {
+                // A forfeit can end the match during the coin toss, and the win screen lives under gameplayCanvas,
+                // which only the kickoff phase used to activate - the host sat on the coin toss UI with an
+                // invisible win screen. Swap the canvases the way kickoff does.
+                ActivateCoinTossUI(false);
+                if (!gameplayCanvas.activeInHierarchy)
+                    gameplayCanvas.SetActive(true);
                 timerText.GetComponent<TimeText>().EndXtraTime();
             }
         }
@@ -2135,7 +2149,7 @@ public class GameplayManager : NetworkBehaviour
         RpcActivateTheTimeoutTimer(false);
     }
     [Server]
-    void SendErrorMessageToTeam(bool isTeamGrey, string message)
+    public void SendErrorMessageToTeam(bool isTeamGrey, string message)
     {
         if (isTeamGrey)
         {
@@ -2188,7 +2202,24 @@ public class GameplayManager : NetworkBehaviour
     // team takes the win. This is the one place that decides what an abandoned team means: when the "forfeit, or let
     // an AI take over?" prompt is added, it replaces the body of this method and nothing else has to change.
     [Server]
+    // The one seam where a team runs out of people. Single player forfeits directly; otherwise TakeoverManager
+    // runs the play-on offer and comes back through ForfeitAbandonedTeam on a decline or timeout.
     public void HandleTeamAbandoned(bool isTeamGrey)
+    {
+        if (this.gamePhase == "gameover" || forfeitWinner != "")
+            return;
+        if (TakeoverManager.instance != null && TakeoverManager.instance.IsOfferOrFillInProgress)
+            return;
+        if (this.isSinglePlayer || TakeoverManager.instance == null)
+        {
+            ForfeitAbandonedTeam(isTeamGrey);
+            return;
+        }
+        TakeoverManager.instance.StartTakeoverOffer(isTeamGrey);
+    }
+    // The pre-takeover forfeit, unchanged: declining the offer, or letting it time out, must produce exactly the
+    // forfeit the 91d056f work shipped. Public because TakeoverManager ends the match through it.
+    public void ForfeitAbandonedTeam(bool isTeamGrey)
     {
         if (this.gamePhase == "gameover" || forfeitWinner != "")
             return;
@@ -2197,101 +2228,16 @@ public class GameplayManager : NetworkBehaviour
         SendErrorMessageToTeam(!isTeamGrey, "Your opponent left the game.");
         this.gamePhase = "gameover";
     }
-    // Part A of the AI takeover (AI Takeover Plan.md): decide what a player leaving a team means. Called from the
-    // leaver's OnStopServer, after RemovePlayerFromTeam, so the leaver is readable but already off the team. Plain
-    // method on purpose - the caller is mid-despawn and this object is fine, but the forfeit path it shares runs the
-    // same way today.
-    public void HandlePlayerLeftTeam(GamePlayer leaver, Team team)
+    // The takeover countdown's display, driven by TakeoverManager: the SyncVar and the shared timer text are this
+    // manager's UI, so they stay here.
+    public void SetTakeoverCountdownDisplay(int secondsLeft)
     {
-        if (this.gamePhase == "gameover" || forfeitWinner != "")
-            return;
-        // A bot despawning is not a person leaving; keep the old empty-team check and nothing else.
-        if (leaver.isAIPlayer)
-        {
-            if (team.teamPlayers.Count == 0)
-                HandleTeamAbandoned(team.isGrey);
-            return;
-        }
-        bool teamStillHasAHuman = false;
-        foreach (GamePlayer teammate in team.teamPlayers)
-        {
-            if (teammate != null && !teammate.isAIPlayer)
-            {
-                teamStillHasAHuman = true;
-                break;
-            }
-        }
-        if (!teamStillHasAHuman)
-        {
-            // Empty, or bots only. teamPlayers.Count == 0 stopped being the test for an abandoned team the moment
-            // bots became teamPlayers; without this, a team whose last person left would have played on as bots
-            // and the forfeit could never fire. Part B replaces this call with the play-on prompt.
-            HandleTeamAbandoned(team.isGrey);
-            return;
-        }
-        if (this.is1v1 || this.isSinglePlayer)
-            return;
-        // A set piece runs through named players, and its timeout resolves through that same object - a despawned
-        // scorer made TimeoutKickAfterRoutine throw and the phase stuck, with the dropped ball lying at the kick
-        // spot. A leaver who was taking the kick-after forfeits the attempt: the blocked path gets from here to the
-        // next kickoff on team references alone, and its _wasKickGoodOrBadSubmitted guard makes a second call safe.
-        if (leaver == scoringPlayer && (this.gamePhase == "kick-after-attempt" || this.gamePhase == "touchdown-transition"))
-            KickAfterAttemptWasBlocked();
-        ReplaceLeaverWithBot(leaver, team);
+        takeoverOfferTimeLeft = secondsLeft;
     }
-    void ReplaceLeaverWithBot(GamePlayer leaver, Team team)
+    void HandleTakeoverOfferTimeLeft(int oldValue, int newValue)
     {
-        string leaverName = leaver.PlayerName;
-        string leaverGoblinType = leaver.goblinType;
-        Debug.Log("ReplaceLeaverWithBot: " + leaverName + " left the " + (team.isGrey ? "grey" : "green") + " team; a bot takes over their " + leaverGoblinType + ".");
-        GamePlayer bot = SpawnAIPlayer(team.isGrey, Game.TakePlayerNumber(), "BOT", leaverGoblinType);
-        string announcement = leaverName + " has left and has been replaced by a BOT";
-        SendErrorMessageToTeam(true, announcement);
-        SendErrorMessageToTeam(false, announcement);
-        StartCoroutine(RefreshGoblinTeammatesWhenBotReady(bot, team.isGrey));
-    }
-    // The replacement's goblin arrives over several ticks: the bot's OnStartClient runs InitializeAIPlayer, whose
-    // ServerRpc spawns the goblin, which then adds itself to the Team roster. Its mid-match CmdPlayerFinishedLoading
-    // is harmless - ResetWaitingForPlayersToLoadStuff cleared the handshake at the real start, so the all-loaded
-    // checks stay false. Only once the goblin exists, and has had a moment to replicate, is the team told to remap.
-    IEnumerator RefreshGoblinTeammatesWhenBotReady(GamePlayer bot, bool isTeamGrey)
-    {
-        float waited = 0f;
-        while (bot != null && bot.myGoblins.Count == 0 && waited < 10f)
-        {
-            waited += 0.25f;
-            yield return new WaitForSeconds(0.25f);
-        }
-        yield return new WaitForSeconds(0.5f);
-        // If the leaver was the kicking player, the kickoff is orphaned: nobody holds the ball, and the timeout
-        // force-kick reads kickingPlayer.serverSelectGoblin on the departed object and throws. The replacement is
-        // the same goblin type by construction - the kicking player is the Grenadier's owner - so point the role at
-        // it and re-run its kickoff reposition, which places the goblin, hands it the ball and starts the AI kick
-        // exactly as a normal kickoff does.
-        if (this.gamePhase == "kickoff" && kickingPlayer == null && kickingTeam != null && kickingTeam.isGrey == isTeamGrey && bot != null)
-        {
-            Debug.Log("RefreshGoblinTeammatesWhenBotReady: the kicking player left mid-kickoff; the replacement bot takes the kickoff.");
-            kickingPlayer = bot;
-            bot.RpcRepositionTeamForKickOff3v3(bot.Owner, true, true);
-        }
-        RpcRefreshGoblinTeammates(isTeamGrey);
-    }
-    [ObserversRpc]
-    void RpcRefreshGoblinTeammates(bool isTeamGrey)
-    {
-        // On every machine with a player on the leaver's team: the leaver's goblin despawned, so a survivor's qGoblin
-        // or eGoblin there is a destroyed object, which compares == null, and GetGoblinTeammatesFor3v3 refills
-        // exactly those slots. The host also remaps the bots it owns, the replacement itself included - a mid-match
-        // bot never saw the kickoff-phase call that normally builds the mapping.
-        if (this.is1v1 || this.isSinglePlayer)
-            return;
-        if (LocalGamePlayerScript != null && LocalGamePlayerScript.isTeamGrey == isTeamGrey)
-            LocalGamePlayerScript.GetGoblinTeammatesFor3v3();
-        foreach (GamePlayer player in Game.GamePlayers)
-        {
-            if (player != null && player.isAIPlayer && player.IsOwner && player.isTeamGrey == isTeamGrey)
-                player.GetGoblinTeammatesFor3v3();
-        }
+        if (IsClientInitialized && TakeoverOfferMenu.instance != null)
+            TakeoverOfferMenu.instance.SetCountdown(newValue);
     }
     // See GoblinScript.DropFootballForDespawn: a ball nested under a despawning goblin can already be destroyed on
     // some clients whatever the server does, so the server replaces it outright. The new ball spawns at the drop

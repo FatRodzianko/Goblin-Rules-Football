@@ -332,8 +332,10 @@ public class GamePlayer : NetworkBehaviour
             // call: a 3v3 leaver whose team still has a person is replaced by a bot (AI Takeover Plan.md, part A),
             // and a team with no people left - empty, or bots only, which a Count check would miss now that bots are
             // teamPlayers too - has nobody playing for it, so the match is over for both sides, as before.
-            if (GameplayManager.instance != null)
-                GameplayManager.instance.HandlePlayerLeftTeam(this, team);
+            if (TakeoverManager.instance != null)
+                TakeoverManager.instance.HandlePlayerLeftTeam(this, team);
+            else if (team.teamPlayers.Count == 0 && GameplayManager.instance != null)
+                GameplayManager.instance.HandleTeamAbandoned(team.isGrey);
         }
     }
     public override void OnStartClient()
@@ -1296,6 +1298,16 @@ public class GamePlayer : NetworkBehaviour
     [ServerRpc]
     void CmdDoesPlayerChooseCoin()
     {
+        // The coin is only ever assigned during the coin toss. InitializeAIPlayer runs this for every
+        // mid-match replacement too, and a takeover bot that owned the grey Grenadier was handed the coin in
+        // open play: AIChoosesCoinToss flipped it, and the toss animation and a fresh kick-or-receive
+        // assignment ran over the live match. The phase is cointoss from GameplayManager.OnStartServer, before
+        // any player initializes, so the real start is unaffected.
+        if (GameplayManager.instance != null && GameplayManager.instance.gamePhase != "cointoss")
+        {
+            doesPlayerChooseCoin = false;
+            return;
+        }
         if (this.is1v1)
         {
             if (this.playerNumber == 2)
@@ -3024,6 +3036,54 @@ public class GamePlayer : NetworkBehaviour
     void CmdResumeGamePlayer()
     {
         GameplayManager.instance.ResumeGameOnServer(this, this.GetComponent<NetworkObject>().ObjectId);
+    }
+    // Part B of the AI takeover: the play-on offer pauses the match without the player-pause banner or its
+    // 90-second countdown, so this sets only the clock. isLocalPlayer keeps a host-owned bot from touching the
+    // host's timeScale a second time.
+    [TargetRpc]
+    public void RpcSetTimeScaleForTakeoverOffer(NetworkConnection target, bool pause)
+    {
+        if (IsOwner && this.isLocalPlayer)
+            Time.timeScale = pause ? 0f : 1f;
+    }
+    // The AI takeover's per-player messages (TakeoverManager sends them; TakeoverOfferMenu is the UI). They live
+    // here because this is where every other per-player message lives, and an owner ServerRpc identifies whose
+    // answer it is with no ownership tricks.
+    [TargetRpc]
+    public void RpcShowTakeoverOffer(NetworkConnection target, bool show)
+    {
+        if (TakeoverOfferMenu.instance != null)
+            TakeoverOfferMenu.instance.ShowOffer(show);
+    }
+    [TargetRpc]
+    public void RpcLeaveToMainMenu(NetworkConnection target)
+    {
+        // This machine chose to leave the offer, or sat out its countdown. The clock comes back first - the offer
+        // froze it, and the title screen would inherit timeScale 0 - then the ordinary exit runs.
+        Time.timeScale = 1f;
+        ExitToMainMenu();
+    }
+    [ServerRpc]
+    public void CmdAnswerTakeoverOffer(bool playOn)
+    {
+        if (TakeoverManager.instance != null)
+            TakeoverManager.instance.HandleTakeoverAnswer(this, playOn);
+    }
+    [TargetRpc]
+    public void RpcRefreshGoblinTeammates(NetworkConnection target, bool isTeamGrey)
+    {
+        // This machine's player, and the bots it owns, rebuild their Q/E mapping after a takeover spawned a new
+        // goblin on that team: a destroyed goblin in a slot compares == null and GetGoblinTeammatesFor3v3 refills
+        // exactly those slots.
+        if (this.is1v1 || this.isSinglePlayer)
+            return;
+        if (this.isLocalPlayer && this.isTeamGrey == isTeamGrey)
+            GetGoblinTeammatesFor3v3();
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            if (player != null && player.isAIPlayer && player.IsOwner && player.isTeamGrey == isTeamGrey)
+                player.GetGoblinTeammatesFor3v3();
+        }
     }
     [TargetRpc]
     public void RpcGamePausedByServer(NetworkConnection target, bool wasPaused)
