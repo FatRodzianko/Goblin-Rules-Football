@@ -741,6 +741,14 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
 
 
+        // The player whose shot this is can disconnect during the awaits above. SkipLeaversTurn has then already
+        // handed the turn over (or advanced the hole), and this older flow re-prompting on top of it gave the next
+        // player two turn starts a couple of seconds apart (Oct 29 retest).
+        if (ball == null || ball.MyPlayer == null || !ball.MyPlayer.IsSpawned)
+        {
+            Debug.Log("StartNextPlayersTurn: the player whose shot this was has left; their leave already moved the game along.");
+            return;
+        }
         // Check if any players still have to hit a ball
         if (_numberOfPlayersInHole >= GolfPlayers.Count)
         {
@@ -1293,7 +1301,20 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if ((CurrentHoleIndex + 1) < CurrentCourse.HolesInCourse.Length)
         {
             Debug.Log("AllPlayersInHoleOrIncapacitated: All players have made it into the hole. No more remaining players! Loading next hole?");
-            await ball.MyPlayer.ServerTellPlayerHoleEnded(3);
+            // The hole-ended banner rides an RPC on a player object. When the player whose shot ended the hole has
+            // left, that object is despawned and the await threw, so NextHole never ran and the game stuck on a
+            // finished hole (Oct 29 two-machine test). Send it through a surviving player, and never let the
+            // banner stop the hole from advancing.
+            try
+            {
+                GolfPlayerTopDown messenger = (ball != null && ball.MyPlayer != null && ball.MyPlayer.IsSpawned) ? ball.MyPlayer : (GolfPlayers.Count > 0 ? GolfPlayers[0] : null);
+                if (messenger != null)
+                    await messenger.ServerTellPlayerHoleEnded(3);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("AllPlayersInHoleOrIncapacitated: could not announce the hole ending. Error: " + e);
+            }
             NextHole();
         }
         else
@@ -1330,9 +1351,85 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (GolfPlayersOutOfCommission.Contains(player))
             GolfPlayersOutOfCommission.Remove(player);
     }
+    // A leaver mid-turn used to stall the game for good: CurrentPlayer pointed at the despawned object and nothing
+    // ever asked for the next turn. Called from GolfPlayerTopDown.OnStopServer after RemoveGolfPlayer, so the
+    // player lists are already pruned. StartNextPlayersTurn's end-of-turn bookkeeping (mulligan prompt, ground
+    // check, stroke limit) belongs to a player who finished a shot, so a leaver takes this path instead: pick the
+    // next player and run only the start-of-turn steps that method ends with.
+    [Server]
+    public void SkipLeaversTurn(GolfPlayerTopDown leaver)
+    {
+        if (TurnOrderForLightningSkips.Contains(leaver))
+        {
+            TurnOrderForLightningSkips.Remove(leaver);
+            if (TurnOrderForLightningSkips.Count == 0)
+                ResetLightningSkipInfo();
+        }
+        // The netid comparison is the fallback for a stale CurrentPlayer reference; the Oct 29 two-machine test had
+        // one mid-flight leave skip silently, so this also says why it decided what it decided.
+        bool leaverWasCurrent = CurrentPlayer == leaver || CurrentPlayerNetId == leaver.ObjectId;
+        Debug.Log("SkipLeaversTurn: " + leaver.PlayerName + " (id " + leaver.ObjectId + ") left. Current player: " + (CurrentPlayer != null ? CurrentPlayer.PlayerName : "null") + " (netid " + CurrentPlayerNetId + "), was it the leaver's turn? " + leaverWasCurrent + ", remaining players: " + GolfPlayers.Count + ", tee off challenge? " + IsTeeOffChallenge);
+        if (!leaverWasCurrent || GolfPlayers.Count == 0)
+            return;
+        if (IsTeeOffChallenge)
+        {
+            // A challenge shot is one hit per player. The leaver is already out of the tee-off order: if others
+            // still have to hit, hand the shot over; if the leaver was the last one, finish the challenge with the
+            // shots that exist. Running the normal-turn handoff here re-prompted a player who had already taken
+            // their challenge shot (the Oct 29 test's double hit).
+            if (GolfPlayersInTeeOffOrder.Count > 0)
+            {
+                WindManager.instance.SetInitialWindDirection();
+                WindManager.instance.SetRandomWindPowerForChallenegeShot();
+                CurrentPlayer = SelectNextPlayer();
+                SetCurrentPlayer(CurrentPlayer);
+                MovePlayerToTeeOffLocation(CurrentPlayer);
+                EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
+                SetCameraOnPlayer(CurrentPlayer);
+                PromptPlayerForNextTurn();
+            }
+            else
+            {
+                _ = FinishTeeOffChallenge();
+            }
+            return;
+        }
+        if (AreAllPlayersInHoleOrIncapacitated())
+        {
+            // Everyone still here already finished the hole; move it along with a remaining player's ball.
+            AllPlayersInHoleOrIncapacitated(GolfPlayers[0].MyBall);
+            return;
+        }
+        GolfPlayerTopDown next = SelectNextPlayer();
+        if (next == null || next == leaver)
+            return;
+        StartTurnAfterLeave(next);
+    }
+    // The weather is rolled for whoever's turn it is, from their favor, so the next player needs a fresh roll like
+    // any other turn; without it they played under the leaver's weather (Oct 30 test).
+    async void StartTurnAfterLeave(GolfPlayerTopDown next)
+    {
+        SetCurrentPlayer(next);
+        if (!next.HasPlayerTeedOff)
+            MovePlayerToTeeOffLocation(next);
+        else
+            next.MovePlayerToPosition(next.Owner, next.MyBall.transform.position);
+        await SetWeatherForNextTurn();
+        // Another leave during the tornado await may already have moved the turn on.
+        if (CurrentPlayer != next || !next.IsSpawned)
+            return;
+        EnableAndDisablePlayerSpritesForNewTurn(next);
+        SetCameraOnPlayer(next);
+        PromptPlayerForNextTurn();
+        ResetPlayersUsedPowerUpEffects(next);
+    }
     [Server]
     public void CheckIfPlayerWhoLeftHadBallInHole(GolfPlayerTopDown player)
     {
+        // The leaver's ball despawns with the same connection and can already be destroyed here; an exception in
+        // OnStopServer would abort the rest of the leaver's cleanup.
+        if (player.MyBall == null)
+            return;
         if (player.MyBall.IsInHole)
         {
             if (this._numberOfPlayersInHole > 0)
@@ -1791,15 +1888,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         if (GolfPlayersInTeeOffOrder.Count <= 0)
         {
             Debug.Log("NextPlayerForChallenege: All players have teed off. Will calculate who is furthest away from the hole beep boop.");
-            _playerOrderFromChallenege.AddRange(OrderPlayersFromTeeOffChallenge());
-            // Tell players who will hit first
-            await _playerOrderFromChallenege[0].ServerSendMessagetoPlayer(5f, "PlayerClosest", token);
-            //DebugOutPlayerOrder();
-            ClearPlayerWeatherFavorForFirstHole();
-            ResetPlayerScoresForNewHole();
-            RewardTeeOffChallenegeWinnersWithFavor();
-            this.IsTeeOffChallenge = false;
-            SwitchToCourse();
+            await FinishTeeOffChallenge();
             return;
         }
 
@@ -1813,6 +1902,27 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         EnableAndDisablePlayerSpritesForNewTurn(CurrentPlayer);
         SetCameraOnPlayer(CurrentPlayer);
         PromptPlayerForNextTurn();
+    }
+    // Ends the challenge and moves to the course: after the last challenge shot (NextPlayerForChallenege), or when
+    // the last player yet to hit leaves (SkipLeaversTurn). The winner banner must never stop the course from
+    // starting, so it is caught - the player it rides on can despawn mid-await.
+    async Task FinishTeeOffChallenge()
+    {
+        _playerOrderFromChallenege.AddRange(OrderPlayersFromTeeOffChallenge());
+        try
+        {
+            CancellationToken token = _cancellationTokenSource.Token;
+            await _playerOrderFromChallenege[0].ServerSendMessagetoPlayer(5f, "PlayerClosest", token);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("FinishTeeOffChallenge: could not announce the closest player. Error: " + e);
+        }
+        ClearPlayerWeatherFavorForFirstHole();
+        ResetPlayerScoresForNewHole();
+        RewardTeeOffChallenegeWinnersWithFavor();
+        this.IsTeeOffChallenge = false;
+        SwitchToCourse();
     }
     List <GolfPlayerTopDown> OrderPlayersFromTeeOffChallenge()
     {

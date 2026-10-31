@@ -981,6 +981,14 @@ public class GamePlayer : NetworkBehaviour
                 IEnumerator stopSwitch = PreventGoblinSwitch();
                 StartCoroutine(stopSwitch);
             }
+            else if (!this.isAIPlayer && qGoblin != null && qGoblin.doesCharacterHaveBall && selectGoblin.canGoblinReceivePass && IsOnlyHumanOnTeam())
+            {
+                // The last human on a team can call for the ball: Q and E already name the two bot teammates, so
+                // the press asks that bot to pass to this player instead of waiting on the AI's own judgement.
+                // The server re-checks everything - the press races the ball on the client.
+                CmdRequestPassFromTeammate(qGoblin.GetComponent<NetworkObject>().ObjectId, selectGoblin.GetComponent<NetworkObject>().ObjectId);
+                StartCoroutine(PreventGoblinSwitch());
+            }
         }
         
         
@@ -1054,7 +1062,46 @@ public class GamePlayer : NetworkBehaviour
                 IEnumerator stopSwitch = PreventGoblinSwitch();
                 StartCoroutine(stopSwitch);
             }
+            else if (!this.isAIPlayer && eGoblin != null && eGoblin.doesCharacterHaveBall && selectGoblin.canGoblinReceivePass && IsOnlyHumanOnTeam())
+            {
+                // See SwitchToQGoblin: the last human can call for the ball from the E teammate too.
+                CmdRequestPassFromTeammate(eGoblin.GetComponent<NetworkObject>().ObjectId, selectGoblin.GetComponent<NetworkObject>().ObjectId);
+                StartCoroutine(PreventGoblinSwitch());
+            }
         }
+    }
+    // True when every other player on this team is a bot: the gate for calling for a pass. Both machines can
+    // answer it - GamePlayers is kept on clients too.
+    bool IsOnlyHumanOnTeam()
+    {
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            if (player != null && player != this && !player.isAIPlayer && player.isTeamGrey == this.isTeamGrey)
+                return false;
+        }
+        return true;
+    }
+    // The last human on a 3v3 team asks a bot teammate for the ball. An owner ServerRpc, so who is asking comes
+    // free. The carrier is host-owned, and the server is the host, so ThrowBall here is exactly the call the
+    // bot's own AI makes when it decides to pass.
+    [ServerRpc]
+    void CmdRequestPassFromTeammate(int carrierGoblinId, int receiverGoblinId)
+    {
+        if (this.isAIPlayer || this.is1v1 || this.isSinglePlayer || !IsOnlyHumanOnTeam())
+            return;
+        GoblinScript carrier;
+        GoblinScript receiver;
+        if (!ObjectLookup.TryGet(carrierGoblinId, out carrier) || !ObjectLookup.TryGet(receiverGoblinId, out receiver))
+            return;
+        if (receiver.serverGamePlayer != this)
+            return;
+        if (carrier.serverGamePlayer == null || !carrier.serverGamePlayer.isAIPlayer || carrier.serverGamePlayer.isTeamGrey != this.isTeamGrey)
+            return;
+        if (!carrier.doesCharacterHaveBall || !receiver.canGoblinReceivePass)
+            return;
+        Debug.Log("CmdRequestPassFromTeammate: " + this.PlayerName + " calls for the ball from " + carrier.name);
+        // ThrowBall re-checks the carrier's own state (kicking, diving, knocked out, still holding the ball).
+        carrier.ThrowBall(receiver);
     }
     void ChangeBallHandler(GoblinScript oldBallHandler, GoblinScript newBallHandler)
     {

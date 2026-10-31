@@ -8,6 +8,7 @@ using FishNet.Managing.Logging;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using System;
+using UnityEngine.Serialization;
 
 public class GoblinScript : NetworkBehaviour
 {
@@ -48,6 +49,13 @@ public class GoblinScript : NetworkBehaviour
     public float MaxStamina;
     public float StaminaDrain;
     public float StaminaRecovery;
+    [Tooltip("Share of MaxStamina each punch costs: 0.2 is 20%.")]
+    [Range(0f, 1f)]
+    [FormerlySerializedAs("PunchStaminaCost")]
+    [SerializeField] private float _punchStaminaCost = 0.2f;
+    [Tooltip("Share of MaxStamina each slide costs: 0.5 is 50%.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float _slideStaminaCost = 0.5f;
     public float MaxSpeed;
     public int MaxDamage;
     private readonly SyncVar<bool> _syncCanCollide = new SyncVar<bool>(true);
@@ -160,6 +168,8 @@ public class GoblinScript : NetworkBehaviour
     public bool isSlidingRoutineRunning { get => _syncIsSlidingRoutineRunning.Value; set => _syncIsSlidingRoutineRunning.Value = value; }
     IEnumerator isSlidingRoutine;
     public float slideSpeedModifer = 1.0f;
+    // Server only: this slide has already knocked someone down, so it trips nobody else.
+    bool slideTripLanded = false;
 
     [Header("Dive Info")]
     private readonly SyncVar<bool> _syncIsDiving = new SyncVar<bool>();
@@ -1774,7 +1784,8 @@ public class GoblinScript : NetworkBehaviour
     public void Attack()
     {
         Debug.Log("Attack: from goblin " + this.name);
-        if (!doesCharacterHaveBall && !isGoblinKnockedOut &&!isSliding && !isDiving)
+        // A fatigued goblin can't punch, as it can't slide or dive.
+        if (!doesCharacterHaveBall && !isGoblinKnockedOut &&!isSliding && !isDiving && !isFatigued)
         {
             if (isRunningOnServer)
             {
@@ -2137,6 +2148,8 @@ public class GoblinScript : NetworkBehaviour
                 StartCoroutine(isSlidingRoutine);
                 if (this.isCharacterSelected)
                     TeamManager.instance.SlideTackle(this, false);
+
+                ChargeStaminaForAction(this._slideStaminaCost);
             }
             
         }
@@ -2165,6 +2178,7 @@ public class GoblinScript : NetworkBehaviour
     public IEnumerator SlideGoblinRoutine()
     {
         this.isSlidingRoutineRunning = true;
+        slideTripLanded = false;
         isSliding = true;
         yield return new WaitForSeconds(0.25f);
         speed = MaxSpeed * 1.2f;
@@ -2186,9 +2200,21 @@ public class GoblinScript : NetworkBehaviour
                 slidingGoblin.TripGoblin();
             if (this.isCharacterSelected)
                 TeamManager.instance.SlideTackle(this.serverGamePlayer, true);*/
+            // One knockdown per slide. The slide box stays out for the rest of the slide, so contacts after the
+            // trip are ignored here.
+            if (slideTripLanded)
+                return;
             if (this.isGoblinGrey != slidingGoblin.isGoblinGrey)
             {
-                slidingGoblin.TripGoblin();
+                if (slidingGoblin.TripGoblin())
+                {
+                    slideTripLanded = true;
+                    // The slider stops where the trip landed but stays down until the slide ends as usual: the owner
+                    // only moves a sliding goblin along a non-zero slideDirection, and cutting the slide short
+                    // snapped the slide animation straight into running.
+                    if (isSliding)
+                        slideDirection = Vector2.zero;
+                }
                 if (this.isCharacterSelected)
                     TeamManager.instance.SlideTackle(this, true);
                 //GoblinScript collidingGoblin = collision.collider.GetComponent<GoblinScript>();
@@ -2203,7 +2229,8 @@ public class GoblinScript : NetworkBehaviour
             }   
         }
     }
-    public void TripGoblin()
+    // Returns true only when this trip actually knocked the goblin down.
+    public bool TripGoblin()
     {
         if (!isGoblinKnockedOut)
         {
@@ -2218,8 +2245,10 @@ public class GoblinScript : NetworkBehaviour
                 if(!this.defenseNormal)
                     this.KnockOutGoblin(false);
             }
+            // KnockOutGoblin can refuse (blue shell invincibility, kickoff), so read the result back.
+            return isGoblinKnockedOut;
         }
-
+        return false;
     }
     [Server]
     public IEnumerator TripGoblinTimer()
@@ -2435,6 +2464,33 @@ public class GoblinScript : NetworkBehaviour
         /*if (this.isCharacterSelected && punching)
             TeamManager.instance.ThrownPunch(this.serverGamePlayer);*/
         TeamManager.instance.ThrownPunch(this);
+        if (punching)
+            ChargeStaminaForAction(this._punchStaminaCost);
+    }
+    // Charges an action (punch, slide) a share of MaxStamina. Punches pay at the start of the punch animation
+    // (StartPunching fires once per punch), slides when the slide starts. An action that empties the bar fatigues the
+    // goblin the same way sprinting it empty does, and spending stamina holds off recovery for the usual second.
+    [Server]
+    void ChargeStaminaForAction(float staminaCost)
+    {
+        if (this.invinvibilityBlueShell || isFatigued)
+            return;
+
+        stamina -= MaxStamina * staminaCost;
+
+        // Repeated costs (five 20% punches) leave a float rounding crumb rather than exactly 0, so empty means
+        // "within a hair of 0".
+        if (stamina <= MaxStamina * 0.001f)
+        {
+            stamina = 0f;
+            isFatigued = true;
+            this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier) * 0.5f;
+        }
+        if (isStaminaRecoveryRoutineRunning)
+            StopCoroutine(staminaRecoveryRoutine);
+
+        staminaRecoveryRoutine = CanGoblinRecoverStamina();
+        StartCoroutine(staminaRecoveryRoutine);
     }
     public void HandleIsPunching(bool oldValue, bool newValue)
     {

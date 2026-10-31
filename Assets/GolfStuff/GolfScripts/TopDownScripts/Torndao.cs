@@ -74,13 +74,18 @@ public class Torndao : NetworkBehaviour
     {
         if (IsMoving)
         {
+            // Stop one step after the last move: that move's trigger contacts arrive in the physics step after this
+            // FixedUpdate, and OnTriggerEnter2D only records a ball as thrown (which the turn waits on) while IsMoving.
+            if (_distanceToMove <= 0f)
+            {
+                IsMoving = false;
+                return;
+            }
             Vector2 newPos = _rb.position + _movementDir * _speed * Time.fixedDeltaTime;
 
             float distSinceLast = Vector2.Distance(newPos, this.transform.position);
             _rb.MovePosition(_rb.position + _movementDir * _speed * Time.fixedDeltaTime);
             _distanceToMove -= distSinceLast;
-            if (_distanceToMove <= 0f)
-                IsMoving = false;
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)

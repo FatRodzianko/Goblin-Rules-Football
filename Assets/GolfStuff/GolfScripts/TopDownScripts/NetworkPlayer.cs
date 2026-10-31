@@ -352,7 +352,12 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
-        CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
+        // GetPersonaName throws when Steam isn't running (solo golf needs no Steam); CmdSetPlayerName already
+        // falls back to a random name for an empty one.
+        if (SteamManager.Initialized)
+            CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
+        else
+            CmdSetPlayerName(string.Empty);
     }
     [ServerRpc]
     void CmdSetPlayerName(string newName)
@@ -370,6 +375,9 @@ public class NetworkPlayer : NetworkBehaviour
     void SetPlayerSteamID()
     {
         if (!this.IsOwner)
+            return;
+        // GetSteamID throws when Steam isn't running; the id stays 0 and the avatar lookup skips itself.
+        if (!SteamManager.Initialized)
             return;
         CmdSetSteamID(SteamUser.GetSteamID().m_SteamID);
     }

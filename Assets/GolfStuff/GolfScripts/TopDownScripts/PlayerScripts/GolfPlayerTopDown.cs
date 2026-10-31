@@ -274,6 +274,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             gameplayManager.CheckIfPlayerWhoLeftHadBallInHole(this);
             gameplayManager.RemoveGolfPlayer(this);
+            // After the lists are pruned: if this was the current player's turn, hand the turn to the next player
+            // instead of waiting forever on a despawned object.
+            gameplayManager.SkipLeaversTurn(this);
             //GameplayManagerTopDownGolf.instance.RemoveOwnerFromHost();
         }
     }

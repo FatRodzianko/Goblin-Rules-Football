@@ -274,6 +274,26 @@ public class SteamLobby : MonoBehaviour
             LeaveLobby();
         }
     }
+    // A one-player golf lobby can never gain peers, so it skips Steam entirely: no Steam lobby is created, and the
+    // session runs on Tugboat bound to loopback, like Football's single player - it works with Steam closed and a
+    // shipped build raises no firewall prompt. CurrentLobbyID stays 0, so every lobby-dependent call (LeaveLobby,
+    // SetGameStatusToInGame) already no-ops, and the course and settings come from GolfLobbySettings as always -
+    // the lobby data only ever fed the lobby list. Only the client's transport is started: the aggregate
+    // StartConnection would fail outright whenever FishySteamworks cannot start (the bcfa0fe7 lesson).
+    public void StartSoloGolfSession()
+    {
+        if (!NetworkManagerGRF.singleton.UseLoopbackTransport())
+        {
+            Debug.LogWarning("SteamLobby: could not point the transport at loopback Tugboat for solo golf.");
+            return;
+        }
+        _startingGolfHost = true;
+        if (!NetworkManagerGRF.singleton.StartServerConnection())
+        {
+            _startingGolfHost = false;
+            Debug.LogWarning("SteamLobby: the solo Golf server didn't start.");
+        }
+    }
     void StartGolfHost()
     {
         _startingGolfHost = true;

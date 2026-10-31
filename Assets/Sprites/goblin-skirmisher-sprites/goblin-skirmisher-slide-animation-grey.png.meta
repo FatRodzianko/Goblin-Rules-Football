@@ -56,7 +56,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
@@ -211,10 +211,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      goblin-skirmisher-slide-animation-grey_3: -4176605942441744139
       goblin-skirmisher-slide-animation-grey_0: 4417905209345627590
-      goblin-skirmisher-slide-animation-grey_2: 4194785764518410225
       goblin-skirmisher-slide-animation-grey_1: 1831200948153865185
+      goblin-skirmisher-slide-animation-grey_2: 4194785764518410225
+      goblin-skirmisher-slide-animation-grey_3: -4176605942441744139
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

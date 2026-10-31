@@ -1249,7 +1249,10 @@ public class GameplayManager : NetworkBehaviour
         {
             Debug.Log("DisableKickAfterAttemptControls: failed for reason: " + e);
         }
-        
+        // The AI blocker stands down with the people's blocking controls, in every mode. Its BlockKickAfterAttempt
+        // stops moving the skirmisher once the ball is kicked but never clears its run animation, so without this a
+        // 3v3 bot ran on the spot for the rest of the kick-after.
+        AIStopBlockingKickAfter();
     }
     IEnumerator TransitionFromKickAfterAttemptToKickOffRoutine()
     {

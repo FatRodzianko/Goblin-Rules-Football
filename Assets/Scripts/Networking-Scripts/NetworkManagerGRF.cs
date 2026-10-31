@@ -124,7 +124,8 @@ public class NetworkManagerGRF : MonoBehaviour
     // pointed at (SteamLobby sets FishySteamworks, DevDirectConnect sets Tugboat), so start just that one. A Steam
     // session no longer binds Tugboat's port either. ServerManager.StartConnection() is itself nothing more than
     // Transport.StartConnection(true), so going through Multipass directly skips no setup.
-    private bool StartServerConnection()
+    // Public because SteamLobby's solo-golf host starts the server the same way.
+    public bool StartServerConnection()
     {
         FishNet.Transporting.Multipass.Multipass multipass = _networkManager.TransportManager.Transport as FishNet.Transporting.Multipass.Multipass;
         if (multipass == null || multipass.ClientTransport == null)

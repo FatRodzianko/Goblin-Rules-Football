@@ -54,6 +54,9 @@ public class GolfPlayerListItem : MonoBehaviour
     }
     public void GetPlayerAvatar()
     {
+        // GetLargeFriendAvatar throws when Steam isn't running, and a solo golf session has no Steam id anyway.
+        if (!SteamManager.Initialized || playerSteamId == 0)
+            return;
         Debug.Log("GetPlayerAvatar: with player with steam id of: " + playerSteamId.ToString());
         int imageId = SteamFriends.GetLargeFriendAvatar((CSteamID)playerSteamId);
 

@@ -109,7 +109,12 @@ public class GolfLobbySettings : MonoBehaviour
         this.CourseName = selectedCourseName;
         this.CourseWorkshopID = selectedCourseWorkshopID;
 
-        SteamLobby.instance.CreateGolfLobby(newLobbyType, numberOfPlayers, lobbyName, this.CourseName);
+        // A lobby of one is effectively single player - lobbies cannot grow once started - so it runs offline on
+        // loopback Tugboat instead of creating a Steam lobby nobody else could ever join.
+        if (numberOfPlayers == 1)
+            SteamLobby.instance.StartSoloGolfSession();
+        else
+            SteamLobby.instance.CreateGolfLobby(newLobbyType, numberOfPlayers, lobbyName, this.CourseName);
     }
     void ResetGameSettingsToDefault()
     {
