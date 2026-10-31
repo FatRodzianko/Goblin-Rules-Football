@@ -68,6 +68,11 @@ public class GameplayManager : NetworkBehaviour
     public GamePlayer blockingPlayer;
     public Team scoringTeam;
     public Team blockingTeam;
+    // Server only. The side and goblin type that scored, kept apart from the scoring goblin, which leaves with its
+    // owner: a replacement of that type takes the kick-after (WaitForReplacementScorer).
+    bool scoringTeamIsGrey;
+    string scoringGoblinType;
+    const float ReplacementScorerWaitSeconds = 10f;
     private readonly SyncVar<float> _syncYPositionOfKickAfter = new SyncVar<float>();
     public float yPositionOfKickAfter { get => _syncYPositionOfKickAfter.Value; set => _syncYPositionOfKickAfter.Value = value; }
     private readonly SyncVar<int> _syncScoringGoblinNetId = new SyncVar<int>(ObjectLookup.NoObject);
@@ -399,17 +404,18 @@ public class GameplayManager : NetworkBehaviour
             }
             if (oldValue == "kick-after-attempt")
             {
-                try
+                // The scoring goblin is gone if its owner left during the touchdown pause or the kick-after.
+                if (ObjectLookup.TryGet(scoringGoblinNetId, out GoblinScript goblinThatKicked) && goblinThatKicked != null)
                 {
-                    GoblinScript goblinThatKicked = ObjectLookup.Get(scoringGoblinNetId).GetComponent<GoblinScript>();
                     goblinThatKicked.isKickAfterPositionSet = false;
                     goblinThatKicked.isKickAfterGoblin = false;
-                    scoringGoblinNetId = ObjectLookup.NoObject;
                 }
-                catch (Exception e)
-                {
-                    Debug.Log("GameplayManager: HandleGamePhase: failed to reset scoring goblin info after kick attempt. Reason: " + e);
-                }
+                scoringGoblinNetId = ObjectLookup.NoObject;
+                // The kick-after is over - it only ever leaves through TransitionFromKickAfterAttemptToKickOffRoutine,
+                // after every result path has read these. Drop the players it named: either can be someone who left
+                // during it, and nothing reads them again until the next kick-after names new ones (SetKickAfterPlayers).
+                scoringPlayer = null;
+                blockingPlayer = null;
                 ObstacleManager.instance.DisableCollidersOnObjects(false);
                 EnableGoblinCollidersOnServer(false);
             }
@@ -611,6 +617,8 @@ public class GameplayManager : NetworkBehaviour
 
         //SetKickAfterPlayers(scoringGoblinNetId);
         this.scoringGoblinNetId = goblinNetId;
+        scoringTeamIsGrey = wasGrey;
+        scoringGoblinType = ObjectLookup.TryGet(goblinNetId, out GoblinScript scorer) && scorer != null ? scorer.soundType : "";
 
         //update scores:
         if (wasGrey)
@@ -832,7 +840,11 @@ public class GameplayManager : NetworkBehaviour
     void SetKickAfterPlayers(int scoringGoblin)
     {
         Debug.Log("SetKickAfterPlayers: the scoring goblin was: " + scoringGoblin.ToString());
-        GoblinScript scoringGoblinScript = ObjectLookup.Get(scoringGoblin).GetComponent<GoblinScript>();
+        if (!ObjectLookup.TryGet(scoringGoblin, out GoblinScript scoringGoblinScript) || scoringGoblinScript == null)
+        {
+            StartCoroutine(WaitForReplacementScorer(scoringGoblin));
+            return;
+        }
         scoringGoblinScript.isKickAfterGoblin = true;
         
         // Make sure all goblins are healed after the touchdown. This is to make sure that kicking and blocking goblins are not still knocked out.
@@ -846,6 +858,12 @@ public class GameplayManager : NetworkBehaviour
 
         if (this.is1v1)
         {
+            // The 3v3 branch names the kickoff teams as well as the players; this one named only the players, so
+            // kickingTeam kept whichever side the coin toss or halftime last gave it. TakeoverManager hands an orphaned
+            // kickoff to a play-on AI only when that AI is on kickingTeam, so a kicker who left after the other side's
+            // kick-after left the kickoff with nobody to take it.
+            kickingTeam = scoringGoblinScript.isGoblinGrey ? TeamManager.instance.greyTeam : TeamManager.instance.greenTeam;
+            receivingTeam = scoringGoblinScript.isGoblinGrey ? TeamManager.instance.greenTeam : TeamManager.instance.greyTeam;
             foreach (GamePlayer player in Game.GamePlayers)
             {
                 // ConnectionId is -1 on every bot's GamePlayer, so it cannot identify one; ownerNetId can.
@@ -926,7 +944,104 @@ public class GameplayManager : NetworkBehaviour
             {
                 player.RpcRepositionForKickAfterFor3v3(player.Owner, false, false, scoringGoblin, yPositionOfKickAfter, 1);
             }
-        }      
+        }
+    }
+    // The player who scored left during the touchdown pause and took the scoring goblin with them. Their replacement
+    // brings a new goblin of the same type (TakeoverManager's bot; in a 1v1, the play-on AI), and that goblin takes the
+    // kick-after. The phase change has already run without a scorer, so on arrival this does what it did for the
+    // others: the normal SetKickAfterPlayers names the players, the new goblin gets the kick-after collider delay, and
+    // the AI kick starts (the client hook only starts it for a scorer named at the phase change). Game time, so a
+    // paused play-on offer doesn't count; no replacement in time resolves the attempt as blocked.
+    [Server]
+    IEnumerator WaitForReplacementScorer(int departedGoblinNetId)
+    {
+        Debug.Log("WaitForReplacementScorer: the scoring goblin left before the kick-after. Waiting for its replacement.");
+        GoblinScript replacement = null;
+        float waited = 0f;
+        while (waited < ReplacementScorerWaitSeconds)
+        {
+            if (gamePhase != "kick-after-attempt")
+                yield break;
+            replacement = FindReplacementScorer(departedGoblinNetId);
+            if (replacement != null)
+                break;
+            waited += 0.25f;
+            yield return new WaitForSeconds(0.25f);
+        }
+        // Let the bot finish its own join, as TakeoverManager does before handing it a kickoff.
+        if (replacement != null)
+            yield return new WaitForSeconds(0.5f);
+        if (gamePhase != "kick-after-attempt")
+            yield break;
+        if (replacement == null)
+        {
+            ResolveKickAfterWithoutScorer();
+            yield break;
+        }
+        Debug.Log("WaitForReplacementScorer: " + replacement.name + " takes the kick-after.");
+        scoringGoblinNetId = replacement.ObjectId;
+        replacement.KickAfterWaitToEnableObstacleColliders();
+        SetKickAfterPlayers(scoringGoblinNetId);
+        if (scoringPlayer != null && scoringPlayer.isAIPlayer)
+            AIKickAfterKickingPlayer();
+    }
+    [Server]
+    GoblinScript FindReplacementScorer(int departedGoblinNetId)
+    {
+        if (string.IsNullOrEmpty(scoringGoblinType))
+            return null;
+        foreach (GameObject goblinObject in GameObject.FindGameObjectsWithTag("Goblin"))
+        {
+            GoblinScript goblin = goblinObject.GetComponent<GoblinScript>();
+            if (goblin == null || goblin.ObjectId == departedGoblinNetId || goblin.isGoblinGrey != scoringTeamIsGrey || goblin.soundType != scoringGoblinType)
+                continue;
+            // Ready once its owner counts it as its own - the signal TakeoverManager waits on too.
+            if (ObjectLookup.TryGet(goblin.ownerNetId, out GamePlayer owner) && owner != null && owner.myGoblins.Contains(goblin))
+                return goblin;
+        }
+        return null;
+    }
+    // No replacement goblin arrived for a scorer who left during the touchdown pause (WaitForReplacementScorer), so
+    // nobody is there to kick. Resolve the attempt as blocked, as a leaver's own kick-after already is
+    // (TakeoverManager), and name the kickoff roles from the side that scored, so the next kickoff goes to that side
+    // as it would after any kick-after. scoringPlayer and blockingPlayer stay empty: nobody kicks or blocks.
+    [Server]
+    void ResolveKickAfterWithoutScorer()
+    {
+        Debug.Log("ResolveKickAfterWithoutScorer: the scoring goblin left before the kick-after. Resolving it as blocked.");
+        scoringPlayer = null;
+        blockingPlayer = null;
+        scoringTeam = scoringTeamIsGrey ? TeamManager.instance.greyTeam : TeamManager.instance.greenTeam;
+        blockingTeam = scoringTeamIsGrey ? TeamManager.instance.greenTeam : TeamManager.instance.greyTeam;
+        kickingTeam = scoringTeam;
+        receivingTeam = blockingTeam;
+        if (this.is1v1 || this.isSinglePlayer)
+        {
+            // Empty first: a 1v1 play-on AI can still be on its way, and TakeoverManager hands an empty kickoff to it.
+            kickingPlayer = null;
+            receivingPlayer = null;
+            foreach (GamePlayer player in Game.GamePlayers)
+            {
+                if (player == null)
+                    continue;
+                if (player.isTeamGrey == scoringTeamIsGrey)
+                    kickingPlayer = player;
+                else
+                    receivingPlayer = player;
+            }
+        }
+        else
+        {
+            if (IsTeamMissingItsCaptain(scoringTeam) || IsTeamMissingItsCaptain(blockingTeam))
+                return;
+            kickingPlayer = scoringTeam.captain;
+            receivingPlayer = blockingTeam.captain;
+        }
+        ResetAllGoblinStatuses();
+        TeamManager.instance.BlockedKick(!scoringTeamIsGrey);
+        TeamManager.instance.KickAfterAttempts(scoringTeamIsGrey, false);
+        RpcKickAfterAttemptWasBlocked();
+        TransitionFromKickAfterAttemptToKickOff();
     }
     [Server]
     void ResetAllGoblinStatuses()
@@ -1026,6 +1141,16 @@ public class GameplayManager : NetworkBehaviour
 
             scoringPlayer.RpcKickAfterUpdateInsctructionsText(scoringPlayer.Owner, true);
             blockingPlayer.RpcKickAfterUpdateInsctructionsText(blockingPlayer.Owner, false);
+            // A 1v1 that played on against AI has a bot at one end, and only the branches below told a bot to act: its
+            // kicker took position and never kicked, and it never went for a person's kicker. Same calls as the 3v3.
+            if (BlockingSkirmisherAI() != null)
+            {
+                AIBlockingPlayer();
+            }
+            if (scoringPlayer.isAIPlayer)
+            {
+                AIKickAfterAttempt();
+            }
         }
         else if (this.isSinglePlayer && !this.is1v1)
         {
@@ -1833,10 +1958,15 @@ public class GameplayManager : NetworkBehaviour
         // goblin. This used to look the goblin up from scoringGoblinNetId, which in a 3v3 handed the AI a different
         // goblin altogether - observed as a grenadier at midfield while the skirmisher stood on the kick spot - so the
         // AI walked and kicked with the wrong one and the ball came in from across the pitch.
+        // Read after the wait: the reposition switches an AI that holds several goblins to the scoring goblin through a
+        // ServerRpc, which lands a tick later. A 1v1 play-on AI handed a leaver's kick-after was still on its grenadier
+        // here, so it set the grenadier's position and the berserker with the ball never counted as set to be blocked.
+        yield return new WaitForSeconds(1.0f);
+        if (gamePhase != "kick-after-attempt" || scoringPlayer == null || scoringPlayer.myAIPlayer != kicker)
+            yield break;
         kicker.kickAfterGoblin = scoringPlayer.selectGoblin;
         if (kicker.kickAfterGoblin == null)
             yield break;
-        yield return new WaitForSeconds(1.0f);
         Debug.Log("AIKickAfterKickingPlayerDelay");
         kicker.finalPositionReached = false;
         kicker.kickKickAfter = true;

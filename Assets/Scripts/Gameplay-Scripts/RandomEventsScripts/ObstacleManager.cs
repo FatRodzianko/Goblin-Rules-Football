@@ -241,6 +241,9 @@ public class ObstacleManager : NetworkBehaviour
     {
         for (int i = 0; i < SpawnedObstacles.Count; i++)
         {
+            // The obstacles go when the scene unloads, and a phase change during that teardown still lands here.
+            if (SpawnedObstacles[i] == null)
+                continue;
             SpawnedObstacles[i].GetComponent<ObstacleObject>().DisableColliderDuringPhase(enable);
         }
     }

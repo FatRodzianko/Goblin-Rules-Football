@@ -307,9 +307,12 @@ public class NetworkManagerGRF : MonoBehaviour
     // so a duplicate stalls the start of a match behind the Waiting for players screen. LobbyPlayers.Count + 1 is
     // not enough on two counts - it repeats a number once a player in the middle has left, and it repeats one for
     // every bot added in the same frame, since the list only gains them a tick later.
+    // No upper bound: a mid-match replacement bot needs a number past the lobby's seats, which are all reserved by
+    // then. Stopping at maxConnections fell through to LobbyPlayers.Count + 1 - an empty list in the gameplay
+    // scene - and gave every replacement the host's number 1.
     public int TakePlayerNumber()
     {
-        for (int number = 1; number <= maxConnections; number++)
+        for (int number = 1; ; number++)
         {
             if (reservedPlayerNumbers.Contains(number))
                 continue;
@@ -328,7 +331,6 @@ public class NetworkManagerGRF : MonoBehaviour
                 return number;
             }
         }
-        return LobbyPlayers.Count + 1;
     }
     public void RemoveBot(LobbyPlayer bot)
     {

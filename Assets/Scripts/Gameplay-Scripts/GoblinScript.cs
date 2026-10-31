@@ -363,6 +363,12 @@ public class GoblinScript : NetworkBehaviour
     // This was Mirror's OnStartAuthority. OnStartClient calls it first for the owner, since Mirror ran it before OnStartClient.
     void StartAsOwner()
     {
+        // The owner moves this goblin with MovePosition on the 50 Hz physics clock. Without interpolation it is only drawn
+        // where it was at the last physics step, so the camera following it moved in steps too and the field stuttered.
+        // Only the owner's copy: everyone else's is placed by the NetworkTransform, which interpolation would fight.
+        // Interpolation can draw the old position over a transform write, so teleport these goblins with TeleportTo.
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+
         // A goblin belongs to the player whose CmdSpawnPlayerCharacters made it, which the server records in ownerNetId.
         // This used to take "the local player" from a tag, which is only right while a machine owns one player's
         // goblins: with bots filling a 3v3 the host owns several players' goblins at once and all six landed on the
@@ -2803,7 +2809,13 @@ public class GoblinScript : NetworkBehaviour
     void RpcKickAfterPositionFromServer(NetworkConnection target, Vector2 newPosition)
     {
         if (IsOwner)
-            this.transform.position = newPosition;
+            TeleportTo(newPosition);
+    }
+    // Moves the body as well as the transform, so the owner's interpolation starts from the new spot (see StartAsOwner).
+    public void TeleportTo(Vector3 position)
+    {
+        this.transform.position = position;
+        rb.position = position;
     }
     public void StartKickAfterKickAttempt()
     {

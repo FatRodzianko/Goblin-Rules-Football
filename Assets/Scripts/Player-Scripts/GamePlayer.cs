@@ -1718,18 +1718,18 @@ public class GamePlayer : NetworkBehaviour
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
-                            goblin.transform.position = KickingPositionGreyGrenadier;
+                            goblin.TeleportTo(KickingPositionGreyGrenadier);
                             //goblin.ToggleGoblinBodyCollider();
                             goblin.EnableKickoffAimArrow(true);
                             CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkObject>().ObjectId);
                         }
                         else if (goblin.goblinType.Contains("berserker"))
                         {
-                            goblin.transform.position = KickingPositionGreyBerserker;
+                            goblin.TeleportTo(KickingPositionGreyBerserker);
                         }
                         else
                         {
-                            goblin.transform.position = KickingPositionGreySkirmisher;
+                            goblin.TeleportTo(KickingPositionGreySkirmisher);
                         }
                         // Make sure grey goblins are facing to the left
                         goblin.FlipRenderer(true);
@@ -1741,17 +1741,17 @@ public class GamePlayer : NetworkBehaviour
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
-                            goblin.transform.position = KickingPositionGreenGrenadier;
+                            goblin.TeleportTo(KickingPositionGreenGrenadier);
                             goblin.EnableKickoffAimArrow(true);
                             CmdRequestFootballForKickOffGoblin(goblin.GetComponent<NetworkObject>().ObjectId);
                         }
                         else if (goblin.goblinType.Contains("berserker"))
                         {
-                            goblin.transform.position = KickingPositionGreenBerserker;
+                            goblin.TeleportTo(KickingPositionGreenBerserker);
                         }
                         else
                         {
-                            goblin.transform.position = KickingPositionGreenSkirmisher;
+                            goblin.TeleportTo(KickingPositionGreenSkirmisher);
                         }
                         // Make sure green goblins are facing to the right
                         goblin.FlipRenderer(false);
@@ -1771,17 +1771,17 @@ public class GamePlayer : NetworkBehaviour
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
-                            goblin.transform.position = ReceivingPositionGreyGrenadier;
+                            goblin.TeleportTo(ReceivingPositionGreyGrenadier);
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(11f, 3f));
                         }
                         else if (goblin.goblinType.Contains("skirmisher"))
                         {
-                            goblin.transform.position = ReceivingPositionGreySkirmisher;
+                            goblin.TeleportTo(ReceivingPositionGreySkirmisher);
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(20f, 0f));
                         }
                         else
                         {
-                            goblin.transform.position = ReceivingPositionGreyBerserker;
+                            goblin.TeleportTo(ReceivingPositionGreyBerserker);
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(11f, -2f));
                         }
                         // Make sure grey goblins are facing to the left
@@ -1794,17 +1794,17 @@ public class GamePlayer : NetworkBehaviour
                     {
                         if (goblin.goblinType.Contains("grenadier"))
                         {
-                            goblin.transform.position = ReceivingPositionGreenGrenadier;
+                            goblin.TeleportTo(ReceivingPositionGreenGrenadier);
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(-11f, 3f));
                         }
                         else if (goblin.goblinType.Contains("skirmisher"))
                         {
-                            goblin.transform.position = ReceivingPositionGreenSkirmisher;
+                            goblin.TeleportTo(ReceivingPositionGreenSkirmisher);
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(-20f, 0f));
                         }
                         else
                         {
-                            goblin.transform.position = ReceivingPositionGreenBerserker;
+                            goblin.TeleportTo(ReceivingPositionGreenBerserker);
                             //goblin.GetComponent<Rigidbody2D>().MovePosition(new Vector2(-11f, -2f));
                         }
                         // Make sure green goblins are facing to the right
@@ -1837,12 +1837,12 @@ public class GamePlayer : NetworkBehaviour
                 {
                     if (this.isTeamGrey)
                     {
-                        selectGoblin.transform.position = KickingPositionGreyGrenadier;
+                        selectGoblin.TeleportTo(KickingPositionGreyGrenadier);
                         selectGoblin.FlipRenderer(true);
                     }
                     else
                     {
-                        selectGoblin.transform.position = KickingPositionGreenGrenadier;
+                        selectGoblin.TeleportTo(KickingPositionGreenGrenadier);
                         selectGoblin.FlipRenderer(false);
                     }
                     if (isKickingPlayer)
@@ -1859,12 +1859,12 @@ public class GamePlayer : NetworkBehaviour
                 {
                     if (this.isTeamGrey)
                     {
-                        selectGoblin.transform.position = KickingPositionGreyBerserker;
+                        selectGoblin.TeleportTo(KickingPositionGreyBerserker);
                         selectGoblin.FlipRenderer(true);
                     }
                     else
                     {
-                        selectGoblin.transform.position = KickingPositionGreenBerserker;
+                        selectGoblin.TeleportTo(KickingPositionGreenBerserker);
                         selectGoblin.FlipRenderer(false);
                     }
                 }
@@ -1872,12 +1872,12 @@ public class GamePlayer : NetworkBehaviour
                 {
                     if (this.isTeamGrey)
                     {
-                        selectGoblin.transform.position = KickingPositionGreySkirmisher;
+                        selectGoblin.TeleportTo(KickingPositionGreySkirmisher);
                         selectGoblin.FlipRenderer(true);
                     }
                     else
                     {
-                        selectGoblin.transform.position = KickingPositionGreenSkirmisher;
+                        selectGoblin.TeleportTo(KickingPositionGreenSkirmisher);
                         selectGoblin.FlipRenderer(false);
                     }
                 }
@@ -1888,12 +1888,12 @@ public class GamePlayer : NetworkBehaviour
                 {
                     if (this.isTeamGrey)
                     {
-                        selectGoblin.transform.position = ReceivingPositionGreyGrenadier;
+                        selectGoblin.TeleportTo(ReceivingPositionGreyGrenadier);
                         selectGoblin.FlipRenderer(true);
                     }
                     else
                     {
-                        selectGoblin.transform.position = ReceivingPositionGreenGrenadier;
+                        selectGoblin.TeleportTo(ReceivingPositionGreenGrenadier);
                         selectGoblin.FlipRenderer(false);
                     }
                 }
@@ -1901,12 +1901,12 @@ public class GamePlayer : NetworkBehaviour
                 {
                     if (this.isTeamGrey)
                     {
-                        selectGoblin.transform.position = ReceivingPositionGreyBerserker;
+                        selectGoblin.TeleportTo(ReceivingPositionGreyBerserker);
                         selectGoblin.FlipRenderer(true);
                     }
                     else
                     {
-                        selectGoblin.transform.position = ReceivingPositionGreenBerserker;
+                        selectGoblin.TeleportTo(ReceivingPositionGreenBerserker);
                         selectGoblin.FlipRenderer(false);
                     }
                 }
@@ -1914,12 +1914,12 @@ public class GamePlayer : NetworkBehaviour
                 {
                     if (this.isTeamGrey)
                     {
-                        selectGoblin.transform.position = ReceivingPositionGreySkirmisher;
+                        selectGoblin.TeleportTo(ReceivingPositionGreySkirmisher);
                         selectGoblin.FlipRenderer(true);
                     }
                     else
                     {
-                        selectGoblin.transform.position = ReceivingPositionGreenSkirmisher;
+                        selectGoblin.TeleportTo(ReceivingPositionGreenSkirmisher);
                         selectGoblin.FlipRenderer(false);
                     }
                 }
@@ -2148,7 +2148,7 @@ public class GamePlayer : NetworkBehaviour
                     kickingPosition.x = 40f;
                 }
                 kickingPosition.y = yPosition;
-                scoringGoblinObject.transform.position = kickingPosition;
+                scoringGoblinObject.GetComponent<GoblinScript>().TeleportTo(kickingPosition);
 
                 int yPositionModifier = 1;
                 foreach (GoblinScript goblin in myGoblins)
@@ -2177,7 +2177,7 @@ public class GamePlayer : NetworkBehaviour
                     Vector3 newPosition = goblin.transform.position;
                     newPosition.x = 0f;
                     newPosition.y = 3 * yPositionModifier;
-                    goblin.transform.position = newPosition;
+                    goblin.TeleportTo(newPosition);
                     goblin.UpdateHasGoblinRepositionedForKickAfter();
                 }
             }
@@ -2202,7 +2202,7 @@ public class GamePlayer : NetworkBehaviour
                             //newPosition.x = -41f;
                             newPosition.x = -52f;
                         }
-                        goblin.transform.position = newPosition;
+                        goblin.TeleportTo(newPosition);
 
                         if (goblin.isCharacterSelected || selectGoblin == goblin)
                             FollowSelectedGoblin(goblin.transform);
@@ -2226,7 +2226,7 @@ public class GamePlayer : NetworkBehaviour
                         newPosition.x = -55f;
                     }
                     newPosition.y = 3 * yPositionModifier;
-                    goblin.transform.position = newPosition;
+                    goblin.TeleportTo(newPosition);
                     goblin.UpdateHasGoblinRepositionedForKickAfter();
                 }
             }
@@ -2267,7 +2267,7 @@ public class GamePlayer : NetworkBehaviour
                 {
                     Debug.Log("RpcRepositionForKickAfterFor3v3: this player is the kicking player on the kicking team: " + this.PlayerName);
                     CmdRequestFootballForKickOffGoblin(selectGoblin.GetComponent<NetworkObject>().ObjectId);
-                    selectGoblin.transform.position = kickingPosition;
+                    selectGoblin.TeleportTo(kickingPosition);
                     selectGoblin.UpdateHasGoblinRepositionedForKickAfter();
                     // A bot is owned by the host, so this Rpc runs on the host's machine. Without the check the host
                     // was shown the accuracy bar for a goblin a bot is kicking, which it cannot aim with anyway.
@@ -2280,7 +2280,7 @@ public class GamePlayer : NetworkBehaviour
                     Vector3 newPosition = selectGoblin.transform.position;
                     newPosition.x = 0f;
                     newPosition.y = 3 * yPositionModifier;
-                    selectGoblin.transform.position = newPosition;
+                    selectGoblin.TeleportTo(newPosition);
                     selectGoblin.UpdateHasGoblinRepositionedForKickAfter();
                 }
             }
@@ -2315,7 +2315,7 @@ public class GamePlayer : NetworkBehaviour
                     else
                         newPosition.x = -55f;
                 }
-                selectGoblin.transform.position = newPosition;
+                selectGoblin.TeleportTo(newPosition);
                 FollowSelectedGoblin(selectGoblin.transform);
                 selectGoblin.UpdateHasGoblinRepositionedForKickAfter();
             }

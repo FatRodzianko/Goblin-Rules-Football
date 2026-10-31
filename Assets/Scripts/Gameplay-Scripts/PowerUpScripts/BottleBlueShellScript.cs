@@ -120,7 +120,11 @@ public class BottleBlueShellScript : NetworkBehaviour
     public bool IsOnScreen()
     {
         bool onscreen = false;
-        Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
+        // No camera while a scene is unloading, and despawn paths still ask; nothing is on screen then.
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null)
+            return false;
+        Vector3 screenPoint = mainCamera.WorldToViewportPoint(this.transform.position);
         if (screenPoint.x < 0 || screenPoint.x > 1)
         {
             onscreen = false;
