@@ -218,6 +218,10 @@ public class Football : NetworkBehaviour
         else
             Debug.Log("Football is OFF screen.");*/
 
+        // OnStartClient sets the marker. A ball the server spawns mid-match (RespawnFootballForCarrierDespawn) runs
+        // Update on the host for a few frames before its client side starts, and the marker goes when the camera does.
+        if (myCameraMarker == null)
+            return;
         Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
         if (screenPoint.x < 0)
         {

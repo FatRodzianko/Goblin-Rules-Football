@@ -26,6 +26,20 @@ public class TakeoverManager : MonoBehaviour
 
     public bool IsOfferOrFillInProgress { get { return offerPending || fillInProgress; } }
 
+    // Where each leaver's goblin was when it despawned, by team and goblin type, so the bot that takes over can start
+    // there rather than back at its kickoff spot. Recorded by GoblinScript.OnStopServer; a takeover bot's spawn uses
+    // it once (CmdSpawnPlayerCharacters). For the play-on fill the leaver is long gone by the time anyone answers.
+    Dictionary<string, Vector3> leaverGoblinPositions = new Dictionary<string, Vector3>();
+    // Nearby spots to try when the leaver's own spot is taken, nearest first.
+    static readonly Vector2[] replacementSpotOffsets = {
+        Vector2.zero, new Vector2(0f, 2f), new Vector2(0f, -2f), new Vector2(2f, 0f), new Vector2(-2f, 0f),
+        new Vector2(2f, 2f), new Vector2(-2f, 2f), new Vector2(2f, -2f), new Vector2(-2f, -2f) };
+    const float replacementSpotRadius = 0.75f;
+    // The leaver's ball is respawned loose where they fell; a bot appearing on top of it would hand it straight back.
+    const float replacementSpotBallClearance = 2f;
+    const float replacementSpotFieldMargin = 1f;
+    Collider2D[] replacementSpotHits = new Collider2D[16];
+
     void Awake()
     {
         instance = this;
@@ -85,10 +99,64 @@ public class TakeoverManager : MonoBehaviour
         string leaverGoblinType = leaver.goblinType;
         Debug.Log("ReplaceLeaverWithBot: " + leaverName + " left the " + (team.isGrey ? "grey" : "green") + " team; a bot takes over their " + leaverGoblinType + ".");
         GamePlayer bot = Gameplay.SpawnAIPlayer(team.isGrey, Game.TakePlayerNumber(), "BOT", leaverGoblinType);
+        bot.isTakeoverBot = true;
         string announcement = leaverName + " has left and has been replaced by a BOT";
         Gameplay.SendErrorMessageToTeam(true, announcement);
         Gameplay.SendErrorMessageToTeam(false, announcement);
         StartCoroutine(RefreshGoblinTeammatesWhenBotReady(bot, team.isGrey));
+    }
+    static string LeaverGoblinKey(bool isTeamGrey, string goblinType)
+    {
+        return (isTeamGrey ? "grey-" : "green-") + goblinType.ToLowerInvariant();
+    }
+    public void RecordLeaverGoblinPosition(bool isTeamGrey, string goblinType, Vector3 position)
+    {
+        leaverGoblinPositions[LeaverGoblinKey(isTeamGrey, goblinType)] = position;
+    }
+    // A takeover bot's goblin starts where the leaver's goblin was, but only in open play - every other phase places
+    // the goblins itself (kickoff and kick-after positions, the coin toss), so the starting spot is right there. The
+    // spot has to be on the field and clear of obstacles (a trip obstacle or split ground knocks a goblin down on
+    // entry), other goblins, power-ups and the loose ball. False means use the kickoff spot.
+    public bool TryTakeReplacementPosition(bool isTeamGrey, string goblinType, out Vector3 position)
+    {
+        position = Vector3.zero;
+        string key = LeaverGoblinKey(isTeamGrey, goblinType);
+        Vector3 leaverPosition;
+        if (!leaverGoblinPositions.TryGetValue(key, out leaverPosition))
+            return false;
+        leaverGoblinPositions.Remove(key);
+        if (Gameplay == null || (Gameplay.gamePhase != "gameplay" && Gameplay.gamePhase != "xtra-time"))
+            return false;
+        GameObject football = GameObject.FindGameObjectWithTag("football");
+        foreach (Vector2 offset in replacementSpotOffsets)
+        {
+            Vector2 spot = (Vector2)leaverPosition + offset;
+            spot.x = Mathf.Clamp(spot.x, Gameplay.minX + replacementSpotFieldMargin, Gameplay.maxX - replacementSpotFieldMargin);
+            spot.y = Mathf.Clamp(spot.y, Gameplay.minY + replacementSpotFieldMargin, Gameplay.maxY - replacementSpotFieldMargin);
+            if (football != null && Vector2.Distance(spot, football.transform.position) < replacementSpotBallClearance)
+                continue;
+            if (!IsReplacementSpotClear(spot))
+                continue;
+            position = new Vector3(spot.x, spot.y, 0f);
+            Debug.Log("TryTakeReplacementPosition: the " + key + " bot starts at " + position.ToString() + " (the leaver was at " + leaverPosition.ToString() + ").");
+            return true;
+        }
+        Debug.Log("TryTakeReplacementPosition: no clear spot near " + leaverPosition.ToString() + "; the " + key + " bot starts at its kickoff spot.");
+        return false;
+    }
+    bool IsReplacementSpotClear(Vector2 spot)
+    {
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.useTriggers = true;
+        int hitCount = Physics2D.OverlapCircle(spot, replacementSpotRadius, filter, replacementSpotHits);
+        for (int i = 0; i < hitCount; i++)
+        {
+            Collider2D hit = replacementSpotHits[i];
+            if (hit.GetComponentInParent<ObstacleObject>() != null || hit.GetComponentInParent<SplitGroundEvent>() != null
+                || hit.GetComponentInParent<GoblinScript>() != null || hit.GetComponentInParent<PowerUp>() != null)
+                return false;
+        }
+        return true;
     }
     // The replacement's goblin arrives over several ticks: the bot's OnStartClient runs InitializeAIPlayer, whose
     // ServerRpc spawns the goblin, which then adds itself to the Team roster. Only once the goblin exists, and has
@@ -277,6 +345,7 @@ public class TakeoverManager : MonoBehaviour
             foreach (string missingType in missingTypes)
             {
                 GamePlayer newBot = Gameplay.SpawnAIPlayer(isTeamGrey, Game.TakePlayerNumber(), "BOT", missingType);
+                newBot.isTakeoverBot = true;
                 if (missingType == "Grenadier")
                     grenadierOwner = newBot;
             }

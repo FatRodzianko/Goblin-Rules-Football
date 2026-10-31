@@ -205,6 +205,8 @@ public class GamePlayer : NetworkBehaviour
     }
     // The single-player AI's GamePlayer is owned by the host, so IsOwner alone can't tell it from the host's own player.
     public bool isAIPlayer { get; private set; }
+    // Server only: a bot that took over from a player who left, so its goblin starts where theirs was (TakeoverManager).
+    [NonSerialized] public bool isTakeoverBot;
     // The AI brain sitting on this same object, when this player is a bot. Null for a human.
     public AIPlayer myAIPlayer { get; private set; }
     // Mirror's isLocalPlayer: the GamePlayer that this machine's player controls.
@@ -715,6 +717,7 @@ public class GamePlayer : NetworkBehaviour
                         newGrenadier.transform.position = GreyGrenadierStartingPosition;
                         //newGrenadier.transform.localScale = new Vector3(-1f,1f,1f);
                     }
+                    newGrenadier.transform.position = TakeoverSpawnPosition(newGrenadier.transform.position);
                     InstanceFinder.ServerManager.Spawn(newGrenadier, Owner);
                     GoblinScript newGrenadierScript = newGrenadier.GetComponent<GoblinScript>();
                     newGrenadierScript.ownerConnectionId = this.ConnectionId;
@@ -740,6 +743,7 @@ public class GamePlayer : NetworkBehaviour
                         newBerserker.transform.position = GreyBerserkerStartingPosition;
                         //newBerserker.transform.localScale = new Vector3(-1f, 1f, 1f);
                     }
+                    newBerserker.transform.position = TakeoverSpawnPosition(newBerserker.transform.position);
                     InstanceFinder.ServerManager.Spawn(newBerserker, Owner);
                     GoblinScript newBerserkerScript = newBerserker.GetComponent<GoblinScript>();
                     newBerserkerScript.ownerConnectionId = this.ConnectionId;
@@ -766,6 +770,7 @@ public class GamePlayer : NetworkBehaviour
                         newSkirmisher.transform.position = GreySkirmisherStartingPosition;
                         //newSkirmisher.transform.localScale = new Vector3(-1f, 1f, 1f);
                     }
+                    newSkirmisher.transform.position = TakeoverSpawnPosition(newSkirmisher.transform.position);
                     InstanceFinder.ServerManager.Spawn(newSkirmisher, Owner);
                     GoblinScript newSkirmisherScript = newSkirmisher.GetComponent<GoblinScript>();
                     newSkirmisherScript.ownerConnectionId = this.ConnectionId;
@@ -785,6 +790,15 @@ public class GamePlayer : NetworkBehaviour
             }
             areCharactersSpawnedYet = true;
         }
+    }
+    // A takeover bot's goblin starts where the leaver's was when that spot is usable (TakeoverManager); everyone else,
+    // and a takeover outside open play, starts at the kickoff spot.
+    Vector3 TakeoverSpawnPosition(Vector3 startingPosition)
+    {
+        Vector3 replacementPosition;
+        if (isTakeoverBot && TakeoverManager.instance != null && TakeoverManager.instance.TryTakeReplacementPosition(isTeamGrey, goblinType, out replacementPosition))
+            return replacementPosition;
+        return startingPosition;
     }
     public void AddToGoblinTeam(GoblinScript GoblinToAdd)
     {
@@ -981,10 +995,11 @@ public class GamePlayer : NetworkBehaviour
                 IEnumerator stopSwitch = PreventGoblinSwitch();
                 StartCoroutine(stopSwitch);
             }
-            else if (!this.isAIPlayer && qGoblin != null && qGoblin.doesCharacterHaveBall && selectGoblin.canGoblinReceivePass && IsOnlyHumanOnTeam())
+            else if (!this.isAIPlayer && qGoblin != null && qGoblin.doesCharacterHaveBall && selectGoblin.canGoblinReceivePass && IsBotGoblin(qGoblin))
             {
-                // The last human on a team can call for the ball: Q and E already name the two bot teammates, so
-                // the press asks that bot to pass to this player instead of waiting on the AI's own judgement.
+                // A human can call for the ball from a bot teammate: Q and E already name the two teammates, so the
+                // press asks that bot to pass to this player instead of waiting on the AI's own judgement. A human
+                // teammate passes for themselves, so their goblin is left alone.
                 // The server re-checks everything - the press races the ball on the client.
                 CmdRequestPassFromTeammate(qGoblin.GetComponent<NetworkObject>().ObjectId, selectGoblin.GetComponent<NetworkObject>().ObjectId);
                 StartCoroutine(PreventGoblinSwitch());
@@ -1062,32 +1077,28 @@ public class GamePlayer : NetworkBehaviour
                 IEnumerator stopSwitch = PreventGoblinSwitch();
                 StartCoroutine(stopSwitch);
             }
-            else if (!this.isAIPlayer && eGoblin != null && eGoblin.doesCharacterHaveBall && selectGoblin.canGoblinReceivePass && IsOnlyHumanOnTeam())
+            else if (!this.isAIPlayer && eGoblin != null && eGoblin.doesCharacterHaveBall && selectGoblin.canGoblinReceivePass && IsBotGoblin(eGoblin))
             {
-                // See SwitchToQGoblin: the last human can call for the ball from the E teammate too.
+                // See SwitchToQGoblin: a human can call for the ball from the E teammate too, when it is a bot.
                 CmdRequestPassFromTeammate(eGoblin.GetComponent<NetworkObject>().ObjectId, selectGoblin.GetComponent<NetworkObject>().ObjectId);
                 StartCoroutine(PreventGoblinSwitch());
             }
         }
     }
-    // True when every other player on this team is a bot: the gate for calling for a pass. Both machines can
-    // answer it - GamePlayers is kept on clients too.
-    bool IsOnlyHumanOnTeam()
+    // True when a bot controls this goblin: only a bot's goblin can be called for the ball. Every machine can answer
+    // it - ownerNetId is a SyncVar and isAIPlayer comes from the prefab.
+    bool IsBotGoblin(GoblinScript goblin)
     {
-        foreach (GamePlayer player in Game.GamePlayers)
-        {
-            if (player != null && player != this && !player.isAIPlayer && player.isTeamGrey == this.isTeamGrey)
-                return false;
-        }
-        return true;
+        return ObjectLookup.TryGet(goblin.ownerNetId, out GamePlayer owner) && owner != null && owner.isAIPlayer;
     }
-    // The last human on a 3v3 team asks a bot teammate for the ball. An owner ServerRpc, so who is asking comes
-    // free. The carrier is host-owned, and the server is the host, so ThrowBall here is exactly the call the
-    // bot's own AI makes when it decides to pass.
+    // A human on a 3v3 team asks a bot teammate for the ball. An owner ServerRpc, so who is asking comes free. The
+    // carrier is host-owned, and the server is the host, so ThrowBall here is exactly the call the bot's own AI makes
+    // when it decides to pass. With two humans on the team both may call at once: the first throw wins, and the second
+    // call finds the carrier no longer holding the ball.
     [ServerRpc]
     void CmdRequestPassFromTeammate(int carrierGoblinId, int receiverGoblinId)
     {
-        if (this.isAIPlayer || this.is1v1 || this.isSinglePlayer || !IsOnlyHumanOnTeam())
+        if (this.isAIPlayer || this.is1v1 || this.isSinglePlayer)
             return;
         GoblinScript carrier;
         GoblinScript receiver;

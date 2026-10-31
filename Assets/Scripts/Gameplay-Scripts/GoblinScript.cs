@@ -425,6 +425,18 @@ public class GoblinScript : NetworkBehaviour
     {
         base.OnStopServer();
         DropFootballForDespawn();
+        RecordPositionForReplacement();
+    }
+    // A person leaving mid-match despawns their goblin; its spot is kept for the bot that takes over (TakeoverManager).
+    // Not [Server], for the same reason as DropFootballForDespawn. Bot goblins only despawn when the server shuts down;
+    // the owner may already be gone here, so only a known bot is skipped.
+    void RecordPositionForReplacement()
+    {
+        if (!IsServerStarted || TakeoverManager.instance == null)
+            return;
+        if (serverGamePlayer != null && serverGamePlayer.isAIPlayer)
+            return;
+        TakeoverManager.instance.RecordLeaverGoblinPosition(isGoblinGrey, soundType, transform.position);
     }
     // The carried football is parented to the goblin holding it (see ParentFootballOnServer). FishNet despawns a
     // disconnecting player's goblins, and despawning an object takes its child NetworkObjects with it, so a player who
@@ -1600,6 +1612,11 @@ public class GoblinScript : NetworkBehaviour
             if (newValue && IsOwner)
             {
                 FlipKickoffAimArrow();
+                // isGrey only leads into the grey animations from plain idle, and idle checks isRunning first. A goblin
+                // spawned mid-match (a takeover bot) is already running when this arrives, so it stayed in the green
+                // run animations. Jump to grey idle; the grey states take over from there. CrossFade, not Play, so
+                // the NetworkAnimator sends this state rather than the one the animator is still in.
+                networkAnimator.CrossFade(soundType + "-grey-idle", 0f, 0, 0f);
             }
             // The marker's sprite was chosen before this value arrived; recolor in place, never reposition.
             ApplyBallMarkerTeamColors();
