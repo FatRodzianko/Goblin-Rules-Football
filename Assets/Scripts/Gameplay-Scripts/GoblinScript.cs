@@ -1089,7 +1089,8 @@ public class GoblinScript : NetworkBehaviour
                 }
                 else
                 {
-                    MoveTowardFootball();
+                    // The switch below does the moving. Calling MoveTowardFootball here as well ran it twice every
+                    // physics step, which sent the sprint stamina drain twice and emptied stamina twice as fast.
                     state = State.ChaseFootball;
                     goblinTarget = null;
                 }
@@ -3110,42 +3111,51 @@ public class GoblinScript : NetworkBehaviour
 
         float distToFootball = Vector3.Distance(this.transform.position, gameFootball.transform.position);
 
-        // Get the direction of the football in relation to the goblin
-        Vector3 directionToFootball = Vector3.zero;
-        Vector3 positionOfFootball = Vector3.zero;
+        // Where the goblin is headed: a kicked ball's landing spot, otherwise the ball itself.
+        Vector3 targetPosition = Vector3.zero;
         if (gameFootball.isKicked)
         {
             GameObject footBallLandingSpot = GameObject.FindGameObjectWithTag("footballLandingTarget");
             if (footBallLandingSpot != null)
             {
                 Debug.Log("MoveTowardFootball: footBallLandingSpot found!");
-                positionOfFootball = footBallLandingSpot.transform.position;
+                targetPosition = footBallLandingSpot.transform.position;
             }
             else
             {
                 Debug.Log("MoveTowardFootball: could not find the football landing spot idk how.");
-                positionOfFootball = gameFootball.transform.position;
+                targetPosition = gameFootball.transform.position;
             }
-            
-
-            directionToFootball = (positionOfFootball - this.transform.position).normalized;
-            
         }
         else
         {
-            positionOfFootball = gameFootball.transform.position;
-            directionToFootball = (positionOfFootball - this.transform.position).normalized;
+            targetPosition = gameFootball.transform.position;
         }
+        // The goblin catches the ball with its body collider, which sits below the centre of its sprite. Steering the
+        // sprite's centre onto the target left the goblin's feet 1.25 units short of a target above it. Steer the body
+        // collider's centre onto the target instead.
+        Vector2 bodyColliderOffset = golbinBodyCollider.transform.TransformPoint(golbinBodyCollider.offset) - this.transform.position;
+        Vector2 positionToStandOn = (Vector2)targetPosition - bodyColliderOffset;
+        Vector2 directionToTarget = (positionToStandOn - rb.position).normalized;
         // If goblin is far away from the ball, try to sprint toward it?
         if (distToFootball > 10f)
         {
             this.WillAIGoblinSprint(true);
         }
-        if (distToFootball > 0.2f)
+        // AIMoveTowardDirection never steps past positionToStandOn, so the goblin reaches it exactly. Closer than one
+        // pixel there is no movement left that would show.
+        float onePixel = 1f / myRenderer.sprite.pixelsPerUnit;
+        if (Vector2.Distance(rb.position, positionToStandOn) > onePixel)
         {
-            AIMoveTowardDirection(directionToFootball, positionOfFootball);
+            AIMoveTowardDirection(directionToTarget, positionToStandOn);
         }
-            
+        else
+        {
+            // Arrived: stand still rather than run in place, as MoveTowrdBallCarrier does.
+            isRunning = false;
+            animator.SetBool("isRunning", isRunning);
+        }
+
         /*Vector2 direction = Vector2.ClampMagnitude(directionToFootball, 1);
 
         // Set whether the goblin is moving. If the "direction" to the football is 0, then they shouldn't be moving?
@@ -3338,7 +3348,10 @@ public class GoblinScript : NetworkBehaviour
             DiveAIGoblinTowardEndzone(direction);
         }
 
-        rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
+        // Never step past the target. A full step taken from closer than one step away lands beyond it, and the
+        // goblin then runs back and forth across it, flipping its sprite every physics step.
+        Vector2 step = Vector2.ClampMagnitude(direction * speed * Time.fixedDeltaTime, Vector2.Distance(rb.position, targetPosition));
+        rb.MovePosition(rb.position + step);
 
         // check the direction the goblin is moving. If they are moving left, make sprite face left. If right, sprite face right
         if (direction.x > 0)
