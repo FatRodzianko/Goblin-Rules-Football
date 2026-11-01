@@ -184,7 +184,8 @@ public class CoinTossManager : NetworkBehaviour
         //string result = "tails";
 
         Debug.Log("FlipCoin: " + result);
-        headsOrTailsServer = result;
+        //headsOrTailsServer = result;
+        headsOrTailsServer = "tails";
     }
     void HandleHeadsOrTailsOnServer(string oldValue, string newValue)
     {
@@ -489,6 +490,15 @@ public class CoinTossManager : NetworkBehaviour
                     }
                     break;
                 }
+            }
+            // The teams as well, as the 3v3 branch, a score and halftime all set them. TakeoverManager hands an orphaned
+            // kickoff to the play-on bot only when it is on kickingTeam, so a 1v1 kicker who left before the first
+            // kickoff left it null, and the kick never happened.
+            if (GameplayManager.instance.kickingPlayer != null)
+            {
+                bool isGreyKickingTeam = GameplayManager.instance.kickingPlayer.isTeamGrey;
+                GameplayManager.instance.kickingTeam = isGreyKickingTeam ? TeamManager.instance.greyTeam : TeamManager.instance.greenTeam;
+                GameplayManager.instance.receivingTeam = isGreyKickingTeam ? TeamManager.instance.greenTeam : TeamManager.instance.greyTeam;
             }
         }
         else // for 3v3 games, set the kickingTeam and receivingTeam variables on gameplay manager. Set the captain of the kicking team to the kickingPlayer

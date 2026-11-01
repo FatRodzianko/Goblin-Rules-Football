@@ -48,6 +48,13 @@ public class NetworkManagerGRF : MonoBehaviour
     public bool spawnObstaclesEnabled;
     public bool mercyRuleEnabled;
     public int mercyRulePointDifferential;
+    // A client's copy of the host's settings, from LobbyPlayer.RpcReceiveMatchSettings. Kept apart from the fields above,
+    // which only the host's code reads, so having the copy changes nothing until a lobby has to move to a new host.
+    public FootballMatchSettings receivedMatchSettings;
+    public bool hasReceivedMatchSettings = false;
+    // Set when this player ends their own session (StopHost/StopClient), so LobbyHostMigration doesn't mistake it for
+    // the host leaving.
+    public bool isLeavingOnPurpose = false;
     private static readonly string[] GoblinTypes = { "Grenadier", "Berserker", "Skirmisher" };
     // Numbers handed out this frame. LobbyPlayers only gains a player once its spawn has been applied, a tick
     // later, so filling a team with bots in one go would otherwise give every one of them the same number.
@@ -114,6 +121,7 @@ public class NetworkManagerGRF : MonoBehaviour
     public void StartHost()
     {
         _isFootballSession = true;
+        isLeavingOnPurpose = false;
         _startHostClientWhenLobbyLoads = true;
         if (!StartServerConnection())
             EndFootballSession();
@@ -152,16 +160,21 @@ public class NetworkManagerGRF : MonoBehaviour
     public void StartClient()
     {
         _isFootballSession = true;
+        isLeavingOnPurpose = false;
         if (!_networkManager.ClientManager.StartConnection(networkAddress))
             EndFootballSession();
     }
+    // Everything that ends a session by choice goes through these two, so a lost host can be told apart from a player
+    // leaving: only the first moves the lobby to a new host.
     public void StopHost()
     {
+        isLeavingOnPurpose = true;
         _networkManager.ServerManager.StopConnection(true);
         _networkManager.ClientManager.StopConnection();
     }
     public void StopClient()
     {
+        isLeavingOnPurpose = true;
         _networkManager.ClientManager.StopConnection();
     }
     private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs args)
@@ -222,15 +235,28 @@ public class NetworkManagerGRF : MonoBehaviour
     {
         if (!_isFootballSession)
             return;
-        if (args.ConnectionState == LocalConnectionState.Stopped)
-            EndFootballSession();
+        if (args.ConnectionState != LocalConnectionState.Stopped)
+            return;
+        // The host left the lobby: it carries on under a new host instead of ending here.
+        if (LobbyHostMigration.instance != null && LobbyHostMigration.instance.HandleClientStopped())
+            return;
+        EndFootballSession();
     }
     // Mirror loaded its offline scene, the title screen, when the client stopped.
-    private void EndFootballSession()
+    // Public for LobbyHostMigration, which ends the session itself if no new host turns up.
+    public void EndFootballSession()
     {
         _isFootballSession = false;
         _startHostClientWhenLobbyLoads = false;
         isDevSession = false;
+        isLeavingOnPurpose = false;
+        hasReceivedMatchSettings = false;
+        if (LobbyHostMigration.instance != null)
+            LobbyHostMigration.instance.Forget();
+        // SteamLobby leaves the Steam lobby when any other session's client stops, but leaves Football's to here: a
+        // lobby moving to a new host keeps its Steam lobby, and only an ended session gives it up.
+        if (SteamLobby.instance != null)
+            SteamLobby.instance.LeaveLobby();
         reservedPlayerNumbers.Clear();
         // This object outlives the session, so clear what the last one left behind, on clients too.
         LobbyPlayers.Clear();
@@ -446,25 +472,75 @@ public class NetworkManagerGRF : MonoBehaviour
         Debug.Log("Checking if player is in correct scene. Player's scene name is: " + SceneManager.GetActiveScene().name.ToString() + ". Correct scene name is: TitleScreen");
         if (SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene")
         {
-            bool isGameLeader = LobbyPlayers.Count == 0; // isLeader is true if the player count is 0, aka when you are the first player to be added to a server/room
+            // The host's own player leads, whenever it arrives. "First to connect" held only while nobody could join
+            // faster than the host's own client, which a lobby moving to a new host breaks: everyone reconnects at once.
+            bool isGameLeader = conn.IsHost;
 
             LobbyPlayer lobbyPlayerInstance = Instantiate(lobbyPlayerPrefab);
 
             lobbyPlayerInstance.IsGameLeader = isGameLeader;
             lobbyPlayerInstance.ConnectionId = conn.ClientId;
             lobbyPlayerInstance.playerNumber = TakePlayerNumber();
-            // Only a session with a Steam lobby has members to read a Steam id from. Single player used to pass the
-            // isDevSession check and read a junk id with Steam running, or throw with Steam closed, which aborted the
-            // spawn and left LobbyPlayers empty.
+            // Only a session with a Steam lobby has Steam ids. Single player used to pass the isDevSession check and read
+            // a junk id with Steam running, or throw with Steam closed, which aborted the spawn and left LobbyPlayers empty.
             if (HasSteamLobby)
-                lobbyPlayerInstance.playerSteamId = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.CurrentLobbyID, LobbyPlayers.Count);
+                lobbyPlayerInstance.playerSteamId = SteamIdOf(conn);
             lobbyPlayerInstance.is1v1 = this.is1v1;
             lobbyPlayerInstance.isSinglePlayer = this.isSinglePlayer;
 
             _networkManager.ServerManager.Spawn(lobbyPlayerInstance.gameObject, conn);
+            // Sent after the spawn, so it reaches the client after its LobbyPlayer exists. Every player keeps a copy, so
+            // whoever takes over the lobby if the host leaves can start it with the same settings.
+            lobbyPlayerInstance.RpcReceiveMatchSettings(conn, CurrentMatchSettings());
             Debug.Log("Player added. Player name: " + lobbyPlayerInstance.PlayerName + ". Player connection id: " + lobbyPlayerInstance.ConnectionId.ToString());
             EnforceTeamCapacity();
         }
+    }
+    // A player's Steam id, read from the connection rather than the lobby. FishySteamworks knows which Steam account each
+    // remote connection is (its address is the Steam id), and the host's own connection is this machine's account.
+    // Reading the lobby's member list by LobbyPlayers.Count assumed Steam lists members in the order they connected,
+    // which breaks as soon as players reconnect in a different order, and put avatars on the wrong rows.
+    private ulong SteamIdOf(NetworkConnection conn)
+    {
+        if (!SteamManager.Initialized)
+            return 0;
+        if (conn.IsHost)
+            return SteamUser.GetSteamID().m_SteamID;
+        ulong steamId;
+        if (ulong.TryParse(conn.GetAddress(), out steamId))
+            return steamId;
+        Debug.LogWarning("SteamIdOf: no Steam id for connection " + conn.ClientId + ".");
+        return 0;
+    }
+    // The settings a lobby was created with. Only the host has them, from the title screen; clients get a copy.
+    public FootballMatchSettings CurrentMatchSettings()
+    {
+        FootballMatchSettings settings = new FootballMatchSettings();
+        settings.is1v1 = this.is1v1;
+        settings.lobbyName = this.lobbyName;
+        settings.secondsPerHalf = this.secondsPerHalf;
+        settings.powerUpsEnabled = this.powerUpsEnabled;
+        settings.randomEventsEnabled = this.randomEventsEnabled;
+        settings.spawnObstaclesEnabled = this.spawnObstaclesEnabled;
+        settings.mercyRuleEnabled = this.mercyRuleEnabled;
+        settings.mercyRulePointDifferential = this.mercyRulePointDifferential;
+        return settings;
+    }
+    // A player taking over a lobby whose host left starts it with the old host's settings. The mode decides the player
+    // counts, as it does in TitleScreenManager.CreateNewLobby.
+    public void ApplyMatchSettings(FootballMatchSettings settings)
+    {
+        this.is1v1 = settings.is1v1;
+        this.isSinglePlayer = false;
+        this.maxConnections = settings.is1v1 ? 2 : 6;
+        this.minPlayers = settings.is1v1 ? 2 : 6;
+        this.lobbyName = settings.lobbyName;
+        this.secondsPerHalf = settings.secondsPerHalf;
+        this.powerUpsEnabled = settings.powerUpsEnabled;
+        this.randomEventsEnabled = settings.randomEventsEnabled;
+        this.spawnObstaclesEnabled = settings.spawnObstaclesEnabled;
+        this.mercyRuleEnabled = settings.mercyRuleEnabled;
+        this.mercyRulePointDifferential = settings.mercyRulePointDifferential;
     }
     public void StartGame()
     {

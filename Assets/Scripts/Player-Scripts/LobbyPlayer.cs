@@ -93,6 +93,20 @@ public class LobbyPlayer : NetworkBehaviour
         base.OnStartServer();
         //UpdateTeamListsOnLobbyManager();
     }
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        // A player who leaves the lobby gives their goblin back to their team. OnStopClient used to do this through the
+        // [Server] UnselectGoblinOnServer, but FishNet stops an object's server side before its client side, so [Server]
+        // skipped it and the goblin stayed taken. The Leave button's own unselect is a ServerRpc sent as the client
+        // disconnects, so it seldom arrives either.
+        // Only for a player who is leaving: IsServerStarted is false while the whole server shuts down, and Start Game
+        // removes every lobby player with its owner still connected.
+        if (!IsServerStarted || !Owner.Disconnecting || LobbyManager.instance == null)
+            return;
+        if (this.isGoblinSelected)
+            ReturnGoblinToTeam();
+    }
     [ServerRpc]
     private void CmdSetPlayerName(string PlayerNameSubmitted)
     {
@@ -104,11 +118,14 @@ public class LobbyPlayer : NetworkBehaviour
             playerNameToSet = PlayerNameSubmitted;
         this.PlayerName = playerNameToSet;
     }
+    // previousSeat: a player coming back to a lobby that moved to a new host asks for the team and goblin they had.
     [ServerRpc]
-    void CmdSetPlayerInitialTeam()
+    void CmdSetPlayerInitialTeam(bool hasPreviousSeat, bool previousSeatIsGrey, string previousGoblinType)
     {
+        if (hasPreviousSeat && LobbyManager.instance.HumansOnTeam(previousSeatIsGrey, this) < 3)
+            this.isTeamGrey = previousSeatIsGrey;
         // set the host as team grey
-        if (this.IsGameLeader)
+        else if (this.IsGameLeader)
             isTeamGrey = false;
         else
         {
@@ -145,6 +162,9 @@ public class LobbyPlayer : NetworkBehaviour
         UpdateAllPlayersOnAvailableGoblins(this.isTeamGrey);
         // The team now has one more player than it had room for, since the lobby let this one in past the bots.
         Game.EnforceTeamCapacity();
+        // Their old goblin, if it's still free on the team they ended up on.
+        if (hasPreviousSeat && !string.IsNullOrEmpty(previousGoblinType) && this.isTeamGrey == previousSeatIsGrey)
+            SelectGoblinOnServer(previousGoblinType);
     }
     public void HandlePlayerNameUpdate(string oldValue, string newValue)
     {
@@ -357,7 +377,13 @@ public class LobbyPlayer : NetworkBehaviour
             gameObject.name = "LocalLobbyPlayer";
             LobbyManager.instance.FindLocalLobbyPlayer();
             LobbyManager.instance.UpdateLobbyName();
-            CmdSetPlayerInitialTeam();
+            // Back in a lobby that moved to a new host: ask for the old seat.
+            bool hasPreviousSeat = false;
+            bool previousSeatIsGrey = false;
+            string previousGoblinType = "";
+            if (LobbyHostMigration.instance != null)
+                hasPreviousSeat = LobbyHostMigration.instance.TakeSeatToRestore(out previousSeatIsGrey, out previousGoblinType);
+            CmdSetPlayerInitialTeam(hasPreviousSeat, previousSeatIsGrey, previousGoblinType ?? "");
             CheckIfDLCsAreInstalled();
         }
 
@@ -365,6 +391,11 @@ public class LobbyPlayer : NetworkBehaviour
         LobbyManager.instance.UpdateLobbyName();
         LobbyManager.instance.UpdateUI();
         StartUpdateTeamListsOnLobbyManager();
+        // A player who just took over a lobby puts back its bots, and on Steam tells the others where to connect. Only
+        // now: a bot's owner is the host's LobbyPlayer, which AddBot finds in LobbyPlayers, and the host's own player
+        // has to be in before anyone else, since it is the one that leads.
+        if (_isOwnedLocally && IsServerStarted && LobbyHostMigration.instance != null)
+            LobbyHostMigration.instance.FinishTakingOver();
     }
     public void ChangeReadyStatus()
     {
@@ -435,6 +466,14 @@ public class LobbyPlayer : NetworkBehaviour
     [Server]
     void UnselectGoblinOnServer()
     {
+        ReturnGoblinToTeam();
+        this.isGoblinSelected = false;
+        this.goblinType = "";
+    }
+    // Puts this player's goblin back on their team's available list and tells the team. No [Server]: OnStopServer calls
+    // this while the object is already deinitializing, where [Server] would skip it. Every caller runs on the server.
+    void ReturnGoblinToTeam()
+    {
         if (this.isTeamGrey)
         {
             if (!string.IsNullOrWhiteSpace(this.goblinType))
@@ -456,8 +495,6 @@ public class LobbyPlayer : NetworkBehaviour
             }
         }
         UpdateAllPlayersOnAvailableGoblins(this.isTeamGrey);
-        this.isGoblinSelected = false;
-        this.goblinType = "";
     }
     public void SelectGoblin(string typeOfGoblin)
     {
@@ -468,6 +505,11 @@ public class LobbyPlayer : NetworkBehaviour
     }
     [ServerRpc]
     void CmdSelectGoblin(string typeOfGoblin)
+    {
+        SelectGoblinOnServer(typeOfGoblin);
+    }
+    [Server]
+    void SelectGoblinOnServer(string typeOfGoblin)
     {
         if (this.goblinType != typeOfGoblin)
         {
@@ -540,13 +582,19 @@ public class LobbyPlayer : NetworkBehaviour
                 
             }
             LobbyManager.instance.UpdateGoblinSelectedTextOnPlayerListItems(this);
+            if (LobbyHostMigration.instance != null)
+                LobbyHostMigration.instance.RememberLobby();
         }
     }
-    [Server]
+    // No [Server], for the same reason as ReturnGoblinToTeam. It only sends to the other players' objects, which are live.
     void UpdateAllPlayersOnAvailableGoblins(bool isGrey)
     {
+        if (!IsServerStarted)
+            return;
         foreach (LobbyPlayer player in Game.LobbyPlayers)
         {
+            if (player == this && !Owner.IsActive)
+                continue;
             if (player.isTeamGrey == isGrey)
             {
                 Debug.Log("UpdateAllPlayersOnAvailableGoblins: Player name: " + player.PlayerName + " player connection id: " + player.ConnectionId);
@@ -570,6 +618,13 @@ public class LobbyPlayer : NetworkBehaviour
         // Single player has no player list item. An exception here would make FishNet drop the rest of the packet.
         if(IsOwner && !LobbyManager.instance.is1v1 && this.myPlayerListItem != null)
             this.myPlayerListItem.UpdateGoblinsAvailable(availableGoblins);
+    }
+    // Each player keeps the host's match settings, so the lobby can carry on under a new host if this one leaves.
+    [TargetRpc]
+    public void RpcReceiveMatchSettings(NetworkConnection target, FootballMatchSettings settings)
+    {
+        Game.receivedMatchSettings = settings;
+        Game.hasReceivedMatchSettings = true;
     }
     /*[ObserversRpc]
     void RpcSendPlayersUpdatedAvailableGoblinList(bool isGrey, List<string> availableGoblins)
@@ -644,11 +699,7 @@ public class LobbyPlayer : NetworkBehaviour
                 LobbyManager.instance.GreenTeamMembers.Remove(this);
             if (LobbyManager.instance.GreyTeamMembers.Contains(this))
                 LobbyManager.instance.GreyTeamMembers.Remove(this);
-            // Remove selected goblins
-            if (this.isGoblinSelected)
-            {
-                UnselectGoblinOnServer();
-            }
+            // The goblin goes back in OnStopServer.
         }
     }
     [Client]

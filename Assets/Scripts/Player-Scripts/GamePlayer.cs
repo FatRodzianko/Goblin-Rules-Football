@@ -1823,6 +1823,10 @@ public class GamePlayer : NetworkBehaviour
     public void RpcRepositionTeamForKickOff3v3(NetworkConnection target, bool isTeamKicking, bool isKickingPlayer)
     {
         Debug.Log("RpcRepositionTeamForKickOff3v3: for player: " + this.PlayerName + " is their team kicking? " + isTeamKicking.ToString() + " are they the kicking player? " + isKickingPlayer.ToString());
+        // A takeover bot whose goblin hasn't spawned yet when the kickoff starts. TakeoverManager lines it up once the
+        // goblin exists; throwing here would drop the rest of the packet, other players' lineups with it.
+        if (IsOwner && selectGoblin == null)
+            return;
         if (IsOwner)
         {
             EnableKickingControls(isKickingPlayer);

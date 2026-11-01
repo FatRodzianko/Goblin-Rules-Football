@@ -2223,6 +2223,7 @@ GameObject:
   - component: {fileID: 1531992552086719743}
   - component: {fileID: 8562962732157465894}
   - component: {fileID: 4074078416168303429}
+  - component: {fileID: 1169304194819172493}
   m_Layer: 0
   m_Name: NetworkManagerGolf
   m_TagString: Untagged
@@ -2460,6 +2461,8 @@ MonoBehaviour:
   spawnObstaclesEnabled: 0
   mercyRuleEnabled: 0
   mercyRulePointDifferential: 0
+  hasReceivedMatchSettings: 0
+  isLeavingOnPurpose: 0
   isGamePaused: 0
   playerWhoPaused: {fileID: 0}
   playerWhoPausedNetId: 0
@@ -2530,3 +2533,16 @@ MonoBehaviour:
   _transports:
   - {fileID: 7983715474653844588}
   - {fileID: 8562962732157465894}
+--- !u!114 &1169304194819172493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7983715474653844596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2f84c8f4c4000d47b821c259df54b55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movingLobbyScreenPrefab: {fileID: 6449923725884206675, guid: 31eeb630671ea30478755e4cf25e0802, type: 3}

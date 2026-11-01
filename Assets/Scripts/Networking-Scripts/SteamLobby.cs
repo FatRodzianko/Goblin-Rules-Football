@@ -41,6 +41,9 @@ public class SteamLobby : MonoBehaviour
     // Golf's host: the server starts, then the Golf scene loads, then the host's own client starts.
     private bool _startingGolfHost = false;
     private bool _startHostClientWhenGolfSceneLoads = false;
+    // Someone who entered a Football lobby while it was moving to a new host waits this long for the move to finish.
+    private const float JoinMovingLobbyTimeoutSeconds = 20f;
+    private Coroutine _joinWhenHostReadyRoutine;
 
     private void Awake()
     {
@@ -125,6 +128,12 @@ public class SteamLobby : MonoBehaviour
         if (!IsSteamReady())
             return;
         Debug.Log("JoinLobby: Will try to join lobby with steam id: " + lobbyId.ToString());
+        // A lobby joined from the list or an invite is never one being created, even one this player created earlier: a
+        // lobby now outlives its creator by moving to a new host. OnLobbyEntered took the creator coming back for the
+        // creator entering it right after creating it, and returned before joining or setting CurrentLobbyID, so the
+        // player sat in the Steam lobby unseen for the rest of the run. That filled a 1v1 lobby, which dropped it from
+        // the list, and kept every old lobby alive with one member nobody could reach.
+        _hostedLobbyID = 0;
         SteamMatchmaking.JoinLobby(lobbyId);
     }
     public void GetListOfLobbies()
@@ -141,6 +150,11 @@ public class SteamLobby : MonoBehaviour
     }
     public void LeaveLobby()
     {
+        if (_joinWhenHostReadyRoutine != null)
+        {
+            StopCoroutine(_joinWhenHostReadyRoutine);
+            _joinWhenHostReadyRoutine = null;
+        }
         if (CurrentLobbyID == 0)
             return;
         try
@@ -258,10 +272,15 @@ public class SteamLobby : MonoBehaviour
         UseSteamTransport();
         if (gameMode == GameModeFootball)
         {
-            NetworkManagerGRF.singleton.networkAddress = hostAddress;
-            NetworkManagerGRF.singleton.StartClient();
-            if (!NetworkManagerGRF.singleton.IsFootballSession)
-                LeaveLobby();
+            // A Football lobby whose host just left is moving to Steam's new owner, and HostAddress still names the old
+            // host until the new one is ready (LobbyHostMigration). Connecting now would only fail.
+            if (!IsHostAddressCurrent(lobbyId))
+            {
+                Debug.Log("OnLobbyEntered: the lobby is moving to a new host. Waiting for it before joining.");
+                _joinWhenHostReadyRoutine = StartCoroutine(JoinWhenHostReadyRoutine(callback.m_ulSteamIDLobby));
+                return;
+            }
+            JoinFootballHost(hostAddress);
         }
         else if (gameMode == GameModeGolf)
         {
@@ -273,6 +292,82 @@ public class SteamLobby : MonoBehaviour
             Debug.LogWarning("SteamLobby: lobby " + CurrentLobbyID.ToString() + " has an unknown game mode: \"" + gameMode + "\"");
             LeaveLobby();
         }
+    }
+    // Also how LobbyHostMigration reconnects to a moved lobby's new host.
+    public void JoinFootballHost(string hostAddress)
+    {
+        UseSteamTransport();
+        NetworkManagerGRF.singleton.networkAddress = hostAddress;
+        NetworkManagerGRF.singleton.StartClient();
+        if (!NetworkManagerGRF.singleton.IsFootballSession)
+            LeaveLobby();
+    }
+    IEnumerator JoinWhenHostReadyRoutine(ulong lobbyID)
+    {
+        CSteamID lobbyId = new CSteamID(lobbyID);
+        float giveUpTime = Time.realtimeSinceStartup + JoinMovingLobbyTimeoutSeconds;
+        while (Time.realtimeSinceStartup < giveUpTime)
+        {
+            yield return new WaitForSecondsRealtime(0.5f);
+            if (CurrentLobbyID != lobbyID)
+                yield break;
+            if (IsHostAddressCurrent(lobbyId))
+            {
+                _joinWhenHostReadyRoutine = null;
+                Debug.Log("JoinWhenHostReadyRoutine: the lobby has its new host. Joining.");
+                JoinFootballHost(SteamMatchmaking.GetLobbyData(lobbyId, HostAddressKey));
+                yield break;
+            }
+        }
+        _joinWhenHostReadyRoutine = null;
+        Debug.LogWarning("SteamLobby: the lobby's new host didn't appear within " + JoinMovingLobbyTimeoutSeconds + " seconds. Leaving it.");
+        LeaveLobby();
+    }
+    // HostAddress names the lobby's current owner: the host is where players should connect.
+    bool IsHostAddressCurrent(CSteamID lobbyId)
+    {
+        return SteamMatchmaking.GetLobbyData(lobbyId, HostAddressKey) == SteamMatchmaking.GetLobbyOwner(lobbyId).ToString();
+    }
+    // For LobbyHostMigration, whose lobby lost its host. Steam hands ownership to a remaining member on its own.
+    public bool IsThisPlayerLobbyOwner()
+    {
+        if (CurrentLobbyID == 0 || !SteamManager.Initialized)
+            return false;
+        return SteamMatchmaking.GetLobbyOwner(new CSteamID(CurrentLobbyID)) == SteamUser.GetSteamID();
+    }
+    // Who Steam names as the lobby's owner, and their Steam name, for the moving-lobby screen. Steam knows the names of
+    // everyone in a lobby this player is in.
+    public bool TryGetLobbyOwner(out string ownerAddress, out string ownerName)
+    {
+        ownerAddress = "";
+        ownerName = "";
+        if (CurrentLobbyID == 0 || !SteamManager.Initialized)
+            return false;
+        CSteamID owner = SteamMatchmaking.GetLobbyOwner(new CSteamID(CurrentLobbyID));
+        ownerAddress = owner.ToString();
+        ownerName = SteamFriends.GetFriendPersonaName(owner);
+        return true;
+    }
+    // The new host, once it has said it is ready: HostAddress names the lobby's owner, and that owner isn't this player.
+    public bool TryGetLobbyHost(out string hostAddress)
+    {
+        hostAddress = "";
+        if (CurrentLobbyID == 0 || !SteamManager.Initialized)
+            return false;
+        CSteamID lobbyId = new CSteamID(CurrentLobbyID);
+        if (!IsHostAddressCurrent(lobbyId) || IsThisPlayerLobbyOwner())
+            return false;
+        hostAddress = SteamMatchmaking.GetLobbyData(lobbyId, HostAddressKey);
+        return true;
+    }
+    // A player who took over a moved lobby, once its own player is in: point everyone at it. Only the owner can write
+    // lobby data, and Steam made this player the owner.
+    public void AnnounceThisPlayerAsHost()
+    {
+        if (!IsThisPlayerLobbyOwner())
+            return;
+        Debug.Log("SteamLobby: this player now hosts lobby " + CurrentLobbyID.ToString() + ".");
+        SteamMatchmaking.SetLobbyData(new CSteamID(CurrentLobbyID), HostAddressKey, SteamUser.GetSteamID().ToString());
     }
     // A one-player golf lobby can never gain peers, so it skips Steam entirely: no Steam lobby is created, and the
     // session runs on Tugboat bound to loopback, like Football's single player - it works with Steam closed and a
@@ -328,10 +423,15 @@ public class SteamLobby : MonoBehaviour
         }
     }
     // Every way out of a session ends here: the menus, the host quitting, and a join that failed or was refused.
+    // Except Football's: NetworkManagerGRF ends that session and leaves the lobby itself, because a Football lobby whose
+    // host left stays in the Steam lobby while it moves to the new host (LobbyHostMigration).
     private void ClientManager_OnClientConnectionState(ClientConnectionStateArgs args)
     {
-        if (args.ConnectionState == LocalConnectionState.Stopped)
-            LeaveLobby();
+        if (args.ConnectionState != LocalConnectionState.Stopped)
+            return;
+        if (NetworkManagerGRF.singleton != null && NetworkManagerGRF.singleton.IsFootballSession)
+            return;
+        LeaveLobby();
     }
     private void SceneManager_OnLoadEnd(SceneLoadEndEventArgs args)
     {

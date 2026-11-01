@@ -177,6 +177,9 @@ public class LobbyManager : MonoBehaviour
             UpdatePlayerListItems();
         SortTeamRows();
         UpdateAddBotRows();
+        // Every change to who is in the lobby, and on which team, comes through here.
+        if (LobbyHostMigration.instance != null)
+            LobbyHostMigration.instance.RememberLobby();
     }
     // One "+ ADD BOT" row per empty slot on each team, for the host only. Rebuilt from scratch on every refresh, which
     // is simpler than reconciling and costs nothing at six rows.
@@ -364,7 +367,9 @@ public class LobbyManager : MonoBehaviour
         {
             if (!playerListItems.Any(b => b.lobbyPlayerObjectId == player.ObjectId))
             {
-                if (is1v1)
+                // The player's own flag as well: on a joiner the host's player can start before this client's own,
+                // which is what tells LobbyManager the lobby is a 1v1. CreatePlayerListItems already checks both.
+                if (is1v1 || player.is1v1)
                 {
                     Debug.Log("CreateNewPlayerListItems: Player not found in 1v1 playerListItems: " + player.PlayerName);
                     GameObject newPlayerListItem = Instantiate(PlayerListItemPrefab) as GameObject;
@@ -519,7 +524,9 @@ public class LobbyManager : MonoBehaviour
                     if (player == localLobbyPlayerScript)
                         ChangeReadyUpButtonText();
                     // If a 3v3 game, check if player changed teams
-                    if (!is1v1)
+                    // The player's own flag too, for the same reason as in CreateNewPlayerListItems. A host that kept grey
+                    // after the lobby moved had its 1v1 row pulled into the hidden 3v3 grey list on a new joiner.
+                    if (!is1v1 && !player.is1v1)
                     {
                         if (player.isTeamGrey != playerListItemScript.isTeamGrey)
                         {

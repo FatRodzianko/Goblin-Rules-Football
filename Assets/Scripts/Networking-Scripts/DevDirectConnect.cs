@@ -16,6 +16,14 @@ using FishNet.Transporting.Tugboat;
 //
 // Use: launch two instances for a 1v1 or six for a 3v3, press a Host button in one and Join in the others, then play
 // as normal. The overlay only appears on the title screen.
+//
+// Scripted test runs: these command-line options let a script start instances that act on their own, for cases that
+// happen too quickly to do by hand.
+//   -devhost 1v1|3v3          host as soon as the title screen is up
+//   -devjoin [address]        join a dev host (127.0.0.1 if no address is given)
+//   -devleavemove [seconds]   press Leave on the moving-lobby screen this long after it appears (at once if no time)
+// An instance started with any of them runs in the background, since a script's instances are never all focused, and
+// hosts on loopback only, so a build in a new folder doesn't raise a firewall prompt.
 public class DevDirectConnect : MonoBehaviour
 {
     const string AddressKey = "DevDirectConnect.Address";
@@ -23,6 +31,12 @@ public class DevDirectConnect : MonoBehaviour
     string _address = "127.0.0.1";
     string _status = "";
     NetworkManager _networkManager;
+
+    string _commandLineHostMode = null;
+    bool _commandLineJoin = false;
+    bool _isCommandLineRun = false;
+    float _leaveMoveDelay = -1f;
+    float _leaveMoveTime = -1f;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Install()
@@ -35,6 +49,70 @@ public class DevDirectConnect : MonoBehaviour
     void Awake()
     {
         _address = PlayerPrefs.GetString(AddressKey, "127.0.0.1");
+        ReadCommandLine();
+    }
+
+    void ReadCommandLine()
+    {
+        string[] args = System.Environment.GetCommandLineArgs();
+        for (int i = 1; i < args.Length; i++)
+        {
+            string value = i + 1 < args.Length && !args[i + 1].StartsWith("-") ? args[i + 1] : null;
+            if (args[i] == "-devhost")
+                _commandLineHostMode = value ?? "1v1";
+            else if (args[i] == "-devjoin")
+            {
+                _commandLineJoin = true;
+                _address = value ?? "127.0.0.1";
+            }
+            else if (args[i] == "-devleavemove")
+            {
+                float seconds;
+                _leaveMoveDelay = value != null && float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out seconds) ? seconds : 0f;
+            }
+        }
+        _isCommandLineRun = _commandLineHostMode != null || _commandLineJoin || _leaveMoveDelay >= 0f;
+        if (_isCommandLineRun)
+            Application.runInBackground = true;
+    }
+
+    void Update()
+    {
+        if ((_commandLineHostMode != null || _commandLineJoin) && SceneManager.GetActiveScene().name == "TitleScreen"
+            && TitleScreenManager.instance != null && NetworkManagerGRF.singleton != null)
+        {
+            if (_commandLineHostMode != null)
+                StartDevHost(_commandLineHostMode != "3v3");
+            else
+                StartDevClient();
+            _commandLineHostMode = null;
+            _commandLineJoin = false;
+        }
+
+        if (_leaveMoveDelay >= 0f && LobbyHostMigration.instance != null)
+        {
+            if (!LobbyHostMigration.instance.IsMigrating)
+                _leaveMoveTime = -1f;
+            else if (_leaveMoveTime < 0f)
+                _leaveMoveTime = Time.realtimeSinceStartup + _leaveMoveDelay;
+            else if (Time.realtimeSinceStartup >= _leaveMoveTime)
+                PressMovingLobbyLeave();
+        }
+    }
+
+    // Clicks the screen's own button, so the prefab's On Click wiring is part of the test.
+    void PressMovingLobbyLeave()
+    {
+        _leaveMoveDelay = -1f;
+        MovingLobbyScreen screen = FindObjectOfType<MovingLobbyScreen>();
+        UnityEngine.UI.Button leave = screen != null ? screen.GetComponentInChildren<UnityEngine.UI.Button>() : null;
+        if (leave == null)
+        {
+            Debug.Log("DevDirectConnect: no Leave button on the moving-lobby screen.");
+            return;
+        }
+        Debug.Log("DevDirectConnect: pressing Leave on the moving-lobby screen.");
+        leave.onClick.Invoke();
     }
 
     void OnGUI()
@@ -134,7 +212,7 @@ public class DevDirectConnect : MonoBehaviour
         Tugboat tugboat = multipass.GetTransport<Tugboat>();
         if (tugboat != null)
         {
-            tugboat.SetServerBindAddress(string.Empty, FishNet.Transporting.IPAddressType.IPv4);
+            tugboat.SetServerBindAddress(_isCommandLineRun ? "127.0.0.1" : string.Empty, FishNet.Transporting.IPAddressType.IPv4);
             tugboat.SetClientAddress("localhost");
         }
         _status = "";

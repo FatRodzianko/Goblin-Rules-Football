@@ -103,7 +103,7 @@ public class TakeoverManager : MonoBehaviour
         string announcement = leaverName + " has left and has been replaced by a BOT";
         Gameplay.SendErrorMessageToTeam(true, announcement);
         Gameplay.SendErrorMessageToTeam(false, announcement);
-        StartCoroutine(RefreshGoblinTeammatesWhenBotReady(bot, team.isGrey));
+        StartCoroutine(RefreshGoblinTeammatesWhenBotReady(bot, team.isGrey, new List<GamePlayer> { bot }));
     }
     static string LeaverGoblinKey(bool isTeamGrey, string goblinType)
     {
@@ -161,29 +161,63 @@ public class TakeoverManager : MonoBehaviour
     // The replacement's goblin arrives over several ticks: the bot's OnStartClient runs InitializeAIPlayer, whose
     // ServerRpc spawns the goblin, which then adds itself to the Team roster. Only once the goblin exists, and has
     // had a moment to replicate, is the team told to remap its Q and E, and an orphaned kickoff handed over.
-    IEnumerator RefreshGoblinTeammatesWhenBotReady(GamePlayer bot, bool isTeamGrey)
+    // bot is the one that may take over the kickoff; newBots is every bot this takeover spawned (the play-on fill can
+    // spawn up to three), each of which has to be lined up if the kickoff is already underway.
+    IEnumerator RefreshGoblinTeammatesWhenBotReady(GamePlayer bot, bool isTeamGrey, List<GamePlayer> newBots)
     {
         float waited = 0f;
-        while (bot != null && bot.myGoblins.Count == 0 && waited < 10f)
+        while (waited < 10f && (IsWaitingForGoblins(bot) || newBots.Exists(IsWaitingForGoblins)))
         {
             waited += 0.25f;
             yield return new WaitForSeconds(0.25f);
         }
         yield return new WaitForSeconds(0.5f);
         fillInProgress = false;
+        HandOverKickOrReceiveChoice(bot);
         // If the leaver was the kicking player, the kickoff is orphaned: nobody holds the ball, and the timeout
         // force-kick reads kickingPlayer.serverSelectGoblin on the departed object and throws. Point the role at
         // the replacement and re-run its kickoff reposition, which places the goblin, hands it the ball and starts
         // the AI kick the normal way. A 1v1 takeover bot goes through the 1v1 reposition instead, whose AI branch
         // is the one single player has always used.
-        if (Gameplay != null && Gameplay.gamePhase == "kickoff" && Gameplay.kickingPlayer == null && Gameplay.kickingTeam != null && Gameplay.kickingTeam.isGrey == isTeamGrey && bot != null)
+        // A 1v1 receiver is named the same way (a 3v3 lines up its receiving team from the roster), and its goblins
+        // stood wherever they spawned. And a leaver in the two seconds between the kick-or-receive choice and the
+        // kickoff phase is handed over too: RepositionTeamsForKickOff would otherwise run on the departed player.
+        // Re-pointing the role is enough then, since the bot's goblins exist by now and that reposition follows.
+        if (Gameplay != null && bot != null && (Gameplay.gamePhase == "kickoff" || Gameplay.gamePhase == "cointoss"))
         {
-            Debug.Log("RefreshGoblinTeammatesWhenBotReady: the kicking player left mid-kickoff; the replacement bot takes the kickoff.");
-            Gameplay.kickingPlayer = bot;
-            if (Gameplay.is1v1)
-                bot.RpcRepositionTeamForKickOff(true);
-            else
-                bot.RpcRepositionTeamForKickOff3v3(bot.Owner, true, true);
+            bool isKickoffUnderway = Gameplay.gamePhase == "kickoff";
+            if (Gameplay.kickingPlayer == null && Gameplay.kickingTeam != null && Gameplay.kickingTeam.isGrey == isTeamGrey)
+            {
+                Debug.Log("RefreshGoblinTeammatesWhenBotReady: the kicking player left " + (isKickoffUnderway ? "mid-kickoff" : "before the kickoff") + "; the replacement bot takes the kickoff.");
+                Gameplay.kickingPlayer = bot;
+                if (isKickoffUnderway)
+                {
+                    if (Gameplay.is1v1)
+                        bot.RpcRepositionTeamForKickOff(true);
+                    else
+                        bot.RpcRepositionTeamForKickOff3v3(bot.Owner, true, true);
+                }
+            }
+            else if (Gameplay.is1v1 && Gameplay.receivingPlayer == null && Gameplay.receivingTeam != null && Gameplay.receivingTeam.isGrey == isTeamGrey)
+            {
+                Debug.Log("RefreshGoblinTeammatesWhenBotReady: the receiving player left " + (isKickoffUnderway ? "mid-kickoff" : "before the kickoff") + "; the replacement bot receives.");
+                Gameplay.receivingPlayer = bot;
+                if (isKickoffUnderway)
+                    bot.RpcRepositionTeamForKickOff(false);
+            }
+            // A 3v3 lines up every goblin by team, but a bot that arrives once the kickoff has started missed that, and
+            // its goblin stood at the team's starting spot instead of its kicking or receiving position. The kicker
+            // was lined up above; everyone else new lines up here. Before the kickoff, RepositionTeamsForKickOff
+            // lines them up with the rest of the team.
+            if (isKickoffUnderway && !Gameplay.is1v1 && Gameplay.kickingTeam != null)
+            {
+                bool isTeamKicking = Gameplay.kickingTeam.isGrey == isTeamGrey;
+                foreach (GamePlayer newBot in newBots)
+                {
+                    if (newBot != null && newBot != Gameplay.kickingPlayer)
+                        newBot.RpcRepositionTeamForKickOff3v3(newBot.Owner, isTeamKicking, false);
+                }
+            }
         }
         // Each human machine refreshes its own Q/E mapping, and the bots it owns, through its player's TargetRpc:
         // a survivor's slot can hold the leaver's destroyed goblin, which compares == null and refills.
@@ -192,6 +226,33 @@ public class TakeoverManager : MonoBehaviour
             if (player != null && !player.isAIPlayer)
                 player.RpcRefreshGoblinTeammates(player.Owner, isTeamGrey);
         }
+    }
+    // The coin has landed but the winner left before choosing kick or receive. Only the chooser was ever told to
+    // choose, so nobody did, and the coin toss timeout forces only a chooser that still exists. The bot that took
+    // over the chooser's team gets the choice the way a bot that won the toss does: the controller activation makes
+    // it pick, and setting the flag restarts the timeout. It is that team's captain, or in a 1v1 the whole team.
+    // A leaver from the other team leaves the chooser in place, so nothing is handed over then.
+    void HandOverKickOrReceiveChoice(GamePlayer bot)
+    {
+        CoinTossManager coinToss = CoinTossManager.instance;
+        if (bot == null || Gameplay == null || Gameplay.gamePhase != "cointoss" || coinToss == null)
+            return;
+        if (!coinToss.didPlayerSelectCoin || coinToss.didPlayerSelectKickOrReceive)
+            return;
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            if (player != null && player.doesPlayerChooseKickOrReceive)
+                return;
+        }
+        Debug.Log("HandOverKickOrReceiveChoice: the player choosing kick or receive left; " + bot.PlayerName + " chooses instead.");
+        bot.doesPlayerChooseKickOrReceive = true;
+        bot.coinTossControlsOnServer = false;
+        bot.kickOrReceiveControlsOnServer = true;
+        bot.RpcCoinTossAndKickOrReceiveControllerActivation(false, true);
+    }
+    static bool IsWaitingForGoblins(GamePlayer bot)
+    {
+        return bot != null && bot.myGoblins.Count == 0;
     }
     // Part B: the play-on offer. GameplayManager.HandleTeamAbandoned starts it; the countdown rides GameplayManager's
     // SyncVar to every client, where it shows on the prompt itself - the shared timeout timer sits under
@@ -319,10 +380,12 @@ public class TakeoverManager : MonoBehaviour
         fillInProgress = true;
         Debug.Log("FillAbandonedTeamWithBots: bots take over the " + (isTeamGrey ? "grey" : "green") + " team.");
         GamePlayer kickoffCandidate;
+        List<GamePlayer> newBots = new List<GamePlayer>();
         if (Gameplay.is1v1)
         {
             // The 1v1 shape is single player's: one AI player whose CmdSpawnPlayerCharacters spawns all three goblins.
             kickoffCandidate = Gameplay.SpawnAIPlayer(isTeamGrey, Game.TakePlayerNumber(), "BOT", "");
+            newBots.Add(kickoffCandidate);
         }
         else
         {
@@ -346,6 +409,7 @@ public class TakeoverManager : MonoBehaviour
             {
                 GamePlayer newBot = Gameplay.SpawnAIPlayer(isTeamGrey, Game.TakePlayerNumber(), "BOT", missingType);
                 newBot.isTakeoverBot = true;
+                newBots.Add(newBot);
                 if (missingType == "Grenadier")
                     grenadierOwner = newBot;
             }
@@ -356,6 +420,6 @@ public class TakeoverManager : MonoBehaviour
         string announcement = "BOTs have taken over the " + (isTeamGrey ? "Grey" : "Green") + " team";
         Gameplay.SendErrorMessageToTeam(true, announcement);
         Gameplay.SendErrorMessageToTeam(false, announcement);
-        StartCoroutine(RefreshGoblinTeammatesWhenBotReady(kickoffCandidate, isTeamGrey));
+        StartCoroutine(RefreshGoblinTeammatesWhenBotReady(kickoffCandidate, isTeamGrey, newBots));
     }
 }
