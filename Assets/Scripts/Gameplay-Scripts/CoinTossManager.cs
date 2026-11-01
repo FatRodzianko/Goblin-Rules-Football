@@ -184,8 +184,7 @@ public class CoinTossManager : NetworkBehaviour
         //string result = "tails";
 
         Debug.Log("FlipCoin: " + result);
-        //headsOrTailsServer = result;
-        headsOrTailsServer = "tails";
+        headsOrTailsServer = result;
     }
     void HandleHeadsOrTailsOnServer(string oldValue, string newValue)
     {
