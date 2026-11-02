@@ -4,15 +4,18 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using FishNet.Managing;
 
-// Keeps a Football lobby going when its host leaves before the match starts. Every client remembers the lobby while it
-// is in it (the host's settings, who is in it, each team's bots, and its own team and goblin). When the host goes, one of
-// the remaining players starts hosting with those settings and everyone else reconnects to them and gets their seat back.
-// Sits on the NetworkManager prefab next to NetworkManagerGRF and SteamLobby.
+// Keeps a Football or Golf lobby going when its host leaves before the game starts. Every client remembers the lobby
+// while it is in it (the host's settings, who is in it, and for Football each team's bots and its own team and goblin).
+// When the host goes, one of the remaining players starts hosting with those settings and everyone else reconnects to
+// them; a Football player also gets their seat back. Sits on the NetworkManager prefab next to NetworkManagerGRF and
+// SteamLobby.
 // Steam lobbies: Steam hands the lobby's ownership to a remaining member when the host leaves, so every client agrees
 // on the new host without asking anyone. The new owner hosts and then writes its id to the lobby's HostAddress; the
 // others wait for that and connect to it.
 // Dev (Tugboat) sessions have no Steam lobby: the next player in join order takes over on the same address and port,
 // which works for instances on one machine.
+// The move itself is the same for both games. Each game's own parts are the methods marked "Per game" below: whether
+// its lobby can move, starting to host it, reconnecting to it, and ending its session.
 public class LobbyHostMigration : MonoBehaviour
 {
     public static LobbyHostMigration instance;
@@ -26,7 +29,10 @@ public class LobbyHostMigration : MonoBehaviour
 
     // What this client last saw of the lobby. Only refreshed while connected: FishNet despawns the lobby's objects before
     // it reports the connection lost, so a refresh during that teardown would remember a half-empty lobby.
+    // Which game the remembered lobby belongs to.
+    private bool _isFootball = true;
     private bool _hasSeat = false;
+    // Football's player number or Golf's join number: both count up in join order.
     private int _myPlayerNumber;
     private bool _seatIsGrey;
     private string _seatGoblinType = "";
@@ -67,7 +73,7 @@ public class LobbyHostMigration : MonoBehaviour
         if (instance == this)
             instance = null;
     }
-    // Called whenever the lobby changes on this client.
+    // Called whenever the Football lobby changes on this client.
     public void RememberLobby()
     {
         if (_isMigrating || !_networkManager.ClientManager.Started || SceneManager.GetActiveScene().name != "LobbyScene")
@@ -75,6 +81,7 @@ public class LobbyHostMigration : MonoBehaviour
         NetworkManagerGRF game = NetworkManagerGRF.singleton;
         if (game == null)
             return;
+        _isFootball = true;
         LobbyPlayer me = null;
         _otherPlayers.Clear();
         _greyBots = 0;
@@ -103,7 +110,32 @@ public class LobbyHostMigration : MonoBehaviour
         _seatIsGrey = me.isTeamGrey;
         _seatGoblinType = me.goblinType;
     }
-    // A lobby this player is leaving for good: the title screen, a match starting, or a failed move.
+    // Called whenever a Golf lobby's players change on this client. A player whose NetworkPlayer is going away passes it
+    // as leaving, since it is still in the scene while it stops.
+    public void RememberGolfLobby(NetworkPlayer leaving)
+    {
+        if (_isMigrating || !_networkManager.ClientManager.Started || SceneManager.GetActiveScene().name != SteamLobby.GolfSceneName)
+            return;
+        _isFootball = false;
+        NetworkPlayer me = null;
+        _otherPlayers.Clear();
+        _greyBots = 0;
+        _greenBots = 0;
+        foreach (NetworkPlayer player in FindObjectsOfType<NetworkPlayer>())
+        {
+            if (player == leaving)
+                continue;
+            if (player.IsOwner)
+                me = player;
+            // The host's own player is the one who would be leaving, so it is never anyone's successor.
+            else if (player.JoinNumber != NetworkPlayer.HostJoinNumber)
+                _otherPlayers[player.JoinNumber] = player.PlayerName;
+        }
+        _hasSeat = me != null;
+        if (me != null)
+            _myPlayerNumber = me.JoinNumber;
+    }
+    // A lobby this player is leaving for good: the title screen, a game starting, or a failed move.
     public void Forget()
     {
         _hasSeat = false;
@@ -121,7 +153,14 @@ public class LobbyHostMigration : MonoBehaviour
             _migrationRoutine = null;
         }
     }
-    // NetworkManagerGRF asks this when its client stops. True means a move is under way, so the session isn't over.
+    // Whether this client's connection stopping now would move its lobby, without starting the move. Golf's
+    // NetworkPlayer asks this as it stops, just before the connection reports it has stopped.
+    public bool WillMoveLobby()
+    {
+        return _isMigrating || CanMoveLobby();
+    }
+    // NetworkManagerGRF (Football) and SteamLobby (Golf) ask this when their client stops. True means a move is under
+    // way, so the session isn't over.
     public bool HandleClientStopped()
     {
         // A reconnect attempt that failed while the new host was still starting. The routine keeps retrying.
@@ -131,15 +170,15 @@ public class LobbyHostMigration : MonoBehaviour
             return false;
 
         _isMigrating = true;
-        _hasSeatToRestore = true;
+        _hasSeatToRestore = _isFootball;
         // Leave the old lobby the way a finished session does, so the moved one loads fresh, exactly as a normal host or
-        // join from the title screen. FishNet keeps a scene that is already loaded, so the old LobbyScene, its UI still
+        // join from the title screen. FishNet keeps a scene that is already loaded, so the old lobby scene, its UI still
         // holding the players that just despawned, would otherwise carry on as the new lobby.
         SceneManager.LoadScene("TitleScreen");
         ShowScreen(MovingMessage(""));
-        if (!NetworkManagerGRF.singleton.isDevSession)
+        if (!IsDevSession())
         {
-            _departedHostAddress = NetworkManagerGRF.singleton.networkAddress;
+            _departedHostAddress = DepartedHostAddress();
             Debug.Log("LobbyHostMigration: the host left the lobby. Waiting for Steam to pick the new host.");
             _migrationRoutine = StartCoroutine(SteamMoveRoutine());
             return true;
@@ -168,18 +207,20 @@ public class LobbyHostMigration : MonoBehaviour
         }
         Debug.Log("LobbyHostMigration: this player left the lobby while it was moving.");
         Forget();
-        NetworkManagerGRF game = NetworkManagerGRF.singleton;
-        if (_networkManager.ServerManager.Started)
-            game.StopHost();
-        else if (_networkManager.ClientManager.Started)
-            game.StopClient();
-        else
-            game.EndFootballSession();
+        EndSession();
     }
+    // Per game: whether the lobby this player was in can move to a new host now that its client has stopped.
     bool CanMoveLobby()
     {
         NetworkManagerGRF game = NetworkManagerGRF.singleton;
-        if (game == null || !game.IsFootballSession || game.isLeavingOnPurpose)
+        if (game == null)
+            return false;
+        return game.IsFootballSession ? CanMoveFootballLobby() : CanMoveGolfLobby();
+    }
+    bool CanMoveFootballLobby()
+    {
+        NetworkManagerGRF game = NetworkManagerGRF.singleton;
+        if (!_isFootball || game.isLeavingOnPurpose)
             return false;
         // A dev session, or a Steam lobby this player is still in. Single player has neither, and no one to move to.
         bool isInSteamLobby = game.HasSteamLobby && SteamLobby.instance != null && SteamLobby.instance.CurrentLobbyID != 0;
@@ -192,6 +233,34 @@ public class LobbyHostMigration : MonoBehaviour
         if (!_hasSeat || !game.hasReceivedMatchSettings || SceneManager.GetActiveScene().name != "LobbyScene")
             return false;
         return true;
+    }
+    bool CanMoveGolfLobby()
+    {
+        GolfLobbySettings golf = GolfLobbySettings.instance;
+        if (_isFootball || golf == null || golf.IsLeavingOnPurpose || golf.HasGameStarted)
+            return false;
+        // A dev session, or a Steam lobby this player is still in. Solo golf has neither, and no one to move to.
+        bool isInSteamLobby = SteamLobby.instance != null && SteamLobby.instance.CurrentLobbyID != 0;
+        if (!golf.IsDevSession && !isInSteamLobby)
+            return false;
+        if (_networkManager.ServerManager.Started)
+            return false;
+        // Only a lobby this player was in, with its settings to carry on with.
+        if (!_hasSeat || !golf.HasReceivedSettings || SceneManager.GetActiveScene().name != SteamLobby.GolfSceneName)
+            return false;
+        return true;
+    }
+    bool IsDevSession()
+    {
+        if (_isFootball)
+            return NetworkManagerGRF.singleton.isDevSession;
+        return GolfLobbySettings.instance.IsDevSession;
+    }
+    string DepartedHostAddress()
+    {
+        if (_isFootball)
+            return NetworkManagerGRF.singleton.networkAddress;
+        return SteamLobby.instance.GolfHostAddress;
     }
     // The next player in join order takes over. Every client works this out from the same lobby, so they agree.
     bool IsSuccessor()
@@ -224,7 +293,15 @@ public class LobbyHostMigration : MonoBehaviour
         _migrationRoutine = null;
         StartHostingMovedLobby();
     }
+    // Per game: start hosting the moved lobby with the old host's settings.
     void StartHostingMovedLobby()
+    {
+        if (_isFootball)
+            StartHostingMovedFootballLobby();
+        else
+            StartHostingMovedGolfLobby();
+    }
+    void StartHostingMovedFootballLobby()
     {
         _greyBotsToRestore = _greyBots;
         _greenBotsToRestore = _greenBots;
@@ -232,6 +309,82 @@ public class LobbyHostMigration : MonoBehaviour
         game.ApplyMatchSettings(game.receivedMatchSettings);
         // If the server can't start, StartHost ends the session, which sends this player to the title screen.
         game.StartHost();
+    }
+    void StartHostingMovedGolfLobby()
+    {
+        GolfLobbySettings golf = GolfLobbySettings.instance;
+        GolfMatchSettings settings = golf.ReceivedSettings;
+        // A player who was still downloading the lobby's custom course can't host it. Leaving the Steam lobby has Steam
+        // hand it to the next member instead. A dev lobby always plays a built-in course.
+        if (!HasGolfCourse(settings.courseId))
+        {
+            Debug.Log("LobbyHostMigration: this player doesn't have the lobby's course, so can't host it. Leaving the lobby.");
+            Forget();
+            EndSession();
+            ShowFailure("You don't have this course yet.");
+            return;
+        }
+        golf.ApplySettings(settings);
+        if (!SteamLobby.instance.StartGolfHost(golf.IsDevSession))
+        {
+            Debug.Log("LobbyHostMigration: the moved Golf lobby's server didn't start. Leaving the lobby.");
+            Forget();
+            EndSession();
+        }
+    }
+    static bool HasGolfCourse(string courseId)
+    {
+        CustomGolfCourseLoader loader = CustomGolfCourseLoader.GetInstance();
+        if (loader == null || loader.AllAvailableCourses == null)
+            return false;
+        return loader.AllAvailableCourses.Courses.Exists(course => course != null && course.id == courseId);
+    }
+    // Per game: connect to the moved lobby's new host. Steam names it; a dev host is on the same address as the old one.
+    void JoinSteamHost(string hostAddress)
+    {
+        if (_isFootball)
+            SteamLobby.instance.JoinFootballHost(hostAddress);
+        else
+            SteamLobby.instance.JoinGolfHost(hostAddress);
+    }
+    void ReconnectToDevHost()
+    {
+        if (_isFootball)
+            NetworkManagerGRF.singleton.StartClient();
+        else
+            SteamLobby.instance.StartGolfClient(null, true);
+    }
+    // Per game: end this player's session for good, the way leaving it from the game's own menus does.
+    void EndSession()
+    {
+        if (_isFootball)
+            EndFootballSession();
+        else
+            EndGolfSession();
+    }
+    void EndFootballSession()
+    {
+        NetworkManagerGRF game = NetworkManagerGRF.singleton;
+        // A connection still being set up ends the session when it stops; otherwise there is nothing left to stop.
+        if (_networkManager.ServerManager.Started)
+            game.StopHost();
+        else if (_networkManager.ClientManager.Started)
+            game.StopClient();
+        else
+            game.EndFootballSession();
+    }
+    void EndGolfSession()
+    {
+        // On purpose, so the stops below don't start another move.
+        GolfLobbySettings.instance.IsLeavingOnPurpose = true;
+        if (_networkManager.ServerManager.Started)
+            _networkManager.ServerManager.StopConnection(true);
+        if (_networkManager.ClientManager.Started)
+            _networkManager.ClientManager.StopConnection();
+        if (SteamLobby.instance != null)
+            SteamLobby.instance.LeaveLobby();
+        if (SceneManager.GetActiveScene().name != "TitleScreen")
+            SceneManager.LoadScene("TitleScreen");
     }
     // Steam has the final say on who hosts: whoever owns the Steam lobby. Checked every second, since the owner can
     // change again if the new host leaves too. Steam keeps naming the old host until it has noticed it is gone.
@@ -261,7 +414,7 @@ public class LobbyHostMigration : MonoBehaviour
                 SetScreenMessage(MovingMessage(ownerName));
             string hostAddress;
             if (lobby.TryGetLobbyHost(out hostAddress) && hostAddress != _departedHostAddress)
-                lobby.JoinFootballHost(hostAddress);
+                JoinSteamHost(hostAddress);
         }
         _migrationRoutine = null;
         GiveUp();
@@ -274,8 +427,7 @@ public class LobbyHostMigration : MonoBehaviour
             yield return new WaitForSecondsRealtime(ReconnectRetrySeconds);
             if (_networkManager.ClientManager.Started)
                 continue;
-            // Same address and port: in a dev session the new host is on this machine.
-            NetworkManagerGRF.singleton.StartClient();
+            ReconnectToDevHost();
         }
         _migrationRoutine = null;
         GiveUp();
@@ -284,14 +436,14 @@ public class LobbyHostMigration : MonoBehaviour
     {
         Debug.Log("LobbyHostMigration: no new host after " + ReconnectTimeoutSeconds + " seconds. Leaving the lobby.");
         Forget();
-        // A connection still being set up ends the session when it stops; otherwise there is nothing left to stop.
-        if (_networkManager.ClientManager.Started)
-            NetworkManagerGRF.singleton.StopClient();
-        else
-            NetworkManagerGRF.singleton.EndFootballSession();
-        // Shown over the title screen for a moment, so the player knows why they are back there. Ending the session
-        // calls Forget again, which leaves a timed message alone.
-        ShowScreen("The lobby couldn't be moved" + System.Environment.NewLine + "to a new host.");
+        EndSession();
+        ShowFailure("The lobby couldn't be moved" + System.Environment.NewLine + "to a new host.");
+    }
+    // Shown over the title screen for a moment, so the player knows why they are back there. Ending the session calls
+    // Forget again, which leaves a timed message alone.
+    void ShowFailure(string message)
+    {
+        ShowScreen(message);
         if (_screen != null)
             _screen.ShowLeaveButton(false);
         _closeScreenRoutine = StartCoroutine(CloseScreenAfterRoutine(FailureMessageSeconds));
@@ -339,7 +491,7 @@ public class LobbyHostMigration : MonoBehaviour
         _closeScreenRoutine = null;
         CloseScreen();
     }
-    // This player's own LobbyPlayer has started in the moved lobby: the move is done for them.
+    // This player's own Football LobbyPlayer has started in the moved lobby: the move is done for them.
     // Returns the seat they had, if any, for LobbyPlayer to ask the server for.
     public bool TakeSeatToRestore(out bool isGrey, out string goblinType)
     {
@@ -347,21 +499,27 @@ public class LobbyHostMigration : MonoBehaviour
         goblinType = _seatGoblinType;
         bool hadSeat = _hasSeatToRestore;
         _hasSeatToRestore = false;
-        if (_isMigrating)
-        {
-            _isMigrating = false;
-            if (_migrationRoutine != null)
-            {
-                StopCoroutine(_migrationRoutine);
-                _migrationRoutine = null;
-            }
-            CloseScreen();
-            Debug.Log("LobbyHostMigration: back in the lobby.");
-        }
+        ArrivedInLobby();
         return hadSeat;
     }
-    // The new host's own LobbyPlayer is in the lobby, so bots have an owner. Puts back the bots each team had, then, on
-    // Steam, tells the lobby to connect here. Called for every host's own player; it does nothing outside a move.
+    // This player's own player object has started in a lobby. If that is the moved one, the move is done for them.
+    // Golf's NetworkPlayer calls this directly; Football's goes through TakeSeatToRestore.
+    public void ArrivedInLobby()
+    {
+        if (!_isMigrating)
+            return;
+        _isMigrating = false;
+        if (_migrationRoutine != null)
+        {
+            StopCoroutine(_migrationRoutine);
+            _migrationRoutine = null;
+        }
+        CloseScreen();
+        Debug.Log("LobbyHostMigration: back in the lobby.");
+    }
+    // The new host's own player is in the lobby, so bots have an owner. Puts back the bots each Football team had (Golf
+    // has none), then, on Steam, tells the lobby to connect here. Called for every host's own player; it does nothing
+    // outside a move.
     public void FinishTakingOver()
     {
         NetworkManagerGRF game = NetworkManagerGRF.singleton;

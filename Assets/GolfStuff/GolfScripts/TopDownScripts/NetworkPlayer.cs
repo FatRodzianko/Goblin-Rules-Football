@@ -48,6 +48,12 @@ public class NetworkPlayer : NetworkBehaviour
     public bool IsReady { get => _syncIsReady.Value; set => _syncIsReady.Value = value; }
     private readonly SyncVar<string> _syncPlayerName = new SyncVar<string>();
     public string PlayerName { get => _syncPlayerName.Value; set => _syncPlayerName.Value = value; }
+    // The order players joined in, from GameModePlayerSpawner before the spawn. A dev lobby whose host leaves moves to the
+    // remaining player who joined first; FishNet's object ids don't follow join order. The host's own player is always
+    // HostJoinNumber, since after a move other players can connect before the new host's own client does.
+    public const int HostJoinNumber = 0;
+    private readonly SyncVar<int> _syncJoinNumber = new SyncVar<int>();
+    public int JoinNumber { get => _syncJoinNumber.Value; set => _syncJoinNumber.Value = value; }
 
     [Header("Prompt Player To Download")]
     [SerializeField] GameObject _promptPlayerHolder;
@@ -87,11 +93,22 @@ public class NetworkPlayer : NetworkBehaviour
         // In that case the GameplayManager registers this player in its own OnStartServer.
         GameplayManagerTopDownGolf gameplayManager = GameplayManagerTopDownGolf.instance;
         if (gameplayManager != null && gameplayManager.IsServerInitialized)
-        {
             gameplayManager.AddNetworkPlayer(this);
-            CheckIfHostCanStartGame();
-        }
 
+    }
+    // GameModePlayerSpawner calls this once the spawn is done. FishNet only adds a new object's observers after its start
+    // callbacks, so a TargetRpc sent from OnStartServer reaches nobody ("Target is not an observer"); the host's own
+    // player lost its "can't start yet" that way.
+    [Server]
+    public void ServerSpawned()
+    {
+        // Each player keeps the host's settings, so whoever takes over the lobby if the host leaves can start it with
+        // the same course and rules.
+        if (GolfLobbySettings.instance != null)
+            RpcReceiveGolfSettings(this.Owner, GolfLobbySettings.instance.CurrentSettings());
+        GameplayManagerTopDownGolf gameplayManager = GameplayManagerTopDownGolf.instance;
+        if (gameplayManager != null && gameplayManager.IsServerInitialized)
+            CheckIfHostCanStartGame();
     }
     public override void OnStopServer()
     {
@@ -136,16 +153,34 @@ public class NetworkPlayer : NetworkBehaviour
             // The Steam lobby was entered before this player's connection started, so the name is known by now. This used
             // to wait for OnClientLoadedStartScenes, but that fires before the player is spawned, so it never ran.
             SetLobbyNameText(SteamLobby.instance.CurrentLobbyName);
+
+            // Back in a lobby that moved to a new host; a new host's own player also has the lobby pointed at it.
+            if (LobbyHostMigration.instance != null)
+            {
+                LobbyHostMigration.instance.ArrivedInLobby();
+                if (IsServerStarted)
+                    LobbyHostMigration.instance.FinishTakingOver();
+            }
         }
-        
+
         _startGameButton.gameObject.SetActive(false);
         SpawnLobbyPlayerListItem();
+        if (LobbyHostMigration.instance != null)
+            LobbyHostMigration.instance.RememberGolfLobby(null);
     }
     public override void OnStopClient()
     {
         base.OnStopClient();
         LobbyManagerGolf.instance.RemoveLobbyPlayerListItem(_myLobbyPlayerListObject);
         if (!this.IsOwner)
+        {
+            if (LobbyHostMigration.instance != null)
+                LobbyHostMigration.instance.RememberGolfLobby(this);
+            return;
+        }
+        // The host left the lobby: it carries on under a new host, which takes this player to the title screen itself
+        // and keeps the Steam lobby (LobbyHostMigration, once the connection reports it has stopped).
+        if (LobbyHostMigration.instance != null && LobbyHostMigration.instance.WillMoveLobby())
             return;
 
         //SceneLoadData sld = new SceneLoadData("TitleScreen");
@@ -176,7 +211,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     }
     [Server]
-    void CheckIfHostCanStartGame()
+    public void CheckIfHostCanStartGame()
     {
         if (AreAllPlayersReady())
         {
@@ -326,6 +361,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (!this.IsOwner)
             return;
+        GolfLobbySettings.instance.HasGameStarted = true;
         _playerUICanvas.SetActive(false);
         LobbyManagerGolf.instance.HideUIStuff();
         GameObject networkingTestHudObject = GameObject.FindGameObjectWithTag("NetworkingTestHud");
@@ -353,8 +389,11 @@ public class NetworkPlayer : NetworkBehaviour
         if (!this.IsOwner)
             return;
         // GetPersonaName throws when Steam isn't running (solo golf needs no Steam); CmdSetPlayerName already
-        // falls back to a random name for an empty one.
-        if (SteamManager.Initialized)
+        // falls back to a random name for an empty one. Dev instances on one machine share a Steam account, so the
+        // process id tells them apart.
+        if (GolfLobbySettings.instance != null && GolfLobbySettings.instance.IsDevSession)
+            CmdSetPlayerName("Dev-" + (System.Diagnostics.Process.GetCurrentProcess().Id % 10000).ToString());
+        else if (SteamManager.Initialized)
             CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
         else
             CmdSetPlayerName(string.Empty);
@@ -371,6 +410,13 @@ public class NetworkPlayer : NetworkBehaviour
             name += " (Client)";
 
         this.PlayerName = name;
+    }
+    // Each player keeps the host's settings, so the lobby can carry on under a new host if this one leaves.
+    [TargetRpc]
+    public void RpcReceiveGolfSettings(NetworkConnection target, GolfMatchSettings settings)
+    {
+        GolfLobbySettings.instance.ReceivedSettings = settings;
+        GolfLobbySettings.instance.HasReceivedSettings = true;
     }
     void SetPlayerSteamID()
     {
@@ -397,6 +443,9 @@ public class NetworkPlayer : NetworkBehaviour
         if (asServer)
             return;
         _myLobbyPlayerListScript.UpdatePlayerName(next);
+        // The name goes on the moving-lobby screen if this player takes the lobby over.
+        if (LobbyHostMigration.instance != null)
+            LobbyHostMigration.instance.RememberGolfLobby(null);
         if (!this.IsOwner)
             return;
         _welcomeText.text = "Welcome " + next + "!";
@@ -460,6 +509,7 @@ public class NetworkPlayer : NetworkBehaviour
     }
     public void OnClick_Disconnect()
     {
+        GolfLobbySettings.instance.IsLeavingOnPurpose = true;
         if (base.IsServer)
         {
             _networkManager.ServerManager.StopConnection(true);

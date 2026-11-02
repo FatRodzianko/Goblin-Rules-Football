@@ -2,6 +2,7 @@ using FishNet;
 using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Object;
+using FishNet.Transporting;
 using UnityEngine;
 
 // Spawns the player object for whichever game the host started. It replaces FishNet's PlayerSpawner, which always spawned
@@ -18,6 +19,9 @@ public class GameModePlayerSpawner : MonoBehaviour
 
     private NetworkManager _networkManager;
     private int _nextSpawn;
+    // Golf players are numbered in the order they join, starting again with each server. The host's own player is
+    // NetworkPlayer.HostJoinNumber.
+    private int _nextGolfJoinNumber = 1;
 
     private void Awake()
     {
@@ -30,11 +34,20 @@ public class GameModePlayerSpawner : MonoBehaviour
             return;
         }
         _networkManager.SceneManager.OnClientLoadedStartScenes += SceneManager_OnClientLoadedStartScenes;
+        _networkManager.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
     }
     private void OnDestroy()
     {
         if (_networkManager != null)
+        {
             _networkManager.SceneManager.OnClientLoadedStartScenes -= SceneManager_OnClientLoadedStartScenes;
+            _networkManager.ServerManager.OnServerConnectionState -= ServerManager_OnServerConnectionState;
+        }
+    }
+    private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs args)
+    {
+        if (args.ConnectionState == LocalConnectionState.Started)
+            _nextGolfJoinNumber = 1;
     }
     private void SceneManager_OnClientLoadedStartScenes(NetworkConnection conn, bool asServer)
     {
@@ -57,7 +70,13 @@ public class GameModePlayerSpawner : MonoBehaviour
         Quaternion rotation;
         SetSpawn(_playerPrefab.transform, out position, out rotation);
         NetworkObject nob = _networkManager.GetPooledInstantiated(_playerPrefab, position, rotation, true);
+        NetworkPlayer player = nob.GetComponent<NetworkPlayer>();
+        if (player != null)
+            player.JoinNumber = conn.IsHost ? NetworkPlayer.HostJoinNumber : _nextGolfJoinNumber++;
         _networkManager.ServerManager.Spawn(nob, conn);
+        // After the spawn, once the owner observes the player: its settings copy and the host's Start Game state.
+        if (player != null)
+            player.ServerSpawned();
         // If there are no global scenes
         if (_addToDefaultScene)
             _networkManager.SceneManager.AddOwnerToDefaultScene(nob);

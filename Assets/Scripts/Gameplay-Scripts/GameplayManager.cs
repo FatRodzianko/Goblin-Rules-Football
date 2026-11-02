@@ -91,6 +91,11 @@ public class GameplayManager : NetworkBehaviour
     [SerializeField] TextMeshProUGUI KickWasBlockedText;
     bool kickAfterRoutineRunning = false;
     [SerializeField] bool _wasKickGoodOrBadSubmitted = false;
+    // Server only. Set once this kick-after has its result - good, no good or blocked - and cleared when the next one
+    // starts. _wasKickGoodOrBadSubmitted clears itself after 0.2 s, so it can't tell a finished attempt apart: an AI
+    // kicker knocked out by an obstacle on its way to the spot still submitted its position afterwards, which started
+    // the countdown and the blocking AI over the next kickoff.
+    bool _isKickAfterResolved = false;
 
     [Header("Xtra Time")]
     private readonly SyncVar<bool> _syncIsXtraTime = new SyncVar<bool>();
@@ -396,6 +401,7 @@ public class GameplayManager : NetworkBehaviour
                 // the kicker the instant this one starts, before a position has been chosen, and block it. This is the
                 // server's hook, which runs ahead of the client one and of the blocking being armed.
                 ClearAllAIBlockKick();
+                _isKickAfterResolved = false;
                 SetKickAfterPlayers(scoringGoblinNetId);
                 RpcNoTeamWithFootball();
                 ObstacleManager.instance.KickAfterWaitToEnableObstacleColliders();
@@ -522,23 +528,34 @@ public class GameplayManager : NetworkBehaviour
     {
         Debug.Log("RepositionTeamsForKickOff in gamemanager");
         ResetAllGoblinStatuses();
+        // The kicker and receiver were named earlier - after the coin toss, at the touchdown, at halftime - and either
+        // can have left since, leaving the kickoff with nobody to kick. Whoever plays for that team now takes the role.
+        // A play-on bot that isn't in yet is handed it by TakeoverManager once it is.
+        kickingPlayer = StandInFor(kickingPlayer, kickingTeam, "kicking");
+        receivingPlayer = StandInFor(receivingPlayer, receivingTeam, "receiving");
         if (this.is1v1 || this.isSinglePlayer)
         {
-            receivingPlayer.RpcRepositionTeamForKickOff(false);
-            receivingPlayer.gameplayActionControlsOnServer = false;
-            receivingPlayer.goblinMovementControlsOnServer = false;
-            receivingPlayer.powerupsControlsOnServer = false;
-            receivingPlayer.kickingControlsOnServer = false;
-            receivingPlayer.kickOffAimArrowControlsOnServer = false;            
-            receivingPlayer.qeSwitchingControlsOnServer = true;
+            if (receivingPlayer != null)
+            {
+                receivingPlayer.RpcRepositionTeamForKickOff(false);
+                receivingPlayer.gameplayActionControlsOnServer = false;
+                receivingPlayer.goblinMovementControlsOnServer = false;
+                receivingPlayer.powerupsControlsOnServer = false;
+                receivingPlayer.kickingControlsOnServer = false;
+                receivingPlayer.kickOffAimArrowControlsOnServer = false;
+                receivingPlayer.qeSwitchingControlsOnServer = true;
+            }
 
-            kickingPlayer.RpcRepositionTeamForKickOff(true);
-            kickingPlayer.gameplayActionControlsOnServer = false;
-            kickingPlayer.goblinMovementControlsOnServer = false;
-            kickingPlayer.powerupsControlsOnServer = false;
-            kickingPlayer.kickingControlsOnServer = true;
-            kickingPlayer.kickOffAimArrowControlsOnServer = true;
-            kickingPlayer.qeSwitchingControlsOnServer = false;
+            if (kickingPlayer != null)
+            {
+                kickingPlayer.RpcRepositionTeamForKickOff(true);
+                kickingPlayer.gameplayActionControlsOnServer = false;
+                kickingPlayer.goblinMovementControlsOnServer = false;
+                kickingPlayer.powerupsControlsOnServer = false;
+                kickingPlayer.kickingControlsOnServer = true;
+                kickingPlayer.kickOffAimArrowControlsOnServer = true;
+                kickingPlayer.qeSwitchingControlsOnServer = false;
+            }
         }
         else
         {
@@ -1009,6 +1026,7 @@ public class GameplayManager : NetworkBehaviour
     void ResolveKickAfterWithoutScorer()
     {
         Debug.Log("ResolveKickAfterWithoutScorer: the scoring goblin left before the kick-after. Resolving it as blocked.");
+        _isKickAfterResolved = true;
         scoringPlayer = null;
         blockingPlayer = null;
         scoringTeam = scoringTeamIsGrey ? TeamManager.instance.greyTeam : TeamManager.instance.greenTeam;
@@ -1073,8 +1091,19 @@ public class GameplayManager : NetworkBehaviour
     public void StartKickAfterTimer()
     {
         Debug.Log("StartKickAfterTimer: for 1v1? " + this.is1v1.ToString());
+        if (_isKickAfterResolved || gamePhase != "kick-after-attempt")
+        {
+            Debug.Log("StartKickAfterTimer: the kick-after is already over. Not starting the countdown.");
+            return;
+        }
         if (this.is1v1)
         {
+            // The blocker was named at the touchdown. One who has left since was replaced by a play-on bot, which has
+            // to be the blocker here, or BlockingSkirmisherAI never finds it and nothing contests the kick. (A 3v3
+            // works from the teams' rosters.) Before that bot is in, the departed player stays named, as before.
+            GamePlayer blocker = StandInFor(blockingPlayer, receivingTeam, "blocking");
+            if (blocker != null)
+                blockingPlayer = blocker;
             scoringPlayer.RpcStartKickAfterTimer(scoringPlayer.Owner, true);
             blockingPlayer.RpcStartKickAfterTimer(blockingPlayer.Owner, false);
         }
@@ -1131,6 +1160,9 @@ public class GameplayManager : NetworkBehaviour
         yield return new WaitForSeconds(1.0f);
         RpcDisableKickAfterTimerUI();
         isKickAfterTimerCountDownRunning = false;
+        // Blocked during the countdown, say by an obstacle: hand out no kicking or blocking controls, and arm no AI.
+        if (_isKickAfterResolved || gamePhase != "kick-after-attempt")
+            yield break;
         if (this.is1v1)
         {
             scoringPlayer.RpcActivateKickAfterKickingControls(scoringPlayer.Owner, true);
@@ -1277,6 +1309,7 @@ public class GameplayManager : NetworkBehaviour
             }
         }
         _wasKickGoodOrBadSubmitted = true;
+        _isKickAfterResolved = true;
         StartCoroutine(WasKickGoodOrBadSubmittedCooldownRoutine());
         RpcKickAfterWasKickGoodOrBad(isKickGood, isScoringPlayerGrey);
         TeamManager.instance.KickAfterAttempts(scoringPlayer.isTeamGrey, isKickGood);
@@ -1432,6 +1465,7 @@ public class GameplayManager : NetworkBehaviour
             Debug.Log("KickAfterAttemptWasBlocked: _wasKickGoodOrBadSubmitted was already set. Returning...");
             return;
         }
+        _isKickAfterResolved = true;
         TransitionFromKickAfterAttemptToKickOff();
         DisableKickAfterPositioningControls();
         DisableKickAfterAttemptControls();
@@ -2404,6 +2438,32 @@ public class GameplayManager : NetworkBehaviour
         newFootball.transform.position = dropPosition;
         InstanceFinder.ServerManager.Spawn(newFootball);
         Debug.Log("RespawnFootballForCarrierDespawn: replaced the ball at " + dropPosition.ToString());
+    }
+    // A player named for a set piece, or if they have left (a departed player compares == null), whoever plays for
+    // their team now: the captain in a 3v3, which Team.PromoteNewCaptain keeps current, and the team's one player in
+    // a 1v1 or single player. Null when the team has nobody yet, such as a play-on bot still joining.
+    [Server]
+    GamePlayer StandInFor(GamePlayer named, Team team, string role)
+    {
+        if (named != null || team == null)
+            return named;
+        GamePlayer standIn = null;
+        if (!this.is1v1 && !this.isSinglePlayer)
+            standIn = team.captain;
+        else
+        {
+            foreach (GamePlayer player in Game.GamePlayers)
+            {
+                if (player != null && player.isTeamGrey == team.isGrey)
+                {
+                    standIn = player;
+                    break;
+                }
+            }
+        }
+        if (standIn != null)
+            Debug.Log("StandInFor: the " + role + " player left; " + standIn.PlayerName + " takes the role.");
+        return standIn;
     }
     // team.captain is null only if the captain left and no teammate was there to take over, which PromoteNewCaptain
     // normally handles. Both kickoff paths read it, so check before reading rather than throwing on the next line.

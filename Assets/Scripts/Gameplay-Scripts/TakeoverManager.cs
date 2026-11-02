@@ -173,6 +173,7 @@ public class TakeoverManager : MonoBehaviour
         }
         yield return new WaitForSeconds(0.5f);
         fillInProgress = false;
+        HandOverCoinChoice(bot);
         HandOverKickOrReceiveChoice(bot);
         // If the leaver was the kicking player, the kickoff is orphaned: nobody holds the ball, and the timeout
         // force-kick reads kickingPlayer.serverSelectGoblin on the departed object and throws. Point the role at
@@ -226,6 +227,26 @@ public class TakeoverManager : MonoBehaviour
             if (player != null && !player.isAIPlayer)
                 player.RpcRefreshGoblinTeammates(player.Owner, isTeamGrey);
         }
+    }
+    // The coin chooser left before calling the coin. A 3v3 replacement takes over the chooser's Grenadier, so
+    // CmdDoesPlayerChooseCoin hands it the coin already, but a 1v1's chooser is player number 2, and the play-on bot
+    // gets a new number past the seats: nobody chose, and the coin toss timeout forces only a chooser that still
+    // exists. The bot gets the coin the way a bot chooser always has: setting the flag makes it pick (on the host,
+    // its owner) and restarts the timeout.
+    void HandOverCoinChoice(GamePlayer bot)
+    {
+        CoinTossManager coinToss = CoinTossManager.instance;
+        if (bot == null || Gameplay == null || Gameplay.gamePhase != "cointoss" || coinToss == null)
+            return;
+        if (coinToss.didPlayerSelectCoin)
+            return;
+        foreach (GamePlayer player in Game.GamePlayers)
+        {
+            if (player != null && player.doesPlayerChooseCoin)
+                return;
+        }
+        Debug.Log("HandOverCoinChoice: the player choosing the coin left; " + bot.PlayerName + " chooses instead.");
+        bot.doesPlayerChooseCoin = true;
     }
     // The coin has landed but the winner left before choosing kick or receive. Only the chooser was ever told to
     // choose, so nobody did, and the coin toss timeout forces only a chooser that still exists. The bot that took

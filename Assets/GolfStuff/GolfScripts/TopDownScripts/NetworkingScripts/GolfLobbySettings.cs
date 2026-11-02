@@ -33,6 +33,17 @@ public class GolfLobbySettings : MonoBehaviour
     [SerializeField] public List<int> CustomHolesToPlay = new List<int>();
     [SerializeField] public ulong CourseWorkshopID;
 
+    // A client's copy of the host's settings, from NetworkPlayer.RpcReceiveGolfSettings. Kept apart from the fields
+    // above, which only the host's code reads, so having the copy changes nothing until a lobby has to move to a new host.
+    public GolfMatchSettings ReceivedSettings;
+    public bool HasReceivedSettings = false;
+    // Set when this player leaves their Golf session themselves, so a lost host can be told apart from a player leaving.
+    public bool IsLeavingOnPurpose = false;
+    // Set on each player when the host presses Start Game. Only a lobby can move to a new host, never a game under way.
+    public bool HasGameStarted = false;
+    // A Golf session started over Tugboat by DevDirectConnect, with no Steam lobby. Always false in a release build.
+    public bool IsDevSession = false;
+
 
     private void Awake()
     {
@@ -65,6 +76,7 @@ public class GolfLobbySettings : MonoBehaviour
             Debug.Log("GolfLobbySettings: CreateLobby: friendsOnlyToggle is on. Making lobby friends only.");
             newLobbyType = ELobbyType.k_ELobbyTypeFriendsOnly;
         }
+        this.FriendsOnly = friendsOnly;
 
         this.PowerUpsEnabled = powerUpsEnabled;
         this.WeatherStatuesEnabled = spawnStatues;
@@ -115,6 +127,55 @@ public class GolfLobbySettings : MonoBehaviour
             SteamLobby.instance.StartSoloGolfSession();
         else
             SteamLobby.instance.CreateGolfLobby(newLobbyType, numberOfPlayers, lobbyName, this.CourseName);
+    }
+    // A Golf session is starting on this machine, as host or client: nothing from an earlier one carries over.
+    public void BeginSession(bool isDevSession)
+    {
+        IsDevSession = isDevSession;
+        HasReceivedSettings = false;
+        IsLeavingOnPurpose = false;
+        HasGameStarted = false;
+    }
+    // The settings this lobby was created with. Only the host has them, from the title screen; clients get a copy.
+    public GolfMatchSettings CurrentSettings()
+    {
+        GolfMatchSettings settings = new GolfMatchSettings();
+        settings.numberOfPlayers = this.NumberOfPlayers;
+        settings.friendsOnly = this.FriendsOnly;
+        settings.powerUpsEnabled = this.PowerUpsEnabled;
+        settings.weatherStatuesEnabled = this.WeatherStatuesEnabled;
+        settings.strokeLimitEnabled = this.StrokeLimitEnabled;
+        settings.strokeLimitNumber = this.StrokeLimitNumber;
+        settings.rainMode = this.GameRainMode;
+        settings.windMode = this.GameWindMode;
+        settings.parFavorPenalty = this.ParFavorPenalty;
+        settings.courseId = this.SelectedCourseID;
+        settings.courseName = this.CourseName;
+        settings.courseWorkshopId = this.CourseWorkshopID;
+        settings.courseHoleSelection = this.CourseHoleSelection;
+        settings.customHolesToPlay = new List<int>(this.CustomHolesToPlay);
+        return settings;
+    }
+    // A player taking over a lobby whose host left starts it with the old host's settings, the same fields CreateLobby
+    // fills in from the title screen.
+    public void ApplySettings(GolfMatchSettings settings)
+    {
+        this.NumberOfPlayers = settings.numberOfPlayers;
+        this.FriendsOnly = settings.friendsOnly;
+        this.PowerUpsEnabled = settings.powerUpsEnabled;
+        this.WeatherStatuesEnabled = settings.weatherStatuesEnabled;
+        this.StrokeLimitEnabled = settings.strokeLimitEnabled;
+        this.StrokeLimitNumber = settings.strokeLimitNumber;
+        this.GameRainMode = settings.rainMode;
+        this.GameWindMode = settings.windMode;
+        this.ParFavorPenalty = settings.parFavorPenalty;
+        this.SelectedCourseID = settings.courseId;
+        this.CourseName = settings.courseName;
+        this.CourseWorkshopID = settings.courseWorkshopId;
+        this.CourseHoleSelection = settings.courseHoleSelection;
+        this.CustomHolesToPlay.Clear();
+        if (settings.customHolesToPlay != null)
+            this.CustomHolesToPlay.AddRange(settings.customHolesToPlay);
     }
     void ResetGameSettingsToDefault()
     {

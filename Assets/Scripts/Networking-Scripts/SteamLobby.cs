@@ -17,7 +17,7 @@ public class SteamLobby : MonoBehaviour
     public const string GameModeFootball = "Football";
     public const string GameModeGolf = "Golf";
     private const string HostAddressKey = "HostAddress";
-    private const string GolfSceneName = "Golf-prototype-topdown";
+    public const string GolfSceneName = "Golf-prototype-topdown";
 
     protected Callback<LobbyCreated_t> lobbyCreated;
     protected Callback<GameLobbyJoinRequested_t> gameLobbyJoinRequested;
@@ -30,6 +30,9 @@ public class SteamLobby : MonoBehaviour
     // The Steam lobby this player is in, or 0.
     public ulong CurrentLobbyID { get; private set; }
     public string CurrentLobbyName { get; private set; }
+    // The Steam id of the Golf host this player last joined, so a lobby moving to a new host doesn't reconnect to the
+    // one that left (LobbyHostMigration). Football's is NetworkManagerGRF.networkAddress.
+    public string GolfHostAddress { get; private set; }
 
     private NetworkManager _networkManager;
     // What the lobby being created is for, kept until Steam reports that it was created.
@@ -215,7 +218,8 @@ public class SteamLobby : MonoBehaviour
         }
         else
         {
-            StartGolfHost();
+            if (!StartGolfHost(false))
+                LeaveLobby();
         }
     }
     // The NetworkManager's transport is Multipass, holding FishySteamworks and Tugboat. The server opens both, but a client
@@ -270,28 +274,30 @@ public class SteamLobby : MonoBehaviour
             return;
         }
         UseSteamTransport();
-        if (gameMode == GameModeFootball)
+        if (gameMode == GameModeFootball || gameMode == GameModeGolf)
         {
-            // A Football lobby whose host just left is moving to Steam's new owner, and HostAddress still names the old
-            // host until the new one is ready (LobbyHostMigration). Connecting now would only fail.
+            // A lobby whose host just left is moving to Steam's new owner, and HostAddress still names the old host until
+            // the new one is ready (LobbyHostMigration). Connecting now would only fail.
             if (!IsHostAddressCurrent(lobbyId))
             {
                 Debug.Log("OnLobbyEntered: the lobby is moving to a new host. Waiting for it before joining.");
-                _joinWhenHostReadyRoutine = StartCoroutine(JoinWhenHostReadyRoutine(callback.m_ulSteamIDLobby));
+                _joinWhenHostReadyRoutine = StartCoroutine(JoinWhenHostReadyRoutine(callback.m_ulSteamIDLobby, gameMode));
                 return;
             }
-            JoinFootballHost(hostAddress);
-        }
-        else if (gameMode == GameModeGolf)
-        {
-            if (!_networkManager.ClientManager.StartConnection(hostAddress))
-                LeaveLobby();
+            JoinHost(gameMode, hostAddress);
         }
         else
         {
             Debug.LogWarning("SteamLobby: lobby " + CurrentLobbyID.ToString() + " has an unknown game mode: \"" + gameMode + "\"");
             LeaveLobby();
         }
+    }
+    void JoinHost(string gameMode, string hostAddress)
+    {
+        if (gameMode == GameModeGolf)
+            JoinGolfHost(hostAddress);
+        else
+            JoinFootballHost(hostAddress);
     }
     // Also how LobbyHostMigration reconnects to a moved lobby's new host.
     public void JoinFootballHost(string hostAddress)
@@ -302,7 +308,26 @@ public class SteamLobby : MonoBehaviour
         if (!NetworkManagerGRF.singleton.IsFootballSession)
             LeaveLobby();
     }
-    IEnumerator JoinWhenHostReadyRoutine(ulong lobbyID)
+    // Also how LobbyHostMigration reconnects to a moved Golf lobby's new host.
+    public void JoinGolfHost(string hostAddress)
+    {
+        UseSteamTransport();
+        GolfHostAddress = hostAddress;
+        if (!StartGolfClient(hostAddress, false))
+            LeaveLobby();
+    }
+    // Joins a Golf host over whichever transport the client is pointed at: Steam's, or Tugboat for DevDirectConnect's dev
+    // sessions. A null address reconnects to the last one, which is how a dev lobby moving to a new host on the same
+    // machine finds it.
+    public bool StartGolfClient(string hostAddress, bool isDevSession)
+    {
+        if (GolfLobbySettings.instance != null)
+            GolfLobbySettings.instance.BeginSession(isDevSession);
+        if (hostAddress == null)
+            return _networkManager.ClientManager.StartConnection();
+        return _networkManager.ClientManager.StartConnection(hostAddress);
+    }
+    IEnumerator JoinWhenHostReadyRoutine(ulong lobbyID, string gameMode)
     {
         CSteamID lobbyId = new CSteamID(lobbyID);
         float giveUpTime = Time.realtimeSinceStartup + JoinMovingLobbyTimeoutSeconds;
@@ -315,7 +340,7 @@ public class SteamLobby : MonoBehaviour
             {
                 _joinWhenHostReadyRoutine = null;
                 Debug.Log("JoinWhenHostReadyRoutine: the lobby has its new host. Joining.");
-                JoinFootballHost(SteamMatchmaking.GetLobbyData(lobbyId, HostAddressKey));
+                JoinHost(gameMode, SteamMatchmaking.GetLobbyData(lobbyId, HostAddressKey));
                 yield break;
             }
         }
@@ -373,8 +398,7 @@ public class SteamLobby : MonoBehaviour
     // session runs on Tugboat bound to loopback, like Football's single player - it works with Steam closed and a
     // shipped build raises no firewall prompt. CurrentLobbyID stays 0, so every lobby-dependent call (LeaveLobby,
     // SetGameStatusToInGame) already no-ops, and the course and settings come from GolfLobbySettings as always -
-    // the lobby data only ever fed the lobby list. Only the client's transport is started: the aggregate
-    // StartConnection would fail outright whenever FishySteamworks cannot start (the bcfa0fe7 lesson).
+    // the lobby data only ever fed the lobby list.
     public void StartSoloGolfSession()
     {
         if (!NetworkManagerGRF.singleton.UseLoopbackTransport())
@@ -382,22 +406,23 @@ public class SteamLobby : MonoBehaviour
             Debug.LogWarning("SteamLobby: could not point the transport at loopback Tugboat for solo golf.");
             return;
         }
+        StartGolfHost(false);
+    }
+    // Golf's host start, for a Steam lobby, solo golf, a dev session (DevDirectConnect) and a lobby moving to a new host
+    // (LobbyHostMigration), with GolfLobbySettings already filled in. Only the transport the local client is pointed at
+    // is started: the aggregate StartConnection fails outright whenever FishySteamworks can't start, which it can't
+    // without Steam (the bcfa0fe7 lesson), and a Steam lobby never needs Tugboat.
+    public bool StartGolfHost(bool isDevSession)
+    {
+        GolfLobbySettings.instance.BeginSession(isDevSession);
         _startingGolfHost = true;
         if (!NetworkManagerGRF.singleton.StartServerConnection())
         {
             _startingGolfHost = false;
-            Debug.LogWarning("SteamLobby: the solo Golf server didn't start.");
-        }
-    }
-    void StartGolfHost()
-    {
-        _startingGolfHost = true;
-        if (!_networkManager.ServerManager.StartConnection())
-        {
-            _startingGolfHost = false;
             Debug.LogWarning("SteamLobby: the Golf server didn't start.");
-            LeaveLobby();
+            return false;
         }
+        return true;
     }
     private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs args)
     {
@@ -423,7 +448,7 @@ public class SteamLobby : MonoBehaviour
         }
     }
     // Every way out of a session ends here: the menus, the host quitting, and a join that failed or was refused.
-    // Except Football's: NetworkManagerGRF ends that session and leaves the lobby itself, because a Football lobby whose
+    // Except Football's: NetworkManagerGRF ends that session and leaves the lobby itself. A lobby of either game whose
     // host left stays in the Steam lobby while it moves to the new host (LobbyHostMigration).
     private void ClientManager_OnClientConnectionState(ClientConnectionStateArgs args)
     {
@@ -431,6 +456,12 @@ public class SteamLobby : MonoBehaviour
             return;
         if (NetworkManagerGRF.singleton != null && NetworkManagerGRF.singleton.IsFootballSession)
             return;
+        if (LobbyHostMigration.instance != null)
+        {
+            if (LobbyHostMigration.instance.HandleClientStopped())
+                return;
+            LobbyHostMigration.instance.Forget();
+        }
         LeaveLobby();
     }
     private void SceneManager_OnLoadEnd(SceneLoadEndEventArgs args)

@@ -17,14 +17,19 @@ using FishNet.Transporting.Tugboat;
 // Use: launch two instances for a 1v1 or six for a 3v3, press a Host button in one and Join in the others, then play
 // as normal. The overlay only appears on the title screen.
 //
+// Golf works the same way: Host Golf in one instance and Join Golf in up to nine others. A dev Golf lobby plays the
+// first built-in course's front three holes with the default rules; a Steam lobby's settings come from the title
+// screen's Golf panel instead.
+//
 // Scripted test runs: these command-line options let a script start instances that act on their own, for cases that
 // happen too quickly to do by hand.
-//   -devhost 1v1|3v3          host as soon as the title screen is up
-//   -devjoin [address]        join a dev host (127.0.0.1 if no address is given)
+//   -devhost 1v1|3v3|golf     host as soon as the title screen is up
+//   -devjoin [address]        join a dev Football host (127.0.0.1 if no address is given)
+//   -devjoingolf [address]    join a dev Golf host (127.0.0.1 if no address is given)
 //   -devleavemove [seconds]   press Leave on the moving-lobby screen this long after it appears (at once if no time)
 //   -devready                 ready up once this player is in the lobby
-//   -devstart                 press Start Game once everyone in the lobby is ready (the host)
-//   -devquitonload [seconds]  quit the game this long after the match scene loads (at once if no time)
+//   -devstart                 press Start Game once everyone in the lobby is ready (the host; Golf waits for two)
+//   -devquitonload [seconds]  quit the game this long after the Football match scene loads (at once if no time)
 // An instance started with any of them runs in the background, since a script's instances are never all focused, and
 // hosts on loopback only, so a build in a new folder doesn't raise a firewall prompt.
 public class DevDirectConnect : MonoBehaviour
@@ -37,6 +42,9 @@ public class DevDirectConnect : MonoBehaviour
 
     string _commandLineHostMode = null;
     bool _commandLineJoin = false;
+    bool _commandLineJoinGolf = false;
+    // The Golf player -devready last readied: a moved lobby gives this player a new one.
+    NetworkPlayer _readiedGolfPlayer;
     bool _isCommandLineRun = false;
     float _leaveMoveDelay = -1f;
     float _leaveMoveTime = -1f;
@@ -70,9 +78,10 @@ public class DevDirectConnect : MonoBehaviour
             string value = i + 1 < args.Length && !args[i + 1].StartsWith("-") ? args[i + 1] : null;
             if (args[i] == "-devhost")
                 _commandLineHostMode = value ?? "1v1";
-            else if (args[i] == "-devjoin")
+            else if (args[i] == "-devjoin" || args[i] == "-devjoingolf")
             {
                 _commandLineJoin = true;
+                _commandLineJoinGolf = args[i] == "-devjoingolf";
                 _address = value ?? "127.0.0.1";
             }
             else if (args[i] == "-devleavemove")
@@ -100,8 +109,12 @@ public class DevDirectConnect : MonoBehaviour
         if ((_commandLineHostMode != null || _commandLineJoin) && SceneManager.GetActiveScene().name == "TitleScreen"
             && TitleScreenManager.instance != null && NetworkManagerGRF.singleton != null)
         {
-            if (_commandLineHostMode != null)
+            if (_commandLineHostMode == "golf")
+                StartDevGolfHost();
+            else if (_commandLineHostMode != null)
                 StartDevHost(_commandLineHostMode != "3v3");
+            else if (_commandLineJoinGolf)
+                StartDevGolfClient();
             else
                 StartDevClient();
             _commandLineHostMode = null;
@@ -116,6 +129,12 @@ public class DevDirectConnect : MonoBehaviour
                 _leaveMoveTime = Time.realtimeSinceStartup + _leaveMoveDelay;
             else if (Time.realtimeSinceStartup >= _leaveMoveTime)
                 PressMovingLobbyLeave();
+        }
+
+        if (SceneManager.GetActiveScene().name == SteamLobby.GolfSceneName)
+        {
+            UpdateGolfLobby();
+            return;
         }
 
         if (_readyUp && LobbyManager.instance != null && LobbyManager.instance.localLobbyPlayerScript != null)
@@ -150,6 +169,53 @@ public class DevDirectConnect : MonoBehaviour
                 Debug.Log("DevDirectConnect: quitting while the match loads.");
                 Application.Quit();
             }
+        }
+    }
+
+    // The scripted ready-up and Start Game for a Golf lobby, whose lobby is the game scene itself. Ready-up happens again
+    // in a lobby that moved to a new host, where every player starts unready, so a moved lobby can be started too.
+    void UpdateGolfLobby()
+    {
+        if (!_readyUp && !_startGame)
+            return;
+        GameplayManagerTopDownGolf manager = GameplayManagerTopDownGolf.instance;
+        if (manager == null)
+            return;
+        NetworkPlayer me = null;
+        bool allReady = manager.NetworkPlayersServer.Count >= 2;
+        foreach (NetworkPlayer player in manager.NetworkPlayersServer)
+        {
+            if (player == null)
+                continue;
+            if (player.IsOwner)
+                me = player;
+            if (!player.IsReady)
+                allReady = false;
+        }
+        if (me == null)
+            return;
+
+        if (_readyUp && me != _readiedGolfPlayer)
+        {
+            if (_readyUpTime < 0f)
+                _readyUpTime = Time.realtimeSinceStartup + LobbySettleSeconds;
+            else if (Time.realtimeSinceStartup >= _readyUpTime)
+            {
+                _readyUpTime = -1f;
+                _readiedGolfPlayer = me;
+                if (!me.IsReady)
+                {
+                    Debug.Log("DevDirectConnect: pressing Ready Up.");
+                    me.PlayerReadyUp();
+                }
+            }
+        }
+
+        if (_startGame && allReady && me.IsServerStarted)
+        {
+            _startGame = false;
+            Debug.Log("DevDirectConnect: pressing Start Game.");
+            me.HostStartGame();
         }
     }
 
@@ -188,7 +254,7 @@ public class DevDirectConnect : MonoBehaviour
         if (SceneManager.GetActiveScene().name != "TitleScreen")
             return;
 
-        GUILayout.BeginArea(new Rect(10f, 10f, 230f, 180f), GUI.skin.box);
+        GUILayout.BeginArea(new Rect(10f, 10f, 230f, 240f), GUI.skin.box);
         GUILayout.Label("Local testing (no Steam)");
 
         if (GUILayout.Button("Host 1v1"))
@@ -205,6 +271,13 @@ public class DevDirectConnect : MonoBehaviour
 
         if (GUILayout.Button("Join over Tugboat"))
             StartDevClient();
+
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Host Golf"))
+            StartDevGolfHost();
+        if (GUILayout.Button("Join Golf"))
+            StartDevGolfClient();
+        GUILayout.EndHorizontal();
 
         if (!string.IsNullOrEmpty(_status))
             GUILayout.Label(_status);
@@ -244,6 +317,45 @@ public class DevDirectConnect : MonoBehaviour
         NetworkManagerGRF.singleton.networkAddress = _address;
         NetworkManagerGRF.singleton.StartClient();
         _status = NetworkManagerGRF.singleton.IsFootballSession ? "Connecting to " + _address + "." : "Could not start the client.";
+        Debug.Log("DevDirectConnect: " + _status);
+    }
+
+    // Golf's session is SteamLobby's, not NetworkManagerGRF's, so it never sets isDevSession: GolfLobbySettings has its own.
+    void StartDevGolfHost()
+    {
+        if (!Ready())
+            return;
+        CustomGolfCourseLoader courses = CustomGolfCourseLoader.GetInstance();
+        if (courses == null || courses.AllAvailableCourses == null || courses.AllAvailableCourses.Courses.Count == 0)
+        {
+            _status = "No golf courses loaded.";
+            return;
+        }
+        // Over Steam these come from the title screen's Golf panel, through GolfLobbySettings.CreateLobby.
+        ScriptableCourse course = courses.AllAvailableCourses.Courses[0];
+        GolfMatchSettings settings = new GolfMatchSettings();
+        settings.numberOfPlayers = GolfLobbySettings.instance.MaxNumberOfPlayers;
+        settings.powerUpsEnabled = true;
+        settings.weatherStatuesEnabled = true;
+        settings.rainMode = RainManager.RainMode.ControlledByPlayerFavor;
+        settings.windMode = WindManager.WindMode.ControlledByPlayerFavor;
+        settings.courseId = course.id;
+        settings.courseName = course.CourseName;
+        settings.courseWorkshopId = course.WorkshopID;
+        settings.courseHoleSelection = "Front 3 (holes 1-3)";
+        settings.customHolesToPlay = new System.Collections.Generic.List<int>();
+        GolfLobbySettings.instance.ApplySettings(settings);
+
+        _status = SteamLobby.instance.StartGolfHost(true) ? "Hosting Golf (" + course.CourseName + ")." : "Could not start the server.";
+        Debug.Log("DevDirectConnect: " + _status);
+    }
+
+    void StartDevGolfClient()
+    {
+        if (!Ready())
+            return;
+        PlayerPrefs.SetString(AddressKey, _address);
+        _status = SteamLobby.instance.StartGolfClient(_address, true) ? "Connecting to Golf at " + _address + "." : "Could not start the client.";
         Debug.Log("DevDirectConnect: " + _status);
     }
 
