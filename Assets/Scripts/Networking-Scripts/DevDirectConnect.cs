@@ -22,6 +22,9 @@ using FishNet.Transporting.Tugboat;
 //   -devhost 1v1|3v3          host as soon as the title screen is up
 //   -devjoin [address]        join a dev host (127.0.0.1 if no address is given)
 //   -devleavemove [seconds]   press Leave on the moving-lobby screen this long after it appears (at once if no time)
+//   -devready                 ready up once this player is in the lobby
+//   -devstart                 press Start Game once everyone in the lobby is ready (the host)
+//   -devquitonload [seconds]  quit the game this long after the match scene loads (at once if no time)
 // An instance started with any of them runs in the background, since a script's instances are never all focused, and
 // hosts on loopback only, so a build in a new folder doesn't raise a firewall prompt.
 public class DevDirectConnect : MonoBehaviour
@@ -37,6 +40,13 @@ public class DevDirectConnect : MonoBehaviour
     bool _isCommandLineRun = false;
     float _leaveMoveDelay = -1f;
     float _leaveMoveTime = -1f;
+    bool _readyUp = false;
+    float _readyUpTime = -1f;
+    bool _startGame = false;
+    float _quitOnLoadDelay = -1f;
+    float _quitOnLoadTime = -1f;
+    // Lets the lobby settle after this player's row appears, as a person would.
+    const float LobbySettleSeconds = 1f;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Install()
@@ -70,8 +80,17 @@ public class DevDirectConnect : MonoBehaviour
                 float seconds;
                 _leaveMoveDelay = value != null && float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out seconds) ? seconds : 0f;
             }
+            else if (args[i] == "-devready")
+                _readyUp = true;
+            else if (args[i] == "-devstart")
+                _startGame = true;
+            else if (args[i] == "-devquitonload")
+            {
+                float seconds;
+                _quitOnLoadDelay = value != null && float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out seconds) ? seconds : 0f;
+            }
         }
-        _isCommandLineRun = _commandLineHostMode != null || _commandLineJoin || _leaveMoveDelay >= 0f;
+        _isCommandLineRun = _commandLineHostMode != null || _commandLineJoin || _leaveMoveDelay >= 0f || _readyUp || _startGame || _quitOnLoadDelay >= 0f;
         if (_isCommandLineRun)
             Application.runInBackground = true;
     }
@@ -98,6 +117,54 @@ public class DevDirectConnect : MonoBehaviour
             else if (Time.realtimeSinceStartup >= _leaveMoveTime)
                 PressMovingLobbyLeave();
         }
+
+        if (_readyUp && LobbyManager.instance != null && LobbyManager.instance.localLobbyPlayerScript != null)
+        {
+            if (_readyUpTime < 0f)
+                _readyUpTime = Time.realtimeSinceStartup + LobbySettleSeconds;
+            else if (Time.realtimeSinceStartup >= _readyUpTime)
+            {
+                _readyUp = false;
+                if (!LobbyManager.instance.localLobbyPlayerScript.isPlayerReady)
+                {
+                    Debug.Log("DevDirectConnect: pressing Ready Up.");
+                    LobbyManager.instance.PlayerReadyUp();
+                }
+            }
+        }
+
+        if (_startGame && LobbyManager.instance != null && LobbyManager.instance.localLobbyPlayerScript != null && IsLobbyReady())
+        {
+            _startGame = false;
+            Debug.Log("DevDirectConnect: pressing Start Game.");
+            LobbyManager.instance.StartGame();
+        }
+
+        if (_quitOnLoadDelay >= 0f && SceneManager.GetActiveScene().name.StartsWith("Gameplay"))
+        {
+            if (_quitOnLoadTime < 0f)
+                _quitOnLoadTime = Time.realtimeSinceStartup + _quitOnLoadDelay;
+            else if (Time.realtimeSinceStartup >= _quitOnLoadTime)
+            {
+                _quitOnLoadDelay = -1f;
+                Debug.Log("DevDirectConnect: quitting while the match loads.");
+                Application.Quit();
+            }
+        }
+    }
+
+    // The same test the lobby uses to offer Start Game.
+    bool IsLobbyReady()
+    {
+        NetworkManagerGRF game = NetworkManagerGRF.singleton;
+        if (game == null || game.LobbyPlayers.Count < game.minPlayers)
+            return false;
+        foreach (LobbyPlayer player in game.LobbyPlayers)
+        {
+            if (player == null || !player.isPlayerReady)
+                return false;
+        }
+        return true;
     }
 
     // Clicks the screen's own button, so the prefab's On Click wiring is part of the test.
