@@ -626,11 +626,23 @@ public class GoblinScript : NetworkBehaviour
         eMarker.SetActive(false);
         myRenderer.material = spriteDefault;
     }
+    // The owner's instant view of isCharacterSelected. CmdSelectThisCharacter is never refused, so a Q/E switch
+    // applies the selection locally at once - the owner's movement and sprint gates read this view - and the
+    // SyncVar's round trip only confirms it (HandleCharacterSelected clears the override, so the server's word
+    // wins from then on). Without it, a client's input kept driving the old goblin until the round trip came back.
+    bool _localSelectedOverride = false;
+    bool _localSelectedValue = false;
+    bool IsSelectedForOwner { get { return _localSelectedOverride ? _localSelectedValue : isCharacterSelected; } }
+
     public void SelectThisCharacter()
     {
         Debug.Log("SelectThisCharacter " + this.name);
         if (IsOwner)
+        {
+            _localSelectedOverride = true;
+            _localSelectedValue = true;
             CmdSelectThisCharacter();
+        }
     }
 
     [ServerRpc]
@@ -642,7 +654,11 @@ public class GoblinScript : NetworkBehaviour
     {
         Debug.Log("UnSelectThisCharacter " + this.name);
         if (IsOwner)
+        {
+            _localSelectedOverride = true;
+            _localSelectedValue = false;
             CmdUnSelectThisCharacter();
+        }
     }
 
     [ServerRpc]
@@ -656,6 +672,8 @@ public class GoblinScript : NetworkBehaviour
         {
             if (IsOwner)
             {
+                // The confirmation a Q/E switch predicted; from here the SyncVar speaks for the selection again.
+                _localSelectedOverride = false;
                 if (newValue)
                 {
                     //rb.bodyType = RigidbodyType2D.Dynamic;
@@ -1007,8 +1025,12 @@ public class GoblinScript : NetworkBehaviour
     {
         // Stamina recovery, drain and health regain live in ServerMovementUpkeep now: the server runs them
         // every step itself instead of the owner asking it to.
+
+        // A predicted slide or dive the server never confirmed: stand back up quietly.
+        if (IsOwner && IsPredictingAction && !isSliding && !isDiving && Time.time > _predictedActionGiveUpTime)
+            CancelPredictedAction();
         //if (hasAuthority && isCharacterSelected && canGoblinMove && !isGoblinPunching && !isGoblinKnockedOut && !isSliding && !isDiving)
-        if (IsOwner && isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && !this.myGamePlayer.isAIPlayer && GameplayManager.instance.gamePhase != "kickoff")
+        if (IsOwner && IsSelectedForOwner && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && !IsPredictingAction && !this.myGamePlayer.isAIPlayer && GameplayManager.instance.gamePhase != "kickoff")
         {
             SendSprintingToServer(isSprinting);
             isRunning = false;
@@ -1048,9 +1070,17 @@ public class GoblinScript : NetworkBehaviour
             Vector2 direction = Vector2.ClampMagnitude(slideDirection, 1);
             rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
         }
+        else if (IsOwner && IsPredictingAction && _predictedActionDirection != Vector2.zero)
+        {
+            // The predicted window before the server's confirmation arrives: the same movement, at the owner's
+            // own view of the speed (the server sets 1.2x MaxSpeed the moment it accepts a dive).
+            float predictedSpeed = _predictedDive ? MaxSpeed * 1.2f : LocalSpeed();
+            Vector2 direction = Vector2.ClampMagnitude(_predictedActionDirection, 1);
+            rb.MovePosition(rb.position + direction * predictedSpeed * Time.fixedDeltaTime);
+        }
         // gameFootball can be gone for a frame or two when a game is ending or a player has just left, and the goblin
         // chasing code below reads it every physics frame.
-        if (IsOwner && !isCharacterSelected && gameFootball != null && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
+        if (IsOwner && !IsSelectedForOwner && gameFootball != null && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
         {
             // Important thing here is "&& !isCharacterSelected"
             // This will be what the goblin does when they are not selected. AI code will go here?
@@ -1683,7 +1713,7 @@ public class GoblinScript : NetworkBehaviour
                 isPlayerSprinting = false;
                 
             //Debug.Log("IsPlayerSprinting: " + isPlayerSprinting.ToString() + " for goblin: " + this.name + " owned by player " + this.ownerName + ":" + this.ownerConnectionId.ToString());
-            if (this.isCharacterSelected)
+            if (IsSelectedForOwner)
                 isSprinting = isPlayerSprinting;
             else
                 isSprinting = false;
@@ -2078,6 +2108,10 @@ public class GoblinScript : NetworkBehaviour
                 // code for knocked out animation?
                 if (newValue)
                 {
+                    // A knockout overrides any predicted slide or dive; its own state plays below.
+                    _predictedSlide = false;
+                    _predictedDive = false;
+                    _predictedActionDirection = Vector2.zero;
                     // CrossFade rather than Play: NetworkAnimator.Play sends whatever state the animator is in at the next
                     // tick. The bomb and lightning knock goblins out from animation events, after this frame's animator
                     // update, so a host goblin sent its old state (running) to clients. CrossFade sends this state itself.
@@ -2183,15 +2217,77 @@ public class GoblinScript : NetworkBehaviour
 
         }
     }
+    // A predicted slide or dive: a client's own goblin starts the animation and movement the moment the key is
+    // pressed, instead of standing still for the server round trip. The ServerRpc still goes out unchanged and the
+    // server stays the authority: its SyncVars (isSliding / isDiving, with slideDirection) confirm the action and
+    // take over the movement seamlessly, and if no confirmation comes - a punch, fatigue or knockout crossed our
+    // input mid-flight, which the mirrored checks below make rare - the goblin quietly stands back up. The host
+    // never predicts: its own ServerRpc lands within a tick.
+    bool _predictedSlide = false;
+    bool _predictedDive = false;
+    Vector2 _predictedActionDirection = Vector2.zero;
+    float _predictedActionGiveUpTime;
+    const float PredictedActionGiveUpSeconds = 0.4f;
+    bool IsPredictingAction { get { return _predictedSlide || _predictedDive; } }
+
+    void PredictSlide(Vector2 direction)
+    {
+        if (IsServerStarted || IsPredictingAction)
+            return;
+        // CmdSlideGoblin's checks, from the owner's view.
+        if (!isRunning || direction == Vector2.zero || doesCharacterHaveBall || isSliding || isDiving || isFatigued || isPunching || isGoblinKnockedOut || isSlidingRoutineRunning || DivingRoutineRunning)
+            return;
+        _predictedSlide = true;
+        _predictedActionDirection = direction;
+        _predictedActionGiveUpTime = Time.time + PredictedActionGiveUpSeconds;
+        animator.SetBool("isSliding", true);
+        if (this.isGoblinOnScreen())
+            SoundManager.instance.PlaySound("slide", 0.75f);
+    }
+    void PredictDive(Vector2 direction)
+    {
+        if (IsServerStarted || IsPredictingAction)
+            return;
+        // DiveGoblin checked the rest already; these are CmdStartDiving's remaining checks, from the owner's view.
+        if (direction == Vector2.zero || isFatigued || isKicking || isSlidingRoutineRunning || DivingRoutineRunning)
+            return;
+        _predictedDive = true;
+        _predictedActionDirection = direction;
+        _predictedActionGiveUpTime = Time.time + PredictedActionGiveUpSeconds;
+        // What HandleIsDiving plays on confirmation; PlayNetworkedState won't restart a state already playing.
+        if (doesCharacterHaveBall)
+            PlayNetworkedState(goblinType + "-dive-with-football");
+        else
+            PlayNetworkedState(goblinType + "-dive");
+    }
+    // The server never started the predicted action. Rare; stand back up without fuss.
+    void CancelPredictedAction()
+    {
+        bool wasSlide = _predictedSlide;
+        _predictedSlide = false;
+        _predictedDive = false;
+        _predictedActionDirection = Vector2.zero;
+        if (wasSlide)
+        {
+            animator.SetBool("isSliding", false);
+            SoundManager.instance.StopSound("slide");
+        }
+        else
+        {
+            // The dive is an animation state, not a bool; crossfade out so the goblin stands up.
+            networkAnimator.CrossFade(goblinType + "-idle", 0f, 0, 0f);
+        }
+    }
     public void SlideGoblin()
     {
         if (IsOwner)
         {
             if (isBlocking)
                 CmdSetBlocking(false);
+            PredictSlide(previousInput);
             CmdSlideGoblin(previousInput);
         }
-            
+
     }
     [ServerRpc]
     void CmdSlideGoblin(Vector2 directionToSlide)
@@ -2217,6 +2313,14 @@ public class GoblinScript : NetworkBehaviour
     {
         if (IsClientInitialized)
         {
+            // The owner may have predicted this slide at the input; the server has confirmed it (slideDirection
+            // arrives in the same update), so hand over to the synced state without restarting the sound.
+            bool ownerPredictedThisSlide = IsOwner && newValue && _predictedSlide;
+            if (ownerPredictedThisSlide)
+            {
+                _predictedSlide = false;
+                _predictedDive = false;
+            }
             if (IsOwner)
             {
                 animator.SetBool("isSliding", newValue);
@@ -2225,10 +2329,13 @@ public class GoblinScript : NetworkBehaviour
                     if (!golbinBodyCollider.gameObject.activeInHierarchy)
                         golbinBodyCollider.gameObject.SetActive(true);
                 }
-                
+
             }
-            if(this.isGoblinOnScreen() && newValue)
-                SoundManager.instance.PlaySound("slide", 0.75f);
+            if (this.isGoblinOnScreen() && newValue)
+            {
+                if (!ownerPredictedThisSlide)
+                    SoundManager.instance.PlaySound("slide", 0.75f);
+            }
             else
                 SoundManager.instance.StopSound("slide");
         }
@@ -2332,6 +2439,7 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (!isGoblinKnockedOut && !isSliding && !isDiving && IsOwner && !isPunching)
                 {
+                    PredictDive(previousInput);
                     CmdStartDiving(previousInput);
                     if (isBlocking)
                         CmdSetBlocking(false);
@@ -2369,7 +2477,9 @@ public class GoblinScript : NetworkBehaviour
 
             if (IsOwner && newValue)
             {
-                
+                // A predicted dive is confirmed here; PlayNetworkedState won't restart the already-playing state.
+                _predictedSlide = false;
+                _predictedDive = false;
                 if (doesCharacterHaveBall)
                 {
                     PlayNetworkedState(goblinType + "-dive-with-football");
@@ -2579,9 +2689,14 @@ public class GoblinScript : NetworkBehaviour
     {
         if (IsOwner && !isPunching && !isDiving && !isSliding && !isGoblinKnockedOut && doesCharacterHaveBall && !isThrowing)
         {
+            // Start the kick animation at the input instead of when isKicking comes back: the animation's
+            // KickTheFootball event is what actually kicks the ball, so a client's whole kick used to run a
+            // round trip late. The hook's replay on confirmation doesn't restart the state, and
+            // CmdKickTheFootball ignores an event whose kick the server refused.
+            PlayNetworkedState(goblinType + "-kick-football");
             CmdKickFootball(kickPower, kickAngle);
         }
-            
+
     }
     [ServerRpc]
     void CmdKickFootball(float kickPower, float kickAngle)
@@ -2640,6 +2755,10 @@ public class GoblinScript : NetworkBehaviour
             //Debug.Log("CmdKickTheFootball: this goblin is knocked out on the server. Don't kick? Returning..." );
             return;
         }
+        // The owner's kick animation starts before the server has accepted the kick (KickFootballGoblin), so its
+        // event can arrive for a kick CmdKickFootball refused. isKicking is true only for an accepted kick.
+        if (!isKicking)
+            return;
         doesCharacterHaveBall = false;
         Football footballScript = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
         Vector3 newLocalPosition = footballScript.transform.localPosition;

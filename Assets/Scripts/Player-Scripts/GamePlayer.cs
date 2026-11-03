@@ -2523,6 +2523,9 @@ public class GamePlayer : NetworkBehaviour
                 try
                 {
                     int powerUpNetId = myPowerUps[powerUpNumber].GetComponent<NetworkObject>().ObjectId;
+                    // Heard at the press; the effect itself stays server-validated and lands a moment later.
+                    if (!this.isAIPlayer)
+                        SoundManager.instance.PlaySound("ui-click", 1.0f);
                     CmdUsePowerUp(powerUpNetId);
                 }
                 catch (Exception e)
