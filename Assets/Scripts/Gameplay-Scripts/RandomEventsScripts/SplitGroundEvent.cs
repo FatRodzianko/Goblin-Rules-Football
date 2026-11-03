@@ -102,7 +102,8 @@ public class SplitGroundEvent : NetworkBehaviour
             onscreen = true;
         return onscreen;
     }
-    [Server]
+    // Animation event: it fires on every machine that plays the clip, so it skips quietly where it doesn't apply.
+    [Server(Logging = LoggingType.Off)]
     public void DestroyMe()
     {
         if (IsServerInitialized)

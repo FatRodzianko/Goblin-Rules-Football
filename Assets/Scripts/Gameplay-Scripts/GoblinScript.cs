@@ -167,7 +167,9 @@ public class GoblinScript : NetworkBehaviour
     private readonly SyncVar<bool> _syncIsSlidingRoutineRunning = new SyncVar<bool>();
     public bool isSlidingRoutineRunning { get => _syncIsSlidingRoutineRunning.Value; set => _syncIsSlidingRoutineRunning.Value = value; }
     IEnumerator isSlidingRoutine;
-    public float slideSpeedModifer = 1.0f;
+    // A SyncVar so the owner's LocalSpeed sees the post-slide slow-down; only the server writes it.
+    private readonly SyncVar<float> _syncSlideSpeedModifer = new SyncVar<float>(1.0f);
+    public float slideSpeedModifer { get => _syncSlideSpeedModifer.Value; set => _syncSlideSpeedModifer.Value = value; }
     // Server only: this slide has already knocked someone down, so it trips nobody else.
     bool slideTripLanded = false;
 
@@ -248,7 +250,9 @@ public class GoblinScript : NetworkBehaviour
     private readonly SyncVar<bool> _syncIsWasPunchedRoutineRunning = new SyncVar<bool>();
     public bool isWasPunchedRoutineRunning { get => _syncIsWasPunchedRoutineRunning.Value; set => _syncIsWasPunchedRoutineRunning.Value = value; }
     IEnumerator isWasPunched;
-    public float wasPunchedSpeedModifier = 1.0f;
+    // A SyncVar so the owner's LocalSpeed sees the was-punched slow-down; only the server writes it.
+    private readonly SyncVar<float> _syncWasPunchedSpeedModifier = new SyncVar<float>(1.0f);
+    public float wasPunchedSpeedModifier { get => _syncWasPunchedSpeedModifier.Value; set => _syncWasPunchedSpeedModifier.Value = value; }
 
     [Header("Can the Goblin Pass stuff")]
     public Football gameFootball;
@@ -937,9 +941,59 @@ public class GoblinScript : NetworkBehaviour
     [Client(Logging = LoggingType.Off)]
     private void FixedUpdate()
     {
-        if (canGoblinRegainHealth && health < MaxHealth && IsOwner)
-            CmdRegainHealth();
+        if (IsServerInitialized)
+            ServerMovementUpkeep();
         Move();
+    }
+    // The server's share of the per-step movement work: health regain, stamina drain and recovery, and the speed
+    // formula. The owner used to drive all of it over ServerRpcs every physics step (CmdRegainHealth, CmdDrainStamina,
+    // CmdRecoverStamina, and CmdIsPlayerSprinting recomputing speed), 3 to 5 reliable RPCs per goblin per step, when
+    // the server can derive every one of them from state it already has. The owner now only reports changes
+    // (SendSprintingToServer / SendRunningToServer below).
+    [Server(Logging = LoggingType.Off)]
+    void ServerMovementUpkeep()
+    {
+        if (serverGamePlayer == null)
+            return;
+        if (canGoblinRegainHealth && health < MaxHealth)
+            RegainHealthOnServer();
+        if (isFatigued || (!isSprintingOnServer && stamina < MaxStamina))
+            RecoverStaminaOnServer();
+        // The owner only drove speed and sprint drain while its goblin could act - the same gates as Move()'s
+        // movement branches - so a dive's 1.2x speed and the kickoff placements are left alone, as before.
+        if (isGoblinKnockedOut || isSliding || isDiving || !canGoblinMove)
+            return;
+        if (GameplayManager.instance == null || GameplayManager.instance.gamePhase == "kickoff")
+            return;
+        UpdateSpeedOnServer();
+        if (isSprintingOnServer && !isFatigued)
+        {
+            // Sprinting holds stamina recovery off until a second after it stops, exactly as the per-step
+            // CmdIsPlayerSprinting restart used to.
+            if (stamina > 0f)
+            {
+                if (isStaminaRecoveryRoutineRunning)
+                    StopCoroutine(staminaRecoveryRoutine);
+                staminaRecoveryRoutine = CanGoblinRecoverStamina();
+                StartCoroutine(staminaRecoveryRoutine);
+            }
+            DrainStaminaOnServer();
+        }
+    }
+    // The owner's own view of the speed formula, for its own movement. The synced `speed` is written on the
+    // server and takes a round trip plus a sync interval to come back, so a client's sprint used to kick in,
+    // and fatigue used to slow it down, a quarter second late. Every input here is already on the owner's
+    // machine - the modifiers are SyncVars, sprint is the owner's own key - so the owner can apply the same
+    // formula at once; the server's `speed` stays the authority everywhere else (AI, remote reads, server
+    // logic) and the two converge as the SyncVars arrive.
+    float LocalSpeed()
+    {
+        float localSpeed = MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus;
+        if (isFatigued)
+            localSpeed *= 0.5f;
+        else if (isSprinting && stamina > 0f)
+            localSpeed *= _sprintSpeedModifier;
+        return localSpeed;
     }
     // Input callbacks: their subscriptions outlive this goblin, so they stay quiet after it despawns.
     [Client(Logging = LoggingType.Off)]
@@ -951,48 +1005,33 @@ public class GoblinScript : NetworkBehaviour
     [Client]
     private void Move()
     {
-        if (IsOwner)
-        {
-            if (isFatigued)
-                CmdRecoverStamina();
-            else if ((!isSprinting) && !isFatigued && stamina < MaxStamina)
-                CmdRecoverStamina();
-
-            /*if (isGoblinKnockedOut)
-                CmdRecoverHealth();*/
-        }
+        // Stamina recovery, drain and health regain live in ServerMovementUpkeep now: the server runs them
+        // every step itself instead of the owner asking it to.
         //if (hasAuthority && isCharacterSelected && canGoblinMove && !isGoblinPunching && !isGoblinKnockedOut && !isSliding && !isDiving)
         if (IsOwner && isCharacterSelected && canGoblinMove && !isGoblinKnockedOut && !isSliding && !isDiving && !this.myGamePlayer.isAIPlayer && GameplayManager.instance.gamePhase != "kickoff")
         {
-            CmdIsPlayerSprinting(isSprinting);
+            SendSprintingToServer(isSprinting);
             isRunning = false;
             if (previousInput.x != 0 || previousInput.y != 0)
                 isRunning = true;
-            CmdSetIsRunningOnServer(isRunning, previousInput);
-
-            if (isSprinting && !isFatigued)
-            {
-                CmdDrainStamina();
-            }
+            SendRunningToServer(isRunning, previousInput);
 
             //isRunning = false;
             Vector2 direction = Vector2.ClampMagnitude(previousInput, 1);
-            rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
+            rb.MovePosition(rb.position + direction * LocalSpeed() * Time.fixedDeltaTime);
             //rb.velocity = new Vector2(direction.x*speed, direction.y*speed);
             /*if (previousInput.x != 0 || previousInput.y != 0)
                 isRunning = true;*/
 
-            if (previousInput.x > 0)
+            // Only a change crosses the network: CmdFlipRenderer ends in an ObserversRpc, which used to go out
+            // every physics step the goblin moved sideways.
+            if (previousInput.x > 0 && myRenderer.flipX)
             {
-                //Vector3 newScale = new Vector3(1f, 1f, 1f);
-                //transform.localScale = newScale;
                 myRenderer.flipX = false;
                 CmdFlipRenderer(false);
             }
-            else if (previousInput.x < 0)
+            else if (previousInput.x < 0 && !myRenderer.flipX)
             {
-                //Vector3 newScale = new Vector3(-1f, 1f, 1f);
-                //transform.localScale = newScale;
                 myRenderer.flipX = true;
                 CmdFlipRenderer(true);
             }
@@ -1099,19 +1138,19 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    MoveTowrdBallCarrier();
+                    //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    GetOpenForPass();
+                    //GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    MoveTowardGoblinTarget();
+                    //MoveTowardGoblinTarget();
                     break;
                 case State.SpyBallCarrier:
-                    MoveTowardSpyPosition();
+                    //MoveTowardSpyPosition();
                     break;
             }
         }
@@ -1140,22 +1179,22 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    MoveTowardFootball();
+                    //MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    MoveTowrdBallCarrier();
+                    //MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    GetOpenForPass();
+                    //GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    MoveTowardGoblinTarget();
+                    //MoveTowardGoblinTarget();
                     break;
                 case State.SpyBallCarrier:
-                    MoveTowardSpyPosition();
+                    //MoveTowardSpyPosition();
                     break;
                 case State.RunTowardEndzone:
-                    myGamePlayer.myAiPlayer.RunTowardEndZone();
+                    //myGamePlayer.myAiPlayer.RunTowardEndZone();
                     break;
             }
 
@@ -1651,52 +1690,48 @@ public class GoblinScript : NetworkBehaviour
         }
             
     }
+    // What this owner last told the server. Move() and AIMoveTowardDirection used to resend these every physics
+    // step; the server only needs the changes, and ServerMovementUpkeep does the per-step work itself now.
+    bool _sentSprintingToServer = false;
+    bool _sentRunningToServer = false;
+    Vector2 _sentRunDirectionToServer = Vector2.zero;
+
+    void SendSprintingToServer(bool sprinting)
+    {
+        if (sprinting == _sentSprintingToServer)
+            return;
+        _sentSprintingToServer = sprinting;
+        CmdIsPlayerSprinting(sprinting);
+    }
+    // The direction matters while running (the football leads a running thrower or receiver with it), so a real
+    // turn goes out, but the AI steering's tiny per-step wobble along a straight chase does not.
+    void SendRunningToServer(bool running, Vector2 direction)
+    {
+        if (running == _sentRunningToServer && (direction - _sentRunDirectionToServer).sqrMagnitude < 0.001f)
+            return;
+        _sentRunningToServer = running;
+        _sentRunDirectionToServer = direction;
+        CmdSetIsRunningOnServer(running, direction);
+    }
     [ServerRpc]
     void CmdIsPlayerSprinting(bool isPlayerSprinting)
     {
-        //Debug.Log("CmdIsPlayerSprinting: " + isPlayerSprinting.ToString());
-
         isSprintingOnServer = isPlayerSprinting;
-        // Get speed modifer for the possession bonus from this goblin's player owner. Possession bonus is divided by 3. So, of possession bonus is 20% (aka 1.2f) then it should make them 6.7% faster (1.067f)
-        /*float possessionSpeedBonus = (this.serverGamePlayer.possessionBonus - 1.0f);
-        if (possessionSpeedBonus > 0)
-        {
-            possessionSpeedBonus /= 3f;            
-        }
-        possessionSpeedBonus += 1.0f;*/
-
-        //Debug.Log("CmdIsPlayerSprinting: possessionSpeedBonus is: " + possessionSpeedBonus.ToString() + " for goblin: " + this.name + " owned by " + this.serverGamePlayer.PlayerName);
-
-        if (isPlayerSprinting)
-        {
-            if (!isFatigued)
-            {
-                if (stamina > 0f)
-                {
-                    //this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * 1.15f;
-                    this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * _sprintSpeedModifier;
-                }
-                //Update CanRecoverStamina Event here?
-                if (isStaminaRecoveryRoutineRunning)
-                    StopCoroutine(staminaRecoveryRoutine);
-      
-                staminaRecoveryRoutine = CanGoblinRecoverStamina();
-                StartCoroutine(staminaRecoveryRoutine);                
-
-            }
-            else if (isFatigued)
-            {
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * 0.5f;
-            }
-        }        
-        else
-        {
-            if(!isFatigued)
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus);
-            else
-                this.speed = (MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus) * 0.5f;
-        }
-            
+        // Apply the new state to the speed right away; ServerMovementUpkeep keeps it current from here.
+        UpdateSpeedOnServer();
+    }
+    // The one speed formula, written only when the result changes so the SyncVar stays quiet. The branches are
+    // CmdIsPlayerSprinting's: sprint speed only with stamina left, half speed while fatigued.
+    [Server(Logging = LoggingType.Off)]
+    void UpdateSpeedOnServer()
+    {
+        float newSpeed = MaxSpeed * ballCarrySpeedModifier * slideSpeedModifer * blockingSpeedModifier * wasPunchedSpeedModifier * speedModifierFromPowerUps * slowDownObstacleModifier * possessionSpeedBonus;
+        if (isFatigued)
+            newSpeed *= 0.5f;
+        else if (isSprintingOnServer && stamina > 0f)
+            newSpeed *= _sprintSpeedModifier;
+        if (this.speed != newSpeed)
+            this.speed = newSpeed;
     }
     public float GetSprintSpeedModifier()
     {
@@ -1713,8 +1748,8 @@ public class GoblinScript : NetworkBehaviour
     {
         return runningDirectionOnServer;
     }
-    [ServerRpc]
-    void CmdDrainStamina()
+    [Server(Logging = LoggingType.Off)]
+    void DrainStaminaOnServer()
     {
         if (isRunningOnServer && !this.invinvibilityBlueShell)
         {
@@ -1761,14 +1796,14 @@ public class GoblinScript : NetworkBehaviour
                 }
                 else
                 {
-                    CmdIsPlayerSprinting(false);
+                    SendSprintingToServer(false);
                 }
 
             }            
         }
     }
-    [ServerRpc]
-    void CmdRecoverStamina()
+    [Server(Logging = LoggingType.Off)]
+    void RecoverStaminaOnServer()
     {
         bool isGoblinAllowedToRecover = false;
         if (isFatigued)
@@ -2016,8 +2051,8 @@ public class GoblinScript : NetworkBehaviour
         isRegainHealthRoutineRunning = false;
         canGoblinRegainHealth = true;
     }
-    [ServerRpc]
-    void CmdRegainHealth()
+    [Server(Logging = LoggingType.Off)]
+    void RegainHealthOnServer()
     {
         if (canGoblinRegainHealth && health < MaxHealth)
         {
@@ -3304,16 +3339,10 @@ public class GoblinScript : NetworkBehaviour
         if (direction.x != 0 || direction.y != 0)
             isRunning = true;
         // Set the goblin's "Running On Server" value so that can be tracked by the server?
-        CmdSetIsRunningOnServer(isRunning, direction);
+        SendRunningToServer(isRunning, direction);
 
         //Set the "isSprinting" on the server and make sure that all the speed modifiers get set correctly?
-        CmdIsPlayerSprinting(isSprinting);
-
-        // If the goblin is sprinting, make sure to drain their stamina
-        if (isSprinting && !isFatigued)
-        {
-            CmdDrainStamina();
-        }
+        SendSprintingToServer(isSprinting);
 
         // Check if a goblin has had an "adjacent" goblin for more than 0.4 seconds and needs to dive to get unstuck?
         /*bool doesGoblinNeedtoDive = IsThereAnAdjacentGoblin();
@@ -3353,13 +3382,14 @@ public class GoblinScript : NetworkBehaviour
         Vector2 step = Vector2.ClampMagnitude(direction * speed * Time.fixedDeltaTime, Vector2.Distance(rb.position, targetPosition));
         rb.MovePosition(rb.position + step);
 
-        // check the direction the goblin is moving. If they are moving left, make sprite face left. If right, sprite face right
-        if (direction.x > 0)
+        // check the direction the goblin is moving. If they are moving left, make sprite face left. If right, sprite
+        // face right. Only a change is sent: CmdFlipRenderer ends in an ObserversRpc.
+        if (direction.x > 0 && myRenderer.flipX)
         {
             myRenderer.flipX = false;
             CmdFlipRenderer(false);
         }
-        else if (direction.x < 0)
+        else if (direction.x < 0 && !myRenderer.flipX)
         {
             myRenderer.flipX = true;
             CmdFlipRenderer(true);
@@ -3565,8 +3595,9 @@ public class GoblinScript : NetworkBehaviour
                 Debug.Log("RpcResetGoblinStatuses: Could not get goblin player owner object. Error: " + e);
             }
 
-            // Reset speed for the goblin?
-            CmdIsPlayerSprinting(this.isSprinting);
+            // Reset speed for the goblin? ServerMovementUpkeep recomputes it every step; this only reports a
+            // sprint state the server doesn't have yet.
+            SendSprintingToServer(this.isSprinting);
         }        
     }
     // If the isWasPunchedRoutineRunning coroutine is running on the server, this command will stop it and reset the goblins wasPunchedSpeedModifier.
@@ -4332,7 +4363,7 @@ public class GoblinScript : NetworkBehaviour
             if (isRunning)
             {
                 isRunning = false;
-                CmdSetIsRunningOnServer(false, Vector2.zero);
+                SendRunningToServer(false, Vector2.zero);
             }
             return;
         }

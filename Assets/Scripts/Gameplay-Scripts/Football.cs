@@ -210,6 +210,11 @@ public class Football : NetworkBehaviour
     }
     private void Update()
     {
+        // Per frame, not per physics step: the loose ball's flight is a scripted arc on a kinematic body, and at
+        // 50 Hz it stepped visibly on the host (and fed the sync stepped positions). Physics still sees the latest
+        // position at each physics step, exactly as before, so pickups and trip collisions are unchanged.
+        MoveLooseBall();
+
         /*Vector3 screenPoint = Camera.main.WorldToViewportPoint(this.transform.position);
         if (screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1)
         {
@@ -265,16 +270,21 @@ public class Football : NetworkBehaviour
             }
         }*/
     }
-    private void FixedUpdate()
+    // Ran in FixedUpdate until Nov 3, 2026; Update calls it every frame now (see the comment there). MovePosition
+    // was wrong for a per-frame move - it only applies at the next physics step, so calls between steps would be
+    // lost - hence the plain transform adds on the throw and fall paths, which is what this code originally did.
+    private void MoveLooseBall()
     {
+        // Gone during scene teardown, and after a mid-play domain reload, while this Update can still run.
+        if (GameplayManager.instance == null)
+            return;
         if (IsServerInitialized)
         {
             if (isThrown)
             {
                 if (transform.position.y < ThrownMaxY && transform.position.y > ThrownMinY && transform.position.x > ThrownMinX && transform.position.x < ThrownMaxX)
                 {
-                    myRigidBody.MovePosition(myRigidBody.position + _directionToThrow * speedOfThrow * Time.fixedDeltaTime);
-                    //transform.position += (directionToThrow * speedOfThrow * Time.fixedDeltaTime);
+                    transform.position += (Vector3)(_directionToThrow * speedOfThrow * Time.deltaTime);
                     animator.SetBool("isThrown", isThrown);
 
                     if (Mathf.Abs(_directionToThrow.y) < 0.55f)
@@ -316,8 +326,10 @@ public class Football : NetworkBehaviour
                 if (transform.position.y < ThrownMaxY && transform.position.y > ThrownMinY && transform.position.x > ThrownMinX && transform.position.x < ThrownMaxX)
                 {
                     Vector2 directionToFall = _directionToThrow;
+                    // fixedDeltaTime on purpose: a constant droop angle per call, as the physics-step version had.
+                    // Scaling it by the frame time would flatten the fall at high frame rates.
                     directionToFall.y -= (fallSpeed * Time.fixedDeltaTime);
-                    myRigidBody.MovePosition(myRigidBody.position + directionToFall * speedOfThrow * Time.fixedDeltaTime);
+                    transform.position += (Vector3)(directionToFall * speedOfThrow * Time.deltaTime);
                 }
                 else
                 {
@@ -354,7 +366,7 @@ public class Football : NetworkBehaviour
             {
                 if (fumbleCount < 1.0f)
                 {
-                    fumbleCount += 2.0f * Time.fixedDeltaTime;
+                    fumbleCount += 2.0f * Time.deltaTime;
                     Vector3 m1 = Vector3.Lerp(FumblePoints[0], FumblePoints[1], fumbleCount);
                     Vector3 m2 = Vector3.Lerp(FumblePoints[1], FumblePoints[2], fumbleCount);
                     this.transform.position = Vector3.Lerp(m1, m2, fumbleCount);
@@ -376,7 +388,7 @@ public class Football : NetworkBehaviour
             {
                 if (kickCount < 1.0f)
                 {
-                    kickCount += kickCountModifier * Time.fixedDeltaTime;
+                    kickCount += kickCountModifier * Time.deltaTime;
                     Vector3 m1 = Vector3.Lerp(KickedBallPoints[0], KickedBallPoints[1], kickCount);
                     Vector3 m2 = Vector3.Lerp(KickedBallPoints[1], KickedBallPoints[2], kickCount);
                     this.transform.position = Vector3.Lerp(m1, m2, kickCount);
@@ -433,7 +445,7 @@ public class Football : NetworkBehaviour
             {
                 if (bounceProgressCount < 1.0f)
                 {
-                    bounceProgressCount += 2.0f * Time.fixedDeltaTime;
+                    bounceProgressCount += 2.0f * Time.deltaTime;
                     Vector3 m1 = Vector3.Lerp(BouncingBallPoints[0], BouncingBallPoints[1], bounceProgressCount);
                     Vector3 m2 = Vector3.Lerp(BouncingBallPoints[1], BouncingBallPoints[2], bounceProgressCount);
                     this.transform.position = Vector3.Lerp(m1, m2, bounceProgressCount);
@@ -464,7 +476,7 @@ public class Football : NetworkBehaviour
             {
                 if (localKickCount < 1.0f)
                 {
-                    localKickCount += localKickCountModifier * Time.fixedDeltaTime;
+                    localKickCount += localKickCountModifier * Time.deltaTime;
                     Vector3 localM1 = Vector3.Lerp(localShadowStartPosition, localShadowEndPosition, localKickCount);
                     footballShadowObject.transform.position = localM1;
                     if (localKickCount >= 1.0f)
