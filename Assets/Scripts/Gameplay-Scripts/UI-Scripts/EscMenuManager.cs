@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class EscMenuManager : MonoBehaviour
 {
@@ -58,7 +59,8 @@ public class EscMenuManager : MonoBehaviour
         EscMenuCanvas.SetActive(false);
         EscMenuPanel.SetActive(false);
         EscMenuPanelButtonHolder.SetActive(false);
-        InputManager.Controls.EscMenu.EscMenu.performed += _ => UpdateEscapeMenu();
+        _escMenuHandler = _ => UpdateEscapeMenu();
+        InputManager.Controls.EscMenu.EscMenu.performed += _escMenuHandler;
         try
         {
             localGamePlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
@@ -68,10 +70,18 @@ public class EscMenuManager : MonoBehaviour
             Debug.Log("EscMenuManager.cs: could not find local game playeR? Error: " + e);
         }
     }
+    // Chunk 2 audit item 10: the Esc handler is stored and removed when the scene object is destroyed. It used to
+    // keep firing on the destroyed manager after the match, from the title screen, and stack across matches.
+    Action<InputAction.CallbackContext> _escMenuHandler;
+    void OnDestroy()
+    {
+        if (_escMenuHandler != null)
+            InputManager.Controls.EscMenu.EscMenu.performed -= _escMenuHandler;
+    }
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     void UpdateEscapeMenu()
     {

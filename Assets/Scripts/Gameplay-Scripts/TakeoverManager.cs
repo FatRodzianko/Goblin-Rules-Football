@@ -302,7 +302,9 @@ public class TakeoverManager : MonoBehaviour
     {
         foreach (GamePlayer player in Game.GamePlayers)
         {
-            if (player != null && !player.isAIPlayer)
+            // The offer can start from the leaver's own disconnect, while their GamePlayer is still in the list.
+            // Their connection is no longer an observer, so a TargetRpc at them only logs a FishNet warning.
+            if (player != null && !player.isAIPlayer && player.Owner != null && player.Owner.IsActive)
                 player.RpcSetTimeScaleForTakeoverOffer(player.Owner, pause);
         }
     }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using UnityEngine.InputSystem;
 
 public class GetOutOfInputField : MonoBehaviour
 {
@@ -16,7 +17,15 @@ public class GetOutOfInputField : MonoBehaviour
         tmpInputField = this.GetComponent<TMP_InputField>();
         //InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
         //InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
-        InputManager.Controls.TitleScreenUINavigation.UINav.performed += _ => EscapeTextInputField();
+        _uiNavHandler = _ => EscapeTextInputField();
+        InputManager.Controls.TitleScreenUINavigation.UINav.performed += _uiNavHandler;
+    }
+    // Chunk 2 audit item 10: stored so OnDestroy can remove it; one copy used to pile up per title-screen visit.
+    Action<InputAction.CallbackContext> _uiNavHandler;
+    void OnDestroy()
+    {
+        if (_uiNavHandler != null)
+            InputManager.Controls.TitleScreenUINavigation.UINav.performed -= _uiNavHandler;
     }
 
     // Update is called once per frame

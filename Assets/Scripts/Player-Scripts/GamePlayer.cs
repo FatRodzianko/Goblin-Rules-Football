@@ -269,40 +269,40 @@ public class GamePlayer : NetworkBehaviour
 
         //CoinTossControlls(true);
         //Set QE Switching Controls
-        InputManager.Controls.QESwitchGoblins.SwitchQ.performed += ctx => SwitchToQGoblin(true, ctx.startTime);
-        InputManager.Controls.QESwitchGoblins.SwitchE.performed += ctx => SwitchToEGoblin(true, ctx.startTime);
+        OnInputPerformed(InputManager.Controls.QESwitchGoblins.SwitchQ, ctx => SwitchToQGoblin(true, ctx.startTime));
+        OnInputPerformed(InputManager.Controls.QESwitchGoblins.SwitchE, ctx => SwitchToEGoblin(true, ctx.startTime));
         //EnableQESwitchingControls(false);
         //Kick off angle controls stuff
-        InputManager.Controls.KickOff.KickoffAngleUp.performed += _ => StartAimArrowDirection(true);
-        InputManager.Controls.KickOff.KickoffAngleUp.canceled += _ => EndAimArrowDirection();
-        InputManager.Controls.KickOff.KickoffAngleDown.performed += _ => StartAimArrowDirection(false);
-        InputManager.Controls.KickOff.KickoffAngleDown.canceled += _ => EndAimArrowDirection();
+        OnInputPerformed(InputManager.Controls.KickOff.KickoffAngleUp, _ => StartAimArrowDirection(true));
+        OnInputCanceled(InputManager.Controls.KickOff.KickoffAngleUp, _ => EndAimArrowDirection());
+        OnInputPerformed(InputManager.Controls.KickOff.KickoffAngleDown, _ => StartAimArrowDirection(false));
+        OnInputCanceled(InputManager.Controls.KickOff.KickoffAngleDown, _ => EndAimArrowDirection());
         //EnableKickoffAimArrowControls(false);
         //Gameplay controls
-        InputManager.Controls.Player.Attack.performed += _ => GoblinAttack();
-        InputManager.Controls.Player.Slide.performed += _ => SlideGoblin();
-        InputManager.Controls.Player.Dive.performed += _ => DiveGoblin();
-        InputManager.Controls.Player.Block.performed += _ => StartBlockGoblin();
-        InputManager.Controls.Player.Block.canceled += _ => StopBlockGoblin();
+        OnInputPerformed(InputManager.Controls.Player.Attack, _ => GoblinAttack());
+        OnInputPerformed(InputManager.Controls.Player.Slide, _ => SlideGoblin());
+        OnInputPerformed(InputManager.Controls.Player.Dive, _ => DiveGoblin());
+        OnInputPerformed(InputManager.Controls.Player.Block, _ => StartBlockGoblin());
+        OnInputCanceled(InputManager.Controls.Player.Block, _ => StopBlockGoblin());
         //EnableGameplayActions(false);
         //Kick After positioning
-        InputManager.Controls.KickAfterPositioning.KickAfterPositioningLeft.performed += _ => KickAfterPositioningMove(true);
-        InputManager.Controls.KickAfterPositioning.KickAfterPositioningLeft.canceled += _ => KickAfterPositioningStop();
-        InputManager.Controls.KickAfterPositioning.KickAfterPositioningRight.performed += _ => KickAfterPositioningMove(false);
-        InputManager.Controls.KickAfterPositioning.KickAfterPositioningRight.canceled += _ => KickAfterPositioningStop();
-        InputManager.Controls.KickAfterPositioning.SubmitPosition.performed += _ => SubmitKickAfterPositionToServer();
+        OnInputPerformed(InputManager.Controls.KickAfterPositioning.KickAfterPositioningLeft, _ => KickAfterPositioningMove(true));
+        OnInputCanceled(InputManager.Controls.KickAfterPositioning.KickAfterPositioningLeft, _ => KickAfterPositioningStop());
+        OnInputPerformed(InputManager.Controls.KickAfterPositioning.KickAfterPositioningRight, _ => KickAfterPositioningMove(false));
+        OnInputCanceled(InputManager.Controls.KickAfterPositioning.KickAfterPositioningRight, _ => KickAfterPositioningStop());
+        OnInputPerformed(InputManager.Controls.KickAfterPositioning.SubmitPosition, _ => SubmitKickAfterPositionToServer());
         // Kick after kicking
-        InputManager.Controls.KickAfterKicking.KickAfterSubmit.performed += _ => SubmitKickAfterKicking();
+        OnInputPerformed(InputManager.Controls.KickAfterKicking.KickAfterSubmit, _ => SubmitKickAfterKicking());
         //Kicking Controls
-        InputManager.Controls.Player.KickFootball.performed += _ => StartKickPower();
-        InputManager.Controls.Player.KickFootball.canceled += _ => EndKickPower();
+        OnInputPerformed(InputManager.Controls.Player.KickFootball, _ => StartKickPower());
+        OnInputCanceled(InputManager.Controls.Player.KickFootball, _ => EndKickPower());
         //Power Up Controls
-        InputManager.Controls.PowerUps.PowerUp1.performed += _ => UsePowerUp(0);
-        InputManager.Controls.PowerUps.PowerUp2.performed += _ => UsePowerUp(1);
-        InputManager.Controls.PowerUps.PowerUp3.performed += _ => UsePowerUp(2);
-        InputManager.Controls.PowerUps.PowerUp4.performed += _ => UsePowerUp(3);
-        InputManager.Controls.SelectPowerUps.RightAnalogStickDirection.performed += ctx => PowerUpAnalogReader(ctx.ReadValue<Vector2>());
-        InputManager.Controls.SelectPowerUps.RightAnalogStickDirection.canceled += ctx => CancelRightAnalogStickDirection();
+        OnInputPerformed(InputManager.Controls.PowerUps.PowerUp1, _ => UsePowerUp(0));
+        OnInputPerformed(InputManager.Controls.PowerUps.PowerUp2, _ => UsePowerUp(1));
+        OnInputPerformed(InputManager.Controls.PowerUps.PowerUp3, _ => UsePowerUp(2));
+        OnInputPerformed(InputManager.Controls.PowerUps.PowerUp4, _ => UsePowerUp(3));
+        OnInputPerformed(InputManager.Controls.SelectPowerUps.RightAnalogStickDirection, ctx => PowerUpAnalogReader(ctx.ReadValue<Vector2>()));
+        OnInputCanceled(InputManager.Controls.SelectPowerUps.RightAnalogStickDirection, ctx => CancelRightAnalogStickDirection());
         // Power Up selection with right analog stick - Gamepads only?
         //InputManager.Controls.SelectPowerUps.SelectLeft.performed += _ => GamepadPowerUpSelectLeftRight(true);
         //InputManager.Controls.SelectPowerUps.SelectRight.performed += _ => GamepadPowerUpSelectLeftRight(false);
@@ -318,10 +318,32 @@ public class GamePlayer : NetworkBehaviour
     // The person's own GamePlayer on this machine; see StartAsOwner.
     public static GamePlayer LocalInstance { get; private set; }
 
+    // Chunk 2 audit item 10: every input subscription is stored so OnStopClient can remove it. The lambdas used to
+    // outlive the player - after a match they still fired on the destroyed object from the title screen, and a second
+    // match stacked a second set of handlers on the same shared Controls.
+    readonly List<Action> _inputUnsubscribes = new List<Action>();
+    void OnInputPerformed(InputAction action, Action<InputAction.CallbackContext> handler)
+    {
+        action.performed += handler;
+        _inputUnsubscribes.Add(() => action.performed -= handler);
+    }
+    void OnInputCanceled(InputAction action, Action<InputAction.CallbackContext> handler)
+    {
+        action.canceled += handler;
+        _inputUnsubscribes.Add(() => action.canceled -= handler);
+    }
+    void RemoveInputHandlers()
+    {
+        foreach (Action unsubscribe in _inputUnsubscribes)
+            unsubscribe();
+        _inputUnsubscribes.Clear();
+    }
+
     public override void OnStopClient()
     {
         base.OnStopClient();
         Debug.Log("GamePlayer " + this.PlayerName + " left the game.");
+        RemoveInputHandlers();
         if (LocalInstance == this)
             LocalInstance = null;
         if (Game != null)
@@ -1432,9 +1454,9 @@ public class GamePlayer : NetworkBehaviour
                 if (!coinTossControllsEnabled)
                 {
                     InputManager.Controls.CoinTossKickReceive.Enable();
-                    InputManager.Controls.CoinTossKickReceive.SelectHeads.performed += _ => SelectCoin("heads");
-                    InputManager.Controls.CoinTossKickReceive.SelectTails.performed += _ => SelectCoin("tails");
-                    InputManager.Controls.CoinTossKickReceive.SubmitCoin.performed += _ => SubmitCoinSelection();
+                    OnInputPerformed(InputManager.Controls.CoinTossKickReceive.SelectHeads, _ => SelectCoin("heads"));
+                    OnInputPerformed(InputManager.Controls.CoinTossKickReceive.SelectTails, _ => SelectCoin("tails"));
+                    OnInputPerformed(InputManager.Controls.CoinTossKickReceive.SubmitCoin, _ => SubmitCoinSelection());
                     coinTossControllsEnabled = true;
                 }
                 
@@ -1472,9 +1494,9 @@ public class GamePlayer : NetworkBehaviour
             {
                 Debug.Log("KickOrReceiveControls: controls enabled.");
                 InputManager.Controls.CoinTossKickReceive.Enable();
-                InputManager.Controls.CoinTossKickReceive.SelectHeads.performed += _ => SelectKickOrReceive("receive");
-                InputManager.Controls.CoinTossKickReceive.SelectTails.performed += _ => SelectKickOrReceive("kick");
-                InputManager.Controls.CoinTossKickReceive.SubmitCoin.performed += _ => SubmitKickOrReceiveSelection();
+                OnInputPerformed(InputManager.Controls.CoinTossKickReceive.SelectHeads, _ => SelectKickOrReceive("receive"));
+                OnInputPerformed(InputManager.Controls.CoinTossKickReceive.SelectTails, _ => SelectKickOrReceive("kick"));
+                OnInputPerformed(InputManager.Controls.CoinTossKickReceive.SubmitCoin, _ => SubmitKickOrReceiveSelection());
                 kickOrReceiveControlsEnabled = true;
             }
         }

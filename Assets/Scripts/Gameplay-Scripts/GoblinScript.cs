@@ -9,6 +9,7 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using System;
 using UnityEngine.Serialization;
+using UnityEngine.InputSystem;
 
 public class GoblinScript : NetworkBehaviour
 {
@@ -414,11 +415,11 @@ public class GoblinScript : NetworkBehaviour
         }
             
 
-        InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
-        InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
+        OnInputPerformed(InputManager.Controls.Player.Move, ctx => SetMovement(ctx.ReadValue<Vector2>()));
+        OnInputCanceled(InputManager.Controls.Player.Move, ctx => ResetMovement());
 
-        InputManager.Controls.Player.Sprint.performed += _ => IsPlayerSprinting(true);
-        InputManager.Controls.Player.Sprint.canceled += _ => IsPlayerSprinting(false);
+        OnInputPerformed(InputManager.Controls.Player.Sprint, _ => IsPlayerSprinting(true));
+        OnInputCanceled(InputManager.Controls.Player.Sprint, _ => IsPlayerSprinting(false));
         EnableGoblinMovement(false);
 
         
@@ -436,6 +437,26 @@ public class GoblinScript : NetworkBehaviour
         base.OnStopServer();
         DropFootballForDespawn();
         RecordPositionForReplacement();
+    }
+    // Chunk 2 audit item 10, same as GamePlayer: the goblin's Move and Sprint lambdas are stored so OnStopClient can
+    // remove them; they used to keep firing on destroyed goblins after the match, and stack across matches.
+    readonly List<Action> _inputUnsubscribes = new List<Action>();
+    void OnInputPerformed(InputAction action, Action<InputAction.CallbackContext> handler)
+    {
+        action.performed += handler;
+        _inputUnsubscribes.Add(() => action.performed -= handler);
+    }
+    void OnInputCanceled(InputAction action, Action<InputAction.CallbackContext> handler)
+    {
+        action.canceled += handler;
+        _inputUnsubscribes.Add(() => action.canceled -= handler);
+    }
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        foreach (Action unsubscribe in _inputUnsubscribes)
+            unsubscribe();
+        _inputUnsubscribes.Clear();
     }
     // A person leaving mid-match despawns their goblin; its spot is kept for the bot that takes over (TakeoverManager).
     // Not [Server], for the same reason as DropFootballForDespawn. Bot goblins only despawn when the server shuts down;

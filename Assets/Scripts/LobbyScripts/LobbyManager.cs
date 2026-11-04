@@ -771,8 +771,9 @@ public class LobbyManager : MonoBehaviour
     {
         greenGoblinImage.sprite = greenGoblinSelected;
         greyGoblinImage.sprite = greyGoblinNotSelected;
-        localLobbyPlayerScript.isTeamGrey = false;
-        localLobbyPlayerScript.isPlayerReady = true;
+        // Through the player's ServerRpc, not direct SyncVar writes (Chunk 2 audit item 9). Start Game's own
+        // ServerRpc queues behind it, so the ready flag is set by the time the start is checked.
+        localLobbyPlayerScript.SinglePlayerPickTeam(false);
         isTeamSelectedYet = true;
         StartGameButton.gameObject.SetActive(true);
     }
@@ -780,8 +781,7 @@ public class LobbyManager : MonoBehaviour
     {
         greenGoblinImage.sprite = greenGoblinNotSelected;
         greyGoblinImage.sprite = greyGoblinSelected;
-        localLobbyPlayerScript.isTeamGrey = true;
-        localLobbyPlayerScript.isPlayerReady = true;
+        localLobbyPlayerScript.SinglePlayerPickTeam(true);
         isTeamSelectedYet = true;
         StartGameButton.gameObject.SetActive(true);
     }
