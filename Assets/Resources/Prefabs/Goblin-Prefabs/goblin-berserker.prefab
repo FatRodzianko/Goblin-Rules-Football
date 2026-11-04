@@ -5597,7 +5597,8 @@ MonoBehaviour:
   MaxStamina: 3
   StaminaDrain: 1.5
   StaminaRecovery: 1
-  PunchStaminaCost: 0.2
+  _punchStaminaCost: 0.2
+  _slideStaminaCost: 0.5
   MaxSpeed: 7
   MaxDamage: 75
   soundType: berserker
@@ -5632,7 +5633,6 @@ MonoBehaviour:
   isRunning: 0
   isSprinting: 0
   shiftHeldDown: 0
-  slideSpeedModifer: 1
   throwingRoutine: 0
   KickPowerBarHolder: {fileID: 2233147570338094041}
   KickPowerBarFillerImage: {fileID: 2233147571271093486}
@@ -5655,7 +5655,6 @@ MonoBehaviour:
   kickAfterMarkerRight: {fileID: 9068016072625198844}
   isGoblinDoingKickAfterAttempt: 0
   AccuracyBarSpeed: 0
-  wasPunchedSpeedModifier: 1
   gameFootball: {fileID: 0}
   isTrippedTimerRunning: 0
   punchBoxCollider: {fileID: 1938259440732540568}
@@ -5779,7 +5778,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584081978987171680
+  _initializedTimestamp: -8584078563111338351
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1

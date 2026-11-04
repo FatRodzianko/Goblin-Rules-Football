@@ -40,10 +40,15 @@ public class HurtBox : MonoBehaviour
             GoblinScript punchingGoblin = collision.transform.parent.GetComponent<GoblinScript>();
             if (Time.time > punchBoxScript.nextPunchTime && !this.myParentScript.isGoblinKnockedOut && this.myParentScript.isGoblinGrey != punchingGoblin.isGoblinGrey)
             {
-                Debug.Log("OnTriggerEnter2D: Hurtbox on " + this.transform.parent.name + ":" + this.myParentScript.ownerConnectionId.ToString() +  " collided with punchbox from: " + collision.transform.parent.name + ":" + punchingGoblin.ownerConnectionId.ToString() + " AFTER nextPunchTime. The punch will count!");
                 punchBoxScript.nextPunchTime = Time.time + punchBoxScript.nextPunchRate;
-                //myParentScript.HurtBoxCollision(collision.transform.parent.GetComponent<GoblinScript>());
-                myParentScript.HurtBoxCollision(punchingGoblin);
+                // The hit is claimed by the machine that owns the puncher - the collision that player saw - and the
+                // server verifies it before any damage (Attack Fairness Plan.md). Every other machine sees the same
+                // overlap and stays quiet.
+                if (punchingGoblin.IsOwner)
+                {
+                    Debug.Log("OnTriggerEnter2D: Hurtbox on " + this.transform.parent.name + " collided with punchbox from: " + collision.transform.parent.name + " AFTER nextPunchTime. Claiming the punch with the server.");
+                    punchingGoblin.ReportPunchHit(myParentScript);
+                }
             }
             else
             {

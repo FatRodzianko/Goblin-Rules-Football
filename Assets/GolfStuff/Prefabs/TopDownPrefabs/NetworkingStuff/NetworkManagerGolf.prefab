@@ -2414,6 +2414,10 @@ MonoBehaviour:
   CourseHolesToPlay: 
   CustomHolesToPlay: 
   CourseWorkshopID: 0
+  HasReceivedSettings: 0
+  IsLeavingOnPurpose: 0
+  HasGameStarted: 0
+  IsDevSession: 0
 --- !u!114 &7983715474653844590
 MonoBehaviour:
   m_ObjectHideFlags: 0

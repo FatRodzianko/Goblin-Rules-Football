@@ -5686,7 +5686,8 @@ MonoBehaviour:
   MaxStamina: 4
   StaminaDrain: 1.75
   StaminaRecovery: 1.5
-  PunchStaminaCost: 0.1
+  _punchStaminaCost: 0.1
+  _slideStaminaCost: 0.5
   MaxSpeed: 9
   MaxDamage: 30
   soundType: skirmisher
@@ -5721,7 +5722,6 @@ MonoBehaviour:
   isRunning: 0
   isSprinting: 0
   shiftHeldDown: 0
-  slideSpeedModifer: 1
   throwingRoutine: 0
   KickPowerBarHolder: {fileID: 5489254380469092858}
   KickPowerBarFillerImage: {fileID: 5489254381653759693}
@@ -5744,7 +5744,6 @@ MonoBehaviour:
   kickAfterMarkerRight: {fileID: 6654117388901068638}
   isGoblinDoingKickAfterAttempt: 0
   AccuracyBarSpeed: 7.25
-  wasPunchedSpeedModifier: 1
   gameFootball: {fileID: 0}
   isTrippedTimerRunning: 0
   punchBoxCollider: {fileID: 1434055712533138084}
@@ -5868,7 +5867,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584081978987171680
+  _initializedTimestamp: -8584078563111338351
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1

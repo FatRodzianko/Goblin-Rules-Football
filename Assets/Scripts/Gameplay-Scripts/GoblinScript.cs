@@ -1168,19 +1168,19 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    //MoveTowardFootball();
+                    MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    //MoveTowrdBallCarrier();
+                    MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    //GetOpenForPass();
+                    GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    //MoveTowardGoblinTarget();
+                    MoveTowardGoblinTarget();
                     break;
                 case State.SpyBallCarrier:
-                    //MoveTowardSpyPosition();
+                    MoveTowardSpyPosition();
                     break;
             }
         }
@@ -1209,19 +1209,19 @@ public class GoblinScript : NetworkBehaviour
             {
                 default:
                 case State.ChaseFootball:
-                    //MoveTowardFootball();
+                    MoveTowardFootball();
                     break;
                 case State.ChaseBallCarrier:
-                    //MoveTowrdBallCarrier();
+                    MoveTowrdBallCarrier();
                     break;
                 case State.TeamHasBall:
-                    //GetOpenForPass();
+                    GetOpenForPass();
                     break;
                 case State.AttackNearbyGoblin:
-                    //MoveTowardGoblinTarget();
+                    MoveTowardGoblinTarget();
                     break;
                 case State.SpyBallCarrier:
-                    //MoveTowardSpyPosition();
+                    MoveTowardSpyPosition();
                     break;
                 case State.RunTowardEndzone:
                     //myGamePlayer.myAiPlayer.RunTowardEndZone();
@@ -1894,6 +1894,89 @@ public class GoblinScript : NetworkBehaviour
     {
         networkAnimator.Play(stateName, 0, float.NegativeInfinity);
     }
+    // Attack fairness (Attack Fairness Plan.md): the machine that owns the puncher reports the hit it saw - the
+    // collision on that player's own screen - and the server applies damage only after checking the claim is
+    // plausible. Hits used to be judged by the server's physics alone, where the attacker's animation arrived late
+    // and the victim stood at the server's older view of their position, so a client's clean punch could miss and
+    // a dodged one could land. The claim carries only who hit whom; every outcome stays the server's.
+    const float MaxReportedPunchRange = 4f;
+    // Matches PunchBoxScript.nextPunchRate: one landed punch per attacker per window, now enforced server-side.
+    const float ServerReportedPunchRate = 0.25f;
+    float _serverNextPunchHitTime = 0f;
+
+    public void ReportPunchHit(GoblinScript victim)
+    {
+        if (IsOwner && victim != null)
+            CmdReportPunchHit(victim.GetComponent<NetworkObject>().ObjectId);
+    }
+    [ServerRpc]
+    void CmdReportPunchHit(int victimNetId)
+    {
+        if (!isPunching || isGoblinKnockedOut)
+            return;
+        if (Time.time < _serverNextPunchHitTime)
+            return;
+        if (!ObjectLookup.TryGet(victimNetId, out GoblinScript victim) || victim == null)
+            return;
+        if (victim.isGoblinGrey == this.isGoblinGrey || victim.isGoblinKnockedOut)
+            return;
+        // Punch reach plus the slack the position sync allows between the owner's view and the server's.
+        if (Vector2.Distance(victim.transform.position, this.transform.position) > MaxReportedPunchRange)
+            return;
+        _serverNextPunchHitTime = Time.time + ServerReportedPunchRate;
+        victim.HurtBoxCollision(this);
+    }
+    // A slide tackle follows the punch's pattern: the slider's machine claims the contact it saw (SlideBox), and
+    // SlideBoxCollision stays the server-side applier with its own guards (one trip per slide, team check, the
+    // kick-after block). A predicted slide's claim can't outrun its slide: the Cmds arrive in order, so the server
+    // has processed CmdSlideGoblin - and set isSliding - before the claim, and a refused slide's claim dies here.
+    public void ReportSlideHit(GoblinScript victim)
+    {
+        if (IsOwner && victim != null)
+            CmdReportSlideHit(victim.GetComponent<NetworkObject>().ObjectId);
+    }
+    [ServerRpc]
+    void CmdReportSlideHit(int victimNetId)
+    {
+        if (!isSliding || isGoblinKnockedOut)
+            return;
+        if (!ObjectLookup.TryGet(victimNetId, out GoblinScript victim) || victim == null)
+            return;
+        if (Vector2.Distance(victim.transform.position, this.transform.position) > MaxReportedPunchRange)
+            return;
+        SlideBoxCollision(victim);
+    }
+    // A touchdown is the carrier's own position crossing the line, and positions are owner-authoritative, so the
+    // carrier's machine claims the crossing (from Endzone's trigger, where the local animation drives the
+    // touchdown hitbox) and the server verifies the claim against its own state: ball, phase, the right endzone,
+    // and the carrier inside the zone plus sync slack.
+    const float EndzoneReportSlack = 4f;
+
+    public void ReportTouchdown(Endzone endzone)
+    {
+        if (IsOwner && endzone != null)
+            CmdReportTouchdown(endzone.GetComponent<NetworkObject>().ObjectId);
+    }
+    [ServerRpc]
+    void CmdReportTouchdown(int endzoneNetId)
+    {
+        GameplayManager gameplay = GameplayManager.instance;
+        if (gameplay == null || (gameplay.gamePhase != "gameplay" && gameplay.gamePhase != "xtra-time"))
+            return;
+        if (!doesCharacterHaveBall || isGoblinKnockedOut)
+            return;
+        if (!ObjectLookup.TryGet(endzoneNetId, out Endzone endzone) || endzone == null)
+            return;
+        if (endzone.isGrey == this.isGoblinGrey)
+            return;
+        if (!endzone.IsNearEndzone(this.transform.position, EndzoneReportSlack))
+            return;
+        Debug.Log(endzone.name + ": Goblin with ball touched down in opposite endzone. This should be a touchdown. Goblin: " + this.name);
+        gameplay.TouchDownScored(this.isGoblinGrey, this.GetComponent<NetworkObject>().ObjectId, this.transform.position.y);
+        gameplay.ActivateGameTimer(false);
+    }
+    // The server-side applier for a verified punch: called only from CmdReportPunchHit (it used to be driven by the
+    // server's own physics through HurtBox).
     public void HurtBoxCollision(GoblinScript punchingGoblin)
     {
 

@@ -22,32 +22,27 @@ public class Endzone : NetworkBehaviour
     {
         
     }
-    [Server(Logging = LoggingType.Off)]
+    // Attack fairness (Attack Fairness Plan.md): the trigger fires on every machine, and the machine that owns the
+    // carrier claims the crossing it saw; the server verifies in GoblinScript.CmdReportTouchdown before scoring.
+    // This used to be [Server]-only: the server's older view of a client's carrier could score a clear dive short.
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("OnTriggerEnter2D for " + this.name);
-        if (collision.tag == "goblin-body")
-        {
-            /*//Debug.Log(this.name + ": collided with goblin-body of goblin named: " + collision.transform.parent.name);
-            GoblinScript goblin = collision.transform.parent.GetComponent<GoblinScript>();
-            if (goblin.isDiving && goblin.doesCharacterHaveBall)
-                Debug.Log(this.name + ": Goblin is diving in the endzone for a touchdown " + collision.transform.parent.name);
-            else
-            {
-                Debug.Log(this.name + ": is in the endzone but NO touchdown " + collision.transform.parent.name);
-            }*/
-            
-        }
-        if (collision.tag == "touchdown-hitbox" && (GameplayManager.instance.gamePhase == "gameplay" || GameplayManager.instance.gamePhase == "xtra-time"))
-        {
-            Debug.Log(this.name + ": collision with touchdown-hitbox");
-            GoblinScript goblin = collision.transform.parent.GetComponent<GoblinScript>();
-            if (goblin.doesCharacterHaveBall && isGrey != goblin.isGoblinGrey)
-            {
-                Debug.Log(this.name + ": Goblin with ball touched down in opposite endzone. This should be a touchdown. Goblin: " + goblin.name);
-                GameplayManager.instance.TouchDownScored(goblin.isGoblinGrey, goblin.GetComponent<NetworkObject>().ObjectId, goblin.transform.position.y);
-                GameplayManager.instance.ActivateGameTimer(false);
-            }
-        }
+        if (collision.tag != "touchdown-hitbox" || GameplayManager.instance == null)
+            return;
+        if (GameplayManager.instance.gamePhase != "gameplay" && GameplayManager.instance.gamePhase != "xtra-time")
+            return;
+        Debug.Log(this.name + ": collision with touchdown-hitbox");
+        GoblinScript goblin = collision.transform.parent.GetComponent<GoblinScript>();
+        if (goblin.doesCharacterHaveBall && isGrey != goblin.isGoblinGrey && goblin.IsOwner)
+            goblin.ReportTouchdown(this);
+    }
+    // Whether a position is inside this endzone's collider grown by the given slack: the room the position sync
+    // allows between the carrier's machine, where the crossing was seen, and the server, plus the touchdown
+    // hitbox's own reach past the goblin's pivot.
+    public bool IsNearEndzone(Vector3 position, float slack)
+    {
+        Bounds bounds = endzoneCollider.bounds;
+        bounds.Expand(slack * 2f);
+        return bounds.Contains(new Vector3(position.x, position.y, bounds.center.z));
     }
 }

@@ -457,7 +457,8 @@ MonoBehaviour:
   MaxStamina: 4
   StaminaDrain: 1.5
   StaminaRecovery: 1.25
-  PunchStaminaCost: 0.15
+  _punchStaminaCost: 0.15
+  _slideStaminaCost: 0.5
   MaxSpeed: 8
   MaxDamage: 45
   soundType: grenadier
@@ -492,7 +493,6 @@ MonoBehaviour:
   isRunning: 0
   isSprinting: 0
   shiftHeldDown: 0
-  slideSpeedModifer: 1
   throwingRoutine: 0
   KickPowerBarHolder: {fileID: 2186301637958236475}
   KickPowerBarFillerImage: {fileID: 2186301639193685516}
@@ -515,7 +515,6 @@ MonoBehaviour:
   kickAfterMarkerRight: {fileID: 8470585999284153651}
   isGoblinDoingKickAfterAttempt: 0
   AccuracyBarSpeed: 6
-  wasPunchedSpeedModifier: 1
   gameFootball: {fileID: 0}
   isTrippedTimerRunning: 0
   punchBoxCollider: {fileID: 7844710513641514242}
@@ -660,7 +659,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584081978987171680
+  _initializedTimestamp: -8584078563111338351
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1

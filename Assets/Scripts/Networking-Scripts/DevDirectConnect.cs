@@ -251,8 +251,12 @@ public class DevDirectConnect : MonoBehaviour
     void OnGUI()
     {
         // Out of the way during a match. The title screen is the only place a session can be started from anyway.
+        // The ping label is the exception: the cellular internet tests needed a live number (Nov 3, 2026).
         if (SceneManager.GetActiveScene().name != "TitleScreen")
+        {
+            DrawPing();
             return;
+        }
 
         GUILayout.BeginArea(new Rect(10f, 10f, 230f, 240f), GUI.skin.box);
         GUILayout.Label("Local testing (no Steam)");
@@ -308,6 +312,17 @@ public class DevDirectConnect : MonoBehaviour
         Debug.Log("DevDirectConnect: " + _status);
     }
 
+    // A pure client's round trip to the host, in milliseconds, top-right during a session. FishNet measures it on
+    // every transport, so Steam internet tests get a live number too. The value includes tick-rate latency. The
+    // host is skipped: its round trip to itself says nothing.
+    void DrawPing()
+    {
+        if (FishNet.InstanceFinder.ServerManager == null || FishNet.InstanceFinder.ServerManager.Started)
+            return;
+        if (FishNet.InstanceFinder.ClientManager == null || !FishNet.InstanceFinder.ClientManager.Started)
+            return;
+        GUI.Label(new Rect(Screen.width - 110f, 5f, 105f, 22f), "ping " + FishNet.InstanceFinder.TimeManager.RoundTripTime + " ms");
+    }
     void StartDevClient()
     {
         if (!Ready())

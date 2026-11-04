@@ -22,7 +22,11 @@ public class SlideBox : MonoBehaviour
         if (collision.tag == "Goblin")
         {
             Debug.Log("OnTriggerEnter2D: SlideBox collided with Goblin from: " + collision.transform.name);
-            myParentScript.SlideBoxCollision(collision.transform.GetComponent<GoblinScript>());
+            // The contact is claimed by the machine that owns the slider - what that player saw - and the server
+            // verifies it before the trip (Attack Fairness Plan.md). Other machines see the same overlap and stay
+            // quiet; SlideBoxCollision remains the server-side applier.
+            if (myParentScript.IsOwner)
+                myParentScript.ReportSlideHit(collision.transform.GetComponent<GoblinScript>());
         }
     }
 }
