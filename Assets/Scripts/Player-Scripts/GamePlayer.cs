@@ -489,6 +489,11 @@ public class GamePlayer : NetworkBehaviour
         aiInitialized = true;
         CmdGetTeamName();
         CmdDoesPlayerChooseCoin();
+        // Before the goblins, like InitializeLocalGamePlayer: only humans spawned the ball, so a bot whose goblins
+        // initialized before any human's football Cmd spawned them into a match with no ball, and
+        // GoblinScript.OnStartServer threw (seen in the first scripted 3v3, Nov 4, 2026). CmdSpawnFootball itself
+        // skips when a ball already exists, and a connection's ServerRpcs run in order, so ball-before-goblins holds.
+        CmdSpawnFootball();
         CmdSpawnPlayerCharacters();
         LinkFootball();
         CmdPlayerFinishedLoading();

@@ -427,10 +427,11 @@ public class GoblinScript : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
+        // Chunk 2 audit item 8: the registered ball, not a tag find - the find's GetComponent threw when a goblin
+        // started before the ball existed, and an exception here aborts the rest of the spawn batch. Null is fine:
+        // OnStartClient sets it on the host once the ball arrives.
         if (!gameFootball)
-        {
-            gameFootball = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
-        }
+            gameFootball = Football.Instance;
     }
     public override void OnStopServer()
     {

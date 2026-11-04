@@ -28,8 +28,18 @@ using FishNet.Transporting.Tugboat;
 //   -devjoingolf [address]    join a dev Golf host (127.0.0.1 if no address is given)
 //   -devleavemove [seconds]   press Leave on the moving-lobby screen this long after it appears (at once if no time)
 //   -devready                 ready up once this player is in the lobby
+//   -devgoblin [type]         pick this goblin (Grenadier/Berserker/Skirmisher; Skirmisher if none is given) in the
+//                             lobby just before -devready readies. In a scripted 3v3, humans picking non-grenadiers
+//                             leaves both grenadiers to bots, whose AI then runs the coin toss and every kickoff, so
+//                             the match plays itself into real gameplay with no human input.
+//   -devbots                  as the 3v3 host, fill every empty seat with a bot once a second player has arrived
 //   -devstart                 press Start Game once everyone in the lobby is ready (the host; Golf waits for two)
 //   -devquitonload [seconds]  quit the game this long after the Football match scene loads (at once if no time)
+//   -devjitter [ms]           once a session runs, oscillate FishNet's latency simulator between 10 ms and this
+//                             (180 if no amount is given), 8 s each, for the session's first 60 s, then stay calm,
+//                             to fake a spiky connection that recovers. On a host it delays everything sent to
+//                             clients, so their ping jumps; AdaptiveRemoteSmoothing reacts there. The phases are
+//                             8 s because FishNet's RoundTripTime is a moving average: a faster wave averages flat.
 // An instance started with any of them runs in the background, since a script's instances are never all focused, and
 // hosts on loopback only, so a build in a new folder doesn't raise a firewall prompt.
 public class DevDirectConnect : MonoBehaviour
@@ -50,9 +60,14 @@ public class DevDirectConnect : MonoBehaviour
     float _leaveMoveTime = -1f;
     bool _readyUp = false;
     float _readyUpTime = -1f;
+    string _goblinType = null;
+    bool _fillWithBots = false;
+    int _lobbyCountAtLastBotAdd = -1;
     bool _startGame = false;
     float _quitOnLoadDelay = -1f;
     float _quitOnLoadTime = -1f;
+    float _jitterAmplitudeMs = -1f;
+    float _jitterSessionStart = -1f;
     // Lets the lobby settle after this player's row appears, as a person would.
     const float LobbySettleSeconds = 1f;
 
@@ -91,6 +106,10 @@ public class DevDirectConnect : MonoBehaviour
             }
             else if (args[i] == "-devready")
                 _readyUp = true;
+            else if (args[i] == "-devgoblin")
+                _goblinType = value ?? "Skirmisher";
+            else if (args[i] == "-devbots")
+                _fillWithBots = true;
             else if (args[i] == "-devstart")
                 _startGame = true;
             else if (args[i] == "-devquitonload")
@@ -98,8 +117,13 @@ public class DevDirectConnect : MonoBehaviour
                 float seconds;
                 _quitOnLoadDelay = value != null && float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out seconds) ? seconds : 0f;
             }
+            else if (args[i] == "-devjitter")
+            {
+                float ms;
+                _jitterAmplitudeMs = value != null && float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out ms) ? ms : 180f;
+            }
         }
-        _isCommandLineRun = _commandLineHostMode != null || _commandLineJoin || _leaveMoveDelay >= 0f || _readyUp || _startGame || _quitOnLoadDelay >= 0f;
+        _isCommandLineRun = _commandLineHostMode != null || _commandLineJoin || _leaveMoveDelay >= 0f || _readyUp || _startGame || _quitOnLoadDelay >= 0f || _jitterAmplitudeMs > 0f || _goblinType != null || _fillWithBots;
         if (_isCommandLineRun)
             Application.runInBackground = true;
     }
@@ -144,6 +168,12 @@ public class DevDirectConnect : MonoBehaviour
             else if (Time.realtimeSinceStartup >= _readyUpTime)
             {
                 _readyUp = false;
+                if (_goblinType != null)
+                {
+                    Debug.Log("DevDirectConnect: picking goblin " + _goblinType + ".");
+                    LobbyManager.instance.localLobbyPlayerScript.SelectGoblin(_goblinType);
+                    _goblinType = null;
+                }
                 if (!LobbyManager.instance.localLobbyPlayerScript.isPlayerReady)
                 {
                     Debug.Log("DevDirectConnect: pressing Ready Up.");
@@ -152,11 +182,58 @@ public class DevDirectConnect : MonoBehaviour
             }
         }
 
+        // The host fills the empty 3v3 seats once the second instance has its row. A spawned bot only shows up in
+        // LobbyPlayers a tick later, so each add waits for the previous bot's row before the next (adding every frame
+        // put 91 bots in the first scripted run); the lobby's own EnforceTeamCapacity hands a bot's seat back if
+        // another human arrives later.
+        if (_fillWithBots && LobbyManager.instance != null && NetworkManagerGRF.singleton != null
+            && InstanceFinder.ServerManager != null && InstanceFinder.ServerManager.Started
+            && NetworkManagerGRF.singleton.LobbyPlayers.Count >= 2)
+        {
+            int lobbyCount = NetworkManagerGRF.singleton.LobbyPlayers.Count;
+            if (lobbyCount >= NetworkManagerGRF.singleton.maxConnections)
+            {
+                _fillWithBots = false;
+            }
+            else if (lobbyCount != _lobbyCountAtLastBotAdd)
+            {
+                _lobbyCountAtLastBotAdd = lobbyCount;
+                int grey = 0;
+                foreach (LobbyPlayer player in NetworkManagerGRF.singleton.LobbyPlayers)
+                {
+                    if (player != null && player.isTeamGrey)
+                        grey++;
+                }
+                bool addToGrey = grey < NetworkManagerGRF.singleton.maxConnections / 2;
+                Debug.Log("DevDirectConnect: adding a bot to the " + (addToGrey ? "grey" : "green") + " team.");
+                LobbyManager.instance.AddBotPressed(addToGrey);
+            }
+        }
+
         if (_startGame && LobbyManager.instance != null && LobbyManager.instance.localLobbyPlayerScript != null && IsLobbyReady())
         {
             _startGame = false;
             Debug.Log("DevDirectConnect: pressing Start Game.");
             LobbyManager.instance.StartGame();
+        }
+
+        if (_jitterAmplitudeMs > 0f && InstanceFinder.TransportManager != null
+            && (InstanceFinder.ServerManager.Started || InstanceFinder.ClientManager.Started))
+        {
+            FishNet.Managing.Transporting.LatencySimulator simulator = InstanceFinder.TransportManager.LatencySimulator;
+            simulator.SetEnabled(true);
+            if (_jitterSessionStart < 0f)
+                _jitterSessionStart = Time.realtimeSinceStartup;
+            // 8 seconds calm, 8 seconds spiky, like the stretches of the Nov 3 cellular tests, then a recovery after
+            // a minute so one run shows the smoothing buffer rise and come all the way back down.
+            float elapsed = Time.realtimeSinceStartup - _jitterSessionStart;
+            bool spiky = elapsed < 60f && Mathf.FloorToInt(elapsed / 8f) % 2 == 1;
+            long target = spiky ? (long)_jitterAmplitudeMs : 10L;
+            if (simulator.GetLatency() != target)
+            {
+                simulator.SetLatency(target);
+                Debug.Log("DevDirectConnect: simulated latency " + target + " ms.");
+            }
         }
 
         if (_quitOnLoadDelay >= 0f && SceneManager.GetActiveScene().name.StartsWith("Gameplay"))
@@ -321,7 +398,10 @@ public class DevDirectConnect : MonoBehaviour
             return;
         if (FishNet.InstanceFinder.ClientManager == null || !FishNet.InstanceFinder.ClientManager.Started)
             return;
-        GUI.Label(new Rect(Screen.width - 110f, 5f, 105f, 22f), "ping " + FishNet.InstanceFinder.TimeManager.RoundTripTime + " ms");
+        // "buf" appears while AdaptiveRemoteSmoothing holds the drawing buffer above the prefab value.
+        string buffer = AdaptiveRemoteSmoothing.CurrentInterpolation != AdaptiveRemoteSmoothing.BaseInterpolation
+            ? "  buf " + AdaptiveRemoteSmoothing.CurrentInterpolation : "";
+        GUI.Label(new Rect(Screen.width - 160f, 5f, 155f, 22f), "ping " + FishNet.InstanceFinder.TimeManager.RoundTripTime + " ms" + buffer);
     }
     void StartDevClient()
     {
