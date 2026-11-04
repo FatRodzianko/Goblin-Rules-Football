@@ -238,6 +238,9 @@ public class GamePlayer : NetworkBehaviour
             return;
         gameObject.name = "LocalGamePlayer";
         gameObject.tag = "LocalGamePlayer";
+        // Chunk 2 audit item 8: the person's own GamePlayer, held as a reference instead of found by the name or
+        // tag above (never a bot - a host owns its bots too, and this runs only for the person's player).
+        LocalInstance = this;
 
 
         //Have these enabled when the "Gameplay" phase starts?
@@ -312,10 +315,15 @@ public class GamePlayer : NetworkBehaviour
     // A player who leaves mid-match used to stay in these lists with all of their objects destroyed, so anything walking
     // them touched a destroyed player or goblin. PowerUpManager.NormalPowerUpDrop did, picking a random player to drop a
     // power-up beside.
+    // The person's own GamePlayer on this machine; see StartAsOwner.
+    public static GamePlayer LocalInstance { get; private set; }
+
     public override void OnStopClient()
     {
         base.OnStopClient();
         Debug.Log("GamePlayer " + this.PlayerName + " left the game.");
+        if (LocalInstance == this)
+            LocalInstance = null;
         if (Game != null)
             Game.GamePlayers.Remove(this);
     }
@@ -467,10 +475,9 @@ public class GamePlayer : NetworkBehaviour
     // ServerRpcs on a later tick, so it may not exist yet. Football.OnStartClient links itself to the local player then.
     void LinkFootball()
     {
-        GameObject footballObject = GameObject.FindGameObjectWithTag("football");
-        if (footballObject == null)
-            return;
-        football = footballObject.GetComponent<Football>();
+        // Chunk 2 audit item 8: the registered ball instead of a tag find. Null when no ball has spawned here yet;
+        // Football.OnStartClient links back to this player when it arrives.
+        football = Football.Instance;
         if (football)
             football.localPlayer = this;
     }
@@ -1269,26 +1276,6 @@ public class GamePlayer : NetworkBehaviour
         Debug.Log("EndKickPower");
         if (selectGoblin.doesCharacterHaveBall)
             selectGoblin.StopKickPower();
-    }
-    public void ReportPlayerSpawnedFootball()
-    {
-        if (IsOwner)
-            CmdReportFootballSpawned();
-    }
-    [ServerRpc]
-    void CmdReportFootballSpawned()
-    {
-        Game.ReportFootballSpawnedForPlayer(this.playerNumber);
-    }
-    public void ReportPlayerGoblinSpawned()
-    {
-        if (IsOwner)
-            CmdReportPlayerGoblinSpawned();
-    }
-    [ServerRpc]
-    void CmdReportPlayerGoblinSpawned()
-    {
-        Game.ReportGoblinSpawnedForPlayer(this.playerNumber);
     }
     public void DoneLoadingGameplayStuff()
     {

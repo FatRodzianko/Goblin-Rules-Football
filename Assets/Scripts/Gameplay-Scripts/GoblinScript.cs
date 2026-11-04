@@ -524,19 +524,10 @@ public class GoblinScript : NetworkBehaviour
         if (IsOwner)
             StartAsOwner();
 
-        try
-        {
-            GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
-            localPlayer.ReportPlayerGoblinSpawned();
-            if (!gameFootball)
-            {
-                gameFootball = GameObject.FindGameObjectWithTag("football").GetComponent<Football>();
-            }
-        }
-        catch
-        {
-            Debug.Log("GoblinScript.cs: Could not find local game player object");
-        }
+        // Chunk 2 audit item 8: the registered ball instead of a tag find. Null when no ball has spawned here yet;
+        // Football.OnStartClient reintroduces itself to every goblin when it arrives.
+        if (!gameFootball)
+            gameFootball = Football.Instance;
         //rb.bodyType = RigidbodyType2D.Kinematic;
 
         if (IsOwner)
@@ -1224,7 +1215,10 @@ public class GoblinScript : NetworkBehaviour
                     MoveTowardSpyPosition();
                     break;
                 case State.RunTowardEndzone:
-                    //myGamePlayer.myAiPlayer.RunTowardEndZone();
+                    // The eleventh line of the testing-aid comment-out (Oct 31 baseline 87932d04): the Nov 3
+                    // restore matched only the five chase calls and missed this one, so a bot carrier played its
+                    // run animation and stood still. The member was renamed since (myAiPlayer -> myAIPlayer).
+                    myGamePlayer.myAIPlayer.RunTowardEndZone();
                     break;
             }
 

@@ -314,10 +314,11 @@ public class GameplayManager : NetworkBehaviour
     void GetLocalGamePlayer()
     {
         Debug.Log("GetLocalGamePlayer: Trying to find local game player");
-        LocalGamePlayer = GameObject.Find("LocalGamePlayer");
-        LocalGamePlayerScript = LocalGamePlayer.GetComponent<GamePlayer>();
+        // Chunk 2 audit item 8: the registered reference instead of a name lookup.
+        LocalGamePlayerScript = GamePlayer.LocalInstance;
         if (LocalGamePlayerScript)
         {
+            LocalGamePlayer = LocalGamePlayerScript.gameObject;
             LocalGamePlayerScript.InitializeLocalGamePlayer();
         }
         

@@ -74,11 +74,7 @@ public class TakeoverOfferMenu : MonoBehaviour
     }
     void SendAnswer(bool playOn)
     {
-        GameObject localPlayerObject = GameObject.FindGameObjectWithTag("LocalGamePlayer");
-        if (localPlayerObject == null)
-            return;
-        GamePlayer localPlayer = localPlayerObject.GetComponent<GamePlayer>();
-        if (localPlayer != null)
-            localPlayer.CmdAnswerTakeoverOffer(playOn);
+        if (GamePlayer.LocalInstance != null)
+            GamePlayer.LocalInstance.CmdAnswerTakeoverOffer(playOn);
     }
 }

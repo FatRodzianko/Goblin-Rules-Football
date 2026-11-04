@@ -30,12 +30,14 @@ public class NetworkManagerGRF : MonoBehaviour
     [Header("Waiting for players to load scene stuff")]
     [SerializeField] private GameObject WaitingForPlayersCanvas;
     public GameObject waitingForPlayersObject;
+    // The loading handshake (simplified Nov 3, 2026; Chunk 2 audit item 7). Each player's client sends
+    // CmdPlayerFinishedLoading AFTER its spawn requests (its football, its goblins), and ServerRpcs from one
+    // connection run in order, so a player's report proves everything it asked for has been spawned on the server.
+    // Once every seat has reported, every spawn exists, and the done-RPC sent after them reaches each client behind
+    // those spawns on the reliable channel. The old version also counted the goblins and footballs each client
+    // OBSERVED (6 per client, with AI special cases); those counts drifted and hung the waiting screen twice.
     public List<int> playersFinishedLoading = new List<int>();
-    public bool areAllPlayersLoaded = false;
-    public Dictionary<int, int> numberOfGoblinsLoaded = new Dictionary<int, int>();
-    public bool areAllGoblinsLoaded = false;
-    public List<int> playersWithFootballSpawned = new List<int>();
-    public bool areFootballsSpawned = false;
+    bool _loadingHandshakeComplete = false;
 
     [Header("Game Info")]
     public bool is1v1 = false;
@@ -619,127 +621,45 @@ public class NetworkManagerGRF : MonoBehaviour
     public void ReportPlayerFinishedLoading(int playerNumber)
     {
         Debug.Log("ReportPlayerFinishedLoading for player " + playerNumber.ToString());
+        // A mid-match replacement bot reports too (InitializeAIPlayer); the handshake is long over by then.
+        if (_loadingHandshakeComplete)
+            return;
         if (!playersFinishedLoading.Contains(playerNumber))
         {
             playersFinishedLoading.Add(playerNumber);
         }
-
-        // Check if all players have finished loading
+        // Until every seat's GamePlayer has spawned, a complete report list proves nothing: the first players load
+        // while the rest are still arriving. Every LobbyPlayer gets a GamePlayer; single player has no lobby and is
+        // always the host plus one AI.
+        int expectedPlayers = this.isSinglePlayer ? 2 : LobbyPlayers.Count;
+        if (GamePlayers.Count < expectedPlayers)
+        {
+            Debug.Log("ReportPlayerFinishedLoading: " + GamePlayers.Count + " of " + expectedPlayers + " players spawned so far.");
+            return;
+        }
         foreach (GamePlayer player in GamePlayers)
         {
             if (!playersFinishedLoading.Contains(player.playerNumber))
             {
-                areAllPlayersLoaded = false;
-                break;
-            }               
-            else
-                areAllPlayersLoaded = true;
-
+                Debug.Log("ReportPlayerFinishedLoading: still waiting on player " + player.playerNumber + ".");
+                return;
+            }
         }
-        Debug.Log("ReportPlayerFinishedLoading: Are all players loaded?: " + areAllPlayersLoaded.ToString());
-        CheckIfAllGameplayStuffIsLoaded();
-    }
-    [Server]
-    void CheckIfAllGameplayStuffIsLoaded()
-    {
-        if (areAllPlayersLoaded && areAllGoblinsLoaded && areFootballsSpawned)
-        {
-            Debug.Log("CheckIfAllGameplayStuffIsLoaded: true");
-            foreach (GamePlayer player in GamePlayers)
-                player.DoneLoadingGameplayStuff();
-            ResetWaitingForPlayersToLoadStuff();
-        }
-        else
-        {
-            Debug.Log("CheckIfAllGameplayStuffIsLoaded: false");
-        }
+        Debug.Log("ReportPlayerFinishedLoading: every player has loaded; starting the match.");
+        _loadingHandshakeComplete = true;
+        playersFinishedLoading.Clear();
+        foreach (GamePlayer player in GamePlayers)
+            player.DoneLoadingGameplayStuff();
     }
     public void ResetWaitingForPlayersToLoadStuff()
     {
         playersFinishedLoading.Clear();
-        areAllGoblinsLoaded = false;
-        areAllPlayersLoaded = false;
-        numberOfGoblinsLoaded.Clear();
-        playersWithFootballSpawned.Clear();
-        areFootballsSpawned = false;
+        _loadingHandshakeComplete = false;
     }
     public void ClearLobbyAndGamePlayerList()
     {
         LobbyPlayers.Clear();
         GamePlayers.Clear();
-    }
-    [Server]
-    public void ReportFootballSpawnedForPlayer(int playerNumber)
-    {
-        Debug.Log("ReportFootballSpawnedForPlayer for player " + playerNumber.ToString());
-        if (!playersWithFootballSpawned.Contains(playerNumber))
-        {
-            playersWithFootballSpawned.Add(playerNumber);
-        }
-
-        // Check if all players have finished loading
-        foreach (GamePlayer player in GamePlayers)
-        {
-            // An AI has no client of its own to report its football, as with the goblin check below. This asked
-            // whether it was single player's player 2, which meant the same thing while single player was the only
-            // mode with an AI. A 3v3 bot was then waited on for ever and the Waiting for players screen never left.
-            if (player.isAIPlayer)
-                continue;
-            if (!playersWithFootballSpawned.Contains(player.playerNumber))
-            {
-                areFootballsSpawned = false;
-                break;
-            }
-            else
-                areFootballsSpawned = true;
-
-        }
-        Debug.Log("ReportFootballSpawnedForPlayer: Do all players have their football spawned?: " + areFootballsSpawned.ToString());
-        CheckIfAllGameplayStuffIsLoaded();
-    }
-    [Server]
-    public void ReportGoblinSpawnedForPlayer(int playerNumber)
-    {
-        if (numberOfGoblinsLoaded.ContainsKey(playerNumber))
-        {
-            int goblinNumber = numberOfGoblinsLoaded[playerNumber] + 1;
-            numberOfGoblinsLoaded[playerNumber] = goblinNumber;
-        }
-        else
-        {
-            numberOfGoblinsLoaded.Add(playerNumber, 1);
-            Debug.Log("ReportGoblinSpawnedForPlayer: Player number: " + playerNumber + " has spawned " + numberOfGoblinsLoaded[playerNumber] + " goblins");
-        }
-
-        // Check if each player has loaded all three goblins
-        // Only a player's own client reports goblins, so this counts the people, not the bots.
-        if (numberOfGoblinsLoaded.Count != CountHumanGamePlayers() && !this.isSinglePlayer)
-            return;
-        else
-        {
-            foreach (GamePlayer player in GamePlayers)
-            {
-                if (player.isAIPlayer)
-                    continue;
-                if (!numberOfGoblinsLoaded.ContainsKey(player.playerNumber))
-                {
-                    areAllGoblinsLoaded = false;
-                    break;
-                }
-                else if (numberOfGoblinsLoaded[player.playerNumber] != 6)
-                {
-                    areAllGoblinsLoaded = false;
-                    break;
-                }
-                else
-                {
-                    areAllGoblinsLoaded = true;
-                }
-
-            }
-        }
-        Debug.Log("ReportGoblinSpawnedForPlayer: Do all players have all goblins spawned?: " + areAllGoblinsLoaded.ToString());
-        CheckIfAllGameplayStuffIsLoaded();
     }
     public void DestroyWaitingForPlayersCanvas()
     {

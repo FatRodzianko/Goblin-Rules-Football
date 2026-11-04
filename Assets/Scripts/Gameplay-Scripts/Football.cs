@@ -120,8 +120,20 @@ public class Football : NetworkBehaviour
         }
     }
 
+    // The match's football on this machine (Chunk 2 audit item 8: a held reference instead of tag finds at start,
+    // which caused every start-order bug so far). Set in Awake so it is available as early as a tag find was - a
+    // spawned object is findable by tag before its network start runs - and a respawned ball (the carrier-despawn
+    // respawn) replaces it from its own Awake. The tag stays for code not yet converted.
+    public static Football Instance { get; private set; }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
     private void Awake()
     {
+        Instance = this;
         _syncIsHeld.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsHeld(prev, next); };
         _syncIsThrown.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleIsThrown(prev, next); };
         _syncGoblinWithBallNetId.OnChange += (prev, next, asServer) => { if (HookFilter.ShouldRun(asServer)) HandleGoblinWithBallNetId(prev, next); };
@@ -153,20 +165,12 @@ public class Football : NetworkBehaviour
         /*footballLandingTargetObject = Instantiate(footballLandingTargetPrefab, this.transform);
         footballLandingTargetObject.SetActive(false);
         footballLandingTargetObject.transform.localPosition = Vector3.zero;*/
-        try
+        // The local GamePlayer may have started before this football existed (see GamePlayer.LinkFootball), and it
+        // may not have started at all yet, in which case LinkFootball finds this ball when it does.
+        if (this.localPlayer == null && GamePlayer.LocalInstance != null)
         {
-            GamePlayer localPlayer = GameObject.FindGameObjectWithTag("LocalGamePlayer").GetComponent<GamePlayer>();
-            localPlayer.ReportPlayerSpawnedFootball();
-            // The local GamePlayer may have started before this football existed (see GamePlayer.LinkFootball).
-            if (this.localPlayer == null)
-            {
-                this.localPlayer = localPlayer;
-                localPlayer.football = this;
-            }
-        }
-        catch
-        {
-            Debug.Log("Football.cs: Could not find local game player object");
+            this.localPlayer = GamePlayer.LocalInstance;
+            this.localPlayer.football = this;
         }
         ballMarkerObject = Instantiate(ballMarkerPrefab, this.transform);
         ballMarkerObject.SetActive(false);
