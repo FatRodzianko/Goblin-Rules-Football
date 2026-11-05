@@ -115,6 +115,9 @@ public class MapMakerHistoryStep
 {
     private MapMakerHistoryItem[] _historyItems;
 
+    // Reused by WriteTiles. Undo and redo never overlap, so one buffer for all steps is enough.
+    static readonly Dictionary<Tilemap, List<MapMakerHistoryItem>> _itemsByMap = new Dictionary<Tilemap, List<MapMakerHistoryItem>>();
+
     // constructor with multiple tilemaps, in event a "Step" stretches across multiple tilemaps
     public MapMakerHistoryStep(Tilemap[] maps, TileBase[] previousTiles, TileBase[] newTiles, Vector3Int[] positions, MapMakerGroundTileBase[] prevMapMakerTileBases, MapMakerGroundTileBase[] newMapMakerTileBases)
     {
@@ -145,17 +148,57 @@ public class MapMakerHistoryStep
     }
     public void Undo()
     {
+        WriteTiles(true);
         foreach (MapMakerHistoryItem item in _historyItems)
         {
-            item.Undo();
+            item.UndoObjects();
         }
     }
     public void Redo()
     {
+        WriteTiles(false);
         foreach (MapMakerHistoryItem item in _historyItems)
         {
-            item.Redo();
+            item.RedoObjects();
         }
+    }
+    // One batched write per tilemap instead of a SetTile per cell. Undoing a large fill was
+    // thousands of single cell writes, each one also refreshing a rule tile's neighbours.
+    // The eraser builds steps that span several tilemaps, hence the grouping.
+    void WriteTiles(bool undo)
+    {
+        _itemsByMap.Clear();
+
+        foreach (MapMakerHistoryItem item in _historyItems)
+        {
+            if (item.Map == null)
+                continue;
+
+            List<MapMakerHistoryItem> itemsForMap;
+            if (!_itemsByMap.TryGetValue(item.Map, out itemsForMap))
+            {
+                itemsForMap = new List<MapMakerHistoryItem>();
+                _itemsByMap.Add(item.Map, itemsForMap);
+            }
+            itemsForMap.Add(item);
+        }
+
+        foreach (KeyValuePair<Tilemap, List<MapMakerHistoryItem>> pair in _itemsByMap)
+        {
+            List<MapMakerHistoryItem> itemsForMap = pair.Value;
+            Vector3Int[] positions = new Vector3Int[itemsForMap.Count];
+            TileBase[] tiles = new TileBase[itemsForMap.Count];
+
+            for (int i = 0; i < itemsForMap.Count; i++)
+            {
+                positions[i] = itemsForMap[i].Position;
+                tiles[i] = undo ? itemsForMap[i].PreviousTile : itemsForMap[i].NewTile;
+            }
+
+            pair.Key.SetTiles(positions, tiles);
+        }
+
+        _itemsByMap.Clear();
     }
 }
 public class MapMakerHistoryItem
@@ -178,10 +221,32 @@ public class MapMakerHistoryItem
         this._newMapMakerTileBase = newMapMakerTileBase;
     }
 
+    public Tilemap Map
+    {
+        get { return _map; }
+    }
+    public Vector3Int Position
+    {
+        get { return _position; }
+    }
+    public TileBase PreviousTile
+    {
+        get { return _previousTile; }
+    }
+    public TileBase NewTile
+    {
+        get { return _newTile; }
+    }
+
     public void Undo()
     {
         _map.SetTile(_position, _previousTile);
-
+        UndoObjects();
+    }
+    // The tile write and the obstacle/marker side effects are separate entry points so a step can
+    // write all of its tiles in one call per tilemap and then run the side effects.
+    public void UndoObjects()
+    {
         //if (_mapMakerTileBase == null)
         //    return;
         //// remove obstacle if it exists.
@@ -236,7 +301,10 @@ public class MapMakerHistoryItem
     public void Redo()
     {
         _map.SetTile(_position, _newTile);
-
+        RedoObjects();
+    }
+    public void RedoObjects()
+    {
         //if (_mapMakerTileBase == null)
         //    return;
         //// place obstacle if it exists.

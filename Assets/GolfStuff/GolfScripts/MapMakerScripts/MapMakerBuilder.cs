@@ -49,6 +49,18 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     // Reused by IsPointerOverUI so the check doesn't allocate a list per click
     static readonly List<RaycastResult> _uiRaycastResults = new List<RaycastResult>();
 
+    [SerializeField] bool _disableTileMapCollidersWhileEditing = true;
+
+    // The maps IsPlacementForbidden tests against, rebuilt when the selected object changes
+    readonly List<Tilemap> _allowedOnMaps = new List<Tilemap>();
+    readonly List<Tilemap> _forbiddenWithMaps = new List<Tilemap>();
+
+    // The cells of the rectangle or line being dragged, reused because the shape is rebuilt every
+    // time the cursor crosses a cell boundary
+    readonly List<Vector3Int> _shapePositions = new List<Vector3Int>();
+    readonly List<bool> _shapeForbidden = new List<bool>();
+    readonly List<Vector3Int> _shapeAllowedPositions = new List<Vector3Int>();
+
     // Drawing rectangle stuff
     [SerializeField] BoundsInt _rectangleBounds;
 
@@ -202,6 +214,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         InitTilemaps();
         InitTileReferences();
+        if (_disableTileMapCollidersWhileEditing)
+            SetTileMapCollidersEnabled(false);
         if (_mapMakerUIManager == null)
         {
             _mapMakerUIManager = GameObject.FindGameObjectWithTag("MapMakerUIManager").GetComponent<MapMakerUIManager>();
@@ -603,6 +617,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             // if selected object is not null, set the selected tile base. If it is null, set selected tile base to null
             _selectedTileBase = _selectedObject != null ? _selectedObject.TileBase : null;
 
+            RebuildPlacementMaps();
+
             //if (_selectedObject)
             //{
             //    UpdateGridPosition(_mousePos);
@@ -748,17 +764,12 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             return false;
 
 
-        if (_selectedObject.CanOnlyBePlacedOnTheseGroundTypes.Count > 0)
+        if (_allowedOnMaps.Count > 0)
         {
-            List<MapMakerTileTypes> allowedCategories = _selectedObject.CanOnlyBePlacedOnTheseGroundTypes;
-            List<Tilemap> allowedMaps = allowedCategories.ConvertAll(category => category.Tilemap);
-            if (allowedMaps.Count > 0)
+            //return !DoesTilemapMatchCanOnlyBePlacedOnTheseGroundTypes(allowedMaps, position);
+            if (!DoesTilemapMatchCanOnlyBePlacedOnTheseGroundTypes(_allowedOnMaps, position))
             {
-                //return !DoesTilemapMatchCanOnlyBePlacedOnTheseGroundTypes(allowedMaps, position);
-                if (!DoesTilemapMatchCanOnlyBePlacedOnTheseGroundTypes(allowedMaps, position))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -769,32 +780,81 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         //        return IsThereATeeOffMarkerAtThisPoint(_selectedObject.MapMakerTileType.Tilemap, position);
         //}
 
-        List<MapMakerTileTypes> restrictedCategories = _selectedObject.PlacementRestrictions;
-        List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
-        //Debug.Log("IsPlacementForbidden: length of restrictedMaps maps: " + restrictedMaps.Count() + " length of restrictedCategories: " + restrictedCategories.Count());
-
-
-        List <Tilemap> allMaps = _tileMapReferenceHolder.ForbiddenPlacingWithMaps.Concat(restrictedMaps).ToList();
-        //Debug.Log("IsPlacementForbidden: length of all maps: " + allMaps.Count());
-        return allMaps.Any(map => {
-            if (map.HasTile(position))
+        for (int i = 0; i < _forbiddenWithMaps.Count; i++)
+        {
+            Tilemap map = _forbiddenWithMaps[i];
+            if (map.HasTile(position) && map.GetTile(position) != _selectedTileBase)
             {
-                return map.GetTile(position) != _selectedTileBase;
+                return true;
             }
+        }
 
-            return false;
-        });
+        return false;
     }
     bool DoesTilemapMatchCanOnlyBePlacedOnTheseGroundTypes(List<Tilemap> allowedMaps, Vector3Int position)
     {
-        return allowedMaps.Any(map => {
-            if (map.HasTile(position))
+        for (int i = 0; i < allowedMaps.Count; i++)
+        {
+            Tilemap map = allowedMaps[i];
+            if (map.HasTile(position) && map.GetTile(position) != _selectedTileBase)
             {
-                return map.GetTile(position) != _selectedTileBase;
+                return true;
             }
+        }
 
-            return false;
-        });
+        return false;
+    }
+    // These tilemaps carry colliders because the golf game uses them for ground detection. Nothing
+    // in the map maker reads them, and Unity rebuilds a tilemap's collider whenever its tiles
+    // change - at a cost that follows how many tiles the map holds, not how many changed. Every
+    // cursor movement during a drag was rebuilding the collider for the whole hole.
+    // Playing a hole from inside the map maker would need them back on, which is what this is for.
+    public void SetTileMapCollidersEnabled(bool collidersEnabled)
+    {
+        if (_tileMapReferenceHolder == null)
+            return;
+
+        foreach (Tilemap map in _tileMapReferenceHolder.AllMaps)
+        {
+            if (map == null)
+                continue;
+
+            TilemapCollider2D tileMapCollider = map.GetComponent<TilemapCollider2D>();
+            if (tileMapCollider != null)
+                tileMapCollider.enabled = collidersEnabled;
+        }
+    }
+    // The two lists IsPlacementForbidden tests against only change with the selection, but it runs
+    // once per cell, so building them per call cost several allocations for every cell of a fill or
+    // of a rectangle preview.
+    void RebuildPlacementMaps()
+    {
+        _allowedOnMaps.Clear();
+        _forbiddenWithMaps.Clear();
+
+        if (_selectedObject == null)
+            return;
+
+        foreach (MapMakerTileTypes category in _selectedObject.CanOnlyBePlacedOnTheseGroundTypes)
+        {
+            if (category != null && category.Tilemap != null)
+                _allowedOnMaps.Add(category.Tilemap);
+        }
+
+        if (_tileMapReferenceHolder != null)
+        {
+            foreach (Tilemap map in _tileMapReferenceHolder.ForbiddenPlacingWithMaps)
+            {
+                if (map != null)
+                    _forbiddenWithMaps.Add(map);
+            }
+        }
+
+        foreach (MapMakerTileTypes category in _selectedObject.PlacementRestrictions)
+        {
+            if (category != null && category.Tilemap != null)
+                _forbiddenWithMaps.Add(category.Tilemap);
+        }
     }
     void HandleDrawing()
     {
@@ -959,6 +1019,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             //MapMakerGroundTileBase[] mapMakerTileBases = new MapMakerGroundTileBase[positions.Length];
             MapMakerGroundTileBase[] prevMapMakerTileBases = new MapMakerGroundTileBase[positions.Length];
             MapMakerGroundTileBase[] newMapMakerTileBases = new MapMakerGroundTileBase[positions.Length];
+            bool[] isForbidden = new bool[positions.Length];
 
             for (int i = 0; i < positions.Length; i++)
             {
@@ -971,30 +1032,34 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 prevMapMakerTileBases[i] = GetMapMakerGroundTileBaseFromTileBase(previousTiles[i]);
                 newMapMakerTileBases[i] = _selectedObject;
 
-                if (_selectedObject.GetType() == typeof(MapMakerTool))
-                {
-                    map.SetTile(positions[i], tileBase);
-                }
-                else if (!IsPlacementForbidden(positions[i]))
-                {
-                    newTiles[i] = tileBase;
-                    map.SetTile(positions[i], tileBase);
+                // A forbidden cell keeps whatever it had, so its history entry records no change
+                isForbidden[i] = IsPlacementForbidden(positions[i]);
+                newTiles[i] = isForbidden[i] ? previousTiles[i] : tileBase;
+            }
 
-                    //if (_selectedObject.GetType() == typeof(MapMakerObstacle) && map != _previewMap)
+            // One batched write rather than a SetTile per cell. A single cell write also refreshes
+            // a rule tile's neighbours, so a large fill was paying for that thousands of times.
+            map.SetTiles(positions, newTiles);
+
+            // Spawned after the tiles are down: placing one of these can clear the tile of the
+            // marker or hole it replaces, and the batch write above must not put that back.
+            if (_selectedObject.GetType() == typeof(MapMakerObstacle) || _selectedObject.GetType() == typeof(MapMakerCourseMarker))
+            {
+                for (int i = 0; i < positions.Length; i++)
+                {
+                    if (isForbidden[i])
+                        continue;
+
                     if (_selectedObject.GetType() == typeof(MapMakerObstacle))
                     {
                         Debug.Log("DrawItem: Placing obstacle at: " + positions[i].ToString());
                         PlaceObstacle(positions[i], (MapMakerObstacle)_selectedObject);
                     }
-                    else if (_selectedObject.GetType() == typeof(MapMakerCourseMarker))
+                    else
                     {
                         Debug.Log("DrawItem: Placing MapMakerCourseMarker at: " + positions[i].ToString());
                         PlaceCourseMarker(positions[i], (MapMakerCourseMarker)_selectedObject);
                     }
-                }
-                else
-                {
-                    newTiles[i] = previousTiles[i];
                 }
             }
 
@@ -1603,9 +1668,17 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         //Debug.Log("DrawBounds: " + map.name + " bounds: " + _rectangleBounds.xMin + ":" + _rectangleBounds.xMax + " x " + _rectangleBounds.yMin + ":" + _rectangleBounds.yMax);
         // List of positions for the History Steps
-        List<Vector3Int> positions = new List<Vector3Int>();
-        List<bool> isForbidden = new List<bool>();
-        List<Vector3Int> forbiddenPositions = new List<Vector3Int>();
+        // Reused between calls: a shape is rebuilt every time the cursor crosses a cell boundary,
+        // and fresh lists for a large rectangle were hundreds of kilobytes of garbage per move.
+        List<Vector3Int> positions = _shapePositions;
+        List<bool> isForbidden = _shapeForbidden;
+        // Collected as the rectangle is walked. Removing the forbidden ones from "positions"
+        // afterwards searched the whole list once per forbidden cell.
+        List<Vector3Int> allowedPositions = _shapeAllowedPositions;
+
+        positions.Clear();
+        isForbidden.Clear();
+        allowedPositions.Clear();
         for (int x = _rectangleBounds.xMin; x <= _rectangleBounds.xMax; x++)
         {
             for (int y = _rectangleBounds.yMin; y <= _rectangleBounds.yMax; y++)
@@ -1622,28 +1695,19 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 //isForbidden.Add(IsPlacementForbidden(newPos));
                 bool forbidden = IsPlacementForbidden(newPos);
                 isForbidden.Add(forbidden);
-                if (forbidden)
-                    forbiddenPositions.Add(newPos);
+                if (!forbidden)
+                    allowedPositions.Add(newPos);
             }
         }
 
         if (isPreview)
         {
-            _previewHandler.SetPreview(positions.ToArray(), isForbidden.ToArray());
-            //_previewHandler.SetPreview(positions.ToArray(), isForbidden.ToArray(), _rectangleBounds);
+            _previewHandler.SetPreview(positions, isForbidden);
         }
         else
         {
-            if (forbiddenPositions.Count > 0)
-            {
-                foreach (Vector3Int forbidPos in forbiddenPositions)
-                {
-                    if (positions.Contains(forbidPos))
-                        positions.Remove(forbidPos);
-                }
-            }
             // NEW for history steps
-            DrawItem(map, positions.ToArray(), _selectedTileBase);
+            DrawItem(map, allowedPositions.ToArray(), _selectedTileBase);
         }
 
         
@@ -1801,9 +1865,13 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         if (_linePoints.Count > 0)
         {
-            // List of positions for the History Steps
-            List<Vector3Int> positions = new List<Vector3Int>();
-            List<bool> isForbidden = new List<bool>();
+            // List of positions for the History Steps, reused between calls like DrawBounds does
+            List<Vector3Int> positions = _shapePositions;
+            List<bool> isForbidden = _shapeForbidden;
+
+            positions.Clear();
+            isForbidden.Clear();
+
             foreach (Vector2Int linePoint in _linePoints)
             {
                 //map.SetTile((Vector3Int)linePoint, _selectedTileBase);
@@ -1819,7 +1887,7 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
             if (isPreview)
             {
-                _previewHandler.SetPreview(positions.ToArray(), isForbidden.ToArray());
+                _previewHandler.SetPreview(positions, isForbidden);
             }
             else
             {
