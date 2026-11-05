@@ -33,6 +33,11 @@ using FishNet.Transporting.Tugboat;
 //                             leaves both grenadiers to bots, whose AI then runs the coin toss and every kickoff, so
 //                             the match plays itself into real gameplay with no human input.
 //   -devbots                  as the 3v3 host, fill every empty seat with a bot once a second player has arrived
+//   -devtornado               as a Golf host, spawn a tornado once the hole is under way, so the spawn can be
+//                             watched from a client (it is otherwise down to chance or a broken statue)
+//   -devswing                 in a Golf game, take a plain default swing whenever it is this player's turn: start
+//                             the turn, aim at the hole's aim point, and submit a mid-power hit, so a scripted
+//                             Golf pair plays itself through the tee-off challenge and the holes
 //   -devstart                 press Start Game once everyone in the lobby is ready (the host; Golf waits for two)
 //   -devquitonload [seconds]  quit the game this long after the Football match scene loads (at once if no time)
 //   -devjitter [ms]           once a session runs, oscillate FishNet's latency simulator between 10 ms and this
@@ -63,6 +68,9 @@ public class DevDirectConnect : MonoBehaviour
     string _goblinType = null;
     bool _fillWithBots = false;
     int _lobbyCountAtLastBotAdd = -1;
+    bool _devSwing = false;
+    float _nextSwingTime = -1f;
+    bool _devTornado = false;
     bool _startGame = false;
     float _quitOnLoadDelay = -1f;
     float _quitOnLoadTime = -1f;
@@ -110,6 +118,10 @@ public class DevDirectConnect : MonoBehaviour
                 _goblinType = value ?? "Skirmisher";
             else if (args[i] == "-devbots")
                 _fillWithBots = true;
+            else if (args[i] == "-devswing")
+                _devSwing = true;
+            else if (args[i] == "-devtornado")
+                _devTornado = true;
             else if (args[i] == "-devstart")
                 _startGame = true;
             else if (args[i] == "-devquitonload")
@@ -123,7 +135,7 @@ public class DevDirectConnect : MonoBehaviour
                 _jitterAmplitudeMs = value != null && float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out ms) ? ms : 180f;
             }
         }
-        _isCommandLineRun = _commandLineHostMode != null || _commandLineJoin || _leaveMoveDelay >= 0f || _readyUp || _startGame || _quitOnLoadDelay >= 0f || _jitterAmplitudeMs > 0f || _goblinType != null || _fillWithBots;
+        _isCommandLineRun = _commandLineHostMode != null || _commandLineJoin || _leaveMoveDelay >= 0f || _readyUp || _startGame || _quitOnLoadDelay >= 0f || _jitterAmplitudeMs > 0f || _goblinType != null || _fillWithBots || _devSwing || _devTornado;
         if (_isCommandLineRun)
             Application.runInBackground = true;
     }
@@ -158,6 +170,8 @@ public class DevDirectConnect : MonoBehaviour
         if (SceneManager.GetActiveScene().name == SteamLobby.GolfSceneName)
         {
             UpdateGolfLobby();
+            UpdateGolfSwing();
+            UpdateGolfTornado();
             return;
         }
 
@@ -183,9 +197,8 @@ public class DevDirectConnect : MonoBehaviour
         }
 
         // The host fills the empty 3v3 seats once the second instance has its row. A spawned bot only shows up in
-        // LobbyPlayers a tick later, so each add waits for the previous bot's row before the next (adding every frame
-        // put 91 bots in the first scripted run); the lobby's own EnforceTeamCapacity hands a bot's seat back if
-        // another human arrives later.
+        // LobbyPlayers a tick later, so each add waits for the previous bot's row before the next; the lobby's own
+        // EnforceTeamCapacity hands a bot's seat back if another human arrives later.
         if (_fillWithBots && LobbyManager.instance != null && NetworkManagerGRF.singleton != null
             && InstanceFinder.ServerManager != null && InstanceFinder.ServerManager.Started
             && NetworkManagerGRF.singleton.LobbyPlayers.Count >= 2)
@@ -224,16 +237,15 @@ public class DevDirectConnect : MonoBehaviour
             simulator.SetEnabled(true);
             if (_jitterSessionStart < 0f)
                 _jitterSessionStart = Time.realtimeSinceStartup;
-            // 8 seconds calm, 8 seconds spiky, like the stretches of the Nov 3 cellular tests, then a recovery after
-            // a minute so one run shows the smoothing buffer rise and come all the way back down.
+            // 8 seconds calm, 8 seconds spiky, in alternating stretches, then calm after a minute so one run shows
+            // the smoothing buffer rise and come all the way back down. A spiky stretch re-rolls the delay every
+            // frame: a link's jitter is each packet arriving a different amount late, and a fixed added delay would
+            // only move every packet equally, which no buffer needs to absorb.
             float elapsed = Time.realtimeSinceStartup - _jitterSessionStart;
             bool spiky = elapsed < 60f && Mathf.FloorToInt(elapsed / 8f) % 2 == 1;
-            long target = spiky ? (long)_jitterAmplitudeMs : 10L;
+            long target = spiky ? (long)Random.Range(10f, _jitterAmplitudeMs) : 10L;
             if (simulator.GetLatency() != target)
-            {
                 simulator.SetLatency(target);
-                Debug.Log("DevDirectConnect: simulated latency " + target + " ms.");
-            }
         }
 
         if (_quitOnLoadDelay >= 0f && SceneManager.GetActiveScene().name.StartsWith("Gameplay"))
@@ -294,6 +306,69 @@ public class DevDirectConnect : MonoBehaviour
             Debug.Log("DevDirectConnect: pressing Start Game.");
             me.HostStartGame();
         }
+    }
+
+    // Spawns one tornado on a Golf host, through WindManager's own spawn, so its arrival can be watched from a
+    // client. The hole has to be under way or there is no player for it to pick a spawn spot beside.
+    void UpdateGolfTornado()
+    {
+        if (!_devTornado || WindManager.instance == null || GameplayManagerTopDownGolf.instance == null)
+            return;
+        if (!WindManager.instance.IsServerStarted || GameplayManagerTopDownGolf.instance.CurrentPlayer == null)
+            return;
+        if (WindManager.instance.IsThereATorndao)
+            return;
+        // The spawn spot is picked beside a player's ball, so every player needs one before asking for a tornado.
+        if (GameplayManagerTopDownGolf.instance.GolfPlayers.Count == 0)
+            return;
+        foreach (GolfPlayerTopDown player in GameplayManagerTopDownGolf.instance.GolfPlayers)
+        {
+            if (player == null || player.MyBall == null)
+                return;
+        }
+        _devTornado = false;
+        Debug.Log("DevDirectConnect: spawning a tornado.");
+        typeof(WindManager).GetMethod("SpawnTornado", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .Invoke(WindManager.instance, new object[0]);
+    }
+
+    // The scripted Golf swing: whenever it is this player's turn, start the turn, then submit a plain mid-power hit
+    // at the hole's aim point through SubmitHitToBall - the real submission path, so tee-off bookkeeping, score and
+    // the turn rotation all run as they would for a person. The swing fields it fills are public on
+    // GolfPlayerTopDown; only the turn-start prompt's handler is private, reached by reflection.
+    void UpdateGolfSwing()
+    {
+        if (!_devSwing || Time.realtimeSinceStartup < _nextSwingTime)
+            return;
+        GameplayManagerTopDownGolf manager = GameplayManagerTopDownGolf.instance;
+        if (manager == null || manager.CurrentPlayer == null)
+            return;
+        GolfPlayerTopDown player = manager.CurrentPlayer;
+        if (!player.IsOwner || player.MyBall == null)
+            return;
+        if (player.MyBall.isHit || player.MyBall.isBouncing || player.MyBall.isRolling)
+            return;
+        if (!player.IsPlayersTurn)
+        {
+            Debug.Log("DevDirectConnect: starting " + player.PlayerName + "'s turn for a scripted swing.");
+            var startTurn = typeof(GolfPlayerTopDown).GetMethod("PlayerStartTurn",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (startTurn != null)
+                startTurn.Invoke(player, new object[] { default(UnityEngine.InputSystem.InputAction.CallbackContext) });
+            _nextSwingTime = Time.realtimeSinceStartup + 2f;
+            return;
+        }
+        Vector3 aimPoint = manager.TeeOffAimPoint;
+        Vector2 direction = ((Vector2)(aimPoint - player.MyBall.transform.position)).normalized;
+        if (direction == Vector2.zero)
+            direction = Vector2.right;
+        player.HitPowerSubmitted = 40f;
+        player.ModifiedHitDirection = direction;
+        player.hitTopSpin = 0f;
+        player.hitLeftOrRightspin = 0f;
+        Debug.Log("DevDirectConnect: scripted swing for " + player.PlayerName + " toward " + aimPoint + ".");
+        player.SubmitHitToBall();
+        _nextSwingTime = Time.realtimeSinceStartup + 5f;
     }
 
     // The same test the lobby uses to offer Start Game.

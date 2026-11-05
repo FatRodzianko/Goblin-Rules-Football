@@ -70,8 +70,7 @@ public class EscMenuManager : MonoBehaviour
             Debug.Log("EscMenuManager.cs: could not find local game playeR? Error: " + e);
         }
     }
-    // Chunk 2 audit item 10: the Esc handler is stored and removed when the scene object is destroyed. It used to
-    // keep firing on the destroyed manager after the match, from the title screen, and stack across matches.
+    // The Esc handler is stored and removed when this scene object is destroyed; the shared Controls outlive it.
     Action<InputAction.CallbackContext> _escMenuHandler;
     void OnDestroy()
     {

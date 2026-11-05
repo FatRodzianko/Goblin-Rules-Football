@@ -398,8 +398,7 @@ public class LobbyPlayer : NetworkBehaviour
             LobbyHostMigration.instance.FinishTakingOver();
     }
     // The single-player lobby's one-click team pick: team and ready set through the server like every other lobby
-    // write (Chunk 2 audit item 9; the UI used to write both SyncVars directly, which only worked because single
-    // player is always the host). Set-style on purpose: picking the other team re-picks, it never un-readies.
+    // write. Set-style on purpose: picking the other team re-picks, it never un-readies.
     public void SinglePlayerPickTeam(bool isGrey)
     {
         if (IsOwner)

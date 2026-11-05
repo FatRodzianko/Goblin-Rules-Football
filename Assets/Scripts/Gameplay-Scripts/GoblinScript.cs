@@ -427,9 +427,8 @@ public class GoblinScript : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
-        // Chunk 2 audit item 8: the registered ball, not a tag find - the find's GetComponent threw when a goblin
-        // started before the ball existed, and an exception here aborts the rest of the spawn batch. Null is fine:
-        // OnStartClient sets it on the host once the ball arrives.
+        // A goblin can start before the ball exists, and an exception here aborts the rest of the spawn batch, so
+        // this must tolerate null. OnStartClient sets it on the host once the ball arrives.
         if (!gameFootball)
             gameFootball = Football.Instance;
     }
@@ -439,8 +438,8 @@ public class GoblinScript : NetworkBehaviour
         DropFootballForDespawn();
         RecordPositionForReplacement();
     }
-    // Chunk 2 audit item 10, same as GamePlayer: the goblin's Move and Sprint lambdas are stored so OnStopClient can
-    // remove them; they used to keep firing on destroyed goblins after the match, and stack across matches.
+    // Same as GamePlayer: the goblin's Move and Sprint lambdas are stored so OnStopClient can remove them from the
+    // shared Controls, which outlive the goblin.
     readonly List<Action> _inputUnsubscribes = new List<Action>();
     void OnInputPerformed(InputAction action, Action<InputAction.CallbackContext> handler)
     {
@@ -1237,9 +1236,6 @@ public class GoblinScript : NetworkBehaviour
                     MoveTowardSpyPosition();
                     break;
                 case State.RunTowardEndzone:
-                    // The eleventh line of the testing-aid comment-out (Oct 31 baseline 87932d04): the Nov 3
-                    // restore matched only the five chase calls and missed this one, so a bot carrier played its
-                    // run animation and stood still. The member was renamed since (myAiPlayer -> myAIPlayer).
                     myGamePlayer.myAIPlayer.RunTowardEndZone();
                     break;
             }
@@ -3450,10 +3446,16 @@ public class GoblinScript : NetworkBehaviour
         //float distToBall = Vector3.Distance(this.transform.position, gameFootball.transform.position);
 
         Vector3 myPosition = this.transform.position;
-        Vector3 targetPosition = gameFootball.transform.position;
+        // The carrier, not the ball riding in its hands: the slide and punch gates judge distance and height to the
+        // goblin that gets hit, and the ball's offset can put a close-in attacker outside gates it should pass.
+        GoblinScript carrier = null;
+        if (gameFootball != null)
+            ObjectLookup.TryGet(gameFootball.goblinWithBallNetId, out carrier);
+        this.goblinTarget = carrier;
+        Vector3 targetPosition = carrier != null ? carrier.transform.position : gameFootball.transform.position;
 
         float distanceToTarget = Vector3.Distance(myPosition, targetPosition);
-        
+
         bool slide = WillGoblinSlideTowardTarget(distanceToTarget);
 
         if (slide)
@@ -3472,18 +3474,23 @@ public class GoblinScript : NetworkBehaviour
             
             if (distanceToTarget > minDistanceFromTarget)
             {
-                // Get the goblin with the football to target them with the AI script
-                this.goblinTarget = ObjectLookup.Get(gameFootball.goblinWithBallNetId).GetComponent<GoblinScript>();
-                
                 //Check to see if the goblin should be sprinting to the ball carrier
-                if (distanceToTarget > 3f || goblinTarget.isSprintingOnServer)
+                if (distanceToTarget > 3f || (goblinTarget != null && goblinTarget.isSprintingOnServer))
                 {
                     this.WillAIGoblinSprint(false);
                 }
                 myGoblinAIPathFindingScript.goblinTarget = goblinTarget;
                 myGoblinAIPathFindingScript.isTargetingAGoblin = true;
                 AIMoveTowardDirection(diretionToBallCarrier, targetPosition);
-            }                
+            }
+            else if (Mathf.Abs(myPosition.y - targetPosition.y) > punchYMax * 0.5f)
+            {
+                // Close enough to stand, but too far above or below the carrier for a punch to count: step toward
+                // their height instead of parking in a spot no attack can ever fire from.
+                myGoblinAIPathFindingScript.goblinTarget = goblinTarget;
+                myGoblinAIPathFindingScript.isTargetingAGoblin = true;
+                AIMoveTowardDirection(new Vector3(0f, Mathf.Sign(targetPosition.y - myPosition.y), 0f), targetPosition);
+            }
             else
             {
                 isRunning = false;
@@ -3939,7 +3946,15 @@ public class GoblinScript : NetworkBehaviour
                     }
                     myGoblinAIPathFindingScript.isTargetingAGoblin = true;
                     AIMoveTowardDirection(diretionToBallCarrier, targetPosition);
-                }                    
+                }
+                else if (Mathf.Abs(myPosition.y - targetPosition.y) > punchYMax * 0.5f)
+                {
+                    // Close enough to stand, but too far above or below the target for a punch to count: step toward
+                    // their height instead of parking in a spot no attack can ever fire from.
+                    myGoblinAIPathFindingScript.goblinTarget = goblinTarget;
+                    myGoblinAIPathFindingScript.isTargetingAGoblin = true;
+                    AIMoveTowardDirection(new Vector3(0f, Mathf.Sign(targetPosition.y - myPosition.y), 0f), targetPosition);
+                }
                 else
                 {
                     isRunning = false;
@@ -4640,8 +4655,14 @@ public class GoblinScript : NetworkBehaviour
             {
                 if (this.goblinTarget != null)
                 {
+                    // An attacker parked at its target is acting, not stuck - its target standing still must never
+                    // read as being wedged. That only holds while a punch is actually legal from here, though: one
+                    // out of reach behind other bodies, or above or below the punch's height window, can do nothing
+                    // where it stands and needs the dive rescue.
                     float distToTarget = Vector2.Distance(this.transform.position, this.goblinTarget.transform.position);
-                    if (distToTarget <= this.slideRange || distToTarget <= this.punchRange)
+                    bool canPunchFromHere = distToTarget < this.punchRange
+                        && Mathf.Abs(this.transform.position.y - this.goblinTarget.transform.position.y) <= punchYMax;
+                    if (canPunchFromHere)
                         return isGoblinStuck;
                 }
             }

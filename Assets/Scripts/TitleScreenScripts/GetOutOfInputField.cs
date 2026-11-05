@@ -20,7 +20,7 @@ public class GetOutOfInputField : MonoBehaviour
         _uiNavHandler = _ => EscapeTextInputField();
         InputManager.Controls.TitleScreenUINavigation.UINav.performed += _uiNavHandler;
     }
-    // Chunk 2 audit item 10: stored so OnDestroy can remove it; one copy used to pile up per title-screen visit.
+    // Stored so OnDestroy can remove it from the shared Controls, which outlive this object.
     Action<InputAction.CallbackContext> _uiNavHandler;
     void OnDestroy()
     {

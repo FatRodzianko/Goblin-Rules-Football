@@ -318,9 +318,8 @@ public class GamePlayer : NetworkBehaviour
     // The person's own GamePlayer on this machine; see StartAsOwner.
     public static GamePlayer LocalInstance { get; private set; }
 
-    // Chunk 2 audit item 10: every input subscription is stored so OnStopClient can remove it. The lambdas used to
-    // outlive the player - after a match they still fired on the destroyed object from the title screen, and a second
-    // match stacked a second set of handlers on the same shared Controls.
+    // Every input subscription is stored so OnStopClient can remove it: the shared Controls outlive this player, so
+    // an unremoved handler would keep firing on the destroyed object and stack across matches.
     readonly List<Action> _inputUnsubscribes = new List<Action>();
     void OnInputPerformed(InputAction action, Action<InputAction.CallbackContext> handler)
     {
@@ -489,10 +488,8 @@ public class GamePlayer : NetworkBehaviour
         aiInitialized = true;
         CmdGetTeamName();
         CmdDoesPlayerChooseCoin();
-        // Before the goblins, like InitializeLocalGamePlayer: only humans spawned the ball, so a bot whose goblins
-        // initialized before any human's football Cmd spawned them into a match with no ball, and
-        // GoblinScript.OnStartServer threw (seen in the first scripted 3v3, Nov 4, 2026). CmdSpawnFootball itself
-        // skips when a ball already exists, and a connection's ServerRpcs run in order, so ball-before-goblins holds.
+        // Before the goblins, like InitializeLocalGamePlayer, so no goblin can spawn into a match with no ball.
+        // CmdSpawnFootball skips when a ball already exists, and a connection's ServerRpcs run in order.
         CmdSpawnFootball();
         CmdSpawnPlayerCharacters();
         LinkFootball();

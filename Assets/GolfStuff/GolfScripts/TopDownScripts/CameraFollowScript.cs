@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
+// Runs before CinemachineBrain's LateUpdate (default order 0), so the brain always reads this frame's follow
+// position; at equal order the two run in undefined order, and frames where the brain went first rendered last
+// frame's position - an on-and-off one-frame lag that showed as screen jitter on whatever the camera tracked.
+[DefaultExecutionOrder(-100)]
 public class CameraFollowScript : MonoBehaviour
 {
     [SerializeField] public GameObject followTarget;
