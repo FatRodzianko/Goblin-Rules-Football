@@ -279,17 +279,22 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
         {
             for (int i = 0; i < aimPoints.Length; i++)
             {
-                if (newAimpoints.Contains(aimPoints[i]))
+                // Shifted to the middle of the cell, like the tee off location, the tee markers and
+                // the hole. A saved aim point is a cell coordinate, so without this an aim lands on
+                // the corner where four tiles meet instead of on the object standing there - most
+                // visibly for the last aim point, which is the hole.
+                Vector3 shiftedAimPoint = ShiftSinglePosition(aimPoints[i]);
+                if (newAimpoints.Contains(shiftedAimPoint))
                     continue;
 
-                // Shift the aim points similar to the tee off location/ tee off markers?
-                newAimpoints.Add(aimPoints[i]);
+                newAimpoints.Add(shiftedAimPoint);
             }
         }
 
-        if (!newAimpoints.Contains(holePosition))
+        Vector3 shiftedHolePosition = ShiftSinglePosition(holePosition);
+        if (!newAimpoints.Contains(shiftedHolePosition))
         {
-            newAimpoints.Add(holePosition);
+            newAimpoints.Add(shiftedHolePosition);
         }
 
         return newAimpoints;
@@ -336,6 +341,10 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                 {
                     hole.DirectionTiles = ConvertTileInfoToSavedTile(mapData.tiles);
                 }
+                else if (mapData.key == "MiniGolfWalls")
+                {
+                    hole.MiniGolfWallTiles = ConvertTileInfoToSavedTile(mapData.tiles);
+                }
                 else if (mapData.key == "Object")
                 {
                     GetObstaclesAndOthersFromTileInfo(hole, mapData.tiles);
@@ -347,17 +356,32 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
     {
         List<SavedTile> newSavedTiles = new List<SavedTile>();
 
+        int skippedTiles = 0;
+
         if (tiles.Count > 0)
         {
             foreach (TileInfo tile in tiles)
             {
+                // A course can name a tile this build doesn't have: an older save, or a workshop
+                // course from a different version. Skip that tile rather than throw, which would
+                // abandon the whole list of custom courses.
+                if (!_guidToTileBase.ContainsKey(tile.GuidForTile))
+                {
+                    skippedTiles++;
+                    continue;
+                }
+
                 SavedTile newTile = new SavedTile();
                 newTile.TilePos = tile.position;
                 newTile.MyTile = _guidToTileBase[tile.GuidForTile];
                 newSavedTiles.Add(newTile);
             }
         }
-        
+
+        if (skippedTiles > 0)
+            Debug.LogWarning("ConvertTileInfoToSavedTile: skipped " + skippedTiles + " tile(s) whose guid is not in this build.");
+
+
 
         return newSavedTiles;
     }

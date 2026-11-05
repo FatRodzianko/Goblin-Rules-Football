@@ -38,7 +38,7 @@ public class ZoomInOutManager : MonoBehaviour
     }
     private void ZoomInOut(InputAction.CallbackContext ctx)
     {
-        if (EventSystem.current.IsPointerOverGameObject())
+        if (Mouse.current != null && MapMakerBuilder.IsPointerOverUI(Mouse.current.position.ReadValue()))
             return;
 
         if (!IsMouseOverGameWindow)
@@ -46,6 +46,11 @@ public class ZoomInOutManager : MonoBehaviour
 
         Vector2 scrollInput = (Vector2)ctx.ReadValueAsObject();
         //Debug.Log("ZoomInOut: scrollInput: + " + scrollInput.ToString());
+
+        // A tilt wheel or a trackpad can report a scroll with no vertical part. Dividing by its
+        // magnitude below would make the orthographic size NaN, and the view never recovers.
+        if (Mathf.Approximately(scrollInput.y, 0f))
+            return;
 
         float currentOrtho = _camera.m_Lens.OrthographicSize;
         float newOrth = currentOrtho + (_scrollRate * (-scrollInput.y / (Mathf.Abs(scrollInput.y))));

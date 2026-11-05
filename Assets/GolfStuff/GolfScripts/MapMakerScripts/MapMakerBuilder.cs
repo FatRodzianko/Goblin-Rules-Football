@@ -46,6 +46,9 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     [SerializeField] bool _holdActive;
     [SerializeField] Vector3Int _holdStartPosition;
 
+    // Reused by IsPointerOverUI so the check doesn't allocate a list per click
+    static readonly List<RaycastResult> _uiRaycastResults = new List<RaycastResult>();
+
     // Drawing rectangle stuff
     [SerializeField] BoundsInt _rectangleBounds;
 
@@ -380,9 +383,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 //UpdatePreview();
                 // maybe move to OnMouseMove instead of constantly calling it in update?
 
-                if (_holdActive)
+                // A flood fill belongs to the press that started it. Filling again as the cursor
+                // moves adds a history step per cell crossed, and at a zoomed out view a couple of
+                // pixels of movement during a click is enough.
+                if (_holdActive && _currentDrawingMode != PlaceType.FloodFill)
                 {
-                    //Debug.Log("UpdateGridPosition: calling HandleDrawing with _holdActive as true");
                     HandleDrawing();
                 }
                 else
@@ -409,6 +414,32 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         
         UpdateGridPosition(_mousePos);
     }
+    // EventSystem.IsPointerOverGameObject() answers with the raycast the event system did in its own
+    // Update, which runs after input action callbacks. On the frame the cursor arrives over a button
+    // - clicking back into an unfocused window, or a fast move onto the UI - it still reports "not
+    // over UI" and the click reaches the map. Raycasting here asks about where the cursor is now.
+    // The mouse position action keeps _mousePos up to date, but read the device when it is there so
+    // a pointer that moved and clicked in the same frame is checked where it actually is.
+    Vector2 CurrentPointerPosition
+    {
+        get
+        {
+            return Mouse.current != null ? Mouse.current.position.ReadValue() : _mousePos;
+        }
+    }
+    public static bool IsPointerOverUI(Vector2 screenPosition)
+    {
+        EventSystem eventSystem = EventSystem.current;
+        if (eventSystem == null)
+            return false;
+
+        PointerEventData pointerData = new PointerEventData(eventSystem);
+        pointerData.position = screenPosition;
+
+        _uiRaycastResults.Clear();
+        eventSystem.RaycastAll(pointerData, _uiRaycastResults);
+        return _uiRaycastResults.Count > 0;
+    }
     private void OnLeftClick(InputAction.CallbackContext ctx)
     {
         //Debug.Log(ctx.interaction + " / " + ctx.phase);
@@ -422,16 +453,18 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         //    return;
         //}
 
-        if (_selectedObject != null && !EventSystem.current.IsPointerOverGameObject())
+        if (_selectedObject != null && !IsPointerOverUI(CurrentPointerPosition))
         {
             if (ctx.phase == InputActionPhase.Started)
             {
-                _holdActive = true;
+                // One press can start the action twice: Tap cancels itself once the button is held
+                // past the tap time and SlowTap takes over, which starts it again. Tap is the first
+                // interaction on the action, so its start is the real one.
+                if (!(ctx.interaction is TapInteraction))
+                    return;
 
-                if (ctx.interaction is TapInteraction)
-                {
-                    _holdStartPosition = _currentGridPosition;
-                }
+                _holdActive = true;
+                _holdStartPosition = _currentGridPosition;
 
                 HandleDrawing();
             }
@@ -580,11 +613,22 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             //    //_previewMap.GetComponent<TilemapRenderer>().sortingOrder = 0;
             //}
 
-            UpdateGridPosition(_mousePos);
-
-            // Update the preview?
+            // The preview handler needs the new map before anything previews with it, so the tiles
+            // it cached for the old map are put back on the old map.
             _previewHandler.UpdateTile(_tilemap, _selectedTileBase);
-            UpdatePreview();
+
+            // Tiles are usually picked with the cursor over the palette, and the cell under the
+            // cursor is then behind the UI. Previewing there leaves a tile sitting under the panel
+            // until the mouse moves back over the map.
+            if (IsPointerOverUI(CurrentPointerPosition))
+            {
+                _previewHandler.ResetPreview();
+            }
+            else
+            {
+                UpdateGridPosition(_mousePos);
+                UpdatePreview();
+            }
             if (_mapMakerUIManager != null)
                 _mapMakerUIManager.PlayerSelectedTileObject(_selectedObject);
         }
@@ -918,8 +962,11 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
             for (int i = 0; i < positions.Length; i++)
             {
-                //previousTiles[i] = map.GetTile(positions[i]);
-                previousTiles[i] = _previewHandler.GetPreviousTile(positions[i]);
+                // Where the preview overwrote a cell, the real tile is in the preview cache. Every
+                // other cell still holds its real tile, so read it off the map. Taking null for
+                // "not cached" is what made undo erase what was underneath instead of restoring it.
+                if (!_previewHandler.TryGetPreviousTile(positions[i], out previousTiles[i]))
+                    previousTiles[i] = map.GetTile(positions[i]);
                 //mapMakerTileBases[i] = _selectedObject;
                 prevMapMakerTileBases[i] = GetMapMakerGroundTileBaseFromTileBase(previousTiles[i]);
                 newMapMakerTileBases[i] = _selectedObject;
@@ -1649,8 +1696,8 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         TileBase targetTile = map.GetTile(startPosition);
         if (newTile == targetTile)
         {
-            // Clicked a tile that already matches what we're filling with
-            fillPoints.Add(startPosition);
+            // Clicked a cell that already holds the tile being filled with. Nothing to fill, and
+            // filling that one cell anyway would add an undo step that changes nothing.
             return fillPoints;
         }
 

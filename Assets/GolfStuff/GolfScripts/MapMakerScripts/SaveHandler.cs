@@ -362,16 +362,14 @@ public class SaveHandler : MonoBehaviour
     {
         List<Vector3> ordered = new List<Vector3>();
 
-        SortedDictionary<float, Vector3> distanceByPoints = new SortedDictionary<float, Vector3> ();
-        foreach (Vector3 point in points)
+        foreach (Vector3Int point in points)
         {
-            float dist = Vector2.Distance(startPoint, point);
-            distanceByPoints.Add(dist, point);
+            ordered.Add(point);
         }
-        foreach (KeyValuePair<float, Vector3> entry in distanceByPoints)
-        {
-            ordered.Add(entry.Value);
-        }
+
+        // Sorting the list rather than keying a dictionary on the distance: two aim points the same
+        // distance from the tee are a duplicate key, which threw and lost the whole save.
+        ordered.Sort((a, b) => Vector2.Distance(startPoint, a).CompareTo(Vector2.Distance(startPoint, b)));
 
         return ordered;
     }
@@ -451,10 +449,19 @@ public class SaveHandler : MonoBehaviour
             courseToSave.CreatorSteamIDHash = GetPlayerSteamID();
         FileHandler.SaveToJSONFile<CourseData>(courseToSave, filename);
     }
+    // Both hashes identify this machine and can't change while the game runs, but the map maker asks
+    // for them once per course file when it builds its course list, and the MAC one walks every
+    // network interface.
+    string _macAddressHash;
+    string _steamIdHash;
+    bool _steamIdHashChecked;
+
     public string GetHashOfSystemMACAddress()
     {
-        string mac = GetMacAddress();
-        return CreateMD5(mac);
+        if (string.IsNullOrEmpty(_macAddressHash))
+            _macAddressHash = CreateMD5(GetMacAddress());
+
+        return _macAddressHash;
     }
     /// <summary>
     /// Finds the MAC address of the NIC with maximum speed.
@@ -509,17 +516,22 @@ public class SaveHandler : MonoBehaviour
     }
     public string GetPlayerSteamID()
     {
+        if (_steamIdHashChecked)
+            return _steamIdHash;
+
+        _steamIdHashChecked = true;
         try
         {
             //return (ulong)SteamUser.GetSteamID();
             ulong steamID = (ulong)SteamUser.GetSteamID();
-            return CreateMD5(steamID.ToString());
+            _steamIdHash = CreateMD5(steamID.ToString());
         }
         catch (Exception e)
         {
             Debug.Log("GetPlayerSteamID: error getting steam id: " + e);
-            return "";
+            _steamIdHash = "";
         }
+        return _steamIdHash;
     }
 }
 

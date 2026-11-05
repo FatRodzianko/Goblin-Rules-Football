@@ -11,17 +11,20 @@ public class PreviewHandler
 
     public void UpdateTile(Tilemap map, TileBase tile)
     {
+        // The cached tiles belong to the map they were read from. Put them back before the preview
+        // switches maps, otherwise they get restored onto the new map and the old map keeps the
+        // preview tile.
+        if (_tilemap != null && _tilemap != map)
+            ResetPreview();
+
         _tilemap = map;
         _tileBase = tile;
     }
-    public TileBase GetPreviousTile(Vector3Int position)
+    // True only when the preview overwrote this cell, so "no entry" and "entry that was empty" stay
+    // distinguishable. Callers that record undo history need that difference.
+    public bool TryGetPreviousTile(Vector3Int position, out TileBase previousTile)
     {
-        if (_tilesBeforePreviewOverride.ContainsKey(position))
-        {
-            return _tilesBeforePreviewOverride[position];
-        }
-
-        return null;
+        return _tilesBeforePreviewOverride.TryGetValue(position, out previousTile);
     }
     public void SetPreview(Vector3Int position, bool isForbidden)
     {
@@ -88,26 +91,26 @@ public class PreviewHandler
     public void ResetPreview()
     {
         // loop through the dictionary. reset every key in the dictionary to the saved "previous tile" to reset the preview
-        foreach (var pair in _tilesBeforePreviewOverride)
+        if (_tilemap != null)
         {
-            _tilemap.SetTile(pair.Key, pair.Value);
+            foreach (var pair in _tilesBeforePreviewOverride)
+            {
+                _tilemap.SetTile(pair.Key, pair.Value);
+            }
         }
 
         ClearPreview();
     }
     public void ResetPreview(Vector3Int position)
     {
-        if (_tilesBeforePreviewOverride.ContainsKey(position))
-        {
+        // Only a cell the preview actually overwrote may be reset. Clearing a cell that isn't in the
+        // dictionary would delete a real tile the player drew.
+        if (!_tilesBeforePreviewOverride.ContainsKey(position))
+            return;
+
+        if (_tilemap != null)
             _tilemap.SetTile(position, _tilesBeforePreviewOverride[position]);
-            _tilesBeforePreviewOverride.Remove(position);
-        }
-        else
-        {
-            //Debug.Log("ResetPreview: Setting: " + position.ToString() + " to null on tilemap: " + _tilemap.name);
-            _tilemap.SetTile(position, null);
-        }
-        
+        _tilesBeforePreviewOverride.Remove(position);
     }
     public void ClearPreview()
     {
