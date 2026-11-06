@@ -595,6 +595,31 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         GolfPlayersInTeeOffOrder.Clear();
         GolfPlayersInTeeOffOrder.AddRange(playerList);
     }
+    // Testing a hole from the map maker: the ball has just been put back on the tee, so the player
+    // is no longer in the hole and needs a turn again.
+    //
+    // The turn is switched off before it is switched on, because the player's own turn setup runs
+    // from the value changing, and after a reset mid turn it is already on. A drop-in is a single
+    // host player, so both changes are applied here and now rather than being batched and
+    // collapsed into nothing on the way to a client.
+    [Server]
+    public void DropInRestartTurnForPlayer(GolfPlayerTopDown player)
+    {
+        if (player == null)
+            return;
+
+        // Sinking the ball leaves this counting the hole as finished, which stops any later turn
+        _numberOfPlayersInHole = 0;
+        if (GolfPlayersOutOfCommission.Contains(player))
+            GolfPlayersOutOfCommission.Remove(player);
+
+        SetCurrentPlayer(player);
+        player.ServerSetIsPlayersTurn(false);
+
+        // StartCurrentPlayersTurn ignores a turn that follows too closely on the last one
+        TimeSinceLastTurnStart = 0f;
+        StartCurrentPlayersTurn(player);
+    }
     void SetCurrentPlayer(GolfPlayerTopDown player)
     {
         // this check probably isn't needed unless I have some sort of event tied to the current player changing and don't want to trigger it multiple times?

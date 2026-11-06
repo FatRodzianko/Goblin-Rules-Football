@@ -492,6 +492,16 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         if (!MyBall)
             return;
+        // Testing a hole from the map maker. Outside the turn checks below on purpose, so the ball
+        // can be called back while it is still in the air or rolling. Function keys because
+        // GolfControls binds none, so they cannot collide with playing the game.
+        if (MapMakerDropInSession.IsActive)
+        {
+            if (Input.GetKeyDown(KeyCode.F5))
+                DropInResetBallToTeeOff();
+            else if (Input.GetKeyDown(KeyCode.F6))
+                DropInUndoLastShot();
+        }
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             //PlayerScoreBoard.instance.OpenScoreBoard();
@@ -1536,6 +1546,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
 
         this.PlayerScore.PlayerHitBall();
+
+        // Testing a hole from the map maker: remember where this shot was played from, so it can be
+        // walked back. The ball is still on its spot here; it only starts moving in Update.
+        if (MapMakerDropInSession.IsActive && MyBall != null)
+            _dropInShotPositions.Add(MyBall.transform.position);
+
         //GameplayManagerTopDownGolf.instance.ResetCurrentPlayer();
         CmdResetCurrentPlayer();
         //GameplayManagerTopDownGolf.instance.LightningAfterPlayerHit();
@@ -2637,6 +2653,79 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void CmdStartCurrentPlayersTurnOnServer()
     {
         GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
+    }
+    // Testing a hole from the map maker: where each shot was played from, oldest first, so shots
+    // can be walked back one at a time. Emptied by a reset to the tee.
+    readonly List<Vector3> _dropInShotPositions = new List<Vector3>();
+
+    // Back to the tee, whatever the ball is doing - in the air, rolling, already sunk - with the
+    // stroke count and the shot history cleared, as though the hole had just begun.
+    public void DropInResetBallToTeeOff()
+    {
+        if (!this.IsOwner || !MapMakerDropInSession.IsActive)
+            return;
+        if (GameplayManagerTopDownGolf.instance == null)
+            return;
+
+        Vector3 teeOffPosition = GameplayManagerTopDownGolf.instance.TeeOffPosition;
+        Debug.Log("DropInResetBallToTeeOff: back to the tee at " + teeOffPosition.ToString());
+
+        _dropInShotPositions.Clear();
+        DropInResetBallTo(teeOffPosition, true, true);
+    }
+    // Undoes the last shot: back to where it was played from, with that stroke taken off. Does
+    // nothing once every shot has been walked back and the ball is at the tee again.
+    public void DropInUndoLastShot()
+    {
+        if (!this.IsOwner || !MapMakerDropInSession.IsActive)
+            return;
+        if (GameplayManagerTopDownGolf.instance == null)
+            return;
+
+        if (_dropInShotPositions.Count == 0)
+        {
+            Debug.Log("DropInUndoLastShot: no shots to walk back; the ball is where the hole started.");
+            return;
+        }
+
+        int lastShot = _dropInShotPositions.Count - 1;
+        Vector3 playedFrom = _dropInShotPositions[lastShot];
+        _dropInShotPositions.RemoveAt(lastShot);
+
+        Debug.Log("DropInUndoLastShot: back to " + playedFrom.ToString() + ", with " + _dropInShotPositions.Count.ToString() + " shot(s) left to walk back.");
+        // Walking back the first shot of the hole puts the ball on the tee again
+        DropInResetBallTo(playedFrom, false, _dropInShotPositions.Count == 0);
+    }
+    // A drop-in is one player who is also the host, so the owner and the server are the same
+    // machine and the ball can be stopped here before the server is told where it ended up.
+    void DropInResetBallTo(Vector3 position, bool startTheHoleAgain, bool backAtTheTeeOff)
+    {
+        if (MyBall != null)
+            MyBall.ResetPosition(position);
+        this.transform.position = position;
+
+        ResetPreviousHitValues();
+        CmdDropInResetBallTo(position, startTheHoleAgain, backAtTheTeeOff);
+    }
+    [ServerRpc]
+    void CmdDropInResetBallTo(Vector3 position, bool startTheHoleAgain, bool backAtTheTeeOff)
+    {
+        if (MyBall != null)
+            MyBall.ResetPosition(position);
+        this.transform.position = position;
+
+        if (startTheHoleAgain)
+            PlayerScore.ResetScoreForNewHole();
+        else
+            PlayerScore.RemoveStroke();
+
+        // Teeing off is a one way switch in a normal round, and the turn setup reads it: a player
+        // who has teed off aims at the last aim point, one who has not aims down the tee off
+        // aim point. Back on the tee, they have not.
+        if (backAtTheTeeOff)
+            HasPlayerTeedOff = false;
+
+        GameplayManagerTopDownGolf.instance.DropInRestartTurnForPlayer(this);
     }
     [ServerRpc]
     void CmdSetCameraOnMyBallForOtherPlayers()

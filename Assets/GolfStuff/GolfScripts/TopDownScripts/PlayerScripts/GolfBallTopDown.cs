@@ -491,6 +491,12 @@ public class GolfBallTopDown : NetworkBehaviour
     }
     public void ResetPosition()
     {
+        ResetPosition(new Vector3(0f, 0f, 0f));
+    }
+    // Stops the ball doing whatever it was doing - waiting, in the air, bouncing, rolling, sunk -
+    // and puts it somewhere.
+    public void ResetPosition(Vector3 newPosition)
+    {
         isHit = false;
 
         isRolling = false;
@@ -498,7 +504,15 @@ public class GolfBallTopDown : NetworkBehaviour
         IsInHole = false;
         hitBallCount = 0f;
         timeInAir = 0f;
-        this.transform.position = new Vector3(0f, 0f, 0f);
+
+        // Height is the ball sprite's offset from its shadow, with the root's z alongside it, so
+        // both have to come back down or the ball sits in mid air where it was caught. The sprite
+        // itself is picked by height as well, so a ball caught high up keeps the big one.
+        this.transform.position = new Vector3(newPosition.x, newPosition.y, 0f);
+        MyBallObject.transform.localPosition = Vector3.zero;
+        myShadow.transform.localPosition = Vector3.zero;
+        ballObjectRenderer.sprite = groundSprite;
+
         myShadow.GetComponent<SpriteRenderer>().enabled = true;
         MyBallObject.GetComponent<SpriteRenderer>().enabled = true;
     }
