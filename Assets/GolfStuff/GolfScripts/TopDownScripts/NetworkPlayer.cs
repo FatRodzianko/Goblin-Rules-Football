@@ -107,8 +107,24 @@ public class NetworkPlayer : NetworkBehaviour
         if (GolfLobbySettings.instance != null)
             RpcReceiveGolfSettings(this.Owner, GolfLobbySettings.instance.CurrentSettings());
         GameplayManagerTopDownGolf gameplayManager = GameplayManagerTopDownGolf.instance;
-        if (gameplayManager != null && gameplayManager.IsServerInitialized)
-            CheckIfHostCanStartGame();
+        if (gameplayManager == null || !gameplayManager.IsServerInitialized)
+            return;
+
+        // A hole being tested from the map maker has nobody to wait for, so it starts here instead
+        // of through the lobby's ready up and Start Game.
+        if (MapMakerDropInSession.IsActive && this.Owner.IsHost)
+        {
+            Debug.Log("ServerSpawned: starting a map maker drop-in.");
+            // A normal session learns its course from an RPC sent when the gameplay manager starts,
+            // and gets to it in the seconds the lobby is open. Starting here is far earlier than
+            // that, so the drop-in's course is handed straight over.
+            gameplayManager.CourseToPlay = MapMakerDropInSession.CourseToPlay;
+            SpawnGolfPlayerObjectsForEachPlayer();
+            gameplayManager.HostStartGame(this.Owner);
+            return;
+        }
+
+        CheckIfHostCanStartGame();
     }
     public override void OnStopServer()
     {
@@ -186,7 +202,8 @@ public class NetworkPlayer : NetworkBehaviour
         //SceneLoadData sld = new SceneLoadData("TitleScreen");
         //sld.ReplaceScenes = ReplaceOption.All;
         //FishNet.InstanceFinder.SceneManager.LoadGlobalScenes(sld);
-        UnityEngine.SceneManagement.SceneManager.LoadScene("TitleScreen");
+        // A session the map maker started to test a hole goes back to the map maker, not the title screen
+        UnityEngine.SceneManagement.SceneManager.LoadScene(MapMakerDropInSession.ReturnScene);
         SteamLobby.instance.LeaveLobby();
 
     }

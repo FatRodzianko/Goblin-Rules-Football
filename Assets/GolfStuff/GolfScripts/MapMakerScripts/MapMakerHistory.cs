@@ -41,7 +41,10 @@ public class MapMakerHistory : SingletonInstance<MapMakerHistory>
         Debug.Log("MapMakerBuilder: ChangedActiveScene: " + current.name + " to " + next.name);
         if (next.name != "Golf-MapMaker")
         {
-            Destroy(this);
+            // The whole object, not just this component: these are DontDestroyOnLoad singletons, so
+            // destroying only the component left an empty object behind on every visit, and drop-in
+            // play makes leaving and coming back an ordinary thing to do.
+            Destroy(gameObject);
         }
     }
     private void OnDisable()

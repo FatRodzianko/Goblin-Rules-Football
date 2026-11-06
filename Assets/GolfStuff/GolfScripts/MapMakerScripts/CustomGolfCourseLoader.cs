@@ -186,6 +186,11 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
         {
             if (course.HolesInCourse.Count <= 0)
                 continue;
+            if (course.HolesInCourse.Count > CustomCourseLimits.MaxHolesPerCourse)
+            {
+                Debug.LogWarning("AddValidCoursesToCustomCourseList: course " + course.CourseId + " claims " + course.HolesInCourse.Count + " holes, past the limit of " + CustomCourseLimits.MaxHolesPerCourse + ". Skipping it.");
+                continue;
+            }
             if (course.HolesInCourse.Any(x => x.IsHoleCompleted == true))
             {
                 Debug.Log("AddValidCoursesToCustomCourseList: Course with  with ID of: " + course.CourseId + " named: " + course.CourseName + " and has " + course.HolesInCourse.Count + " number of holes.");
@@ -205,7 +210,8 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                     continue;
                 }
 
-                newCustomCourse.CourseName = course.CourseName;
+                // Drawn with TextMeshPro, and this one came out of somebody else's file
+                newCustomCourse.CourseName = CustomCourseLimits.SanitizeCourseName(course.CourseName);
 
                 List<ScriptableHole> holesInCustomCourse = new List<ScriptableHole>();
                 foreach (HoleData holeData in course.HolesInCourse)
@@ -221,6 +227,39 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                 _customCourses.Add(newCustomCourse);
             }
         }
+    }
+    // Drop-in play. Builds a one hole course from the hole currently open in the map maker and makes
+    // it available to a golf session like any other course, by the id the session asks for. Nothing
+    // is written to disk, and the IsHoleCompleted filter that LoadAllCustomCourses applies is
+    // deliberately skipped: the point is to test a hole that is not finished.
+    public ScriptableCourse RegisterTemporaryCourse(HoleData hole, string courseName, string courseId)
+    {
+        if (hole == null || string.IsNullOrEmpty(courseId))
+            return null;
+
+        RemoveTemporaryCourse(courseId);
+
+        if (_allAvailableCourses == null)
+            GetAllAvailableCourses();
+
+        ScriptableCourse tempCourse = ScriptableObject.CreateInstance<ScriptableCourse>();
+        tempCourse.id = courseId;
+        tempCourse.CourseName = courseName;
+        tempCourse.IsCustomCourse = true;
+        tempCourse.WorkshopID = 0;
+        tempCourse.HolesInCourse = new ScriptableHole[] { ParseHoleDataIntoScriptableHole(hole, courseName) };
+
+        _allAvailableCourses.Courses.Add(tempCourse);
+        Debug.Log("RegisterTemporaryCourse: added temporary course " + courseName + " with id: " + courseId);
+        return tempCourse;
+    }
+    public void RemoveTemporaryCourse(string courseId)
+    {
+        if (string.IsNullOrEmpty(courseId) || _allAvailableCourses == null)
+            return;
+
+        _allAvailableCourses.Courses.RemoveAll(x => x != null && x.id == courseId);
+        _customCourses.RemoveAll(x => x != null && x.id == courseId);
     }
     ScriptableHole ParseHoleDataIntoScriptableHole(HoleData holeData, string courseName)
     {
@@ -275,7 +314,10 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
     {
         List<Vector3> newAimpoints = new List<Vector3>();
 
-        if (aimPoints.Length > 0)
+        // A hole with no aim points has a null array, not an empty one. Reading one back from a
+        // file hides that, because JsonUtility writes null arrays as [], but a hole handed straight
+        // over in memory - which is what drop-in does - keeps the null.
+        if (aimPoints != null && aimPoints.Length > 0)
         {
             for (int i = 0; i < aimPoints.Length; i++)
             {
@@ -310,6 +352,14 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
         hole.EdgesTiles = new List<SavedTile>();
         hole.DirectionTiles = new List<SavedTile>();
         hole.MiniGolfWallTiles = new List<SavedTile>();
+
+        // Only ever filled in when the hole has something on its Object tilemap, and the game walks
+        // all three whether it does or not. Every saved course happened to have at least one
+        // object, so a hole with none - a new one, or one being tested from the map maker - left
+        // these null and broke loading.
+        hole.SavedObstacles = new List<SavedObstacle>();
+        hole.Statues = new List<SavedStatue>();
+        hole.BalloonPowerUps = new List<SavedBalloonPowerUp>();
     }
     void ParseTileMapDataToSavedTilesAndSavedStuff(ScriptableHole hole, List<TilemapData> tileMapData)
     {
@@ -357,6 +407,7 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
         List<SavedTile> newSavedTiles = new List<SavedTile>();
 
         int skippedTiles = 0;
+        int outOfRangeTiles = 0;
 
         if (tiles.Count > 0)
         {
@@ -371,15 +422,31 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                     continue;
                 }
 
+                // A tile far outside the playable area makes the tilemap allocate storage covering
+                // the whole distance to it, which hangs the game on a file from anybody else.
+                if (!CustomCourseLimits.IsTilePositionInRange(tile.position))
+                {
+                    outOfRangeTiles++;
+                    continue;
+                }
+
                 SavedTile newTile = new SavedTile();
                 newTile.TilePos = tile.position;
                 newTile.MyTile = _guidToTileBase[tile.GuidForTile];
                 newSavedTiles.Add(newTile);
+
+                if (newSavedTiles.Count >= CustomCourseLimits.MaxTilesPerTileMap)
+                {
+                    Debug.LogWarning("ConvertTileInfoToSavedTile: stopping at the limit of " + CustomCourseLimits.MaxTilesPerTileMap + " tiles for one tilemap.");
+                    break;
+                }
             }
         }
 
         if (skippedTiles > 0)
             Debug.LogWarning("ConvertTileInfoToSavedTile: skipped " + skippedTiles + " tile(s) whose guid is not in this build.");
+        if (outOfRangeTiles > 0)
+            Debug.LogWarning("ConvertTileInfoToSavedTile: skipped " + outOfRangeTiles + " tile(s) placed outside the allowed cell range.");
 
 
 

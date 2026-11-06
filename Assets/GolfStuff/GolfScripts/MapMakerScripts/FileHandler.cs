@@ -9,9 +9,21 @@ public static class FileHandler
 
     public static void SaveToJSONFile<T>(List<T> toSave, string filename)
     {
+        if (!IsFileNameAllowed(filename))
+            return;
         Debug.Log("SaveToJSONFile (list): " + GetPath(filename));
         string content = JsonHelper.ToJson<T>(toSave.ToArray());
         WriteFile(GetPath(filename), content);
+    }
+    // A course file carries the name it was saved under, and that name is used again when the
+    // course is saved. Nothing should ever be written outside the save folder.
+    static bool IsFileNameAllowed(string filename)
+    {
+        if (CustomCourseLimits.IsSafeSaveFileName(filename))
+            return true;
+
+        Debug.LogError("FileHandler: refusing to write to '" + filename + "'. A save file name cannot contain a path.");
+        return false;
     }
     public static string SaveToJSON<T>(List<T> toSave)
     {
@@ -22,6 +34,8 @@ public static class FileHandler
 
     public static void SaveToJSONFile<T>(T toSave, string filename)
     {
+        if (!IsFileNameAllowed(filename))
+            return;
         Debug.Log("SaveToJSONFile (single): " + GetPath(filename));
         string content = JsonUtility.ToJson(toSave);
         WriteFile(GetPath(filename), content);
@@ -85,6 +99,15 @@ public static class FileHandler
     {
         if (File.Exists(path))
         {
+            // Course files can come from other players through the workshop, and this reads the
+            // whole file into a string before anything looks at it.
+            long lengthInBytes = new FileInfo(path).Length;
+            if (lengthInBytes > CustomCourseLimits.MaxCourseFileBytes)
+            {
+                Debug.LogWarning("ReadFile: " + path + " is " + lengthInBytes + " bytes, past the limit of " + CustomCourseLimits.MaxCourseFileBytes + ". Skipping it.");
+                return "";
+            }
+
             using (StreamReader reader = new StreamReader(path))
             {
                 string content = reader.ReadToEnd();

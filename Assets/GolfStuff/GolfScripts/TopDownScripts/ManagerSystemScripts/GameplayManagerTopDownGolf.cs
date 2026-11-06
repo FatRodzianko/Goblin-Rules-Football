@@ -1131,6 +1131,13 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     void PromptPlayerForNextTurn()
     {
         Debug.Log("PromptPlayerForNextTurn: For player: " + CurrentPlayer.PlayerName);
+
+        // Nobody testing their own hole wants to confirm every shot, so the turn just begins.
+        if (MapMakerDropInSession.IsActive)
+        {
+            StartCurrentPlayersTurn(CurrentPlayer);
+            return;
+        }
         CurrentPlayer.RpcEnablePromptPlayerToStartTurn(CurrentPlayer.Owner, true);
         if (_lightningManager.IsThereLightning)
         {
@@ -1297,6 +1304,14 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         if (PlayerHasSkippedTurn)
             ResetLightningSkipInfo();
+
+        // A hole being tested from the map maker is not a round: sinking the ball does not move on
+        // to another hole or end anything. The ball stays where it is.
+        if (MapMakerDropInSession.IsActive)
+        {
+            Debug.Log("AllPlayersInHoleOrIncapacitated: drop-in, so the hole stays as it is.");
+            return;
+        }
 
         if ((CurrentHoleIndex + 1) < CurrentCourse.HolesInCourse.Length)
         {

@@ -265,8 +265,10 @@ public class NetworkManagerGRF : MonoBehaviour
         GamePlayers.Clear();
         ResetWaitingForPlayersToLoadStuff();
         DestroyWaitingForPlayersCanvas();
-        if (SceneManager.GetActiveScene().name != "TitleScreen")
-            SceneManager.LoadScene("TitleScreen");
+        // A session the map maker started to test a hole goes back to the map maker, not the title screen
+        string sceneToReturnTo = MapMakerDropInSession.ReturnScene;
+        if (SceneManager.GetActiveScene().name != sceneToReturnTo)
+            SceneManager.LoadScene(sceneToReturnTo);
     }
     // Shows the waiting-for-players screen while the gameplay scene loads, as Mirror's OnClientChangeScene did.
     // On the host FishNet may raise this for both its server and client side, so only show it once.

@@ -88,17 +88,22 @@ public class SteamWorkshopCourseDownloader : MonoBehaviour
                                                                                                                                    //print(Folder);
 
             Debug.Log("MoveFile: installedStuff: " + installedStuff.ToString());
-            string[] path = Directory.GetFiles(Folder);
+            // Only a course file, so an item carrying anything else is left alone
+            string[] path = Directory.GetFiles(Folder, "course_*.json");
             if (path.Length <= 0)
             {
-                Debug.Log("MoveFile: path length is 0? " + path.Length.ToString());
+                Debug.Log("MoveFile: workshop item " + i.ToString() + " holds no course file. Skipping it.");
                 return;
             }
-            string filename = Path.GetFileName(path[0]);
             string fullPath = path[0];
-            string destPath = Application.persistentDataPath + "/" + filename;
 
-            if (File.GetLastWriteTime(fullPath) > File.GetLastWriteTime(destPath))
+            // The item does not choose where it lands. Naming the local copy after the workshop id
+            // means an item can only ever replace its own download, never a course the player made
+            // or anything else in the save folder. An update keeps the same id, so it still lands
+            // here and replaces the version before it.
+            string destPath = Path.Combine(Application.persistentDataPath, "course_workshop_" + i.m_PublishedFileId.ToString() + ".json");
+
+            if (!File.Exists(destPath) || File.GetLastWriteTime(fullPath) > File.GetLastWriteTime(destPath))
             {
                 Debug.Log("MoveFile: copying: " + fullPath + " to " + destPath);
                 //print(destPath);

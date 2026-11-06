@@ -107,6 +107,27 @@ public class MapMakerUIManager : MonoBehaviour
     
 
     #region Setters and Getters
+    public bool IsSelectedCourseMiniGolf
+    {
+        get
+        {
+            return _isSelectedCourseMiniGolf;
+        }
+    }
+    public string SelectedCourseId
+    {
+        get
+        {
+            return _selectedCourse != null ? _selectedCourse.CourseId : "";
+        }
+    }
+    public int SelectedHoleNumber
+    {
+        get
+        {
+            return _selectedHoleNumber;
+        }
+    }
     Dictionary<string, Tilemap> TileMapsToSelect
     {
         get
@@ -490,8 +511,11 @@ public class MapMakerUIManager : MonoBehaviour
 
                         if (!IsThisCourseMadeByThisPlayer(courseToLoad.CreatorSteamIDHash, courseToLoad.CreatorMacAddressHash))
                             continue;
+                        // Skip this one file, not every file after it. Subscribing to a course you
+                        // published puts a second copy of it on disk under the same course id.
                         if (_allCustomCourses.Any(x => x.CourseId == courseToLoad.CourseId))
-                            return;
+                            continue;
+                        courseToLoad.CourseName = CustomCourseLimits.SanitizeCourseName(courseToLoad.CourseName);
                         _allCustomCourses.Add(courseToLoad);
                         _currentCourseDropDown.AddOptions(new List<string> { courseToLoad.CourseName });
                     }
@@ -689,6 +713,31 @@ public class MapMakerUIManager : MonoBehaviour
             }
         }
     }
+    // Coming back from testing a hole, the course and hole that were open have to be open again, or
+    // the tiles that get restored belong to nothing and Save Hole has nowhere to put them.
+    public void ReselectCourseAndHole(string courseId, int holeNumber)
+    {
+        if (string.IsNullOrEmpty(courseId))
+            return;
+
+        int courseIndex = _allCustomCourses.FindIndex(x => x != null && x.CourseId == courseId);
+        if (courseIndex < 0)
+        {
+            Debug.Log("ReselectCourseAndHole: no course with id " + courseId + " to go back to.");
+            return;
+        }
+
+        // The drop down's first entry is "Create New Course", so the courses start at one
+        int courseDropDownIndex = courseIndex + 1;
+        _currentCourseDropDown.value = courseDropDownIndex;
+        CurrentCourseDropDownValueChanged(courseDropDownIndex);
+
+        // Same again for the holes, whose entries are numbered from one in order
+        if (holeNumber <= 0 || holeNumber >= _currentHoleDropDown.options.Count)
+            return;
+        _currentHoleDropDown.value = holeNumber;
+        CurrentHoleDropDownValueChanged(holeNumber);
+    }
     public void CurrentHoleDropDownValueChanged(int index)
     {
         Debug.Log("CurrentHoleDropDownValueChanged: " + index.ToString());
@@ -859,6 +908,65 @@ public class MapMakerUIManager : MonoBehaviour
 
         _uploadToWorkshopButton.gameObject.SetActive(enable);
     }
+    // Reads the hole as it currently stands on the tilemaps into a HoleData. Saving a hole and
+    // dropping in to test one both need this, and they have to agree: a hole tested in drop-in
+    // should be the hole that gets saved.
+    public void FillHoleDataFromCurrentMap(HoleData hole, bool isMiniGolf)
+    {
+        if (hole == null)
+            return;
+
+        hole.HoleTileMapData = _saveHandler.GetAllTileMapData();
+        hole.PolygonPoints = _saveHandler.GetBoundsOfAllTileMaps(isMiniGolf).ToArray();
+        hole.ZoomOutPosition = _saveHandler.GetCenterOfHoleBounds(hole.PolygonPoints);
+        hole.IsMiniGolf = isMiniGolf;
+
+        // Save the tee off location if it was set in the builder
+        if (_mapMakerBuilder.HasTeeOffLocationBeenPlaced)
+        {
+            hole.TeeOffLocation = _mapMakerBuilder.TeeOffLocationPosition;
+        }
+        else
+        {
+            hole.TeeOffLocation = Vector3.zero;
+        }
+        // Save the aim points if it was set in the builder
+        if (_mapMakerBuilder.AimPoints.Count > 0)
+        {
+            hole.CourseAimPoints = _saveHandler.OrderAimPointsByDistanceToTeeOff(_mapMakerBuilder.TeeOffLocationPosition, _mapMakerBuilder.AimPoints).ToArray();
+        }
+        else
+        {
+            // Empty rather than null, so a hole used straight from memory matches one read back
+            // from a file, where JsonUtility turns a null array into an empty one
+            hole.CourseAimPoints = new Vector3[0];
+        }
+        // save hole position
+        if (_mapMakerBuilder.HasHoleBeenPlaced)
+        {
+            hole.HolePosition = _mapMakerBuilder.HolePositon;
+        }
+        if (_mapMakerBuilder.HaveBothTeeOffMarkersBeenPlaced)
+        {
+            if (_mapMakerBuilder.TeeOffMarkerPositions.Count == 2)
+            {
+                hole.TeeOffMarkerPositions.Clear();
+                foreach (Vector3Int markerPosition in _mapMakerBuilder.TeeOffMarkerPositions)
+                {
+                    hole.TeeOffMarkerPositions.Add(markerPosition);
+                }
+            }
+        }
+        // Check if the hole is "complete" or not. Not including aim points at the moment since as long as the hole has been placed, there should be at least one aim point
+        if (_mapMakerBuilder.HasHoleBeenPlaced && _mapMakerBuilder.HasTeeOffLocationBeenPlaced && _mapMakerBuilder.HaveBothTeeOffMarkersBeenPlaced && _mapMakerBuilder.TeeOffMarkerPositions.Count == 2)
+        {
+            hole.IsHoleCompleted = true;
+        }
+        else
+        {
+            hole.IsHoleCompleted = false;
+        }
+    }
     public void SaveHole()
     {
         if (_selectedCourse == null)
@@ -867,55 +975,7 @@ public class MapMakerUIManager : MonoBehaviour
             return;
 
         Debug.Log("SaveHole: Course: " + _selectedCourse.CourseName + " hole #: " + _selectedHole.HoleIndex);
-        _selectedHole.HoleTileMapData = _saveHandler.GetAllTileMapData();
-        _selectedHole.PolygonPoints = _saveHandler.GetBoundsOfAllTileMaps(_selectedCourse.IsMiniGolf).ToArray();
-        _selectedHole.ZoomOutPosition = _saveHandler.GetCenterOfHoleBounds(_selectedHole.PolygonPoints);
-        // Save the tee off location if it was set in the builder
-        if (_mapMakerBuilder.HasTeeOffLocationBeenPlaced)
-        {
-            _selectedHole.TeeOffLocation = _mapMakerBuilder.TeeOffLocationPosition;
-        }
-        else
-        {
-            _selectedHole.TeeOffLocation = Vector3.zero;
-        }
-        // Save the aim points if it was set in the builder
-        if (_mapMakerBuilder.AimPoints.Count > 0)
-        {
-            
-            _selectedHole.CourseAimPoints = _saveHandler.OrderAimPointsByDistanceToTeeOff(_mapMakerBuilder.TeeOffLocationPosition, _mapMakerBuilder.AimPoints).ToArray();
-        }
-        else
-        {
-            _selectedHole.CourseAimPoints = null;
-        }
-        // save hole position
-        if (_mapMakerBuilder.HasHoleBeenPlaced)
-        {
-            _selectedHole.HolePosition = _mapMakerBuilder.HolePositon;
-        }
-        if (_mapMakerBuilder.HaveBothTeeOffMarkersBeenPlaced)
-        {
-            if (_mapMakerBuilder.TeeOffMarkerPositions.Count == 2)
-            {
-                _selectedHole.TeeOffMarkerPositions.Clear();
-                foreach (Vector3Int markerPosition in _mapMakerBuilder.TeeOffMarkerPositions)
-                {
-                    _selectedHole.TeeOffMarkerPositions.Add(markerPosition);
-                }
-            }
-            
-
-        }
-        // Check if the hole is "complete" or not. Not including aim points at the moment since as long as the hole has been placed, there should be at least one aim point
-        if (_mapMakerBuilder.HasHoleBeenPlaced && _mapMakerBuilder.HasTeeOffLocationBeenPlaced && _mapMakerBuilder.HaveBothTeeOffMarkersBeenPlaced && _mapMakerBuilder.TeeOffMarkerPositions.Count == 2 && _mapMakerBuilder.HasTeeOffLocationBeenPlaced)
-        {
-            _selectedHole.IsHoleCompleted = true;
-        }
-        else
-        {
-            _selectedHole.IsHoleCompleted = false;
-        }
+        FillHoleDataFromCurrentMap(_selectedHole, _selectedCourse.IsMiniGolf);
 
         int newHolePar = _holeDetailsUIManager.GetHolePar();
         if (_selectedHole.HolePar != newHolePar && newHolePar > 0)

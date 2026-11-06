@@ -405,6 +405,14 @@ public class SaveHandler : MonoBehaviour
                         continue;
                     }
 
+                    // A tile far outside the playable area makes the tilemap allocate storage
+                    // covering the whole distance to it, which hangs on a file from anybody else.
+                    if (!CustomCourseLimits.IsTilePositionInRange(tile.position))
+                    {
+                        Debug.LogWarning("LoadTileMapData: skipping a tile placed outside the allowed cell range: " + tile.position.ToString());
+                        continue;
+                    }
+
                     //TileBase tileBase = _guidToTileBase[tile.GuidForTile];
                     TileBase tileBase = _mapMakerBuilder.GetTileBaseFromGUID(tile.GuidForTile);
                     //map.SetTile(tile.position, _guidToTileBase[tile.GuidForTile]);
