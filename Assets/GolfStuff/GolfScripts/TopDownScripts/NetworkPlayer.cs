@@ -115,6 +115,7 @@ public class NetworkPlayer : NetworkBehaviour
         if (MapMakerDropInSession.IsActive && this.Owner.IsHost)
         {
             Debug.Log("ServerSpawned: starting a map maker drop-in.");
+            MapMakerDropInWeather.Create();
             // A normal session learns its course from an RPC sent when the gameplay manager starts,
             // and gets to it in the seconds the lobby is open. Starting here is far earlier than
             // that, so the drop-in's course is handed straight over.

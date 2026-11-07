@@ -8,6 +8,10 @@ public class WeatherIconHolder : MonoBehaviour
     [SerializeField] SpriteRenderer _weatherIcon;
     [SerializeField] SpriteRenderer _weatherText;
 
+    // Drop-in play cycles the weather by clicking this icon, and needs its bounds to know when the
+    // cursor is over it
+    public SpriteRenderer WeatherIcon { get { return _weatherIcon; } }
+
     [Header("Weather Icons")]
     [SerializeField] Sprite _clearSprite;
     [SerializeField] Sprite _lightRainSprite;

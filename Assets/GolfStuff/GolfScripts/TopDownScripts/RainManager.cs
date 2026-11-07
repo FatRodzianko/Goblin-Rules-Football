@@ -705,6 +705,23 @@ public class RainManager : NetworkBehaviour
     {
         this.GameRainMode = rainMode;
     }
+    // Set an exact weather state, rather than rolling one. SetRainState alone only drives the
+    // visuals and the ball modifiers; BaseRainState is what the next turn works from, so it has to
+    // move too or the new state gets undone. Used by map maker drop-in play.
+    [Server]
+    public void SetWeatherState(string newState)
+    {
+        if (string.IsNullOrWhiteSpace(newState))
+            return;
+
+        newState = newState.ToLower();
+
+        if (!RainStates.Contains(newState))
+            return;
+
+        BaseRainState = newState;
+        SetRainState(newState);
+    }
     [Server]
     void RandomChangetoRain()
     {

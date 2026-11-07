@@ -782,5 +782,29 @@ public class WindManager : NetworkBehaviour
     {
         this.GameWindMode = gameMode;
     }
+    // What the game's own wind roll clamps to
+    const int MaxWindPower = 25;
+    // Point the wind in an exact direction, rather than rolling one. Used by map maker drop-in
+    // play, where the tester picks the wind themselves.
+    [Server]
+    public void SetWindDirection(Vector2 direction)
+    {
+        if (direction == Vector2.zero)
+            return;
+
+        WindDirection = direction;
+    }
+    // Set an exact wind strength, rather than rolling one. BaseWindPower is what the next turn
+    // works from, so it has to move with WindPower or the new value gets undone.
+    [Server]
+    public void SetWindPower(int power)
+    {
+        int newPower = Mathf.Clamp(power, 0, MaxWindPower);
+        if (newPower == WindPower && newPower == BaseWindPower)
+            return;
+
+        BaseWindPower = newPower;
+        WindPower = newPower;
+    }
 
 }

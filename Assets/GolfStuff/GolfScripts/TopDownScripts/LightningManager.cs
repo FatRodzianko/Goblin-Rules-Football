@@ -223,6 +223,12 @@ public class LightningManager : NetworkBehaviour
         {
             return;
         }
+        // A hole being tested from the map maker can have its weather set by hand, and rain is what
+        // lets lightning start. Nobody testing a hole wants to be struck by it.
+        if (MapMakerDropInSession.IsActive)
+        {
+            return;
+        }
         if (forNewhole)
             _lightningStormThisTurnAlready = false;
 

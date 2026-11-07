@@ -9,6 +9,10 @@ public class WindIconHolder : MonoBehaviour
     [SerializeField] SpriteRenderer _windNumberRightDigit;
     [SerializeField] SpriteRenderer _windNumberLeftDigit;
 
+    // Drop-in play lets the wind be set by clicking this icon, and needs its bounds to know when
+    // the cursor is over it
+    public SpriteRenderer WindDirectionArrow { get { return _windDirectionArrow; } }
+
     [Header("Wind Direction Sprites")]
     [SerializeField] Sprite _north;
     [SerializeField] Sprite _northEast;
