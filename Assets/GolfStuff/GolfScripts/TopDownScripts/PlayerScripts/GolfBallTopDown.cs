@@ -516,6 +516,83 @@ public class GolfBallTopDown : NetworkBehaviour
         myShadow.GetComponent<SpriteRenderer>().enabled = true;
         MyBallObject.GetComponent<SpriteRenderer>().enabled = true;
     }
+    // Ground tilemaps are left out on purpose: resting on rough is not being stuck inside something.
+    static readonly string[] PlacementObstacleLayers = { "golfEnvironmentObstacles", "walls" };
+    // Pushing clear of one obstacle can put the ball inside the next, so the separation runs a few
+    // times before giving up.
+    const int PlacementEjectPasses = 4;
+    // Map maker drop-in: while the ball is being placed by hand it leaves the physics simulation, so
+    // nothing pushes it and it passes through anything in the way.
+    public void SetHeldForPlacement(bool held)
+    {
+        if (rb == null)
+            return;
+
+        if (held)
+        {
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+        rb.simulated = !held;
+    }
+    // Map maker drop-in: the ball may have been released inside an obstacle, so push it back out
+    // along the shortest way.
+    public void MoveOutOfObstaclesForDropIn()
+    {
+        if (myCollider == null)
+            return;
+
+        int obstacleMask = LayerMask.GetMask(PlacementObstacleLayers);
+
+        for (int pass = 0; pass < PlacementEjectPasses; pass++)
+        {
+            Collider2D[] overlaps = Physics2D.OverlapCircleAll(this.transform.position, MyColliderRadius, obstacleMask);
+            if (overlaps.Length == 0)
+                return;
+
+            bool movedThisPass = false;
+            for (int i = 0; i < overlaps.Length; i++)
+            {
+                ColliderDistance2D separation = myCollider.Distance(overlaps[i]);
+                if (!separation.isValid || !separation.isOverlapped)
+                    continue;
+
+                // distance is negative while overlapping and normal points at the obstacle, so this
+                // backs the ball out by exactly the depth it was buried.
+                this.transform.position += (Vector3)(separation.normal * separation.distance);
+                movedThisPass = true;
+            }
+
+            if (!movedThisPass)
+                return;
+        }
+    }
+    // Map maker drop-in: a ball released over water is handed to the normal hazard drop, which puts
+    // it back on the bank it came from. No stroke penalty, because no shot was played.
+    // Done here and now rather than through MoveBallOutOfWater, whose delay exists to let the stroke
+    // penalty message be read. Nothing is being penalised, and the caller re-points the camera, the
+    // golfer and the aim at wherever the ball ends up, so the move has to have happened by then.
+    public bool DropOutOfWaterForDropIn(Vector3 cameFrom)
+    {
+        if (!IsOverWater(this.transform.position))
+            return false;
+
+        this.transform.position = FindPointOutOfWater(cameFrom);
+        CheckIfInStatueRingRadius();
+        bounceContactGroundMaterial = GetGroundMaterial();
+        return true;
+    }
+    public bool IsOverWater(Vector3 worldPosition)
+    {
+        if (GameplayManagerTopDownGolf.instance == null || GameplayManagerTopDownGolf.instance.TileMapMangerObject == null)
+            return false;
+
+        var waterMap = GameplayManagerTopDownGolf.instance.TileMapMangerObject.WaterTrapMap;
+        if (waterMap == null)
+            return false;
+
+        return waterMap.GetTile(waterMap.WorldToCell(worldPosition)) != null;
+    }
     public void HitBall(float hitDistance, float hitAngle, float hitTopSpin, Vector2 hitDirection, float hitLeftOrRightSpin = 0f, bool provideHeight = false, float hieghtProvided = 0f)
     {
         //CalculateHitTrajectory(hitDistance, hitAngle, hitTopSpin, hitDirection, Vector2.zero, 0f);
@@ -2097,69 +2174,51 @@ public class GolfBallTopDown : NetworkBehaviour
     //
     // OLD WAY
     //
+    const float WaterSearchStep = 0.5f;
+    // Implements the water hazard rule: the ball is dropped where it last crossed the margin of the
+    // hazard. Walking back toward the player approximates the incoming flight line, so the ball ends
+    // up outside the hazard on the side it came in from. Inexact for a curved shot, which did not
+    // cross the margin at the straight-line point.
     Vector3 FindPointOutOfWater()
     {
-        Vector3 playerPos = MyPlayer.transform.position;
+        return FindPointOutOfWater(MyPlayer.transform.position);
+    }
+    Vector3 FindPointOutOfWater(Vector3 towardPoint)
+    {
+        Vector3 playerPos = towardPoint;
         Vector3 ballPos = this.transform.position;
+
+        if (GameplayManagerTopDownGolf.instance == null || GameplayManagerTopDownGolf.instance.TileMapMangerObject == null)
+            return ballPos;
+
+        var waterMap = GameplayManagerTopDownGolf.instance.TileMapMangerObject.WaterTrapMap;
+        if (waterMap == null)
+            return ballPos;
+
         Vector3 directionToPlayer = (playerPos - ballPos).normalized;
-        float distanceToPlayer = Vector2.Distance(playerPos, ballPos);
-        float distanceChecked = 0f;
 
-        Debug.Log("FindPointOutOfWater: ballPos " + ballPos.ToString() + " directionToPlayer: " + directionToPlayer.ToString());
+        // Normalizing a zero vector gives a zero vector, which would leave the position unchanged on
+        // every step. Only reachable when the ball sits exactly on the player.
+        if (directionToPlayer == Vector3.zero)
+            directionToPlayer = Vector3.up;
 
-        bool isBallStillOnWater = true;
-        float timeStarted = Time.time;
+        // Leaving the water map ends the walk, because no cell outside it can hold a water tile.
+        // This only guards against a float edge case keeping the position inside the bounds forever.
+        BoundsInt waterBounds = waterMap.cellBounds;
+        int maxSteps = Mathf.CeilToInt((waterBounds.size.x + waterBounds.size.y) * 2f / WaterSearchStep);
 
-        while (isBallStillOnWater)
+        for (int step = 0; step < maxSteps; step++)
         {
-            ballPos += directionToPlayer * .5f;
-            distanceChecked += .5f;
-            Vector3Int ballTilePos = Vector3Int.FloorToInt(ballPos);
+            ballPos += directionToPlayer * WaterSearchStep;
+            Vector3Int ballTilePos = waterMap.WorldToCell(ballPos);
 
-            Debug.Log("FindPointOutOfWater: checking new position at: " + ballPos.ToString() +  " have checked over a distance of: " + distanceChecked);
-
-            if (GameplayManagerTopDownGolf.instance.TileMapMangerObject.WaterTrapMap.GetTile(ballTilePos) == null)
-            {
-                Debug.Log("FindPointOutOfWater: no longer over a tile that has a water tile. BallPos: " + ballPos.ToString() + " ballTilePos: " + ballTilePos.ToString());
-                //ballPos = ballTilePos;
-                isBallStillOnWater = false;
-            }
-
-            //if (distanceChecked >= distanceToPlayer)
-            //{
-            //    isBallStillOnWater = false;
-            //    //return ballPos;
-            //}
-            //if (Time.time > timeStarted + 1f)
-            //{
-            //    isBallStillOnWater = false;
-            //}
-
-            //RaycastHit2D[] ground = Physics2D.CircleCastAll(ballPos, pixelUnit, Vector2.zero, 0f, groundMask);
-            //if (ground.Length > 0)
-            //{
-            //    for (int i = 0; i < ground.Length; i++)
-            //    {
-            //        GroundTopDown groundScript = ground[i].collider.GetComponent<GroundTopDown>();
-            //        if (groundScript.groundType.Contains("water"))
-            //        {
-            //            isBallStillOnWater = true;
-            //            break;
-            //        }
-            //        else
-            //        {
-            //            isBallStillOnWater = false;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    isBallStillOnWater = false;
-            //    //return ballPos;
-            //}
+            if (!waterBounds.Contains(ballTilePos))
+                return ballPos;
+            if (waterMap.GetTile(ballTilePos) == null)
+                return ballPos;
         }
-        Debug.Log("FindPointOutOfWater: ball is no longer on water at " + ballPos.ToString());
-        return ballPos;
+
+        return playerPos;
     }
     public void BallEndedInWater()
     {

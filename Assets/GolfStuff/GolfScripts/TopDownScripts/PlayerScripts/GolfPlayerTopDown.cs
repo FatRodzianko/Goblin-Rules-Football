@@ -492,15 +492,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         if (!MyBall)
             return;
-        // Testing a hole from the map maker. Outside the turn checks below on purpose, so the ball
-        // can be called back while it is still in the air or rolling. Function keys because
-        // GolfControls binds none, so they cannot collide with playing the game.
-        if (MapMakerDropInSession.IsActive)
+        // Testing a hole from the map maker: placing the ball takes over the frame, so no aiming,
+        // no hitting and no turn handling. The resets themselves are DropInControls callbacks,
+        // which fire whatever this method does, so they still work mid flight.
+        if (MapMakerDropInSession.IsActive && _ballMovementMode)
         {
-            if (Input.GetKeyDown(KeyCode.F5))
-                DropInResetBallToTeeOff();
-            else if (Input.GetKeyDown(KeyCode.F6))
-                DropInUndoLastShot();
+            PlaceBallAtClick();
+            MoveBallBeingPlaced();
+            return;
         }
         if (Input.GetKeyDown(KeyCode.Tab))
         {
@@ -1300,6 +1299,9 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         _moveRight = false;
         _moveHitMeterIcon = true;
+        // Stays set for the rest of the turn, and is cleared by StartPlayerTurn. Map maker drop-in
+        // reads it to stop the ball being moved once the shot is under way.
+        HitSequenceStarted = true;
     }
     void MoveHitMeterIcon()
     {
@@ -2727,6 +2729,227 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
         GameplayManagerTopDownGolf.instance.DropInRestartTurnForPlayer(this);
     }
+    // Testing a hole from the map maker: placing the ball by hand. The ball leaves the physics
+    // simulation while it is being moved, so it passes through everything, and is pushed back out of
+    // obstacles and off water once the mode ends. The ball's NetworkTransform is client
+    // authoritative, so the owner moving it is already the authority and no RPC is needed.
+    bool _ballMovementMode = false;
+    Vector2 _ballMovementInput = Vector2.zero;
+    Vector3 _ballPositionBeforePlacing = Vector3.zero;
+    bool _wasZoomedOutBeforePlacing = false;
+    const float BallPlacementSpeed = 10f;
+    const float BallPlacementFineSpeed = 2.5f;
+
+    // Subscribed only in a drop-in, and only by the owner: Controls is a single shared instance, so
+    // every player that subscribed would answer the same key press.
+    void EnableDropInControls(bool enable)
+    {
+        if (!this.IsOwner)
+            return;
+
+        if (enable)
+        {
+            InputManagerGolf.Controls.DropInControls.ResetToTee.Enable();
+            InputManagerGolf.Controls.DropInControls.ResetToTee.performed += ResetToTeePressed;
+            InputManagerGolf.Controls.DropInControls.UndoShot.Enable();
+            InputManagerGolf.Controls.DropInControls.UndoShot.performed += UndoShotPressed;
+            InputManagerGolf.Controls.DropInControls.ToggleBallPlacement.Enable();
+            InputManagerGolf.Controls.DropInControls.ToggleBallPlacement.performed += ToggleBallPlacementPressed;
+        }
+        else
+        {
+            InputManagerGolf.Controls.DropInControls.ResetToTee.Disable();
+            InputManagerGolf.Controls.DropInControls.ResetToTee.performed -= ResetToTeePressed;
+            InputManagerGolf.Controls.DropInControls.UndoShot.Disable();
+            InputManagerGolf.Controls.DropInControls.UndoShot.performed -= UndoShotPressed;
+            InputManagerGolf.Controls.DropInControls.ToggleBallPlacement.Disable();
+            InputManagerGolf.Controls.DropInControls.ToggleBallPlacement.performed -= ToggleBallPlacementPressed;
+        }
+    }
+    void ResetToTeePressed(InputAction.CallbackContext context)
+    {
+        DropInResetBallToTeeOff();
+    }
+    void UndoShotPressed(InputAction.CallbackContext context)
+    {
+        DropInUndoLastShot();
+    }
+    void ToggleBallPlacementPressed(InputAction.CallbackContext context)
+    {
+        ToggleBallMovementMode();
+    }
+    void ToggleBallMovementMode()
+    {
+        if (_ballMovementMode)
+        {
+            ExitBallMovementMode();
+            return;
+        }
+
+        if (!CanEnterBallMovementMode())
+            return;
+
+        EnterBallMovementMode();
+    }
+    // Only while the ball is sitting still, waiting to be hit. Deliberately not gated on whose turn
+    // it is, nor on having teed off, so the ball can be placed at the tee.
+    bool CanEnterBallMovementMode()
+    {
+        if (!MapMakerDropInSession.IsActive || !this.IsOwner || MyBall == null)
+            return false;
+        if (GolfEscMenuManager.instance != null && GolfEscMenuManager.instance.IsMenuOpen)
+            return false;
+        if (MyBall.isHit || MyBall.isBouncing || MyBall.isRolling)
+            return false;
+        if (MyBall.IsHitByTornado || MyBall.BallInTube || MyBall.PlayerUsingRocket || MyBall.IsInHole)
+            return false;
+        // Aiming, or aim confirmed but the hit meter not started yet. Once the meter runs the shot
+        // is under way, and the ball stays put until the next turn begins and aiming comes back.
+        if (HitSequenceStarted)
+            return false;
+
+        return true;
+    }
+    void EnterBallMovementMode()
+    {
+        _ballMovementMode = true;
+        _ballMovementInput = Vector2.zero;
+        _ballPositionBeforePlacing = MyBall.transform.position;
+        _wasZoomedOutBeforePlacing = _cameraViewHole != null && _cameraViewHole.IsCameraZoomedOut;
+
+        MyBall.SetHeldForPlacement(true);
+        EnableBallPlacementActions(true);
+        // The camera is on the landing target while aiming, which would leave it sitting where the
+        // old shot pointed instead of on the ball being moved.
+        SetCameraOnPlayer();
+        // Click to aim is enabled separately from the rest of aiming - zooming out turns it on - so
+        // switching aiming off does not cover it. Left on, a click re-aims while placing and hands
+        // the camera to the landing target, which it then keeps when zooming back in.
+        EnableZoomOutAim(false);
+        MapMakerDropInBanner.Show("MOVING BALL POSITION\nWASD move  -  Shift fine  -  Click to place  -  ` zoom out  -  F7 done");
+    }
+    void ExitBallMovementMode()
+    {
+        _ballMovementMode = false;
+        _ballMovementInput = Vector2.zero;
+
+        EnableBallPlacementActions(false);
+        MapMakerDropInBanner.Hide();
+
+        if (MyBall == null)
+            return;
+
+        MyBall.SetHeldForPlacement(false);
+        MyBall.MoveOutOfObstaclesForDropIn();
+        // Where the ball started stands in for the flight line a hazard drop would normally trace
+        // back along, since nothing was actually played here.
+        MyBall.DropOutOfWaterForDropIn(_ballPositionBeforePlacing);
+
+        // Put the view back the way placement found it. Zooming is locked once the aim has been
+        // confirmed, so a zoom out done while placing cannot be undone afterwards without cancelling
+        // the shot - placement must not leave the camera somewhere the player is stuck with.
+        if (_cameraViewHole != null && _cameraViewHole.IsCameraZoomedOut != _wasZoomedOutBeforePlacing)
+            _cameraViewHole.ZoomOutCamera();
+
+        // Hand click to aim back, matching whether the view is still zoomed out.
+        EnableZoomOutAim(_cameraViewHole.IsCameraZoomedOut);
+
+        // The golfer, the camera, the aim, the trajectory and the club were all worked out from
+        // where the ball used to be. Starting the turn again recomputes every one of them from
+        // where it is now; without it the golfer swings from the old spot and the ball leaves from
+        // the new one.
+        //
+        // This always drops back to aiming, even when the aim had already been confirmed. An aim
+        // confirmed before the ball moved was taken from the old position and means nothing now, so
+        // the shot is set up again rather than left pointing somewhere the ball no longer is.
+        if (IsPlayersTurn)
+        {
+            StartPlayerTurn();
+            return;
+        }
+
+        SetPlayerOnBall();
+        SetDistanceToHoleForPlayer();
+    }
+    // Clicking drops the ball straight onto the cursor and stays in the mode, so it can be put
+    // roughly in place from the zoomed out view and then nudged with WASD. Zooming out is the
+    // existing key: it is enabled once when the player starts and is never gated on aiming.
+    void PlaceBallAtClick()
+    {
+        if (!Input.GetMouseButtonDown(0))
+            return;
+        if (MyBall == null || myCamera == null)
+            return;
+        if (GolfEscMenuManager.instance != null && GolfEscMenuManager.instance.IsMenuOpen)
+            return;
+
+        // Don't also fling the ball across the hole when the click was meant for a button
+        UnityEngine.EventSystems.EventSystem eventSystem = UnityEngine.EventSystems.EventSystem.current;
+        if (eventSystem != null && eventSystem.IsPointerOverGameObject())
+            return;
+
+        Vector3 mouseScreenPos = Input.mousePosition;
+        if (mouseScreenPos.x < 0f || mouseScreenPos.y < 0f || mouseScreenPos.x > Screen.width || mouseScreenPos.y > Screen.height)
+            return;
+
+        // Keep the ball's own z: it carries the height, and placing must not change it.
+        Vector3 mouseWorldPos = myCamera.ScreenToWorldPoint(mouseScreenPos);
+        MyBall.transform.position = new Vector3(mouseWorldPos.x, mouseWorldPos.y, MyBall.transform.position.z);
+    }
+    void MoveBallBeingPlaced()
+    {
+        if (MyBall == null)
+        {
+            ExitBallMovementMode();
+            return;
+        }
+        if (_ballMovementInput == Vector2.zero)
+            return;
+
+        bool fineControl = InputManagerGolf.Controls.AimingActions.ShortPutt.IsPressed();
+        float speed = fineControl ? BallPlacementFineSpeed : BallPlacementSpeed;
+        MyBall.transform.position += (Vector3)(_ballMovementInput.normalized * speed * Time.deltaTime);
+    }
+    // Borrows the aiming stick/WASD and the short putt key while aiming is switched off, so the
+    // player's own rebinds still apply and no new bindings are needed.
+    void EnableBallPlacementActions(bool enable)
+    {
+        if (!this.IsOwner)
+            return;
+
+        if (enable)
+        {
+            EnableAimingActions(false);
+            InputManagerGolf.Add("HittingActions");
+
+            InputManagerGolf.Controls.AimingActions.AimPosition.Enable();
+            InputManagerGolf.Controls.AimingActions.AimPosition.performed += BallPlacementMoved;
+            InputManagerGolf.Controls.AimingActions.AimPosition.canceled += BallPlacementMoveStopped;
+            InputManagerGolf.Controls.AimingActions.ShortPutt.Enable();
+        }
+        else
+        {
+            InputManagerGolf.Controls.AimingActions.AimPosition.Disable();
+            InputManagerGolf.Controls.AimingActions.AimPosition.performed -= BallPlacementMoved;
+            InputManagerGolf.Controls.AimingActions.AimPosition.canceled -= BallPlacementMoveStopped;
+            InputManagerGolf.Controls.AimingActions.ShortPutt.Disable();
+
+            InputManagerGolf.Remove("HittingActions");
+
+            // Aiming is deliberately not switched back on here. ExitBallMovementMode starts the
+            // turn again, and that enables it; doing it here as well would subscribe every aiming
+            // callback twice and handle each input twice. Outside the player's own turn the turn is
+            // not restarted, and aiming correctly stays off.
+        }
+    }
+    void BallPlacementMoved(InputAction.CallbackContext context)
+    {
+        _ballMovementInput = context.ReadValue<Vector2>();
+    }
+    void BallPlacementMoveStopped(InputAction.CallbackContext context)
+    {
+        _ballMovementInput = Vector2.zero;
+    }
     [ServerRpc]
     void CmdSetCameraOnMyBallForOtherPlayers()
     {
@@ -3682,12 +3905,17 @@ public class GolfPlayerTopDown : NetworkBehaviour
         EnableViewScoreBoard(true);
         EnableZoomOut(true);
         EnableEscapeMenu(true);
+        // Only while testing a hole from the map maker. In a normal game these stay disabled, so
+        // the keys are free and nothing has to be filtered out at the handler.
+        if (MapMakerDropInSession.IsActive)
+            EnableDropInControls(true);
     }
     void UnsubscribeToControls()
     {
         EnableViewScoreBoard(false);
         EnableZoomOut(false);
         EnableEscapeMenu(false);
+        EnableDropInControls(false);
     }
     #region Start Player Turn
     [TargetRpc]
@@ -4031,11 +4259,18 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
         Debug.Log("ZoomOutPressed: ");
 
-        if (DirectionAndDistanceChosen && this.IsPlayersTurn)
+        // Placing the ball is exempt: the aim is confirmed for a shot that has not started, and the
+        // zoomed out view is how the ball gets put somewhere far away.
+        if (DirectionAndDistanceChosen && this.IsPlayersTurn && !_ballMovementMode)
             return;
 
         _cameraViewHole.ZoomOutCamera();
-        EnableZoomOutAim(_cameraViewHole.IsCameraZoomedOut);
+        // Aiming stays off for the whole of placement, zoomed out or not.
+        EnableZoomOutAim(_cameraViewHole.IsCameraZoomedOut && !_ballMovementMode);
+
+        // Keep the camera on the ball being placed, rather than on the last landing target.
+        if (_ballMovementMode)
+            SetCameraOnPlayer();
     }
     public void ResetEnableZoomOutAim(bool enable)
     {

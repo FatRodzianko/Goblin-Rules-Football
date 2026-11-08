@@ -1379,6 +1379,74 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "DropInControls",
+            "id": "e5a42899-2166-46cb-9baf-148e036ff3d9",
+            "actions": [
+                {
+                    "name": "ResetToTee",
+                    "type": "Button",
+                    "id": "2446b2c7-6077-4636-8f0b-bbd0f914ee44",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "UndoShot",
+                    "type": "Button",
+                    "id": "fa701279-974d-4a9a-9578-fa582fd5c874",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ToggleBallPlacement",
+                    "type": "Button",
+                    "id": "ebf1336a-685f-4e11-8f96-11533ef9b37f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "591cf399-0b2f-42dc-bed9-b88568e33609",
+                    "path": "<Keyboard>/f5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "ResetToTee",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "43a05435-1ea8-4b43-b395-0d28d64c3bab",
+                    "path": "<Keyboard>/f6",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "UndoShot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "73364a47-04fd-401b-a076-e86c0bd34e75",
+                    "path": "<Keyboard>/f7",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "ToggleBallPlacement",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
