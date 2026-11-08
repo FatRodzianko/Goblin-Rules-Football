@@ -46,4 +46,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerName: 
   PlayerConnectionId: 0
-  _playerScoreScript: {fileID: 0}
+  PlayerScoreForCourse: 0
+  PlayerColor: {r: 1, g: 1, b: 1, a: 1}
+  PlayerScoreScript: {fileID: 0}
+  _name: {fileID: 0}
+  _playerFavor: {fileID: 0}
+  _totalScore: {fileID: 0}
+  _scoreItemHolderPanel: {fileID: 0}
+  _scoreTextPrefab: {fileID: 0}
+  _scoreItems: []

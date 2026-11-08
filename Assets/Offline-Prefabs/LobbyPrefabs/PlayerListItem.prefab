@@ -68,8 +68,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Not Ready
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: ff9f08750f66d4146ab3c72518cd88d4, type: 2}
-  m_sharedMaterial: {fileID: -4300753035572066090, guid: ff9f08750f66d4146ab3c72518cd88d4, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: ad172d596dabf3a46b4ef5be6a25e489, type: 2}
+  m_sharedMaterial: {fileID: 4343382523053203784, guid: ad172d596dabf3a46b4ef5be6a25e489, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -93,12 +93,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
+  m_fontSize: 32.727272
   m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
-  m_fontSizeMax: 25
+  m_fontSizeMin: 23.563635
+  m_fontSizeMax: 32.727272
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -203,8 +203,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: PlayerName
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: ff9f08750f66d4146ab3c72518cd88d4, type: 2}
-  m_sharedMaterial: {fileID: -4300753035572066090, guid: ff9f08750f66d4146ab3c72518cd88d4, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: ad172d596dabf3a46b4ef5be6a25e489, type: 2}
+  m_sharedMaterial: {fileID: 4343382523053203784, guid: ad172d596dabf3a46b4ef5be6a25e489, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -228,12 +228,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
+  m_fontSize: 32.727272
   m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 5
-  m_fontSizeMax: 25
+  m_fontSizeMin: 6.545454
+  m_fontSizeMax: 32.727272
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
@@ -459,15 +459,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerName: 
   ConnectionId: 0
+  lobbyPlayerObjectId: -1
+  isBot: 0
   isPlayerReady: 0
   playerSteamId: 0
   isTeamGrey: 0
   PlayerNameText: {fileID: 1025634851475189220}
   PlayerReadyStatus: {fileID: 1025634851165951235}
   playerAvatar: {fileID: 1025634851683010203}
+  botAvatar: {fileID: 0}
   readyColor: {r: 0, g: 1, b: 0, a: 1}
   notReadyColor: {r: 1, g: 0, b: 0, a: 1}
   GoblinTypeDropdown: {fileID: 0}
+  KickBotButton: {fileID: 0}
   goblinSelected: {fileID: 0}
   dlcImage: {fileID: 3463518225381559952}
   dlc99: {fileID: 21300000, guid: 88c4d4a30cfad404789a0cf68ae9355f, type: 3}
