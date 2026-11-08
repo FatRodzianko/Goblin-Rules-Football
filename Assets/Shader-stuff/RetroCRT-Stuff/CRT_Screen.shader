@@ -227,12 +227,23 @@ Shader "Hidden/RetroCRT/CRT Screen"
                 return (acc / wsum) * _GlowStrength;
             }
 
-            // Tied to the source line count, not the output resolution, so the pattern stays
-            // under Nyquist and resolves instead of turning into moire.
+            // A scanline needs two output rows to exist at all, one dark and one light. Asking for
+            // more lines than the window has room for does not draw a finer pattern, it aliases
+            // into moire, and moire eats the two-pixel strokes of a bitmap font alive.
+            //
+            // 432 lines therefore needs 864 rows. At 864p and above this clamp does nothing; below
+            // it, the count comes down to whatever the window can actually resolve.
+            float ScanlineCount()
+            {
+                return min(_ScanlineCount, _ScreenParams.y * 0.5);
+            }
+
+            // Tied to the source line count rather than the output resolution, so the pattern keeps
+            // its apparent size as the window changes instead of thinning out.
             float ScanlineWeight(float uvY, float noise)
             {
                 float strength = _ScanlineStrength * lerp(1.0 - _NoiseStrength, 1.0, noise);
-                float s = sin(frac(uvY * _ScanlineCount) * PI);
+                float s = sin(frac(uvY * ScanlineCount()) * PI);
                 s = s * s;
                 // sin^2 averages 0.5, so divide by the mean to leave overall brightness alone.
                 return lerp(1.0 - strength, 1.0, s) / max(1.0 - 0.5 * strength, 1e-4);
@@ -270,7 +281,9 @@ Shader "Hidden/RetroCRT/CRT Screen"
                 float3 col = HorizontalBleed(uvW, texel.x);
                 col += BeamGlow(uvW, texel);
 
-                float lineIndex = floor(uvW.y * _ScanlineCount);
+                // The same count the pattern uses, or the noise would flicker across lines that
+                // are not there.
+                float lineIndex = floor(uvW.y * ScanlineCount());
                 float noise = Hash21(float2(lineIndex, floor(_Time.y * _NoiseSpeed * 24.0)));
                 col *= ScanlineWeight(uvW.y, noise);
 
