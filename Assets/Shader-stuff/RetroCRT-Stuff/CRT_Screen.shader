@@ -12,7 +12,13 @@ Shader "Hidden/RetroCRT/CRT Screen"
 {
     Properties
     {
-        _MainTex ("Source", 2D) = "white" {}
+        _MainTex ("Source (world)", 2D) = "white" {}
+        // The UI is rendered by its own camera into its own texture and composited here, so the
+        // effect covers it without it ever passing through the world camera's pipeline.
+        _UITex ("Source (UI)", 2D) = "black" {}
+
+        // Off still composites the two sources; only the effect itself is skipped.
+        [Toggle] _EffectOn ("Effect on", Float) = 1
 
         // Whether the source arrives upside down depends on where the Blit feature runs. After
         // post-processing the camera target is the back buffer, so our pass draws into a temporary
@@ -77,8 +83,11 @@ Shader "Hidden/RetroCRT/CRT Screen"
 
             TEXTURE2D(_MainTex);
             SAMPLER(sampler_MainTex);
+            TEXTURE2D(_UITex);
+            SAMPLER(sampler_UITex);
 
             CBUFFER_START(UnityPerMaterial)
+                float _EffectOn;
                 float _FlipY;
                 float _Curvature;
                 float _VignetteWidth;
@@ -122,9 +131,30 @@ Shader "Hidden/RetroCRT/CRT Screen"
 
             float Luma(float3 c) { return dot(c, float3(0.299, 0.587, 0.114)); }
 
+            // The UI texture carries premultiplied coverage: Pixel Perfect's stretch blends its
+            // colour toward the transparent clear, which multiplies it by alpha already. So it is
+            // added over the attenuated world rather than lerped, which would multiply twice.
+            float3 Composite(float2 uv)
+            {
+                float3 world = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).rgb;
+                float4 ui    = SAMPLE_TEXTURE2D(_UITex, sampler_UITex, uv);
+                return world * (1.0 - ui.a) + ui.rgb;
+            }
+
+            // Alpha has to survive this pass. If the effect ever runs over a camera that renders UI
+            // into a texture - which happens if the old renderer feature is left switched on - then
+            // writing a flat 1 here makes that texture opaque, and compositing it over the world
+            // hides the world completely.
+            float CompositeAlpha(float2 uv)
+            {
+                float world = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a;
+                float ui    = SAMPLE_TEXTURE2D(_UITex, sampler_UITex, uv).a;
+                return max(world, ui);
+            }
+
             float3 SampleLinear(float2 uv)
             {
-                return ToLinear(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).rgb);
+                return ToLinear(Composite(uv));
             }
 
             float Hash21(float2 p)
@@ -225,6 +255,11 @@ Shader "Hidden/RetroCRT/CRT Screen"
                 // the picture. The mask is not affected: it runs on output pixel x.
                 float2 uv = float2(IN.uv.x, lerp(IN.uv.y, 1.0 - IN.uv.y, saturate(_FlipY)));
 
+                // With the effect off this still has to run, because the UI only reaches the screen
+                // through the composite.
+                if (_EffectOn < 0.5)
+                    return float4(Composite(uv), CompositeAlpha(uv));
+
                 float2 uvW = BarrelWarp(uv, _Curvature);
 
                 // The warp pushes the corners off the source, so black those out rather than
@@ -246,7 +281,7 @@ Shader "Hidden/RetroCRT/CRT Screen"
                 float2 v = saturate(smoothstep(0.0, w, 1.0 - edge));
                 col *= v.x * v.y * onTube;
 
-                return float4(saturate(ToGamma(col)), 1.0);
+                return float4(saturate(ToGamma(col)), CompositeAlpha(uvW) * onTube);
             }
             ENDHLSL
         }

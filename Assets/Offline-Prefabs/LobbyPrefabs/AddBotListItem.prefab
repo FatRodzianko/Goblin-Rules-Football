@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7137739823185136934}
   - component: {fileID: 5875921955647389834}
   - component: {fileID: 8040022640133582871}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,7 +148,7 @@ GameObject:
   - component: {fileID: 59188908128048205}
   - component: {fileID: 204224487106793224}
   - component: {fileID: 6525861294729354406}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: AddBotListItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}

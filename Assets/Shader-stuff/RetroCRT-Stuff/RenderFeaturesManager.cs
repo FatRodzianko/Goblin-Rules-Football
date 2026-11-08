@@ -33,10 +33,23 @@ public class RenderFeaturesManager : MonoBehaviour
     {
         
     }
+    /// <summary>Whether the player has the CRT effect switched on, for scenes that load later.</summary>
+    public bool RetroCRTEnabled { get; private set; }
+
     public void EnableRetroCRT(bool enable)
     {
-        Debug.Log("EnableRetroCRT: " + enable.ToString());
-        feature.SetActive(enable);
+        RetroCRTEnabled = enable;
         _globalVolume.enabled = enable;
+
+        // Where a presenter is in the scene it draws the effect, and the renderer feature has to
+        // stay off or the effect would be applied twice.
+        if (CRTPresenter.Instance != null)
+        {
+            feature.SetActive(false);
+            CRTPresenter.Instance.SetEffectEnabled(enable);
+            return;
+        }
+
+        feature.SetActive(enable);
     }
 }

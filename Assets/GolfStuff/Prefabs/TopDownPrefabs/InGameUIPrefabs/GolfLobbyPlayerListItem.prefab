@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6829058587030897088}
   - component: {fileID: 3121035856629872301}
   - component: {fileID: 1428599265217816987}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ReadyStatus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -168,7 +168,7 @@ GameObject:
   - component: {fileID: 1141669271534810810}
   - component: {fileID: 4228219154650466155}
   - component: {fileID: 7172217376695300497}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PlayerAvatar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -262,7 +262,7 @@ GameObject:
   - component: {fileID: 1235497977718920675}
   - component: {fileID: 1365888496612536784}
   - component: {fileID: 4777737540533845462}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PlayerName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -418,7 +418,7 @@ GameObject:
   - component: {fileID: 944409657007568749}
   - component: {fileID: 7767731925905542031}
   - component: {fileID: 2962087914862162768}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PlayerBallColorIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -517,7 +517,7 @@ GameObject:
   - component: {fileID: 8344350434338612024}
   - component: {fileID: 736427993388615645}
   - component: {fileID: 1800726623030268147}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: GolfLobbyPlayerListItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}

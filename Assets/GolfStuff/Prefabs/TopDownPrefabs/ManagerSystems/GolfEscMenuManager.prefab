@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 3450848885307070287}
   - component: {fileID: 7221013409905387053}
   - component: {fileID: 4569775680840421320}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ReturnToGameButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -417,7 +417,7 @@ GameObject:
   - component: {fileID: 4300347173384832128}
   - component: {fileID: 7839839960708257067}
   - component: {fileID: 7287721160732063400}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: SettingsButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -948,7 +948,7 @@ GameObject:
   - component: {fileID: 3986260336472835987}
   - component: {fileID: 3047371734817758228}
   - component: {fileID: 6899768125553553209}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1894,7 +1894,7 @@ GameObject:
   - component: {fileID: 7001537676314218151}
   - component: {fileID: 5546871012487954618}
   - component: {fileID: 2914444362732027947}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2142,7 +2142,7 @@ GameObject:
   - component: {fileID: 4314054076288157068}
   - component: {fileID: 802305618774140157}
   - component: {fileID: 8002374980150348525}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3003,7 +3003,7 @@ GameObject:
   - component: {fileID: 7465965223195000726}
   - component: {fileID: 529809020097315456}
   - component: {fileID: 3266458323496290618}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CloseSettingsPanelButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3224,7 +3224,7 @@ GameObject:
   - component: {fileID: 870134701199723207}
   - component: {fileID: 4525668152871714007}
   - component: {fileID: 7603661329120368756}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4048,6 +4048,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 10
@@ -4252,7 +4253,7 @@ GameObject:
   - component: {fileID: 6049761076932824092}
   - component: {fileID: 5075876227077661600}
   - component: {fileID: 8490169195652968812}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5062,7 +5063,7 @@ GameObject:
   - component: {fileID: 8656317785020955478}
   - component: {fileID: 7777881080214655447}
   - component: {fileID: 6405895140940829873}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: SettingsPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5341,7 +5342,7 @@ GameObject:
   - component: {fileID: 3556735266607502227}
   - component: {fileID: 8007431961114619010}
   - component: {fileID: 6100856663518100418}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: SaveSettingsButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6160,7 +6161,7 @@ GameObject:
   - component: {fileID: 2161381984026585646}
   - component: {fileID: 4644407430808148215}
   - component: {fileID: 7692052249481395111}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TurnMusicOnOffButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}

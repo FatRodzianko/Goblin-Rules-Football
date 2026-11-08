@@ -264,7 +264,7 @@ public class LobbyManager : MonoBehaviour
                 newPlayerListItemScript.SetPlayerListItemValues();
 
 
-                newPlayerListItem.transform.SetParent(ContentPanel.transform);
+                newPlayerListItem.transform.SetParent(ContentPanel.transform, false);
                 newPlayerListItem.transform.localScale = Vector3.one;
 
                 playerListItems.Add(newPlayerListItemScript);
@@ -291,7 +291,7 @@ public class LobbyManager : MonoBehaviour
                 /*if (player.IsGameLeader)
                 {
                     Debug.Log("CreatePlayerListItems:  3v3 playerlistitem player is game leader: " + player.PlayerName);
-                    newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                    newPlayerListItem.transform.SetParent(greenContentPanel.transform, false);
                     newPlayerListItem.transform.localScale = Vector3.one;
                     greenPlayerListItems.Add(newPlayerListItemScript);
                     newPlayerListItemScript.SetPlayerTeam(false);
@@ -301,7 +301,7 @@ public class LobbyManager : MonoBehaviour
                     if (greenPlayerListItems.Count > greyPlayerListItems.Count)
                     {
                         Debug.Log("CreatePlayerListItems:  3v3 playerlistitem more green team member than grey: "+ greenPlayerListItems.Count.ToString() +" " + greyPlayerListItems.Count.ToString() + " " + player.PlayerName);
-                        newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                        newPlayerListItem.transform.SetParent(greyContentPanel.transform, false);
                         newPlayerListItem.transform.localScale = Vector3.one;
                         greyPlayerListItems.Add(newPlayerListItemScript);
                         newPlayerListItemScript.SetPlayerTeam(true);
@@ -309,7 +309,7 @@ public class LobbyManager : MonoBehaviour
                     else if (greenPlayerListItems.Count < greyPlayerListItems.Count)
                     {
                         Debug.Log("CreatePlayerListItems:  3v3 playerlistitem more grey team member than green: " + greenPlayerListItems.Count.ToString() + " " + greyPlayerListItems.Count.ToString() + " " + player.PlayerName);
-                        newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                        newPlayerListItem.transform.SetParent(greenContentPanel.transform, false);
                         newPlayerListItem.transform.localScale = Vector3.one;
                         greenPlayerListItems.Add(newPlayerListItemScript);
                         newPlayerListItemScript.SetPlayerTeam(false);
@@ -323,14 +323,14 @@ public class LobbyManager : MonoBehaviour
                         string result = headsTails[rng.Next(headsTails.Length)];
                         if (result == "green")
                         {
-                            newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                            newPlayerListItem.transform.SetParent(greenContentPanel.transform, false);
                             newPlayerListItem.transform.localScale = Vector3.one;
                             greenPlayerListItems.Add(newPlayerListItemScript);
                             newPlayerListItemScript.SetPlayerTeam(false);
                         }
                         else
                         {
-                            newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                            newPlayerListItem.transform.SetParent(greyContentPanel.transform, false);
                             newPlayerListItem.transform.localScale = Vector3.one;
                             greyPlayerListItems.Add(newPlayerListItemScript);
                             newPlayerListItemScript.SetPlayerTeam(true);
@@ -342,14 +342,14 @@ public class LobbyManager : MonoBehaviour
 
                 if (player.isTeamGrey)
                 {
-                    newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                    newPlayerListItem.transform.SetParent(greyContentPanel.transform, false);
                     newPlayerListItem.transform.localScale = Vector3.one;
                     if (!greyPlayerListItems.Contains(newPlayerListItemScript))
                         greyPlayerListItems.Add(newPlayerListItemScript);
                 }
                 else
                 {
-                    newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                    newPlayerListItem.transform.SetParent(greenContentPanel.transform, false);
                     newPlayerListItem.transform.localScale = Vector3.one;
                     if (!greenPlayerListItems.Contains(newPlayerListItemScript))
                         greenPlayerListItems.Add(newPlayerListItemScript);
@@ -384,7 +384,7 @@ public class LobbyManager : MonoBehaviour
                     newPlayerListItemScript.SetPlayerListItemValues();
 
 
-                    newPlayerListItem.transform.SetParent(ContentPanel.transform);
+                    newPlayerListItem.transform.SetParent(ContentPanel.transform, false);
                     newPlayerListItem.transform.localScale = Vector3.one;
 
                     playerListItems.Add(newPlayerListItemScript);
@@ -405,14 +405,14 @@ public class LobbyManager : MonoBehaviour
                     playerListItems.Add(newPlayerListItemScript);
                     /*if (player.isTeamGrey)
                     {
-                        newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                        newPlayerListItem.transform.SetParent(greyContentPanel.transform, false);
                         newPlayerListItem.transform.localScale = Vector3.one;
                         if (!greyPlayerListItems.Contains(newPlayerListItemScript))
                             greyPlayerListItems.Add(newPlayerListItemScript);
                     }
                     else
                     {
-                        newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                        newPlayerListItem.transform.SetParent(greenContentPanel.transform, false);
                         newPlayerListItem.transform.localScale = Vector3.one;
                         if (!greenPlayerListItems.Contains(newPlayerListItemScript))
                             greenPlayerListItems.Add(newPlayerListItemScript);
@@ -420,7 +420,7 @@ public class LobbyManager : MonoBehaviour
                     if (player.IsGameLeader)
                     {
                         Debug.Log("CreateNewPlayerListItems:  3v3 playerlistitem player is game leader: " + player.PlayerName);
-                        newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                        newPlayerListItem.transform.SetParent(greenContentPanel.transform, false);
                         newPlayerListItem.transform.localScale = Vector3.one;
                         if (!greenPlayerListItems.Contains(newPlayerListItemScript))
                             greenPlayerListItems.Add(newPlayerListItemScript);
@@ -431,7 +431,7 @@ public class LobbyManager : MonoBehaviour
                         if (greenPlayerListItems.Count > greyPlayerListItems.Count)
                         {
                             Debug.Log("CreateNewPlayerListItems:  3v3 playerlistitem more green team member than grey: " + greenPlayerListItems.Count.ToString() + " " + greyPlayerListItems.Count.ToString() + " " + player.PlayerName);
-                            newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                            newPlayerListItem.transform.SetParent(greyContentPanel.transform, false);
                             newPlayerListItem.transform.localScale = Vector3.one;
                             if (!greyPlayerListItems.Contains(newPlayerListItemScript))
                                 greyPlayerListItems.Add(newPlayerListItemScript);
@@ -440,7 +440,7 @@ public class LobbyManager : MonoBehaviour
                         else if (greenPlayerListItems.Count < greyPlayerListItems.Count)
                         {
                             Debug.Log("CreateNewPlayerListItems:  3v3 playerlistitem more grey team member than green: " + greenPlayerListItems.Count.ToString() + " " + greyPlayerListItems.Count.ToString() + " " + player.PlayerName);
-                            newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                            newPlayerListItem.transform.SetParent(greenContentPanel.transform, false);
                             newPlayerListItem.transform.localScale = Vector3.one;
                             if (!greenPlayerListItems.Contains(newPlayerListItemScript))
                                 greenPlayerListItems.Add(newPlayerListItemScript);
@@ -455,7 +455,7 @@ public class LobbyManager : MonoBehaviour
                             string result = headsTails[rng.Next(headsTails.Length)];
                             if (result == "green")
                             {
-                                newPlayerListItem.transform.SetParent(greenContentPanel.transform);
+                                newPlayerListItem.transform.SetParent(greenContentPanel.transform, false);
                                 newPlayerListItem.transform.localScale = Vector3.one;
                                 if (!greenPlayerListItems.Contains(newPlayerListItemScript))
                                     greenPlayerListItems.Add(newPlayerListItemScript);
@@ -463,7 +463,7 @@ public class LobbyManager : MonoBehaviour
                             }
                             else
                             {
-                                newPlayerListItem.transform.SetParent(greyContentPanel.transform);
+                                newPlayerListItem.transform.SetParent(greyContentPanel.transform, false);
                                 newPlayerListItem.transform.localScale = Vector3.one;
                                 if (!greyPlayerListItems.Contains(newPlayerListItemScript))
                                     greyPlayerListItems.Add(newPlayerListItemScript);
@@ -538,7 +538,7 @@ public class LobbyManager : MonoBehaviour
                                     greenPlayerListItems.Remove(playerListItemScript);
                                 if (!greyPlayerListItems.Contains(playerListItemScript))
                                     greyPlayerListItems.Add(playerListItemScript);
-                                playerListItemScript.gameObject.transform.SetParent(greyContentPanel.transform);
+                                playerListItemScript.gameObject.transform.SetParent(greyContentPanel.transform, false);
                                 playerListItemScript.gameObject.transform.localScale = Vector3.one;
                             }
                             else
@@ -547,7 +547,7 @@ public class LobbyManager : MonoBehaviour
                                     greenPlayerListItems.Add(playerListItemScript);
                                 if (greyPlayerListItems.Contains(playerListItemScript))
                                     greyPlayerListItems.Remove(playerListItemScript);
-                                playerListItemScript.gameObject.transform.SetParent(greenContentPanel.transform);
+                                playerListItemScript.gameObject.transform.SetParent(greenContentPanel.transform, false);
                                 playerListItemScript.gameObject.transform.localScale = Vector3.one;
                             }
                             ActivateChangeGoblinButton();
@@ -561,14 +561,14 @@ public class LobbyManager : MonoBehaviour
                         {
                             if (player.isTeamGrey)
                             {
-                                playerListItemScript.gameObject.transform.SetParent(greyContentPanel.transform);
+                                playerListItemScript.gameObject.transform.SetParent(greyContentPanel.transform, false);
                                 playerListItemScript.gameObject.transform.localScale = Vector3.one;
                                 if (!greyPlayerListItems.Contains(playerListItemScript))
                                     greyPlayerListItems.Add(playerListItemScript);
                             }
                             else
                             {
-                                playerListItemScript.gameObject.transform.SetParent(greenContentPanel.transform);
+                                playerListItemScript.gameObject.transform.SetParent(greenContentPanel.transform, false);
                                 playerListItemScript.gameObject.transform.localScale = Vector3.one;
                                 if (!greenPlayerListItems.Contains(playerListItemScript))
                                     greenPlayerListItems.Add(playerListItemScript);

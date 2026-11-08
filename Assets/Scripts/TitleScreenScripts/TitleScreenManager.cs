@@ -564,7 +564,7 @@ public class TitleScreenManager : MonoBehaviour
                             newLobbyListItemScript.SetLobbyItemValues();
 
 
-                            newLobbyListItem.transform.SetParent(ContentPanel.transform);
+                            newLobbyListItem.transform.SetParent(ContentPanel.transform, false);
                             newLobbyListItem.transform.localScale = Vector3.one;
 
                             listOfLobbyListItems.Add(newLobbyListItem);
@@ -585,7 +585,7 @@ public class TitleScreenManager : MonoBehaviour
                         newLobbyListItemScript.SetLobbyItemValues();
 
 
-                        newLobbyListItem.transform.SetParent(ContentPanel.transform);
+                        newLobbyListItem.transform.SetParent(ContentPanel.transform, false);
                         newLobbyListItem.transform.localScale = Vector3.one;
 
                         listOfLobbyListItems.Add(newLobbyListItem);

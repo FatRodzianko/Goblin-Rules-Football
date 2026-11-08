@@ -31,7 +31,7 @@ Material:
     - _BleedLumaKeep: 0.6
     - _BleedTau: 3
     - _Curvature: 10
-    - _FlipY: 1
+    - _FlipY: 0
     - _GlowRadius: 1
     - _GlowStrength: 0.6
     - _GlowThreshold: 0.6

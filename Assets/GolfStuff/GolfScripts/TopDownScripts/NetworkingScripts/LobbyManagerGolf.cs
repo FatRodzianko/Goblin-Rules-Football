@@ -45,7 +45,7 @@ public class LobbyManagerGolf : MonoBehaviour
         GolfPlayerListItem playerListItem = newPlayerListItem.GetComponent<GolfPlayerListItem>();
         if (!_lobbyPlayerListItems.Contains(playerListItem))
             _lobbyPlayerListItems.Add(playerListItem);
-        newPlayerListItem.transform.parent = this._lobbyListContent.transform;
+        newPlayerListItem.transform.SetParent(this._lobbyListContent.transform, false);
         newPlayerListItem.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
     }
     public void RemoveLobbyPlayerListItem(GameObject newPlayerListItem)

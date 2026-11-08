@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 0
   settings:
-    Event: 600
+    Event: 500
     blitMaterial: {fileID: 2100000, guid: 272fe7283c575e24dae332438a2198ff, type: 2}
     blitMaterialPassIndex: 0
     setInverseViewMatrix: 0
