@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 2560
     height: 1357
   m_ShowMode: 4
-  m_Title: Inspector
+  m_Title: Game
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 371}
   m_MaxSize: {x: 10000, y: 10000}
@@ -118,7 +118,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 1
-  controlID: 18603
+  controlID: 84115
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -143,7 +143,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 18604
+  controlID: 84116
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -168,7 +168,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 18639
+  controlID: 84147
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -193,7 +193,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 18640
+  controlID: 84148
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -351,7 +351,7 @@ MonoBehaviour:
   m_ShowGizmos: 0
   m_TargetDisplay: 0
   m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
-  m_TargetSize: {x: 2560, y: 1440}
+  m_TargetSize: {x: 1920, y: 1080}
   m_TextureFilterMode: 0
   m_TextureHideFlags: 61
   m_RenderIMGUI: 1
@@ -360,16 +360,16 @@ MonoBehaviour:
   m_VSyncEnabled: 0
   m_Gizmos: 0
   m_Stats: 0
-  m_SelectedSizes: 0a000000000000000000000000000000000000000000000000000000000000000000000000000000
+  m_SelectedSizes: 09000000000000000000000000000000000000000000000000000000000000000000000000000000
   m_ZoomArea:
     m_HRangeLocked: 0
     m_VRangeLocked: 0
     hZoomLockedByDefault: 0
     vZoomLockedByDefault: 0
-    m_HBaseRangeMin: -1280
-    m_HBaseRangeMax: 1280
-    m_VBaseRangeMin: -720
-    m_VBaseRangeMax: 720
+    m_HBaseRangeMin: -960
+    m_HBaseRangeMax: 960
+    m_VBaseRangeMin: -540
+    m_VBaseRangeMax: 540
     m_HAllowExceedBaseRangeMin: 1
     m_HAllowExceedBaseRangeMax: 1
     m_VAllowExceedBaseRangeMin: 1
@@ -389,7 +389,7 @@ MonoBehaviour:
       y: 21
       width: 1590
       height: 879
-    m_Scale: {x: 0.61041665, y: 0.61041665}
+    m_Scale: {x: 0.8138889, y: 0.8138889}
     m_Translation: {x: 795, y: 439.5}
     m_MarginLeft: 0
     m_MarginRight: 0
@@ -397,12 +397,12 @@ MonoBehaviour:
     m_MarginBottom: 0
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
-      x: -1302.3892
-      y: -720
-      width: 2604.7783
-      height: 1440
+      x: -976.7918
+      y: -540
+      width: 1953.5836
+      height: 1080
     m_MinimalGUI: 1
-  m_defaultScale: 0.61041665
+  m_defaultScale: 0.8138889
   m_LastWindowPixelSize: {x: 1590, y: 900}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
@@ -441,9 +441,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 5087f9ff
+      m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 7e7ef9ff0c9ff9ff909ff9ffdaa5f9fff2a5f9ff70a9f9ffdca9f9ff82aaf9ff96aaf9ff24bef9ffc0d1f9ffe2d8f9ff62d9f9ff38e4f9ff52e4f9ff00e8f9ff80e8f9ff64e9f9ff7ae9f9ff08fdf9ff3211faff8825faff4226faff4e3afaffe03afaffec4efaff004ffaff6a76faffe876faffbc81faffd481faff8085faff0086faffe086fafff886faff869afaff8caefaffc6c4faff50dbfaffacdbfaffbef3faff80f4faffdcf5faff5cf6faff3601fbff4e01fbfffc04fbff7c05fbff6006fbff7806fbff061afbffda44fbff5648fbff6848fbffe64bfbfff04ffbff0a50fbffa050fbff6c62fbff3469fbffb26cfbffc86cfbff326dfbffd66dfbffe86dfbff7481fbff6098fbff649cfbffec9cfbffda9dfbff029ffbff969ffbffa6b3fbff82b4fbff0ec8fbff44cbfbffd0defbff02e2fbff8ef5fbffe6f6fbffcaf8fbffe0f9fbff56fbfbffc2fcfbff44fdfbff2608fcff4608fcfffa0bfcff7e0cfcff660dfcff820dfcff1621fcfff649fcff4050fcffc253fcffe053fcff4e54fcfff654fcff0c55fcff9c68fcffca69fcff1e80fcff1287fcff1a8bfcffa68bfcff988cfcffc48dfcff5c8efcff70a2fcff84b6fcff58bdfcffdec0fcff00c1fcff72c1fcff8cc1fcff20d5fcff5ed6fcff7a7ffdffa280fdffe686fdff628afdffda9efdff5ca0fdffe4a3fdff28a5fdff6ea6fdffb2a7fdfff8a8fdff3eaafdff04c8fdff86e4fdffa0ebfdffdaecfdffaaf3fdff26f7fdff3ef7fdffa6f7fdff48f8fdff58f8fdffe20bfeffcc2ffeff4e31feff2060feffe670feff6871feff447cfeff5e7cfeff0c80feff8a80feff2e81feff4481feff2c95feffdc97feff02d7feff62d8feff44e3feff88f5feff9cf5feff0cf7feff500effffe20fffff5e11ffff5c13ffffc616fffff819ffff5222ffff6036ffff603cfffff041ffff3c43ffffc846ffffae4effff2655ffff526effff2e82ffffd283fffffc99ffff7a9affff54a5ffff6ea5ffff1ca9ffff9aa9ffff7eaaffff94aaffff22beffffc8f8ffff00fbfffff4fffffff8e602002e52030084530300305d04007e5d04001c600400126404007eaf08002c7d0f004c7d0f00567e0f00627e0f001430100054301000c4311000c8171300c42913001e4413009c461300524e13003a4f1300ac241400ca28140082311400a8361400ce371400823f14000251140080531400045b14001e5c1400
+      m_ExpandedIDs: 428cf4ffc08cf4ff9e97f4ffb897f4ff829bf4ff029cf4ffe69cf4fffc9cf4ff8eb0f4ffe402f5ffb41cf5ff6435f5ff8269f5ffd879f5ffa69ef5ff4cb8f5ff28c4f5ff6237f6ffe037f6ff523ef6ff723ef6ff0442f6ff7442f6ff1e43f6ff3643f6ffcc56f6ff6697f6ffe497f6ffc0a2f6ffdaa2f6ff9ca6f6ff1ca7f6ff00a8f6ff16a8f6ffa8bbf6ffbce2f6ff82e9f6fffa02f7ffe41af7fffa2ef7ff102ff7ff3c36f7ffae4ff7ff6080f7ff5682f7ff1483f7fffc88f7ffb8abf7ff10acf7ff26acf7ff76acf7ff3eb3f7ff76def7ff1ee5f7ff3ce5f7fffef2f7ffa804f8ffbe04f8fff204f8ffea0bf8ff3245f8ff4c55f8fff655f8ff2672f8ff328ff8ff488ff8ff7496f8ff14d7f8ffd2dbf8ff780ef9ff241cf9ffd24ef9ffc46cf9ffeecaf9ff42ccf9ffcae1f9ffeae4f9ff00e5f9ff08e5f9ff204dfefff25efeffaa5ffeff3a6bfeff348dfeff1e8ffeff9491feff9c91feffa691feffac91feffea94feff2eaffeffe0c0feffe8c0feff52dcfeff96f0feff4c51ffff2a56ffffa856ffff7e61ffff9861ffff4665ffffc665ffffaa66ffffc066ffff507affff7a8effff62c9ffff06caffff2acbffff16ccffff5ed2ffffdcd5ffff82d6ffff96d6ffff00fbffffaafc020012fe0200a0ff02007e0003003c010300ca010300300203003c04030076040300100603003e0a0300e80a0300420b03005c0b0300ae0d0300e40f03000e1003002a10030034110300ea160300321703007c170300e8180300261a0300801a0300ae1b0300141c03002a1c0300321d0300fe1f03008a200300b6200300da2003000c210300422403005a260300c2270300682a0300e62c0300462e03006a3403009c34030084350300b4350300287003003e710300767c0400c67e0400e0800400769e0400940805008c0c0500280d0500b40f0500ca10050082110500be120500e6120500241305002e1305001020050050200500542105008ec6090092c6090068c709007ac8090088c809004e4a0a00644a0a00c8bc0a00debc0a0078620b0042a10b0058a10b001ea60b0034a60b00dc4f0c00f24f0c00b48e0c00ca8e0c006cce0c0082ce0c0054d30c00444b0d00144f0d001abe0d0098c01000082d1100e22d1100482e1100622e1100ba2e1100d02e110004311100de311100443211005e321100b6321100529c1100ac9d1100049e11001a9e1100280712006808120082081200da081200f0081200
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -554,7 +554,7 @@ MonoBehaviour:
       containerId: overlay-toolbar__top
       floating: 0
       collapsed: 0
-      displayed: 0
+      displayed: 1
       snapOffset: {x: 0, y: 25}
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
@@ -726,9 +726,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -0.66126627, y: 1.1703, z: 23.578571}
+    m_Target: {x: 960, y: 1030, z: 0}
     speed: 2
-    m_Value: {x: -0.66126627, y: 1.1703, z: 23.578571}
+    m_Value: {x: 960, y: 1030, z: 0}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -779,9 +779,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 13.307934
+    m_Target: 103.28427
     speed: 2
-    m_Value: 13.307934
+    m_Value: 103.28427
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -11722,23 +11722,23 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Fonts
+    - Assets/Scenes
     m_Globs: []
     m_OriginalText: 
     m_FilterByTypeIntersection: 0
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Fonts
+  - Assets/Scenes
   m_LastFoldersGridSize: 16
   m_LastProjectPath: C:\Users\murph\Desktop\Unity-gamedev-stuff\Goblin-Rules-Football\Goblin-Rules-Football\Goblin-Rules-Football
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 155}
-    m_SelectedIDs: 58ad0000
-    m_LastClickedID: 44376
-    m_ExpandedIDs: 00000000d0ac0000d2ac0000d4ac0000d6ac0000d8ac0000daac0000dcac0000deac0000e0ac0000e2ac0000e4ac0000e6ac0000e8ac0000eaac0000ecac0000eeac0000f0ac0000f2ac0000f4ac0000f6ac0000f8ac0000faac0000fcac0000feac000000ad000002ad000004ad000006ad000008ad00000aad00000cad00000ead000010ad000012ad000014ad000016ad000018ad00001aad00001cad00001ead000020ad000022ad000024ad000026ad000028ad00002aad00002cad00002ead000030ad000032ad000034ad000036ad000038ad00003aad00003cad00003ead00005aad000000ca9a3b
+    scrollPos: {x: 0, y: 791}
+    m_SelectedIDs: 0aca0000
+    m_LastClickedID: 51722
+    m_ExpandedIDs: 0000000018c900001ac900001cc900001ec9000020c9000022c9000024c9000026c9000028c900002ac900002cc900002ec9000030c9000032c9000034c9000036c9000038c900003ac900003cc900003ec9000040c9000042c9000044c9000046c9000048c900004ac900004cc900004ec9000050c9000052c9000054c9000056c9000058c900005ac900005cc900005ec9000060c9000062c9000064c9000066c9000068c900006ac900006cc900006ec9000070c9000072c9000074c9000076c9000078c900007ac900007cc900007ec9000080c9000082c9000084c9000086c9000088c900000aca000020ca000022ca0000d4c1010000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -11766,7 +11766,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000d0ac0000d2ac0000d4ac0000d6ac0000d8ac0000daac0000dcac0000deac0000e0ac0000e2ac0000e4ac0000e6ac0000e8ac0000eaac0000ecac0000eeac0000f0ac0000f2ac0000f4ac0000f6ac0000f8ac0000faac0000fcac0000feac000000ad000002ad000004ad000006ad000008ad00000aad00000cad00000ead000010ad000012ad000014ad000016ad000018ad00001aad00001cad00001ead000020ad000022ad000024ad000026ad000028ad00002aad00002cad00002ead000030ad000032ad000034ad000036ad000038ad00003aad00003cad00003ead00005aad000000ca9a3b
+    m_ExpandedIDs: 0000000018c900001ac900001cc900001ec9000020c9000022c9000024c9000026c9000028c900002ac900002cc900002ec9000030c9000032c9000034c9000036c9000038c900003ac900003cc900003ec9000040c9000042c9000044c9000046c9000048c900004ac900004cc900004ec9000050c9000052c9000054c9000056c9000058c900005ac900005cc900005ec9000060c9000062c9000064c9000066c9000068c900006ac900006cc900006ec9000070c9000072c9000074c9000076c9000078c900007ac900007cc900007ec9000080c9000082c9000084c9000086c9000088c900000aca000020ca000022ca0000d4c1010000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -11793,7 +11793,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000fac30000ce740000887f0000b6c40000f6bc00006ccd0000a68f0000da8f0000126b000094710000746b000042d40000026c0000006c0000686b00006c670000be6c0000c06c0000a2f100004af00000266f0000c0870000dcfd0000b698000080830000e66e0000446f0000548b0000e07a0000127b0000da4301001af3000078c900007aca0000146e00007cc9000030ca0000a2ca000028cb000044cb00000a72000006760000047600000e7600001076000076ce0000bcd7000024d90000bc7a00003a760000387600009694000088b50000ae7a0000fed2000064aa0000567600004e76000052760000d86e0000ae74000080cd00005a5c01003e8e0000208f0000a47b0000dc7b00009e8f0000ba810000369c0000309c00009c460000649b00004ac800001cca00001e62010072bd0000e4880400e0180100f4890000a6a9000048aa000054810000c8790000d07b0000607900005ec400009c5001005cae0100f47c0000be7e00002eea000060370100ea770000ec770000d27900001afe0000aa980000da7a000040d3000048a400009e0d0100127c0000105c0100ee7a00001c7b0000527c00003a7b0000e8370000d6be0000ee370000de7800004a7b0000d06d0000be790000b8790000cc790000ba7c0000c8240100d4790000b6f6000020430100ee420100e4420100acbb00000000000032380000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -13064,8 +13064,8 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_ActionMapsTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: dd1fb545
-    m_LastClickedID: 1169498077
+    m_SelectedIDs: 67c988f4
+    m_LastClickedID: -192362137
     m_ExpandedIDs: 00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -13086,9 +13086,9 @@ MonoBehaviour:
     m_SearchString: 
   m_ActionsTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: a14be535
-    m_LastClickedID: 904219553
-    m_ExpandedIDs: 02544eac0956d5b15f2469cb742093dca9c8faecf678a3f0f8e135f1934537f7beae000008a3c904123eca0836bb0d096ff80911ee6f041c0dc9a42094d336213d3cf7238dc07242dd1fb54509877d478d205c4ae19fd65728f2265f92c7b262da97c5722ca7467b
+    m_SelectedIDs: 11eb8b2a
+    m_LastClickedID: 713812753
+    m_ExpandedIDs: fadcd784843442898e28d89c0956d5b15f2469cba9c8faecf678a3f067c988f4c6cd25f6beae000008a3c90436bb0d096ff80911ee6f041c0dc9a42094d336218dc07242dd1fb54509877d478d205c4a92c7b262
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -13125,8 +13125,8 @@ MonoBehaviour:
         selectedIndex: 0
         scroll: {x: 0, y: 0}
       - itemId: 1275948795
-        selectedIndex: 2
-        scroll: {x: 0, y: 63.5}
+        selectedIndex: 10
+        scroll: {x: 0, y: 0}
       - itemId: -1184024587
         selectedIndex: -1
         scroll: {x: 0, y: 0}
@@ -13134,6 +13134,12 @@ MonoBehaviour:
         selectedIndex: -1
         scroll: {x: 0, y: 0}
       - itemId: -654788001
+        selectedIndex: -1
+        scroll: {x: 0, y: 0}
+      - itemId: 998472819
+        selectedIndex: -1
+        scroll: {x: 0, y: 0}
+      - itemId: -2053868959
         selectedIndex: -1
         scroll: {x: 0, y: 0}
     m_ManualPathEditMode: 0
@@ -13792,11 +13798,41 @@ MonoBehaviour:
       \"path\": \"<Gamepad>/start\",\n                    \"interactions\": \"\",\n                   
       \"processors\": \"\",\n                    \"groups\": \"GamePad\",\n                   
       \"action\": \"EscMenu\",\n                    \"isComposite\": false,\n                   
-      \"isPartOfComposite\": false\n                }\n            ]\n        }\n   
-      ],\n    \"controlSchemes\": [\n        {\n            \"name\": \"GamePad\",\n           
-      \"bindingGroup\": \"GamePad\",\n            \"devices\": []\n        },\n       
-      {\n            \"name\": \"Keyboard and Mouse\",\n            \"bindingGroup\":
-      \"Keyboard and Mouse\",\n            \"devices\": []\n        }\n    ]\n}"
+      \"isPartOfComposite\": false\n                }\n            ]\n        },\n       
+      {\n            \"name\": \"DropInControls\",\n            \"id\": \"e5a42899-2166-46cb-9baf-148e036ff3d9\",\n           
+      \"actions\": [\n                {\n                    \"name\": \"ResetToTee\",\n                   
+      \"type\": \"Button\",\n                    \"id\": \"2446b2c7-6077-4636-8f0b-bbd0f914ee44\",\n                   
+      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
+      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
+      },\n                {\n                    \"name\": \"UndoShot\",\n                   
+      \"type\": \"Button\",\n                    \"id\": \"fa701279-974d-4a9a-9578-fa582fd5c874\",\n                   
+      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
+      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
+      },\n                {\n                    \"name\": \"ToggleBallPlacement\",\n                   
+      \"type\": \"Button\",\n                    \"id\": \"ebf1336a-685f-4e11-8f96-11533ef9b37f\",\n                   
+      \"expectedControlType\": \"Button\",\n                    \"processors\": \"\",\n                   
+      \"interactions\": \"\",\n                    \"initialStateCheck\": false\n               
+      }\n            ],\n            \"bindings\": [\n                {\n                   
+      \"name\": \"\",\n                    \"id\": \"591cf399-0b2f-42dc-bed9-b88568e33609\",\n                   
+      \"path\": \"<Keyboard>/f5\",\n                    \"interactions\": \"\",\n                   
+      \"processors\": \"\",\n                    \"groups\": \"Keyboard and Mouse\",\n                   
+      \"action\": \"ResetToTee\",\n                    \"isComposite\": false,\n                   
+      \"isPartOfComposite\": false\n                },\n                {\n                   
+      \"name\": \"\",\n                    \"id\": \"43a05435-1ea8-4b43-b395-0d28d64c3bab\",\n                   
+      \"path\": \"<Keyboard>/f6\",\n                    \"interactions\": \"\",\n                   
+      \"processors\": \"\",\n                    \"groups\": \"Keyboard and Mouse\",\n                   
+      \"action\": \"UndoShot\",\n                    \"isComposite\": false,\n                   
+      \"isPartOfComposite\": false\n                },\n                {\n                   
+      \"name\": \"\",\n                    \"id\": \"73364a47-04fd-401b-a076-e86c0bd34e75\",\n                   
+      \"path\": \"<Keyboard>/f7\",\n                    \"interactions\": \"\",\n                   
+      \"processors\": \"\",\n                    \"groups\": \"Keyboard and Mouse\",\n                   
+      \"action\": \"ToggleBallPlacement\",\n                    \"isComposite\":
+      false,\n                    \"isPartOfComposite\": false\n                }\n           
+      ]\n        }\n    ],\n    \"controlSchemes\": [\n        {\n            \"name\":
+      \"GamePad\",\n            \"bindingGroup\": \"GamePad\",\n            \"devices\":
+      []\n        },\n        {\n            \"name\": \"Keyboard and Mouse\",\n           
+      \"bindingGroup\": \"Keyboard and Mouse\",\n            \"devices\": []\n       
+      }\n    ]\n}"
     m_IsDirty: 0
   m_Toolbar:
     m_IsDirty: 0
@@ -14731,7 +14767,7 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 1334326
+  m_LastSelectedObjectID: 1097902
 --- !u!114 &31
 MonoBehaviour:
   m_ObjectHideFlags: 52

@@ -60,7 +60,37 @@ public class InputManagerGolf : MonoBehaviour
         if (GamepadUIManager.instance != null && GamepadUIManager.instance.gamepadUI)
             bindingGroup = "GamePad";
 
-        return action.GetBindingDisplayString(group: bindingGroup);
+        string displayString = action.GetBindingDisplayString(group: bindingGroup);
+        if (!string.IsNullOrEmpty(displayString))
+            return displayString;
+
+        return CompositePartNames(action, bindingGroup);
+    }
+    // A composite such as the WASD aim has no display string of its own once a binding group is asked
+    // for, so its parts are read one at a time and joined in the order they read on screen.
+    static string CompositePartNames(InputAction action, string bindingGroup)
+    {
+        string[] partOrder = { "up", "left", "down", "right" };
+        List<string> partNames = new List<string>();
+
+        foreach (string partName in partOrder)
+        {
+            for (int i = 0; i < action.bindings.Count; i++)
+            {
+                InputBinding binding = action.bindings[i];
+                if (!binding.isPartOfComposite)
+                    continue;
+                if (binding.name != partName)
+                    continue;
+                if (string.IsNullOrEmpty(binding.groups) || !binding.groups.Contains(bindingGroup))
+                    continue;
+
+                partNames.Add(InputControlPath.ToHumanReadableString(binding.effectivePath, InputControlPath.HumanReadableStringOptions.OmitDevice));
+                break;
+            }
+        }
+
+        return string.Join("/", partNames);
     }
     // Add a "disable" to an action map by making its int value +1
     public static void Add(string mapName)

@@ -32,7 +32,9 @@ public class LobbyManagerGolf : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _lobbyPlayersPanel.SetActive(true);
+        // A drop-in goes straight into a hole with no lobby step, so showing the list here would only
+        // put it on screen until the player spawns and HideUIStuff runs.
+        _lobbyPlayersPanel.SetActive(!MapMakerDropInSession.IsActive);
     }
 
     // Update is called once per frame

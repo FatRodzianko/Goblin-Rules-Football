@@ -2502,6 +2502,7 @@ GameObject:
   m_Component:
   - component: {fileID: 107069269644790584}
   - component: {fileID: 6143583604513910543}
+  - component: {fileID: 9126464491552066551}
   m_Layer: 25
   m_Name: hit-meter-background
   m_TagString: Untagged
@@ -2580,6 +2581,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &9126464491552066551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7163028177395403728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84f95fddfb322604bbb52f7619a2002d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7480688039904862262
 GameObject:
   m_ObjectHideFlags: 0
