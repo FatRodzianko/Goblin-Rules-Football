@@ -1,27 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class SpinIcon : MonoBehaviour
+// The spin selector on the player's canvas. The player owns the spin value; this turns a pointer
+// position or an arrow-key nudge into a normalised -1..1 vector and hands that over, so nothing
+// outside this script needs to know how big the icon is.
+//
+// Pointer input goes through the canvas raycaster rather than a collider. ScreenPointToLocalPointInRectangle
+// with the event's own camera is correct both for Screen Space - Overlay and for the Screen Space -
+// Camera the CRT presenter converts canvases to at runtime.
+public class SpinIcon : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerClickHandler
 {
     [SerializeField] GolfPlayerTopDown _myPlayer;
-    [SerializeField] GameObject _selectionIconObject;
-    [SerializeField] CircleCollider2D _myCollider;
-    [SerializeField] LayerMask _spinIconLayerMask;
+    [SerializeField] RectTransform _myRect;
+    [SerializeField] RectTransform _selectionIcon;
+
+    // How close to the edge of the icon the selection dot may get, in canvas pixels.
+    [SerializeField] float _edgeMargin = 2f;
     public float _maxDistanceFromCenter;
 
     [Header("Icon Movement Stuff")]
-    [SerializeField] float _moveRate = 2f;
+    [SerializeField] float _moveRate = 32f;
     [SerializeField] Vector2 _moveSpinDirection = Vector2.zero;
     [SerializeField] bool _moveIcon = false;
 
-    // Start is called before the first frame update
     void Start()
     {
-        _maxDistanceFromCenter = _myCollider.radius - (_myPlayer.MyBall.pixelUnit * 2f);
-    }
+        if (!_myRect)
+            _myRect = transform as RectTransform;
 
-    // Update is called once per frame
+        _maxDistanceFromCenter = (_myRect.rect.width * 0.5f) - _edgeMargin;
+    }
     void Update()
     {
         if (!_moveIcon)
@@ -34,73 +42,71 @@ public class SpinIcon : MonoBehaviour
     }
     void MoveSpinIcon()
     {
-        _selectionIconObject.transform.localPosition = Vector2.ClampMagnitude(((Vector2)_selectionIconObject.transform.localPosition + _moveSpinDirection * _moveRate * Time.deltaTime), _maxDistanceFromCenter);
-        _myPlayer.UpdateHitSpinForPlayer(AdjustVectorForSpin(_selectionIconObject.transform.localPosition));
+        SetSpinFromPoint(_selectionIcon.anchoredPosition + _moveSpinDirection * _moveRate * Time.deltaTime);
     }
-    private void OnMouseDown()
+    public void OnPointerDown(PointerEventData eventData)
     {
-        if (!_myPlayer.IsOwner)
+        if (eventData.button != PointerEventData.InputButton.Left)
             return;
-        if (_myPlayer.DirectionAndDistanceChosen)
-            return;
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        _selectionIconObject.transform.position = new Vector3(mousePos.x, mousePos.y, 0f);
-        _myPlayer.UpdateHitSpinForPlayer(AdjustVectorForSpin(_selectionIconObject.transform.localPosition));
+
+        SetSpinFromPointer(eventData);
     }
-    private void OnMouseDrag()
+    public void OnDrag(PointerEventData eventData)
     {
-        if (!_myPlayer.IsOwner)
+        if (eventData.button != PointerEventData.InputButton.Left)
             return;
-        if (_myPlayer.DirectionAndDistanceChosen)
-            return;
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        if (Vector2.Distance(mousePos, this.transform.position) < _maxDistanceFromCenter)
-        {
-            _selectionIconObject.transform.position = new Vector3(mousePos.x, mousePos.y, 0f);
-        }
-        else
-        {
-            Vector2 startPos = this.transform.position;
-            Vector2 dir = ((Vector2)mousePos - startPos).normalized;
-            Vector2 endPos = startPos + dir * _maxDistanceFromCenter;
-            _selectionIconObject.transform.position = new Vector3(endPos.x, endPos.y, 0f);
-        }
-
-
-        _myPlayer.UpdateHitSpinForPlayer(AdjustVectorForSpin(_selectionIconObject.transform.localPosition));
-        
+        SetSpinFromPointer(eventData);
     }
-    private void OnMouseOver()
+    public void OnPointerClick(PointerEventData eventData)
     {
+        if (eventData.button != PointerEventData.InputButton.Right)
+            return;
+        if (!CanPlayerSetSpin())
+            return;
+
+        ResetIconPosition();
+    }
+    void SetSpinFromPointer(PointerEventData eventData)
+    {
+        if (!CanPlayerSetSpin())
+            return;
+
+        Vector2 pointInIcon;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(_myRect, eventData.position, eventData.pressEventCamera, out pointInIcon))
+            return;
+
+        SetSpinFromPoint(pointInIcon);
+    }
+    void SetSpinFromPoint(Vector2 pointInIcon)
+    {
+        Vector2 clamped = Vector2.ClampMagnitude(pointInIcon, _maxDistanceFromCenter);
+        _selectionIcon.anchoredPosition = clamped;
+        _myPlayer.UpdateHitSpinForPlayer(AdjustVectorForSpin(clamped));
+    }
+    bool CanPlayerSetSpin()
+    {
+        if (!_myPlayer)
+            return false;
         if (!_myPlayer.IsOwner)
-            return;
-        if (_myPlayer.DirectionAndDistanceChosen)
-            return;
-        if (Input.GetMouseButtonDown(1))
-            ResetIconPosition();
+            return false;
+
+        return !_myPlayer.DirectionAndDistanceChosen;
     }
     public void ResetIconPosition()
     {
-        _selectionIconObject.transform.localPosition = Vector2.zero;
-        _myPlayer.UpdateHitSpinForPlayer(AdjustVectorForSpin(_selectionIconObject.transform.localPosition));
+        _selectionIcon.anchoredPosition = Vector2.zero;
+        _myPlayer.UpdateHitSpinForPlayer(Vector2.zero);
     }
     Vector2 AdjustVectorForSpin(Vector2 newSpin)
     {
-        Vector2 spin = Vector2.zero;
-        if (newSpin.y != 0f)
-        {
-            spin.y = newSpin.y / _maxDistanceFromCenter;
-        }
-        if (newSpin.x != 0f)
-        {
-            spin.x = newSpin.x / _maxDistanceFromCenter;
-        }
-        return spin;
+        if (_maxDistanceFromCenter <= 0f)
+            return Vector2.zero;
+
+        return newSpin / _maxDistanceFromCenter;
     }
     public void UpdateSpinDirection(Vector2 dir)
     {
-        
         _moveSpinDirection = dir;
         _moveIcon = true;
     }
@@ -109,5 +115,4 @@ public class SpinIcon : MonoBehaviour
         _moveSpinDirection = Vector2.zero;
         _moveIcon = false;
     }
-
 }

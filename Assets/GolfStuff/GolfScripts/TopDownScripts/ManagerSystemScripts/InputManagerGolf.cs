@@ -49,6 +49,19 @@ public class InputManagerGolf : MonoBehaviour
     {
         
     }
+    // The name of the key or button an action is actually bound to, for showing in UI. The display string
+    // comes from the effective binding, so rebinds saved in PlayerPrefs and loaded above are included.
+    public static string GetBindingName(InputAction action)
+    {
+        if (action == null)
+            return string.Empty;
+
+        string bindingGroup = "Keyboard and Mouse";
+        if (GamepadUIManager.instance != null && GamepadUIManager.instance.gamepadUI)
+            bindingGroup = "GamePad";
+
+        return action.GetBindingDisplayString(group: bindingGroup);
+    }
     // Add a "disable" to an action map by making its int value +1
     public static void Add(string mapName)
     {

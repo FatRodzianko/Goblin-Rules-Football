@@ -158,11 +158,15 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
     [Header("Club Selection UI Stuff")]
     [SerializeField] GameObject _clubSelectionHolder;
-    [SerializeField] SpriteRenderer _selectedClubTextImage;
-    [SerializeField] SpriteRenderer _selectedClubImage;
-    [SerializeField] SpriteRenderer _puttDistanceTextImage;
+    [SerializeField] Image _selectedClubTextImage;
+    [SerializeField] Image _selectedClubImage;
+    [SerializeField] Image _puttDistanceTextImage;
+    [SerializeField] ClubSwitchIndicator _clubSwitchIndicator;
     [SerializeField] Sprite _shortPuttTextImage;
     [SerializeField] Sprite _longPuttTextImage;
+    // Which putt length is selected. Held here rather than read back off the sprite on screen, so
+    // the UI stays a view of this and never the place the answer lives.
+    bool _isShortPutt = false;
 
     [Header("Power Ups")]
     private readonly SyncVar<bool> _syncHasPowerUp = new SyncVar<bool>();
@@ -253,6 +257,14 @@ public class GolfPlayerTopDown : NetworkBehaviour
             cameraFollowScript = _vCam.GetComponent<CameraFollowScript>();        
         if (!_cameraViewHole)
             _cameraViewHole = _vCam.GetComponent<CameraViewHole>();*/
+
+        if (_clubSwitchIndicator)
+            _clubSwitchIndicator.SwitchRequested += HandleClubSwitchRequested;
+    }
+    private void OnDestroy()
+    {
+        if (_clubSwitchIndicator)
+            _clubSwitchIndicator.SwitchRequested -= HandleClubSwitchRequested;
     }
     public override void OnStartServer()
     {
@@ -333,18 +345,18 @@ public class GolfPlayerTopDown : NetworkBehaviour
             Debug.Log("SyncIsGameLeader: as client");
             if (!base.IsOwner)
             {
-                EnablePlayerCanvas(false);
+                EnablePlayerMessage(false);
                 _startGameButton.SetActive(false);
                 return;
             }
             if (next)
             {
-                //EnablePlayerCanvas(true);
+                //EnablePlayerMessage(true);
                 //_startGameButton.SetActive(true);
             }
             else
             {
-                EnablePlayerCanvas(false);
+                EnablePlayerMessage(false);
                 _startGameButton.SetActive(false);
             }
         }
@@ -519,7 +531,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && !this.PlayerMulligan)
                 {
                     //Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " will start their turn after pressing space! Time: " + Time.time);
-                    //this.EnablePlayerCanvas(false);
+                    //this.EnablePlayerMessage(false);
                     //// Begin old way of starting turn
                     ////GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
                     //// End old way of starting turn
@@ -533,7 +545,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             //if (GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Space))
             //{
             //    Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " will start their turn after pressing space! Time: " + Time.time);
-            //    this.EnablePlayerCanvas(false);
+            //    this.EnablePlayerMessage(false);
             //    // Begin old way of starting turn
             //    //GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
             //    // End old way of starting turn
@@ -543,7 +555,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             else if (PromptedForLightning && GameplayManagerTopDownGolf.instance.CurrentPlayer == this && Input.GetKeyDown(KeyCode.Backspace))
             {
                 //Debug.Log("GolfPlayerTopDown: Player: " + this.PlayerName + " is skipping their turn due to lightning. At time of: " + Time.time.ToString() + " and last skip was: " + GameplayManagerTopDownGolf.instance.TimeSinceLastSkip.ToString());
-                //this.EnablePlayerCanvas(false);
+                //this.EnablePlayerMessage(false);
                 //PlayerScore.StrokePenalty(1);
                 ////GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(MyBall, true);
                 //MyBall.CmdTellServerToStartNexPlayersTurn(true);
@@ -569,8 +581,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 //_golfAnimator.ResetGolfAnimator();
                 //EnablePlayerSprite(false);
                 //CmdDisableSpriteForLightningStrike();
-                //this.EnablePlayerCanvas(false);
-                //CmdEnablePlayerCanvasForOtherClients(false);
+                //this.EnablePlayerMessage(false);
+                //CmdEnablePlayerMessageForOtherClients(false);
                 ////this.IsPlayersTurn = false;
                 //CmdEndPlayersTurn();
 
@@ -1108,8 +1120,20 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void ActivateHitUIObjects(bool enable)
     {
         _hitMeterObject.SetActive(enable);
-        _spinIcon.gameObject.SetActive(enable);
         _clubSelectionHolder.SetActive(enable);
+
+        // Spin is only ever set by the owner, so another machine would show a dot frozen at the
+        // centre. Leaving it off also keeps its raycast target from swallowing that player's clicks.
+        _spinIcon.gameObject.SetActive(enable && this.IsOwner);
+
+        if (!_clubSwitchIndicator)
+            return;
+
+        // Other machines show this player's club, but only the owner can switch it.
+        bool showIndicator = enable && this.IsOwner;
+        _clubSwitchIndicator.gameObject.SetActive(showIndicator);
+        if (showIndicator)
+            _clubSwitchIndicator.RefreshBinding();
     }
     void GetHitStatsFromClub()
     {
@@ -1722,20 +1746,22 @@ public class GolfPlayerTopDown : NetworkBehaviour
             }
         }
     }
-    void ChangeCurrentClub()
+    // direction is +1 for the next club in the bag and -1 for the previous one. The key and the down
+    // arrow both ask for +1; only the up arrow asks for -1.
+    void ChangeCurrentClub(int direction)
     {
         // Make sure the ground material for the ball is up-to-date so you select the right clubS? May only be necessary for testing right now...
         UpdateBallGroundMaterial();
 
-        int oldIndex = _currentClubIndex;
-        _currentClubIndex++;
-
-        if (_currentClubIndex >= _myClubs.Length)
-            _currentClubIndex = 0;
-        if (!CanClubBeUsedOnCurrentGround(_myClubs[_currentClubIndex]))
+        if (!IsAnotherClubUsable())
         {
-            _currentClubIndex = GetFirstClubThatCanHitOnThisGround();
+            if (_clubSwitchIndicator)
+                _clubSwitchIndicator.FlashRefused();
+            return;
         }
+
+        int oldIndex = _currentClubIndex;
+        _currentClubIndex = NextUsableClubIndex(_currentClubIndex, direction);
         // Play the change club sound if the clubs will be different
         if (CurrentClub != _myClubs[_currentClubIndex])
         {
@@ -1768,6 +1794,10 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         _selectedClubTextImage.sprite = club.ClubTextSprite;
         _selectedClubImage.sprite = club.ClubImageSprite;
+
+        // An Image with no sprite draws a solid white box, so they stay off until there is art to show.
+        _selectedClubTextImage.enabled = _selectedClubTextImage.sprite != null;
+        _selectedClubImage.enabled = _selectedClubImage.sprite != null;
     }
     void GetNewClubAttributes(ClubTopDown club)
     {
@@ -1838,6 +1868,20 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         MyBall.UpdateGroundMaterial();
     }
+    // Whether a switch would actually reach a different club. A sand trap allows only the wedge, mini golf
+    // only the putter and a tee off challenge only its own type, so on those the switch has nowhere to go.
+    bool IsAnotherClubUsable()
+    {
+        for (int i = 0; i < _myClubs.Length; i++)
+        {
+            if (_myClubs[i] == CurrentClub)
+                continue;
+            if (CanClubBeUsedOnCurrentGround(_myClubs[i]))
+                return true;
+        }
+
+        return false;
+    }
     bool CanClubBeUsedOnCurrentGround(ClubTopDown club)
     {
         if (GameplayManagerTopDownGolf.instance.CurrentHoleInCourse.IsMiniGolf)
@@ -1863,6 +1907,29 @@ public class GolfPlayerTopDown : NetworkBehaviour
                 return false;
         }
         return true;
+    }
+    // Walks the bag the way the player asked until a club suits the ground, so one the ground forbids
+    // is stepped over rather than bounced off. Searching from index 0 instead sends every skip to the
+    // same club whichever way the player was going, which strands them on it. IsAnotherClubUsable has
+    // already established that a usable club exists.
+    int NextUsableClubIndex(int fromIndex, int direction)
+    {
+        int step = direction < 0 ? -1 : 1;
+        int index = fromIndex;
+
+        for (int i = 0; i < _myClubs.Length; i++)
+        {
+            index += step;
+            if (index >= _myClubs.Length)
+                index = 0;
+            else if (index < 0)
+                index = _myClubs.Length - 1;
+
+            if (CanClubBeUsedOnCurrentGround(_myClubs[index]))
+                return index;
+        }
+
+        return fromIndex;
     }
     int GetFirstClubThatCanHitOnThisGround()
     {
@@ -1968,17 +2035,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         AttachUIToNewParent(this.transform);
     }
+    // Only the world-space pieces move between the camera and the player. The club selection and the
+    // spin icon live on the player's canvas and must never be reparented, or they leave the canvas.
     void AttachUIToNewParent(Transform newParent)
     {
         Vector3 localTransformPosition = _hitMeterObject.transform.localPosition;
         _hitMeterObject.transform.parent = newParent;
         _hitMeterObject.transform.localPosition = localTransformPosition;
-        localTransformPosition = _spinIcon.transform.localPosition;
-        _spinIcon.transform.parent = newParent;
-        _spinIcon.transform.localPosition = localTransformPosition;
-        localTransformPosition = _clubSelectionHolder.transform.localPosition;
-        _clubSelectionHolder.transform.parent = newParent;
-        _clubSelectionHolder.transform.localPosition = localTransformPosition;
         localTransformPosition = _windUIHolder.transform.localPosition;
         _windUIHolder.transform.parent = newParent;
         _windUIHolder.transform.localPosition = localTransformPosition;
@@ -2007,28 +2070,22 @@ public class GolfPlayerTopDown : NetworkBehaviour
 
         if (!fromShift)
         {
-            _puttDistanceTextImage.sprite = _longPuttTextImage;
+            _isShortPutt = false;
         }
         else
         {
-            if (_puttDistanceTextImage.sprite == _longPuttTextImage)
-            {
-                _puttDistanceTextImage.sprite = _shortPuttTextImage;
+            _isShortPutt = !_isShortPutt;
+            if (_isShortPutt)
                 MaxDistanceFromClub = GetDistanceFromClub(club) / 4f;
-                hitDistance = MaxDistanceFromClub;
-                UpdatePositionOfAdjustedDistanceIcon(hitDistance);
-                MinDistance = GetMinDistance(hitDistance);
-
-            }
             else
-            {
-                _puttDistanceTextImage.sprite = _longPuttTextImage;
                 GetNewClubAttributes(club);
-                hitDistance = MaxDistanceFromClub;
-                UpdatePositionOfAdjustedDistanceIcon(hitDistance);
-                MinDistance = GetMinDistance(hitDistance);
-            }
+
+            hitDistance = MaxDistanceFromClub;
+            UpdatePositionOfAdjustedDistanceIcon(hitDistance);
+            MinDistance = GetMinDistance(hitDistance);
         }
+
+        _puttDistanceTextImage.sprite = _isShortPutt ? _shortPuttTextImage : _longPuttTextImage;
         _puttDistanceTextImage.enabled = true;
     }
     Vector2 SetInitialDirection(Vector3 ballPos, Vector3 aimPoint)
@@ -2182,36 +2239,33 @@ public class GolfPlayerTopDown : NetworkBehaviour
         return closestHole;
     }
     [ServerRpc]
-    void CmdEnablePlayerCanvasForOtherClients(bool enable)
+    void CmdEnablePlayerMessageForOtherClients(bool enable)
     {
-        RpcEnablePlayerCanvasForOtherClients(enable);
+        RpcEnablePlayerMessageForOtherClients(enable);
     }
     [ObserversRpc(ExcludeOwner = true)]
-    void RpcEnablePlayerCanvasForOtherClients(bool enable)
+    void RpcEnablePlayerMessageForOtherClients(bool enable)
     {
-        EnablePlayerCanvas(enable);
+        EnablePlayerMessage(enable);
     }
     [ObserversRpc]
-    public void RpcEnablePlayerCanvasForNewTurn(bool enable)
+    public void RpcEnablePlayerMessageForNewTurn(bool enable)
     {
         if (!this.IsOwner)
         {
-            EnablePlayerCanvas(false);
+            EnablePlayerMessage(false);
             return;
         }
-        EnablePlayerCanvas(enable);
+        EnablePlayerMessage(enable);
     }
-    public void EnablePlayerCanvas(bool enable)
+    // The canvas itself stays on. It carries the club and spin UI, which has its own visibility
+    // rules, so only the prompt text follows this.
+    public void EnablePlayerMessage(bool enable)
     {
-        Debug.Log("EnablePlayerCanvas: " + enable + " for player: " + this.PlayerName);
-        try
-        {
-            _playerCanvas.gameObject.SetActive(enable);
-        }
-        catch (Exception e)
-        {
-            Debug.Log("EnablePlayerCanvas: error: " + e);
-        }
+        if (!_playerUIMessage)
+            return;
+
+        _playerUIMessage.gameObject.SetActive(enable);
     }
     [TargetRpc]
     public void RpcPlayerUIMessage(NetworkConnection conn, string message)
@@ -2219,7 +2273,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         //Debug.Log("RpcPlayerUIMessage: for player: " + this.PlayerName + " message: " + message);
         if (!this.IsOwner)
             return;
-        this.EnablePlayerCanvas(true);
+        this.EnablePlayerMessage(true);
         PlayerUIMessage(message);
     }
     public void PlayerUIMessage(string message)
@@ -2247,7 +2301,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void RpcTellClientsUpdatePlayerMessageText(string newMessage)
     {
         //Debug.Log("RpcTellClientsUpdatePlayerMessageText: with message: " + newMessage);
-        this.EnablePlayerCanvas(true);
+        this.EnablePlayerMessage(true);
         _playerUIMessage.UpdatePlayerMessageText(newMessage);
     }
     [Server]
@@ -2292,7 +2346,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     void RpcPromptPlayerForMulligan(int duration)
     {
         PlayerUIMessage("mulligan " + duration.ToString());
-        EnablePlayerCanvas(true);
+        EnablePlayerMessage(true);
 
     }
     [Server]
@@ -2358,7 +2412,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             await Task.Yield();
         }
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
         if (this.IsOwner)
             CmdTellServerPlayerGroundTheyLandedOnCompleted();
     }
@@ -2371,7 +2425,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ObserversRpc(ExcludeOwner = true)]
     void RpcTellServerPlayerGroundTheyLandedOnCompleted()
     {
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
     }
     public async Task TellPlayerBallIsOutOfBounds(float duration)
     {
@@ -2382,7 +2436,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             await Task.Yield();
         }
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
     }
     [Server]
     public async Task ServerTellPlayerHoleEnded(float duration)
@@ -2416,12 +2470,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
         Debug.Log("TellPlayerHoleEnded: on game player: " + this.PlayerName);
         float end = Time.time + duration;
         this.PlayerUIMessage("hole ended");
-        this.EnablePlayerCanvas(true);
+        this.EnablePlayerMessage(true);
         while (Time.time < end)
         {
             await Task.Yield();
         }
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
         if (this.IsOwner)
             CmdTellServerPlayerHoleEndedCompleted();
     }
@@ -2434,7 +2488,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ObserversRpc(ExcludeOwner = true)]
     void RpcTellServerPlayerHoleEndedCompleted()
     {
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
     }
     [Server]
     public async Task ServerTellPlayerGameIsOver(float duration)
@@ -2467,12 +2521,12 @@ public class GolfPlayerTopDown : NetworkBehaviour
         Debug.Log("TellPlayerGameIsOver: on game player: " + this.PlayerName);
         float end = Time.time + duration;
         this.PlayerUIMessage("game over");
-        this.EnablePlayerCanvas(true);
+        this.EnablePlayerMessage(true);
         while (Time.time < end)
         {
             await Task.Yield();
         }
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
         if (this.IsOwner)
             CmdTellServerPlayerGameIsOverCompleted();
     }
@@ -2485,7 +2539,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ObserversRpc(ExcludeOwner = true)]
     void RpcTellServerPlayerGameIsOverCompleted()
     {
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
     }
     public void GetCameraBoundingBox(bool forceUpdate = false)
     {
@@ -2574,6 +2628,20 @@ public class GolfPlayerTopDown : NetworkBehaviour
     {
         PromptedForLightning = true;
     }
+    // Measured on the spot rather than read from the DistanceToHole SyncVar, which is only refreshed when
+    // a ball comes to rest and so can lag a turn start. Returns -1 when there is no ball or hole yet.
+    public float GetDistanceFromBallToHole()
+    {
+        if (!MyBall)
+            return -1f;
+
+        Vector3 ballPos = MyBall.transform.position;
+        GameObject closestHole = FindClosestHole(ballPos);
+        if (!closestHole)
+            return -1f;
+
+        return GetDistanceToHole(closestHole, ballPos);
+    }
     public void SetDistanceToHoleForPlayer()
     {
         Vector3 ballPos = MyBall.transform.position;
@@ -2621,7 +2689,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         PlayerStruckByLightning = true;
         _golfAnimator.PlayerStruckByLightning();
         //PlayerUIMessage("struck by lightning");
-        //EnablePlayerCanvas(true);
+        //EnablePlayerMessage(true);
         PlayerScore.StrokePenalty(10);
         EnableAcknowledgePlayerLightningStrike(true);
     }
@@ -2631,7 +2699,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         _golfAnimator.StartDeathFromLightning();
         //PlayerUIMessage("struck by lightning");
-        //EnablePlayerCanvas(true);
+        //EnablePlayerMessage(true);
         //EnablePlayerSprite(false);
     }
     public void LightningFlashForPlayerStruck(bool enableStruckSprite)
@@ -3728,20 +3796,20 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             Debug.Log("TellPlayerHowFarTheyAreFromHoleForChallenege: on game player: " + this.PlayerName + " ball is in hole!");
             this.PlayerUIMessage("challenege:hole");
-            this.EnablePlayerCanvas(true);
+            this.EnablePlayerMessage(true);
             end += 1f;
         }
         else
         {
             this.PlayerUIMessage("challenege:" + distance.ToString("0.00"));
-            this.EnablePlayerCanvas(true);
+            this.EnablePlayerMessage(true);
         }
         while (Time.time < end)
         {
             await Task.Yield();
         }
 
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
         if (this.IsOwner)
             CmdTellPlayerHowFarTheyAreFromHoleForChallenegeCompleted();
     }
@@ -3754,7 +3822,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ObserversRpc(ExcludeOwner = true)]
     void RpcTellPlayerHowFarTheyAreFromHoleForChallenegeCompleted()
     {
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
     }
     [Server]
     public void RewardPlayerForWinningChallenege()
@@ -3813,13 +3881,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             await Task.Yield();
         }
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
         CmdServerSendMessagetoPlayerCompleted();
     }
     void TellPlayerWhoWasClosestOnChallenege()
     {
         this.PlayerUIMessage("PlayerClosest");
-        this.EnablePlayerCanvas(true);
+        this.EnablePlayerMessage(true);
     }
     void TellPlayerHowFarTheyWereFromHole(float distance)
     {
@@ -3827,18 +3895,18 @@ public class GolfPlayerTopDown : NetworkBehaviour
         {
             Debug.Log("TellPlayerHowFarTheyWereFromHole: on game player: " + this.PlayerName + " ball is in hole!");
             this.PlayerUIMessage("challenege:hole");
-            this.EnablePlayerCanvas(true);
+            this.EnablePlayerMessage(true);
         }
         else
         {
             this.PlayerUIMessage("challenege:" + distance.ToString("0.00"));
-            this.EnablePlayerCanvas(true);
+            this.EnablePlayerMessage(true);
         }
     }
     void TellPlayerTheyHitTheStrokeLimit()
     {
         this.PlayerUIMessage("stroke limit");
-        this.EnablePlayerCanvas(true);
+        this.EnablePlayerMessage(true);
     }
     [ServerRpc]
     void CmdServerSendMessagetoPlayerCompleted()
@@ -3849,7 +3917,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     [ObserversRpc(ExcludeOwner = true)]
     void RpcServerSendMessagetoPlayerCompleted()
     {
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
     }
     #endregion
     #region Ball In Tube
@@ -3959,7 +4027,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
         }
             
         Debug.Log("PlayerStartTurn: Player: " + this.PlayerName + " will start their turn after pressing space! Time: " + Time.time);
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
         // Begin old way of starting turn
         //GameplayManagerTopDownGolf.instance.StartCurrentPlayersTurn(this);
         // End old way of starting turn
@@ -4001,8 +4069,8 @@ public class GolfPlayerTopDown : NetworkBehaviour
         _golfAnimator.ResetGolfAnimator();
         EnablePlayerSprite(false);
         CmdDisableSpriteForLightningStrike();
-        this.EnablePlayerCanvas(false);
-        CmdEnablePlayerCanvasForOtherClients(false);
+        this.EnablePlayerMessage(false);
+        CmdEnablePlayerMessageForOtherClients(false);
         //this.IsPlayersTurn = false;
         CmdEndPlayersTurn();
 
@@ -4059,7 +4127,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
             return;
         }
         Debug.Log("PlayerSkipForLightning: Player: " + this.PlayerName + " is skipping their turn due to lightning. At time of: " + Time.time.ToString() + " and last skip was: " + GameplayManagerTopDownGolf.instance.TimeSinceLastSkip.ToString());
-        this.EnablePlayerCanvas(false);
+        this.EnablePlayerMessage(false);
         PlayerScore.StrokePenalty(1);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(MyBall, true);
         MyBall.CmdTellServerToStartNexPlayersTurn(true);
@@ -4233,20 +4301,22 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     void ChangeClubButtonPressed(InputAction.CallbackContext context)
     {
+        HandleClubSwitchRequested(1);
+    }
+    // Clicking an arrow is just another way of asking for the next club, so it passes the same gates
+    // the key does.
+    void HandleClubSwitchRequested(int direction)
+    {
         if (!this.IsOwner)
             return;
         if (GolfEscMenuManager.instance.IsMenuOpen)
-        {
-            Debug.Log("EscMenuOpen. Do not take action!");
             return;
-        }
         if (DirectionAndDistanceChosen)
             return;
         if (_moveHitMeterIcon)
             return;
-        Debug.Log("ChangeClubButtonPressed: ");
 
-        ChangeCurrentClub();
+        ChangeCurrentClub(direction);
     }
     void ZoomOutPressed(InputAction.CallbackContext context)
     {

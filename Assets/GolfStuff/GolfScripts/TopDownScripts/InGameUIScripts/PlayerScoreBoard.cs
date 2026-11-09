@@ -79,6 +79,31 @@ public class PlayerScoreBoard : MonoBehaviour
         newPlayerScoreBordItemScript.InitializePlayerItem(_currentCourse.HolesInCourse.Length);
         this.PlayerScoreItems.Add(newPlayerScoreBordItemScript);
     }
+    // A player's place in the standings, 1 for the lowest total. Counted rather than read off the list's
+    // order, which is only re-sorted on a new course score or when the board is opened. Players on the
+    // same total share a place. Returns 0 for a player who is not on the board yet.
+    public int GetPositionFor(GolfPlayerTopDown player)
+    {
+        if (!player)
+            return 0;
+
+        PlayerScoreBoardItem playerItem = PlayerScoreItems.FirstOrDefault(x => x.PlayerConnectionId == player.ConnectionId);
+        if (playerItem == null || !playerItem.PlayerScoreScript)
+            return 0;
+
+        int playerTotal = playerItem.PlayerScoreScript.TotalStrokesForCourse;
+        int ahead = 0;
+        for (int i = 0; i < PlayerScoreItems.Count; i++)
+        {
+            PlayerScoreBoardItem item = PlayerScoreItems[i];
+            if (item == null || !item.PlayerScoreScript)
+                continue;
+            if (item.PlayerScoreScript.TotalStrokesForCourse < playerTotal)
+                ahead++;
+        }
+
+        return ahead + 1;
+    }
     void SortScoreBoardList()
     {
         PlayerScoreItems = PlayerScoreItems.OrderBy(x => x.PlayerScoreScript.TotalStrokesForCourse).ToList();

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using TMPro;
-using System.Globalization;
 using System.Threading.Tasks;
 using FishNet.Object.Synchronizing;
 using FishNet.Object;
@@ -76,6 +75,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] float _lastBallInHoleTime = 0f;
     [SerializeField] bool _haveAllPlayersTeedOff = false;
     public GolfPlayerTopDown CurrentPlayer;
+    // Raised on every machine when a player's turn begins, carrying that player and whether they are
+    // still on the tee. Static so a listener does not have to exist in a particular order relative to
+    // this scene object; listeners subscribe for as long as they live and drop the handler when destroyed.
+    public static event Action<GolfPlayerTopDown, bool> TurnStarted;
     private readonly SyncVar<int> _syncCurrentPlayerNetId = new SyncVar<int>();
     public int CurrentPlayerNetId { get => _syncCurrentPlayerNetId.Value; set => _syncCurrentPlayerNetId.Value = value; }
 
@@ -92,11 +95,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     [SerializeField] PolygonCollider2D _cameraBoundingBox;
     [SerializeField] TextMeshProUGUI _holeNumberText;
     [SerializeField] TextMeshProUGUI _parText;
-    [SerializeField] TextMeshProUGUI _playerNameText;
-    [SerializeField] TextMeshProUGUI _numberOfStrokesText;
-    [SerializeField] TextMeshProUGUI _terrainTypeText;
     [SerializeField] TextMeshProUGUI _terrainPenaltyText;
-    TextInfo titleCase = new CultureInfo("en-US", false).TextInfo;
     [SerializeField] Canvas _loadingHoleCanvas;
     [SerializeField] Canvas _holeInfoCanvas;
     //[SerializeField] GameObject _currentplayerui;
@@ -281,7 +280,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         SetCameraOnPlayer(CurrentPlayer);
         // Prompt player to start their turn
         CurrentPlayer.PlayerUIMessage("start turn");
-        CurrentPlayer.EnablePlayerCanvas(true);
+        CurrentPlayer.EnablePlayerMessage(true);
         UpdateUIForCurrentPlayer(CurrentPlayer,true);
         */
 
@@ -1003,14 +1002,10 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         if (!player)
             return;
-        _playerNameText.text = "Player: " + player.PlayerName;
-        _numberOfStrokesText.text = "Strokes: " + player.PlayerScore.StrokesForCurrentHole.ToString();
-        if (forTeeOff)
-            _terrainTypeText.text = "";
-        else
-            _terrainTypeText.text = titleCase.ToTitleCase(player.GetTerrainTypeFromBall());
         if (player != LocalGolfPlayer)
             UpdateTerrainPenaltyText(false);
+
+        TurnStarted?.Invoke(player, forTeeOff);
     }
     public void UpdateTerrainPenaltyText(bool enable)
     {
@@ -1177,8 +1172,8 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             
             CurrentPlayer.RpcEnablePromptPlayerSkipForLightning(CurrentPlayer.Owner, false);
         }
-        //CurrentPlayer.EnablePlayerCanvas(true);
-        CurrentPlayer.RpcEnablePlayerCanvasForNewTurn(true);
+        //CurrentPlayer.EnablePlayerMessage(true);
+        CurrentPlayer.RpcEnablePlayerMessageForNewTurn(true);
         //UpdateUIForCurrentPlayer(CurrentPlayer);
         RpcUpdateUIForCurrentPlayer(CurrentPlayer, true);
     }
@@ -1607,6 +1602,21 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
 
         Debug.Log("RemoveNetworkPlayer: Player removed with connection id of: " + player.OwnerId + " count of NetworkPlayerServers: " + NetworkPlayersServer.Count.ToString());
     }
+    // A GolfPlayerTopDown carries no Steam id; its NetworkPlayer does, and the two share an owning
+    // connection. Returns 0 when there is no match, which is also what a session without Steam gives.
+    public ulong GetSteamIdFor(GolfPlayerTopDown player)
+    {
+        if (!player)
+            return 0;
+
+        foreach (NetworkPlayer networkPlayer in NetworkPlayersServer)
+        {
+            if (networkPlayer != null && networkPlayer.OwnerId >= 0 && networkPlayer.OwnerId == player.OwnerId)
+                return networkPlayer.PlayerSteamID;
+        }
+
+        return 0;
+    }
     public void SetLocalGolfPlayer(GolfPlayerTopDown player)
     {
         if (player.tag.ToLower().Contains("local"))
@@ -1652,7 +1662,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
             CurrentPlayer.RpcPlayerUIMessage(CurrentPlayer.Owner, "start turn");
             CurrentPlayer.RpcEnablePromptPlayerToStartTurn(CurrentPlayer.Owner, true);
             CurrentPlayer.RpcEnablePromptPlayerSkipForLightning(CurrentPlayer.Owner, false);
-            CurrentPlayer.RpcEnablePlayerCanvasForNewTurn(true);
+            CurrentPlayer.RpcEnablePlayerMessageForNewTurn(true);
             RpcUpdateUIForCurrentPlayer(CurrentPlayer, true);
         }
     }
@@ -1671,7 +1681,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         }
 
         // End the message?
-        CurrentPlayer.RpcEnablePlayerCanvasForNewTurn(false);
+        CurrentPlayer.RpcEnablePlayerMessageForNewTurn(false);
 
         SkipsInARow = 0;
     }

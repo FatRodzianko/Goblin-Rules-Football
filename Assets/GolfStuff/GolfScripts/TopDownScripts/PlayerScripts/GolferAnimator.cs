@@ -239,7 +239,7 @@ public class GolferAnimator : NetworkBehaviour
         if (this.IsOwner)
         {
             _myPlayer.PlayerUIMessage("struck by lightning");
-            _myPlayer.EnablePlayerCanvas(true);
+            _myPlayer.EnablePlayerMessage(true);
         }
     }
     public void TurnOnLightForLightningFlash()

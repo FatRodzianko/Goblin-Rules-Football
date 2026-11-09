@@ -235,10 +235,6 @@ public class PlayerUIMessage : MonoBehaviour
     }
     string GetActionBindingName(InputAction action)
     {
-        string bindingGroup = "Keyboard and Mouse";
-        if(GamepadUIManager.instance.gamepadUI)
-            bindingGroup = "GamePad";
-
-        return action.GetBindingDisplayString(0, bindingGroup);
+        return InputManagerGolf.GetBindingName(action);
     }
 }

@@ -2224,7 +2224,7 @@ public class GolfBallTopDown : NetworkBehaviour
     {
         Debug.Log("BallEndedInWater: for player: " + MyPlayer.PlayerName);
         MyPlayer.PlayerUIMessage("water");
-        MyPlayer.EnablePlayerCanvas(true);
+        MyPlayer.EnablePlayerMessage(true);
 
         if (!this.IsOwner)
             return;
@@ -2249,20 +2249,20 @@ public class GolfBallTopDown : NetworkBehaviour
             MyPlayer.SetDistanceToHoleForPlayer();
         bounceContactGroundMaterial = GetGroundMaterial();
 
-        //MyPlayer.EnablePlayerCanvas(false);
+        //MyPlayer.EnablePlayerMessage(false);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
     public void TellPlayerBallIsInHole()
     {
         Debug.Log("TellPlayerBallIsInHole");
         MyPlayer.PlayerUIMessage("ball in hole");
-        MyPlayer.EnablePlayerCanvas(true);
+        MyPlayer.EnablePlayerMessage(true);
         //StartCoroutine(DelayForBallInHole(4f));
     }
     IEnumerator DelayForBallInHole(float delaySeconds)
     {
         yield return new WaitForSeconds(delaySeconds);
-        MyPlayer.EnablePlayerCanvas(false);
+        MyPlayer.EnablePlayerMessage(false);
         GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
     public void OutOfBounds(bool notNormalHit = false)
@@ -2283,7 +2283,7 @@ public class GolfBallTopDown : NetworkBehaviour
             return;
 
         MyPlayer.PlayerUIMessage("out of bounds");
-        MyPlayer.EnablePlayerCanvas(true);
+        MyPlayer.EnablePlayerMessage(true);
 
         if (!this.IsOwner)
             return;
@@ -2320,7 +2320,7 @@ public class GolfBallTopDown : NetworkBehaviour
         }
         this.CheckIfInStatueRingRadius();
         MyPlayer.PlayerUIMessage("ground: " + this.bounceContactGroundMaterial);
-        MyPlayer.EnablePlayerCanvas(true);
+        MyPlayer.EnablePlayerMessage(true);
         //GameplayManagerTopDownGolf.instance.StartNextPlayersTurn(this);
     }
     public void CheckIfInStatueRingRadius()
