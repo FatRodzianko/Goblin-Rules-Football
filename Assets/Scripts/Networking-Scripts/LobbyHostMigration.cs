@@ -174,7 +174,7 @@ public class LobbyHostMigration : MonoBehaviour
         // Leave the old lobby the way a finished session does, so the moved one loads fresh, exactly as a normal host or
         // join from the title screen. FishNet keeps a scene that is already loaded, so the old lobby scene, its UI still
         // holding the players that just despawned, would otherwise carry on as the new lobby.
-        SceneManager.LoadScene("TitleScreen");
+        SceneManager.LoadScene(TitleScene.Startup);
         ShowScreen(MovingMessage(""));
         if (!IsDevSession())
         {
@@ -383,8 +383,8 @@ public class LobbyHostMigration : MonoBehaviour
             _networkManager.ClientManager.StopConnection();
         if (SteamLobby.instance != null)
             SteamLobby.instance.LeaveLobby();
-        if (SceneManager.GetActiveScene().name != "TitleScreen")
-            SceneManager.LoadScene("TitleScreen");
+        if (!TitleScene.IsActive())
+            SceneManager.LoadScene(TitleScene.Startup);
     }
     // Steam has the final say on who hosts: whoever owns the Steam lobby. Checked every second, since the owner can
     // change again if the new host leaves too. Steam keeps naming the old host until it has noticed it is gone.

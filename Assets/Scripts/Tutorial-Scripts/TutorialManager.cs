@@ -1750,7 +1750,7 @@ public class TutorialManager : MonoBehaviour
             return;
         
         index55Tracker = true;
-        SceneManager.LoadScene("TitleScreen");
+        SceneManager.LoadScene(TitleScene.Startup);
     }
     public void PauseGameOnServer()
     {
@@ -1776,7 +1776,7 @@ public class TutorialManager : MonoBehaviour
     {
         if (Time.timeScale == 0.0f)
             Time.timeScale = 1.0f;
-        SceneManager.LoadScene("TitleScreen"); ;
+        SceneManager.LoadScene(TitleScene.Startup);
     }
     public void ExitToDesktopButton()
     {

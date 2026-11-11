@@ -66,6 +66,6 @@ public class MapMakerEscapeMenu : MonoBehaviour
     }
     public void ExitMapMaker()
     {
-        SceneManager.LoadScene("TitleScreen");
+        SceneManager.LoadScene(TitleScene.Startup);
     }
 }

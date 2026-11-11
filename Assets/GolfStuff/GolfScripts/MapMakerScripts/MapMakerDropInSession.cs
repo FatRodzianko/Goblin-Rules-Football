@@ -7,7 +7,6 @@ using UnityEngine;
 public static class MapMakerDropInSession
 {
     public const string MapMakerSceneName = "Golf-MapMaker";
-    public const string TitleSceneName = "TitleScreen";
 
     public static bool IsActive { get; private set; }
 
@@ -31,7 +30,7 @@ public static class MapMakerDropInSession
     // screen; a drop-in goes back to the map maker.
     public static string ReturnScene
     {
-        get { return IsActive ? MapMakerSceneName : TitleSceneName; }
+        get { return IsActive ? MapMakerSceneName : TitleScene.Startup; }
     }
 
     public static void Begin(HoleData holeBeingTested, string tempCourseId, ScriptableCourse courseToPlay, string courseIdBeingEdited, int holeNumberBeingEdited)

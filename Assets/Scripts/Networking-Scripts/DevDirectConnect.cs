@@ -142,7 +142,7 @@ public class DevDirectConnect : MonoBehaviour
 
     void Update()
     {
-        if ((_commandLineHostMode != null || _commandLineJoin) && SceneManager.GetActiveScene().name == "TitleScreen"
+        if ((_commandLineHostMode != null || _commandLineJoin) && TitleScene.IsActive()
             && TitleScreenManager.instance != null && NetworkManagerGRF.singleton != null)
         {
             if (_commandLineHostMode == "golf")
@@ -404,7 +404,7 @@ public class DevDirectConnect : MonoBehaviour
     {
         // Out of the way during a match. The title screen is the only place a session can be started from anyway.
         // The ping label is the exception: the cellular internet tests needed a live number (Nov 3, 2026).
-        if (SceneManager.GetActiveScene().name != "TitleScreen")
+        if (!TitleScene.IsActive())
         {
             DrawPing();
             return;
@@ -449,19 +449,31 @@ public class DevDirectConnect : MonoBehaviour
         // Over Steam the mode and the match settings are set in TitleScreenManager.CreateNewLobby, just before it starts
         // the host, and nowhere else. Skipping that leaves the prefab's values: 3v3 with minPlayers 2, so the lobby
         // offers Start Game at two players and then hangs waiting for six, and halves of zero seconds.
-        NetworkManagerGRF.singleton.is1v1 = is1v1;
-        NetworkManagerGRF.singleton.isSinglePlayer = false;
-        NetworkManagerGRF.singleton.maxConnections = is1v1 ? 2 : 6;
-        NetworkManagerGRF.singleton.minPlayers = is1v1 ? 2 : 6;
+        NetworkManagerGRF.singleton.ConfigureFootballLobby(is1v1);
 
         // The real settings panel, so a dev session uses whatever is typed there and the same fallbacks as a Steam lobby
         // (60 second halves, mercy rule at 21) when it has never been opened.
         if (TitleScreenManager.instance != null)
             TitleScreenManager.instance.SetGameSettings(false);
+        else
+            ApplyDefaultMatchSettings();
 
         NetworkManagerGRF.singleton.StartHost();
         _status = NetworkManagerGRF.singleton.IsFootballSession ? "Hosting " + (is1v1 ? "1v1." : "3v3.") : "Could not start the server.";
         Debug.Log("DevDirectConnect: " + _status);
+    }
+
+    // On a title screen that has no TitleScreenManager there is no settings panel to read, and the prefab's own values
+    // are a half of zero seconds. These are the same fallbacks the settings panels use for a blank box.
+    void ApplyDefaultMatchSettings()
+    {
+        NetworkManagerGRF game = NetworkManagerGRF.singleton;
+        game.secondsPerHalf = 60;
+        game.mercyRuleEnabled = true;
+        game.mercyRulePointDifferential = 21;
+        game.powerUpsEnabled = true;
+        game.randomEventsEnabled = true;
+        game.spawnObstaclesEnabled = true;
     }
 
     // A pure client's round trip to the host, in milliseconds, top-right during a session. FishNet measures it on

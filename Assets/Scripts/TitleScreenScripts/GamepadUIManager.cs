@@ -29,4 +29,8 @@ public class GamepadUIManager : MonoBehaviour
     {
         Debug.Log("GamepadUIManager UseGamepadChecked: " + isChecked.ToString());
     }
+    public void SetGamepadUI(bool useGamepadUI)
+    {
+        gamepadUI = useGamepadUI;
+    }
 }

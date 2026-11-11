@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f051614fb9a6774c81cac9c7226a33b, type: 3}
+  m_Name: Light_Medium_Tunnel
+  m_EditorClassIdentifier: 
+  _firstCatchDelay: {x: 0, y: 0.25}
+  _strikeAttempts: {x: 3, y: 6}
+  _strikeOnSeconds: {x: 0.05, y: 0.25}
+  _strikeOffSeconds: {x: 0.4, y: 0.05}
+  _jitter: 0.3
+  _twitchBlinks: {x: 2, y: 4}
+  _twitchSeconds: {x: 0.03, y: 0.1}

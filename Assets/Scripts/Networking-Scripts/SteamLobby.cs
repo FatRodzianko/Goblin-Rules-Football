@@ -16,6 +16,11 @@ public class SteamLobby : MonoBehaviour
 
     public const string GameModeFootball = "Football";
     public const string GameModeGolf = "Golf";
+
+    // A lobby browser subscribes to these instead of being called into by name. Raised alongside
+    // the existing TitleScreenManager calls, so both title screens can be live at once.
+    public event System.Action LobbyListCleared;
+    public event System.Action<CSteamID> LobbyInfoReceived;
     private const string HostAddressKey = "HostAddress";
     public const string GolfSceneName = "Golf-prototype-topdown";
 
@@ -254,6 +259,8 @@ public class SteamLobby : MonoBehaviour
         lobbyIDS.Clear();
         if (TitleScreenManager.instance != null && TitleScreenManager.instance.listOfLobbyListItems.Count > 0)
             TitleScreenManager.instance.DestroyOldLobbyListItems();
+        if (LobbyListCleared != null)
+            LobbyListCleared();
 
         // The host entering its own lobby. OnLobbyCreated already stored it and started hosting.
         if (callback.m_ulSteamIDLobby == _hostedLobbyID)
@@ -481,10 +488,13 @@ public class SteamLobby : MonoBehaviour
     void OnGetLobbiesList(LobbyMatchList_t result)
     {
         Debug.Log("Found " + result.m_nLobbiesMatching + " lobbies!");
-        if (TitleScreenManager.instance == null)
+        // Steam also sends these once the title screen is gone, with nothing listening.
+        if (TitleScreenManager.instance == null && LobbyListCleared == null)
             return;
-        if (TitleScreenManager.instance.listOfLobbyListItems.Count > 0)
+        if (TitleScreenManager.instance != null && TitleScreenManager.instance.listOfLobbyListItems.Count > 0)
             TitleScreenManager.instance.DestroyOldLobbyListItems();
+        if (LobbyListCleared != null)
+            LobbyListCleared();
         for (int i = 0; i < result.m_nLobbiesMatching; i++)
         {
             CSteamID lobbyID = SteamMatchmaking.GetLobbyByIndex(i);
@@ -497,8 +507,9 @@ public class SteamLobby : MonoBehaviour
     void OnGetLobbyInfo(LobbyDataUpdate_t result)
     {
         // Steam also sends these for the lobby you're in, after the title screen is gone.
-        if (TitleScreenManager.instance == null)
-            return;
-        TitleScreenManager.instance.DisplayLobbies(lobbyIDS, result);
+        if (TitleScreenManager.instance != null)
+            TitleScreenManager.instance.DisplayLobbies(lobbyIDS, result);
+        if (LobbyInfoReceived != null)
+            LobbyInfoReceived(new CSteamID(result.m_ulSteamIDLobby));
     }
 }

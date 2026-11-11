@@ -61,7 +61,7 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
     private void ChangedActiveScene(Scene current, Scene next)
     {
         Debug.Log("CustomGolfCourseLoader: ChangedActiveScene: " + current.name + " to " + next.name);
-        if (next.name == "TitleScreen")
+        if (TitleScene.Is(next.name))
         {
             GetAllAvailableCourses(true);
         }

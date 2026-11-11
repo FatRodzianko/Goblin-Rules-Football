@@ -118,6 +118,37 @@ public class NetworkManagerGRF : MonoBehaviour
         _networkManager.SceneManager.OnLoadStart -= SceneManager_OnLoadStart;
         _networkManager.SceneManager.OnLoadEnd -= SceneManager_OnLoadEnd;
     }
+    // Clears the leftovers of the previous session before a new one is set up. TitleScreenManager
+    // did this inline as ResetGameServerSettings; it lives here so every caller gets both halves.
+    public void ResetForNewSession()
+    {
+        ResetWaitingForPlayersToLoadStuff();
+        ClearLobbyAndGamePlayerList();
+    }
+    // The mode fields below have to move together: a session that sets some of them and not the others gets the
+    // prefab's defaults for the rest, which lights up Start Game at the wrong player count and then hangs the match
+    // waiting for players who will never arrive. These three setters are the only supported way to pick a mode.
+    public void ConfigureFootballLobby(bool is1v1Lobby)
+    {
+        is1v1 = is1v1Lobby;
+        isSinglePlayer = false;
+        maxConnections = is1v1Lobby ? 2 : 6;
+        minPlayers = is1v1Lobby ? 2 : 6;
+    }
+    public void ConfigureSinglePlayerSession()
+    {
+        is1v1 = false;
+        isSinglePlayer = true;
+        maxConnections = 1;
+        minPlayers = 1;
+    }
+    public void ConfigureTutorialSession()
+    {
+        is1v1 = false;
+        isSinglePlayer = false;
+        maxConnections = 1;
+        minPlayers = 1;
+    }
     // Mirror's StartHost loaded the online scene (LobbyScene) and then added the host's player there. Start the server now;
     // the host's own client starts once the lobby has loaded, in SceneManager_OnLoadEnd.
     public void StartHost()
@@ -215,7 +246,7 @@ public class NetworkManagerGRF : MonoBehaviour
                 conn.Disconnect(true);
                 return;
             }
-            if (SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene") // prevents players from joining a game that has already started. When the game starts, the scene will no longer be the "TitleScreen"
+            if (TitleScene.IsActive() || SceneManager.GetActiveScene().name == "LobbyScene") // prevents players from joining a game that has already started. When the game starts, the scene will no longer be a title screen
             {
                 Debug.Log("Player loaded from scene: " + SceneManager.GetActiveScene().name);
             }
@@ -473,8 +504,8 @@ public class NetworkManagerGRF : MonoBehaviour
     }
     public void SpawnLobbyPlayer(NetworkConnection conn)
     {
-        Debug.Log("Checking if player is in correct scene. Player's scene name is: " + SceneManager.GetActiveScene().name.ToString() + ". Correct scene name is: TitleScreen");
-        if (SceneManager.GetActiveScene().name == "TitleScreen" || SceneManager.GetActiveScene().name == "LobbyScene")
+        Debug.Log("Checking if player is in correct scene. Player's scene name is: " + SceneManager.GetActiveScene().name.ToString() + ". Correct scene is a title screen or LobbyScene.");
+        if (TitleScene.IsActive() || SceneManager.GetActiveScene().name == "LobbyScene")
         {
             // The host's own player leads, whenever it arrives. "First to connect" held only while nobody could join
             // faster than the host's own client, which a lobby moving to a new host breaks: everyone reconnects at once.
