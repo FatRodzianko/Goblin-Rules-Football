@@ -76,7 +76,6 @@ public class CustomGolfCourseLoader : SingletonInstance<CustomGolfCourseLoader>
                 Debug.LogError("InitTileReferences: Tilebase: " + tile.TileBase.name + " is already in use by: " + _tileBaseToMapMakerObject[tile.TileBase].name);
                 continue;
             }
-            Debug.Log("InitTileReferences: tile Guid: " + tile.Guid);
             _tileBaseToMapMakerObject.Add(tile.TileBase, tile);
             _guidToTileBase.Add(tile.Guid, tile.TileBase);
 

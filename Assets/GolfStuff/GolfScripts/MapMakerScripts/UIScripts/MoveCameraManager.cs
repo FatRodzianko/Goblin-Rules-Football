@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +16,11 @@ public class MoveCameraManager : MonoBehaviour
     bool _draggingCamera = false;
     Vector2 _previousDragPointer = Vector2.zero;
 
+    // Kept so OnDisable can remove the same delegate it added. A lambda built at the -= is a different object
+    // and never matches the one that was subscribed.
+    Action<InputAction.CallbackContext> _moveCameraPerformed;
+    Action<InputAction.CallbackContext> _moveCameraCanceled;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,16 +29,23 @@ public class MoveCameraManager : MonoBehaviour
         _builder = MapMakerBuilder.GetInstance();
 
         _playerInput = _builder.PlayerInput;
-        _playerInput.MapMaker.MoveCamera.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
-        _playerInput.MapMaker.MoveCamera.canceled += ctx => ResetMovement();
+        _moveCameraPerformed = ctx => SetMovement(ctx.ReadValue<Vector2>());
+        _moveCameraCanceled = ctx => ResetMovement();
+        _playerInput.MapMaker.MoveCamera.performed += _moveCameraPerformed;
+        _playerInput.MapMaker.MoveCamera.canceled += _moveCameraCanceled;
 
         _playerInput.MapMaker.MiddleMouseMove.started += StartDraggingCamera;
         _playerInput.MapMaker.MiddleMouseMove.canceled += StopDraggingCamera;
     }
     private void OnDisable()
     {
-        _playerInput.MapMaker.MoveCamera.performed -= ctx => SetMovement(ctx.ReadValue<Vector2>());
-        _playerInput.MapMaker.MoveCamera.canceled -= ctx => ResetMovement();
+        // Start does the subscribing, so this runs with nothing to remove if the object is disabled before it.
+        if (_playerInput == null)
+            return;
+        if (_moveCameraPerformed != null)
+            _playerInput.MapMaker.MoveCamera.performed -= _moveCameraPerformed;
+        if (_moveCameraCanceled != null)
+            _playerInput.MapMaker.MoveCamera.canceled -= _moveCameraCanceled;
 
         _playerInput.MapMaker.MiddleMouseMove.started -= StartDraggingCamera;
         _playerInput.MapMaker.MiddleMouseMove.canceled -= StopDraggingCamera;

@@ -196,7 +196,6 @@ public class DirectionTileManager : MonoBehaviour
     }
     void MapTiles()
     {
-        Debug.Log("MapTiles: ");
         TileToSlopeMap.Clear();
         foreach (Tile tile in _slopeTiles)
         {
@@ -207,7 +206,6 @@ public class DirectionTileManager : MonoBehaviour
             tileSlopeAndSpeedMapping.TileName = tile.name;
             tileSlopeAndSpeedMapping.SlopeDirection = GetTileDirectionFromName(tile.name);
             tileSlopeAndSpeedMapping.SlopeSpeedModifier = GetTileSpeedFromName(tile.name);
-            Debug.Log("MapTiles: adding tile of type: " + tileSlopeAndSpeedMapping.TileType.ToString() + " and direction: " + tileSlopeAndSpeedMapping.SlopeDirection.ToString() + " and slope speed: " + tileSlopeAndSpeedMapping.SlopeSpeedModifier.ToString());
             TileToSlopeMap.Add(tileSlopeAndSpeedMapping);
         }
     }
@@ -253,7 +251,6 @@ public class DirectionTileManager : MonoBehaviour
         {
             tileDir = new Vector2(-1f, 0f);
         }
-        Debug.Log("GetTileDirectionFromName: returning: " + tileDir.normalized.ToString() + " for tile name: " + tileName);
         return tileDir.normalized;
     }
     float GetTileSpeedFromName(string tileName)
@@ -272,12 +269,10 @@ public class DirectionTileManager : MonoBehaviour
         {
             speed = _fastSpeed;
         }
-        Debug.Log("GetTileSpeedFromName: returning: " + speed.ToString() + " for tile name: " + tileName);
         return speed;
     }
     public void GetTilesWithSlopes()
     {
-        Debug.Log("GetTilesWithSlopes: ");
         _tilePositionsWithSlopes.Clear();
         foreach (var pos in _directionTiles.cellBounds.allPositionsWithin)
         {
@@ -292,7 +287,6 @@ public class DirectionTileManager : MonoBehaviour
     {
         // Get the cell position that the ball is on
         //Vector3Int tileBallIsOn = MyTiles.WorldToCell(ballPos);
-        Debug.Log("GetSlopeDirection: total number of sloped tiles: " + _tilePositionsWithSlopes.Count.ToString() + " number of tiles in TileToSlopeMap: " + TileToSlopeMap.Count.ToString());
         // Check to see if that tile has a slope
         if (_tilePositionsWithSlopes.Contains(tilePos))
         {
@@ -302,14 +296,11 @@ public class DirectionTileManager : MonoBehaviour
             TileBase tile = _directionTiles.GetTile(tilePos);
             //TileSlopeAndSpeedMapping tileToSlopeMap = TileToSlopeMap.FirstOrDefault(x => x.TileType == tile);
             TileSlopeAndSpeedMapping tileToSlopeMap = TileToSlopeMap.FirstOrDefault(x => x.TileName == tile.name);
-            Tuple<Vector2, float> newSlopeValues = new Tuple<Vector2, float>(tileToSlopeMap.SlopeDirection, tileToSlopeMap.SlopeSpeedModifier);
-            Debug.Log("GetSlopeDirection: Found slope: at: " + tilePos.ToString() + " with a slope direction of: " + newSlopeValues.Item1.ToString() + ":"+ tileToSlopeMap.SlopeDirection.ToString() + " and a slope speed modifier of: " + newSlopeValues.Item2.ToString() + ":" + tileToSlopeMap.SlopeSpeedModifier.ToString() + " tile type is: " + tile.ToString() + ":" + tile.name + " tileToSlopeMap type is: " + tileToSlopeMap.TileType.ToString());
             return new Tuple<Vector2, float>(tileToSlopeMap.SlopeDirection, tileToSlopeMap.SlopeSpeedModifier);
 
         }
         else // If the tile position isn't in the list of tiles with slopes, return a direction of 0 and a speed modifier of 0f
         {
-            Debug.Log("GetSlopeDirection: Could not find slope: for tile at: " + tilePos.ToString());
             return new Tuple<Vector2, float>(Vector2.zero, 0f);
         }
     }

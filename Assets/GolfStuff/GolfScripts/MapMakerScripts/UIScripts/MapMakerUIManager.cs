@@ -342,7 +342,6 @@ public class MapMakerUIManager : MonoBehaviour
             // Add checks here for "course type." If the course type is minigolf, only enable _allowedInMiniGolf tiles. If it is regular golf, don't enable _miniGolfOnly tiles
             if (_isSelectedCourseMiniGolf)
             {
-                Debug.Log("EnableRegularTileObjects: enable " + enable + " _isSelectedCourseMiniGolf: " + _isSelectedCourseMiniGolf);
                 if (_allowedInMiniGolf.Contains(ob))
                 {
                     ob.SetActive(enable);
@@ -354,7 +353,6 @@ public class MapMakerUIManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("EnableRegularTileObjects: enable " + enable + " _isSelectedCourseMiniGolf: " + _isSelectedCourseMiniGolf);
                 if (_miniGolfOnly.Contains(ob))
                 {
                     ob.SetActive(false);
@@ -377,7 +375,6 @@ public class MapMakerUIManager : MonoBehaviour
             //ob.SetActive(enable);
             if (_isSelectedCourseMiniGolf)
             {
-                Debug.Log("EnableRuleTileObjects: enable " + enable + " _isSelectedCourseMiniGolf: " + _isSelectedCourseMiniGolf);
                 if (_allowedInMiniGolf.Contains(ob))
                 {
                     ob.SetActive(enable);
@@ -389,7 +386,6 @@ public class MapMakerUIManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("EnableRuleTileObjects: enable " + enable + " _isSelectedCourseMiniGolf: " + _isSelectedCourseMiniGolf);
                 if (_miniGolfOnly.Contains(ob))
                 {
                     ob.SetActive(false);
@@ -946,16 +942,12 @@ public class MapMakerUIManager : MonoBehaviour
         {
             hole.HolePosition = _mapMakerBuilder.HolePositon;
         }
-        if (_mapMakerBuilder.HaveBothTeeOffMarkersBeenPlaced)
+        // Rewritten from what is placed right now, whether that is both markers, one or none. Writing it only
+        // when both are placed left the previous pair in the file after one was deleted.
+        hole.TeeOffMarkerPositions.Clear();
+        foreach (Vector3Int markerPosition in _mapMakerBuilder.TeeOffMarkerPositions)
         {
-            if (_mapMakerBuilder.TeeOffMarkerPositions.Count == 2)
-            {
-                hole.TeeOffMarkerPositions.Clear();
-                foreach (Vector3Int markerPosition in _mapMakerBuilder.TeeOffMarkerPositions)
-                {
-                    hole.TeeOffMarkerPositions.Add(markerPosition);
-                }
-            }
+            hole.TeeOffMarkerPositions.Add(markerPosition);
         }
         // Check if the hole is "complete" or not. Not including aim points at the moment since as long as the hole has been placed, there should be at least one aim point
         if (_mapMakerBuilder.HasHoleBeenPlaced && _mapMakerBuilder.HasTeeOffLocationBeenPlaced && _mapMakerBuilder.HaveBothTeeOffMarkersBeenPlaced && _mapMakerBuilder.TeeOffMarkerPositions.Count == 2)

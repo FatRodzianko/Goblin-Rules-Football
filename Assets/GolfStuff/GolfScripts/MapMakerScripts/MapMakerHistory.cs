@@ -274,13 +274,11 @@ public class MapMakerHistoryItem
             if (_previousMapMakerTileBase.GetType() == typeof(MapMakerObstacle))
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                Debug.Log("MapMakerHistoryItem: Undo: _previousMapMakerTileBase" + _previousMapMakerTileBase.name + " was NOT null and was an obstacle. Obstacle was deleted and needs to be respawned? Position: " + _position.ToString() + " new tile was: " + _newMapMakerTileBase);
                 builder.PlaceObstacle(_position, (MapMakerObstacle)_previousMapMakerTileBase);
             }
             else if (_previousMapMakerTileBase.GetType() == typeof(MapMakerCourseMarker))
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                Debug.Log("MapMakerHistoryItem: Undo: _previousMapMakerTileBase" + _previousMapMakerTileBase.name + " was NOT null and was an course marker. Marker was deleted and needs to be respawned? Position: " + _position.ToString() + " new tile was: " + _newMapMakerTileBase);
                 builder.PlaceCourseMarker(_position, (MapMakerCourseMarker)_previousMapMakerTileBase);
             }
         }
@@ -290,13 +288,11 @@ public class MapMakerHistoryItem
             if (_newMapMakerTileBase.GetType() == typeof(MapMakerObstacle))
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                Debug.Log("MapMakerHistoryItem: Undo: _newMapMakerTileBase " + _newMapMakerTileBase.name + " was NOT null and was an obstacle. Obstacle will be removed. Position: " + _position.ToString() + " previous tile was: " + _previousMapMakerTileBase);
                 builder.RemoveObstacle(_position);
             }
             if (_newMapMakerTileBase.GetType() == typeof(MapMakerCourseMarker))
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                Debug.Log("MapMakerHistoryItem: Undo: _newMapMakerTileBase " + _newMapMakerTileBase.name + " was NOT null and was an MapMakerCourseMarker. MapMakerCourseMarker will be removed. Position: " + _position.ToString() + " previous tile was: " + _previousMapMakerTileBase);
                 builder.RemoveCourseMarker(_position, (MapMakerCourseMarker)_newMapMakerTileBase);
             }
         }
@@ -333,13 +329,11 @@ public class MapMakerHistoryItem
             if (_newMapMakerTileBase.GetType() == typeof(MapMakerObstacle))
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                Debug.Log("MapMakerHistoryItem: Redo: _newMapMakerTileBase was NOT null and was an obstacle. Respawning obstacle");
                 builder.PlaceObstacle(_position, (MapMakerObstacle)_newMapMakerTileBase, true);
             }
             else if (_newMapMakerTileBase.GetType() == typeof(MapMakerCourseMarker))
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                Debug.Log("MapMakerHistoryItem: Redo: _newMapMakerTileBase" + _newMapMakerTileBase.name + " was NOT null and was an course marker. Marker was deleted and needs to be respawned? Position: " + _position.ToString() + " new tile was: " + _newMapMakerTileBase);
                 builder.PlaceCourseMarker(_position, (MapMakerCourseMarker)_newMapMakerTileBase);
             }
         }
@@ -351,13 +345,11 @@ public class MapMakerHistoryItem
             if (_previousMapMakerTileBase.GetType() == typeof(MapMakerObstacle) && _newTile == null)
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                Debug.Log("MapMakerHistoryItem: Redo: _previousMapMakerTileBase was NOT null and was an obstacle. _newTile IS null, making the new tile an 'eraser.' Obstacle will be removed.");
                 builder.RemoveObstacle(_position);
             }
             else if (_previousMapMakerTileBase.GetType() == typeof(MapMakerCourseMarker) && _newTile == null)
             {
                 MapMakerBuilder builder = MapMakerBuilder.GetInstance();
-                Debug.Log("MapMakerHistoryItem: Redo: _previousMapMakerTileBase was NOT null and was an MapMakerCourseMarker. _newTile IS null, making the new tile an 'eraser.' MapMakerCourseMarker will be removed.");
                 builder.RemoveCourseMarker(_position, (MapMakerCourseMarker)_previousMapMakerTileBase);
             }
         }

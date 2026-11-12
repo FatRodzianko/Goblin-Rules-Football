@@ -250,7 +250,6 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
                 Debug.LogError("InitTileReferences: Tilebase: " + tile.TileBase.name + " is already in use by: " + _tileBaseToMapMakerObject[tile.TileBase].name);
                 continue;
             }
-            Debug.Log("InitTileReferences: tile Guid: " + tile.Guid);
             _tileBaseToMapMakerObject.Add(tile.TileBase, tile);
             _guidToTileBase.Add(tile.Guid, tile.TileBase);
 
@@ -1055,7 +1054,6 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
                     if (_selectedObject.GetType() == typeof(MapMakerObstacle))
                     {
-                        Debug.Log("DrawItem: Placing obstacle at: " + positions[i].ToString());
                         PlaceObstacle(positions[i], (MapMakerObstacle)_selectedObject);
                     }
                     else
@@ -1105,7 +1103,6 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
     {
         if (_placeObstaclesByPostion.ContainsKey(position))
         {
-            Debug.Log("PlaceObstacle: Object has already been placeed at this position: " + position + " : " + _placeObstaclesByPostion[position].name);
             return;
         }
 
@@ -1129,18 +1126,14 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
 
         // Check if the obstacle is a hole or not that needs to have its position saved?
         CheckIfPlacingHoleFlag(position, obstacle);
-
-        Debug.Log("PlaceObstacle: NEW OBJECT has been placeed at this position: " + position + " : " + _placeObstaclesByPostion[position].name);
     }
     public void RemoveObstacle(Vector3Int position, bool removeFromDict = true)
     {
         if (!_placeObstaclesByPostion.ContainsKey(position))
         {
-            Debug.Log("RemoveObstacle: No obstacle found at: " + position);
             return;
         }
 
-        Debug.Log("RemoveObstacle: Removing obstacle: " + _placeObstaclesByPostion[position].name + " found at position: " + position);
         GameObject objToRemove = _placeObstaclesByPostion[position];
         Destroy(objToRemove);
 

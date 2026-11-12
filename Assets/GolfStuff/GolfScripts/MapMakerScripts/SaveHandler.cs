@@ -484,16 +484,11 @@ public class SaveHandler : MonoBehaviour
 
         foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
         {
-            Debug.Log(
-                "Found MAC Address: " + nic.GetPhysicalAddress() +
-                " Type: " + nic.NetworkInterfaceType);
-
             string tempMac = nic.GetPhysicalAddress().ToString();
             if (nic.Speed > maxSpeed &&
                 !string.IsNullOrEmpty(tempMac) &&
                 tempMac.Length >= MIN_MAC_ADDR_LENGTH)
             {
-                Debug.Log("New Max Speed = " + nic.Speed + ", MAC: " + tempMac);
                 maxSpeed = nic.Speed;
                 macAddress = tempMac;
             }
