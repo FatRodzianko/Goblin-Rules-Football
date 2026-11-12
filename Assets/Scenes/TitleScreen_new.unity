@@ -4839,6 +4839,7 @@ GameObject:
   - component: {fileID: 202902155}
   - component: {fileID: 202902154}
   - component: {fileID: 202902153}
+  - component: {fileID: 202902159}
   m_Layer: 5
   m_Name: CanvasTitleScreen
   m_TagString: Untagged
@@ -4967,6 +4968,63 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &202902159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202902152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76e75b4dbf757034ebaa6111f8423d12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _buttons:
+  - {fileID: 378589652}
+  - {fileID: 725981910}
+  - {fileID: 2071997731}
+  - {fileID: 1151206099}
+  - {fileID: 848002726}
+  - {fileID: 2132400696}
+  _arriveWith: {fileID: 1529563531}
+  _firstArrivesAt: 1.5
+  _flyTime: 0.26
+  _stagger: 0.07
+  _startBelowScreen: 40
+  _ease:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 3.2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.72
+      value: 1.06
+      inSlope: 0.35
+      outSlope: 0.35
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &212809398
 GameObject:
   m_ObjectHideFlags: 0
@@ -37433,7 +37491,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8bc25fb177d58649b6659e2ab30301a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  feature: {fileID: -3138874197357993834, guid: c2f5eb07d28beea4794c250c9dbe9799, type: 2}
   _globalVolume: {fileID: 1761387016}
 --- !u!4 &1761387015
 Transform:

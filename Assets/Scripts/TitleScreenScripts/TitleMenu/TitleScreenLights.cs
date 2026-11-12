@@ -60,6 +60,9 @@ public class TitleScreenLights : MonoBehaviour
     /// <summary>Whether the opening has already run this time the game was started.</summary>
     public static bool PowerIsOn { get { return _powerIsOn; } }
 
+    /// <summary>Seconds of darkness before the sparks fly and the first bank catches.</summary>
+    public float OpeningDelay { get { return _openingDelay; } }
+
     public int LightCount { get { return _lights.Count; } }
 
     public int BankCount { get { return _banks.Count; } }
