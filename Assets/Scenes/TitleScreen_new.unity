@@ -4988,9 +4988,9 @@ MonoBehaviour:
   - {fileID: 848002726}
   - {fileID: 2132400696}
   _arriveWith: {fileID: 1529563531}
-  _firstArrivesAt: 1.5
-  _flyTime: 0.26
-  _stagger: 0.07
+  _firstArrivesAt: 5
+  _flyTime: 1
+  _stagger: 0.14
   _startBelowScreen: 40
   _ease:
     serializedVersion: 2
