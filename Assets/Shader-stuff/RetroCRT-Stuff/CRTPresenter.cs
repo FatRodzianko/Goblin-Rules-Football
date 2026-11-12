@@ -46,7 +46,6 @@ public class CRTPresenter : MonoBehaviour
     private int _builtHeight;
     private int _worldCullingMask;
     private bool _started;
-    private bool _quitting;
     private int _overlayBaseOrder = -1;
     private float _nextCanvasScan;
     private readonly List<CanvasState> _convertedCanvases = new List<CanvasState>();
@@ -120,8 +119,7 @@ public class CRTPresenter : MonoBehaviour
         }
 
         // The setting is applied long before this scene loads, when there is no presenter to take
-        // it, so the manager put the effect on the renderer feature. Re-applying it now that one
-        // exists moves it off the feature and onto this.
+        // it, so the manager only remembered it. Re-applying it now that the rig exists puts it here.
         if (RenderFeaturesManager.instance != null)
             RenderFeaturesManager.instance.EnableRetroCRT(RenderFeaturesManager.instance.RetroCRTEnabled);
         else
@@ -247,14 +245,7 @@ public class CRTPresenter : MonoBehaviour
     private void OnDestroy()
     {
         if (Instance == this)
-        {
             Instance = null;
-            // Hand the effect back to the renderer feature, or scenes without a presenter would lose
-            // it for the rest of the run. Not while the game is closing: everything is being torn
-            // down then and the manager's own references may already have gone.
-            if (!_quitting && RenderFeaturesManager.instance != null)
-                RenderFeaturesManager.instance.EnableRetroCRT(RenderFeaturesManager.instance.RetroCRTEnabled);
-        }
         SafeDestroy(_runtimeMaterial);
     }
 
@@ -274,11 +265,6 @@ public class CRTPresenter : MonoBehaviour
             // children at runtime, and each one arrives on whatever layer its prefab carries.
             EnforceUILayers();
         }
-    }
-
-    private void OnApplicationQuit()
-    {
-        _quitting = true;
     }
 
     /// <summary>

@@ -2,12 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 
 public class RenderFeaturesManager : MonoBehaviour
 {
     public static RenderFeaturesManager instance;
-    [SerializeField] ScriptableRendererFeature feature;
     [SerializeField] Volume _globalVolume;
 
     private void Awake()
@@ -41,15 +39,9 @@ public class RenderFeaturesManager : MonoBehaviour
         RetroCRTEnabled = enable;
         _globalVolume.enabled = enable;
 
-        // Where a presenter is in the scene it draws the effect, and the renderer feature has to
-        // stay off or the effect would be applied twice.
+        // The presenter is the only thing that draws the effect. With none in the scene yet, the
+        // setting is only remembered: each presenter applies it once its rig is built.
         if (CRTPresenter.Instance != null)
-        {
-            feature.SetActive(false);
             CRTPresenter.Instance.SetEffectEnabled(enable);
-            return;
-        }
-
-        feature.SetActive(enable);
     }
 }
