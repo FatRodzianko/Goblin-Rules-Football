@@ -121,6 +121,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "MiddleMouseMove",
+                    "type": "Button",
+                    "id": "78586e89-4a13-4279-ae93-86971c33f175",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -246,15 +255,37 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "4d66c6b4-6178-474f-ad66-de9f5cf8277c",
-                    "path": "<Mouse>/middleButton",
+                    "name": "Ctrl+0",
+                    "id": "ebad04f9-7544-478b-880f-a669d8bab647",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ResetZoom",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "ac72d794-0243-47cd-a9b2-5e25dabbaee1",
+                    "path": "<Keyboard>/ctrl",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "ResetZoom",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "5f68b6ac-c174-4c4e-ac8c-26ef97210e30",
+                    "path": "<Keyboard>/0",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ResetZoom",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "2D Vector",
@@ -310,6 +341,17 @@
                     "action": "MoveCamera",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "918adc08-bda5-4ab8-981b-4a52b5536033",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MiddleMouseMove",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },

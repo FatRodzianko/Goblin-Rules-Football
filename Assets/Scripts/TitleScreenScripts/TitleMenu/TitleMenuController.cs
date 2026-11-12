@@ -112,8 +112,14 @@ public class TitleMenuController : MonoBehaviour
     {
         int depth = DepthOf(entry);
 
-        // Choosing the entry that is already open at this depth closes it again.
         bool wasAlreadyOpen = depth < _openPath.Count && _openPath[depth] == entry;
+
+        // A tab is a choice between siblings, not a switch: choosing the one already showing has to
+        // leave it showing, or the panel it belongs to would be left with nothing in it.
+        if (wasAlreadyOpen && entry.StaysOpen)
+            return;
+
+        // Choosing the entry that is already open at this depth closes it again.
         CloseFrom(depth);
         if (wasAlreadyOpen)
             return;

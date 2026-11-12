@@ -1787,6 +1787,14 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
             return true;
         }
 
+        // Two autotiled layers only join cleanly where they both hold a tile on the same cell: each
+        // draws its own transition sprite there and the edges line up. Stopping next to the
+        // neighbour instead of on it leaves a seam, so the fill takes the ring of cells it was
+        // blocked by as well. Nothing is traversed through them, so the overlap is one cell deep.
+        // Hand-picked tiles are left alone: the sprite chosen for the middle of a region is not the
+        // one an edge needs.
+        bool shareBoundaryWithNeighbours = newTile is RuleTile;
+
         BoundsInt bounds = GetFloodFillBounds(map, blockingMaps, startPosition);
 
         // HashSet instead of List.Contains: O(1) lookups, and each cell is only queued once
@@ -1801,7 +1809,13 @@ public class MapMakerBuilder : SingletonInstance<MapMakerBuilder>
         {
             Vector3Int cell = points.Dequeue();
             if (!BelongsToRegion(cell))
+            {
+                // The fill map is still free here, so a neighbouring layer is what stopped the
+                // fill: this cell is on the boundary, and the two layers have to share it.
+                if (shareBoundaryWithNeighbours && map.GetTile(cell) == targetTile)
+                    fillPoints.Add(cell);
                 continue;
+            }
 
             fillPoints.Add(cell);
 

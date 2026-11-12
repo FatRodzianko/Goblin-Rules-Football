@@ -29,7 +29,20 @@ public class TitleMenuEntry : MonoBehaviour
     [Tooltip("Runs when this entry is chosen, after whatever it opens is shown.")]
     [SerializeField] private UnityEvent _activated;
 
+    [Header("Tab")]
+    [Tooltip("A tab cannot turn itself off: choosing the one already showing leaves it showing.")]
+    [SerializeField] private bool _staysOpen;
+
+    [Tooltip("The panel inside this entry's border. Set it to recolour the border and the inside together, which is what makes a tab read as the chosen one.")]
+    [SerializeField] private Graphic _interior;
+
+    [SerializeField] private Color _borderWhenOpen = Color.white;
+    [SerializeField] private Color _borderWhenClosed = Color.white;
+    [SerializeField] private Color _interiorWhenOpen = Color.white;
+    [SerializeField] private Color _interiorWhenClosed = Color.white;
+
     private Button _button;
+    private Graphic _border;
 
     /// <summary>Raised when the player chooses this entry.</summary>
     public event Action<TitleMenuEntry> Chosen;
@@ -40,9 +53,13 @@ public class TitleMenuEntry : MonoBehaviour
 
     public bool IsLeaf { get { return _opens == null; } }
 
+    /// <summary>Whether choosing this entry while it is already open should leave it open.</summary>
+    public bool StaysOpen { get { return _staysOpen; } }
+
     private void Awake()
     {
         _button = GetComponent<Button>();
+        _border = GetComponent<Graphic>();
         _button.onClick.AddListener(OnClicked);
 
         // A level that has just been opened starts with nothing chosen inside it. This also runs the
@@ -71,6 +88,14 @@ public class TitleMenuEntry : MonoBehaviour
             _highlight.SetActive(isOpen);
         if (_bottomBarContent != null)
             _bottomBarContent.SetActive(isOpen);
+
+        // A tab turns inside out when it is the chosen one: dark inside, light edge.
+        if (_interior != null)
+        {
+            _interior.color = isOpen ? _interiorWhenOpen : _interiorWhenClosed;
+            if (_border != null)
+                _border.color = isOpen ? _borderWhenOpen : _borderWhenClosed;
+        }
     }
 
     /// <summary>Runs this entry's action, if it has one.</summary>
