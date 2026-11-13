@@ -198,6 +198,9 @@ public class DevDirectConnect : MonoBehaviour
         // The host fills the empty 3v3 seats once the second instance has its row. A spawned bot only shows up in
         // LobbyPlayers a tick later, so each add waits for the previous bot's row before the next; the lobby's own
         // EnforceTeamCapacity hands a bot's seat back if another human arrives later.
+        // A full lobby keeps watching rather than stopping: the joining player's team can be settled after the last bot
+        // lands, and the bot that gives way then leaves a seat that a 3v3 (which needs all six) cannot start without.
+        // Filling stops when this instance presses Start Game, whose despawns would otherwise read as empty seats.
         if (_fillWithBots && LobbyManager.instance != null && NetworkManagerGRF.singleton != null
             && InstanceFinder.ServerManager != null && InstanceFinder.ServerManager.Started
             && NetworkManagerGRF.singleton.LobbyPlayers.Count >= 2)
@@ -205,7 +208,7 @@ public class DevDirectConnect : MonoBehaviour
             int lobbyCount = NetworkManagerGRF.singleton.LobbyPlayers.Count;
             if (lobbyCount >= NetworkManagerGRF.singleton.maxConnections)
             {
-                _fillWithBots = false;
+                _lobbyCountAtLastBotAdd = -1;
             }
             else if (lobbyCount != _lobbyCountAtLastBotAdd)
             {
@@ -225,6 +228,7 @@ public class DevDirectConnect : MonoBehaviour
         if (_startGame && LobbyManager.instance != null && LobbyManager.instance.localLobbyPlayerScript != null && IsLobbyReady())
         {
             _startGame = false;
+            _fillWithBots = false;
             Debug.Log("DevDirectConnect: pressing Start Game.");
             LobbyManager.instance.StartGame();
         }

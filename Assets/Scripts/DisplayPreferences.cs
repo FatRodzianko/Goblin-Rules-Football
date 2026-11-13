@@ -14,7 +14,10 @@ using UnityEngine;
 ///  - a mode is only applied if the display actually reports it and it clears a hard floor, so a
 ///    bad value can never reach Screen.SetResolution;
 ///  - a stored mode the current display cannot do is replaced, and the replacement is written back,
-///    so the same bad value cannot trap the player twice.
+///    so the same bad value cannot trap the player twice;
+///  - Unity's own display launch options (-screen-width, -screen-fullscreen and the rest) win over the
+///    stored mode for that launch, because they are how a player gets out of a mode that does not work.
+///    The stored mode is left untouched, so the next ordinary launch goes back to it.
 ///
 /// Only borderless fullscreen and windowed are offered. Exclusive fullscreen is the mode that can
 /// leave a display showing nothing at all, and it buys this game nothing.
@@ -39,6 +42,18 @@ public static class DisplayPreferences
         "Screenmanager Window Position X",
         "Screenmanager Window Position Y",
         "UnitySelectMonitor"
+    };
+
+    // The Unity Standalone Player options that choose the window. Any one of them on the launch line means
+    // the player, or a troubleshooting guide, picked this launch's mode by hand.
+    private static readonly string[] DisplayLaunchOptions =
+    {
+        "-screen-width",
+        "-screen-height",
+        "-screen-fullscreen",
+        "-window-mode",
+        "-popupwindow",
+        "-monitor"
     };
 
     private const int SettingsVersion = 1;
@@ -90,6 +105,12 @@ public static class DisplayPreferences
         // chose is what produced the 0x0 window.
         if (!PlayerPrefs.HasKey(WidthKey) || !PlayerPrefs.HasKey(HeightKey))
             return;
+
+        if (LaunchedWithDisplayOptions())
+        {
+            Debug.Log("DisplayPreferences: display launch options given; leaving the stored mode unapplied for this launch.");
+            return;
+        }
 
         Resolution stored = new Resolution();
         stored.width = PlayerPrefs.GetInt(WidthKey, 0);
@@ -244,6 +265,20 @@ public static class DisplayPreferences
         current.height = Screen.height;
         current.refreshRateRatio = Screen.currentResolution.refreshRateRatio;
         return current;
+    }
+
+    private static bool LaunchedWithDisplayOptions()
+    {
+        string[] args = System.Environment.GetCommandLineArgs();
+        for (int i = 1; i < args.Length; i++)
+        {
+            for (int j = 0; j < DisplayLaunchOptions.Length; j++)
+            {
+                if (string.Equals(args[i], DisplayLaunchOptions[j], System.StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+        }
+        return false;
     }
 
     private static bool ScreenIsFullscreen()
