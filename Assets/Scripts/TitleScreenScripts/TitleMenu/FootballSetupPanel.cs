@@ -14,7 +14,6 @@ public class FootballSetupPanel : GameSetupPanel
     private const int MaxSecondsPerHalf = 300;
     private const int MinMercyRulePoints = 21;
     private const int MaxLobbyNameLength = 15;
-    private const string DefaultLobbyName = "Player's Lobby";
 
     [Header("Rows shown only when hosting")]
     [SerializeField] private GameObject[] _hostOnlyRows;
@@ -95,10 +94,11 @@ public class FootballSetupPanel : GameSetupPanel
         game.mercyRuleEnabled = IsOn(_mercyRule);
     }
 
+    // Blank stays blank: SteamLobby names an unnamed lobby after the host's Steam name.
     private string ReadLobbyName()
     {
         if (_lobbyName == null || string.IsNullOrWhiteSpace(_lobbyName.text))
-            return DefaultLobbyName;
+            return string.Empty;
         string name = _lobbyName.text.Trim();
         return name.Length > MaxLobbyNameLength ? name.Substring(0, MaxLobbyNameLength) : name;
     }

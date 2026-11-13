@@ -119,7 +119,7 @@ public class SteamLobby : MonoBehaviour
         if (!IsSteamReady())
             return;
         _pendingGameMode = gameMode;
-        _pendingLobbyName = string.IsNullOrEmpty(lobbyName) ? DefaultLobbyName() : lobbyName;
+        _pendingLobbyName = string.IsNullOrWhiteSpace(lobbyName) ? DefaultLobbyName() : lobbyName.Trim();
         _pendingCourseName = courseName ?? string.Empty;
         Debug.Log("SteamLobby: CreateLobby: " + gameMode + " lobby \"" + _pendingLobbyName + "\" for " + maxPlayers + " players");
         SteamMatchmaking.CreateLobby(lobbyType, maxPlayers);
@@ -127,9 +127,12 @@ public class SteamLobby : MonoBehaviour
     string DefaultLobbyName()
     {
         string steamUserName = SteamFriends.GetPersonaName();
+        if (string.IsNullOrWhiteSpace(steamUserName))
+            return "Player's Lobby";
+        steamUserName = steamUserName.Trim();
         if (steamUserName.Length > 12)
             steamUserName = steamUserName.Substring(0, 12);
-        return steamUserName + "'s lobby";
+        return steamUserName + "'s Lobby";
     }
     public void JoinLobby(CSteamID lobbyId)
     {

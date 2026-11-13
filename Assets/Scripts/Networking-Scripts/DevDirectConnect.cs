@@ -142,8 +142,7 @@ public class DevDirectConnect : MonoBehaviour
 
     void Update()
     {
-        if ((_commandLineHostMode != null || _commandLineJoin) && TitleScene.IsActive()
-            && TitleScreenManager.instance != null && NetworkManagerGRF.singleton != null)
+        if ((_commandLineHostMode != null || _commandLineJoin) && IsReadyForCommandLineStart())
         {
             if (_commandLineHostMode == "golf")
                 StartDevGolfHost();
@@ -440,14 +439,22 @@ public class DevDirectConnect : MonoBehaviour
         GUILayout.EndArea();
     }
 
+    // Either title screen will do. A Golf host also needs the course loader, which loads the list when asked.
+    bool IsReadyForCommandLineStart()
+    {
+        if (!TitleScene.IsActive() || NetworkManagerGRF.singleton == null)
+            return false;
+        return _commandLineHostMode != "golf" || CustomGolfCourseLoader.GetInstance() != null;
+    }
+
     void StartDevHost(bool is1v1)
     {
         if (!Ready())
             return;
         NetworkManagerGRF.singleton.isDevSession = true;
 
-        // Over Steam the mode and the match settings are set in TitleScreenManager.CreateNewLobby, just before it starts
-        // the host, and nowhere else. Skipping that leaves the prefab's values: 3v3 with minPlayers 2, so the lobby
+        // Over Steam the mode and the match settings are set by the title screen just before it starts the host, and
+        // nowhere else. Skipping that leaves the prefab's values: 3v3 with minPlayers 2, so the lobby
         // offers Start Game at two players and then hangs waiting for six, and halves of zero seconds.
         NetworkManagerGRF.singleton.ConfigureFootballLobby(is1v1);
 
@@ -507,7 +514,10 @@ public class DevDirectConnect : MonoBehaviour
     {
         if (!Ready())
             return;
+        // The title screen's Golf panel loads the course list when it opens, so a dev host that never opened it asks too.
         CustomGolfCourseLoader courses = CustomGolfCourseLoader.GetInstance();
+        if (courses != null)
+            courses.GetAllAvailableCourses();
         if (courses == null || courses.AllAvailableCourses == null || courses.AllAvailableCourses.Courses.Count == 0)
         {
             _status = "No golf courses loaded.";

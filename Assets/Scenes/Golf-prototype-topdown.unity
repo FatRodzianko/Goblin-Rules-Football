@@ -630793,6 +630793,10 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0.9056604
       objectReference: {fileID: 0}
+    - target: {fileID: 6847237581801163528, guid: d32a4166bb1e2b149bbd1fc65e75591e, type: 3}
+      propertyPath: m_FontData.m_VerticalOverflow
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7002024433979963911, guid: d32a4166bb1e2b149bbd1fc65e75591e, type: 3}
       propertyPath: m_MatchWidthOrHeight
       value: 1

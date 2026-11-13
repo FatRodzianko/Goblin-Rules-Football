@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 2560
     height: 1357
   m_ShowMode: 4
-  m_Title: Inspector
+  m_Title: Game
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -118,7 +118,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 112}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 1
-  controlID: 175
+  controlID: 96
   draggingID: 0
 --- !u!114 &6
 MonoBehaviour:
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 112}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 176
+  controlID: 97
   draggingID: 0
 --- !u!114 &7
 MonoBehaviour:
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 112}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 177
+  controlID: 42
   draggingID: 0
 --- !u!114 &8
 MonoBehaviour:
@@ -196,7 +196,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 56}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 178
+  controlID: 43
   draggingID: 0
 --- !u!114 &9
 MonoBehaviour:
@@ -729,7 +729,79 @@ MonoBehaviour:
       m_LastClickedID:
         m_Data: 0
       m_ExpandedIDs:
-      - m_Data: -164918
+      - m_Data: -207384
+      - m_Data: -207136
+      - m_Data: -203906
+      - m_Data: -203880
+      - m_Data: -202910
+      - m_Data: -202782
+      - m_Data: -202556
+      - m_Data: -202534
+      - m_Data: -197480
+      - m_Data: -197024
+      - m_Data: -189416
+      - m_Data: -189188
+      - m_Data: -185958
+      - m_Data: -185932
+      - m_Data: -184962
+      - m_Data: -184834
+      - m_Data: -184608
+      - m_Data: -184586
+      - m_Data: -179532
+      - m_Data: -179076
+      - m_Data: -177598
+      - m_Data: -176494
+      - m_Data: -175916
+      - m_Data: -175492
+      - m_Data: -173610
+      - m_Data: -172414
+      - m_Data: -172086
+      - m_Data: -171650
+      - m_Data: -171360
+      - m_Data: -166032
+      - m_Data: -160790
+      - m_Data: -160562
+      - m_Data: -157332
+      - m_Data: -157306
+      - m_Data: -156336
+      - m_Data: -156208
+      - m_Data: -155982
+      - m_Data: -155960
+      - m_Data: -150906
+      - m_Data: -150450
+      - m_Data: -142250
+      - m_Data: -142022
+      - m_Data: -138862
+      - m_Data: -138836
+      - m_Data: -137866
+      - m_Data: -137738
+      - m_Data: -137512
+      - m_Data: -137490
+      - m_Data: -132436
+      - m_Data: -131980
+      - m_Data: -125014
+      - m_Data: -124786
+      - m_Data: -121626
+      - m_Data: -121600
+      - m_Data: -120630
+      - m_Data: -120502
+      - m_Data: -120276
+      - m_Data: -120254
+      - m_Data: -119896
+      - m_Data: -114744
+      - m_Data: -110664
+      - m_Data: -110436
+      - m_Data: -107192
+      - m_Data: -107152
+      - m_Data: -106174
+      - m_Data: -106038
+      - m_Data: -105804
+      - m_Data: -105774
+      - m_Data: -100712
+      - m_Data: -100248
+      - m_Data: -91674
+      - m_Data: -82862
+      - m_Data: -594
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -12403,7 +12475,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets
+    - Assets/Scenes
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -12413,21 +12485,21 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets
+  - Assets/Scenes
   m_LastFoldersGridSize: 16
-  m_LastProjectPath: C:\Users\murph\Desktop\Unity-gamedev-stuff\Goblin-Rules-Football\Goblin-Rules-Football\Goblin-Rules-Football-Unity6
+  m_LastProjectPath: C:\Users\murph\Desktop\Unity-gamedev-stuff\GRF6
   m_LockTracker:
     m_IsLocked: 0
   m_LastLocalAssetsSearchArea: 1
   m_FolderTreeState:
     scrollPos: {x: 0, y: 79}
     m_SelectedIDs:
-    - m_Data: 56720
+    - m_Data: 198052
     m_LastClickedID:
-      m_Data: 56720
+      m_Data: 198052
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 62824
+    - m_Data: 74828
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -12460,7 +12532,7 @@ MonoBehaviour:
       m_Data: 0
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 62824
+    - m_Data: 74828
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 

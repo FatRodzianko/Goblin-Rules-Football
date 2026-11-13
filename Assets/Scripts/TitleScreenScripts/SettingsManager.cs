@@ -8,10 +8,9 @@ using UnityEngine.EventSystems;
 public class SettingsManager : MonoBehaviour
 {
 
-    private const string resolutionWidthPlayerPrefKey = "ResolutionWidth";
-    private const string resolutionHeightPlayerPrefKey = "ResolutionHeight";
+    // The resolution and window mode are not stored here: they belong to DisplayPreferences, which
+    // every menu shares. This only shows them and hands the player's choice over on Save.
     private const string volumePlayerPrefKey = "VolumePreference";
-    private const string fullScreenPlayerPrefKey = "FullScreen";
     private const string gamepadUIPlayerPrefKey = "GamepadUI";
     private const string crtScreenEffectPrefKey = "CRT";
     private const string _gameSFXVolumePrefKEy = "GameSFXVolume";
@@ -25,10 +24,8 @@ public class SettingsManager : MonoBehaviour
     
     public Toggle fillScreenToggle;
     public Toggle gamepadUIToggle;
-    int currentScreenWidth;
-    int currentScreenHeight;
-    
-    Resolution[] resolutions;
+    private int _chosenModeIndex;
+
     public Toggle crtScreenEffectToggle;
 
     [Header("Volume Slider Stuff")]
@@ -43,6 +40,9 @@ public class SettingsManager : MonoBehaviour
 
     private void Start()
     {
+        // A scene can carry this without its menu (the map maker does), which leaves nothing to show.
+        if (resolutionDropdown == null)
+            return;
         GetResolutions();
         LoadSettings();
     }
@@ -93,233 +93,38 @@ public class SettingsManager : MonoBehaviour
             _musicSlider.value = newVolume;
         }
     }
-    public void SetFullscreen(bool isFullScreen)
-    {
-        Debug.Log("SetFullscreen: " + isFullScreen.ToString());
-        fillScreenToggle.isOn = isFullScreen;
-        //Screen.fullScreenMode = FullScreenMode.Windowed;
-        //Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
-        Screen.fullScreen = isFullScreen;
-        //string test = Screen.fullScreenMode
-        //ullScreenMode fullScreen = Screen.FullScreenMode;
-        //Screen.fullScreenMode = FullScreenMode.Windowed;
-    }
+    // Lists the modes the display reports and selects the one on screen. Nothing is applied here:
+    // the window already shows the player's mode, and a scene load must never change it.
     void GetResolutions()
     {
-        //resolutions = Screen.resolutions;
-        //Debug.Log("GetResolutions: Current screen resolution is: " + Screen.currentResolution.ToString());
-        List<Resolution> resolutionList = new List<Resolution>();
-        double aspectRatio = ((double)16 / (double)9);
-
-        double maxHeight = 0;
-
-        // OLD WAY
-        //foreach (Resolution resolution in Screen.resolutions)
-        //{
-        //    double resolutionAspectRation = (double)resolution.width / (double)resolution.height;
-        //    if ((resolutionAspectRation == aspectRatio) && (resolution.refreshRate == Screen.currentResolution.refreshRate))
-        //    {
-        //        resolutionList.Add(resolution);
-        //    }
-
-        //    //Debug.Log("GetResolutions: Found resolution of " + resolution.ToString());
-        //    if (resolution.height > maxHeight)
-        //        maxHeight = resolution.height;
-
-        //}
-
-        //Debug.Log("GetResolutions: The max screen resolution height is: " + maxHeight.ToString());
-        // OLD WAY
-
-        /*if (resolutionList.Count > 0)
-        {
-            resolutions = resolutionList.ToArray();
-        }
-        resolutionDropdown.ClearOptions();
+        DisplayPreferences.RefreshModes();
+        IList<Resolution> modes = DisplayPreferences.Modes;
         List<string> options = new List<string>();
-
-        if (resolutions.Length > 0)
-        {
-            int currentResolutionIndex = 0;
-            for (int i = 0; i < resolutions.Length; i++)
-            {
-                string option = resolutions[i].width + "x" + resolutions[i].height;
-                options.Add(option);
-
-
-                if (resolutions[i].width == Screen.width && resolutions[i].height == Screen.height)
-                {
-                    currentResolutionIndex = i;
-                }
-            }
-            resolutionDropdown.AddOptions(options);
-            resolutionDropdown.value = currentResolutionIndex;
-            ResolutionDropDown(currentResolutionIndex);
-        }*/
-        //resolutionList.Clear();
+        for (int i = 0; i < modes.Count; i++)
+            options.Add(modes[i].width + " x " + modes[i].height);
         resolutionDropdown.ClearOptions();
-        List<string> options = new List<string>();
-        string option = "";
-        int index = 0;
-        int currentResolutionIndex = 0;
-        Resolution newRes = new Resolution();
-
-        // OLD WAY
-        //if (maxHeight >= 720)
-        //{
-        //    option = "1280x720";
-        //    options.Add(option);
-
-        //    newRes.width = 1280;
-        //    newRes.height = 720;
-        //    newRes.refreshRate = Screen.currentResolution.refreshRate;
-        //    resolutionList.Add(newRes);
-
-        //    if (Screen.width == 1280 && Screen.height == 720)
-        //    {
-        //        currentResolutionIndex = index;
-        //    }
-        //    index++;
-        //}
-
-
-        //if (maxHeight >= 900)
-        //{
-        //    option = "1600x900";
-        //    options.Add(option);
-
-        //    newRes.width = 1600;
-        //    newRes.height = 900;
-        //    newRes.refreshRate = Screen.currentResolution.refreshRate;
-        //    resolutionList.Add(newRes);
-
-        //    if (Screen.width == 1600 && Screen.height == 900)
-        //    {
-        //        currentResolutionIndex = index;
-        //    }
-        //    index++;
-        //}
-        //if (maxHeight >= 1080)
-        //{
-        //    option = "1920x1080";
-        //    options.Add(option);
-
-        //    newRes.width = 1920;
-        //    newRes.height = 1080;
-        //    newRes.refreshRate = Screen.currentResolution.refreshRate;
-        //    resolutionList.Add(newRes);
-
-        //    if (Screen.width == 1920 && Screen.height == 1080)
-        //    {
-        //        currentResolutionIndex = index;
-        //    }
-        //    index++;
-        //}
-        //if (maxHeight >= 1440)
-        //{
-        //    option = "2560x1440";
-        //    options.Add(option);
-
-        //    newRes.width = 2560;
-        //    newRes.height = 1440;
-        //    newRes.refreshRate = Screen.currentResolution.refreshRate;
-        //    resolutionList.Add(newRes);
-
-        //    if (Screen.width == 2560 && Screen.height == 1440)
-        //    {
-        //        currentResolutionIndex = index;
-        //    }
-        //    index++;
-        //}
-        // OLD WAY
-
-        foreach (Resolution resolution in Screen.resolutions)
-        {
-            newRes.width = resolution.width;
-            newRes.height = resolution.height;
-            newRes.refreshRateRatio = Screen.currentResolution.refreshRateRatio;
-
-            if (resolutionList.Contains(newRes))
-                continue;
-            Debug.Log("New resolution: " + newRes.ToString());
-            //option = resolution.width.ToString() + "x" + resolution.height.ToString() + "@" + resolution.refreshRate;
-
-            
-            option = newRes.width + " x " + newRes.height + " @ " + Mathf.RoundToInt((float)newRes.refreshRateRatio.value) + "Hz";
-            options.Add(option);
-            resolutionList.Add(newRes);
-
-            //if (Screen.width == resolution.width && Screen.height == resolution.height && (resolution.refreshRate == Screen.currentResolution.refreshRate || resolution.refreshRate + 1 == Screen.currentResolution.refreshRate))
-            if (Screen.width == newRes.width && Screen.height == newRes.height)
-            {
-                Debug.Log("Resolution match: " + newRes.ToString() + " at index: " + index.ToString());
-                currentResolutionIndex = index;
-            }
-
-            index++;
-        }
-        
-        
-        if (resolutionList.Count > 0)
-        {
-            resolutions = resolutionList.ToArray();
-        }
         resolutionDropdown.AddOptions(options);
-        resolutionDropdown.value = 0;
-        resolutionDropdown.value = currentResolutionIndex;
-        ResolutionDropDown(currentResolutionIndex);
-
-        //LoadSettings();        
+        ShowCurrentDisplayMode();
     }
     public void ResolutionDropDown(int index)
     {
-        currentScreenWidth = resolutions[index].width;
-        currentScreenHeight = resolutions[index].height;
-
-        Debug.Log("ResolutionDropDown " + currentScreenWidth.ToString() + " " + currentScreenHeight.ToString());
+        _chosenModeIndex = index;
     }
-    public void SetResolution(int width, int height, bool fullScreen)
+    private void ShowCurrentDisplayMode()
     {
-        Debug.Log("SetResolution: " + width.ToString() + "x" + height.ToString() + " " + fullScreen.ToString());
-        if (width > 0 && height > 0 && ((width / height) == (1920 / 1080)))
-        {
-            if (fullScreen)
-                Screen.SetResolution(width, height, FullScreenMode.FullScreenWindow);
-            else
-                Screen.SetResolution(width, height, false);
-
-            currentScreenWidth = width;
-            currentScreenHeight = height;
-        }
-        else
-        {
-            //Screen.SetResolution(1920, 1080, false);
-            if (fullScreen)
-                Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, FullScreenMode.FullScreenWindow);
-            else
-                Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, false);
-
-            currentScreenWidth = Screen.currentResolution.width;
-            currentScreenHeight = Screen.currentResolution.height;
-
-        }
-        SetResolutionIndex(currentScreenWidth, currentScreenHeight);
+        _chosenModeIndex = DisplayPreferences.CurrentModeIndex();
+        if (resolutionDropdown != null)
+            resolutionDropdown.SetValueWithoutNotify(_chosenModeIndex);
+        if (fillScreenToggle != null)
+            fillScreenToggle.SetIsOnWithoutNotify(DisplayPreferences.IsFullscreen);
     }
-    void SetResolutionIndex(int width, int height)
+    private void SaveDisplayMode()
     {
-        Debug.Log("SetResolutionIndex: " + resolutions.Length);
-        if (resolutions.Length > 0)
-        {
-            for (int i = 0; i < resolutions.Length; i++)
-            {
-                if (width == resolutions[i].width && height == resolutions[i].height)
-                {
-                    Debug.Log("SetResolutionIndex: to " + i + " for " + resolutions[i].ToString());
-                    resolutionDropdown.value = i;
-                    break;
-                }
-            }
-        }
+        Resolution mode;
+        if (!DisplayPreferences.TryGetMode(_chosenModeIndex, out mode))
+            return;
+        bool fullscreen = fillScreenToggle == null || fillScreenToggle.isOn;
+        DisplayPreferences.ApplyAndStore(mode, fullscreen);
     }
     public void SetCRTScreenEffect(bool isCRTEffectOn)
     {
@@ -344,26 +149,13 @@ public class SettingsManager : MonoBehaviour
         PlayerPrefs.SetFloat(_gameSFXVolumePrefKEy, _gameSFXVolume);
         PlayerPrefs.SetFloat(_musicVolumePrefKEy, _musicVolume);
 
-        int fullScreenBool = Convert.ToInt32(fillScreenToggle.isOn);
-        if (fullScreenBool == 1 || fullScreenBool == 0)
-            PlayerPrefs.SetInt(fullScreenPlayerPrefKey, fullScreenBool);
-        else
-            PlayerPrefs.SetInt(fullScreenPlayerPrefKey, 0);
         int gamepadUIBool = Convert.ToInt32(gamepadUIToggle.isOn);
         if (gamepadUIBool == 1 || gamepadUIBool == 0)
             PlayerPrefs.SetInt(gamepadUIPlayerPrefKey, gamepadUIBool);
         else
             PlayerPrefs.SetInt(gamepadUIPlayerPrefKey, 0);
-        if (currentScreenHeight > 0 && currentScreenWidth > 0 && (currentScreenWidth / currentScreenHeight) == (1920 / 1080))
-        {
-            PlayerPrefs.SetInt(resolutionWidthPlayerPrefKey, currentScreenWidth);
-            PlayerPrefs.SetInt(resolutionHeightPlayerPrefKey, currentScreenHeight);
-        }
-        else
-        {
-            PlayerPrefs.SetInt(resolutionWidthPlayerPrefKey, 1920);
-            PlayerPrefs.SetInt(resolutionHeightPlayerPrefKey, 1080);
-        }
+
+        SaveDisplayMode();
 
         int crtBool = Convert.ToInt32(crtScreenEffectToggle.isOn);
         if (crtBool == 1 || crtBool == 0)
@@ -436,41 +228,7 @@ public class SettingsManager : MonoBehaviour
             _musicSlider.value = setVolume;
 
         }
-        if (PlayerPrefs.HasKey(fullScreenPlayerPrefKey))
-        {
-            int fullScreenBool = PlayerPrefs.GetInt(fullScreenPlayerPrefKey);
-            if (fullScreenBool == 1 || fullScreenBool == 0)
-                SetFullscreen(Convert.ToBoolean(PlayerPrefs.GetInt(fullScreenPlayerPrefKey)));
-            else
-                SetFullscreen(true);
-            //  SetFullscreen(false);
-        }
-        else
-        {
-            //SetFullscreen(false);
-            SetFullscreen(true);
-        }
-        if (PlayerPrefs.HasKey(resolutionWidthPlayerPrefKey) && PlayerPrefs.HasKey(resolutionHeightPlayerPrefKey) && PlayerPrefs.HasKey(fullScreenPlayerPrefKey))
-        {
-            int width = PlayerPrefs.GetInt(resolutionWidthPlayerPrefKey);
-            int height = PlayerPrefs.GetInt(resolutionHeightPlayerPrefKey);
-            int fullScreenBool = PlayerPrefs.GetInt(fullScreenPlayerPrefKey);
-            if ((width / height) == (1920 / 1080) && width > 0 && height > 0 && (fullScreenBool == 1 || fullScreenBool == 0))
-            {
-                SetResolution(PlayerPrefs.GetInt(resolutionWidthPlayerPrefKey), PlayerPrefs.GetInt(resolutionHeightPlayerPrefKey), Convert.ToBoolean(PlayerPrefs.GetInt(fullScreenPlayerPrefKey)));
-            }
-            else
-            {
-                //SetResolution(1920, 1080, false);
-                SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, true);
-            }
-
-        }
-        else
-        {
-            //SetResolution(1920, 1080, false);
-            SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, true);
-        }
+        ShowCurrentDisplayMode();
         if (PlayerPrefs.HasKey(gamepadUIPlayerPrefKey))
         {
             int gamepadUIBool = PlayerPrefs.GetInt(gamepadUIPlayerPrefKey);
@@ -504,17 +262,17 @@ public class SettingsManager : MonoBehaviour
             SetCRTScreenEffect(false);
         }
     }
+    // Resets only what this menu shows. Never PlayerPrefs.DeleteAll, which would also take the
+    // player's key bindings, name and golf settings.
     public void ResetToDefault()
     {
-        PlayerPrefs.DeleteAll();
-        Debug.Log("ResetToDefault: Screen.currentResolution.width: " + Screen.currentResolution.width.ToString() + " x Screen.currentResolution.height: " + Screen.currentResolution.height.ToString());
-        //Resolution max = GetMaxResolution();
-        ////SetResolution(Screen.currentResolution.width, Screen.currentResolution.width, true);
-        //SetResolution(max.width, max.width, true);
+        PlayerPrefs.DeleteKey(volumePlayerPrefKey);
+        PlayerPrefs.DeleteKey(_gameSFXVolumePrefKEy);
+        PlayerPrefs.DeleteKey(_musicVolumePrefKEy);
+        PlayerPrefs.DeleteKey(gamepadUIPlayerPrefKey);
+        PlayerPrefs.DeleteKey(crtScreenEffectPrefKey);
+        PlayerPrefs.Save();
+        DisplayPreferences.ResetToDefault();
         LoadSettings();
-    }
-    Resolution GetMaxResolution()
-    {
-        return Screen.resolutions[Screen.resolutions.Length - 1];
     }
 }
