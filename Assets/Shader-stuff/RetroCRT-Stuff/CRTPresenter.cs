@@ -316,10 +316,10 @@ public class CRTPresenter : MonoBehaviour
             // The UI camera gets its own Pixel Perfect so UI still rasterises at a whole multiple of
             // the reference resolution. Copied from the world camera so a scene with a different
             // reference resolution still matches itself.
-            var worldPP = _worldCamera.GetComponent<UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera>();
+            var worldPP = _worldCamera.GetComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>();
             if (worldPP != null)
             {
-                var uiPP = uiGo.AddComponent<UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera>();
+                var uiPP = uiGo.AddComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>();
                 uiPP.assetsPPU = worldPP.assetsPPU;
                 uiPP.refResolutionX = worldPP.refResolutionX;
                 uiPP.refResolutionY = worldPP.refResolutionY;

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 //using UnityEngine.U2D;
-using UnityEngine.Experimental.Rendering.Universal;
+
 using System;
 
 public class CanvasScaler : MonoBehaviour
 {
     public Camera MainCamera;
-    [SerializeField] PixelPerfectCamera myPixelPerfectCamera;
+    [SerializeField] UnityEngine.Rendering.Universal.PixelPerfectCamera myPixelPerfectCamera;
     // Start is called before the first frame update
     private void Awake()
     {
@@ -40,7 +40,7 @@ public class CanvasScaler : MonoBehaviour
         //   scaler.AdjustScalingFactor() = MainCamera.GetComponent<PixelPerfectCamera>().pixelRatio;
         try
         {
-            c.scaleFactor = MainCamera.GetComponent<PixelPerfectCamera>().pixelRatio;
+            c.scaleFactor = MainCamera.GetComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>().pixelRatio;
         }
         catch (Exception)
         {

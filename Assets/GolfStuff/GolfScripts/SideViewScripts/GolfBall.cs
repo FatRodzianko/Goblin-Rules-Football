@@ -38,7 +38,7 @@ public class GolfBall : MonoBehaviour
         {
             ResetPosition(true);
         }*/
-        if (isHit && Mathf.Abs(rb.velocity.x) < 0.01f && Mathf.Abs(rb.velocity.y) < 0.01f)
+        if (isHit && Mathf.Abs(rb.linearVelocity.x) < 0.01f && Mathf.Abs(rb.linearVelocity.y) < 0.01f)
         {
             ResetPosition(false);
             Debug.Log("Ball stopped moving after hit");
@@ -55,14 +55,14 @@ public class GolfBall : MonoBehaviour
     }
     public void ResetPosition(bool positionReset)
     {
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
         if (positionReset)
         {
             this.transform.position = resetPosition;
             this.transform.rotation = resetRotation;
         }
-        rb.angularDrag = angularDragAir;
+        rb.angularDamping = angularDragAir;
         isHit = false;
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -70,17 +70,17 @@ public class GolfBall : MonoBehaviour
         if (collision.gameObject.tag == "groundRough" && isHit)
         {
             Debug.Log("OnCollisionEnter2D: Changing angulardrag to Rough");
-            rb.angularDrag = angularDragRough;
+            rb.angularDamping = angularDragRough;
         }
         if (collision.gameObject.tag == "groundFairway" && isHit)
         {
             Debug.Log("OnCollisionEnter2D: Changing angulardrag to Fairway");
-            rb.angularDrag = angularDragFairway;
+            rb.angularDamping = angularDragFairway;
         }
         if (collision.gameObject.tag == "groundGreen" && isHit)
         {
             Debug.Log("OnCollisionEnter2D: Changing angulardrag to Green");
-            rb.angularDrag = angularDragGreen ;
+            rb.angularDamping = angularDragGreen ;
         }
     }
     private void OnCollisionExit2D(Collision2D collision)
@@ -88,17 +88,17 @@ public class GolfBall : MonoBehaviour
         if (collision.gameObject.tag == "groundRough")
         {
             Debug.Log("OnCollisionExit2D: Changing angulardrag to Air");
-            rb.angularDrag = angularDragAir;
+            rb.angularDamping = angularDragAir;
         }
         if (collision.gameObject.tag == "groundFairway")
         {
             Debug.Log("OnCollisionExit2D: Changing angulardrag to Air");
-            rb.angularDrag = angularDragAir;
+            rb.angularDamping = angularDragAir;
         }
         if (collision.gameObject.tag == "groundGreen")
         {
             Debug.Log("OnCollisionExit2D: Changing angulardrag to Air");
-            rb.angularDrag = angularDragAir;
+            rb.angularDamping = angularDragAir;
         }
     }
     private void OnCollisionStay2D(Collision2D collision)
@@ -106,17 +106,17 @@ public class GolfBall : MonoBehaviour
         if (collision.gameObject.tag == "groundRough" && isHit)
         {
             Debug.Log("OnCollisionEnter2D: Changing angulardrag to Rough");
-            rb.angularDrag = angularDragRough;
+            rb.angularDamping = angularDragRough;
         }
         if (collision.gameObject.tag == "groundFairway" && isHit)
         {
             Debug.Log("OnCollisionEnter2D: Changing angulardrag to Fairway");
-            rb.angularDrag = angularDragFairway;
+            rb.angularDamping = angularDragFairway;
         }
         if (collision.gameObject.tag == "groundGreen" && isHit)
         {
             Debug.Log("OnCollisionEnter2D: Changing angulardrag to Green");
-            rb.angularDrag = angularDragGreen;
+            rb.angularDamping = angularDragGreen;
         }
     }
     IEnumerator WasHitDelay()

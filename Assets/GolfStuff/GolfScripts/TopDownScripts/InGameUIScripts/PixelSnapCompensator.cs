@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
-using PixelPerfectCamera = UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera;
+using PixelPerfectCamera = UnityEngine.Rendering.Universal.PixelPerfectCamera;
 
 // Holds a world-space object that is parented to the camera still on screen. PixelPerfectCamera replaces
 // the camera's view matrix every frame with one built from the camera's position rounded to the pixel

@@ -3,10 +3,16 @@
 --- !u!162 &1
 EditorUserSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 4
+  serializedVersion: 5
   m_ConfigSettings:
     Entity Inspector Settings:
       value: 183b144645154b790c0d07271e271d4a564654406c6866706f0d1420f2ec3521c1e83bf9e8343a322d36f62c017c5b7ff40b0518f36117
+      flags: 0
+    QuickInstaller_com.unity.purchasing_installRecorded:
+      value: 2550581500
+      flags: 0
+    QuickInstaller_com.unity.services.levelplay_installRecorded:
+      value: 2550581500
       flags: 0
     RecentlyUsedSceneGuid-0:
       value: 5700510403070b0d5957542744215a444f4f4f7b2e7d23322e714e30bbb0666a
@@ -99,3 +105,5 @@ EditorUserSettings:
   m_VCAllowAsyncUpdate: 0
   m_VCScanLocalPackagesOnConnect: 1
   m_ArtifactGarbageCollection: 1
+  m_CompressAssetsOnImport: 1
+  m_VCAutoRevertUnchangedFiles: 0
