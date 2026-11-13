@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: DistanceCondition
   m_EditorClassIdentifier: 
   NetworkObject: {fileID: 0}
+  _addOrder: 0
+  _isConstant: 0
   _maximumDistance: 10
   _hideDistancePercent: 0.1
-  UpdateFrequency: 0

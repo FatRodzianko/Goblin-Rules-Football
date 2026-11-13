@@ -2420,6 +2420,7 @@ MonoBehaviour:
   Statues: []
   BalloonPowerUps: []
   Tubes: []
+  MiniGolfPipes: []
   IsTeeOffChallenge: 1
   ClubToUse: putter
   IsMiniGolf: 1

@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: MatchCondition
   m_EditorClassIdentifier: 
   NetworkObject: {fileID: 0}
+  _addOrder: 0
+  _isConstant: 0

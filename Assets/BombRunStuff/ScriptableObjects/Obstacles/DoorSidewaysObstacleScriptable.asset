@@ -17,3 +17,4 @@ MonoBehaviour:
   _tile: {fileID: 11400000, guid: b14e86332e637cd48a3933d4bb9d6e7a, type: 2}
   _isDestrucable: 0
   _isInteractable: 1
+  _obstacleCoverType: 0

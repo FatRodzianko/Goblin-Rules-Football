@@ -24,12 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6260449127378760459}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 95.66345}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6260449127378760458
 MonoBehaviour:
@@ -44,11 +45,103 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkManager: {fileID: 0}
+  _fishNetNetworkManager: {fileID: 0}
+  eventSystem: {fileID: 0}
   mainMenuPanel: {fileID: 0}
   PlayerNamePanel: {fileID: 0}
   HostOrJoinPanel: {fileID: 0}
   EnterIPAddressPanel: {fileID: 0}
+  CreateGameInfoPanel: {fileID: 0}
   playerNameInputField: {fileID: 0}
   GamepadToggle: {fileID: 0}
   IpAddressField: {fileID: 0}
   returnToMainMenu: {fileID: 0}
+  toggle3v3: {fileID: 0}
+  singlePlayerSecondsPerHalfInputField: {fileID: 0}
+  singlePlayerPowerUpsToggle: {fileID: 0}
+  singlePlayerRandomEventsToggle: {fileID: 0}
+  singlePlayerSpawnObstacles: {fileID: 0}
+  singlePlayerMercyRuleToggle: {fileID: 0}
+  singlePlayerMercyRuleInputField: {fileID: 0}
+  multiplayerLobbyNameInputField: {fileID: 0}
+  multiplayer1v1Toggle: {fileID: 0}
+  multiplayer3v3Toggle: {fileID: 0}
+  multiplayerSecondsPerHalfInputField: {fileID: 0}
+  multiplayerPowerUpsToggle: {fileID: 0}
+  multiplayerRandomEventsToggle: {fileID: 0}
+  multiplayerSpawnObstacles: {fileID: 0}
+  multiplayerMercyRuleToggle: {fileID: 0}
+  multiplayerMercyRuleInputField: {fileID: 0}
+  _customGolfCourseLoader: {fileID: 0}
+  _selectedCourseIndex: 0
+  _selectedCourseId: 
+  _selectedCourseName: 
+  _selectedCourseWorkshopID: 0
+  _golfMultiplayerLobbyNameInputField: {fileID: 0}
+  _golfNumberOfPlayersInputField: {fileID: 0}
+  _golfFriendsOnlyToggle: {fileID: 0}
+  _golfPowerUpsToggle: {fileID: 0}
+  _spawnWeatherStatueToggle: {fileID: 0}
+  _strokeLimitToggle: {fileID: 0}
+  _strokeLimitInputField: {fileID: 0}
+  _rainModeDropDown: {fileID: 0}
+  _windModeDropDown: {fileID: 0}
+  _selectCourseDropdown: {fileID: 0}
+  _courseHoleSelectionDropdown: {fileID: 0}
+  _golfParPenaltyFavorToggle: {fileID: 0}
+  _selectCustomHolesPanel: {fileID: 0}
+  _allToggles: []
+  _customeSelectHole1Toggle: {fileID: 0}
+  _customeSelectHole2Toggle: {fileID: 0}
+  _customeSelectHole3Toggle: {fileID: 0}
+  _customeSelectHole4Toggle: {fileID: 0}
+  _customeSelectHole5Toggle: {fileID: 0}
+  _customeSelectHole6Toggle: {fileID: 0}
+  _customeSelectHole7Toggle: {fileID: 0}
+  _customeSelectHole8Toggle: {fileID: 0}
+  _customeSelectHole9Toggle: {fileID: 0}
+  _front3: 
+  _middle3: 
+  _back3: 
+  _allNine: 
+  _custom: 
+  is1v1: 0
+  secondsPerHalf: 0
+  powerUpsEnabled: 0
+  randomEventsEnabled: 0
+  spawnObstaclesEnabled: 0
+  mercyRuleEnabled: 0
+  mercyRulePointDifferential: 0
+  GolfLobbyName: 
+  GolfFriendsOnly: 0
+  GolfPowerUpsEnabled: 1
+  SpawnStatuesEnabled: 1
+  StrokeLimitEnabled: 0
+  StrokeLimitNumber: 12
+  startGameButton: {fileID: 0}
+  confirmNameButton: {fileID: 0}
+  hostGameButton: {fileID: 0}
+  connectToIPButton: {fileID: 0}
+  createLobbyButton: {fileID: 0}
+  LobbyListCanvas: {fileID: 0}
+  LobbyListItemPrefab: {fileID: 0}
+  ContentPanel: {fileID: 0}
+  LobbyListScrollRect: {fileID: 0}
+  searchBox: {fileID: 0}
+  didPlayerSearchForLobbies: 0
+  CreateLobbyCanvas: {fileID: 0}
+  lobbyNameInputField: {fileID: 0}
+  friendsOnlyToggle: {fileID: 0}
+  listOfLobbyListItems: []
+  _switchToGolfButton: {fileID: 0}
+  _switchToFootballButton: {fileID: 0}
+  _titleText: {fileID: 0}
+  _footballBackgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  _golfBackgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  _footballCanvas: {fileID: 0}
+  _golfCanvas: {fileID: 0}
+  _turnMusicOnOffButtonText: {fileID: 0}
+  _turnMusicOnOffImage: {fileID: 0}
+  _musicOffSprite: {fileID: 0}
+  _musicOnSprite: {fileID: 0}
+  IsMusicOn: 0

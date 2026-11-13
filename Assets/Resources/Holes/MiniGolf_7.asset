@@ -1542,6 +1542,7 @@ MonoBehaviour:
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   Tubes: []
+  MiniGolfPipes: []
   IsTeeOffChallenge: 0
   ClubToUse: 
   IsMiniGolf: 1

@@ -21863,6 +21863,7 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
   - TilePos: {x: 344, y: 1, z: 0}
     MyTile: {fileID: 11400000, guid: 761b04c912f4af64e9263437008a8d98, type: 2}
+  MiniGolfWallTiles: []
   SavedObstacles:
   - ObstaclePos: {x: 180.26001, y: -26.84, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
@@ -21969,6 +21970,7 @@ MonoBehaviour:
   ZoomedOutPos: {x: 200.5, y: -5.5, z: 0}
   CameraZoomValue: 10
   TeeOffAimPoint: {x: 205.25, y: -10.75, z: 0}
+  CourseAimPoints: []
   Statues:
   - StatuePosition: {x: 198.5, y: -25.5, z: 0}
     StatueType: bad-weather
@@ -22029,5 +22031,7 @@ MonoBehaviour:
   - TubePosition: {x: 27.5, y: -22.5, z: 0}
     IsPrimaryTube: 1
     TubeScriptableObstacle: {fileID: 11400000, guid: c609b74f5b25db04abf8f7bc30c3db9e, type: 2}
+  MiniGolfPipes: []
   IsTeeOffChallenge: 0
   ClubToUse: 
+  IsMiniGolf: 0

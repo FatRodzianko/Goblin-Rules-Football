@@ -13,18 +13,18 @@ MonoBehaviour:
   m_Name: GolfCourses
   m_EditorClassIdentifier: 
   m_GroupName: GolfCourses
-  m_Data:
-    m_SerializedData: []
   m_GUID: ac53588047718dc4bbbfb8fcf5673c4d
   m_SerializeEntries:
   - m_GUID: 0de78215564c4a647b4d3a8026292151
     m_Address: Assets/GolfStuff/GolfCourses/Forest.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 79aed7ec2c7ae8f42a97300aee2aa423
     m_Address: Assets/GolfStuff/GolfCourses/TeeOffChallenges.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

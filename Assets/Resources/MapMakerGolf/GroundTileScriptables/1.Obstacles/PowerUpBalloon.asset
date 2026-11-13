@@ -22,6 +22,8 @@ MonoBehaviour:
   _usePlacementRestrictions: 0
   _placementRestrictions:
   - {fileID: 11400000, guid: 6aed32eadc5fd624e9b4a385e003217a, type: 2}
+  _onlyAllowedOnSpecificGroundType: 0
+  _canOnlyBePlacedOnTheseGroundTypes: []
   _allowedInMiniGolf: 1
   _miniGolfOnly: 0
   ScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}

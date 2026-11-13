@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: SpinningHoop
   m_EditorClassIdentifier: 
   ObstaclePrefab: {fileID: 8740297031622800146, guid: 706fad580fbecf8489a44ce6f69027cc, type: 3}
+  MapMakerPrefab: {fileID: 0}
   SoftBounceSoundType: golfball-bounce-brush
   HardBounceSoundType: golfball-bounce-wood

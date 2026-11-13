@@ -24,12 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8687703095736431245}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5332453089652659202
 MonoBehaviour:
@@ -44,6 +45,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioMixer: {fileID: 0}
+  _gameSFXMixer: {fileID: 0}
+  _musicMixer: {fileID: 0}
   resolutionDropdown: {fileID: 0}
-  volumeSlider: {fileID: 0}
   fillScreenToggle: {fileID: 0}
+  gamepadUIToggle: {fileID: 0}
+  crtScreenEffectToggle: {fileID: 0}
+  volumeSlider: {fileID: 0}
+  currentVolume: 0
+  _gameSFXSlider: {fileID: 0}
+  _gameSFXVolume: 0
+  _defaultGameSFXVolume: -21
+  _musicSlider: {fileID: 0}
+  _musicVolume: 0
+  _defaultMusicVolume: -21

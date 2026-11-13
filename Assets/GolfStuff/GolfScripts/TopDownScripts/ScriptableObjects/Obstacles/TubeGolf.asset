@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: TubeGolf
   m_EditorClassIdentifier: 
   ObstaclePrefab: {fileID: 7192555778628400987, guid: d8064f70ac9f6184caf5d0d70edd404f, type: 3}
+  MapMakerPrefab: {fileID: 0}
   SoftBounceSoundType: golfball-bounce-brush
   HardBounceSoundType: golfball-bounce-wood

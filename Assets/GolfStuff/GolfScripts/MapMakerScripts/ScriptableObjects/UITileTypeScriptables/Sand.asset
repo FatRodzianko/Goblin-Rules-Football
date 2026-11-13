@@ -15,3 +15,5 @@ MonoBehaviour:
   _siblingIndex: 7
   _backgroundColor: {r: 0.9490197, g: 0.7803922, b: 0.47450984, a: 1}
   _uiName: 
+  _allowedInMiniGolf: 0
+  _miniGolfOnly: 0

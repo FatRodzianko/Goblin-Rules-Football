@@ -24,12 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6239443145067976430}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 873.33905, y: 686.11237, z: -677.0315}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4269107553849375132
 MonoBehaviour:
@@ -43,3 +44,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07a8653735c4be54c8e8e450c65d8b4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isStatsOpen: 0
+  statsButtonText: {fileID: 0}
+  ScrollObject: {fileID: 0}
+  greenYeehaws: {fileID: 0}
+  greenPunchesThrown: {fileID: 0}
+  greenPunchesHit: {fileID: 0}
+  greenSlideTackles: {fileID: 0}
+  greenSlideTacklesHit: {fileID: 0}
+  greenTouchdowns: {fileID: 0}
+  greenKickAfter: {fileID: 0}
+  greenKickAfterPercentage: {fileID: 0}
+  greenFumbles: {fileID: 0}
+  greenPassess: {fileID: 0}
+  greenPowerUps: {fileID: 0}
+  greenPowerUpsUsed: {fileID: 0}
+  greenBlockedKicks: {fileID: 0}
+  greenKicksDownfield: {fileID: 0}
+  greenKnockedOut: {fileID: 0}
+  greenTripped: {fileID: 0}
+  greyYeehaws: {fileID: 0}
+  greyPunchesThrown: {fileID: 0}
+  greyPunchesHit: {fileID: 0}
+  greySlideTackles: {fileID: 0}
+  greySlideTacklesHit: {fileID: 0}
+  greyTouchdowns: {fileID: 0}
+  greyKickAfter: {fileID: 0}
+  greyKickAfterPercentage: {fileID: 0}
+  greyFumbles: {fileID: 0}
+  greyPassess: {fileID: 0}
+  greyPowerUps: {fileID: 0}
+  greyPowerUpsUsed: {fileID: 0}
+  greyBlockedKicks: {fileID: 0}
+  greyKicksDownfield: {fileID: 0}
+  greyKnockedOut: {fileID: 0}
+  greyTripped: {fileID: 0}

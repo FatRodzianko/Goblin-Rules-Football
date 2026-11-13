@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: SceneCondition
   m_EditorClassIdentifier: 
   NetworkObject: {fileID: 0}
-  _synchronizeScene: 1
-  _timed: 0
+  _addOrder: 0
+  _isConstant: 0

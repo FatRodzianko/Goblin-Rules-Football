@@ -25,6 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 411310913693086750}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 31.5, y: -1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -32,10 +33,10 @@ Transform:
   m_Children:
   - {fileID: 1031175540907802206}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &411310913693086749
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -51,6 +52,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -72,9 +78,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 4
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 586eb66b4d99de04bac0d4dabfc2fe02, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -84,7 +92,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &411310913693086747
 MonoBehaviour:
@@ -103,13 +110,23 @@ MonoBehaviour:
   myScriptableObject: {fileID: 11400000, guid: 8fd38948f6526f64cb570263f66a8fef, type: 2}
   MyExitPipe: {fileID: 0}
   _myCircleRadius: 0
+  _mySpriteRadius: 0
   ExitPipePosition: {x: 0, y: 0, z: 0}
   ExitPipeDirection: {x: 0, y: -1, z: 0}
   ExitPointReferenceObject: {fileID: 7298841874408124581}
   ExitPipeExitPoint: {x: 0, y: 0, z: 0}
   ExitPipeIsOffset: 0
+  ExitSpeedAddition: 2
+  WayPointHolder: {fileID: 0}
+  _wayPoints: []
+  _pathLength: 0
   _ballSpeedOnEntry: 1
   _ballMovementDirectionOnEntry: {x: 0, y: 0}
+  _ballAngleToHoleOnEntry: 0
+  _ballExitSpeed: 0
+  _differenceInStartAndEndSpeed: 0
+  _ballAcceleration: 0.75
+  _timeInTube: 0
   _moveBall: 0
   _ballToMove: {fileID: 0}
   _moveBallSpeed: 1
@@ -142,11 +159,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7298841874408124581}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.3125, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 411310913693086748}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

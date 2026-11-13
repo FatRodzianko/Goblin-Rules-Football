@@ -58257,6 +58257,7 @@ MonoBehaviour:
     MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
   - TilePos: {x: 12, y: 24, z: 0}
     MyTile: {fileID: 11400000, guid: f67d65da9a05cb04ab8924f41f025482, type: 2}
+  MiniGolfWallTiles: []
   SavedObstacles:
   - ObstaclePos: {x: 96.32, y: -79.46, z: 0}
     ObstacleScriptableObject: {fileID: 11400000, guid: 0faaabc9c6b9a61409991c7508ffae95, type: 2}
@@ -58801,5 +58802,7 @@ MonoBehaviour:
     BalloonHeight: low
     BalloonScriptableObstacle: {fileID: 11400000, guid: b45a38212793302449af7807d3682d54, type: 2}
   Tubes: []
+  MiniGolfPipes: []
   IsTeeOffChallenge: 0
   ClubToUse: 
+  IsMiniGolf: 0

@@ -24,12 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5695608621318469281}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 22.258692, y: 11.304009, z: -2.3082905}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4859128927231544625
 MonoBehaviour:
@@ -43,7 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6de66f7d326d2864fa3e6a3a9e1ce43d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gamePhase: 
+  gamepadUI: 0
   tutorialPlayer: {fileID: 0}
+  secondTutorialPlayer: {fileID: 0}
   grenadierPrefb: {fileID: 2813347414334592412, guid: 99103c3582b1912469beddd3b2b53c80, type: 3}
   skirmisherPrefb: {fileID: 6877901074420270458, guid: e17b8c28ea7d9584d9fb80245c5346c3, type: 3}
   berserkerPrefb: {fileID: 6607051740916151457, guid: f50da633388e42843b12055605bd51d5, type: 3}
@@ -78,12 +82,57 @@ MonoBehaviour:
   greenGrenadierNewLocation: {x: -35, y: -0.5, z: 0}
   greenSkirmisherNewLocation: {x: -45, y: 2.4, z: 0}
   greenBerserkerNewLocation: {x: -45, y: -3.6, z: 0}
+  powerUpPrefab: {fileID: 0}
+  powerUpObject: {fileID: 0}
+  powerUpMarker: {fileID: 0}
+  PowerUp1Image: {fileID: 0}
+  PowerUp2Image: {fileID: 0}
+  PowerUp3Image: {fileID: 0}
+  PowerUp4Image: {fileID: 0}
+  PowerUpUIImages: []
+  PowerUpUIRemainingUses: []
+  EmptyPowerUpImage: {fileID: 0}
+  ActivePowerUps: []
+  ActivePowerUpNetIds: 
+  blueShellCount: 0
+  PowerUpText1: {fileID: 0}
+  PowerUpText2: {fileID: 0}
+  PowerUpText3: {fileID: 0}
+  PowerUpText4: {fileID: 0}
+  DpadImage1: {fileID: 0}
+  DpadImage2: {fileID: 0}
+  DpadImage3: {fileID: 0}
+  DpadImage4: {fileID: 0}
+  rockObstaclePrefab: {fileID: 0}
+  brushObstaclePrefab: {fileID: 0}
+  rockObstacleObject: {fileID: 0}
+  brushObstacleObject: {fileID: 0}
+  touchDownTrigger: {fileID: 0}
   goblinLayerMask:
     serializedVersion: 2
     m_Bits: 2048
   obstacleLayerMask:
     serializedVersion: 2
     m_Bits: 524288
+  PossessionFootballGreen: {fileID: 0}
+  PossessionFootballGrey: {fileID: 0}
+  PossessionBarGreen: {fileID: 0}
+  PossessionBarGrey: {fileID: 0}
+  PossessionBarMarker: {fileID: 0}
+  ScoreGreenText: {fileID: 0}
+  TouchDownPanel: {fileID: 0}
+  touchDownText: {fileID: 0}
+  touchDownTeamText: {fileID: 0}
+  yPositionOfKickAfter: 0
+  KickAfterPositionControlsPanel: {fileID: 0}
+  KickAfterTimerBeforeKickPanel: {fileID: 0}
+  KickAfterWasKickGoodPanel: {fileID: 0}
+  TheKickWasText: {fileID: 0}
+  KickWasGoodText: {fileID: 0}
+  KickWasNotGoodText: {fileID: 0}
+  KickWasBlockedText: {fileID: 0}
+  greenScore: 0
+  isGamePaused: 0
   maxY: 7.1
   minY: -11
   maxX: 59.44
@@ -100,7 +149,66 @@ MonoBehaviour:
   index9Tracker: 0
   index10Tracker: 0
   index11Tracker: 0
+  index12Tracker: 0
+  index13Tracker: 0
+  index14Tracker: 0
+  index15Tracker: 0
+  index16Tracker: 0
+  index17Tracker: 0
+  index18Tracker: 0
+  index19Tracker: 0
+  index20Tracker: 0
+  index21Tracker: 0
+  index22Tracker: 0
+  index23Tracker: 0
+  index24Tracker: 0
+  index25Tracker: 0
+  index26Tracker: 0
+  index27Tracker: 0
+  index28Tracker: 0
+  index29Tracker: 0
+  index30Tracker: 0
+  index31Tracker: 0
+  index32Tracker: 0
+  index33Tracker: 0
+  index34Tracker: 0
+  index35Tracker: 0
+  index36Tracker: 0
+  index37Tracker: 0
+  index38Tracker: 0
+  index39Tracker: 0
+  index40Tracker: 0
+  index41Tracker: 0
+  index42Tracker: 0
+  index43Tracker: 0
+  index44Tracker: 0
+  index45Tracker: 0
+  index46Tracker: 0
+  index47Tracker: 0
+  index48Tracker: 0
+  index49Tracker: 0
+  index50Tracker: 0
+  index51Tracker: 0
+  index52Tracker: 0
+  index53Tracker: 0
+  index54Tracker: 0
+  index55Tracker: 0
   doneSprinting: 0
   usedQE: 0
   playerPickedUpBall: 0
   firstThrownPass: 0
+  donePunchingPlayerGoblin: 0
+  playerBlocked: 0
+  firstKickDownField: 0
+  opponentPickedUpBall: 0
+  playerCausedFumble: 0
+  opponentFumbledFromSlide: 0
+  playerPickedUpBallAfterSlideTackle: 0
+  playerPickedUpPowerUp: 0
+  playerUsedPowerUp: 0
+  playerIsNearEndZone: 0
+  playerScoredTouchdown: 0
+  playerSubmittedKickAfterPosition: 0
+  playerChangedKickAfterPosition: 0
+  playerSubmittedKickAfterAccuracy: 0
+  wasKickGood: 0

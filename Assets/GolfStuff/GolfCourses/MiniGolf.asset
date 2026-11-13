@@ -26,3 +26,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 23de549fa40b46c45ac564a6c31792a2, type: 2}
   AddressablePath: Assets/GolfStuff/GolfCourses/MiniGolf.asset
   IsCustomCourse: 0
+  WorkshopID: 0

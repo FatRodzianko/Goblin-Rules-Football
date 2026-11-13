@@ -20,3 +20,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 78e07102f152c334693669bc5b3fed5f, type: 2}
   - {fileID: 11400000, guid: 61c9b55884923fd42adab70caa1dc65b, type: 2}
   AddressablePath: Assets/GolfStuff/GolfCourses/TeeOffChallenges.asset
+  IsCustomCourse: 0
+  WorkshopID: 0

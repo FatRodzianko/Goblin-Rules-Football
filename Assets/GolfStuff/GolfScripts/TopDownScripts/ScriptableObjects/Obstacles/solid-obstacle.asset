@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: solid-obstacle
   m_EditorClassIdentifier: 
   ObstaclePrefab: {fileID: 4690552690983110126, guid: c8cf136080bde904ba0e34ddcde1df11, type: 3}
+  MapMakerPrefab: {fileID: 0}
   SoftBounceSoundType: golfball-bounce-brush
   HardBounceSoundType: golfball-bounce-wood

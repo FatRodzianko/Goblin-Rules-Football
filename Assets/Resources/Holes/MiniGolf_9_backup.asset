@@ -2561,6 +2561,7 @@ MonoBehaviour:
   Statues: []
   BalloonPowerUps: []
   Tubes: []
+  MiniGolfPipes: []
   IsTeeOffChallenge: 0
   ClubToUse: 
   IsMiniGolf: 1

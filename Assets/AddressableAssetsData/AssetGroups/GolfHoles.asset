@@ -13,14 +13,13 @@ MonoBehaviour:
   m_Name: GolfHoles
   m_EditorClassIdentifier: 
   m_GroupName: GolfHoles
-  m_Data:
-    m_SerializedData: []
   m_GUID: c41d9b63420bc7d4ea59144ce9890cee
   m_SerializeEntries:
   - m_GUID: a790ae814cc855447b7fa6a8c54785c8
     m_Address: Assets/GolfStuff/GolfHoles
     m_ReadOnly: 0
     m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fd17779eb592dc14898c22b2293119bd, type: 2}
   m_SchemaSet:

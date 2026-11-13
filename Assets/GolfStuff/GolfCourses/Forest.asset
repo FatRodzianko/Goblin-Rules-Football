@@ -25,3 +25,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 39659faafb21321498193e9ccc91118d, type: 2}
   - {fileID: 11400000, guid: 7065d0bafbf6b3f46b51bb3f8d978ee6, type: 2}
   AddressablePath: Assets/GolfStuff/GolfCourses/Forest.asset
+  IsCustomCourse: 0
+  WorkshopID: 0

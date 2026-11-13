@@ -24,12 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3388201622877087087}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7369390176571773480
 MonoBehaviour:
@@ -43,3 +44,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 248e0db736b95f34d96d1c36e04c5675, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isGamePaused: 0
+  goblinTeam: []
+  selectGoblin: {fileID: 0}
+  qGoblin: {fileID: 0}
+  eGoblin: {fileID: 0}
+  canSwitchGoblin: 1
+  myTeam: {fileID: 0}
+  teamName: 
+  doesTeamHaveBall: 0
+  isTeamGrey: 0
+  possessionPoints: 0
+  possessionBonus: 1
+  myPowerUps: []
+  powerUpSelectedIndexNumber: 0
+  canSelectWithRightStickAgain: 1
+  nextPowerUpSelectTime: 0
+  wasRightStickUsedToSelect: 0
+  areGoblinsRepositionedForKickAfter: 0
+  localIsKickingPlayer: 0
+  coinTossControllsEnabled: 0
+  kickOrReceiveControlsEnabled: 0
+  qeSwitchingEnabled: 0
+  kickingControlsEnabled: 0
+  kickoffAimArrowControlsEnabled: 0
+  goblinMovementEnabled: 0
+  gameplayActionsEnabled: 0
+  kickAfterPositioningEnabled: 0
+  kickAfterKickingEnabled: 0
+  powerUpsEnabled: 0
+  menuNavigationEnabled: 0
+  blockingControlsEnabled: 0
+  attackControlsEnabled: 0
+  coinTossControlsOnServer: 0
+  kickOrReceiveControlsOnServer: 0
+  qeSwitchingControlsOnServer: 0
+  kickingControlsOnServer: 0
+  kickOffAimArrowControlsOnServer: 0
+  goblinMovementControlsOnServer: 0
+  gameplayActionControlsOnServer: 0
+  kickAfterPositioningControlsOnServer: 0
+  kickAfterKickingControlsOnServer: 0
+  powerupsControlsOnServer: 0
+  blockingControlsOnServer: 0
+  attackContolsOnServer: 0

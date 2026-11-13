@@ -1312,6 +1312,8 @@ MonoBehaviour:
     ExitPipePosition: {x: 31.5, y: -1.5, z: 0}
     MiniGolfPipeScriptableObstacle: {fileID: 11400000, guid: 70709322d50b42643aed5d477c2b74f8, type: 2}
     MiniGolfExitPipeScriptableObstacle: {fileID: 11400000, guid: 3b8b18f3adb61654bb5cac33afc9ff8f, type: 2}
+    ExitSpeedAddition: 0
+    PathPoints: []
   IsTeeOffChallenge: 0
   ClubToUse: 
   IsMiniGolf: 1

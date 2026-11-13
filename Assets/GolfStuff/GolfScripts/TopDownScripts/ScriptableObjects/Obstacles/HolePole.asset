@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: HolePole
   m_EditorClassIdentifier: 
   ObstaclePrefab: {fileID: 6368484937695458252, guid: f9439c3bc5530b741837e082df10dc38, type: 3}
+  MapMakerPrefab: {fileID: 0}
   SoftBounceSoundType: golfball-bounce-hole-pole
   HardBounceSoundType: golfball-bounce-hole-pole

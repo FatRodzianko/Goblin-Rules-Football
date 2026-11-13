@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: TNTPowerUp
   m_EditorClassIdentifier: 
   ObstaclePrefab: {fileID: 4945871248816518468, guid: be283ec9eb8e82748bce00c2754a63bb, type: 3}
+  MapMakerPrefab: {fileID: 0}
   SoftBounceSoundType: golfball-bounce-brush
   HardBounceSoundType: golfball-bounce-wood

@@ -24,13 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5358437306754383148}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &774302535805406891
 MonoBehaviour:
@@ -44,3 +44,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56cbe6d61a701594ea5e783c3012b816, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _greenMap: {fileID: 0}
+  _fairwayMap: {fileID: 0}
+  _roughMap: {fileID: 0}
+  _deepRoughMap: {fileID: 0}
+  _sandTrapMap: {fileID: 0}
+  _waterTrapMap: {fileID: 0}
+  _edgesMap: {fileID: 0}
+  _directionTilesMap: {fileID: 0}
+  _miniGolfWalls: {fileID: 0}
+  _allMaps: []
+  _nullTile: {fileID: 0}
+  _holeIndex: 0
+  _courseName: 
+  _holePar: 0
+  _cameraZoomValue: 0
+  _clubToUse: 
+  _isTeeOffChallenge: 0
+  IsMiniGolf: 0
+  _holePrefab: {fileID: 0}
+  _teeMarkerPrefab: {fileID: 0}
+  _cameraBoundingBox: {fileID: 0}
+  _environmentObstacleHolderPrefab: {fileID: 0}
+  _environmentObstacleHolderObject: {fileID: 0}
+  _golfAimPoint: {fileID: 0}
+  _zoomedOutPosition: {fileID: 0}
+  _teeOffPosition: {fileID: 0}
+  _myCamera: {fileID: 0}

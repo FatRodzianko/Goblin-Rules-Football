@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: PipeEntryHole
   m_EditorClassIdentifier: 
   ObstaclePrefab: {fileID: 7111652433616017505, guid: b3d3471c594a58142837fb3af2145b55, type: 3}
+  MapMakerPrefab: {fileID: 0}
   SoftBounceSoundType: golfball-bounce-brush
   HardBounceSoundType: golfball-bounce-wood

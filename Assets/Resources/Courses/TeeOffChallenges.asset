@@ -21,3 +21,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 61c9b55884923fd42adab70caa1dc65b, type: 2}
   - {fileID: 11400000, guid: 7042dbfe8058a9c49bb6d50aafdb9920, type: 2}
   AddressablePath: 
+  IsCustomCourse: 0
+  WorkshopID: 0
