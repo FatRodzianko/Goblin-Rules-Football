@@ -2239,15 +2239,19 @@ public class GameplayManager : NetworkBehaviour
     {
         if (isKickAfterTimerRunning)
             isKickAfterTimerRunning = false;
-        try
+        // A kick-after that resolves before its timer started has no routine to stop, but the timer still gets hidden.
+        if (timeoutKickAfter != null)
         {
-            StopCoroutine(timeoutKickAfter);
+            try
+            {
+                StopCoroutine(timeoutKickAfter);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("StopTimeoutKickAfterRoutine: Could not stop coroutine. Error: " + e);
+            }
         }
-        catch (Exception e)
-        {
-            Debug.Log("StopTimeoutKickAfterRoutine: Could not stop coroutine. Error: " + e);
-        }
-        
+
         RpcActivateTheTimeoutTimer(false);
     }
     IEnumerator TimeoutKickOffRoutine()

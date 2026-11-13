@@ -2543,10 +2543,13 @@ public class GolfPlayerTopDown : NetworkBehaviour
     }
     public void GetCameraBoundingBox(bool forceUpdate = false)
     {
-        if (!_cameraBoundingBox)
-            _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
-        if (forceUpdate)
-            _cameraBoundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox").GetComponent<PolygonCollider2D>();
+        if (_cameraBoundingBox && !forceUpdate)
+            return;
+        // The player can start before the course scene that holds the box has loaded. The box is fetched again later
+        // (each hole's setup forces it, and turns ask for it), so a miss here only means "not yet".
+        GameObject boundingBox = GameObject.FindGameObjectWithTag("CameraBoundingBox");
+        if (boundingBox != null)
+            _cameraBoundingBox = boundingBox.GetComponent<PolygonCollider2D>();
     }
     [TargetRpc]
     public void RpcGetCameraBoundingBox(NetworkConnection conn)

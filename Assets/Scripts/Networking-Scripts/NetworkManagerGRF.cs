@@ -61,6 +61,9 @@ public class NetworkManagerGRF : MonoBehaviour
     // Numbers handed out this frame. LobbyPlayers only gains a player once its spawn has been applied, a tick
     // later, so filling a team with bots in one go would otherwise give every one of them the same number.
     private List<int> reservedPlayerNumbers = new List<int>();
+    // Bots spawned on the server that LobbyPlayers has not gained yet, for the same reason. A team counts them, or
+    // two Add Bots before the first one lands both see a free seat and the team ends up four deep.
+    private List<LobbyPlayer> _botsNotYetListed = new List<LobbyPlayer>();
 
     [Header("Pause/Resume Game")]
     public bool isGamePaused = false;
@@ -291,6 +294,7 @@ public class NetworkManagerGRF : MonoBehaviour
         if (SteamLobby.instance != null)
             SteamLobby.instance.LeaveLobby();
         reservedPlayerNumbers.Clear();
+        _botsNotYetListed.Clear();
         // This object outlives the session, so clear what the last one left behind, on clients too.
         LobbyPlayers.Clear();
         GamePlayers.Clear();
@@ -361,6 +365,7 @@ public class NetworkManagerGRF : MonoBehaviour
         bot.is1v1 = this.is1v1;
         bot.isSinglePlayer = this.isSinglePlayer;
         _networkManager.ServerManager.Spawn(bot.gameObject, hostConnection);
+        _botsNotYetListed.Add(bot);
         Debug.Log("AddBot: added a bot to the " + (isTeamGrey ? "grey" : "green") + " team.");
         return bot;
     }
@@ -400,6 +405,7 @@ public class NetworkManagerGRF : MonoBehaviour
         Debug.Log("RemoveBot: removing a bot from the " + (bot.isTeamGrey ? "grey" : "green") + " team.");
         reservedPlayerNumbers.Remove(bot.playerNumber);
         LobbyPlayers.Remove(bot);
+        _botsNotYetListed.Remove(bot);
         _networkManager.ServerManager.Despawn(bot.gameObject);
     }
     // A player always beats a bot to a slot. Called whenever team membership changes, so a joining or switching
@@ -482,7 +488,17 @@ public class NetworkManagerGRF : MonoBehaviour
             if (player != null && player.isTeamGrey == isTeamGrey)
                 count++;
         }
+        PruneListedBots();
+        foreach (LobbyPlayer bot in _botsNotYetListed)
+        {
+            if (bot.isTeamGrey == isTeamGrey)
+                count++;
+        }
         return count;
+    }
+    private void PruneListedBots()
+    {
+        _botsNotYetListed.RemoveAll(bot => bot == null || LobbyPlayers.Contains(bot));
     }
     private LobbyPlayer FindBotOnTeam(bool isTeamGrey)
     {
@@ -490,6 +506,12 @@ public class NetworkManagerGRF : MonoBehaviour
         {
             if (player != null && player.isBot && player.isTeamGrey == isTeamGrey)
                 return player;
+        }
+        PruneListedBots();
+        foreach (LobbyPlayer bot in _botsNotYetListed)
+        {
+            if (bot.isTeamGrey == isTeamGrey)
+                return bot;
         }
         return null;
     }

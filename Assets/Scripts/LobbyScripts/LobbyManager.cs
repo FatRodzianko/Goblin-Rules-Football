@@ -496,14 +496,16 @@ public class LobbyManager : MonoBehaviour
         {
             foreach (PlayerListItem playerListItemToRemove in playerListItemsToRemove)
             {
-                GameObject playerListItemToRemoveObject = playerListItemToRemove.gameObject;
                 playerListItems.Remove(playerListItemToRemove);
                 // The team lists held the row too, and only playerListItems was being cleaned, so every removal left a
                 // destroyed entry behind in green or grey. Rare while only players left; routine once bots come and go.
                 greenPlayerListItems.Remove(playerListItemToRemove);
                 greyPlayerListItems.Remove(playerListItemToRemove);
-                Destroy(playerListItemToRemoveObject);
-                playerListItemToRemoveObject = null;
+                // While the lobby is torn down (the host quitting, or a client's session ending) Unity can destroy the
+                // rows before the lobby players stop, and reading .gameObject of a destroyed row throws inside FishNet's
+                // stop callbacks, which skips the rest of them.
+                if (playerListItemToRemove != null)
+                    Destroy(playerListItemToRemove.gameObject);
             }
         }
     }
@@ -657,6 +659,10 @@ public class LobbyManager : MonoBehaviour
     }
     public void ActivateChangeGoblinButton()
     {
+        // Another player's lobby object can start before this machine's own. FindLocalLobbyPlayer runs this again once
+        // the local player exists.
+        if (localLobbyPlayerScript == null)
+            return;
         try
         {
             Debug.Log("ActivateChangeGoblinButton. Is local lobby player grey? " + localLobbyPlayerScript.isTeamGrey.ToString());

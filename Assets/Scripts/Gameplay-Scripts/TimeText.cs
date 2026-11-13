@@ -29,20 +29,17 @@ public class TimeText : MonoBehaviour
             StartCoroutine(xtraTimeRoutine);
         }
     }
+    // A match that ends before extra time (a forfeit) has no extra-time routine, and still shows GAME OVER.
     public void EndXtraTime()
     {
-        try
-        {
+        StopXtraTimeRoutine();
+        timeText.text = "GAME\nOVER";
+    }
+    void StopXtraTimeRoutine()
+    {
+        if (xtraTimeRoutine != null)
             StopCoroutine(xtraTimeRoutine);
-            isXtraTimeRoutineRunning = false;
-            timeText.text = "GAME\nOVER";
-        }
-        catch (Exception e)
-        {
-            Debug.Log("EndXtraTime: Could not stop coroutine. Error: " + e);
-        }
-        
-        
+        isXtraTimeRoutineRunning = false;
     }
     IEnumerator XtraTimeRoutine()
     {
@@ -59,8 +56,7 @@ public class TimeText : MonoBehaviour
     }
     public void EndFirstHalfExtraTime()
     {
-        StopCoroutine(xtraTimeRoutine);
-        isXtraTimeRoutineRunning = false;
+        StopXtraTimeRoutine();
         timeText.color = new Color(1f, 0.5f, 0f);
     }
 }

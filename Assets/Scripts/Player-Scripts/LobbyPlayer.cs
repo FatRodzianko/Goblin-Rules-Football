@@ -422,6 +422,14 @@ public class LobbyPlayer : NetworkBehaviour
     void CmdChangePlayerReadyStatus()
     {
         Debug.Log("Executing CmdChangePlayerReadyStatus on the server for player: " + this.PlayerName);
+        // A 3v3 player must hold a goblin to be ready: one who reaches the match without one has nothing to control,
+        // and every kickoff, kick-after and power-up drop that looks for their goblin fails. The lobby only hides the
+        // Ready button, so the server enforces it. Un-readying is always allowed.
+        if (!this.isPlayerReady && !this.is1v1 && !this.isSinglePlayer && !this.isGoblinSelected)
+        {
+            Debug.Log("CmdChangePlayerReadyStatus: refused for " + this.PlayerName + ", who has not picked a goblin.");
+            return;
+        }
         this.isPlayerReady = !this.isPlayerReady;
     }
     void HandlePlayerReadyStatusChange(bool oldValue, bool newValue)

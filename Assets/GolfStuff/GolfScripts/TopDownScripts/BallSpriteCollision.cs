@@ -96,6 +96,9 @@ public class BallSpriteCollision : MonoBehaviour
         try
         {
             SpriteCollision spriteCollision = collision.GetComponent<SpriteCollision>();
+            // Only sprite objects take part in the ball's sorting; leaving any other trigger changes nothing.
+            if (spriteCollision == null)
+                return;
             if (spriteCollision.MySpriteMask.enabled && collision.transform.position.y <= _shadowObject.transform.position.y && spriteCollision.MySpriteRenderer.sortingOrder <= _spriteRenderer.sortingOrder)
             {
                 spriteCollision.MySpriteMask.enabled = false;

@@ -52,6 +52,12 @@ public class LobbyManagerGolf : MonoBehaviour
     }
     public void RemoveLobbyPlayerListItem(GameObject newPlayerListItem)
     {
+        // When the session ends, Unity can destroy the row before the player that owns it stops; drop the dead entry.
+        if (newPlayerListItem == null)
+        {
+            _lobbyPlayerListItems.RemoveAll(item => item == null);
+            return;
+        }
         try
         {
             GolfPlayerListItem playerListItem = newPlayerListItem.GetComponent<GolfPlayerListItem>();

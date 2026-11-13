@@ -27,7 +27,9 @@ using FishNet.Transporting.Tugboat;
 //   -devjoin [address]        join a dev Football host (127.0.0.1 if no address is given)
 //   -devjoingolf [address]    join a dev Golf host (127.0.0.1 if no address is given)
 //   -devleavemove [seconds]   press Leave on the moving-lobby screen this long after it appears (at once if no time)
-//   -devready                 ready up once this player is in the lobby
+//   -devready                 ready up once this player is in the lobby. In a 3v3 it first picks a goblin, as a person
+//                             must: the -devgoblin one if given, else Skirmisher, then Berserker, then Grenadier,
+//                             whichever the team still has free
 //   -devgoblin [type]         pick this goblin (Grenadier/Berserker/Skirmisher; Skirmisher if none is given) in the
 //                             lobby just before -devready readies. In a scripted 3v3, humans picking non-grenadiers
 //                             leaves both grenadiers to bots, whose AI then runs the coin toss and every kickoff, so
@@ -66,6 +68,12 @@ public class DevDirectConnect : MonoBehaviour
     bool _readyUp = false;
     float _readyUpTime = -1f;
     string _goblinType = null;
+    // The 3v3 goblins -devready tries in turn. A pick the team has already taken is refused by the server, which shows
+    // here only as isGoblinSelected staying false, so each try gets a moment before the next.
+    static readonly string[] GoblinPickOrder = { "Skirmisher", "Berserker", "Grenadier" };
+    const float GoblinPickWaitSeconds = 1f;
+    int _goblinPicksTried = 0;
+    float _nextGoblinPickTime = -1f;
     bool _fillWithBots = false;
     int _lobbyCountAtLastBotAdd = -1;
     bool _devSwing = false;
@@ -180,17 +188,35 @@ public class DevDirectConnect : MonoBehaviour
                 _readyUpTime = Time.realtimeSinceStartup + LobbySettleSeconds;
             else if (Time.realtimeSinceStartup >= _readyUpTime)
             {
-                _readyUp = false;
-                if (_goblinType != null)
+                LobbyPlayer me = LobbyManager.instance.localLobbyPlayerScript;
+                if (!me.is1v1 && !me.isGoblinSelected)
                 {
-                    Debug.Log("DevDirectConnect: picking goblin " + _goblinType + ".");
-                    LobbyManager.instance.localLobbyPlayerScript.SelectGoblin(_goblinType);
-                    _goblinType = null;
+                    // A 3v3 player can only ready with a goblin: the lobby hides Ready until one is picked, and the
+                    // server refuses the ready without one.
+                    if (Time.realtimeSinceStartup >= _nextGoblinPickTime)
+                    {
+                        string pick = NextGoblinToPick();
+                        if (pick == null)
+                        {
+                            Debug.LogWarning("DevDirectConnect: the team has no goblin left to pick; not readying up.");
+                            _readyUp = false;
+                        }
+                        else
+                        {
+                            Debug.Log("DevDirectConnect: picking goblin " + pick + ".");
+                            me.SelectGoblin(pick);
+                            _nextGoblinPickTime = Time.realtimeSinceStartup + GoblinPickWaitSeconds;
+                        }
+                    }
                 }
-                if (!LobbyManager.instance.localLobbyPlayerScript.isPlayerReady)
+                else
                 {
-                    Debug.Log("DevDirectConnect: pressing Ready Up.");
-                    LobbyManager.instance.PlayerReadyUp();
+                    _readyUp = false;
+                    if (!me.isPlayerReady)
+                    {
+                        Debug.Log("DevDirectConnect: pressing Ready Up.");
+                        LobbyManager.instance.PlayerReadyUp();
+                    }
                 }
             }
         }
@@ -266,6 +292,27 @@ public class DevDirectConnect : MonoBehaviour
 
     // The scripted ready-up and Start Game for a Golf lobby, whose lobby is the game scene itself. Ready-up happens again
     // in a lobby that moved to a new host, where every player starts unready, so a moved lobby can be started too.
+    // The -devgoblin choice first, then the default order without repeating it; null once every goblin was tried.
+    string NextGoblinToPick()
+    {
+        int index = _goblinPicksTried++;
+        if (_goblinType != null)
+        {
+            if (index == 0)
+                return _goblinType;
+            index--;
+        }
+        for (int i = 0; i < GoblinPickOrder.Length; i++)
+        {
+            if (_goblinType != null && string.Equals(GoblinPickOrder[i], _goblinType, System.StringComparison.OrdinalIgnoreCase))
+                continue;
+            if (index == 0)
+                return GoblinPickOrder[i];
+            index--;
+        }
+        return null;
+    }
+
     void UpdateGolfLobby()
     {
         if (!_readyUp && !_startGame)
