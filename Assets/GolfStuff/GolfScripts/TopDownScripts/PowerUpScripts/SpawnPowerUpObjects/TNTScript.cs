@@ -84,7 +84,7 @@ public class TNTScript : NetworkBehaviour
     [ObserversRpc]
     void RpcStartExplosionAnimation()
     {
-        if (this.IsServer)
+        if (this.IsServerInitialized)
             return;
 
         _myAnimator.Play(_explosionAnim);
@@ -123,7 +123,7 @@ public class TNTScript : NetworkBehaviour
     }
     public void ExplosionAnimationComplete()
     {
-        if (!this.IsServer)
+        if (!this.IsServerInitialized)
             return;
         Debug.Log("ExplosionAnimationComplete: telling: " + _golfBallThatStartedExplosion.MyPlayer.PlayerName + "'s ball");
         //if (_areBallsInBlastRadius)
@@ -137,7 +137,7 @@ public class TNTScript : NetworkBehaviour
     }
     public void WillBallsLaunch()
     {
-        if (!this.IsServer)
+        if (!this.IsServerInitialized)
             return;
         if (!_areBallsInBlastRadius)
             return;

@@ -339,7 +339,7 @@ public class NetworkPlayer : NetworkBehaviour
     [ServerRpc]
     void CmdHostStartGame()
     {
-        if (!this.IsHost)
+        if (!this.IsHostInitialized)
             return;
         SteamLobby.instance.SetGameStatusToInGame();
         SpawnGolfPlayerObjectsForEachPlayer();
@@ -528,14 +528,14 @@ public class NetworkPlayer : NetworkBehaviour
     public void OnClick_Disconnect()
     {
         GolfLobbySettings.instance.IsLeavingOnPurpose = true;
-        if (base.IsServer)
+        if (base.IsServerInitialized)
         {
             _networkManager.ServerManager.StopConnection(true);
             SteamLobby.instance.LeaveLobby();
         }
 
 
-        if (base.IsClient)
+        if (base.IsClientInitialized)
         {
             _networkManager.ClientManager.StopConnection();
             SteamLobby.instance.LeaveLobby();

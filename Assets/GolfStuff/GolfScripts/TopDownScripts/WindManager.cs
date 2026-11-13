@@ -403,7 +403,7 @@ public class WindManager : NetworkBehaviour
     void UpdateRainForTornado(string newRainState)
     {
         // If the weather is clear, destroy any tornado objects 
-        if (newRainState == "clear" && this.IsServer)
+        if (newRainState == "clear" && this.IsServerInitialized)
         {
             //DestroyTornadoObjects();
         }

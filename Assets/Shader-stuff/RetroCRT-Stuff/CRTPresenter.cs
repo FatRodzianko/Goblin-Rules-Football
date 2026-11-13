@@ -276,7 +276,7 @@ public class CRTPresenter : MonoBehaviour
     /// </summary>
     private Camera FindWorldCamera()
     {
-        foreach (Camera candidate in FindObjectsOfType<Camera>())
+        foreach (Camera candidate in FindObjectsByType<Camera>(FindObjectsSortMode.None))
         {
             if (candidate.gameObject.scene != gameObject.scene)
                 continue;
@@ -430,7 +430,7 @@ public class CRTPresenter : MonoBehaviour
         var toConvert = new List<Canvas>();
         var alreadyInCamera = new List<Canvas>();
 
-        foreach (Canvas canvas in FindObjectsOfType<Canvas>(true))
+        foreach (Canvas canvas in FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             if (canvas == null)
                 continue;

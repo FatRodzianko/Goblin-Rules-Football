@@ -269,7 +269,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
-        Debug.Log("OnStartServer: On GolfPlayerTopDown: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHost.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
+        Debug.Log("OnStartServer: On GolfPlayerTopDown: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHostInitialized.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
         //this.IsGameLeader = base.Owner.IsHost;
         //this.ConnectionId = this.Owner.ClientId;
         GameplayManagerTopDownGolf.instance.AddGolfPlayer(this);
@@ -465,7 +465,7 @@ public class GolfPlayerTopDown : NetworkBehaviour
     // SyncMyBallNetId couldn't find the local player for those, so count their balls now.
     void CountBallsSpawnedBeforeLocalPlayer()
     {
-        foreach (GolfPlayerTopDown player in FindObjectsOfType<GolfPlayerTopDown>())
+        foreach (GolfPlayerTopDown player in FindObjectsByType<GolfPlayerTopDown>(FindObjectsSortMode.None))
         {
             if (player != this && player.MyBall)
                 CmdBallSpawnedForPlayer();

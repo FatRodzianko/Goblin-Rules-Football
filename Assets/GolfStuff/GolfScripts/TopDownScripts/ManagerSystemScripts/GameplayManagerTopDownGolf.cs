@@ -213,7 +213,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     {
         base.OnStartServer();
         // set the ownership to the server?
-        Debug.Log("OnStartServer: On GameplayManager: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHost.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
+        Debug.Log("OnStartServer: On GameplayManager: is this player object (" + this.name + ") the host from base.IsHost? " + this.IsHostInitialized.ToString() + " and from base.Owner.IsHost? " + base.Owner.IsHost.ToString() + " and an owned client id of: " + base.Owner.ClientId + ":" + OwnerId);
         ClearSyncLists();
         RegisterAlreadySpawnedNetworkPlayers();
 
@@ -544,7 +544,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
         UpdateZoomedOutPos(CurrentHoleInCourse.ZoomedOutPos, CurrentHoleInCourse.CameraZoomValue);
         //// update the par value for the hole
         UpdateParForNewHole(CurrentHoleInCourse.HolePar);
-        if (IsServer)
+        if (IsServerInitialized)
         {
             if(this.WeatherStatuesEnabled)
                 StatueSpawner.instance.SpawnStatuesOnServer(CurrentHoleInCourse.Statues);
@@ -1638,7 +1638,7 @@ public class GameplayManagerTopDownGolf : NetworkBehaviour
     }
     bool IsLocalPlayerHost()
     {
-        if (!LocalGolfPlayer || LocalGolfPlayer.IsHost)
+        if (!LocalGolfPlayer || LocalGolfPlayer.IsHostInitialized)
             return true;
 
         return false;

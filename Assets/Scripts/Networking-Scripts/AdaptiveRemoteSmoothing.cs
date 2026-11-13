@@ -166,7 +166,7 @@ public class AdaptiveRemoteSmoothing : MonoBehaviour
     void CollectRemotes()
     {
         _remotes.Clear();
-        foreach (GoblinScript goblin in FindObjectsOfType<GoblinScript>())
+        foreach (GoblinScript goblin in FindObjectsByType<GoblinScript>(FindObjectsSortMode.None))
             AddRemote(goblin);
         AddRemote(Football.Instance);
     }

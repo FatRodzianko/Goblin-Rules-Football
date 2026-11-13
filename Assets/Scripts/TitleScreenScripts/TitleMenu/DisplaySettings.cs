@@ -210,7 +210,7 @@ public class DisplaySettings : MonoBehaviour
         Resolution stored = new Resolution();
         stored.width = PlayerPrefs.GetInt(WidthKey, 0);
         stored.height = PlayerPrefs.GetInt(HeightKey, 0);
-        stored.refreshRate = PlayerPrefs.GetInt(RefreshKey, 0);
+        stored.refreshRateRatio = new RefreshRate { numerator = (uint)Mathf.Max(0, PlayerPrefs.GetInt(RefreshKey, 0)), denominator = 1 };
         bool fullscreen = PlayerPrefs.GetInt(FullscreenKey, 1) != 0;
 
         if (!IsSupported(stored.width, stored.height))
@@ -240,8 +240,8 @@ public class DisplaySettings : MonoBehaviour
             return false;
         }
         FullScreenMode screenMode = fullscreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed;
-        if (mode.refreshRate > 0)
-            Screen.SetResolution(mode.width, mode.height, screenMode, mode.refreshRate);
+        if (mode.refreshRateRatio.value > 0)
+            Screen.SetResolution(mode.width, mode.height, screenMode, mode.refreshRateRatio);
         else
             Screen.SetResolution(mode.width, mode.height, screenMode);
         return true;
@@ -252,7 +252,7 @@ public class DisplaySettings : MonoBehaviour
         PlayerPrefs.SetInt(VersionKey, SettingsVersion);
         PlayerPrefs.SetInt(WidthKey, mode.width);
         PlayerPrefs.SetInt(HeightKey, mode.height);
-        PlayerPrefs.SetInt(RefreshKey, mode.refreshRate);
+        PlayerPrefs.SetInt(RefreshKey, Mathf.RoundToInt((float)mode.refreshRateRatio.value));
         PlayerPrefs.SetInt(FullscreenKey, fullscreen ? 1 : 0);
         PlayerPrefs.Save();
     }
@@ -326,7 +326,7 @@ public class DisplaySettings : MonoBehaviour
         Resolution current = new Resolution();
         current.width = Screen.width;
         current.height = Screen.height;
-        current.refreshRate = Screen.currentResolution.refreshRate;
+        current.refreshRateRatio = Screen.currentResolution.refreshRateRatio;
         return current;
     }
 }

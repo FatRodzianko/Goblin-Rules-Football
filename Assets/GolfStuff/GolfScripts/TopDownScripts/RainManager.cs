@@ -268,7 +268,7 @@ public class RainManager : NetworkBehaviour
             _globalLight.intensity = 1.0f;
         }
 
-        if(this.IsServer)
+        if(this.IsServerInitialized)
             RainState = newState;
     }
     void WeatherChangedFunction(string newEffect)

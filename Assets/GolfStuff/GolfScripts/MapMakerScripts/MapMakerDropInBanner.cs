@@ -67,7 +67,7 @@ public class MapMakerDropInBanner : MonoBehaviour
         text.alignment = TextAlignmentOptions.Center;
         text.fontSize = BannerFontSize;
         text.color = Color.white;
-        text.enableWordWrapping = false;
+        text.textWrappingMode = TextWrappingModes.NoWrap;
         text.raycastTarget = false;
         StretchAcrossTop(text.rectTransform);
 

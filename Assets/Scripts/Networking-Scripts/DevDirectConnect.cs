@@ -389,7 +389,7 @@ public class DevDirectConnect : MonoBehaviour
     void PressMovingLobbyLeave()
     {
         _leaveMoveDelay = -1f;
-        MovingLobbyScreen screen = FindObjectOfType<MovingLobbyScreen>();
+        MovingLobbyScreen screen = FindAnyObjectByType<MovingLobbyScreen>();
         UnityEngine.UI.Button leave = screen != null ? screen.GetComponentInChildren<UnityEngine.UI.Button>() : null;
         if (leave == null)
         {

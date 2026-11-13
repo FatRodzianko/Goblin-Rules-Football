@@ -363,7 +363,7 @@ public class LightningManager : NetworkBehaviour
     [ObserversRpc]
     void RpcStartLightningStrike(float distFromPlay, float lightIntensity, int numberOfFlashes, bool wasPlayerStruck, int playerThatWasStruckNetId = -99)
     {
-        if (!this.IsServer)
+        if (!this.IsServerInitialized)
         {
             _lightIntensity = lightIntensity;
             _wasPlayerStruck = wasPlayerStruck;
@@ -456,13 +456,13 @@ public class LightningManager : NetworkBehaviour
         if (_playerThatWasStruck)
             _playerThatWasStruck = null;
 
-        if (IsServer)
+        if (IsServerInitialized)
             RpcLightningRoutineStuff();
     }
     [ObserversRpc]
     void RpcLightningRoutineStuff()
     {
-        if (IsServer)
+        if (IsServerInitialized)
             return;
         StopLightningRoutineStuff();
     }

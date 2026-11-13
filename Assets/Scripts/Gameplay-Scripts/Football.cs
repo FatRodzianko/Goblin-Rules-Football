@@ -179,9 +179,9 @@ public class Football : NetworkBehaviour
         // A respawned ball must reintroduce itself: every goblin and AI caches gameFootball once, a destroyed
         // object compares == null, and nothing re-finds it. This runs on every machine, the host included, and is
         // harmless on the original spawn. See GameplayManager.RespawnFootballForCarrierDespawn.
-        foreach (GoblinScript goblin in FindObjectsOfType<GoblinScript>())
+        foreach (GoblinScript goblin in FindObjectsByType<GoblinScript>(FindObjectsSortMode.None))
             goblin.gameFootball = this;
-        foreach (AIPlayer aiPlayer in FindObjectsOfType<AIPlayer>())
+        foreach (AIPlayer aiPlayer in FindObjectsByType<AIPlayer>(FindObjectsSortMode.None))
             aiPlayer.RelinkFootball(this);
     }
     public override void OnStartServer()

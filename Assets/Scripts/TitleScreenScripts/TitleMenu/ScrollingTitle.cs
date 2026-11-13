@@ -111,7 +111,7 @@ public class ScrollingTitle : MonoBehaviour
         _textRect.pivot = new Vector2(0.5f, 0.5f);
         _textRect.sizeDelta = new Vector2(_width, _window.rect.height);
         _text.alignment = TextAlignmentOptions.Center;
-        _text.enableWordWrapping = false;
+        _text.textWrappingMode = TextWrappingModes.NoWrap;
         _targetX = _window.rect.width * 0.5f;
     }
 }

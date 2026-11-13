@@ -90,7 +90,7 @@ public class Torndao : NetworkBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!this.IsServer)
+        if (!this.IsServerInitialized)
             return;
         if (collision.tag == "golfBall")
         {

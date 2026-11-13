@@ -237,7 +237,7 @@ public class SettingsManager : MonoBehaviour
         {
             newRes.width = resolution.width;
             newRes.height = resolution.height;
-            newRes.refreshRate = Screen.currentResolution.refreshRate;
+            newRes.refreshRateRatio = Screen.currentResolution.refreshRateRatio;
 
             if (resolutionList.Contains(newRes))
                 continue;
@@ -245,7 +245,7 @@ public class SettingsManager : MonoBehaviour
             //option = resolution.width.ToString() + "x" + resolution.height.ToString() + "@" + resolution.refreshRate;
 
             
-            option = newRes.ToString();
+            option = newRes.width + " x " + newRes.height + " @ " + Mathf.RoundToInt((float)newRes.refreshRateRatio.value) + "Hz";
             options.Add(option);
             resolutionList.Add(newRes);
 

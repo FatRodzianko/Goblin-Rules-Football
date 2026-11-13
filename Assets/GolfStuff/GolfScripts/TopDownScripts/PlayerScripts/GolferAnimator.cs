@@ -148,7 +148,7 @@ public class GolferAnimator : NetworkBehaviour
     }
     public void LightningStrikeForHit()
     {
-        if(InstanceFinder.IsServer) // only run on the server?
+        if(InstanceFinder.IsServerStarted) // only run on the server?
             GameplayManagerTopDownGolf.instance.LightningForPlayerHit(_myPlayer);
     }
     public void EnablePlayerSprite(bool enable)

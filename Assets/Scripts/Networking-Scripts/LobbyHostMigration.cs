@@ -121,7 +121,7 @@ public class LobbyHostMigration : MonoBehaviour
         _otherPlayers.Clear();
         _greyBots = 0;
         _greenBots = 0;
-        foreach (NetworkPlayer player in FindObjectsOfType<NetworkPlayer>())
+        foreach (NetworkPlayer player in FindObjectsByType<NetworkPlayer>(FindObjectsSortMode.None))
         {
             if (player == leaving)
                 continue;
