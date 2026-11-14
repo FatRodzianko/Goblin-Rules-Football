@@ -48,51 +48,293 @@ MonoBehaviour:
   audioMixer: {fileID: 24100000, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
   mixerGroup: {fileID: -9069800408082282386, guid: 9f09d17da7187f64d80504d7336ea8f7, type: 2}
   songs:
-  - name: frail-noise-again
-    clip: {fileID: 8300000, guid: 80680e5e6d5ce1a4eb5a7b60074514ef, type: 3}
-    ClipAddress: Assets/SFX/Music/frail-noise-again.mp3
+  - name: Stop Hesitating and Believe!
+    clip: {fileID: 8300000, guid: 0c8c457d96fbeb34492cc47a59c5804f, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/49 Stop Hesitating and Believe!.mp3
     volume: 1
     pitch: 1
     isLooping: 0
-  - name: fertile-cable-worm
-    clip: {fileID: 8300000, guid: 12ba931491c88254a9432805f222928e, type: 3}
-    ClipAddress: Assets/SFX/Music/fertile-cable-worm.wav
+  - name: The Life and Times of an Obedient Sucker
+    clip: {fileID: 8300000, guid: a64a438a61f10384f9b49f2a4474e502, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/48 The Life and Times of an Obedient Sucker.mp3
     volume: 1
     pitch: 1
     isLooping: 0
-  - name: handy-question
-    clip: {fileID: 8300000, guid: 11ae4b6c20be0a945a7efdb5ab5d102d, type: 3}
-    ClipAddress: Assets/SFX/Music/ill-fated-stew-2.mp3
+  - name: Smile Stimulation Simulation
+    clip: {fileID: 8300000, guid: 0b4d519ea1b0b8a459132f804d6e3164, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/47 Smile Stimulation Simulation.mp3
     volume: 1
     pitch: 1
     isLooping: 0
-  - name: unsuitable-turn
-    clip: {fileID: 8300000, guid: 100636e6268fdfe4e811ef544983b3ec, type: 3}
-    ClipAddress: Assets/SFX/Music/unsuitable-turn-40-bar_final_bass-boosted-3.mp3
+  - name: Hot Acid Summer Camp
+    clip: {fileID: 8300000, guid: 5d11f51a53b2b764fbae60449578f12c, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/46 Hot Acid Summer Camp.mp3
     volume: 1
     pitch: 1
     isLooping: 0
-  - name: illegal-toothpaste
-    clip: {fileID: 8300000, guid: 6bb9c184051462f4187d1c6833741296, type: 3}
-    ClipAddress: Assets/SFX/Music/illegal-toothpaste_2-pole-chord.mp3
+  - name: Welcome to the Grin Club
+    clip: {fileID: 8300000, guid: d4617709a6b04744185371f3a85c58e8, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/45 Welcome to the Grin Club.mp3
     volume: 1
     pitch: 1
     isLooping: 0
-  - name: first-song
-    clip: {fileID: 8300000, guid: 7a4c61294a2a9be4da8560aedc53993f, type: 3}
-    ClipAddress: Assets/SFX/Music/first-song.mp3
+  - name: Pushy Be Thy Man
+    clip: {fileID: 8300000, guid: c69d9533addfb43428ce03f3d5ed24ef, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/44 Pushy Be Thy Man.mp3
     volume: 1
     pitch: 1
     isLooping: 0
-  - name: synthwave
-    clip: {fileID: 8300000, guid: f71bdcef604c1dc4a95cfd90960386c3, type: 3}
-    ClipAddress: Assets/SFX/Music/synthwave-more-synth.mp3
+  - name: The Fumbling Machine
+    clip: {fileID: 8300000, guid: 90bb62b5b31e25c4e96ec80dd619ae30, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/43 The Fumbling Machine.mp3
     volume: 1
     pitch: 1
     isLooping: 0
-  - name: ill-fated-stew
-    clip: {fileID: 8300000, guid: 67536d73a3cc6fc42bbe8c3a0b6b30fc, type: 3}
-    ClipAddress: Assets/SFX/Music/ill-fated-stew-2.mp3
+  - name: Faulty Pickups
+    clip: {fileID: 8300000, guid: 3f103a08f97fb2344b19e8b195142bee, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/42 Faulty Pickups.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Sincere Pity Party
+    clip: {fileID: 8300000, guid: 1a88ade2f9b99664db31f4e56cd9eebb, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/41 Sincere Pity Party.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Lacking Distance From The Heart
+    clip: {fileID: 8300000, guid: c88cb27cb21a7f648a8c96e5981e572c, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/40 Lacking Distance From The Heart.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: The Gruesome, Low End
+    clip: {fileID: 8300000, guid: a04a56e01c4892d4b84f86ddb7de2387, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/39 The Gruesome, Low End.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Put Some Spice in Your Juice
+    clip: {fileID: 8300000, guid: 9e9dc0a47db24f54fb09a942c5af7586, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/38 Put Some Spice in Your Juice.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Wonderful Tranquilizer For Your Mind's Eye
+    clip: {fileID: 8300000, guid: 19d07add941f1b64c95f24fce788aa45, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/37 Wonderful Tranquilizer For Your Mind's
+      Eye.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Your Son, In the Abstract
+    clip: {fileID: 8300000, guid: 74dbb03e3082448458688c3d91a5d6bb, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/36 Your Son, In the Abstract.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Wandering in the Wicka Wild Wild Wilderness Mk.II
+    clip: {fileID: 8300000, guid: 6167438fca137524294ca29200ad8b2a, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/35 Wandering in the Wicka Wild Wild Wilderness
+      Mk.II.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Cheap Beliefs For a Free Society
+    clip: {fileID: 8300000, guid: 53cf451539d7b8441b9bc67b5101f277, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/33 Cheap Beliefs For a Free Society.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Office Drugs
+    clip: {fileID: 8300000, guid: d3e7c2f2eb747a3448b77f9304e53eed, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/32 Office Drugs.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Two Fingers Deep
+    clip: {fileID: 8300000, guid: 2be47ba4727b16443bc51d9f5f2cdae5, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/31 Two Fingers Deep.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: The Obeisant Man
+    clip: {fileID: 8300000, guid: 91f4a1cbe7e20494b9096fd8bf82bb7b, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/30 The Obeisant Man.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: More Than Brick
+    clip: {fileID: 8300000, guid: b2c6dbea2bf15764a92f2c4f599ab809, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/29 More Than Brick.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Bored Nights
+    clip: {fileID: 8300000, guid: 177c5a11f13b9d345a037dd2e8ad78cf, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/28 Bored Nights.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Sad Cap
+    clip: {fileID: 8300000, guid: ee07f08345d50114da8062e2f6b80b7f, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/27 Sad Cap.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Right Side In
+    clip: {fileID: 8300000, guid: 453f023791e970648ab894029528d5b3, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/26 Right Side In.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Mayonnaise Malaise
+    clip: {fileID: 8300000, guid: 9bce33357b2b9464abb5db83de57c307, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/25 Mayonnaise Malaise.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: 'Table: Full of Dread'
+    clip: {fileID: 8300000, guid: e75f6d1b1e392fb4da3a4a3b08b29330, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/24 Table- Full of Dread.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Gifted Week Sweeps
+    clip: {fileID: 8300000, guid: d7dfd48c2c7b8a040a0ad7567b620224, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/23 Gifted Week Sweeps.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Calculating Sense
+    clip: {fileID: 8300000, guid: af6738d924cee6248acaeb91c99af493, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/22 Calculating Sense.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Jobless Hole Watching
+    clip: {fileID: 8300000, guid: 6d130b52d7bb40a4598dc78cc4759a04, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/21 Jobless Hole Watching.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Acceptable Smell
+    clip: {fileID: 8300000, guid: 3f9e0c38824cbdd44a0a09704937057a, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/20 Acceptable Smell.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: High Falutin Bait
+    clip: {fileID: 8300000, guid: dd23db5aa9dccc5408ea1dca0f5100ab, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/19 High Falutin Bait.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Warm Butter
+    clip: {fileID: 8300000, guid: c95dc4ef58b277a4c8cfa2d5c671758d, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/18 Warm Butter.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Thin Authority
+    clip: {fileID: 8300000, guid: 30d4e45e016635646a809473c063f2be, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/17 Thin Authority.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Thoughtless Argument
+    clip: {fileID: 8300000, guid: f65f8b4d78611ac42bbda600cef1da42, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/16 Thoughtless Argument.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Ad Hoc Reward
+    clip: {fileID: 8300000, guid: 21fe95aa499174e47bb639c89c2c60ce, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/15 Ad Hoc Reward.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Cruel Snow
+    clip: {fileID: 8300000, guid: 59b9b92ff4d2c954fa77c4deee3304c7, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/14 Cruel Snow.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Incompetent Duck
+    clip: {fileID: 8300000, guid: ee8abd3d39da81a4e915d45ff6d14387, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/13 Incompetent Duck.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Equal Pigs
+    clip: {fileID: 8300000, guid: 8cc0f662e95ca87429f3339bb008cf1d, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/12 Equal Pigs.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Depressed Taste
+    clip: {fileID: 8300000, guid: 2ac8e1ee8760eb84c9863354add3b2ff, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/11 Depressed Taste.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Stingy Development
+    clip: {fileID: 8300000, guid: 1c0358608ed25514cb8f496ea6d17110, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/10 Stingy Development.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Scent Message
+    clip: {fileID: 8300000, guid: 390d0c37e6816b049971769e7a72e47b, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/09 Scent Message.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Ill Fated Stew
+    clip: {fileID: 8300000, guid: a66e8ef3cff937d41bf3f8b53e2e9284, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/08 Ill Fated Stew.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: '"Synthwave"'
+    clip: {fileID: 8300000, guid: 2a3431ac150c7574cbc9259bb452605f, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/07 -Synthwave-.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: First "Song"
+    clip: {fileID: 8300000, guid: 64ddd1f4d79eaf04cadef308d3cad4a1, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/06 First -Song-.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Illegal Toothpaste
+    clip: {fileID: 8300000, guid: 5a9372baf9e8c304d8764834e59c21f6, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/05 Illegal Toothpaste.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Unsuitable Turn
+    clip: {fileID: 8300000, guid: 5d266424a3a3d92428466939cf52a961, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/04 Unsuitable Turn.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Handy Question
+    clip: {fileID: 8300000, guid: 8a65552498f76924fb793029872e35ed, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/03 Handy Question.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Fertile Cable
+    clip: {fileID: 8300000, guid: 295355ff7b7c8bd41a3520a026b267e8, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/02 Fertile Cable.mp3
+    volume: 1
+    pitch: 1
+    isLooping: 0
+  - name: Frail Noise
+    clip: {fileID: 8300000, guid: c19225aadc4c2d240aaded17609aa4a7, type: 3}
+    ClipAddress: Assets/SFX/Music/bandcamp/01 Frail Noise.mp3
     volume: 1
     pitch: 1
     isLooping: 0
