@@ -1247,7 +1247,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4279900698
   m_fontColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -1288,13 +1288,13 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
-  m_isOrthographic: 0
+  m_isOrthographic: 1
   m_isCullingEnabled: 0
   m_horizontalMapping: 0
   m_verticalMapping: 0
@@ -5191,7 +5191,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -7161,7 +7161,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4279900698
   m_fontColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -7202,13 +7202,13 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
-  m_isOrthographic: 0
+  m_isOrthographic: 1
   m_isCullingEnabled: 0
   m_horizontalMapping: 0
   m_verticalMapping: 0
@@ -9993,6 +9993,7 @@ GameObject:
   - component: {fileID: 504696919}
   - component: {fileID: 504696918}
   - component: {fileID: 504696917}
+  - component: {fileID: 504696920}
   m_Layer: 5
   m_Name: SaveButton
   m_TagString: Untagged
@@ -10114,6 +10115,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 504696914}
   m_CullTransparentMesh: 1
+--- !u!114 &504696920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 504696914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: 1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &506823752
 GameObject:
   m_ObjectHideFlags: 0
@@ -11914,7 +11935,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1234975353}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.2
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -16466,6 +16487,7 @@ MonoBehaviour:
   _rowTemplate: {fileID: 1635149447}
   _message: {fileID: 1370746641}
   _hint: CLICK A BINDING TO CHANGE IT
+  _wasdSwapButton: {fileID: 1537820011}
 --- !u!114 &805806059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16941,7 +16963,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -18140,7 +18162,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &861261646
 RectTransform:
   m_ObjectHideFlags: 0
@@ -19026,6 +19048,7 @@ MonoBehaviour:
   _rowTemplate: {fileID: 2043106658}
   _message: {fileID: 29841104}
   _hint: CLICK A BINDING TO CHANGE IT
+  _wasdSwapButton: {fileID: 0}
 --- !u!114 &920760024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19299,6 +19322,7 @@ GameObject:
   - component: {fileID: 942639399}
   - component: {fileID: 942639398}
   - component: {fileID: 942639397}
+  - component: {fileID: 942639400}
   m_Layer: 5
   m_Name: ResetButton
   m_TagString: Untagged
@@ -19420,6 +19444,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 942639394}
   m_CullTransparentMesh: 1
+--- !u!114 &942639400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942639394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: 1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &942771843
 GameObject:
   m_ObjectHideFlags: 0
@@ -23800,7 +23844,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -25543,6 +25587,143 @@ RectTransform:
   m_AnchoredPosition: {x: 112, y: 0}
   m_SizeDelta: {x: 12, y: 0}
   m_Pivot: {x: 0, y: 0.5}
+--- !u!1 &1186549992
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1186549993}
+  - component: {fileID: 1186549995}
+  - component: {fileID: 1186549994}
+  m_Layer: 5
+  m_Name: Label
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1186549993
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1186549992}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1537820012}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -4, y: -4}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1186549994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1186549992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: SWAP TO W/A/S/D
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: ad172d596dabf3a46b4ef5be6a25e489, type: 2}
+  m_sharedMaterial: {fileID: 4343382523053203784, guid: ad172d596dabf3a46b4ef5be6a25e489, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4279900698
+  m_fontColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 16
+  m_fontSizeBase: 16
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 0
+  m_fontSizeMax: 0
+  m_fontStyle: 0
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 0
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1186549995
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1186549992}
+  m_CullTransparentMesh: 1
 --- !u!1 &1204556050
 GameObject:
   m_ObjectHideFlags: 0
@@ -26460,6 +26641,7 @@ MonoBehaviour:
   _rowTemplate: {fileID: 2050513557}
   _message: {fileID: 1943025941}
   _hint: CLICK A BINDING TO CHANGE IT
+  _wasdSwapButton: {fileID: 0}
 --- !u!114 &1234249814
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26523,7 +26705,7 @@ RectTransform:
   m_Father: {fileID: 453787082}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -27652,7 +27834,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -29022,7 +29204,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4279900698
   m_fontColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -29063,13 +29245,13 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
-  m_isOrthographic: 0
+  m_isOrthographic: 1
   m_isCullingEnabled: 0
   m_horizontalMapping: 0
   m_verticalMapping: 0
@@ -29249,7 +29431,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4279900698
   m_fontColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -29290,13 +29472,13 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
-  m_isOrthographic: 0
+  m_isOrthographic: 1
   m_isCullingEnabled: 0
   m_horizontalMapping: 0
   m_verticalMapping: 0
@@ -30189,6 +30371,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1365294697}
+  - component: {fileID: 1365294698}
   m_Layer: 5
   m_Name: ControlsActions
   m_TagString: Untagged
@@ -30209,6 +30392,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 942639395}
+  - {fileID: 1537820012}
   - {fileID: 504696915}
   m_Father: {fileID: 1768870833}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -30217,6 +30401,32 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 768, y: 432}
   m_Pivot: {x: 0, y: 1}
+--- !u!114 &1365294698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1365294696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_Padding:
+    m_Left: 275
+    m_Right: 83
+    m_Top: 387
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 10
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &1370746640
 GameObject:
   m_ObjectHideFlags: 0
@@ -30264,7 +30474,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4279900698
   m_fontColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -30277,7 +30487,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -30305,13 +30515,13 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
-  m_isOrthographic: 0
+  m_isOrthographic: 1
   m_isCullingEnabled: 0
   m_horizontalMapping: 0
   m_verticalMapping: 0
@@ -31814,6 +32024,7 @@ MonoBehaviour:
   _rowTemplate: {fileID: 1850432646}
   _message: {fileID: 2083395640}
   _hint: CLICK A BINDING TO CHANGE IT
+  _wasdSwapButton: {fileID: 0}
 --- !u!114 &1449906546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33140,6 +33351,160 @@ MonoBehaviour:
           m_BoolArgument: 1
         m_CallState: 2
   _idleIntervalRange: {x: 30, y: 120}
+--- !u!1 &1537820011
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1537820012}
+  - component: {fileID: 1537820015}
+  - component: {fileID: 1537820014}
+  - component: {fileID: 1537820013}
+  - component: {fileID: 1537820016}
+  m_Layer: 5
+  m_Name: SwapToWASD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1537820012
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537820011}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1186549993}
+  m_Father: {fileID: 1365294697}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 415, y: -387}
+  m_SizeDelta: {x: 130, y: 26}
+  m_Pivot: {x: 0, y: 1}
+--- !u!114 &1537820013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537820011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 0.9, g: 0.9, b: 0.9, a: 1}
+    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_PressedColor: {r: 0.62, g: 0.62, b: 0.62, a: 1}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_DisabledColor: {r: 0.55, g: 0.55, b: 0.55, a: 0.5}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.08
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1537820014}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 861261647}
+        m_TargetAssemblyTypeName: ControlsPanelRouter, Assembly-CSharp
+        m_MethodName: SwapMovementToWasd
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &1537820014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537820011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: dce3df6c6e364f943b91961c63919082, type: 3}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1537820015
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537820011}
+  m_CullTransparentMesh: 1
+--- !u!114 &1537820016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537820011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: 1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &1545561392
 GameObject:
   m_ObjectHideFlags: 0
@@ -36255,7 +36620,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -40986,7 +41351,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -47708,6 +48073,540 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.size
+      value: 47
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[3].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d4617709a6b04744185371f3a85c58e8, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[3].name
+      value: Welcome to the Grin Club
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[4].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: c69d9533addfb43428ce03f3d5ed24ef, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[4].name
+      value: Pushy Be Thy Man
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[5].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 90bb62b5b31e25c4e96ec80dd619ae30, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[5].name
+      value: The Fumbling Machine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[6].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 3f103a08f97fb2344b19e8b195142bee, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[6].name
+      value: Faulty Pickups
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[7].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 1a88ade2f9b99664db31f4e56cd9eebb, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[7].name
+      value: Sincere Pity Party
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[8].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: c88cb27cb21a7f648a8c96e5981e572c, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[8].name
+      value: Lacking Distance From The Heart
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[9].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: a04a56e01c4892d4b84f86ddb7de2387, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[9].name
+      value: The Gruesome, Low End
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[10].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 9e9dc0a47db24f54fb09a942c5af7586, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[10].name
+      value: Put Some Spice in Your Juice
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[11].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 19d07add941f1b64c95f24fce788aa45, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[11].name
+      value: Wonderful Tranquilizer For Your Mind's Eye
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[12].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 74dbb03e3082448458688c3d91a5d6bb, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[12].name
+      value: Your Son, In the Abstract
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[13].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 6167438fca137524294ca29200ad8b2a, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[13].name
+      value: Wandering in the Wicka Wild Wild Wilderness Mk.II
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[14].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 53cf451539d7b8441b9bc67b5101f277, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[14].name
+      value: Cheap Beliefs For a Free Society
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[15].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d3e7c2f2eb747a3448b77f9304e53eed, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[15].name
+      value: Office Drugs
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[16].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 2be47ba4727b16443bc51d9f5f2cdae5, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[16].name
+      value: Two Fingers Deep
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[17].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 91f4a1cbe7e20494b9096fd8bf82bb7b, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[17].name
+      value: The Obeisant Man
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[18].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: b2c6dbea2bf15764a92f2c4f599ab809, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[18].name
+      value: More Than Brick
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[19].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 177c5a11f13b9d345a037dd2e8ad78cf, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[19].name
+      value: Bored Nights
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[20].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: ee07f08345d50114da8062e2f6b80b7f, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[20].name
+      value: Sad Cap
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[21].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 453f023791e970648ab894029528d5b3, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[21].name
+      value: Right Side In
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[22].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 9bce33357b2b9464abb5db83de57c307, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[22].name
+      value: Mayonnaise Malaise
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[23].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: e75f6d1b1e392fb4da3a4a3b08b29330, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[23].name
+      value: 'Table: Full of Dread'
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[24].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: d7dfd48c2c7b8a040a0ad7567b620224, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[24].name
+      value: Gifted Week Sweeps
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[25].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: af6738d924cee6248acaeb91c99af493, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[25].name
+      value: Calculating Sense
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[26].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 6d130b52d7bb40a4598dc78cc4759a04, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[26].name
+      value: Jobless Hole Watching
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[27].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 3f9e0c38824cbdd44a0a09704937057a, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[27].name
+      value: Acceptable Smell
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[28].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: dd23db5aa9dccc5408ea1dca0f5100ab, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[28].name
+      value: High Falutin Bait
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[29].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: c95dc4ef58b277a4c8cfa2d5c671758d, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[29].name
+      value: Warm Butter
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[30].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 30d4e45e016635646a809473c063f2be, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[30].name
+      value: Thin Authority
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[31].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: f65f8b4d78611ac42bbda600cef1da42, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[31].name
+      value: Thoughtless Argument
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[32].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 21fe95aa499174e47bb639c89c2c60ce, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[32].name
+      value: Ad Hoc Reward
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[33].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 59b9b92ff4d2c954fa77c4deee3304c7, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[33].name
+      value: Cruel Snow
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[34].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: ee8abd3d39da81a4e915d45ff6d14387, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[34].name
+      value: Incompetent Duck
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[35].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 8cc0f662e95ca87429f3339bb008cf1d, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[35].name
+      value: Equal Pigs
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[36].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 2ac8e1ee8760eb84c9863354add3b2ff, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[36].name
+      value: Depressed Taste
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[37].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 1c0358608ed25514cb8f496ea6d17110, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[37].name
+      value: Stingy Development
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[38].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 390d0c37e6816b049971769e7a72e47b, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[38].name
+      value: Scent Message
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[39].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: a66e8ef3cff937d41bf3f8b53e2e9284, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[39].name
+      value: Ill Fated Stew
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[40].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 2a3431ac150c7574cbc9259bb452605f, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[40].name
+      value: '"Synthwave"'
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[41].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 64ddd1f4d79eaf04cadef308d3cad4a1, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[41].name
+      value: First "Song"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[42].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 5a9372baf9e8c304d8764834e59c21f6, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[42].name
+      value: Illegal Toothpaste
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[43].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 5d266424a3a3d92428466939cf52a961, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[43].name
+      value: Unsuitable Turn
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[44].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 8a65552498f76924fb793029872e35ed, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[44].name
+      value: Handy Question
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[45].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 295355ff7b7c8bd41a3520a026b267e8, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[45].name
+      value: Fertile Cable
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[46].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: c19225aadc4c2d240aaded17609aa4a7, type: 3}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[46].name
+      value: Frail Noise
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[3].ClipAddress
+      value: Assets/SFX/Music/bandcamp/45 Welcome to the Grin Club.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[4].ClipAddress
+      value: Assets/SFX/Music/bandcamp/44 Pushy Be Thy Man.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[5].ClipAddress
+      value: Assets/SFX/Music/bandcamp/43 The Fumbling Machine.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[6].ClipAddress
+      value: Assets/SFX/Music/bandcamp/42 Faulty Pickups.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[7].ClipAddress
+      value: Assets/SFX/Music/bandcamp/41 Sincere Pity Party.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[8].ClipAddress
+      value: Assets/SFX/Music/bandcamp/40 Lacking Distance From The Heart.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[9].ClipAddress
+      value: Assets/SFX/Music/bandcamp/39 The Gruesome, Low End.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[10].ClipAddress
+      value: Assets/SFX/Music/bandcamp/38 Put Some Spice in Your Juice.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[11].ClipAddress
+      value: Assets/SFX/Music/bandcamp/37 Wonderful Tranquilizer For Your Mind's
+        Eye.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[12].ClipAddress
+      value: Assets/SFX/Music/bandcamp/36 Your Son, In the Abstract.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[13].ClipAddress
+      value: Assets/SFX/Music/bandcamp/35 Wandering in the Wicka Wild Wild Wilderness
+        Mk.II.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[14].ClipAddress
+      value: Assets/SFX/Music/bandcamp/33 Cheap Beliefs For a Free Society.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[15].ClipAddress
+      value: Assets/SFX/Music/bandcamp/32 Office Drugs.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[16].ClipAddress
+      value: Assets/SFX/Music/bandcamp/31 Two Fingers Deep.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[17].ClipAddress
+      value: Assets/SFX/Music/bandcamp/30 The Obeisant Man.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[18].ClipAddress
+      value: Assets/SFX/Music/bandcamp/29 More Than Brick.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[19].ClipAddress
+      value: Assets/SFX/Music/bandcamp/28 Bored Nights.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[20].ClipAddress
+      value: Assets/SFX/Music/bandcamp/27 Sad Cap.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[21].ClipAddress
+      value: Assets/SFX/Music/bandcamp/26 Right Side In.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[22].ClipAddress
+      value: Assets/SFX/Music/bandcamp/25 Mayonnaise Malaise.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[23].ClipAddress
+      value: Assets/SFX/Music/bandcamp/24 Table- Full of Dread.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[24].ClipAddress
+      value: Assets/SFX/Music/bandcamp/23 Gifted Week Sweeps.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[25].ClipAddress
+      value: Assets/SFX/Music/bandcamp/22 Calculating Sense.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[26].ClipAddress
+      value: Assets/SFX/Music/bandcamp/21 Jobless Hole Watching.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[27].ClipAddress
+      value: Assets/SFX/Music/bandcamp/20 Acceptable Smell.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[28].ClipAddress
+      value: Assets/SFX/Music/bandcamp/19 High Falutin Bait.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[29].ClipAddress
+      value: Assets/SFX/Music/bandcamp/18 Warm Butter.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[30].ClipAddress
+      value: Assets/SFX/Music/bandcamp/17 Thin Authority.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[31].ClipAddress
+      value: Assets/SFX/Music/bandcamp/16 Thoughtless Argument.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[32].ClipAddress
+      value: Assets/SFX/Music/bandcamp/15 Ad Hoc Reward.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[33].ClipAddress
+      value: Assets/SFX/Music/bandcamp/14 Cruel Snow.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[34].ClipAddress
+      value: Assets/SFX/Music/bandcamp/13 Incompetent Duck.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[35].ClipAddress
+      value: Assets/SFX/Music/bandcamp/12 Equal Pigs.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[36].ClipAddress
+      value: Assets/SFX/Music/bandcamp/11 Depressed Taste.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[37].ClipAddress
+      value: Assets/SFX/Music/bandcamp/10 Stingy Development.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[38].ClipAddress
+      value: Assets/SFX/Music/bandcamp/09 Scent Message.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[39].ClipAddress
+      value: Assets/SFX/Music/bandcamp/08 Ill Fated Stew.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[40].ClipAddress
+      value: Assets/SFX/Music/bandcamp/07 -Synthwave-.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[41].ClipAddress
+      value: Assets/SFX/Music/bandcamp/06 First -Song-.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[42].ClipAddress
+      value: Assets/SFX/Music/bandcamp/05 Illegal Toothpaste.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[43].ClipAddress
+      value: Assets/SFX/Music/bandcamp/04 Unsuitable Turn.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[44].ClipAddress
+      value: Assets/SFX/Music/bandcamp/03 Handy Question.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[45].ClipAddress
+      value: Assets/SFX/Music/bandcamp/02 Fertile Cable.mp3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3483718780386464396, guid: 477c67288e902794d87bae625a25372c, type: 3}
+      propertyPath: songs.Array.data[46].ClipAddress
+      value: Assets/SFX/Music/bandcamp/01 Frail Noise.mp3
+      objectReference: {fileID: 0}
     - target: {fileID: 4194653183813880415, guid: 477c67288e902794d87bae625a25372c, type: 3}
       propertyPath: m_RootOrder
       value: 10

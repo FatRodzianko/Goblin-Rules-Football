@@ -37,6 +37,14 @@ public class ControlsPanelRouter : MonoBehaviour
             panel.ResetAll();
     }
 
+    /// <summary>Wired to SWAP TO W/A/S/D, which only Football's keyboard tab shows and acts on.</summary>
+    public void SwapMovementToWasd()
+    {
+        RebindingPanel panel = Visible();
+        if (panel != null)
+            panel.SwapMovementToWasd();
+    }
+
     private RebindingPanel Visible()
     {
         for (int i = 0; i < _panels.Count; i++)

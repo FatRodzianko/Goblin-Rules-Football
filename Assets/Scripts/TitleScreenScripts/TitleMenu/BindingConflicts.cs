@@ -54,7 +54,12 @@ public static class BindingConflicts
                 bool wasEnabled = map.enabled;
                 if (wasEnabled)
                     map.Disable();
-                map.ApplyBindingOverride(i, new InputBinding { overridePath = previousPath ?? string.Empty });
+                // Handing a binding back its shipped key clears the override rather than saving a
+                // copy of the default.
+                string overridePath = previousPath ?? string.Empty;
+                if (string.Equals(candidate.path, overridePath, StringComparison.OrdinalIgnoreCase))
+                    overridePath = null;
+                map.ApplyBindingOverride(i, new InputBinding { overridePath = overridePath });
                 if (wasEnabled)
                     map.Enable();
 

@@ -35,6 +35,9 @@ public class RebindingPanel : MonoBehaviour
     [Tooltip("Shown when nothing has just happened.")]
     [SerializeField] private string _hint = "CLICK A BINDING TO CHANGE IT";
 
+    [Tooltip("SWAP TO W/A/S/D on the bottom bar. Only Football's keyboard tab offers it: it is shown while that tab is open, and leaving this empty on the other tabs keeps it hidden there.")]
+    [SerializeField] private GameObject _wasdSwapButton;
+
     private readonly List<RebindRow> _rows = new List<RebindRow>();
     private readonly List<InputActionMap> _scope = new List<InputActionMap>();
     private InputActionRebindingExtensions.RebindingOperation _operation;
@@ -54,12 +57,14 @@ public class RebindingPanel : MonoBehaviour
     private void OnEnable()
     {
         BuildRows();
+        ShowWasdSwapButton(true);
     }
 
     private void OnDisable()
     {
         CancelRebind();
         CleanUpOperation();
+        ShowWasdSwapButton(false);
     }
 
     private InputActionAsset Asset
@@ -97,33 +102,56 @@ public class RebindingPanel : MonoBehaviour
         Listen(row.Action, index, wholeComposite);
     }
 
-    /// <summary>Puts this row's binding back to the one the game ships with.</summary>
+    /// <summary>
+    /// Puts this row's binding back to the one the game ships with. If something else has moved onto
+    /// that key since, it takes the key this row gives up, exactly as in a rebind by hand.
+    /// </summary>
     public void ResetRow(RebindRow row)
     {
         if (row == null || row.Action == null)
             return;
         InputAction action = row.Action;
-        InputActionMap map = action.actionMap;
-        bool wasEnabled = map.enabled;
-        if (wasEnabled)
-            map.Disable();
+        var displaced = new List<string>();
 
         if (row.IsComposite)
         {
             for (int i = row.BindingIndex + 1; i < action.bindings.Count && action.bindings[i].isPartOfComposite; i++)
-                action.RemoveBindingOverride(i);
+                ResetBinding(action, i, displaced);
         }
         else
         {
-            action.RemoveBindingOverride(row.BindingIndex);
+            ResetBinding(action, row.BindingIndex, displaced);
         }
+        if (OffersWasdSwap && WasdMovementSwap.IsMovement(action))
+            WasdMovementSwap.MatchSteeringToMovement(Asset, _controlScheme);
 
+        RefreshRows();
+        for (int i = 0; i < displaced.Count; i++)
+            HighlightRowFor(displaced[i]);
+        if (displaced.Count > 0)
+            SetMessage("Other keys swapped to keep every binding unique.");
+        if (_store != null)
+            _store.Save();
+    }
+
+    private void ResetBinding(InputAction action, int bindingIndex, List<string> displaced)
+    {
+        string previousPath = action.bindings[bindingIndex].effectivePath;
+
+        // Overrides cannot be changed on a map that is running.
+        InputActionMap map = action.actionMap;
+        bool wasEnabled = map.enabled;
+        if (wasEnabled)
+            map.Disable();
+        action.RemoveBindingOverride(bindingIndex);
         if (wasEnabled)
             map.Enable();
 
-        RefreshRows();
-        if (_store != null)
-            _store.Save();
+        if (string.Equals(previousPath, action.bindings[bindingIndex].effectivePath, System.StringComparison.OrdinalIgnoreCase))
+            return;
+        string moved = BindingConflicts.SwapWithConflict(_scope, action, bindingIndex, previousPath);
+        if (moved != null)
+            displaced.Add(moved);
     }
 
     /// <summary>Wired to RESET TO DEFAULT. Puts every binding in this game's asset back.</summary>
@@ -137,6 +165,36 @@ public class RebindingPanel : MonoBehaviour
             _store.ResetFootball();
         RefreshRows();
         SetMessage("All bindings reset.");
+    }
+
+    /// <summary>
+    /// Wired to SWAP TO W/A/S/D. Moves movement onto the letters and whatever was on them onto the
+    /// arrows, then saves, the same as a rebind by hand.
+    /// </summary>
+    public void SwapMovementToWasd()
+    {
+        if (!OffersWasdSwap)
+            return;
+        CancelRebind();
+
+        bool changed;
+        List<string> displaced = WasdMovementSwap.Apply(Asset, _scope, _controlScheme, out changed);
+        if (displaced == null)
+            return;
+
+        RefreshRows();
+        if (!changed)
+        {
+            SetMessage("Movement is already on W/A/S/D.");
+            return;
+        }
+
+        HighlightRowFor("Move");
+        for (int i = 0; i < displaced.Count; i++)
+            HighlightRowFor(displaced[i]);
+        if (_store != null)
+            _store.Save();
+        SetMessage("Movement swapped to W/A/S/D.");
     }
 
     /// <summary>Wired to SAVE.</summary>
@@ -336,6 +394,14 @@ public class RebindingPanel : MonoBehaviour
                 return true;
         }
         return false;
+    }
+
+    private bool OffersWasdSwap { get { return _wasdSwapButton != null && !_isGolf; } }
+
+    private void ShowWasdSwapButton(bool shown)
+    {
+        if (_wasdSwapButton != null)
+            _wasdSwapButton.SetActive(shown);
     }
 
     private void SetMessage(string text)
