@@ -3367,12 +3367,12 @@ public class GoblinScript : NetworkBehaviour
             GameObject footBallLandingSpot = GameObject.FindGameObjectWithTag("footballLandingTarget");
             if (footBallLandingSpot != null)
             {
-                Debug.Log("MoveTowardFootball: footBallLandingSpot found!");
+                //Debug.Log("MoveTowardFootball: footBallLandingSpot found!");
                 targetPosition = footBallLandingSpot.transform.position;
             }
             else
             {
-                Debug.Log("MoveTowardFootball: could not find the football landing spot idk how.");
+                //Debug.Log("MoveTowardFootball: could not find the football landing spot idk how.");
                 targetPosition = gameFootball.transform.position;
             }
         }
@@ -4726,7 +4726,7 @@ public class GoblinScript : NetworkBehaviour
             return willDive;
         else
             diveCheckTime = Time.time;
-        Debug.Log("DiveOverObstacles: running trip obstacle checks for this Goblin: " + this.name + ":" + this.ownerConnectionId.ToString());
+        //Debug.Log("DiveOverObstacles: running trip obstacle checks for this Goblin: " + this.name + ":" + this.ownerConnectionId.ToString());
 
         // make sure that the diving routine/cool down isn't running? It is a syncvar so clients should know as well?
         if (this.DivingRoutineRunning)

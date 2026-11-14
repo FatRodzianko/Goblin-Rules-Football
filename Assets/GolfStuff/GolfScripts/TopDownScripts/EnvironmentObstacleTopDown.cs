@@ -240,13 +240,13 @@ public class EnvironmentObstacleTopDown : MonoBehaviour
                 if (_isSpinningHoop)
                 {
                     SpinningHoopCollision(golfBallScript);
-                    Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: Done with spinning hoop checks");
+                    //Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: Done with spinning hoop checks");
                     return;
                 }
                 if (_isTube)
                 {
                     TubeOnStayCollision(golfBallScript);
-                    Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: Done with TUBE checks");
+                    //Debug.Log("EnvironmentObstacleTopDown: OnTriggerStay2D: Done with TUBE checks");
                     return;
                 }
                 return;

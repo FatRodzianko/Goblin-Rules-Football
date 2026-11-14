@@ -27,6 +27,7 @@ public class CowboyScript : NetworkBehaviour
     public bool isCowboyBelowExit = false;
     public bool waitingToSmoke = false;
     Vector2 directionToMove = Vector2.zero;
+    bool? _sentFlip;
     IEnumerator waitingToSmokeRoutine;
     public int numberOfSmokes = 0;
     List<int> playersReceivedYeehawFromNetIds = new List<int>();
@@ -86,10 +87,7 @@ public class CowboyScript : NetworkBehaviour
             }
             myRb.MovePosition(myRb.position + directionToMove * walkingSpeed * Time.fixedDeltaTime);
             myAnimator.SetBool("isWalking", true);
-            if (directionToMove.x < 0)
-                RpcFlipRenderer(true);
-            else
-                RpcFlipRenderer(false);
+            SendFlipToObservers(directionToMove.x < 0);
             if (Mathf.Abs(myRb.position.x - destinationPoint.x) <= 0.1f && !doesCowboyExitNow)
             {
                 if (!waitingToSmoke)
@@ -100,6 +98,15 @@ public class CowboyScript : NetworkBehaviour
                 }
             }
         }
+    }
+    // Only a change crosses the network. Empty until the first step, so the first facing always goes out.
+    [Server]
+    void SendFlipToObservers(bool flip)
+    {
+        if (_sentFlip == flip)
+            return;
+        _sentFlip = flip;
+        RpcFlipRenderer(flip);
     }
     [ObserversRpc]
     void RpcFlipRenderer(bool flip)

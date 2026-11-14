@@ -37,6 +37,9 @@ public class GolfBallTopDown : NetworkBehaviour
     [Header("Trail")]
     [SerializeField] TrailRenderer trail;
     [SerializeField] ParticleSystem _rocketParticle;
+    // What the other players' copies of this ball are showing, as far as the owner has told them. Starts off, as the
+    // prefab's trail does.
+    bool _trailEnabledForOtherPlayers = false;
 
     [Header("Ball Status")]
     public bool isHit = false;
@@ -255,7 +258,7 @@ public class GolfBallTopDown : NetworkBehaviour
             if (!trail.enabled && !this.PlayerUsingRocket)
             {
                 trail.enabled = true;
-                CmdEnableTrailForOtherPlayers(true);
+                SendTrailToOtherPlayers(true);
             }
         }
         else if (isRolling)
@@ -270,7 +273,7 @@ public class GolfBallTopDown : NetworkBehaviour
             if (!trail.enabled && !this.PlayerUsingRocket)
             {
                 trail.enabled = true;
-                CmdEnableTrailForOtherPlayers(true);
+                SendTrailToOtherPlayers(true);
             }
 
 
@@ -285,8 +288,17 @@ public class GolfBallTopDown : NetworkBehaviour
             if (trail.enabled)
                 trail.enabled = false;
 
-            CmdEnableTrailForOtherPlayers(false);
+            SendTrailToOtherPlayers(false);
         }
+    }
+    // Only a change crosses the network. The local trail can't be the guard: OwnerUpdateTasks switches it off in
+    // Update without telling anyone, so it often reads off before the "off" has been sent.
+    void SendTrailToOtherPlayers(bool enable)
+    {
+        if (enable == _trailEnabledForOtherPlayers)
+            return;
+        _trailEnabledForOtherPlayers = enable;
+        CmdEnableTrailForOtherPlayers(enable);
     }
     void MoveBallOnTrajectory()
     {
@@ -2496,6 +2508,8 @@ public class GolfBallTopDown : NetworkBehaviour
                 _rocketParticle.Play();
                 trail.enabled = false;
                 CmdEnableRocketParticleForOtherPlayers(enable);
+                // The rocket RPC switches the other players' trail off as well.
+                _trailEnabledForOtherPlayers = false;
             }
         }
         else
@@ -2505,6 +2519,8 @@ public class GolfBallTopDown : NetworkBehaviour
                 _rocketParticle.Stop();
                 trail.enabled = true;
                 CmdEnableRocketParticleForOtherPlayers(enable);
+                // And back on: the ball stopping must still send the "off" that follows.
+                _trailEnabledForOtherPlayers = true;
             }
             this._rocketParticle.gameObject.SetActive(enable);
         }

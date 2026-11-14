@@ -138,14 +138,14 @@ public class PowerUpThrownObject : NetworkBehaviour
     [Server(Logging = LoggingType.Off)]
     private void OnTriggerStay2D(Collider2D collision)
     {
-        Debug.Log("OnTriggerStay2D for ObstacleObject: " + this.name);
+        //Debug.Log("OnTriggerStay2D for ObstacleObject: " + this.name);
         if (!slowObject)
             return;
         if (collision.tag == "Goblin")
         {
             if (slowObject && !isThrown)
             {
-                Debug.Log("ObstacleObject: still colliding with goblin named: " + collision.transform.name);
+                //Debug.Log("ObstacleObject: still colliding with goblin named: " + collision.transform.name);
                 collision.transform.gameObject.GetComponent<GoblinScript>().SlowDownObstacleEffect(true);
                 collision.transform.gameObject.GetComponent<GoblinScript>().onGlueSlowDown = this.isGlue;
                 collision.transform.gameObject.GetComponent<GoblinScript>().onWaterSlowDown = this.isWater;
@@ -160,7 +160,7 @@ public class PowerUpThrownObject : NetworkBehaviour
     [Server(Logging = LoggingType.Off)]
     private void OnTriggerExit2D(Collider2D collision)
     {
-        Debug.Log("OnTriggerStay2D for ObstacleObject: " + this.name);
+        //Debug.Log("OnTriggerStay2D for ObstacleObject: " + this.name);
         if (!slowObject)
             return;
         if (collision.tag == "Goblin")

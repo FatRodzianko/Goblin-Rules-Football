@@ -46,7 +46,7 @@ public class TubeScript : MonoBehaviour
         _distanceTraveled = _ballDistanceToTravel * _movePercentage;
 
         Vector3 newPoint = _ballStartingPoint + (Vector3)(_ballMovementDirection * _distanceTraveled);
-        Debug.Log("TubeScript: newPoint is: " + newPoint.ToString() + " based on starting point: " + _ballStartingPoint.ToString() + " movement direction: " + _ballMovementDirection.ToString() + " distanced traveled: " + _distanceTraveled.ToString() + " out of: " + _ballDistanceToTravel.ToString());
+        //Debug.Log("TubeScript: newPoint is: " + newPoint.ToString() + " based on starting point: " + _ballStartingPoint.ToString() + " movement direction: " + _ballMovementDirection.ToString() + " distanced traveled: " + _distanceTraveled.ToString() + " out of: " + _ballDistanceToTravel.ToString());
         _ballToMove.transform.position = newPoint;
 
     }
